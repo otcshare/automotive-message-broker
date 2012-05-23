@@ -1,0 +1,17 @@
+#ifndef _VehicleSpeed_H_
+#define _VehicleSpeed_H_
+
+#include "propertytypes/abstractproperty.h"
+
+class VehicleSpeed: public AbstractProperty
+{
+public:
+	VehicleSpeed(): AbstractProperty("Velocity","i")
+	{
+	
+	}
+	
+	void setValue(boost::any val );
+};
+
+#endif

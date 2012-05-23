@@ -1,0 +1,121 @@
+Running Status hierarchy
+=================
+
+Service         org.automotive
+Interface       org.automotive.runningstatus
+Object path     /
+
+Properties	byte VehiclePowerMode [readonly]
+			
+				Off = 0,
+				Accessory1 = 1,
+				Accessory2 = 2,
+				Run = 3
+				
+			uint16 VehicleSpeed [readonly]
+			
+				Velocity of vehicle in kph.
+
+			uint16 EngineSpeed [readonly]
+			
+				Engine speed in rotations per minute (RPM)
+				
+			array{uint32} TripMeter [readonly]
+			
+				Distance from trip meter(s) in km.
+				
+			byte TransmissionGearStatus [readonly]
+			
+				Neautral = 0,
+				1st = 1,
+				2nd = 2,
+				3rd = 3,
+				4th = 4,
+				5th = 5,
+				6th = 6,
+				7th = 7,
+				8th = 8,
+				9th = 9,
+				10th = 10,
+				Reverse = 64,
+				Auto = 128
+				
+			struct{bool, uint16} CruiseControlStatus [readonly]
+			
+				Activated/Deactivated, Speed in kph.
+				
+			bool WheelBrake [readonly]
+			
+				Engaged = true
+				Idle = false
+				
+			dict{byte, bool} LightStatus [readonly]
+			
+				Light (uint16), On=true/Off=false
+				Light Type:
+				Head = 0,
+				RightTurn = 1,
+				LeftTurn = 2,
+				Brake = 3,
+				Fog = 4,
+				Hazard = 5,
+				Parking = 6,
+				HighBeam = 7
+				
+			dict{byte, bool} InteriorLightStatus [readonly]
+			
+				Interior Light (uint16), On = true / Off = false
+				Interior Light Type:
+				Driver = 0,
+				Passenger = 1,
+				Center = 2
+				
+			bool Horn [readonly]
+				
+				On = true / Off = false
+				
+			bool Chime [readonly]
+			
+				On = true / Off = false
+				
+			byte FuelLevel [readonly]
+			
+				Remaining percentage of fuel.
+				
+			uint16 FuelRange
+			
+				Estimated fuel range with available fuel in km
+				
+			struct{ byte, byte, byte } EngineOil
+			
+				Remaining Oil Percentage (byte)
+				Engine Oil Temperature (byte)
+				Engine Oil Pressure (byte)
+				
+			struct{ byte, byte } EngineCoolant
+			
+				Level (byte)
+				Temperature (byte)
+				
+			struct{ uint16, uint16, uint16 } Acceleration
+			
+				X, Y and Z acceleration in m/s*s
+			
+			struct{ uint16, uint16, byte, uint32 } VehicleOdometry
+			
+				x_mm (uint16)
+				y_mm (uint16)
+				angle (byte)
+				timestamp (in number of seconds since unix epoch: Jan 1, 1970) (uint32)
+				
+			uint16 SteeringWheelAngle
+			
+				Angle of the steering wheel (0-360)
+				
+			struct{ uint16, uint16 } WheelTickSensor
+			
+				Left wheel rotation counter (uint16)
+				Right wheel rotation counter (uint16)
+				
+				
+				

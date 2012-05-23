@@ -1,0 +1,13 @@
+
+namespace VehicleType
+{
+	enum Type
+	{
+		Sedan=0,
+		Coupe,
+		Cabriole,
+		Roadster,
+		SUV,
+		Truck
+	};
+}

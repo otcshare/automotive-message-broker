@@ -1,0 +1,38 @@
+Maintenance hierarchy
+=================
+
+Service         org.automotive
+Interface       org.automotive.maintenance
+Object path     /
+
+Properties	uint32 Odometer [readonly]
+
+				Distance in km
+				
+			byte TransmissionFluid [readonly]
+			
+				Remaining percentage
+			
+			byte BrakeFluid [readonly]
+			
+				Remaining percentage
+				
+			byte WasherFluid [readonly]
+			
+				Remaining percentage
+				
+			struct{ double, double } BatteryStatus [readonly]
+			
+				Voltage (double)
+				Current (double)
+				
+			dict{ byte, double } TirePressure [readonly]
+			
+				Tire (byte), Pressure (kPa)
+				Tire:
+				RightFront = 0,
+				LeftFront = 1,
+				RightRear = 2,
+				LeftRear = 3
+				
+			

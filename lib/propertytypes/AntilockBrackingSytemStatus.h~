@@ -1,0 +1,22 @@
+#ifndef _VEHICLEINFOINTERFACE_H_
+#define _VEHICLEINFOINTERFACE_H_
+
+#include "abstractproperty.h"
+
+class AntilockBrakingSystem : public AbstractProperty
+{
+	enum Status
+	{
+		Idle = 0,
+		Engaged = 1
+	};
+	
+	AntilockBrakingSystem()
+	:
+	{
+		
+	}
+}
+
+
+#endif

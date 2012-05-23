@@ -1,0 +1,20 @@
+
+include_directories(${CMAKE_SOURCE_DIR})
+
+set(exampleplugin_headers exampleplugin.h)
+set(exampleplugin_sources exampleplugin.cpp)
+add_library(exampleplugin MODULE ${exampleplugin_sources})
+set_target_properties(exampleplugin PROPERTIES PREFIX "")
+
+if(use_qtcore)
+	if(nobdy_compat)
+		pkg_check_modules(nobdy REQUIRED nobdy)
+		set(nobdyplugin_headers nobdycompatplugin.h)
+		set(nobdyplugin_sources nobdycompatplugin.cpp)
+		qt4_wrap_cpp(nobdy_moc_sources ${nobdyplugin_headers})
+		add_library(nobdyplugin MODULE ${nobdyplugin_sources} ${nobdy_moc_sources})
+		set_target_properties(nobdyplugin PROPERTIES PREFIX "")
+		include_directories(${nobdy_INCLUDE_DIRS} ${include_dirs})
+		target_link_libraries(nobdyplugin ${nobdy_LIBRARIES} -lnobdy2 -L${CMAKE_CURRENT_BINARY_DIR} ${link_libraries})
+	endif(nobdy_compat)
+endif(use_qtcore)
