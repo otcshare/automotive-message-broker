@@ -18,19 +18,19 @@
 #ifndef RUNNINGSTATUSINTERFACE_H
 #define RUNNINGSTATUSINTERFACE_H
 
-#include <lib/abstractdbusinterface.h>
+#include "abstractdbusinterface.h"
 
 
 class RunningStatusInterface : public AbstractDBusInterface
 {
 public:
-    RunningStatusInterface();
+	RunningStatusInterface();
 
 	static RunningStatusInterface* iface;
 	
 protected:
-    virtual GVariant* getProperty(std::string propertyName);
-    virtual void setProperty(std::string propertyName, GVariant* value);
+	virtual GVariant* getProperty(std::string propertyName);
+	virtual void setProperty(std::string propertyName, GVariant* value);
 };
 
 

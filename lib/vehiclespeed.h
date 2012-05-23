@@ -18,7 +18,7 @@
 #ifndef VEHICLESPEED_H
 #define VEHICLESPEED_H
 
-#include "propertytypes/abstractproperty.h"
+#include "abstractproperty.h"
 
 class VehicleSpeedProperty : public AbstractProperty
 {

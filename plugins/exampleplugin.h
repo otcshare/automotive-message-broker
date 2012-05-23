@@ -18,7 +18,7 @@
 #ifndef EXAMPLEPLUGIN_H
 #define EXAMPLEPLUGIN_H
 
-#include "propertytypes/vehiclespeed.h"
+#include "vehiclespeed.h"
 
 class ExamplePlugin 
 {
