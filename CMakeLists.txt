@@ -3,12 +3,16 @@ cmake_minimum_required(VERSION 2.8)
 
 include(FindPkgConfig)
 
+set(PROJECT_NAME "automotive-message-broker")
+set(PROJECT_VERSION "0.0.1")
+
+add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
+add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
+
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" CACHE STRING "Directory where lib will install")
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
-
-set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.0.1")
+set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "The directory the docs will be installed to")
 
 option(use_qtcore "Use QCoreApplication mainloop " OFF)
 option(nobdy_compat "Build nobdy compatibility plugin" OFF)
@@ -43,3 +47,4 @@ add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/c
 add_subdirectory(lib)
 add_subdirectory(ambd)
 add_subdirectory(plugins)
+add_subdirectory(docs)

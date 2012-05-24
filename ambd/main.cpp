@@ -1,4 +1,17 @@
 #include <iostream>
+#include <string>
+#include <getopt.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pwd.h>
+#include <grp.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <signal.h>
+#include <string.h>
 
 #ifdef USE_QT_CORE
 
@@ -15,19 +28,84 @@
 
 using namespace std;
 
-int main(int argc, char **argv) {
-    
+#ifndef USE_QT_CORE
+
+GMainLoop* mainLoop = nullptr;
+
+#endif
+
+void interrupt(int sign)
+{
+	signal(sign, SIG_IGN);
+	cout<<"Signal caught. Exiting gracefully.\n"<<endl;
+	
+#ifdef USE_QT_CORE
+	QCoreApplication::exit(0);
+#else
+	g_main_loop_quit(mainLoop);
+	exit(0);
+#endif
+}
+
+void daemonize();
+
+void printhelp(const char *argv0);
+
+static const char shortopts[] = "hvdp:";
+
+static const struct option longopts[] = {
+	{ "help", no_argument, NULL, 'h' }, ///< Print the help text
+	{ "version", no_argument, NULL, 'v' }, ///< Print the version text
+	{ "daemonise", no_argument, NULL, 'd' }, ///< Daemonise
+	{ "plugin", required_argument, NULL, 'p' },
+	{ NULL, 0, NULL, 0 } ///< End
+};
+
+int main(int argc, char **argv) 
+{
+
+	bool isdeamonize=false;
+	int optc;
+	string plugin;
+	
+	while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
+	{
+		switch (optc)
+		{
+			case 'd':
+				isdeamonize = true;
+				break;
+				
+			case 'v':
+				cout<<PROJECT_NAME<<endl;
+				cout<<"Version: "<<PROJECT_VERSION<<endl;
+				return (0);
+				break;
+			case 'p':
+				cout<<"plugin: "<<optarg<<endl;
+				plugin=optarg;
+				break;
+			default:
+				cerr<<"Unknown option "<<optc<<endl;
+				printhelp(argv[0]);
+				return (0);
+				break;
+		}
+	}
+	if(isdeamonize)
+		daemonize();
+	
 #ifdef USE_QT_CORE
 
 	QCoreApplication app(argc,argv);
 
 #else
 
-	GMainLoop* mainLoop = g_main_loop_new(NULL, false);
+	mainLoop = g_main_loop_new(NULL, false);
 	
 #endif
 	
-	PluginLoader loader("plugins/nobdyplugin.so");
+	PluginLoader loader(plugin);
 	
 	if(!loader.load())
 		return -1;
@@ -46,3 +124,43 @@ int main(int argc, char **argv) {
 	
 	return 0;
 }
+
+void daemonize()
+{
+	int i=0;
+	if(getppid() == 1)
+	{
+		return;	// already a daemon
+	}
+	if((i = fork()) < 0)
+	{
+		fprintf(stderr, "%s:%s(%d) - fork error: %s", __FILE__, __FUNCTION__, __LINE__, strerror(errno));
+		exit(1);
+	}
+	if(i > 0)
+	{
+		exit(0);	// parent exits
+	}	// child (daemon) continues
+	setsid();	// obtain a new process group
+	for(i = getdtablesize(); i >= 0; --i)
+	{
+		close(i);	// close all descriptors
+	}
+	{	// handle standard I/O
+	i = open("/dev/null", O_RDWR);
+	dup(i);
+	dup(i);
+	}
+	// first instance continues
+}
+
+void printhelp(const char *argv0)
+{
+	printf("Usage: %s [args]\n"
+	"   [-d|--daemonise]\n"
+	"   [-v|--version]\n"
+	"   [-p]--plugin <pathtoplugin> \t]"
+	"   [-h|--help]\n"
+	, argv0);
+}
+
