@@ -7,43 +7,44 @@ Object path     /
 
 Properties	string WMI [readonly]
 
-				World Manufacturer Identifier as defined by SAE. 3 characters.
+			World Manufacturer Identifier as defined by SAE. 3 characters.
 
-			string VIN [readonly]
+		string VIN [readonly]
 
-				Vehicle Identification Number as defined by ISO 3779. 17 characters.
-				
-			byte VehicleType [readonly]
-				
-				Vehicle Type: Sedan = 0,
-				Coupe = 1,
-				Cabriole = 2,
-				Roadster = 3,
-				SUV = 4,
-				Truck = 5
-				
-			array{ byte } DoorType [readonly]
-				
-				Number of doors in each row.  The index represents the row.  Position '0'
-				represents the first row, '1' the second row etc.
-
-				Example a common mini-van may have DoorType[0] = 2 doors,
-				DoorType[1] = 1 (side door), DoorType[2] = 1 (trunk).
-				
-			byte EngineType [readonly]
+			Vehicle Identification Number as defined by ISO 3779. 17 characters.
 			
-				Gasoline = 0,
-				Diesel = 1,
-				Hybrid = 2,
-				Electric = 3
+		byte VehicleType [readonly]
+			
+			Vehicle Type: Sedan = 0,
+			Coupe = 1,
+			Cabriole = 2,
+			Roadster = 3,
+			SUV = 4,
+			Truck = 5
+			
+		array{ byte } DoorType [readonly]
+			
+			Number of doors in each row.  The index represents the row.  Position '0'
+			represents the first row, '1' the second row etc.
+
+			Example a common mini-van may have DoorType[0] = 2 doors,
+			DoorType[1] = 1 (side door), DoorType[2] = 1 (trunk).
+			
+		byte EngineType [readonly]
 		
-			byte TransmissionGearType [readonly]
+			Gasoline = 0,
+			Diesel = 1,
+			Hybrid = 2,
+			Electric = 3
+	
+		byte TransmissionGearType [readonly]
+		
+			Auto = 0,
+			Manual = 1,
+			CVT
 			
-				Auto = 0,
-				Manual = 1
-				
-			struct{ double, double } WheelInformation [readonly]
-			
-				Radius of Wheel, Wheel Track.
+		struct{ double, double } WheelInformation [readonly]
+		
+			Radius of Wheel, Wheel Track.
 				
 			

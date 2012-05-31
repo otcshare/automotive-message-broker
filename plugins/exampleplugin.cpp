@@ -20,6 +20,7 @@
 ExamplePlugin::ExamplePlugin()
 {
 	VehicleSpeedProperty* speed = new VehicleSpeedProperty();
+	speed->setValue((uint16_t)5);
 }
 
 extern "C" void create()

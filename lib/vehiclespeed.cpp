@@ -17,24 +17,25 @@
 
 #include "vehiclespeed.h"
 #include "runningstatusinterface.h"
+#include "debugout.h"
 
 #include <glib.h>
 
-VehicleSpeedProperty::VehicleSpeedProperty(): AbstractProperty("VehicleSpeed", "i")
+VehicleSpeedProperty::VehicleSpeedProperty(): AbstractProperty("VehicleSpeed", "q", AbstractProperty::Read)
 {
 	if(RunningStatusInterface::iface == nullptr)
 	{
 		new RunningStatusInterface();
 	}
 
-	RunningStatusInterface::iface->addProperty(mPropertyName, mSignature);
+	RunningStatusInterface::iface->addProperty(this);
 }
 
 void VehicleSpeedProperty::setValue(boost::any val)
 {
 	AbstractProperty::setValue(val);
 	
-	RunningStatusInterface::iface->updateValue(mPropertyName, val);
+	RunningStatusInterface::iface->updateValue(this);
 }
 
 GVariant* VehicleSpeedProperty::toGVariant()
@@ -46,9 +47,12 @@ GVariant* VehicleSpeedProperty::toGVariant()
 	}
 	catch (...)
 	{
-		return nullptr;
+		cerr<<"Could not cast VehicleSpeedProperty.  Maybe value is not uint16?";
+		throw -1;
 	}
 
+	debugOut("TRACE");
+	
 	return g_variant_new_uint16(v);
 }
 

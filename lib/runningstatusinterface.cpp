@@ -18,11 +18,14 @@
 #include "runningstatusinterface.h"
 #include <iostream>
 
+#include "debugout.h"
+
 using namespace std;
 
 RunningStatusInterface* RunningStatusInterface::iface = nullptr;
 
-RunningStatusInterface::RunningStatusInterface(): AbstractDBusInterface(DBusServiceName".RunningStatus", "/runningStatus")
+RunningStatusInterface::RunningStatusInterface()
+	: AbstractDBusInterface(DBusServiceName".RunningStatus", "/runningStatus")
 {
 	if(iface != nullptr)
 	{
@@ -36,12 +39,23 @@ RunningStatusInterface::RunningStatusInterface(): AbstractDBusInterface(DBusServ
 
 GVariant* RunningStatusInterface::getProperty(std::string propertyName)
 {
-
+	debugOut("TRACE");
+	if(properties.count(propertyName))
+		return properties[propertyName]->toGVariant();
+	else
+		throw -1;
 }
 
 void RunningStatusInterface::setProperty(std::string propertyName, GVariant* value)
 {
-
+	if(properties.count(propertyName))
+	{
+		properties[propertyName]->fromGVariant(value);
+	}
+	else
+	{
+		throw -1;
+	}
 }
 
 

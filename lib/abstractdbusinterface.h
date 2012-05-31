@@ -24,16 +24,9 @@
 #include <gio/gio.h>
 #include <boost/any.hpp>
 
+#include "abstractproperty.h"
+
 using namespace std;
-
-typedef function<void (boost::any)> SetterFunc;
-
-struct PropertyNameSignaturePair {
-	string name;
-	string signature;
-	boost::any value;
-	SetterFunc setter;
-};
 
 class AbstractDBusInterface
 {
@@ -44,9 +37,8 @@ public:
 	
 	void registerObject(GDBusConnection* connection);
 	
-	void addProperty(string name, string signature);
-	void addProperty(string name, string signature, SetterFunc setter);
-	virtual void updateValue(string name, boost::any value);
+	void addProperty(AbstractProperty* property);
+	virtual void updateValue(AbstractProperty* property);
 	
 protected:
 	
@@ -56,7 +48,7 @@ protected:
 	virtual void setProperty(string propertyName, GVariant * value) = 0;
 	virtual GVariant * getProperty(string propertyName) = 0;
 	
-	unordered_map<string, PropertyNameSignaturePair> properties;
+	unordered_map<string, AbstractProperty*> properties;
 
 private:
 	string mInterfaceName;

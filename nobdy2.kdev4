@@ -1,4 +1,4 @@
 [Project]
-Name=nobdy2
 Manager=KDevCMakeManager
+Name=automotive-message-broker
 VersionControl=kdevgit

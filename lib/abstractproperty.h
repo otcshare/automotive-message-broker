@@ -21,18 +21,26 @@
 #include <string>
 #include <functional>
 #include <boost/any.hpp>
-
-#include "abstractdbusinterface.h"
+#include <glib.h>
 
 
 using namespace std;
+
+typedef function<void (boost::any)> SetterFunc;
 
 class AbstractProperty
 {
 
 public:
-	AbstractProperty(string propertyName, string signature);
 
+	enum Access {
+		Read,
+		Write,
+		ReadWrite
+	};
+
+	AbstractProperty(string propertyName, string signature, Access access);
+	
 	virtual void setSetterFunction(SetterFunc setterFunc)
 	{
 		mSetterFunc = setterFunc;
@@ -49,6 +57,16 @@ public:
 	{
 		return mSignature;
 	}
+	
+	virtual string name() 
+	{
+		return mPropertyName;
+	}
+
+	virtual Access access()
+	{
+		return mAccess;
+	}
 
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
@@ -58,6 +76,7 @@ protected:
 	string mSignature;
 	SetterFunc mSetterFunc;
 	boost::any mValue;
+	Access mAccess;
 };
 
 #endif // ABSTRACTPROPERTY_H

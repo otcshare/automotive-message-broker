@@ -16,6 +16,7 @@
 
 
 #include "abstractdbusinterface.h"
+#include "debugout.h"
 #include <boost/algorithm/string.hpp>
 #include <gio/gio.h>
 
@@ -24,34 +25,25 @@ unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMa
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectPath)
 : mInterfaceName(interfaceName), mObjectPath(objectPath)
 {
+	mConnection = nullptr;
+
 	interfaceMap[interfaceName] = this;
 	introspectionXml ="<node>" ;
 	introspectionXml += "<interface name='"+ interfaceName + "' >";
 }
 
-void AbstractDBusInterface::addProperty(string name, string signature)
+void AbstractDBusInterface::addProperty(AbstractProperty* property)
 {
-	string nameToLower = name;
+	string nameToLower = property->name();
 	boost::algorithm::to_lower<string>(nameToLower);
 	
 	///see which properties are supported:
-	introspectionXml += 	"<property type='"+ signature + "' name='"+name+"' access='read' />"
-	"<signal name='" + name + "' >"
-	"	<arg type='"+ signature + "' name='" + nameToLower + "' direction='out' />"
+	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='read' />"
+	"<signal name='" + property->name() + "' >"
+	"	<arg type='"+ property->signature() + "' name='" + nameToLower + "' direction='out' />"
 	"</signal>";
 	
-	PropertyNameSignaturePair property;
-	property.name = name;
-	property.signature = signature;
-	
-	properties[name] = property;
-}
-
-void AbstractDBusInterface::addProperty(string name, string signature, SetterFunc setter)
-{
-	addProperty(name, signature);
-	
-	properties[name].setter = setter;
+	properties[property->name()] = property;
 }
 
 void AbstractDBusInterface::registerObject(GDBusConnection* connection)
@@ -61,7 +53,7 @@ void AbstractDBusInterface::registerObject(GDBusConnection* connection)
 	if(introspectionXml.empty())
 	{
 		cerr<<"no interface to export: "<<mInterfaceName<<endl;
-		return;
+		throw -1;
 	}
 
 	introspectionXml += "</interface>";
@@ -82,22 +74,43 @@ void AbstractDBusInterface::registerObject(GDBusConnection* connection)
 
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, mInterfaceName.c_str());
 	
-	const GDBusInterfaceVTable vtable = {NULL, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty};	
+	const GDBusInterfaceVTable vtable = { NULL, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 	
-	guint regId = g_dbus_connection_register_object(connection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, NULL);
+	guint regId = g_dbus_connection_register_object(connection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
+	
+	if(error) throw -1;
 	
 	g_assert(regId > 0);
 }
 
-void AbstractDBusInterface::updateValue(string name, boost::any value)
+void AbstractDBusInterface::updateValue(AbstractProperty *property)
 {
+	if(mConnection == nullptr)
+	{
+		return;
+	}
 
+	GError *error = NULL;
+	g_dbus_connection_emit_signal(mConnection, "", mObjectPath.c_str(), mInterfaceName.c_str(), property->name().c_str(),property->toGVariant(), &error);
+
+	if(error)
+	{
+		throw -1;
+	}
 }
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
+	debugOut("setting error to NULL");
+	*error = NULL;
+	debugOut("Get Property called!");
 	if(interfaceMap.count(interfaceName))
-		return interfaceMap[interfaceName]->getProperty(propertyName);
+	{
+		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
+		debugOut("i hate you gdbus");
+		return value;
+	}
+	debugOut("No interface for" + string(interfaceName));
 	return nullptr;
 }
 

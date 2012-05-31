@@ -25,7 +25,6 @@ using namespace std;
 static void
 on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
-	//vehicleInfoInterface->registerObject(connection);
 	RunningStatusInterface::iface->registerObject(connection);
 }
 
