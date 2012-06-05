@@ -107,7 +107,6 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 	if(interfaceMap.count(interfaceName))
 	{
 		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
-		debugOut("i hate you gdbus");
 		return value;
 	}
 	debugOut("No interface for" + string(interfaceName));

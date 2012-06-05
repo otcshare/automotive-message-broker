@@ -17,8 +17,8 @@
 
 #include "abstractproperty.h"
 
-AbstractProperty::AbstractProperty(string pn, string sig)
-: mPropertyName(pn), mSignature(sig)
+AbstractProperty::AbstractProperty(string pn, string sig, Access access)
+	: mPropertyName(pn), mSignature(sig), mAccess(access)
 {
 
 }
