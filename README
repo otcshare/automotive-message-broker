@@ -1,0 +1,18 @@
+Automotive Message Broker is built using CMake.  glib2 (with gio) and boost are the only dependencies
+aside from the normal c/c++ toolchain.  Alternatively, Automotive Message Broker can be built to use
+the Qt mainloop.  In this case QtCore is also a dependency.
+
+To build:
+
+cd automotive-message-broker
+mkdir build
+cd build
+cmake ..
+make
+
+To install:
+
+sudo make install
+
+TODO: link to website for questions/comments
+
