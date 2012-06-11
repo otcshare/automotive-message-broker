@@ -7,22 +7,22 @@ Object path     /
 
 Properties		byte SecurityAlert [readonly]
 				
-					returns status of security alert:
+				returns status of security alert:
 
-					Idle = 0,
-					Armed = 1,
-					Alarm Detected = 2
-					
-				bool ParkingBrake
+				Idle = 0,
+				Armed = 1,
+				Alarm Detected = 2
 				
-					returns whether the parking break is active (true)/inactive (false)
-					
-				bool ParkingLights
+			bool ParkingBrake
+			
+				returns whether the parking break is active (true)/inactive (false)
 				
-					returns whether the parking lights are active (true) or inactive (false)
-					
-				bool HazardLights
+			bool ParkingLights
+			
+				returns whether the parking lights are active (true) or inactive (false)
 				
-					returns whether the hazard lights are active (true)/inactive (false)
+			bool HazardLights
+			
+				returns whether the hazard lights are active (true)/inactive (false)
 				
 				
