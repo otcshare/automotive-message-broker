@@ -47,13 +47,6 @@ public:
 		mSetterFunc = setterFunc;
 	}
 	
-	virtual void setValue(boost::any val)
-	{
-		mValue = val;
-	}
-
-	boost::any value() { return mValue; }
-
 	virtual string signature()
 	{
 		return mSignature;
@@ -76,7 +69,6 @@ protected:
 	string mPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;
-	boost::any mValue;
 	Access mAccess;
 };
 

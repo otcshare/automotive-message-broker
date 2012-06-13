@@ -25,13 +25,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class RunningStatusInterface : public AbstractDBusInterface
 {
 public:
-	RunningStatusInterface();
-
-	static RunningStatusInterface* iface;
+	static RunningStatusInterface* iface();
 	
 protected:
+	RunningStatusInterface();
+	
 	virtual GVariant* getProperty(std::string propertyName);
 	virtual void setProperty(std::string propertyName, GVariant* value);
+	
+	static RunningStatusInterface* mIface;
 };
 
 

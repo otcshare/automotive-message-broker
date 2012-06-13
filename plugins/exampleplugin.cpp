@@ -18,10 +18,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "exampleplugin.h"
 
+#include "enginespeedproperty.h"
+#include "vehiclepowermodeproperty.h"
+
 ExamplePlugin::ExamplePlugin()
 {
 	VehicleSpeedProperty* speed = new VehicleSpeedProperty();
-	speed->setValue((uint16_t)5);
+	speed->setValue(5);
+	
+	EngineSpeedProperty* engineSpeed = new EngineSpeedProperty();
+	engineSpeed->setValue(2000);
+	
+	VehiclePowerModeProperty* vehiclePowerMode = new VehiclePowerModeProperty();
+	vehiclePowerMode->setValue(VehiclePowerModeProperty::Run);
 }
 
 extern "C" void create()

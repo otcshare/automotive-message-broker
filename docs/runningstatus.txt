@@ -41,11 +41,11 @@ Properties	byte VehiclePowerMode [readonly]
 			8th = 8,
 			9th = 9,
 			10th = 10,
-			Auto = 64,
+			Drive = 64,
 			Reverse = 128,
-			Parking = 256
+			Park = 256
 			
-			For transmissions with no gear (ie CVT), 'Auto' and 'Reverse' will be used.
+			For transmissions with no gear (ie CVT), 'Drive' and 'Reverse' will be used.
 			
 		struct{bool, uint16} CruiseControlStatus [readonly]
 		

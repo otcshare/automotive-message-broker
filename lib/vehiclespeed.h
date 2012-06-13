@@ -26,11 +26,15 @@ class VehicleSpeedProperty : public AbstractProperty
 
 public:
 	VehicleSpeedProperty();
-	void setValue(boost::any val);
+	void setValue(uint16_t val);
+	uint16_t value();
 	
 
 	GVariant* toGVariant();
 	void fromGVariant(GVariant *value);
+	
+private: 
+	uint16_t mValue;
 };
 
 #endif // VEHICLESPEED_H

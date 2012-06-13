@@ -23,18 +23,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
-RunningStatusInterface* RunningStatusInterface::iface = nullptr;
+RunningStatusInterface* RunningStatusInterface::mIface = nullptr;
+
+RunningStatusInterface* RunningStatusInterface::iface()
+{
+	if(mIface == nullptr)
+		mIface = new RunningStatusInterface();
+	
+	return mIface;
+}
+
 
 RunningStatusInterface::RunningStatusInterface()
 	: AbstractDBusInterface(DBusServiceName".RunningStatus", "/runningStatus")
 {
-	if(iface != nullptr)
-	{
-		cerr<<"only one instance of this class may exist "<<__FUNCTION__<<" "<<__FILE__<<":"<<__LINE__<<endl;
-		throw -1;
-	}
-
-	iface = this;
+	
 }
 
 

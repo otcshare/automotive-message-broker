@@ -24,40 +24,27 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 VehicleSpeedProperty::VehicleSpeedProperty(): AbstractProperty("VehicleSpeed", "q", AbstractProperty::Read)
 {
-	if(RunningStatusInterface::iface == nullptr)
-	{
-		new RunningStatusInterface();
-	}
-
-	RunningStatusInterface::iface->addProperty(this);
+	RunningStatusInterface::iface()->addProperty(this);
 }
 
-void VehicleSpeedProperty::setValue(boost::any val)
+void VehicleSpeedProperty::setValue(uint16_t val)
 {
-	AbstractProperty::setValue(val);
-	
-	RunningStatusInterface::iface->updateValue(this);
+	mValue = val;
+	RunningStatusInterface::iface()->updateValue(this);
+}
+
+uint16_t VehicleSpeedProperty::value()
+{
+	return mValue;
 }
 
 GVariant* VehicleSpeedProperty::toGVariant()
 {
-	uint16_t v = 0;
-	try
-	{
-		v = boost::any_cast<uint16_t>(mValue);
-	}
-	catch (...)
-	{
-		cerr<<"Could not cast VehicleSpeedProperty.  Maybe value is not uint16?";
-		throw -1;
-	}
 
-	debugOut("TRACE");
-	
-	return g_variant_new_uint16(v);
+	return g_variant_new_uint16(mValue);
 }
 
 void VehicleSpeedProperty::fromGVariant(GVariant *value)
 {
-	mValue = g_variant_get_uint16(value);
+	mValue = (uint16_t)g_variant_get_uint16(value);
 }
