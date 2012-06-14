@@ -2,8 +2,8 @@ Running Status hierarchy
 =================
 
 Service         org.automotive
-Interface       org.automotive.runningstatus
-Object path     /
+Interface       org.automotive.runningStatus
+Object path     /runningStatus
 
 Properties	byte VehiclePowerMode [readonly]
 			

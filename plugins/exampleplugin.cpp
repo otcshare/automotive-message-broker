@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "enginespeedproperty.h"
 #include "vehiclepowermodeproperty.h"
+#include "fueleconomyproperty.h"
 
 ExamplePlugin::ExamplePlugin()
 {
@@ -31,6 +32,9 @@ ExamplePlugin::ExamplePlugin()
 	
 	VehiclePowerModeProperty* vehiclePowerMode = new VehiclePowerModeProperty();
 	vehiclePowerMode->setValue(VehiclePowerModeProperty::Run);
+	
+	FuelEconomyProperty* fueleconomyproperty = new FuelEconomyProperty();
+	fueleconomyproperty->setValue(42);
 }
 
 extern "C" void create()

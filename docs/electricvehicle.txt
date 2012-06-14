@@ -7,29 +7,29 @@ Object path     /
 
 Properties		byte HybridPowerSystem [readonly]
 
-					Hybrid power system:
-					
-					Idle = 0,
-					Battery Mode = 1,
-					Engine Mode = 2,
-					Hybrid Mode = 3
-					
-				bool ChargingStatus [readwrite]
+				Hybrid power system:
 				
-					get or sets charging status: on = true, off = false.
-					
-				struct{ double, byte } BatteryVoltage [readonly]
+				Idle = 0,
+				Battery Mode = 1,
+				Engine Mode = 2,
+				Hybrid Mode = 3
 				
-					Voltage of battery (double) and Level of charge (0-100%) (byte).
-					
-				bool BatteryChargeCord [readonly]
+			bool ChargingStatus [readwrite]
+			
+				get or sets charging status: on = true, off = false.
 				
-					Cord connected (true), disconnected (false)
-					
-				byte TargetChargeLevel [readonly]
+			struct{ double, byte } BatteryVoltage [readonly]
+			
+				Voltage of battery (double) and Level of charge (0-100%) (byte).
 				
-					Level of charge capacity relative to factory charge rating (0-100%) (byte)
+			bool BatteryChargeCord [readonly]
+			
+				Cord connected (true), disconnected (false)
 				
-				uint16 TimeToFullCharge [readonly]
-				
-					Number of minutes remaining until fully charged.
+			byte TargetChargeLevel [readonly]
+			
+				Level of charge capacity relative to factory charge rating (0-100%) (byte)
+			
+			uint16 TimeToFullCharge [readonly]
+			
+				Number of minutes remaining until fully charged.

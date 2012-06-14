@@ -1,5 +1,5 @@
 
-set(amb_sources enginespeedproperty.cpp runningstatusinterface.cpp vehiclespeed.cpp abstractdbusinterface.cpp abstractproperty.cpp dbusinterfacemanager.cpp debugout.cpp)
+set(amb_sources fueleconomyproperty.cpp vehiclepowermodeproperty.cpp enginespeedproperty.cpp runningstatusinterface.cpp vehiclespeed.cpp abstractdbusinterface.cpp abstractproperty.cpp dbusinterfacemanager.cpp debugout.cpp)
 set(amb_headers_install abstractproperty.h vehiclespeed.h )
 include_directories( ${include_dirs} )
 add_library(amb SHARED ${amb_sources})
