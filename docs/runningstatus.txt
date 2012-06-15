@@ -30,7 +30,7 @@ Properties	byte VehiclePowerMode [readonly]
 			
 		byte TransmissionGearStatus [readonly]
 		
-			Neautral = 0,
+			Neutral = 0,
 			1st = 1,
 			2nd = 2,
 			3rd = 3,
@@ -89,37 +89,37 @@ Properties	byte VehiclePowerMode [readonly]
 		
 			Remaining percentage of fuel.
 			
-		uint16 FuelRange
+		uint16 FuelRange [readonly]
 		
 			Estimated fuel range with available fuel in km
 			
-		struct{ byte, byte, byte } EngineOil
+		struct{ byte, byte, byte } EngineOil [readonly]
 		
 			Remaining Oil Percentage (byte)
 			Engine Oil Temperature (byte)
 			Engine Oil Pressure (byte)
 			
-		struct{ byte, byte } EngineCoolant
+		struct{ byte, byte } EngineCoolant [readonly]
 		
 			Level (byte)
 			Temperature (byte)
 			
-		struct{ uint16, uint16, uint16 } Acceleration
+		struct{ uint16, uint16, uint16 } Acceleration [readonly]
 		
 			X, Y and Z acceleration in m/s*s
 		
-		struct{ uint16, uint16, byte, uint32 } VehicleOdometry
+		struct{ uint16, uint16, byte, uint32 } VehicleOdometry [readonly]
 		
 			x_mm (uint16)
 			y_mm (uint16)
 			angle (byte)
 			timestamp (in number of seconds since unix epoch: Jan 1, 1970) (uint32)
 			
-		uint16 SteeringWheelAngle
+		uint16 SteeringWheelAngle [readonly]
 		
 			Angle of the steering wheel (0-360)
 			
-		struct{ uint16, uint16 } WheelTickSensor
+		struct{ uint16, uint16 } WheelTickSensor [readonly]
 		
 			Left wheel rotation counter (uint16)
 			Right wheel rotation counter (uint16)

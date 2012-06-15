@@ -33,8 +33,7 @@ public:
 	GVariant* toGVariant();
 	void fromGVariant(GVariant *value);
 	
-private: 
-	uint16_t mValue;
+
 };
 
 #endif // VEHICLESPEED_H

@@ -26,7 +26,7 @@ class RunningStatusInterface : public AbstractDBusInterface
 {
 public:
 	static RunningStatusInterface* iface();
-	
+
 protected:
 	RunningStatusInterface();
 	

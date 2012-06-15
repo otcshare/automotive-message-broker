@@ -22,29 +22,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <glib.h>
 
-VehicleSpeedProperty::VehicleSpeedProperty(): AbstractProperty("VehicleSpeed", "q", AbstractProperty::Read)
+VehicleSpeedProperty::VehicleSpeedProperty(): AbstractProperty("VehicleSpeed", "q", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-	RunningStatusInterface::iface()->addProperty(this);
+	
 }
 
 void VehicleSpeedProperty::setValue(uint16_t val)
 {
-	mValue = val;
-	RunningStatusInterface::iface()->updateValue(this);
+	AbstractProperty::setValue<uint16_t>(val);
 }
 
 uint16_t VehicleSpeedProperty::value()
 {
-	return mValue;
+	return AbstractProperty::value<uint16_t>();
 }
 
 GVariant* VehicleSpeedProperty::toGVariant()
 {
 
-	return g_variant_new_uint16(mValue);
+	return g_variant_new_uint16(value());
 }
 
 void VehicleSpeedProperty::fromGVariant(GVariant *value)
 {
-	mValue = (uint16_t)g_variant_get_uint16(value);
+	setValue((uint16_t)g_variant_get_uint16(value));
 }

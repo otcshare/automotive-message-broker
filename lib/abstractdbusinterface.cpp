@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/algorithm/string.hpp>
 #include <gio/gio.h>
 
+#include "abstractproperty.h"
+
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMap;
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectPath)

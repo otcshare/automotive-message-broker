@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/any.hpp>
 #include <glib.h>
 
+#include "abstractdbusinterface.h"
 
 using namespace std;
 
@@ -40,7 +41,7 @@ public:
 		ReadWrite
 	};
 
-	AbstractProperty(string propertyName, string signature, Access access);
+	AbstractProperty(string propertyName, string signature, Access access, AbstractDBusInterface* interface);
 	
 	virtual void setSetterFunction(SetterFunc setterFunc)
 	{
@@ -61,15 +62,34 @@ public:
 	{
 		return mAccess;
 	}
-
+	
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
+protected: ///methods:
+
+	template<typename T>
+	void setValue(T val)
+	{
+		mValue = val;
+		mInterface->updateValue(this);
+	}
+
+	template<typename T>
+	T value()
+	{
+		return boost::any_cast<T>(mValue);
+	}
+	
 protected:
+	
+	boost::any mValue;
 	string mPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;
 	Access mAccess;
+	
+	AbstractDBusInterface* mInterface;
 };
 
 #endif // ABSTRACTPROPERTY_H

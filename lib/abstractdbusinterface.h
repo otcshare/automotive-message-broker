@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <gio/gio.h>
 #include <boost/any.hpp>
 
-#include "abstractproperty.h"
+class AbstractProperty;
 
 using namespace std;
 
