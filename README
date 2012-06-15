@@ -1,3 +1,6 @@
+Automotive Message Broker is a vehicle network abstraction system.  It brokers information from the vehicle
+to applications.
+
 Automotive Message Broker is built using CMake.  glib2 (with gio) and boost are the only dependencies
 aside from the normal c/c++ toolchain.  Alternatively, Automotive Message Broker can be built to use
 the Qt mainloop.  In this case QtCore is also a dependency.
