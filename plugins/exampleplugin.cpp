@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "enginespeedproperty.h"
 #include "vehiclepowermodeproperty.h"
 #include "fueleconomyproperty.h"
+#include "tripmeterproperty.h"
 
 ExamplePlugin::ExamplePlugin()
 {
@@ -35,6 +36,14 @@ ExamplePlugin::ExamplePlugin()
 	
 	FuelEconomyProperty* fueleconomyproperty = new FuelEconomyProperty();
 	fueleconomyproperty->setValue(42);
+	
+	TripMeters trips;
+	trips.push_back(1500);
+	trips.push_back(1000);
+	
+	TripMeterProperty* tripmeterproperty = new TripMeterProperty();
+	
+	tripmeterproperty->setValue(trips);
 }
 
 extern "C" void create()
