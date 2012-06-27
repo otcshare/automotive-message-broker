@@ -20,9 +20,9 @@ Properties	byte VehiclePowerMode [readonly]
 		
 			Engine speed in rotations per minute (RPM)
 			
-		uint16 FuelEconomy [readonly]
+		uint16 FuelConsumption [readonly]
 		
-			Fuel Economy in grams of fuel per minute.
+			Fuel Economy in ml of fuel per minute.
 			
 		array{uint32} TripMeter [readonly]
 		
@@ -43,7 +43,7 @@ Properties	byte VehiclePowerMode [readonly]
 			10th = 10,
 			Drive = 64,
 			Reverse = 128,
-			Park = 256
+			Park = 255
 			
 			For transmissions with no gear (ie CVT), 'Drive' and 'Reverse' will be used.
 			
@@ -58,7 +58,7 @@ Properties	byte VehiclePowerMode [readonly]
 			
 		dict{byte, bool} LightStatus [readonly]
 		
-			Light (uint16), On=true/Off=false
+			Dictionary of Light (uint16) and Status On=true/Off=false
 			Light Type:
 			Head = 0,
 			RightTurn = 1,
@@ -96,7 +96,7 @@ Properties	byte VehiclePowerMode [readonly]
 		struct{ byte, byte, byte } EngineOil [readonly]
 		
 			Remaining Oil Percentage (byte)
-			Engine Oil Temperature (byte)
+			Engine Oil Temperature (byte) in degrees C
 			Engine Oil Pressure (byte)
 			
 		struct{ byte, byte } EngineCoolant [readonly]
@@ -108,13 +108,6 @@ Properties	byte VehiclePowerMode [readonly]
 		
 			X, Y and Z acceleration in m/s*s
 		
-		struct{ uint16, uint16, byte, uint32 } VehicleOdometry [readonly]
-		
-			x_mm (uint16)
-			y_mm (uint16)
-			angle (byte)
-			timestamp (in number of seconds since unix epoch: Jan 1, 1970) (uint32)
-			
 		uint16 SteeringWheelAngle [readonly]
 		
 			Angle of the steering wheel (0-360)

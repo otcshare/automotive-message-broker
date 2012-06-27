@@ -18,15 +18,28 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "exampleplugin.h"
 
+#include <iostream>
+
+using namespace std;
+
 #include "enginespeedproperty.h"
 #include "vehiclepowermodeproperty.h"
 #include "fueleconomyproperty.h"
 #include "tripmeterproperty.h"
+#include "transmissiongearstatus.h"
+#include "cruisecontrolstatus.h"
+#include "wheelbrakeproperty.h"
+#include "lightstatusproperty.h"
+#include "interiorlightstatusproperty.h"
+
+#include "debugout.h"
 
 ExamplePlugin::ExamplePlugin()
 {
+	uint16_t velocity = 5;
+	
 	VehicleSpeedProperty* speed = new VehicleSpeedProperty();
-	speed->setValue(5);
+	speed->setValue(velocity);
 	
 	EngineSpeedProperty* engineSpeed = new EngineSpeedProperty();
 	engineSpeed->setValue(2000);
@@ -42,8 +55,41 @@ ExamplePlugin::ExamplePlugin()
 	trips.push_back(1000);
 	
 	TripMeterProperty* tripmeterproperty = new TripMeterProperty();
-	
 	tripmeterproperty->setValue(trips);
+	
+	TransmissionGearStatusProperty* transmissiongearstatus = new TransmissionGearStatusProperty();
+	transmissiongearstatus->setValue(TransmissionGearStatusProperty::First);
+	
+	CruiseControlStatus cruisecontrolstatus = CruiseControlStatus(true, velocity);
+	DebugOut()<<"Speed: "<<cruisecontrolstatus.speed<<endl;
+		
+	CruiseControlStatusProperty * cruisecontrolstatusproperty = new CruiseControlStatusProperty();
+	cruisecontrolstatusproperty->setValue(cruisecontrolstatus);
+	
+	WheelBrakeProperty *wheelbrakeproperty = new WheelBrakeProperty();
+	wheelbrakeproperty->setValue(false);
+	
+	LightStatusProperty::LightStatus lights;
+	lights[LightStatusProperty::Brake] = wheelbrakeproperty->value();
+	lights[LightStatusProperty::Fog] = true;
+	lights[LightStatusProperty::Head] = true;
+	lights[LightStatusProperty::HighBeam] = false;
+	lights[LightStatusProperty::Hazard] = false;
+	lights[LightStatusProperty::LeftTurn] = false;
+	lights[LightStatusProperty::RightTurn] = false;
+	lights[LightStatusProperty::Parking] = false;
+	
+	LightStatusProperty *lightstatusproperty = new LightStatusProperty();
+	lightstatusproperty->setValue(lights);
+	
+	InteriorLightStatusProperty::InteriorLightStatus interiorLights;
+	interiorLights[InteriorLightStatusProperty::Driver] = false;
+	interiorLights[InteriorLightStatusProperty::Passenger] = true;
+	interiorLights[InteriorLightStatusProperty::Center] = false;
+	
+	InteriorLightStatusProperty* interiorlightstatusproperty = new InteriorLightStatusProperty();
+	interiorlightstatusproperty->setValue(interiorLights);
+	
 }
 
 extern "C" void create()

@@ -18,7 +18,7 @@ Properties		byte HybridPowerSystem [readonly]
 			
 				get or sets charging status: on = true, off = false.
 				
-			struct{ double, byte } BatteryVoltage [readonly]
+			struct{ double, byte } Battery [readonly]
 			
 				Voltage of battery (double) and Level of charge (0-100%) (byte).
 				

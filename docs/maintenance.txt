@@ -7,32 +7,32 @@ Object path     /
 
 Properties	uint32 Odometer [readonly]
 
-				Distance in km
-				
-			byte TransmissionFluid [readonly]
+			Distance in km
 			
-				Remaining percentage
+		byte TransmissionFluid [readonly]
+		
+			Remaining percentage
+		
+		byte BrakeFluid [readonly]
+		
+			Remaining percentage
 			
-			byte BrakeFluid [readonly]
+		byte WasherFluid [readonly]
+		
+			Remaining percentage
 			
-				Remaining percentage
-				
-			byte WasherFluid [readonly]
+		struct{ double, double } BatteryStatus [readonly]
+		
+			Voltage (double)
+			Current (double)
 			
-				Remaining percentage
-				
-			struct{ double, double } BatteryStatus [readonly]
-			
-				Voltage (double)
-				Current (double)
-				
-			dict{ byte, double } TirePressure [readonly]
-			
-				Tire (byte), Pressure (kPa)
-				Tire:
-				RightFront = 0,
-				LeftFront = 1,
-				RightRear = 2,
-				LeftRear = 3
+		dict{ byte, double } TirePressure [readonly]
+		
+			Tire (byte), Pressure (kPa)
+			Tire:
+			RightFront = 0,
+			LeftFront = 1,
+			RightRear = 2,
+			LeftRear = 3
 				
 			

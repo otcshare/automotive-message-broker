@@ -8,121 +8,121 @@ Object path     /
  
 Properties		byte AntilockBrakingSystem [readonly]
 
-					Idle = 0,
-					Engaged = 1
-					
-				byte TractionControlSystem [readonly]
+				Idle = 0,
+				Engaged = 1
 				
-					Off = 0,
-					On = 1
-					
-				uint16 VehicleTopSpeedLimit [readonly]
+			byte TractionControlSystem [readonly]
+			
+				Off = 0,
+				On = 1
 				
-					top rated speed in km/h. 0 = no limit
-					
-				dict{ byte, byte } AirbagStatus [readonly]
+			uint16 VehicleTopSpeedLimit [readonly]
+			
+				top rated speed in km/h. 0 = no limit
 				
-					Dictionary of Airbag (byte) and Status (byte)
-					
-					Airbag:
-					
-					Driver = 0,
-					Passenger = 1,
-					LeftSide = 2,
-					RightSide = 3
-					
-					Status:
-					
-					Active = 0,
-					Inactive = 1,
-					Deployed = 2
-					
-				dict{ byte, byte } DoorStatus [readonly]
+			dict{ byte, byte } AirbagStatus [readonly]
+			
+				Dictionary of Airbag (byte) and Status (byte)
 				
-					Dictionary of Door (byte) and Status (byte)
-					
-					Door:
-					
-					Driver = 0,
-					Passenger = 1,
-					LeftRear = 2,
-					RightRear = 3,
-					Trunk = 4,
-					FuelCap = 5,
-					Hood = 6
-					
-					Status:
-					
-					Closed = 0,
-					Open = 1,
-					Ajar = 2
+				Airbag:
 				
-				dict{ byte, bool } DoorLockStatus [readonly]
+				Driver = 0,
+				Passenger = 1,
+				LeftSide = 2,
+				RightSide = 3
 				
-					Dictionary of Door (byte) and Status (bool locked = true)
-					
-					Door:
-					
-					Driver = 0,
-					Passenger = 1,
-					LeftRear = 2,
-					RightRear = 3,
+				Status:
 				
-				dict{ byte, bool } SeatBeltStatus [readonly]
+				Active = 0,
+				Inactive = 1,
+				Deployed = 2
 				
-					Dictionary of Seat Belt (byte) and Status (bool: Fasten = true)
-					
-					Seat Belt:
-					
-					Driver = 0,
-					Passenger = 1,
-					LeftRear = 2,
-					RightRear = 3
-					
-				dict{ byte, bool } WindowLockStatus [readonly]
+			dict{ byte, byte } DoorStatus [readonly]
+			
+				Dictionary of Door (byte) and Status (byte)
 				
-					Dictionary of Windows (byte) and Status (bool: Locked = true)
-					
-					Window:
-					
-					Driver = 0,
-					Passenger = 1,
-					LeftRear = 2,
-					RightRear = 3
+				Door:
 				
-				dict{ byte, byte } OccupantStatus [readonly]
+				Driver = 0,
+				Passenger = 1,
+				LeftRear = 2,
+				RightRear = 3,
+				Trunk = 4,
+				FuelCap = 5,
+				Hood = 6
 				
-					Dictionary of Occupant (byte) and Status
-					
-					Occupant:
-					
-					Driver = 0,
-					Passenger = 1,
-					LeftRear = 2,
-					RightRear = 3
-					
-					Status:
-					
-					Vacant = 0,
-					Child = 1, 
-					Adult = 2
-					
-				dict{ byte, double } ObstacleDistance [readonly]
+				Status:
 				
-					Dictionary of Distance Sensor and distance (double) in m
+				Closed = 0,
+				Open = 1,
+				Ajar = 2
+			
+			dict{ byte, bool } DoorLockStatus [readonly]
+			
+				Dictionary of Door (byte) and Status (bool locked = true)
 				
-					Distance Sensors:
-					
-					LeftFront = 0,
-					RightFront = 1,
-					LeftRear = 2,
-					RightRear = 3,
-					LeftBlindSpot = 4,
-					RightBlindSPot = 5
-					
-				string CameraFrame [readonly]
+				Door:
 				
-					string representing a shared memory key where the camera frame is stored.  
-					The frame is stored as a PNG encoded byte array.
-	
+				Driver = 0,
+				Passenger = 1,
+				LeftRear = 2,
+				RightRear = 3,
+			
+			dict{ byte, bool } SeatBeltStatus [readonly]
+			
+				Dictionary of Seat Belt (byte) and Status (bool: Fasten = true)
+				
+				Seat Belt:
+				
+				Driver = 0,
+				Passenger = 1,
+				LeftRear = 2,
+				RightRear = 3
+				
+			dict{ byte, bool } WindowLockStatus [readonly]
+			
+				Dictionary of Windows (byte) and Status (bool: Locked = true)
+				
+				Window:
+				
+				Driver = 0,
+				Passenger = 1,
+				LeftRear = 2,
+				RightRear = 3
+			
+			dict{ byte, byte } OccupantStatus [readonly]
+			
+				Dictionary of Occupant (byte) and Status
+				
+				Occupant:
+				
+				Driver = 0,
+				Passenger = 1,
+				LeftRear = 2,
+				RightRear = 3
+				
+				Status:
+				
+				Vacant = 0,
+				Child = 1, 
+				Adult = 2
+				
+			dict{ byte, double } ObstacleDistance [readonly]
+			
+				Dictionary of Distance Sensor and distance (double) in m
+			
+				Distance Sensors:
+				
+				LeftFront = 0,
+				RightFront = 1,
+				LeftRear = 2,
+				RightRear = 3,
+				LeftBlindSpot = 4,
+				RightBlindSPot = 5
+				
+			string CameraFrame [readonly]
+			
+				string representing a shared memory key where the camera frame is stored.  
+				The frame is stored as a PNG encoded byte array.
+
 				
