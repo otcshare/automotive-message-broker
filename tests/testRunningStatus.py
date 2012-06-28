@@ -35,7 +35,7 @@ print "LightStatus: ", lightStatus
 print "InteriorLightStatus", interiorLightStatus
 print "HornSatus", hornStatus
 print "Chime", chimeStatus
-print "FuelLevel: ", fuelLevelStatus
+print "FuelLevel: %i" % fuelLevelStatus
 print "FuelRange", fuelRange
 
 assert type(speed) == dbus.UInt16
@@ -90,6 +90,6 @@ assert type(fuelLevelStatus) == dbus.Byte
 assert fuelLevelStatus == 95
 
 assert type(fuelRange) == dbus.UInt16
-assert fuelRange = 321
+assert fuelRange == 321
 
 print "Passed"

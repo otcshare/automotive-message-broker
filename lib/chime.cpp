@@ -27,7 +27,7 @@ void Chime::fromGVariant(GVariant* value)
 
 GVariant* Chime::toGVariant()
 {
-
+	return g_variant_new_boolean(value());
 }
 
 Chime::Chime()

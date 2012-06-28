@@ -1,5 +1,4 @@
 /*
-    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -17,34 +16,32 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef CHIME_H
-#define CHIME_H
+
+#ifndef ENGINEOILPROPERTY_H
+#define ENGINEOILPROPERTY_H
 
 #include <abstractproperty.h>
 
-class Chime : public AbstractProperty
+class EngineOil 
+{
+public:
+	EngineOil():remaining(0), temperature(0), pressure(0) { }
+	
+	uint8_t remaining;
+	uint8_t temperature;
+	uint16_t pressure;
+};
+
+class EngineOilProperty : public AbstractProperty
 {
 
 public:
-	void setValue(bool);
-	bool value();
 
-	operator bool()
-	{
-		return value();
-	}
-
-	Chime& operator =  (bool const & val)
-	{
-		this->setValue(val);
-		return *this;
-	}
 
 	virtual void fromGVariant(GVariant* value);
 	virtual GVariant* toGVariant();
-	Chime();
+    
+    
 };
 
-
-
-#endif // CHIME_H
+#endif // ENGINEOILPROPERTY_H

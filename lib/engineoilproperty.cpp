@@ -1,5 +1,4 @@
 /*
-    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -17,34 +16,18 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef CHIME_H
-#define CHIME_H
 
-#include <abstractproperty.h>
+#include "engineoilproperty.h"
 
-class Chime : public AbstractProperty
+void EngineOilProperty::fromGVariant(GVariant* value)
 {
 
-public:
-	void setValue(bool);
-	bool value();
+}
 
-	operator bool()
-	{
-		return value();
-	}
+GVariant* EngineOilProperty::toGVariant()
+{
 
-	Chime& operator =  (bool const & val)
-	{
-		this->setValue(val);
-		return *this;
-	}
-
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	Chime();
-};
+}
 
 
 
-#endif // CHIME_H

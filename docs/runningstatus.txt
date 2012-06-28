@@ -97,7 +97,7 @@ Properties	byte VehiclePowerMode [readonly]
 		
 			Remaining Oil Percentage (byte)
 			Engine Oil Temperature (byte) in degrees C
-			Engine Oil Pressure (byte)
+			Engine Oil Pressure in kPa (uint16)
 			
 		struct{ byte, byte } EngineCoolant [readonly]
 		
