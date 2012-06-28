@@ -27,6 +27,18 @@ class FuelEconomyProperty : public AbstractProperty
 {
 
 public:
+
+	operator uint16_t()
+	{
+		return value();
+	}
+
+	FuelEconomyProperty & operator = (uint16_t const &v)
+	{
+		setValue(v);
+		return *this;
+	}
+
 	void setValue(uint16_t val);
 	uint16_t value() { return AbstractProperty::value<uint16_t>(); }
 	virtual void fromGVariant(GVariant* value);

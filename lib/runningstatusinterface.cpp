@@ -44,7 +44,6 @@ RunningStatusInterface::RunningStatusInterface()
 
 GVariant* RunningStatusInterface::getProperty(std::string propertyName)
 {
-	debugOut("TRACE");
 	if(properties.count(propertyName))
 		return properties[propertyName]->toGVariant();
 	else

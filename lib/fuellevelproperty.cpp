@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,42 +17,38 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "fuellevelproperty.h"
+#include "runningstatusinterface.h"
 
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
-
-#include <abstractproperty.h>
-#include <map>
-
-class InteriorLightStatusProperty : public AbstractProperty
+void FuelLevelProperty::fromGVariant(GVariant* value)
 {
 
-public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+}
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
+GVariant* FuelLevelProperty::toGVariant()
+{
+	return g_variant_new_byte(value());
+}
 
-	operator InteriorLightStatus()
-	{
-		return value();
-	}
+FuelLevelProperty::FuelLevelProperty()
+	:AbstractProperty("FuelLevel", "y", AbstractProperty::Read, RunningStatusInterface::iface())
+{
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
-	{
-		setValue(v);
-		return *this;
-	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
-};
+}
 
-#endif // INTERIORLIGHTSTATUSPROPERTY_H
+void FuelLevelProperty::setValue(uint8_t val)
+{
+	AbstractProperty::setValue<uint8_t>(val);
+}
+
+uint8_t FuelLevelProperty::value()
+{
+	return 	AbstractProperty::value<uint8_t>();
+}
+
+FuelLevelProperty& FuelLevelProperty::operator =(uint8_t const &val)
+{
+	this->setValue(val);
+	return *this;
+}
+

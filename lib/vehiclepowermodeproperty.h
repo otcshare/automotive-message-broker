@@ -35,6 +35,17 @@ public:
 		Run = 3
 	};
 
+	operator VehiclePowerMode()
+	{
+		return value();
+	}
+
+	VehiclePowerModeProperty& operator = (VehiclePowerMode const & mode)
+	{
+		setValue(mode);
+		return *this;
+	}
+
 	void setValue(VehiclePowerMode mode);
 	VehiclePowerMode value();
 

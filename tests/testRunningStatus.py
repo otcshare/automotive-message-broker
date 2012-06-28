@@ -18,6 +18,10 @@ cruiseControlStatus = runningStatusInterface.Get("org.automotive.message.broker.
 wheelBrake = runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "WheelBrake");
 lightStatus = runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "LightStatus");
 interiorLightStatus = runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "InteriorLightStatus");
+hornStatus =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "Horn");
+chimeStatus =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "Chime");
+fuelLevelStatus =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "FuelLevel");
+fuelRange =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "FuelRange");
 
 print "VehicleSpeed: ", speed
 print "EngineSpeed: ", enginespeed
@@ -29,6 +33,10 @@ print "CruiseControlStatus: ", cruiseControlStatus
 print "WheelBrake: ", wheelBrake
 print "LightStatus: ", lightStatus
 print "InteriorLightStatus", interiorLightStatus
+print "HornSatus", hornStatus
+print "Chime", chimeStatus
+print "FuelLevel: ", fuelLevelStatus
+print "FuelRange", fuelRange
 
 assert type(speed) == dbus.UInt16
 assert speed == 5
@@ -71,5 +79,17 @@ assert type(interiorLightStatus) == dbus.Dictionary
 assert interiorLightStatus[0] == False
 assert interiorLightStatus[1] == True
 assert interiorLightStatus[2] == False
+
+assert type(hornStatus) == dbus.Boolean
+assert hornStatus == False
+
+assert type(chimeStatus) == dbus.Boolean
+assert chimeStatus == False
+
+assert type(fuelLevelStatus) == dbus.Byte
+assert fuelLevelStatus == 95
+
+assert type(fuelRange) == dbus.UInt16
+assert fuelRange = 321
 
 print "Passed"

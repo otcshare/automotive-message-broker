@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,42 +17,33 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "hornproperty.h"
+#include "runningstatusinterface.h"
 
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
+void HornProperty::setValue(bool val)
+{
+    AbstractProperty::setValue<bool>(val);
+}
 
-#include <abstractproperty.h>
-#include <map>
+bool HornProperty::value()
+{
+    return AbstractProperty::value<bool>();
+}
 
-class InteriorLightStatusProperty : public AbstractProperty
+
+void HornProperty::fromGVariant(GVariant* value)
 {
 
-public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+}
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
+GVariant* HornProperty::toGVariant()
+{
+    return g_variant_new_boolean(value());
+}
 
-	operator InteriorLightStatus()
-	{
-		return value();
-	}
+HornProperty::HornProperty()
+    :AbstractProperty("Horn","b",AbstractProperty::Read,RunningStatusInterface::iface())
+{
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
-	{
-		setValue(v);
-		return *this;
-	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
-};
+}
 
-#endif // INTERIORLIGHTSTATUSPROPERTY_H

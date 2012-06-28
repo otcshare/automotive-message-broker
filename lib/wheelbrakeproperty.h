@@ -27,6 +27,17 @@ class WheelBrakeProperty : public AbstractProperty
 {
 
 public:
+	operator bool()
+	{
+		return value();
+	}
+
+	WheelBrakeProperty & operator = (bool const & v)
+	{
+		setValue(v);
+		return *this;
+	}
+
     virtual void fromGVariant(GVariant* value);
     virtual GVariant* toGVariant();
     

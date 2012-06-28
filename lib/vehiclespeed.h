@@ -29,6 +29,16 @@ public:
 	void setValue(uint16_t val);
 	uint16_t value();
 	
+	operator uint16_t()
+	{
+		return value();
+	}
+
+	VehicleSpeedProperty& operator = (uint16_t const &v)
+	{
+		setValue(v);
+		return *this;
+	}
 
 	GVariant* toGVariant();
 	void fromGVariant(GVariant *value);

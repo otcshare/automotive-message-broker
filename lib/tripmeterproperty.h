@@ -35,6 +35,17 @@ public:
 	virtual void fromGVariant(GVariant* value);
 	virtual GVariant* toGVariant();
 	TripMeterProperty();
+
+	operator TripMeters()
+	{
+		return value();
+	}
+
+	TripMeterProperty& operator = (TripMeters const &t)
+	{
+		setValue(t);
+		return *this;
+	}
 	
 private:
 	TripMeters mValue;

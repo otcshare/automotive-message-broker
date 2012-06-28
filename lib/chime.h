@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,42 +17,34 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
+#ifndef CHIME_H
+#define CHIME_H
 
 #include <abstractproperty.h>
-#include <map>
 
-class InteriorLightStatusProperty : public AbstractProperty
+class Chime : public AbstractProperty
 {
 
 public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+	void setValue(bool);
+	bool value();
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
-
-	operator InteriorLightStatus()
+	operator bool()
 	{
 		return value();
 	}
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
+	Chime& operator =  (bool val)
 	{
-		setValue(v);
+		this->setValue(val);
 		return *this;
 	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
+
 	virtual void fromGVariant(GVariant* value);
 	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
+	Chime();
 };
 
-#endif // INTERIORLIGHTSTATUSPROPERTY_H
+
+
+#endif // CHIME_H

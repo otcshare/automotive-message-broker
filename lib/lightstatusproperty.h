@@ -40,7 +40,17 @@ public:
 	
 	typedef std::map<Light, bool> LightStatus;
 	
-	
+	operator LightStatus()
+	{
+		return value();
+	}
+
+	LightStatusProperty& operator = (LightStatus l)
+	{
+		setValue(l);
+		return *this;
+	}
+
 	void setValue(LightStatusProperty::LightStatus val);
 	LightStatusProperty::LightStatus value();
 	

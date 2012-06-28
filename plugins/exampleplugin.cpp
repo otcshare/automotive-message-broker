@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "exampleplugin.h"
 
 #include <iostream>
+#include <boost/assert.hpp>
 
 using namespace std;
 
@@ -31,6 +32,10 @@ using namespace std;
 #include "wheelbrakeproperty.h"
 #include "lightstatusproperty.h"
 #include "interiorlightstatusproperty.h"
+#include "hornproperty.h"
+#include "chime.h"
+#include "fuellevelproperty.h"
+#include "fuelrangeproperty.h"
 
 #include "debugout.h"
 
@@ -39,35 +44,34 @@ ExamplePlugin::ExamplePlugin()
 	uint16_t velocity = 5;
 	
 	VehicleSpeedProperty* speed = new VehicleSpeedProperty();
-	speed->setValue(velocity);
+	*speed = velocity;
 	
 	EngineSpeedProperty* engineSpeed = new EngineSpeedProperty();
 	engineSpeed->setValue(2000);
 	
 	VehiclePowerModeProperty* vehiclePowerMode = new VehiclePowerModeProperty();
-	vehiclePowerMode->setValue(VehiclePowerModeProperty::Run);
+	*vehiclePowerMode = VehiclePowerModeProperty::Run;
 	
 	FuelEconomyProperty* fueleconomyproperty = new FuelEconomyProperty();
-	fueleconomyproperty->setValue(42);
+	*fueleconomyproperty = 42;
 	
 	TripMeters trips;
 	trips.push_back(1500);
 	trips.push_back(1000);
 	
 	TripMeterProperty* tripmeterproperty = new TripMeterProperty();
-	tripmeterproperty->setValue(trips);
+	*tripmeterproperty = trips;
 	
 	TransmissionGearStatusProperty* transmissiongearstatus = new TransmissionGearStatusProperty();
 	transmissiongearstatus->setValue(TransmissionGearStatusProperty::First);
 	
 	CruiseControlStatus cruisecontrolstatus = CruiseControlStatus(true, velocity);
-	DebugOut()<<"Speed: "<<cruisecontrolstatus.speed<<endl;
-		
+
 	CruiseControlStatusProperty * cruisecontrolstatusproperty = new CruiseControlStatusProperty();
-	cruisecontrolstatusproperty->setValue(cruisecontrolstatus);
+	*cruisecontrolstatusproperty = cruisecontrolstatus;
 	
 	WheelBrakeProperty *wheelbrakeproperty = new WheelBrakeProperty();
-	wheelbrakeproperty->setValue(false);
+	*wheelbrakeproperty = false;
 	
 	LightStatusProperty::LightStatus lights;
 	lights[LightStatusProperty::Brake] = wheelbrakeproperty->value();
@@ -80,7 +84,7 @@ ExamplePlugin::ExamplePlugin()
 	lights[LightStatusProperty::Parking] = false;
 	
 	LightStatusProperty *lightstatusproperty = new LightStatusProperty();
-	lightstatusproperty->setValue(lights);
+	*lightstatusproperty = lights;
 	
 	InteriorLightStatusProperty::InteriorLightStatus interiorLights;
 	interiorLights[InteriorLightStatusProperty::Driver] = false;
@@ -88,8 +92,32 @@ ExamplePlugin::ExamplePlugin()
 	interiorLights[InteriorLightStatusProperty::Center] = false;
 	
 	InteriorLightStatusProperty* interiorlightstatusproperty = new InteriorLightStatusProperty();
-	interiorlightstatusproperty->setValue(interiorLights);
-	
+	*interiorlightstatusproperty = interiorLights;
+
+	HornProperty *hornProperty = new HornProperty();
+	*hornProperty = false;
+
+	Chime * chime = new Chime();
+	*chime = false;
+
+	bool val = *chime;
+
+	BOOST_ASSERT(val == false);
+
+	FuelLevelProperty *fuelLevel = new FuelLevelProperty();
+	*fuelLevel = (uint8_t)95;
+
+	uint8_t fl = *fuelLevel;
+
+	BOOST_ASSERT(fl == 95);
+
+	FuelRangeProperty* fuelRange = new FuelRangeProperty();
+
+	*fuelRange = 321;
+
+	uint16_t fr = *fuelRange;
+
+	BOOST_ASSERT(fr == 321);
 }
 
 extern "C" void create()

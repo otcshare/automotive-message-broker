@@ -37,7 +37,7 @@ public:
 		speed = other.speed;
 	}
 	
-	CruiseControlStatus operator = (CruiseControlStatus other)
+	CruiseControlStatus& operator = (CruiseControlStatus other)
 	{
 		activated = other.activated;
 		speed = other.speed;
@@ -58,6 +58,18 @@ public:
 class CruiseControlStatusProperty : public AbstractProperty
 {
 public:
+
+	operator CruiseControlStatus()
+	{
+		return value();
+	}
+
+	CruiseControlStatusProperty & operator = (CruiseControlStatus const & v)
+	{
+		setValue(v);
+		return *this;
+	}
+
 	void setValue(CruiseControlStatus status);
 	CruiseControlStatus value();
 	

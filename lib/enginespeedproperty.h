@@ -27,6 +27,18 @@ class EngineSpeedProperty : public AbstractProperty
 {
 
 public:
+
+	operator uint16_t()
+	{
+		return value();
+	}
+
+	EngineSpeedProperty & operator = (uint16_t const &v)
+	{
+		setValue(v);
+		return *this;
+	}
+
 	void setValue(uint16_t v);
 	uint16_t value() { return AbstractProperty::value<uint16_t>(); }
 	virtual void fromGVariant(GVariant* value);

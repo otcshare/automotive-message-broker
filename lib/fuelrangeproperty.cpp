@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,42 +17,27 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
-
-#include <abstractproperty.h>
-#include <map>
-
-class InteriorLightStatusProperty : public AbstractProperty
+#include "fuelrangeproperty.h"
+#include "runningstatusinterface.h"
+void FuelRangeProperty::fromGVariant(GVariant* value)
 {
 
-public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+}
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
+GVariant* FuelRangeProperty::toGVariant()
+{
+	return g_variant_new_uint16(value<uint16_t>());
+}
 
-	operator InteriorLightStatus()
-	{
-		return value();
-	}
+FuelRangeProperty::FuelRangeProperty()
+	:AbstractProperty("FuelRange","q",AbstractProperty::Read, RunningStatusInterface::iface())
+{
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
-	{
-		setValue(v);
-		return *this;
-	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
-};
+}
 
-#endif // INTERIORLIGHTSTATUSPROPERTY_H
+FuelRangeProperty& FuelRangeProperty::operator=(uint16_t const & other)
+{
+	setValue<uint16_t>(other);
+	return *this;
+}
+

@@ -66,8 +66,6 @@ public:
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
-protected: ///methods:
-
 	template<typename T>
 	void setValue(T val)
 	{
@@ -80,6 +78,10 @@ protected: ///methods:
 	{
 		return boost::any_cast<T>(mValue);
 	}
+	
+protected: ///methods:
+
+	
 	
 protected:
 	

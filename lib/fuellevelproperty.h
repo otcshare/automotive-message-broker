@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,42 +17,29 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
+#ifndef FUELLEVELPROPERTY_H
+#define FUELLEVELPROPERTY_H
 
 #include <abstractproperty.h>
-#include <map>
 
-class InteriorLightStatusProperty : public AbstractProperty
+
+class FuelLevelProperty : public AbstractProperty
 {
 
 public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+	void setValue(uint8_t val);
+	uint8_t value();
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
+	FuelLevelProperty& operator = (uint8_t const &val);
 
-	operator InteriorLightStatus()
+	operator uint8_t()
 	{
 		return value();
 	}
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
-	{
-		setValue(v);
-		return *this;
-	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
 	virtual void fromGVariant(GVariant* value);
 	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
+	FuelLevelProperty();
 };
 
-#endif // INTERIORLIGHTSTATUSPROPERTY_H
+#endif // FUELLEVELPROPERTY_H

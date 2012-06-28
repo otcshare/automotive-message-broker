@@ -45,6 +45,17 @@ public:
 		Park = 255
 	};
 	
+	operator TransmissionGearStatus()
+	{
+		return value();
+	}
+
+	TransmissionGearStatusProperty& operator = (TransmissionGearStatus const & t)
+	{
+		setValue(t);
+		return *this;
+	}
+
 	void setValue(TransmissionGearStatus status);
 	TransmissionGearStatus value();
 

@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,42 +17,32 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "chime.h"
+#include "runningstatusinterface.h"
 
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
-
-#include <abstractproperty.h>
-#include <map>
-
-class InteriorLightStatusProperty : public AbstractProperty
+void Chime::fromGVariant(GVariant* value)
 {
 
-public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+}
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
+GVariant* Chime::toGVariant()
+{
 
-	operator InteriorLightStatus()
-	{
-		return value();
-	}
+}
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
-	{
-		setValue(v);
-		return *this;
-	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
-};
+Chime::Chime()
+	:AbstractProperty("Chime","b",AbstractProperty::Read,RunningStatusInterface::iface())
+{
 
-#endif // INTERIORLIGHTSTATUSPROPERTY_H
+}
+
+void Chime::setValue(bool val)
+{
+	AbstractProperty::setValue<bool>(val);
+}
+
+bool Chime::value()
+{
+	return AbstractProperty::value<bool>();
+}
+
