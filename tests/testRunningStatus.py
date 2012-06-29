@@ -22,6 +22,7 @@ hornStatus =  runningStatusInterface.Get("org.automotive.message.broker.RunningS
 chimeStatus =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "Chime");
 fuelLevelStatus =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "FuelLevel");
 fuelRange =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "FuelRange");
+engineOil =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "EngineOil");
 
 print "VehicleSpeed: ", speed
 print "EngineSpeed: ", enginespeed
@@ -37,6 +38,7 @@ print "HornSatus", hornStatus
 print "Chime", chimeStatus
 print "FuelLevel: %i" % fuelLevelStatus
 print "FuelRange", fuelRange
+print "EngineOil", engineOil
 
 assert type(speed) == dbus.UInt16
 assert speed == 5
@@ -91,5 +93,10 @@ assert fuelLevelStatus == 95
 
 assert type(fuelRange) == dbus.UInt16
 assert fuelRange == 321
+
+assert type(engineOil) == dbus.Struct
+assert engineOil[0] == 88;
+assert engineOil[1] == 32;
+assert engineOil[2] == 400;
 
 print "Passed"

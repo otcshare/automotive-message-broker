@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,25 +17,30 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef STEERINGWHEELANGLEPROPERTY_H
+#define STEERINGWHEELANGLEPROPERTY_H
 
-#include "engineoilproperty.h"
-#include "runningstatusinterface.h"
-void EngineOilProperty::fromGVariant(GVariant* value)
+#include <abstractproperty.h>
+
+
+class SteeringWheelAngleProperty : public AbstractProperty
 {
 
-}
+public:
+	operator uint16_t()
+	{
+		return value<uint16_t>();
+	}
 
-GVariant* EngineOilProperty::toGVariant()
-{
-	EngineOil v = *this;
-	return g_variant_new(signature().c_str(), v.remaining, v.temperature, v.pressure);
-}
+	SteeringWheelAngleProperty & operator = (uint16_t const & v)
+	{
+		setValue<uint16_t>(v);
+		return *this;
+	}
 
-EngineOilProperty::EngineOilProperty()
-	:AbstractProperty("EngineOil","(yyq)",AbstractProperty::Read,RunningStatusInterface::iface())
-{
+	virtual void fromGVariant(GVariant* value);
+	virtual GVariant* toGVariant();
+	SteeringWheelAngleProperty();
+};
 
-}
-
-
-
+#endif // STEERINGWHEELANGLEPROPERTY_H

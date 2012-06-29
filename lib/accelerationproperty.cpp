@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,25 +17,22 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "engineoilproperty.h"
+#include "accelerationproperty.h"
 #include "runningstatusinterface.h"
-void EngineOilProperty::fromGVariant(GVariant* value)
+void AccelerationProperty::fromGVariant(GVariant* value)
 {
 
 }
 
-GVariant* EngineOilProperty::toGVariant()
+GVariant* AccelerationProperty::toGVariant()
 {
-	EngineOil v = *this;
-	return g_variant_new(signature().c_str(), v.remaining, v.temperature, v.pressure);
+	Acceleration acl = *this;
+	return g_variant_new(signature().c_str(),acl.x, acl.y, acl.z);
 }
 
-EngineOilProperty::EngineOilProperty()
-	:AbstractProperty("EngineOil","(yyq)",AbstractProperty::Read,RunningStatusInterface::iface())
+AccelerationProperty::AccelerationProperty()
+	: AbstractProperty("Acceleration","(qqq)",AbstractProperty::Read,RunningStatusInterface::iface())
 {
 
 }
-
-
 

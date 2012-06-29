@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,67 +17,50 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#ifndef ENGINEOILPROPERTY_H
-#define ENGINEOILPROPERTY_H
+#ifndef WHEELTICKSENSORPROPERTY_H
+#define WHEELTICKSENSORPROPERTY_H
 
 #include <abstractproperty.h>
 
-class EngineOil 
+class WheelTickSensor
 {
 public:
-	EngineOil():remaining(0), temperature(0), pressure(0) { }
-	
-	EngineOil(EngineOil const & other)
+	WheelTickSensor(): right(0), left(0) { }
+
+	WheelTickSensor(WheelTickSensor const & other)
 	{
-		remaining = other.remaining;
-		temperature = other.temperature;
-		pressure = other.pressure;
+		right = other.right;
+		left = other.left;
 	}
-
-	EngineOil & operator = (EngineOil const & other)
+	WheelTickSensor & operator = (WheelTickSensor const & other)
 	{
-		remaining = other.remaining;
-		temperature = other.temperature;
-		pressure = other.pressure;
-
+		right = other.right;
+		left = other.left;
 		return *this;
 	}
 
-	bool operator == (EngineOil const & other)
-	{
-		return remaining == other.remaining &&
-				temperature == other.temperature &&
-				pressure == other.pressure;
-	}
-
-	uint8_t remaining;
-	uint8_t temperature;
-	uint16_t pressure;
+	uint16_t right;
+	uint16_t left;
 };
 
-class EngineOilProperty : public AbstractProperty
+class WheelTickSensorProperty : public AbstractProperty
 {
 
 public:
-
-	operator EngineOil()
+	operator WheelTickSensor()
 	{
-		return value<EngineOil>();
+		return value<WheelTickSensor>();
 	}
 
-	EngineOilProperty & operator = (EngineOil const & val)
+	WheelTickSensorProperty & operator = (WheelTickSensor const & v)
 	{
-		AbstractProperty::setValue<EngineOil>(val);
+		setValue<WheelTickSensor>(v);
 		return *this;
 	}
 
 	virtual void fromGVariant(GVariant* value);
 	virtual GVariant* toGVariant();
-
-	EngineOilProperty();
-    
-    
+	WheelTickSensorProperty();
 };
 
-#endif // ENGINEOILPROPERTY_H
+#endif // WHEELTICKSENSORPROPERTY_H

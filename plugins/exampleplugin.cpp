@@ -36,6 +36,10 @@ using namespace std;
 #include "chime.h"
 #include "fuellevelproperty.h"
 #include "fuelrangeproperty.h"
+#include "engineoilproperty.h"
+#include "enginecoolantproperty.h"
+#include "accelerationproperty.h"
+#include "steeringwheelangleproperty.h"
 
 #include "debugout.h"
 
@@ -118,6 +122,40 @@ ExamplePlugin::ExamplePlugin()
 	uint16_t fr = *fuelRange;
 
 	BOOST_ASSERT(fr == 321);
+
+	EngineOilProperty *oilproperty = new EngineOilProperty();
+
+	EngineOil oil;
+	oil.temperature = 32;
+	oil.pressure = 400;
+	oil.remaining = 88;
+
+	*oilproperty = oil;
+
+	EngineOil ol = *oilproperty;
+
+	BOOST_ASSERT(ol == oil);
+
+	EngineCoolant coolant;
+	coolant.level= 99;
+	coolant.temperature = 44;
+
+	EngineCoolantProperty *coolantProp = new EngineCoolantProperty();
+	*coolantProp = coolant;
+
+	BOOST_ASSERT(*coolantProp == coolant);
+
+	AccelerationProperty* accelerationProp = new AccelerationProperty();
+	Acceleration accel;
+	accel.x = 1;
+	accel.y = 0.25;
+	accel.z = 0;
+
+	*accelerationProp = accel;
+
+	SteeringWheelAngleProperty * steeringWheelAngle = new SteeringWheelAngleProperty();
+
+	*steeringWheelAngle = 100;
 }
 
 extern "C" void create()

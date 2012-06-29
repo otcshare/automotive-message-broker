@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,67 +17,54 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#ifndef ENGINEOILPROPERTY_H
-#define ENGINEOILPROPERTY_H
+#ifndef ACCELERATIONPROPERTY_H
+#define ACCELERATIONPROPERTY_H
 
 #include <abstractproperty.h>
 
-class EngineOil 
+
+class Acceleration
 {
 public:
-	EngineOil():remaining(0), temperature(0), pressure(0) { }
-	
-	EngineOil(EngineOil const & other)
+	Acceleration() : x(0),y(0),z(0) { }
+	Acceleration(Acceleration const & other)
 	{
-		remaining = other.remaining;
-		temperature = other.temperature;
-		pressure = other.pressure;
+		x = other.x;
+		y = other.y;
+		z = other.z;
 	}
 
-	EngineOil & operator = (EngineOil const & other)
+	Acceleration & operator = (Acceleration const & other)
 	{
-		remaining = other.remaining;
-		temperature = other.temperature;
-		pressure = other.pressure;
+		x = other.x;
+		y = other.y;
+		z = other.z;
 
 		return *this;
 	}
 
-	bool operator == (EngineOil const & other)
-	{
-		return remaining == other.remaining &&
-				temperature == other.temperature &&
-				pressure == other.pressure;
-	}
-
-	uint8_t remaining;
-	uint8_t temperature;
-	uint16_t pressure;
+	uint16_t x;
+	uint16_t y;
+	uint16_t z;
 };
 
-class EngineOilProperty : public AbstractProperty
+class AccelerationProperty : public AbstractProperty
 {
 
 public:
-
-	operator EngineOil()
+	operator Acceleration()
 	{
-		return value<EngineOil>();
+		return value<Acceleration>();
 	}
 
-	EngineOilProperty & operator = (EngineOil const & val)
+	AccelerationProperty & operator = (Acceleration const & v)
 	{
-		AbstractProperty::setValue<EngineOil>(val);
-		return *this;
+		setValue<Acceleration>(v);
 	}
 
 	virtual void fromGVariant(GVariant* value);
 	virtual GVariant* toGVariant();
-
-	EngineOilProperty();
-    
-    
+	AccelerationProperty();
 };
 
-#endif // ENGINEOILPROPERTY_H
+#endif // ACCELERATIONPROPERTY_H

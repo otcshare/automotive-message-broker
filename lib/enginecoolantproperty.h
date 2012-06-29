@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,67 +17,58 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#ifndef ENGINEOILPROPERTY_H
-#define ENGINEOILPROPERTY_H
+#ifndef ENGINECOOLANTPROPERTY_H
+#define ENGINECOOLANTPROPERTY_H
 
 #include <abstractproperty.h>
 
-class EngineOil 
+class EngineCoolant
 {
 public:
-	EngineOil():remaining(0), temperature(0), pressure(0) { }
-	
-	EngineOil(EngineOil const & other)
+	EngineCoolant(): temperature(0), level(0) {}
+	EngineCoolant(EngineCoolant const & other)
 	{
-		remaining = other.remaining;
 		temperature = other.temperature;
-		pressure = other.pressure;
+		level = other.level;
 	}
 
-	EngineOil & operator = (EngineOil const & other)
+	EngineCoolant& operator = (EngineCoolant const &other)
 	{
-		remaining = other.remaining;
 		temperature = other.temperature;
-		pressure = other.pressure;
-
+		level = other.level;
 		return *this;
 	}
 
-	bool operator == (EngineOil const & other)
+	bool operator == (const EngineCoolant& other) const
 	{
-		return remaining == other.remaining &&
-				temperature == other.temperature &&
-				pressure == other.pressure;
+		return temperature == other.temperature && level == other.level;
 	}
 
-	uint8_t remaining;
+
+
 	uint8_t temperature;
-	uint16_t pressure;
+	uint8_t level;
 };
 
-class EngineOilProperty : public AbstractProperty
+class EngineCoolantProperty : public AbstractProperty
 {
 
 public:
-
-	operator EngineOil()
-	{
-		return value<EngineOil>();
-	}
-
-	EngineOilProperty & operator = (EngineOil const & val)
-	{
-		AbstractProperty::setValue<EngineOil>(val);
-		return *this;
-	}
-
 	virtual void fromGVariant(GVariant* value);
 	virtual GVariant* toGVariant();
+	EngineCoolantProperty();
 
-	EngineOilProperty();
-    
-    
+	EngineCoolantProperty& operator=(EngineCoolant const & other)
+	{
+		setValue<EngineCoolant>(other);
+		return *this;
+	}
+
+	operator EngineCoolant()
+	{
+		return value<EngineCoolant>();
+	}
+
 };
 
-#endif // ENGINEOILPROPERTY_H
+#endif // ENGINECOOLANTPROPERTY_H

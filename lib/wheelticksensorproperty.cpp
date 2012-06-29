@@ -1,4 +1,5 @@
 /*
+    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -16,25 +17,24 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#include "engineoilproperty.h"
+#include "wheelticksensorproperty.h"
 #include "runningstatusinterface.h"
-void EngineOilProperty::fromGVariant(GVariant* value)
+
+void WheelTickSensorProperty::fromGVariant(GVariant* value)
 {
 
 }
 
-GVariant* EngineOilProperty::toGVariant()
+GVariant* WheelTickSensorProperty::toGVariant()
 {
-	EngineOil v = *this;
-	return g_variant_new(signature().c_str(), v.remaining, v.temperature, v.pressure);
+	WheelTickSensor ticks = value<WheelTickSensor();
+
+	return g_variant_new(signature().c_str(),ticks.left,ticks.right);
 }
 
-EngineOilProperty::EngineOilProperty()
-	:AbstractProperty("EngineOil","(yyq)",AbstractProperty::Read,RunningStatusInterface::iface())
+WheelTickSensorProperty::WheelTickSensorProperty()
+	:AbstractProperty("WheelTickSensor", "(qq)", AbstractProperty::Read, RunningStatusInterface::iface())
 {
 
 }
-
-
 
