@@ -112,10 +112,5 @@ Properties	byte VehiclePowerMode [readonly]
 		
 			Angle of the steering wheel (0-360)
 			
-		struct{ uint16, uint16 } WheelTickSensor [readonly]
-		
-			Left wheel rotation counter (uint16)
-			Right wheel rotation counter (uint16)
-			
 				
 				
