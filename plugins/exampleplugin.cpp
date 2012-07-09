@@ -40,8 +40,6 @@ using namespace std;
 #include "enginecoolantproperty.h"
 #include "accelerationproperty.h"
 #include "steeringwheelangleproperty.h"
-#include "wheelticksensorproperty.h"
-
 
 #include "debugout.h"
 
@@ -160,10 +158,6 @@ ExamplePlugin::ExamplePlugin()
 	SteeringWheelAngleProperty * steeringWheelAngle = new SteeringWheelAngleProperty();
 
 	*steeringWheelAngle = 100;
-	
-	WheelTickSensor wheelTicks;
-	wheelTicks.right = 1000;
-	wheelTicks.left = 1300;
 }
 
 extern "C" void create()
