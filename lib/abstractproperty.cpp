@@ -18,9 +18,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 #include "abstractproperty.h"
+#include "abstractdbusinterface.h"
 
 AbstractProperty::AbstractProperty(string pn, string sig, Access access, AbstractDBusInterface* interface)
 	: mPropertyName(pn), mSignature(sig), mAccess(access), mInterface(interface)
 {
 	interface->addProperty(this);
+}
+
+void AbstractProperty::updateValue()
+{
+	mInterface->updateValue(this);
 }

@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/any.hpp>
 #include <glib.h>
 
-#include "abstractdbusinterface.h"
+class AbstractDBusInterface;
 
 using namespace std;
 
@@ -70,7 +70,7 @@ public:
 	void setValue(T val)
 	{
 		mValue = val;
-		mInterface->updateValue(this);
+		updateValue();
 	}
 
 	template<typename T>
@@ -81,7 +81,7 @@ public:
 	
 protected: ///methods:
 
-	
+	void updateValue();
 	
 protected:
 	
