@@ -111,7 +111,7 @@ assert engineCoolant[1] == 44
 
 assert type(acceleration) == dbus.Struct
 assert acceleration[0] == 1
-assert acceleration[1] == 0.25
+assert acceleration[1] == 0
 assert acceleration[2] == 0
 
 assert type(steeringWheelAngle) == dbus.UInt16

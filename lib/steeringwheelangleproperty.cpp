@@ -33,6 +33,6 @@ GVariant* SteeringWheelAngleProperty::toGVariant()
 SteeringWheelAngleProperty::SteeringWheelAngleProperty()
 	:AbstractProperty("SteeringWheelAngle","q",AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue<uint16_t>(0);
 }
 

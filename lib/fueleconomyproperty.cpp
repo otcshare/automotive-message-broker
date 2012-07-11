@@ -33,7 +33,7 @@ GVariant* FuelEconomyProperty::toGVariant()
 FuelEconomyProperty::FuelEconomyProperty()
 : AbstractProperty("FuelEconomy","q",AbstractProperty::Read, RunningStatusInterface::iface())
 {
-	
+	setValue(0);
 }
 
 void FuelEconomyProperty::setValue(uint16_t val)

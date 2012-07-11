@@ -60,6 +60,6 @@ GVariant* TripMeterProperty::toGVariant()
 TripMeterProperty::TripMeterProperty()
 : AbstractProperty("TripMeter", "au", AbstractProperty::ReadWrite, RunningStatusInterface::iface())
 {
-
+	setValue(TripMeters());
 }
 

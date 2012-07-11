@@ -33,7 +33,7 @@ GVariant* FuelLevelProperty::toGVariant()
 FuelLevelProperty::FuelLevelProperty()
 	:AbstractProperty("FuelLevel", "y", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue(0);
 }
 
 void FuelLevelProperty::setValue(uint8_t val)

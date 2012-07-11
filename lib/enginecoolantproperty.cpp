@@ -34,6 +34,6 @@ GVariant* EngineCoolantProperty::toGVariant()
 EngineCoolantProperty::EngineCoolantProperty()
 	:AbstractProperty("EngineCoolant", "(yy)", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue<EngineCoolant>(EngineCoolant());
 }
 

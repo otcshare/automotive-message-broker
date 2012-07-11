@@ -43,6 +43,6 @@ GVariant* EngineSpeedProperty::toGVariant()
 EngineSpeedProperty::EngineSpeedProperty()
 : AbstractProperty("EngineSpeed", "q", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-	
+	setValue(0);
 }
 

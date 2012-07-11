@@ -44,6 +44,6 @@ GVariant* HornProperty::toGVariant()
 HornProperty::HornProperty()
     :AbstractProperty("Horn","b",AbstractProperty::Read,RunningStatusInterface::iface())
 {
-
+	setValue(false);
 }
 

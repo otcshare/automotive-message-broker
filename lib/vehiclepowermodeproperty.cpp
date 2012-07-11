@@ -44,8 +44,8 @@ GVariant* VehiclePowerModeProperty::toGVariant()
 }
 
 VehiclePowerModeProperty::VehiclePowerModeProperty()
-: AbstractProperty("VehiclePowerMode", "b", AbstractProperty::Read, RunningStatusInterface::iface())
+: AbstractProperty("VehiclePowerMode", "y", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-	
+	setValue(VehiclePowerModeProperty::Off);
 }
 

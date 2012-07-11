@@ -58,6 +58,6 @@ GVariant* InteriorLightStatusProperty::toGVariant()
 InteriorLightStatusProperty::InteriorLightStatusProperty()
 : AbstractProperty("InteriorLightStatus","a{yb}", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue(InteriorLightStatusProperty::InteriorLightStatus());
 }
 

@@ -43,6 +43,6 @@ GVariant* WheelBrakeProperty::toGVariant()
 WheelBrakeProperty::WheelBrakeProperty()
 : AbstractProperty("WheelBrake","b",AbstractProperty::Read,RunningStatusInterface::iface())
 {
-
+	setValue(false);
 }
 

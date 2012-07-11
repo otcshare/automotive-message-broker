@@ -32,7 +32,7 @@ GVariant* FuelRangeProperty::toGVariant()
 FuelRangeProperty::FuelRangeProperty()
 	:AbstractProperty("FuelRange","q",AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue<uint16_t>(0);
 }
 
 FuelRangeProperty& FuelRangeProperty::operator=(uint16_t const & other)

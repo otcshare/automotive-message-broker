@@ -59,6 +59,6 @@ GVariant* LightStatusProperty::toGVariant()
 LightStatusProperty::LightStatusProperty()
 : AbstractProperty("LightStatus","a{yb}", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue(LightStatus());
 }
 

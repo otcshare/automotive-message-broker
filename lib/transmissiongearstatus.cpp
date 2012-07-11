@@ -43,8 +43,8 @@ GVariant* TransmissionGearStatusProperty::toGVariant()
 }
 
 TransmissionGearStatusProperty::TransmissionGearStatusProperty()
-: AbstractProperty("TransmissionGearStatus", "b", AbstractProperty::Read, RunningStatusInterface::iface())
+: AbstractProperty("TransmissionGearStatus", "y", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue(TransmissionGearStatus::Neutral);
 }
 

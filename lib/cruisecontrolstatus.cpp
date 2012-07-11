@@ -46,6 +46,6 @@ GVariant* CruiseControlStatusProperty::toGVariant()
 CruiseControlStatusProperty::CruiseControlStatusProperty()
 : AbstractProperty("CruiseControlStatus", "(bq)", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-
+	setValue(CruiseControlStatus());
 }
 

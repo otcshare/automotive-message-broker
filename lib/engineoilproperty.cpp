@@ -33,7 +33,7 @@ GVariant* EngineOilProperty::toGVariant()
 EngineOilProperty::EngineOilProperty()
 	:AbstractProperty("EngineOil","(yyq)",AbstractProperty::Read,RunningStatusInterface::iface())
 {
-
+	setValue<EngineOil>(EngineOil());
 }
 
 

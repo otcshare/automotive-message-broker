@@ -33,7 +33,7 @@ GVariant* Chime::toGVariant()
 Chime::Chime()
 	:AbstractProperty("Chime","b",AbstractProperty::Read,RunningStatusInterface::iface())
 {
-
+	setValue(false);
 }
 
 void Chime::setValue(bool val)

@@ -33,6 +33,6 @@ GVariant* AccelerationProperty::toGVariant()
 AccelerationProperty::AccelerationProperty()
 	: AbstractProperty("Acceleration","(qqq)",AbstractProperty::Read,RunningStatusInterface::iface())
 {
-
+	setValue<Acceleration>(Acceleration());
 }
 
