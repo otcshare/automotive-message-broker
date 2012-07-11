@@ -45,7 +45,7 @@ using namespace std;
 
 ExamplePlugin::ExamplePlugin()
 {
-	uint16_t velocity = 5;
+	int velocity = 5;
 	
 	VehicleSpeedProperty* speed = new VehicleSpeedProperty();
 	*speed = velocity;

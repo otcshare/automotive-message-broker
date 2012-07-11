@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.2.0")
+set(PROJECT_VERSION "0.2.2")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")

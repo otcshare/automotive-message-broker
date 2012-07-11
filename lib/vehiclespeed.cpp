@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 VehicleSpeedProperty::VehicleSpeedProperty(): AbstractProperty("VehicleSpeed", "q", AbstractProperty::Read, RunningStatusInterface::iface())
 {
-	
+	setValue(0);
 }
 
 void VehicleSpeedProperty::setValue(uint16_t val)

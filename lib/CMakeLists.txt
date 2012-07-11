@@ -1,6 +1,6 @@
 
 set(amb_sources steeringwheelangleproperty.cpp accelerationproperty.cpp enginecoolantproperty.cpp engineoilproperty.cpp fuelrangeproperty.cpp fuellevelproperty.cpp chime.cpp hornproperty.cpp interiorlightstatusproperty.cpp lightstatusproperty.cpp wheelbrakeproperty.cpp cruisecontrolstatus.cpp transmissiongearstatus.cpp tripmeterproperty.cpp fueleconomyproperty.cpp vehiclepowermodeproperty.cpp enginespeedproperty.cpp runningstatusinterface.cpp vehiclespeed.cpp abstractdbusinterface.cpp abstractproperty.cpp dbusinterfacemanager.cpp debugout.cpp)
-set(amb_headers_install abstractdbusinterface.h abstractproperty.h vehiclespeed.h hornproperty.h interiorlightstatusproperty.h lightstatusproperty.h wheelbrakeproperty.h cruisecontrolstatus.h transmissiongearstatus.h tripmeterproperty.h fueleconomyproperty.h vehiclepowermodeproperty.h enginespeedproperty.h chime.h)
+set(amb_headers_install dbusinterfacemanager.h runningstatusinterface.h abstractproperty.h vehiclespeed.h hornproperty.h interiorlightstatusproperty.h lightstatusproperty.h wheelbrakeproperty.h cruisecontrolstatus.h transmissiongearstatus.h tripmeterproperty.h fueleconomyproperty.h vehiclepowermodeproperty.h enginespeedproperty.h chime.h)
 include_directories( ${include_dirs} )
 add_library(amb SHARED ${amb_sources})
 

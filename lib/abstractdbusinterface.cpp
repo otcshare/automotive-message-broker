@@ -94,7 +94,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	}
 
 	GError *error = NULL;
-	g_dbus_connection_emit_signal(mConnection, "", mObjectPath.c_str(), mInterfaceName.c_str(), property->name().c_str(),property->toGVariant(), &error);
+	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), property->name().c_str(), g_variant_new("(v)",property->toGVariant()), &error);
 
 	if(error)
 	{
@@ -104,9 +104,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
-	debugOut("setting error to NULL");
 	*error = NULL;
-	debugOut("Get Property called!");
 	if(interfaceMap.count(interfaceName))
 	{
 		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
