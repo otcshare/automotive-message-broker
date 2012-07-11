@@ -43,9 +43,9 @@ public:
 		return *this;
 	}
 
-	uint16_t x;
-	uint16_t y;
-	uint16_t z;
+	double x;
+	double y;
+	double z;
 };
 
 class AccelerationProperty : public AbstractProperty

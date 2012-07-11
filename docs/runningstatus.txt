@@ -104,7 +104,7 @@ Properties	byte VehiclePowerMode [readonly]
 			Level (byte)
 			Temperature (byte)
 			
-		struct{ uint16, uint16, uint16 } Acceleration [readonly]
+		struct{ double, double, double } Acceleration [readonly]
 		
 			X, Y and Z acceleration in m/s*s
 		
