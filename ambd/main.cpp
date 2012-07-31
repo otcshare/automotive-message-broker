@@ -42,7 +42,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #include "pluginloader.h"
-#include "dbusinterfacemanager.h"
+#include "abstractsource.h"
 
 using namespace std;
 
@@ -125,11 +125,10 @@ int main(int argc, char **argv)
 	
 	PluginLoader loader(plugin);
 	
-	if(!loader.load())
+	AbstractSource* source = loader.loadSource();
+	if(source == nullptr) 
 		return -1;
 	
-	DBusInterfaceManager manager;
-
 #ifdef USE_QT_CORE
 	
 	app.exec();

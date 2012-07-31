@@ -17,46 +17,20 @@
 */
 
 
-#ifndef LIGHTSTATUSPROPERTY_H
-#define LIGHTSTATUSPROPERTY_H
+#include "abstractsource.h"
 
-#include <abstractproperty.h>
-#include <map>
-
-class LightStatusProperty : public AbstractProperty
+AbstractSource::AbstractSource()
 {
 
-public:
-	enum Light {
-		Head = 0,
-		RightTurn = 1,
-		LeftTurn = 2,
-		Brake = 3,
-		Fog = 4,
-		Hazard = 5,
-		Parking = 6,
-		HighBeam = 7
-	};
-	
-	typedef std::map<Light, bool> LightStatus;
-	
-	operator LightStatus()
-	{
-		return value();
-	}
+}
 
-	LightStatusProperty& operator = (LightStatus l)
-	{
-		setValue(l);
-		return *this;
-	}
+void AbstractSource::propertyChanged(VehicleProperty::Property property, boost::any value)
+{
+	mPropertyChangedCb(property, value);
+}
 
-	void setValue(LightStatusProperty::LightStatus val);
-	LightStatusProperty::LightStatus value();
-	
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	LightStatusProperty();
-};
+void AbstractSource::setPropertyChangedCb(PropertyChangedSignal propertyChangedCb)
+{
+	mPropertyChangedCb = propertyChangedCb;
+}
 
-#endif // LIGHTSTATUSPROPERTY_H

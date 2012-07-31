@@ -28,13 +28,13 @@ PluginLoader::PluginLoader(std::string pluginPath)
 	
 }
 
-bool PluginLoader::load()
+AbstractSource* PluginLoader::loadSource()
 {
 	if(lt_dlinit())
 	{
 		mErrorString = lt_dlerror();
 		cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-		return false;
+		return nullptr;
 	}
 	
 	lt_dlerror();
@@ -45,7 +45,7 @@ bool PluginLoader::load()
 	{
 		mErrorString = lt_dlerror();
 		cerr<<"error opening plugin: "<<mPluginPath<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-		return false;
+		return nullptr;
 	}
 	
 	f_create = (create_t *)lt_dlsym(handle, "create");
@@ -53,11 +53,11 @@ bool PluginLoader::load()
 	//mErrorString = lt_dlerror();
 	if(f_create) 
 	{
-		f_create();
-		return true;
+		return f_create();
+		
 	}
 	
-	return false;
+	return nullptr;
 }
 
 std::string PluginLoader::errorString()

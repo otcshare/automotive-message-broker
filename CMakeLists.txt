@@ -15,7 +15,6 @@ set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The direc
 set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "The directory the docs will be installed to")
 
 option(use_qtcore "Use QCoreApplication mainloop " OFF)
-option(nobdy_compat "Build nobdy compatibility plugin" OFF)
 
 find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")

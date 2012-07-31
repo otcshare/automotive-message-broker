@@ -17,32 +17,19 @@
 */
 
 
-#include "wheelbrakeproperty.h"
-#include "runningstatusinterface.h"
+#include "vehicleproperty.h"
 
-void WheelBrakeProperty::setValue(bool val)
-{
-	AbstractProperty::setValue<bool>(val);
-}
-
-bool WheelBrakeProperty::value()
-{
-	return AbstractProperty::value<bool>();
-}
-
-void WheelBrakeProperty::fromGVariant(GVariant* value)
+VehicleProperty::VehicleProperty()
 {
 
 }
 
-GVariant* WheelBrakeProperty::toGVariant()
+string VehicleProperty::name(VehicleProperty::Property prop)
 {
-	return g_variant_new_boolean(value());
+	return "";
 }
 
-WheelBrakeProperty::WheelBrakeProperty()
-: AbstractProperty("WheelBrake","b",AbstractProperty::Read,RunningStatusInterface::iface())
+VehicleProperty::Property VehicleProperty::value(string name)
 {
-	setValue(false);
+	return VehicleProperty::NoValue;
 }
-

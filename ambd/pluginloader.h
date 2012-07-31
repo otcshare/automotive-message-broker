@@ -21,20 +21,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <string>
 #include <ltdl.h>
+#include "abstractsource.h"
 
 
-
-typedef void create_t();
+typedef AbstractSource* create_t();
 
 class PluginLoader
 {
 
 public:
-    PluginLoader(std::string pluginPath);
-        
-    bool load();
-    
-    std::string errorString();
+	PluginLoader(std::string pluginPath);
+
+	AbstractSource * loadSource();
+
+	std::string errorString();
         
 private:
 	std::string mPluginPath;

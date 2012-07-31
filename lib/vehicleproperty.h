@@ -17,34 +17,33 @@
 */
 
 
-#ifndef ENGINESPEEDPROPERTY_H
-#define ENGINESPEEDPROPERTY_H
+#ifndef VEHICLEPROPERTY_H
+#define VEHICLEPROPERTY_H
 
-#include "abstractproperty.h"
+#include <string>
+#include <list>
 
+using namespace std;
 
-class EngineSpeedProperty : public AbstractProperty
+class VehicleProperty
 {
 
 public:
 
-	operator uint16_t()
+	VehicleProperty();
+
+	enum Property
 	{
-		return value();
-	}
+		NoValue=0,
+		VehicleSpeed,
+		EngineSpeed
+	};
 
-	EngineSpeedProperty & operator = (uint16_t const &v)
-	{
-		setValue(v);
-		return *this;
-	}
-
-	void setValue(uint16_t v);
-	uint16_t value() { return AbstractProperty::value<uint16_t>(); }
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	EngineSpeedProperty();
-
+	static string name(Property prop);
+	static Property value(string name);
+    
 };
 
-#endif // ENGINESPEEDPROPERTY_H
+typedef list<VehicleProperty::Property> PropertyList;
+
+#endif // VEHICLEPROPERTY_H

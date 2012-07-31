@@ -17,41 +17,44 @@
 */
 
 
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
+#include "abstractsink.h"
 
-#include <abstractproperty.h>
-#include <map>
-
-class InteriorLightStatusProperty : public AbstractProperty
+AbstractSink::AbstractSink()
 {
 
-public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+}
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
+void AbstractSink::setProperty(VehicleProperty::Property prop, boost::any value)
+{
+	setPropertyCb(prop, value);
+}
 
-	operator InteriorLightStatus()
-	{
-		return value();
-	}
+void AbstractSink::setSupported(PropertyList properties)
+{
+	mSupported = properties;
+}
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
-	{
-		setValue(v);
-		return *this;
-	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
-};
+void AbstractSink::subscribeToProperty(VehicleProperty::Property property)
+{
+	subscribeToPropertyCb(property);
+}
 
-#endif // INTERIORLIGHTSTATUSPROPERTY_H
+PropertyList AbstractSink::supported()
+{
+	return mSupported;
+}
+
+void AbstractSink::unsubscribeToProperty(VehicleProperty::Property property)
+{
+	unsubscribeToPropertyCb(property);
+}
+
+void AbstractSinkManager::sinkCreated(AbstractSink* sink)
+{
+	sinkCreatedCb(sink);
+}
+
+void AbstractSinkManager::sinkRemoved(AbstractSink* sink)
+{
+	sinkRemovedCb(sink);
+}
