@@ -123,11 +123,12 @@ int main(int argc, char **argv)
 	
 #endif
 	
-	PluginLoader loader(plugin);
+	/*PluginLoader loader;
 	
-	AbstractSource* source = loader.loadSource();
+	AbstractSource* source = loader.sources();
 	if(source == nullptr) 
 		return -1;
+	*/
 	
 #ifdef USE_QT_CORE
 	

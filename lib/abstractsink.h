@@ -23,10 +23,13 @@
 #include <string>
 #include <list>
 #include <functional>
+#include <boost/any.hpp>
 
 #include "vehicleproperty.h"
 
 using namespace std;
+
+class AbstractSink;
 
 typedef function<void (VehicleProperty::Property, boost::any)> SetPropertySignal;
 typedef function<void (VehicleProperty::Property)> SubscriptionSignal;
@@ -47,6 +50,12 @@ public:
 	
 	void setSupported(PropertyList properties);
 	
+	///callback setters:
+	void setSetPropertyCb(SetPropertySignal cb);
+	void setSubcribeToPropertyCb(SubscriptionSignal cb);
+	void setUnsubscribeToPropertyCb(SubscriptionSignal cb);
+	
+	
 	///Pure virtual methods:
 	
 	virtual string name() = 0;
@@ -58,6 +67,7 @@ private:
 	SetPropertySignal setPropertyCb;
 	SubscriptionSignal subscribeToPropertyCb;
 	SubscriptionSignal unsubscribeToPropertyCb;
+	
 	PropertyList mSupported;
 };
 

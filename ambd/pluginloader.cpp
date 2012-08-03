@@ -19,46 +19,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "pluginloader.h"
 #include <iostream>
+#include <json-glib/json-glib.h>
 
 using namespace std;
 
-PluginLoader::PluginLoader(std::string pluginPath)
-:mPluginPath(pluginPath),f_create(NULL)
+PluginLoader::PluginLoader(string configFile):f_create(NULL)
 {
+	JsonParser* parser = json_parser_new();
+	GError* error = nullptr;
+	if(!json_parser_load_from_file(parser, configFile.c_str(), error))
+	{
+		throw -1;
+	}
 	
+	JsonReader* reader = json_reader_new(json_parser_get_root(parser));
+	
+	g_error_free(error);
 }
 
-AbstractSource* PluginLoader::loadSource()
-{
-	if(lt_dlinit())
-	{
-		mErrorString = lt_dlerror();
-		cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-		return nullptr;
-	}
-	
-	lt_dlerror();
-	
-	lt_dlhandle handle = lt_dlopenext(mPluginPath.c_str());
-	
-	if(!handle)
-	{
-		mErrorString = lt_dlerror();
-		cerr<<"error opening plugin: "<<mPluginPath<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-		return nullptr;
-	}
-	
-	f_create = (create_t *)lt_dlsym(handle, "create");
-	
-	//mErrorString = lt_dlerror();
-	if(f_create) 
-	{
-		return f_create();
-		
-	}
-	
-	return nullptr;
-}
+
 
 std::string PluginLoader::errorString()
 {
