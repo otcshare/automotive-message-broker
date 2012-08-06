@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "abstractsource.h"
 #include "abstractsink.h"
+#include "debugout.h"
 
 
 
@@ -51,8 +52,10 @@ public:
 private: ///methods:
 	
 	template<class T>
-	T* loadPlugin(string pluginName)
+	T loadPlugin(string pluginName)
 	{
+		DebugOut()<<"Loading plugin: "<<pluginName;
+		
 		if(lt_dlinit())
 		{
 			mErrorString = lt_dlerror();
@@ -73,10 +76,12 @@ private: ///methods:
 		
 		f_create = (create_t *)lt_dlsym(handle, "create");
 		
-		//mErrorString = lt_dlerror();
+		mErrorString = lt_dlerror();
+		
 		if(f_create) 
 		{
-			return dynamic_cast<T*>( f_create() );
+			void* obj = f_create();
+			return static_cast<T>( obj );
 		}
 		
 		return nullptr;
@@ -86,6 +91,9 @@ private:
 	
 	std::string mPluginPath;
 	std::string mErrorString;
+	
+	SourceList mSources;
+	SinkList mSinks;
 	
 	SinkSignal sinkCreatedCb;
 	SinkSignal sinkRemovedCb;

@@ -30,6 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <stdlib.h>
 #include <signal.h>
 #include <string.h>
+#include <stdexcept>
+#include <glib-object.h>
 
 #ifdef USE_QT_CORE
 
@@ -69,13 +71,13 @@ void daemonize();
 
 void printhelp(const char *argv0);
 
-static const char shortopts[] = "hvdp:";
+static const char shortopts[] = "hvdc:";
 
 static const struct option longopts[] = {
 	{ "help", no_argument, NULL, 'h' }, ///< Print the help text
 	{ "version", no_argument, NULL, 'v' }, ///< Print the version text
 	{ "daemonise", no_argument, NULL, 'd' }, ///< Daemonise
-	{ "plugin", required_argument, NULL, 'p' },
+	{ "config", required_argument, NULL, 'c' },
 	{ NULL, 0, NULL, 0 } ///< End
 };
 
@@ -84,7 +86,7 @@ int main(int argc, char **argv)
 
 	bool isdeamonize=false;
 	int optc;
-	string plugin;
+	string config;
 	
 	while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
 	{
@@ -99,9 +101,9 @@ int main(int argc, char **argv)
 				cout<<"Version: "<<PROJECT_VERSION<<endl;
 				return (0);
 				break;
-			case 'p':
-				cout<<"plugin: "<<optarg<<endl;
-				plugin=optarg;
+			case 'c':
+				cout<<"Config: "<<optarg<<endl;
+				config=optarg;
 				break;
 			default:
 				cerr<<"Unknown option "<<optc<<endl;
@@ -110,8 +112,10 @@ int main(int argc, char **argv)
 				break;
 		}
 	}
+	
 	if(isdeamonize)
 		daemonize();
+	
 	
 #ifdef USE_QT_CORE
 
@@ -123,12 +127,15 @@ int main(int argc, char **argv)
 	
 #endif
 	
-	/*PluginLoader loader;
+	g_type_init();
 	
-	AbstractSource* source = loader.sources();
-	if(source == nullptr) 
-		return -1;
-	*/
+	PluginLoader loader(config);
+	
+	if(!loader.sources().size())
+	{
+		throw std::runtime_error("No sources present. aborting");
+	}
+	
 	
 #ifdef USE_QT_CORE
 	
