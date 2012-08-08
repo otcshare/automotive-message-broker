@@ -1,5 +1,4 @@
 /*
-    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -17,27 +16,20 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "fuelrangeproperty.h"
-#include "runningstatusinterface.h"
-void FuelRangeProperty::fromGVariant(GVariant* value)
+
+#include "vehicleproperty.h"
+
+VehicleProperty::VehicleProperty()
 {
 
 }
 
-GVariant* FuelRangeProperty::toGVariant()
+string VehicleProperty::name(VehicleProperty::Property prop)
 {
-	return g_variant_new_uint16(value<uint16_t>());
+	return "";
 }
 
-FuelRangeProperty::FuelRangeProperty()
-	:AbstractProperty("FuelRange","q",AbstractProperty::Read, RunningStatusInterface::iface())
+VehicleProperty::Property VehicleProperty::value(string name)
 {
-
+	return VehicleProperty::NoValue;
 }
-
-FuelRangeProperty& FuelRangeProperty::operator=(uint16_t const & other)
-{
-	setValue<uint16_t>(other);
-	return *this;
-}
-

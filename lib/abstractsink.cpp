@@ -1,5 +1,4 @@
 /*
-    <one line to give the library's name and an idea of what it does.>
     Copyright (C) 2012  Intel Corporation
 
     This library is free software; you can redistribute it and/or
@@ -17,22 +16,45 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include "accelerationproperty.h"
-#include "runningstatusinterface.h"
-void AccelerationProperty::fromGVariant(GVariant* value)
+
+#include "abstractsink.h"
+
+AbstractSink::AbstractSink()
 {
 
 }
 
-GVariant* AccelerationProperty::toGVariant()
+void AbstractSink::setProperty(VehicleProperty::Property prop, boost::any value)
 {
-	Acceleration acl = *this;
-	return g_variant_new(signature().c_str(),acl.x, acl.y, acl.z);
+	setPropertyCb(prop, value);
 }
 
-AccelerationProperty::AccelerationProperty()
-	: AbstractProperty("Acceleration","(qqq)",AbstractProperty::Read,RunningStatusInterface::iface())
+void AbstractSink::setSupported(PropertyList properties)
 {
-
+	mSupported = properties;
 }
 
+void AbstractSink::subscribeToProperty(VehicleProperty::Property property)
+{
+	subscribeToPropertyCb(property);
+}
+
+PropertyList AbstractSink::supported()
+{
+	return mSupported;
+}
+
+void AbstractSink::unsubscribeToProperty(VehicleProperty::Property property)
+{
+	unsubscribeToPropertyCb(property);
+}
+
+void AbstractSinkManager::sinkCreated(AbstractSink* sink)
+{
+	sinkCreatedCb(sink);
+}
+
+void AbstractSinkManager::sinkRemoved(AbstractSink* sink)
+{
+	sinkRemovedCb(sink);
+}

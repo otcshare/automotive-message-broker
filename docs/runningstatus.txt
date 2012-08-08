@@ -104,18 +104,13 @@ Properties	byte VehiclePowerMode [readonly]
 			Level (byte)
 			Temperature (byte)
 			
-		struct{ uint16, uint16, uint16 } Acceleration [readonly]
+		struct{ double, double, double } Acceleration [readonly]
 		
 			X, Y and Z acceleration in m/s*s
 		
 		uint16 SteeringWheelAngle [readonly]
 		
 			Angle of the steering wheel (0-360)
-			
-		struct{ uint16, uint16 } WheelTickSensor [readonly]
-		
-			Left wheel rotation counter (uint16)
-			Right wheel rotation counter (uint16)
 			
 				
 				

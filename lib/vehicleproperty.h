@@ -17,24 +17,33 @@
 */
 
 
-#include "engineoilproperty.h"
-#include "runningstatusinterface.h"
-void EngineOilProperty::fromGVariant(GVariant* value)
+#ifndef VEHICLEPROPERTY_H
+#define VEHICLEPROPERTY_H
+
+#include <string>
+#include <list>
+
+using namespace std;
+
+class VehicleProperty
 {
 
-}
+public:
 
-GVariant* EngineOilProperty::toGVariant()
-{
-	EngineOil v = *this;
-	return g_variant_new(signature().c_str(), v.remaining, v.temperature, v.pressure);
-}
+	VehicleProperty();
 
-EngineOilProperty::EngineOilProperty()
-	:AbstractProperty("EngineOil","(yyq)",AbstractProperty::Read,RunningStatusInterface::iface())
-{
+	enum Property
+	{
+		NoValue=0,
+		VehicleSpeed,
+		EngineSpeed
+	};
 
-}
+	static string name(Property prop);
+	static Property value(string name);
+    
+};
 
+typedef list<VehicleProperty::Property> PropertyList;
 
-
+#endif // VEHICLEPROPERTY_H

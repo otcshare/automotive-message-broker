@@ -23,6 +23,9 @@ chimeStatus =  runningStatusInterface.Get("org.automotive.message.broker.Running
 fuelLevelStatus =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "FuelLevel");
 fuelRange =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "FuelRange");
 engineOil =  runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "EngineOil");
+engineCoolant = runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "EngineCoolant");
+acceleration = runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "Acceleration");
+steeringWheelAngle = runningStatusInterface.Get("org.automotive.message.broker.RunningStatus", "SteeringWheelAngle");
 
 print "VehicleSpeed: ", speed
 print "EngineSpeed: ", enginespeed
@@ -39,6 +42,9 @@ print "Chime", chimeStatus
 print "FuelLevel: %i" % fuelLevelStatus
 print "FuelRange", fuelRange
 print "EngineOil", engineOil
+print "EngineCoolant", engineCoolant
+print "Acceleration", acceleration
+print "SteeringWheelAngle", steeringWheelAngle
 
 assert type(speed) == dbus.UInt16
 assert speed == 5
@@ -98,5 +104,17 @@ assert type(engineOil) == dbus.Struct
 assert engineOil[0] == 88;
 assert engineOil[1] == 32;
 assert engineOil[2] == 400;
+
+assert type(engineCoolant) == dbus.Struct
+assert engineCoolant[0] == 99
+assert engineCoolant[1] == 44
+
+assert type(acceleration) == dbus.Struct
+assert acceleration[0] == 1
+assert acceleration[1] == 0
+assert acceleration[2] == 0
+
+assert type(steeringWheelAngle) == dbus.UInt16
+assert steeringWheelAngle == 100;
 
 print "Passed"

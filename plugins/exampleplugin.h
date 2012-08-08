@@ -19,13 +19,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef EXAMPLEPLUGIN_H
 #define EXAMPLEPLUGIN_H
 
-#include "vehiclespeed.h"
+#include <abstractsource.h>
+#include <string>
 
-class ExamplePlugin 
+using namespace std;
+
+class ExampleSourcePlugin: public AbstractSource
 {
 
 public:
-	ExamplePlugin();
+	ExampleSourcePlugin();
+	string name();
+	void setProperty(VehicleProperty::Property, boost::any);
+	void subscribeToPropertyChanges(VehicleProperty::Property property);
+	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
+	PropertyList supported();
+	
+private:
+	PropertyList mRequests;
 };
 
 #endif // EXAMPLEPLUGIN_H

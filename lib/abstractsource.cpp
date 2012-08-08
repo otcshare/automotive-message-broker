@@ -17,41 +17,20 @@
 */
 
 
-#ifndef INTERIORLIGHTSTATUSPROPERTY_H
-#define INTERIORLIGHTSTATUSPROPERTY_H
+#include "abstractsource.h"
 
-#include <abstractproperty.h>
-#include <map>
-
-class InteriorLightStatusProperty : public AbstractProperty
+AbstractSource::AbstractSource()
 {
 
-public:
-	enum InteriorLight {
-		Driver = 0,
-		Passenger = 1,
-		Center = 2
-	};
+}
 
-	typedef std::map<InteriorLight, bool> InteriorLightStatus;
+void AbstractSource::propertyChanged(VehicleProperty::Property property, boost::any value)
+{
+	mPropertyChangedCb(property, value);
+}
 
-	operator InteriorLightStatus()
-	{
-		return value();
-	}
+void AbstractSource::setPropertyChangedCb(PropertyChangedSignal propertyChangedCb)
+{
+	mPropertyChangedCb = propertyChangedCb;
+}
 
-	InteriorLightStatusProperty & operator = (InteriorLightStatus const & v)
-	{
-		setValue(v);
-		return *this;
-	}
-	
-	void setValue(InteriorLightStatusProperty::InteriorLightStatus val);
-	InteriorLightStatusProperty::InteriorLightStatus value();
-	
-	virtual void fromGVariant(GVariant* value);
-	virtual GVariant* toGVariant();
-	InteriorLightStatusProperty();
-};
-
-#endif // INTERIORLIGHTSTATUSPROPERTY_H

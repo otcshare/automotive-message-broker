@@ -20,25 +20,83 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define PLUGINLOADER_H
 
 #include <string>
+#include <functional>
 #include <ltdl.h>
+#include <iostream>
+
+#include "abstractsource.h"
+#include "abstractsink.h"
+#include "debugout.h"
 
 
 
-typedef void create_t();
+using namespace std;
+
+typedef void* create_t();
+
 
 class PluginLoader
 {
 
 public:
-    PluginLoader(std::string pluginPath);
+	PluginLoader(string configFile);
+
+	SourceList sources();
+	SinkList sinks();
+
+	std::string errorString();
         
-    bool load();
-    
-    std::string errorString();
-        
+	void setSinkCreatedCb(SinkSignal cb);
+	void setSinkRemovedCb(SinkSignal cb);
+	
+private: ///methods:
+	
+	template<class T>
+	T loadPlugin(string pluginName)
+	{
+		DebugOut()<<"Loading plugin: "<<pluginName;
+		
+		if(lt_dlinit())
+		{
+			mErrorString = lt_dlerror();
+			cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			return nullptr;
+		}
+		
+		lt_dlerror();
+		
+		lt_dlhandle handle = lt_dlopenext(mPluginPath.c_str());
+		
+		if(!handle)
+		{
+			mErrorString = lt_dlerror();
+			cerr<<"error opening plugin: "<<mPluginPath<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			return nullptr;
+		}
+		
+		f_create = (create_t *)lt_dlsym(handle, "create");
+		
+		mErrorString = lt_dlerror();
+		
+		if(f_create) 
+		{
+			void* obj = f_create();
+			return static_cast<T>( obj );
+		}
+		
+		return nullptr;
+	}
+	
 private:
+	
 	std::string mPluginPath;
 	std::string mErrorString;
+	
+	SourceList mSources;
+	SinkList mSinks;
+	
+	SinkSignal sinkCreatedCb;
+	SinkSignal sinkRemovedCb;
 	
 	create_t * f_create;
 };
