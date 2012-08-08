@@ -34,3 +34,9 @@ void AbstractSource::setPropertyChangedCb(PropertyChangedSignal propertyChangedC
 	mPropertyChangedCb = propertyChangedCb;
 }
 
+void AbstractSource::setSupportedChangedCb(SupportedChangedSignal supportedChangedCb)
+{
+	mSupportedChangedCb = supportedChangedCb;
+}
+
+

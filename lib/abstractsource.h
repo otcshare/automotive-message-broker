@@ -31,6 +31,7 @@ using namespace std;
 class AbstractSource;
 
 typedef function<void (VehicleProperty::Property, boost::any)> PropertyChangedSignal;
+typedef function<void (PropertyList)> SupportedChangedSignal;
 
 typedef list<AbstractSource*> SourceList;
 
@@ -43,6 +44,7 @@ public:
 	void propertyChanged(VehicleProperty::Property property, boost::any value);
 
 	void setPropertyChangedCb(PropertyChangedSignal propertyChangedCb);
+	void setSupportedChangedCb(SupportedChangedSignal supportedChangedCb);
 	
 	///pure virtual methods:
 
@@ -55,6 +57,7 @@ public:
 
 private:
 	PropertyChangedSignal mPropertyChangedCb;
+	SupportedChangedSignal mSupportedChangedCb;
     
 };
 
