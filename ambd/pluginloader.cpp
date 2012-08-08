@@ -45,73 +45,78 @@ PluginLoader::PluginLoader(string configFile): f_create(NULL)
 		throw std::runtime_error("Failed to load config");
 	}
 	
-	JsonReader* reader = json_reader_new(json_parser_get_root(parser));
+	JsonNode* node = json_parser_get_root(parser);
+	
+	if(node == nullptr)
+		throw std::runtime_error("Unable to get JSON root object");
+	
+	JsonReader* reader = json_reader_new(node);
 	
 	if(reader == nullptr)
 		throw std::runtime_error("Unable to create JSON reader");
 	
+	DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
+	
+	gchar** members = json_reader_list_members(reader);
+	
+	for(int i=0; i< json_reader_count_members(reader); i++)
+	{
+		cout<<"member: "<<members[i]<<endl;
+	}
+	
 	json_reader_read_member(reader,"sources");
 	
-	JsonNode* sourcesNode = json_reader_get_value(reader);
+	const GError * srcReadError = json_reader_get_error(reader);
 	
-	if(sourcesNode != nullptr)
+	if(srcReadError != nullptr)
 	{
-
-		JsonArray* sourcesArray = json_node_get_array(sourcesNode);
-
-		int sourcesLength = json_array_get_length(sourcesArray);
-
-		for(int i=0; i < sourcesLength; i++)
-		{
-			string path = json_array_get_string_element(sourcesArray,i);
-			AbstractSource* plugin = loadPlugin<AbstractSource*>(path);
-			
-			if(plugin != nullptr)
-				mSources.push_back(plugin);
-		}
-			
-		json_reader_end_member(reader);
-		g_object_unref(sourcesArray);
+		DebugOut()<<"Error getting sources member: "<<srcReadError->message<<endl;
+		throw std::runtime_error("Error getting sources member");
 	}
 	
-	else 
-	{
-		DebugOut()<<"Config contains no sources."<<endl;
-	}
+	g_assert(json_reader_is_array(reader));
 	
+	
+	
+	for(int i=0; i < json_reader_count_elements(reader); i++)
+	{
+		json_reader_read_element(reader,i);
+		
+		string path = json_reader_get_string_value(reader);
+		AbstractSource* plugin = loadPlugin<AbstractSource*>(path);
+		
+		if(plugin != nullptr)
+			mSources.push_back(plugin);
+		
+		json_reader_end_element(reader);
+	}
+			
+	json_reader_end_member(reader);
+
 	///read the sinks:
 		
 	json_reader_read_member(reader,"sinks");
-	
-	JsonNode* sinksNode = json_reader_get_value(reader);
-	
-	if(sinksNode != nullptr)
-	{
-	
-		JsonArray* sinksArray = json_node_get_array(sinksNode);
-		
-		int sinksLength = json_array_get_length(sinksArray);
-		
-		for(int i=0; i < sinksLength; i++)
-		{
-			string path = json_array_get_string_element(sinksArray,i);
-			AbstractSink* plugin = loadPlugin<AbstractSink*>(path);
 			
-			if(plugin != nullptr)
-				mSinks.push_back(plugin);
-		}
+	for(int i=0; i < json_reader_count_elements(reader); i++)
+	{
+		json_reader_read_element(reader,i);
 		
-		json_reader_end_member(reader);
-		g_object_unref(sinksArray);
+		string path = json_reader_get_string_value(reader);
+		AbstractSink* plugin = loadPlugin<AbstractSink*>(path);
+		
+		if(plugin != nullptr)
+			mSinks.push_back(plugin);
+		
+		json_reader_end_element(reader);
 	}
+	
+	json_reader_end_member(reader);
 	
 	///TODO: this will probably explode:
 	
 	g_error_free(error);
 	g_object_unref(reader);
 	g_object_unref(parser);
-	g_object_unref(sourcesNode);
-	g_object_unref(sinksNode);
 	
 }
 

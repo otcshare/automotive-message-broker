@@ -54,7 +54,7 @@ private: ///methods:
 	template<class T>
 	T loadPlugin(string pluginName)
 	{
-		DebugOut()<<"Loading plugin: "<<pluginName;
+		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 		
 		if(lt_dlinit())
 		{
@@ -65,18 +65,18 @@ private: ///methods:
 		
 		lt_dlerror();
 		
-		lt_dlhandle handle = lt_dlopenext(mPluginPath.c_str());
+		lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
 		
 		if(!handle)
 		{
 			mErrorString = lt_dlerror();
-			cerr<<"error opening plugin: "<<mPluginPath<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
 		
 		f_create = (create_t *)lt_dlsym(handle, "create");
 		
-		mErrorString = lt_dlerror();
+		//mErrorString = lt_dlerror();
 		
 		if(f_create) 
 		{
