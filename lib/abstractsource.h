@@ -31,7 +31,10 @@ using namespace std;
 class AbstractSource;
 
 typedef function<void (VehicleProperty::Property, boost::any)> PropertyChangedSignal;
-typedef function<void (PropertyList)> SupportedChangedSignal;
+
+/// [void](PropertyList added, PropertyList removed) { }
+
+typedef function<void (PropertyList, PropertyList)> SupportedChangedSignal;
 
 typedef list<AbstractSource*> SourceList;
 
