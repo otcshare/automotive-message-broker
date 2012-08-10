@@ -29,6 +29,12 @@ void AbstractSource::propertyChanged(VehicleProperty::Property property, boost::
 	mPropertyChangedCb(property, value);
 }
 
+void AbstractSource::supportedChanged(PropertyList addedList, PropertyList removed)
+{
+	mSupportedChangedCb(addedList, removed);
+}
+
+
 void AbstractSource::setPropertyChangedCb(PropertyChangedSignal propertyChangedCb)
 {
 	mPropertyChangedCb = propertyChangedCb;

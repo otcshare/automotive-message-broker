@@ -45,6 +45,7 @@ public:
 	AbstractSource();
 
 	void propertyChanged(VehicleProperty::Property property, boost::any value);
+	void supportedChanged(PropertyList added, PropertyList removed);
 
 	void setPropertyChangedCb(PropertyChangedSignal propertyChangedCb);
 	void setSupportedChangedCb(SupportedChangedSignal supportedChangedCb);
