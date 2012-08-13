@@ -36,7 +36,7 @@ void AbstractSink::setSupported(PropertyList properties)
 
 void AbstractSink::subscribeToProperty(VehicleProperty::Property property)
 {
-	subscribeToPropertyCb(property);
+	subscribeToPropertyCb(property,this);
 }
 
 PropertyList AbstractSink::supported()
@@ -46,7 +46,7 @@ PropertyList AbstractSink::supported()
 
 void AbstractSink::unsubscribeToProperty(VehicleProperty::Property property)
 {
-	unsubscribeToPropertyCb(property);
+	unsubscribeToPropertyCb(property, this);
 }
 
 void AbstractSinkManager::sinkCreated(AbstractSink* sink)
@@ -57,4 +57,19 @@ void AbstractSinkManager::sinkCreated(AbstractSink* sink)
 void AbstractSinkManager::sinkRemoved(AbstractSink* sink)
 {
 	sinkRemovedCb(sink);
+}
+
+void AbstractSink::setSetPropertyCb(SetPropertySignal cb)
+{
+	setPropertyCb = cb;
+}
+
+void AbstractSink::setSubcribeToPropertyCb(SubscriptionSignal cb)
+{
+	subscribeToPropertyCb = cb;
+}
+
+void AbstractSink::setUnsubscribeToPropertyCb(SubscriptionSignal cb)
+{
+	unsubscribeToPropertyCb = cb;
 }

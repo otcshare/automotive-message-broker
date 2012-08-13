@@ -28,7 +28,7 @@ class ListPlusPlus
 {
 public:
 	
-	ListPlusPlus(std::list<T> list)
+	ListPlusPlus(std::list<T> *list)
 	:mList(list)
 	{
 		
@@ -37,22 +37,22 @@ public:
 	
 	void removeOne(T value)
 	{
-		typename std::list<T>::iterator itr = std::find<T>(mList.begin(), mList.end(), value);
+		typename std::list<T>::iterator itr = std::find(mList->begin(), mList->end(), value);
 		
-		if (itr != mList.end())
+		if (itr != mList->end())
 		{
-			mList.erase(itr);
+			mList->erase(itr);
 		}
 	}
 	
 	
 	bool contains(T value)
 	{
-		return (std::find<T>(mList.begin(), mList.end(), value) != mList.end());
+		return (std::find(mList->begin(), mList->end(), value) != mList->end());
 	}
 	
 private:
-	std::list<T> mList;
+	std::list<T> *mList;
 };
 
 #endif // LISTPLUSPLUS_H

@@ -23,6 +23,8 @@
 #include "abstractsink.h"
 #include "abstractsource.h"
 
+#include <unordered_map>
+
 class Core
 {
 
@@ -33,14 +35,21 @@ public:
 private: ///methods
 
 	void supportedChanged(PropertyList added, PropertyList removed);
-	
 	void propertyChanged(VehicleProperty::Property property, boost::any value);
+	
+	///sinks:
+	
+	void setProperty(VehicleProperty::Property, boost::any);
+	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
+	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
     
 private:
 	PropertyList mMasterPropertyList;
 	
 	SourceList mSources;
 	SinkList mSinks;
+	
+	unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
     
 };
 

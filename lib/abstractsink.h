@@ -32,7 +32,7 @@ using namespace std;
 class AbstractSink;
 
 typedef function<void (VehicleProperty::Property, boost::any)> SetPropertySignal;
-typedef function<void (VehicleProperty::Property)> SubscriptionSignal;
+typedef function<void (VehicleProperty::Property, AbstractSink*)> SubscriptionSignal;
 
 typedef list<AbstractSink*> SinkList;
 typedef function<void (AbstractSink*)> SinkSignal;

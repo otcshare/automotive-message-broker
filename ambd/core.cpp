@@ -30,11 +30,23 @@ Core::Core(SourceList sources, SinkList sinks)
 	
 	for(SourceList::iterator itr = mSources.begin(); itr!=mSources.end(); itr++)
 	{
-		auto supportedChangedCb = std::bind(&Core::supportedChanged,this, _1, _2);
+		auto supportedChangedCb = std::bind(&Core::supportedChanged, this, _1, _2);
 		(*itr)->setSupportedChangedCb(supportedChangedCb);
 		
 		auto propChangedDb = std::bind(&Core::propertyChanged, this, _1, _2);
 		(*itr)->setPropertyChangedCb(propChangedDb);
+	}
+	
+	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
+	{
+		auto setPropertyCb = std::bind(&Core::setProperty, this, _1, _2);
+		(*itr)->setSetPropertyCb(setPropertyCb);
+		
+		auto subscribeToPropertyCb = std::bind(&Core::subscribeToProperty, this, _1, _2);
+		(*itr)->setSubcribeToPropertyCb(subscribeToPropertyCb);
+		
+		auto unsubscribeToPropertyCb = std::bind(&Core::unsubscribeToProperty, this, _1, _2);
+		(*itr)->setUnsubscribeToPropertyCb(unsubscribeToPropertyCb);
 	}
 }
 
@@ -42,23 +54,66 @@ Core::Core(SourceList sources, SinkList sinks)
 void Core::supportedChanged(PropertyList added, PropertyList removed)
 {
 	
+	/// add the newly supported to master list
+	
 	for(PropertyList::iterator itr = added.begin(); itr != added.end(); itr++)
 	{
-		if(ListPlusPlus<VehicleProperty::Property>(added).contains(*itr))
+		if(ListPlusPlus<VehicleProperty::Property>(&added).contains(*itr))
 		{
 			mMasterPropertyList.push_back(*itr);
 		}
 	}
 	
+	/// removed no longer supported properties from master list.
+	
 	for(PropertyList::iterator itr = removed.begin(); itr != removed.end(); itr++)
 	{
-		ListPlusPlus<VehicleProperty::Property>(removed).removeOne(*itr);
+		ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).removeOne(*itr);
 	}
 	
+	/// tell all new sinks about the newly supported properties.
+	
+	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
+	{
+		(*itr)->setSupported(mMasterPropertyList);
+	}
+	
+	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
+	
+	for(unordered_map<VehicleProperty::Property, SinkList>::iterator itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
+	{
+		VehicleProperty::Property  property = (*itr).first;
+		
+		for(SourceList::iterator source = mSources.begin(); source != mSources.end(); source++)
+		{
+			PropertyList properties = (*source)->supported();
+			
+			if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+			{
+				(*source)->subscribeToPropertyChanges(property);
+			}
+		}
+	}
 }
 
 void Core::propertyChanged(VehicleProperty::Property property, boost::any value)
 {
 
 }
+
+void Core::setProperty(VehicleProperty::Property , boost::any )
+{
+
+}
+
+void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
+{
+	
+}
+
+void Core::unsubscribeToProperty(VehicleProperty::Property , AbstractSink* self)
+{
+
+}
+
 
