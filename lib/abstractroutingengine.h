@@ -17,41 +17,27 @@
 */
 
 
-#ifndef CORE_H
-#define CORE_H
+#ifndef ABSTRACTROUTINGENGINE_H
+#define ABSTRACTROUTINGENGINE_H
 
-#include "abstractsink.h"
-#include "abstractsource.h"
-#include "abstractroutingengine.h"
+#include <boost/any.hpp>
+#include "vehicleproperty.h"
 
-#include <unordered_map>
+class AbstractSink;
+class AbstractSource;
 
-class Core: public AbstractRoutingEngine
+class AbstractRoutingEngine
 {
-
 public:
-	Core();
-        
-	/// sources:
-
-	void setSupported(PropertyList supported, AbstractSource* source);
-	void updateSupported(PropertyList added, PropertyList removed);
-	void updateProperty(VehicleProperty::Property property, boost::any value);
+	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
+	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
+	virtual void updateProperty(VehicleProperty::Property property, boost::any value) = 0;
 	
 	/// sinks:
 	
-	void setProperty(VehicleProperty::Property, boost::any);
-	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-    
-private:
-	PropertyList mMasterPropertyList;
-	
-	SourceList mSources;
-	SinkList mSinks;
-	
-	std::unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
-    
+	virtual void setProperty(VehicleProperty::Property, boost::any) = 0;
+	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
+	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 };
 
-#endif // CORE_H
+#endif // ABSTRACTROUTINGENGINE_H

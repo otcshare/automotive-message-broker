@@ -17,41 +17,5 @@
 */
 
 
-#ifndef CORE_H
-#define CORE_H
-
-#include "abstractsink.h"
-#include "abstractsource.h"
 #include "abstractroutingengine.h"
 
-#include <unordered_map>
-
-class Core: public AbstractRoutingEngine
-{
-
-public:
-	Core();
-        
-	/// sources:
-
-	void setSupported(PropertyList supported, AbstractSource* source);
-	void updateSupported(PropertyList added, PropertyList removed);
-	void updateProperty(VehicleProperty::Property property, boost::any value);
-	
-	/// sinks:
-	
-	void setProperty(VehicleProperty::Property, boost::any);
-	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-    
-private:
-	PropertyList mMasterPropertyList;
-	
-	SourceList mSources;
-	SinkList mSinks;
-	
-	std::unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
-    
-};
-
-#endif // CORE_H
