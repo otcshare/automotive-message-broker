@@ -35,9 +35,9 @@ extern "C" AbstractSource * create()
 	return new ExampleSourcePlugin();
 }
 
-string ExampleSourcePlugin::name()
+string ExampleSourcePlugin::uuid()
 {
-	return "example source plugin";
+	return "6dd4268a-c605-4a06-9034-59c1e8344c8e";
 }
 
 void ExampleSourcePlugin::setProperty(VehicleProperty::Property , boost::any )

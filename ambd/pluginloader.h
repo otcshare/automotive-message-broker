@@ -46,8 +46,6 @@ public:
 
 	std::string errorString();
         
-	void setSinkCreatedCb(SinkSignal cb);
-	void setSinkRemovedCb(SinkSignal cb);
 	
 private: ///methods:
 	
@@ -94,9 +92,6 @@ private:
 	
 	SourceList mSources;
 	SinkList mSinks;
-	
-	SinkSignal sinkCreatedCb;
-	SinkSignal sinkRemovedCb;
 	
 	create_t * f_create;
 };

@@ -22,19 +22,14 @@
 
 #include <string>
 #include <list>
-#include <functional>
 #include <boost/any.hpp>
+
 #include "vehicleproperty.h"
+#include "abstractroutingengine.h"
 
 using namespace std;
 
 class AbstractSource;
-
-typedef function<void (VehicleProperty::Property, boost::any)> PropertyChangedSignal;
-
-/// [void](PropertyList added, PropertyList removed) { }
-
-typedef function<void (PropertyList, PropertyList)> SupportedChangedSignal;
 
 typedef list<AbstractSource*> SourceList;
 
@@ -43,26 +38,20 @@ class AbstractSource
 
 public:
 	AbstractSource();
-
-	void propertyChanged(VehicleProperty::Property property, boost::any value);
-	void supportedChanged(PropertyList added, PropertyList removed);
-
-	void setPropertyChangedCb(PropertyChangedSignal propertyChangedCb);
-	void setSupportedChangedCb(SupportedChangedSignal supportedChangedCb);
+	void setRoutingEngine(AbstractRoutingEngine* engine);
 	
 	///pure virtual methods:
 
-	virtual string name() = 0;
+	virtual string uuid() = 0;
 	virtual void setProperty(VehicleProperty::Property property, boost::any value) = 0;
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 	virtual PropertyList supported() = 0;
 	
 
-private:
-	PropertyChangedSignal mPropertyChangedCb;
-	SupportedChangedSignal mSupportedChangedCb;
-    
+protected:
+	AbstractRoutingEngine* routingEngine;
+	    
 };
 
 #endif // ABSTRACTSOURCE_H

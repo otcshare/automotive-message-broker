@@ -20,29 +20,15 @@
 #include "abstractsource.h"
 
 AbstractSource::AbstractSource()
+: routingEngine(nullptr)
 {
 
 }
 
-void AbstractSource::propertyChanged(VehicleProperty::Property property, boost::any value)
+void AbstractSource::setRoutingEngine(AbstractRoutingEngine* engine)
 {
-	mPropertyChangedCb(property, value);
+	routingEngine = engine;
 }
 
-void AbstractSource::supportedChanged(PropertyList addedList, PropertyList removed)
-{
-	mSupportedChangedCb(addedList, removed);
-}
-
-
-void AbstractSource::setPropertyChangedCb(PropertyChangedSignal propertyChangedCb)
-{
-	mPropertyChangedCb = propertyChangedCb;
-}
-
-void AbstractSource::setSupportedChangedCb(SupportedChangedSignal supportedChangedCb)
-{
-	mSupportedChangedCb = supportedChangedCb;
-}
 
 

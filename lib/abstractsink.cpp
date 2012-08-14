@@ -24,52 +24,13 @@ AbstractSink::AbstractSink()
 
 }
 
-void AbstractSink::setProperty(VehicleProperty::Property prop, boost::any value)
+void AbstractSink::setRoutingEngine(AbstractRoutingEngine* engine)
 {
-	setPropertyCb(prop, value);
+	routingEngine = engine;
 }
 
-void AbstractSink::setSupported(PropertyList properties)
-{
-	mSupported = properties;
-}
 
-void AbstractSink::subscribeToProperty(VehicleProperty::Property property)
+void AbstractSinkManager::setRoutingEngine(AbstractRoutingEngine* engine)
 {
-	subscribeToPropertyCb(property,this);
-}
-
-PropertyList AbstractSink::supported()
-{
-	return mSupported;
-}
-
-void AbstractSink::unsubscribeToProperty(VehicleProperty::Property property)
-{
-	unsubscribeToPropertyCb(property, this);
-}
-
-void AbstractSinkManager::sinkCreated(AbstractSink* sink)
-{
-	sinkCreatedCb(sink);
-}
-
-void AbstractSinkManager::sinkRemoved(AbstractSink* sink)
-{
-	sinkRemovedCb(sink);
-}
-
-void AbstractSink::setSetPropertyCb(SetPropertySignal cb)
-{
-	setPropertyCb = cb;
-}
-
-void AbstractSink::setSubcribeToPropertyCb(SubscriptionSignal cb)
-{
-	subscribeToPropertyCb = cb;
-}
-
-void AbstractSink::setUnsubscribeToPropertyCb(SubscriptionSignal cb)
-{
-	unsubscribeToPropertyCb = cb;
+	routingEngine = engine;
 }

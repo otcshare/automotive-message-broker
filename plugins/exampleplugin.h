@@ -29,7 +29,7 @@ class ExampleSourcePlugin: public AbstractSource
 
 public:
 	ExampleSourcePlugin();
-	string name();
+	string uuid();
 	void setProperty(VehicleProperty::Property, boost::any);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);

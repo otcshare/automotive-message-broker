@@ -22,22 +22,23 @@
 
 #include "abstractsink.h"
 #include "abstractsource.h"
+#include "abstractroutingengine.h"
 
 #include <unordered_map>
 
-class Core
+class Core: public AbstractRoutingEngine
 {
 
 public:
-    Core(SourceList sources, SinkList sinks);
-    
-    
-private: ///methods
+	Core();
+        
+	/// sources:
 
-	void supportedChanged(PropertyList added, PropertyList removed);
-	void propertyChanged(VehicleProperty::Property property, boost::any value);
+	void setSupported(PropertyList supported, AbstractSource* source);
+	void updateSupported(PropertyList added, PropertyList removed);
+	void updateProperty(VehicleProperty::Property property, boost::any value);
 	
-	///sinks:
+	/// sinks:
 	
 	void setProperty(VehicleProperty::Property, boost::any);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);

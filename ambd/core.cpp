@@ -23,35 +23,18 @@
 
 using namespace std::placeholders;
 
-Core::Core(SourceList sources, SinkList sinks)
-: mSources(sources), mSinks(sinks)
+Core::Core()
 {
-	///Hook up signals for each source
 	
-	for(SourceList::iterator itr = mSources.begin(); itr!=mSources.end(); itr++)
-	{
-		auto supportedChangedCb = std::bind(&Core::supportedChanged, this, _1, _2);
-		(*itr)->setSupportedChangedCb(supportedChangedCb);
-		
-		auto propChangedDb = std::bind(&Core::propertyChanged, this, _1, _2);
-		(*itr)->setPropertyChangedCb(propChangedDb);
-	}
-	
-	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
-	{
-		auto setPropertyCb = std::bind(&Core::setProperty, this, _1, _2);
-		(*itr)->setSetPropertyCb(setPropertyCb);
-		
-		auto subscribeToPropertyCb = std::bind(&Core::subscribeToProperty, this, _1, _2);
-		(*itr)->setSubcribeToPropertyCb(subscribeToPropertyCb);
-		
-		auto unsubscribeToPropertyCb = std::bind(&Core::unsubscribeToProperty, this, _1, _2);
-		(*itr)->setUnsubscribeToPropertyCb(unsubscribeToPropertyCb);
-	}
+}
+
+void Core::setSupported(PropertyList supported, AbstractSource* source)
+{
+	mSources.push_back(source);
 }
 
 
-void Core::supportedChanged(PropertyList added, PropertyList removed)
+void Core::updateSupported(PropertyList added, PropertyList removed)
 {
 	
 	/// add the newly supported to master list
@@ -75,7 +58,7 @@ void Core::supportedChanged(PropertyList added, PropertyList removed)
 	
 	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
 	{
-		(*itr)->setSupported(mMasterPropertyList);
+		(*itr)->supportedChanged(mMasterPropertyList);
 	}
 	
 	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
@@ -96,7 +79,7 @@ void Core::supportedChanged(PropertyList added, PropertyList removed)
 	}
 }
 
-void Core::propertyChanged(VehicleProperty::Property property, boost::any value)
+void Core::updateProperty(VehicleProperty::Property property, boost::any value)
 {
 
 }
@@ -108,7 +91,7 @@ void Core::setProperty(VehicleProperty::Property , boost::any )
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
-	
+	propertySinkMap[property].push_back(self);
 }
 
 void Core::unsubscribeToProperty(VehicleProperty::Property , AbstractSink* self)

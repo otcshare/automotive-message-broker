@@ -26,62 +26,41 @@
 #include <boost/any.hpp>
 
 #include "vehicleproperty.h"
+#include "abstractroutingengine.h"
 
 using namespace std;
 
 class AbstractSink;
 
-typedef function<void (VehicleProperty::Property, boost::any)> SetPropertySignal;
-typedef function<void (VehicleProperty::Property, AbstractSink*)> SubscriptionSignal;
-
 typedef list<AbstractSink*> SinkList;
-typedef function<void (AbstractSink*)> SinkSignal;
 
 class AbstractSink
 {
 
 public:
 	AbstractSink();
-	
-	void setProperty(VehicleProperty::Property, boost::any);
-	void subscribeToProperty(VehicleProperty::Property property);
-	void unsubscribeToProperty(VehicleProperty::Property property);
-	PropertyList supported(); 
-	
-	void setSupported(PropertyList properties);
-	
-	///callback setters:
-	void setSetPropertyCb(SetPropertySignal cb);
-	void setSubcribeToPropertyCb(SubscriptionSignal cb);
-	void setUnsubscribeToPropertyCb(SubscriptionSignal cb);
-	
+	void setRoutingEngine(AbstractRoutingEngine* engine);
 	
 	///Pure virtual methods:
 	
-	virtual string name() = 0;
-	virtual void propertyChanged(VehicleProperty::Property property, boost::any value) = 0;
+	virtual string uuid() = 0;
+	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid) = 0;
+	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	virtual PropertyList subscriptions() = 0;
 	
-	
-private:
-	SetPropertySignal setPropertyCb;
-	SubscriptionSignal subscribeToPropertyCb;
-	SubscriptionSignal unsubscribeToPropertyCb;
-	
-	PropertyList mSupported;
+protected:
+	AbstractRoutingEngine* routingEngine;
 };
 
 class AbstractSinkManager
 {
 public:
+	
 	virtual SinkList sinks() = 0;
+	void setRoutingEngine(AbstractRoutingEngine* engine);
 	
-	void sinkCreated(AbstractSink*);
-	void sinkRemoved(AbstractSink*);
-	
-private:
-	SinkSignal sinkCreatedCb;
-	SinkSignal sinkRemovedCb;
+protected:
+	AbstractRoutingEngine* routingEngine;
 };
 
 #endif // ABSTRACTSINK_H

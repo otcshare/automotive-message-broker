@@ -120,16 +120,6 @@ PluginLoader::PluginLoader(string configFile): f_create(NULL)
 	
 }
 
-void PluginLoader::setSinkCreatedCb(SinkSignal cb)
-{
-	sinkCreatedCb = cb;
-}
-
-void PluginLoader::setSinkRemovedCb(SinkSignal cb)
-{
-	sinkRemovedCb = cb;
-}
-
 SinkList PluginLoader::sinks()
 {
 	return mSinks;
