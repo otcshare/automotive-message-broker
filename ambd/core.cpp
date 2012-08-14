@@ -91,7 +91,12 @@ void Core::setProperty(VehicleProperty::Property , boost::any )
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
-	propertySinkMap[property].push_back(self);
+	SinkList list = propertySinkMap[property];
+	
+	if(!ListPlusPlus<AbstractSink*>(&list).contains(self))
+	{
+		list.push_back(self);
+	}
 }
 
 void Core::unsubscribeToProperty(VehicleProperty::Property , AbstractSink* self)

@@ -18,6 +18,7 @@
 
 
 #include "abstractsink.h"
+#include "abstractroutingengine.h"
 
 AbstractSink::AbstractSink()
 {

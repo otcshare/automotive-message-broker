@@ -50,7 +50,7 @@ private:
 	SourceList mSources;
 	SinkList mSinks;
 	
-	std::unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
+	unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
     
 };
 

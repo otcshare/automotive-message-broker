@@ -26,10 +26,10 @@
 #include <boost/any.hpp>
 
 #include "vehicleproperty.h"
-#include "abstractroutingengine.h"
 
 using namespace std;
 
+class AbstractRoutingEngine;
 class AbstractSink;
 
 typedef list<AbstractSink*> SinkList;
