@@ -23,12 +23,13 @@
 #include <string>
 #include <list>
 
-using namespace std;
+
 
 class VehicleProperty
 {
 
 public:
+	
 
 	VehicleProperty();
 
@@ -39,11 +40,11 @@ public:
 		EngineSpeed
 	};
 
-	static string name(Property prop);
-	static Property value(string name);
+	static std::string name(Property prop);
+	static Property value(std::string name);
     
 };
 
-typedef list<VehicleProperty::Property> PropertyList;
+typedef std::list<VehicleProperty::Property> PropertyList;
 
 #endif // VEHICLEPROPERTY_H

@@ -19,6 +19,8 @@
 
 #include "vehicleproperty.h"
 
+using namespace std;
+
 VehicleProperty::VehicleProperty()
 {
 

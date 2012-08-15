@@ -24,11 +24,11 @@
 #include "abstractsource.h"
 #include "abstractroutingengine.h"
 
-#include <unordered_map>
+#include <map>
 
 class Core: public AbstractRoutingEngine
 {
-
+	
 public:
 	Core();
         
@@ -44,13 +44,16 @@ public:
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
     
+protected: 
+	~Core();
+	
 private:
 	PropertyList mMasterPropertyList;
 	
 	SourceList mSources;
 	SinkList mSinks;
 	
-	unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
+	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
     
 };
 

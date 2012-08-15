@@ -20,6 +20,7 @@
 #include "core.h"
 #include <functional>
 #include "listplusplus.h"
+#include "debugout.h"
 
 using namespace std::placeholders;
 
@@ -27,6 +28,12 @@ Core::Core()
 {
 	
 }
+
+Core::~Core()
+{
+
+}
+
 
 void Core::setSupported(PropertyList supported, AbstractSource* source)
 {
@@ -63,7 +70,7 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	
 	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
 	
-	for(unordered_map<VehicleProperty::Property, SinkList>::iterator itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
+	for(map<VehicleProperty::Property, SinkList>::iterator itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
 	{
 		VehicleProperty::Property  property = (*itr).first;
 		
@@ -91,12 +98,20 @@ void Core::setProperty(VehicleProperty::Property , boost::any )
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
+	if(propertySinkMap.find(property) == propertySinkMap.end())
+	{
+		DebugOut()<<__FUNCTION__<<"property not supported: "<<VehicleProperty::name(property);
+		return; 
+	}
+	
 	SinkList list = propertySinkMap[property];
 	
 	if(!ListPlusPlus<AbstractSink*>(&list).contains(self))
 	{
 		list.push_back(self);
 	}
+	
+	
 }
 
 void Core::unsubscribeToProperty(VehicleProperty::Property , AbstractSink* self)
