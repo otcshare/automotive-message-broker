@@ -20,7 +20,7 @@
 #ifndef EXAMPLESINK_H
 #define EXAMPLESINK_H
 
-#include <../../home/tripzero/src/automotive-message-broker/lib/abstractsink.h>
+#include "abstractsink.h"
 
 
 class ExampleSink : public AbstractSink
