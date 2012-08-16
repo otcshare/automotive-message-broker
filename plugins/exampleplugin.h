@@ -28,15 +28,23 @@ class ExampleSourcePlugin: public AbstractSource
 {
 
 public:
-	ExampleSourcePlugin();
+	ExampleSourcePlugin(AbstractRoutingEngine* re);
+	
 	string uuid();
 	void setProperty(VehicleProperty::Property, boost::any);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
 	
+	void propertyChanged(VehicleProperty::Property property, boost::any value, string uuid) {}
+	void supportedChanged(PropertyList) {}
+	
+	void randomizeProperties();
+	
 private:
 	PropertyList mRequests;
+	uint16_t velocity;
+	uint16_t engineSpeed;
 };
 
 #endif // EXAMPLEPLUGIN_H

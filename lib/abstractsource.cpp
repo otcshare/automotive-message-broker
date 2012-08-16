@@ -19,15 +19,15 @@
 
 #include "abstractsource.h"
 
-AbstractSource::AbstractSource()
-: routingEngine(nullptr)
+AbstractSource::AbstractSource(AbstractRoutingEngine* engine)
+: AbstractSink(engine), routingEngine(engine)
 {
-
+	
 }
 
-void AbstractSource::setRoutingEngine(AbstractRoutingEngine* engine)
+AbstractSource::~AbstractSource()
 {
-	routingEngine = engine;
+
 }
 
 

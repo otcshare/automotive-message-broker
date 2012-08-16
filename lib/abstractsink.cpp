@@ -20,18 +20,21 @@
 #include "abstractsink.h"
 #include "abstractroutingengine.h"
 
-AbstractSink::AbstractSink()
+AbstractSink::AbstractSink(AbstractRoutingEngine* engine)
+:routingEngine(engine)
 {
 
 }
 
-void AbstractSink::setRoutingEngine(AbstractRoutingEngine* engine)
+AbstractSink::~AbstractSink()
 {
-	routingEngine = engine;
+
+}
+
+AbstractSinkManager::AbstractSinkManager(AbstractRoutingEngine* engine)
+:routingEngine(engine)
+{
+
 }
 
 
-void AbstractSinkManager::setRoutingEngine(AbstractRoutingEngine* engine)
-{
-	routingEngine = engine;
-}

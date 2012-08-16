@@ -24,6 +24,7 @@
 #include <list>
 #include <boost/any.hpp>
 
+#include "abstractsink.h"
 #include "vehicleproperty.h"
 #include "abstractroutingengine.h"
 
@@ -33,16 +34,15 @@ class AbstractSource;
 
 typedef list<AbstractSource*> SourceList;
 
-class AbstractSource
+class AbstractSource: public AbstractSink
 {
 
 public:
-	AbstractSource();
-	void setRoutingEngine(AbstractRoutingEngine* engine);
+	AbstractSource(AbstractRoutingEngine* engine);
+	virtual ~AbstractSource();
 	
 	///pure virtual methods:
 
-	virtual string uuid() = 0;
 	virtual void setProperty(VehicleProperty::Property property, boost::any value) = 0;
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property) = 0;
@@ -51,7 +51,9 @@ public:
 
 protected:
 	AbstractRoutingEngine* routingEngine;
-	    
+	
+private:
+	AbstractSource():AbstractSink(nullptr) { }
 };
 
 #endif // ABSTRACTSOURCE_H

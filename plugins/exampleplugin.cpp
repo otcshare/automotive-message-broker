@@ -20,19 +20,37 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 #include <boost/assert.hpp>
+#include <glib.h>
 
 using namespace std;
 
 #include "debugout.h"
 
-ExampleSourcePlugin::ExampleSourcePlugin()
+static gboolean timeoutCallback(gpointer data)
 {
+	ExampleSourcePlugin* src = (ExampleSourcePlugin*)data;
+	
+	src->randomizeProperties();
+	
+	return true;
+}
+
+ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re)
+:AbstractSource(re), velocity(0), engineSpeed(0)
+{
+	re->setSupported(supported(), this);
+	
+	debugOut("setting timeout");
+	g_timeout_add(1000, timeoutCallback, this );
 	
 }
 
-extern "C" AbstractSource * create()
+
+
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine)
 {
-	return new ExampleSourcePlugin();
+	return new ExampleSourcePlugin(routingengine);
+	
 }
 
 string ExampleSourcePlugin::uuid()
@@ -64,3 +82,14 @@ void ExampleSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property
 	mRequests.remove(property);
 }
 
+void ExampleSourcePlugin::randomizeProperties()
+{
+	velocity = 1 + (255.00 * (rand() / (RAND_MAX + 1.0)));
+	engineSpeed = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
+	
+	DebugOut()<<"setting velocity to: "<<velocity<<endl;
+	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
+	
+	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
+	routingEngine->updateProperty(VehicleProperty::EngineSpeed, engineSpeed);
+}

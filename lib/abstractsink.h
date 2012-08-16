@@ -38,15 +38,14 @@ class AbstractSink
 {
 
 public:
-	AbstractSink();
-	void setRoutingEngine(AbstractRoutingEngine* engine);
+	AbstractSink(AbstractRoutingEngine* engine);
+	virtual ~AbstractSink();
 	
 	///Pure virtual methods:
 	
 	virtual string uuid() = 0;
 	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid) = 0;
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
-	virtual PropertyList subscriptions() = 0;
 	
 protected:
 	AbstractRoutingEngine* routingEngine;
@@ -56,8 +55,7 @@ class AbstractSinkManager
 {
 public:
 	
-	virtual SinkList sinks() = 0;
-	void setRoutingEngine(AbstractRoutingEngine* engine);
+	AbstractSinkManager(AbstractRoutingEngine* engine);
 	
 protected:
 	AbstractRoutingEngine* routingEngine;

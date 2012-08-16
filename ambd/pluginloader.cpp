@@ -33,7 +33,7 @@ using namespace std;
  * 
 **********************************************/
 
-PluginLoader::PluginLoader(string configFile): f_create(NULL)
+PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re): f_create(NULL), routingEngine(re)
 {
 	DebugOut()<<"Loading config file: "<<configFile<<endl;
 	
@@ -102,19 +102,23 @@ PluginLoader::PluginLoader(string configFile): f_create(NULL)
 		json_reader_read_element(reader,i);
 		
 		string path = json_reader_get_string_value(reader);
-		AbstractSink* plugin = loadPlugin<AbstractSink*>(path);
+		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path);
 		
-		if(plugin != nullptr)
-			mSinks.push_back(plugin);
+		if(plugin == nullptr)
+		{
+			throw std::runtime_error("plugin is not a SinkManager");
+		}
 		
 		json_reader_end_element(reader);
+		
 	}
 	
 	json_reader_end_member(reader);
 	
 	///TODO: this will probably explode:
 	
-	g_error_free(error);
+	if(error) g_error_free(error);
+	
 	g_object_unref(reader);
 	g_object_unref(parser);
 	

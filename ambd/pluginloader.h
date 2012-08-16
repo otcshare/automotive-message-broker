@@ -26,20 +26,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "abstractsource.h"
 #include "abstractsink.h"
+#include "abstractroutingengine.h"
 #include "debugout.h"
 
 
 
 using namespace std;
 
-typedef void* create_t();
+typedef void* create_t(AbstractRoutingEngine*);
 
 
 class PluginLoader
 {
 
 public:
-	PluginLoader(string configFile);
+	PluginLoader(string configFile, AbstractRoutingEngine* routingEngine);
 
 	SourceList sources();
 	SinkList sinks();
@@ -78,7 +79,7 @@ private: ///methods:
 		
 		if(f_create) 
 		{
-			void* obj = f_create();
+			void* obj = f_create(routingEngine);
 			return static_cast<T>( obj );
 		}
 		
@@ -89,6 +90,8 @@ private:
 	
 	std::string mPluginPath;
 	std::string mErrorString;
+	
+	AbstractRoutingEngine* routingEngine;
 	
 	SourceList mSources;
 	SinkList mSinks;

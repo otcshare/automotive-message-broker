@@ -38,6 +38,15 @@ Core::~Core()
 void Core::setSupported(PropertyList supported, AbstractSource* source)
 {
 	mSources.push_back(source);
+		
+	for(PropertyList::iterator itr = supported.begin(); itr != supported.end(); itr++)
+	{
+		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((*itr)))
+		{
+			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<VehicleProperty::name((*itr))<<endl;
+			mMasterPropertyList.push_back((*itr));
+		}
+	}	
 }
 
 
@@ -88,15 +97,52 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 
 void Core::updateProperty(VehicleProperty::Property property, boost::any value)
 {
-
+	SinkList list = propertySinkMap[property];
+	
+	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<VehicleProperty::name(property)<<endl;
+	
+	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
+	{
+		(*itr)->propertyChanged(property, value,(*itr)->uuid());
+	}
 }
 
-void Core::setProperty(VehicleProperty::Property , boost::any )
+void Core::setProperty(VehicleProperty::Property property, boost::any value)
 {
-
+	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = (*itr);
+		PropertyList properties = src->supported();
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		{
+			src->setProperty(property, value);
+		}
+	}
 }
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
+{
+	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
+	{
+		DebugOut()<<__FUNCTION__<<"(): property not supported: "<<VehicleProperty::name(property)<<endl;
+		return; 
+	}
+	
+	if(propertySinkMap.find(property) == propertySinkMap.end())
+	{
+		propertySinkMap[property] = SinkList();
+	}
+	
+	SinkList list = propertySinkMap[property];
+	
+	if(!ListPlusPlus<AbstractSink*>(&list).contains(self))
+	{
+		propertySinkMap[property].push_back(self);
+	}
+	
+}
+
+void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
@@ -106,17 +152,18 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 	
 	SinkList list = propertySinkMap[property];
 	
-	if(!ListPlusPlus<AbstractSink*>(&list).contains(self))
+	ListPlusPlus<AbstractSink*>(&list).removeOne(self);
+	
+	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
-		list.push_back(self);
+		AbstractSource* src = (*itr);
+		PropertyList properties = src->supported();
+		
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		{
+			src->unsubscribeToPropertyChanges(property);
+		}
 	}
-	
-	
-}
-
-void Core::unsubscribeToProperty(VehicleProperty::Property , AbstractSink* self)
-{
-
 }
 
 

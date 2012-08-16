@@ -44,7 +44,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #include "pluginloader.h"
-#include "abstractsource.h"
+#include "core.h"
 
 using namespace std;
 
@@ -129,12 +129,13 @@ int main(int argc, char **argv)
 	
 	g_type_init();
 	
-	PluginLoader loader(config);
+	PluginLoader loader(config, new Core());
 	
 	if(!loader.sources().size())
 	{
 		throw std::runtime_error("No sources present. aborting");
 	}
+	
 	
 	
 #ifdef USE_QT_CORE

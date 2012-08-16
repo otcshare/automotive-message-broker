@@ -1,4 +1,5 @@
 {
-	"sources" : [ "../plugins/exampleplugin.so" ]
+	"sources" : [ "../plugins/examplesourceplugin.so" ],
+	"sinks": [ "../plugins/examplesinkplugin.so" ]
 }
 
