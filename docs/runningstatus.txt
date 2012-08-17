@@ -28,7 +28,7 @@ Properties	byte VehiclePowerMode [readonly]
 		
 			Distance from trip meter(s) in km.
 			
-		byte TransmissionGearStatus [readonly]
+		byte TransmissionShiftPosition [readonly]
 		
 			Neutral = 0,
 			1st = 1,

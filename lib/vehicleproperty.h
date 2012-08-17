@@ -36,8 +36,23 @@ public:
 	enum Property
 	{
 		NoValue=0,
-		VehicleSpeed,
-		EngineSpeed
+		VehicleSpeed, /**< Vehicle Velocity in km/h */
+		EngineSpeed, /**< Engine Speed in rotations per minute */
+		TransmissionShiftPosition, /**< Transmission Shift Position
+									* 0 = Neutral
+									* 1 = 1st
+									* 2 = 2nd
+									* ...
+									* 64 = Drive
+									* 128 = Reverse
+									* 255 = Park
+									*/
+
+		ThrottlePosition, /**< Throttle position 0-100% */
+		WheelBrake, /**< Wheel brake position.  Engaged = true, Idle = false */
+		SteeringWheelAngle, /**< Steering wheel angle (0-360) */
+		TurnSignal, /**< 0=off, 1=right, 2=left, 3=hazard */
+		MachineGunTurretStatus /**< 0=off, 1=on */
 	};
 
 	static std::string name(Property prop);
