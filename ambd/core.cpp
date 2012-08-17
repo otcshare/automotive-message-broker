@@ -107,6 +107,36 @@ void Core::updateProperty(VehicleProperty::Property property, boost::any value)
 	}
 }
 
+boost::any Core::getProperty(VehicleProperty::Property property)
+{
+	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = (*itr);
+		PropertyList properties = src->supported();
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		{
+			return src->getProperty(property);
+		}
+	}
+}
+
+AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
+{
+	AsyncPropertyReply * reply = new AsyncPropertyReply(request);
+
+	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = (*itr);
+		PropertyList properties = src->supported();
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
+		{
+			src->getPropertyAsync(reply);
+		}
+	}
+
+	return reply;
+}
+
 void Core::setProperty(VehicleProperty::Property property, boost::any value)
 {
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
@@ -165,5 +195,4 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 		}
 	}
 }
-
 

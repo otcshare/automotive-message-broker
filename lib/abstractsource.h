@@ -43,6 +43,8 @@ public:
 	
 	///pure virtual methods:
 
+	virtual boost::any getProperty(VehicleProperty::Property) = 0;
+	virtual void getPropertyAsync(AsyncPropertyReply *reply) = 0;
 	virtual void setProperty(VehicleProperty::Property property, boost::any value) = 0;
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property) = 0;

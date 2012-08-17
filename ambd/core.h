@@ -40,6 +40,8 @@ public:
 	
 	/// sinks:
 	
+	boost::any getProperty(VehicleProperty::Property);
+	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
 	void setProperty(VehicleProperty::Property, boost::any);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);

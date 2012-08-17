@@ -30,6 +30,12 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine): AbstractSink(engine)
 {
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
+
+	AsyncPropertyRequest velocityRequest;
+	velocityRequest.property = VehicleProperty::VehicleSpeed;
+	velocityRequest.completed = [](void) { DebugOut()<<"Velocity Async request completed"<<endl; };
+
+	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 }
 
 

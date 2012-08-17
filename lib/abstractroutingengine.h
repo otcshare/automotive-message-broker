@@ -21,10 +21,32 @@
 #define ABSTRACTROUTINGENGINE_H
 
 #include <boost/any.hpp>
+#include <functional>
 #include "vehicleproperty.h"
 
 class AbstractSink;
 class AbstractSource;
+
+typedef std::function<void (void)> CompletedSignal;
+
+class AsyncPropertyRequest
+{
+public:
+	VehicleProperty::Property property;
+	CompletedSignal completed;
+};
+
+class AsyncPropertyReply: public AsyncPropertyRequest
+{
+public:
+	AsyncPropertyReply(AsyncPropertyRequest request)
+	{
+		this->property = request.property;
+		this->completed = request.completed;
+	}
+
+	boost::any value;
+};
 
 class AbstractRoutingEngine
 {
@@ -34,7 +56,9 @@ public:
 	virtual void updateProperty(VehicleProperty::Property property, boost::any value) = 0;
 	
 	/// sinks:
-	
+
+	virtual boost::any getProperty(VehicleProperty::Property) = 0;
+	virtual AsyncPropertyReply *getPropertyAsync(AsyncPropertyRequest request) = 0;
 	virtual void setProperty(VehicleProperty::Property, boost::any) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;

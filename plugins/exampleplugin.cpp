@@ -58,6 +58,32 @@ string ExampleSourcePlugin::uuid()
 	return "6dd4268a-c605-4a06-9034-59c1e8344c8e";
 }
 
+boost::any ExampleSourcePlugin::getProperty(VehicleProperty::Property property)
+{
+	if(property == VehicleProperty::VehicleSpeed)
+	{
+		return velocity;
+	}
+	else if(property == VehicleProperty::EngineSpeed)
+	{
+		return engineSpeed;
+	}
+}
+
+void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
+{
+	if(reply->property == VehicleProperty::VehicleSpeed)
+	{
+		reply->value = velocity;
+		reply->completed();
+	}
+	else if(reply->property == VehicleProperty::EngineSpeed)
+	{
+		reply->value = engineSpeed;
+		reply->completed();
+	}
+}
+
 void ExampleSourcePlugin::setProperty(VehicleProperty::Property , boost::any )
 {
 

@@ -31,6 +31,8 @@ public:
 	ExampleSourcePlugin(AbstractRoutingEngine* re);
 	
 	string uuid();
+	boost::any getProperty(VehicleProperty::Property property);
+	void getPropertyAsync(AsyncPropertyReply *reply);
 	void setProperty(VehicleProperty::Property, boost::any);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
