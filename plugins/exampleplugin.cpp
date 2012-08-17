@@ -75,12 +75,12 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
 		reply->value = velocity;
-		reply->completed();
+		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::EngineSpeed)
 	{
 		reply->value = engineSpeed;
-		reply->completed();
+		reply->completed(reply);
 	}
 }
 

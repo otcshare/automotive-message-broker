@@ -26,8 +26,10 @@
 
 class AbstractSink;
 class AbstractSource;
+class AsyncPropertyReply;
 
-typedef std::function<void (void)> CompletedSignal;
+
+typedef std::function<void (AsyncPropertyReply*)> CompletedSignal;
 
 class AsyncPropertyRequest
 {
