@@ -17,3 +17,4 @@ set_target_properties(examplesinkplugin PROPERTIES PREFIX "")
 target_link_libraries(examplesinkplugin -lamb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
 add_subdirectory(wheel)
+add_subdirectory(tcpsink)
