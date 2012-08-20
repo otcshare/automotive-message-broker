@@ -21,14 +21,13 @@ find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
 find_package(Boost REQUIRED)
 
 pkg_check_modules(glib REQUIRED glib-2.0)
-pkg_check_modules(gio REQUIRED gio-2.0)
 pkg_check_modules(json REQUIRED json-glib-1.0)
 
 add_definitions(-std=c++0x)
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
 set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${gio_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 if(use_qtcore)
 
