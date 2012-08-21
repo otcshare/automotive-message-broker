@@ -68,6 +68,11 @@ public:
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
+	void setValue(boost::any val)
+	{
+		mValue = val;
+	}
+
 	template<typename T>
 	void setValue(T val)
 	{

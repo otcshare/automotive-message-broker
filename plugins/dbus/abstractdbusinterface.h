@@ -33,10 +33,15 @@ class AbstractDBusInterface
 {
 
 public:
-	AbstractDBusInterface(string interfaceName, string objectPath);
+	AbstractDBusInterface(string interfaceName, string objectPath, GDBusConnection* connection);
 
 	
-	void registerObject(GDBusConnection* connection);
+	void setDBusConnection(GDBusConnection* connection)
+	{
+		mConnection = connection;
+	}
+
+	void registerObject();
 	
 	void addProperty(AbstractProperty* property);
 	virtual void updateValue(AbstractProperty* property);
@@ -50,8 +55,8 @@ protected:
 								const gchar *interfaceName, const gchar * propertyName, GVariant *value,
 								GError** error, gpointer userData);
     
-	virtual void setProperty(string propertyName, GVariant * value) = 0;
-	virtual GVariant * getProperty(string propertyName) = 0;
+	virtual void setProperty(string propertyName, GVariant * value);
+	virtual GVariant * getProperty(string propertyName);
 	
 	unordered_map<string, AbstractProperty*> properties;
 

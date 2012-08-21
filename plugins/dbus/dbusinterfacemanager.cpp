@@ -17,15 +17,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "dbusinterfacemanager.h"
+
+
 #include <gio/gio.h>
 #include <string>
+
+///properties:
+#include "accelerationproperty.h"
 
 using namespace std;
 
 static void
 on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
-	//AbstractDBusInterface::iface()->registerObject(connection);
+	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
+	AbstractDBusInterface* acceleration = new AccelerationPropertyInterface(iface->re, connection);
+
 }
 
 static void
@@ -40,7 +47,8 @@ on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data
 
 
 
-DBusInterfaceManager::DBusInterfaceManager()
+DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine)
+	:re(engine)
 {
 	g_type_init();
 

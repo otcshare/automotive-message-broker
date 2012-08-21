@@ -46,7 +46,7 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<VehicleProperty::name((*itr))<<endl;
 			mMasterPropertyList.push_back((*itr));
 		}
-	}	
+	}
 }
 
 
@@ -99,7 +99,7 @@ void Core::updateProperty(VehicleProperty::Property property, boost::any value)
 {
 	SinkList list = propertySinkMap[property];
 	
-	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<VehicleProperty::name(property)<<endl;
+	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<property<<endl;
 	
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{

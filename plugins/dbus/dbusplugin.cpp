@@ -17,8 +17,9 @@
 */
 
 
-#include "dbusplugin.h".h"
+#include "dbusplugin.h"
 #include "abstractroutingengine.h"
+#include "dbusinterfacemanager.h"
 #include "debugout.h"
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
@@ -26,35 +27,26 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 	return new DBusSinkManager(routingengine);
 }
 
-DBusSink::DBusSink(AbstractRoutingEngine* engine): AbstractSink(engine)
-{
-	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
-	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
-
-	AsyncPropertyRequest velocityRequest;
-	velocityRequest.property = VehicleProperty::VehicleSpeed;
-	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<boost::any_cast<uint16_t>(reply->value)<<endl; };
-
-	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
-}
-
-
-PropertyList DBusSink::subscriptions()
+DBusSink::DBusSink(AbstractRoutingEngine* engine)
+	: AbstractSink(engine)
 {
 
 }
 
-void DBusSink::supportedChanged(PropertyList supportedProperties)
+void DBusSink::propertyChanged(VehicleProperty::Property property, boost::any value, string uuid)
 {
+	AbstractProperty* prop = propertyDBusMap[property];
 
-}
-
-void DBusSink::propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid)
-{
-	DebugOut()<<VehicleProperty::name(property)<<" value: "<<boost::any_cast<uint16_t>(value)<<endl;
+	prop->setValue(value);
 }
 
 std::string DBusSink::uuid()
 {
 	return "c2e6cafa-eef5-4b8a-99a0-0f2c9be1057d";
+}
+
+DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine)
+	:AbstractSinkManager(engine)
+{
+	DBusInterfaceManager* manager = new DBusInterfaceManager(engine);
 }

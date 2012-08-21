@@ -45,6 +45,7 @@ public:
 	void setProperty(VehicleProperty::Property, boost::any);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
+	PropertyList supported() { return mMasterPropertyList; }
     
 protected: 
 	~Core();
