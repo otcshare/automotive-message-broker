@@ -35,8 +35,10 @@ DBusSink::DBusSink(AbstractRoutingEngine* engine)
 
 void DBusSink::propertyChanged(VehicleProperty::Property property, boost::any value, string uuid)
 {
-	AbstractProperty* prop = propertyDBusMap[property];
+	if(!propertyDBusMap.count(property))
+		return;
 
+	AbstractProperty* prop = propertyDBusMap[property];
 	prop->setValue(value);
 }
 

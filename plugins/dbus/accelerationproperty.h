@@ -29,7 +29,7 @@ public:
 	AccelerationPropertyInterface(AbstractRoutingEngine* re, GDBusConnection* connection);
 
 	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid);
+	//virtual void propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid);
 
 private:
 

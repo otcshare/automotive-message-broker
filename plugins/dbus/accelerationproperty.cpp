@@ -35,6 +35,7 @@ void AccelerationPropertyInterface::supportedChanged(PropertyList supportedPrope
 		{
 			routingEngine->subscribeToProperty(VehicleProperty::AccelerationX, this);
 			accelerationX = new BasicProperty<int>("X", "i", AbstractProperty::Read, this);
+			propertyDBusMap[VehicleProperty::AccelerationX] = accelerationX;
 			supported = true;
 		}
 	}
@@ -45,6 +46,7 @@ void AccelerationPropertyInterface::supportedChanged(PropertyList supportedPrope
 		{
 			routingEngine->subscribeToProperty(VehicleProperty::AccelerationY, this);
 			accelerationY = new BasicProperty<int>("Y", "i", AbstractProperty::Read, this);
+			propertyDBusMap[VehicleProperty::AccelerationY] = accelerationY;
 			supported = true;
 		}
 	}
@@ -55,6 +57,7 @@ void AccelerationPropertyInterface::supportedChanged(PropertyList supportedPrope
 		{
 			routingEngine->subscribeToProperty(VehicleProperty::AccelerationZ, this);
 			accelerationZ = new BasicProperty<int>("Z", "i", AbstractProperty::Read, this);
+			propertyDBusMap[VehicleProperty::AccelerationZ] = accelerationZ;
 			supported = true;
 		}
 	}
@@ -65,7 +68,7 @@ void AccelerationPropertyInterface::supportedChanged(PropertyList supportedPrope
 	}
 }
 
-void AccelerationPropertyInterface::propertyChanged(VehicleProperty::Property property, boost::any value, string)
+/*void AccelerationPropertyInterface::propertyChanged(VehicleProperty::Property property, boost::any value, string)
 {
 
 	if(property == VehicleProperty::AccelerationX)
@@ -91,7 +94,7 @@ void AccelerationPropertyInterface::propertyChanged(VehicleProperty::Property pr
 			accelerationZ->setValue(boost::any_cast<int>(value));
 		}
 	}
-}
+}*/
 
 
 
