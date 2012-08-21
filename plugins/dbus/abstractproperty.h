@@ -71,6 +71,7 @@ public:
 	void setValue(boost::any val)
 	{
 		mValue = val;
+		updateValue();
 	}
 
 	template<typename T>
