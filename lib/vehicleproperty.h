@@ -52,6 +52,9 @@ public:
 		WheelBrake, /**< Wheel brake position.  Engaged = true, Idle = false */
 		SteeringWheelAngle, /**< Steering wheel angle (0-359) */
 		TurnSignal, /**< 0=off, 1=right, 2=left, 3=hazard */
+		ClutchStatus, /**< Clutch pedal status 0=off, 1=on */
+		EngineOilPressure, /**< Oil pressure TODO: units */
+		EngineCoolantTemperature, /**< Engine coolant temperature in degrees celcius **/
 		MachineGunTurretStatus, /**< 0=off, 1=on */
 		AccelerationX, /**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
 		AccelerationY, /**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
