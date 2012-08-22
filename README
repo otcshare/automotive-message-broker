@@ -19,7 +19,8 @@ To run:
 
 ambd -c /path/to/config
 
-ambd can load different plugins.  The config file specifies what plugins to use.  The default config loads the example plugins.  You can change this or use your own config to have ambd use your own plugins.  For example:
+ambd can load different plugins.  The config file specifies what plugins to use.  The default config loads
+the example plugins.  You can change this or use your own config to have ambd use your own plugins.  For example:
 
 # copy the config to your own config
 cp config myconfig
