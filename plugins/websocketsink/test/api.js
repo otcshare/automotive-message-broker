@@ -57,7 +57,7 @@ function Vehicle(socketUrl, sCB, eCB, calltimeout)
     function init() {
         if ("WebSocket" in window)
         {
-            self.socket = new WebSocket(socketUrl);
+            self.socket = new WebSocket(socketUrl,"http-only");
             self.socket.onopen = function()
             {
                 self.connected = true;
