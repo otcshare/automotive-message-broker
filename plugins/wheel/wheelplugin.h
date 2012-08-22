@@ -24,11 +24,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
+class WheelPrivate;
+
 class WheelSourcePlugin: public AbstractSource
 {
 
 public:
 	WheelSourcePlugin(AbstractRoutingEngine* re);
+	~WheelSourcePlugin();
 	
 	string uuid();
 	boost::any getProperty(VehicleProperty::Property property);
@@ -41,9 +44,8 @@ public:
 	void propertyChanged(VehicleProperty::Property property, boost::any value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
-	void randomizeProperties();
-	
 private:
+	WheelPrivate *wheel;
 	PropertyList mRequests;
 	uint16_t velocity;
 	uint16_t engineSpeed;
