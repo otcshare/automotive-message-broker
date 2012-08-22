@@ -18,6 +18,7 @@
 
 
 #include "websocketsinkmanager.h"
+#include "websocketsink.h"
 #include <sstream>
 #include <json-glib/json-glib.h>
 
@@ -49,17 +50,17 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):Abstra
 	//Create a listening socket on port 23000 on localhost.
 	context = libwebsocket_create_context(port, interface, protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
 }
-void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property)
+void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
 	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
-	velocityRequest.completed = [socket](AsyncPropertyReply* reply) {
+	velocityRequest.completed = [socket,id](AsyncPropertyReply* reply) {
 		printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
 		uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-		s << "{\"type\":\"reply\",\"name\":\"Velocity\",\"arguments\":\"[\"" << velocity << "\"],\"transactionid\":\"aeff0345defaa03c132\"}";
+		s << "{\"type\":\"reply\",\"name\":\"Velocity\",\"arguments\":\"[\"" << velocity << "\"],\"transactionid\":\"" << id << "\"}";
 		
 		string replystr = s.str();
 		
@@ -75,6 +76,10 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	};
 
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
+}
+void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
+{
+	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid);
 }
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
@@ -109,8 +114,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_HTTP:
 		{
+			//TODO: Verify that ALL requests get sent via LWS_CALLBACK_HTTP, so we can use that instead of LWS_CALLBACK_RECIEVE
 			printf("requested URI: %s\n", (char*)in);
-			//This contains the JSON, but so does LWS_CALLBACK_RECEIVE...
 			
 			/*{
 			  "type":"method",
@@ -124,6 +129,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
 			  printf("Error loading JSON\n");
+			  return 0;
 			}
 			
 			JsonNode* node = json_parser_get_root(parser);
@@ -182,6 +188,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			{
 			  if (name == "GetProperty")
 			  {
+			    //GetProperty is going to be a singleshot sink.
 			    string arg = arguments.front();
 			    if (arg == "Velocity")
 			    {			   
@@ -189,10 +196,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			    //m_engine->subscribeToProperty(VehicleProperty::VehicleSpeed,this);
 			      
 			    
-			    sinkManager->addSink(wsi,VehicleProperty::Property::VehicleSpeed);
+			    sinkManager->addSingleShotSink(wsi,VehicleProperty::Property::VehicleSpeed,id);
 			    //libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 			    }
 			    
+			  }
+			  else if (name == "Subscribe")
+			  {
+			    //Subscribe is a permanent sink, until unsubscription.
+			    sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
 			  }
 			}
 			

@@ -22,16 +22,18 @@
 #include <glib.h>
 #include <abstractroutingengine.h>
 #include "abstractsink.h"
+#include <libwebsockets.h>
 class WebSocketSink : public AbstractSink
 {
 
 public:
-	WebSocketSink(AbstractRoutingEngine* re);
+	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid);
 	string uuid() ;
 	void propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid);
 	void supportedChanged(PropertyList supportedProperties);
 	PropertyList subscriptions();
-
+private:
+	string m_uuid;
 };
 
 #endif // WEBSOCKETSINK_H
