@@ -95,6 +95,26 @@ function getValue(event)
     );
 }
 
+function setValue(event)
+{
+    var types = window.vehicle.set(event, 23,
+        function(data) {
+            PRINT.clear();
+            if(data && data.property && data.value)
+            {
+                PRINT.pass(data.property+" value changes to "+data.value);
+            }
+            else
+            {
+                PRINT.fail("bad response for set "+event);
+            }
+        },
+        function(msg) {
+            PRINT.fail(((event === "")?"all events":event)+":<br>"+msg);
+        }
+    );
+}
+
 function start(msg)
 {
     if(window.vehicle && window.vehicle.getSupportedEventTypes)
@@ -112,13 +132,15 @@ function start(msg)
     var part1 = '<div class="proptest">';
     var part2 = '<div class="buttons"><div class="testbutton types" onclick=getTypes("';
     var part3 = '")></div><div class="testbutton get" onclick=getValue("'
-    var part4 = '")></div></div></div>';
+    var part4 = '")></div><div class="testbutton set" onclick=setValue("'
+    var part5 = '")></div></div></div>';
     var events = vehicleEventType.event;
-    var html = part1 + "all events" + part2 + part3 + part4;
+    var html = part1 + "all events" + part2 + part3 + part4 + part5;
     for(i in events)
     {
         html += part1 + events[i] + part2 + events[i] + 
-                part3 + events[i] + part4;
+                part3 + events[i] + part4 + events[i] +
+                part5;
     }
     tester.innerHTML = html;
 }

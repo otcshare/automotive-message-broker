@@ -9,51 +9,48 @@
 
 /* ------------------------ vehicle interface ----------------------------- */
 
-function Vehicle(socketUrl, sCB, eCB, tout)
+function Vehicle(socketUrl, sCB, eCB, calltimeout)
 {
     var self = this;
-    this.successCB = sCB;
-    this.errorCB = eCB;
-    this.transactionid = 0;
-    this.methodCalls = [];
-    this.timeouttime = (tout == undefined)?2000:tout;
+    this.iSuccessCB = sCB;
+    this.iErrorCB = eCB;
     this.retries = 5;
     this.connected = false;
+    this.transactionid = 0;
+    this.methodCalls = [];
+    this.methodIdx = 0;
+    this.timeouttime = (calltimeout == undefined)?5000:calltimeout;
 
-    this.VehicleMethodCall = function(n, sCB, eCB)
+    for(var i = 0; i < 100; i++)
+    {
+        this.methodCalls[i] = null;
+    }
+
+    this.VehicleMethodCall = function(id, name, successCB, errorCB)
     {
         var me = this;
-        this.name = n;
-        this.successCB = sCB;
-        this.errorCB = eCB;
-        this.transactionid = self.transactionid++;
-
-        this.send = function(msg)
+        this.successCB = successCB;
+        this.errorCB = errorCB;
+        this.transactionid = id;
+        this.name = name;
+        this.done = false;
+        this.start = function()
         {
-            var errCB = (me.errorCB == undefined)?self.errorCB:me.errorCB;
-            if(!self.connected)
-            {
-                if(errCB != undefined)
-                {
-                    errCB("\""+me.name+"\" method failed because socket is closed");
-                }
-                self.methodCalls.pop(this);
-            }
             me.timeout = setTimeout(function(){
-                if(errCB != undefined)
+                if(me.errorCB != undefined)
                 {
-                    errCB("\""+me.name+"\" method timed out after "+self.timeouttime+"ms");
+                    me.errorCB("\""+me.name+"\" method timed out after "+self.timeouttime+"ms");
                 }
-                self.methodCalls.pop(this);
+                me.finish();
             }, self.timeouttime);
-            self.socket.send(msg);
         }
-        this.done = function()
+        this.finish = function()
         {
             if(me.timeout != undefined)
             {
                 clearTimeout(me.timeout);
             }
+            me.done = true;
         }
     }
 
@@ -65,13 +62,13 @@ function Vehicle(socketUrl, sCB, eCB, tout)
             {
                 self.connected = true;
                 this.send("client");
-                self.successCB((self.retries < 5)?"(RECONNECTED)":"");
+                self.iSuccessCB((self.retries < 5)?"(RECONNECTED)":"");
                 self.retries = 5;
             };
             self.socket.onclose = function()
             {
                 self.connected = false;
-                self.errorCB("socket closed "+((self.retries > 0)?"retrying in 5 seconds ...":""));
+                self.iErrorCB("socket closed "+((self.retries > 0)?"retrying in 5 seconds ...":""));
                 if(self.retries > 0)
                 {
                     setTimeout(function(){
@@ -82,7 +79,7 @@ function Vehicle(socketUrl, sCB, eCB, tout)
             };
             self.socket.onerror = function(e)
             {
-                self.errorCB(e.data);
+                self.iErrorCB(e.data);
             };
             self.socket.onmessage = function (e) 
             {
@@ -97,30 +94,58 @@ function Vehicle(socketUrl, sCB, eCB, tout)
     init();
 }
 
+Vehicle.prototype.send = function(obj, successCB, errorCB)
+{
+    obj.transactionid = this.transactionid++;
+    if(!this.connected)
+    {
+        if(errorCB != undefined)
+        {
+            errorCB("\""+obj.name+"\" method failed because socket is closed");
+        }
+        return;
+    }
+    var i = this.methodIdx;
+    this.methodIdx = (this.methodIdx + 1)%100;
+    this.methodCalls[i] = new this.VehicleMethodCall(obj.transactionid, 
+        obj.name, successCB, errorCB);
+    this.socket.send(JSON.stringify(obj));
+    this.methodCalls[i].start();
+}
+
+
 Vehicle.prototype.getSupportedEventTypes = function(type, writeable, successCB, errorCB)
 {
-    var call = new this.VehicleMethodCall("getSupportedEventTypes", successCB, errorCB);
-    this.methodCalls.push(call);
     var obj = {
         "type" : "method",
-        "name": "getSupportedEventTypes",
-        "transactionid" : call.transactionid,
+        "name" : "getSupportedEventTypes",
+        "writeable" : writeable,
+        "transactionid" : 0,
         "data" : type
     };
-    call.send(JSON.stringify(obj));
+    this.send(obj, successCB, errorCB);
 }
 
 Vehicle.prototype.get = function(type, successCB, errorCB)
 {
-    var call = new this.VehicleMethodCall("get", successCB, errorCB);
-    this.methodCalls.push(call);
     var obj = {
         "type" : "method",
         "name": "get",
-        "transactionid" : call.transactionid,
+        "transactionid" : 0,
         "data" : type
     };
-    call.send(JSON.stringify(obj));
+    this.send(obj, successCB, errorCB);
+}
+
+Vehicle.prototype.set = function(type, value, successCB, errorCB)
+{
+    var obj = {
+        "type" : "method",
+        "name": "set",
+        "transactionid" : 0,
+        "data" : {"property" : type, "value" : value}
+    };
+    this.send(obj, successCB, errorCB);
 }
 
 Vehicle.prototype.receive = function(msg)
@@ -131,14 +156,14 @@ Vehicle.prototype.receive = function(msg)
         event = JSON.parse(msg);
     }
     catch(e) {
-        self.errCB("GARBAGE MESSAGE: "+msg);
+        self.iErrorCB("GARBAGE MESSAGE: "+msg);
         return;
     }
 
     if((event == undefined)||(event.type == undefined)||
        (event.name == undefined)||(event.transactionid == undefined))
     {
-        self.errCB("BADLY FORMED MESSAGE: "+msg);
+        self.iErrorCB("BADLY FORMED MESSAGE: "+msg);
         return;
     }
     else
@@ -146,13 +171,12 @@ Vehicle.prototype.receive = function(msg)
         if(event.type === "methodReply")
         {
             var calls = this.methodCalls;
-            for(i in calls)
+            for(var i = 0; i < calls.length; i++)
             {
                 var call = calls[i];
-                if((call.transactionid == event.transactionid)&&
-                   (call.name === event.name))
+                if(call&&(!call.done)&&(call.transactionid === event.transactionid))
                 {
-                    call.done();
+                    call.finish();
                     if(event.error != undefined)
                     {
                         call.errorCB(event.error);
@@ -161,7 +185,6 @@ Vehicle.prototype.receive = function(msg)
                     {
                         call.successCB(event.data);
                     }
-                    this.methodCalls.pop(call);
                     return;
                 }
             }
