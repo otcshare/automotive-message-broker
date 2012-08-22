@@ -35,6 +35,12 @@ public:
 	virtual std::string uuid();
 
 protected:
+	template <typename T>
+	void wantProperty(VehicleProperty::Property)
+	{
+
+	}
+
 	PropertyDBusMap propertyDBusMap;
 };
 
