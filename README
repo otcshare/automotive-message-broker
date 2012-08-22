@@ -15,5 +15,11 @@ To install:
 
 sudo make install
 
+To run:
+
+./ambd -c /path/to/config
+
+also see ./ambd -h
+
 TODO: link to website for questions/comments
 
