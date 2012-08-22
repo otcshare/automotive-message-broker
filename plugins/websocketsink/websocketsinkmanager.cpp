@@ -1,24 +1,23 @@
 /*
-    <one line to give the library's name and an idea of what it does.>
-    Copyright (C) 2012  Michael Carpenter <email>
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#include "tcpsinkmanager.h"
+#include "websocketsinkmanager.h"
 #include <sstream>
 #include <json-glib/json-glib.h>
 
@@ -27,13 +26,13 @@
 struct pollfd pollfds[100];
 int count_pollfds = 0;
 libwebsocket_context *context;
-TcpSinkManager *sinkManager;
+WebSocketSinkManager *sinkManager;
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len);
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data);
 
 
 
-TcpSinkManager::TcpSinkManager(AbstractRoutingEngine* engine):AbstractSinkManager(engine)
+WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):AbstractSinkManager(engine)
 {
 	m_engine = engine;
 	
@@ -50,7 +49,7 @@ TcpSinkManager::TcpSinkManager(AbstractRoutingEngine* engine):AbstractSinkManage
 	//Create a listening socket on port 23000 on localhost.
 	context = libwebsocket_create_context(port, interface, protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
 }
-void TcpSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property)
+void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property)
 {
 	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
@@ -80,7 +79,7 @@ void TcpSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property pro
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 {
-	sinkManager = new TcpSinkManager(routingengine);
+	sinkManager = new WebSocketSinkManager(routingengine);
 	return sinkManager;
 }
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len)
