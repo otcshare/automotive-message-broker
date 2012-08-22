@@ -17,9 +17,24 @@ sudo make install
 
 To run:
 
-./ambd -c /path/to/config
+ambd -c /path/to/config
 
-also see ./ambd -h
+ambd can load different plugins.  The config file specifies what plugins to use.  The default config loads the example plugins.  You can change this or use your own config to have ambd use your own plugins.  For example:
+
+# copy the config to your own config
+cp config myconfig
+
+# edit myconfig and specify the path to your plugin:
+# change the line: 
+"sources" : [ "../plugins/examplesourceplugin.so" ],
+# to:
+"sources" : [ "/path/to/mysourceplugin.so" ],
+
+Now you can run ambd with:
+
+ambd -c /path/to/myconfig
+
+also see ambd -h
 
 TODO: link to website for questions/comments
 
