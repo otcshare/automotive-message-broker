@@ -16,32 +16,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef DBUSSINK_H_
-#define DBUSSINK_H_
+#include "basicproperty.h"
 
-#include "abstractsink.h"
-#include "abstractproperty.h"
-#include <map>
 
-typedef std::map<VehicleProperty::Property, AbstractProperty*> PropertyDBusMap;
 
-class DBusSink : public AbstractSink
-{
 
-public:
-	DBusSink(AbstractRoutingEngine* engine);
-	virtual void supportedChanged(PropertyList supportedProperties) = 0;
-	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid);
-	virtual std::string uuid();
 
-protected:
-	PropertyDBusMap propertyDBusMap;
-};
-
-class DBusSinkManager: public AbstractSinkManager
-{
-public:
-	DBusSinkManager(AbstractRoutingEngine* engine);
-};
-
-#endif

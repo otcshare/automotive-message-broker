@@ -20,17 +20,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef DBUSINTERFACEMANAGER_H
 #define DBUSINTERFACEMANAGER_H
 
+class AbstractRoutingEngine;
+
 class DBusInterfaceManager
 {
 
 public:
-	DBusInterfaceManager();
+	DBusInterfaceManager(AbstractRoutingEngine* re);
 	~DBusInterfaceManager();
-    
+
+	AbstractRoutingEngine* re;
     
 private:
 	
 	unsigned int ownerId;
+
 
 };
 

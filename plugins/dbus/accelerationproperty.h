@@ -16,39 +16,27 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef __ACCELERATIONPROPERTY_H_
+#define __ACCELERATIONPROPERTY_H_
 
+#include "abstractdbusinterface.h"
 #include "dbusplugin.h"
-#include "abstractroutingengine.h"
-#include "dbusinterfacemanager.h"
-#include "debugout.h"
+#include "basicproperty.h"
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
+class AccelerationPropertyInterface: public AbstractDBusInterface, public DBusSink
 {
-	return new DBusSinkManager(routingengine);
-}
+public:
+	AccelerationPropertyInterface(AbstractRoutingEngine* re, GDBusConnection* connection);
 
-DBusSink::DBusSink(AbstractRoutingEngine* engine)
-	: AbstractSink(engine)
-{
+	virtual void supportedChanged(PropertyList supportedProperties);
+	//virtual void propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid);
 
-}
+private:
 
-void DBusSink::propertyChanged(VehicleProperty::Property property, boost::any value, string uuid)
-{
-	if(!propertyDBusMap.count(property))
-		return;
+	BasicProperty<int> * accelerationX;
+	BasicProperty<int> * accelerationY;
+	BasicProperty<int> * accelerationZ;
+	bool supported;
+};
 
-	AbstractProperty* prop = propertyDBusMap[property];
-	prop->setValue(value);
-}
-
-std::string DBusSink::uuid()
-{
-	return "c2e6cafa-eef5-4b8a-99a0-0f2c9be1057d";
-}
-
-DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine)
-	:AbstractSinkManager(engine)
-{
-	DBusInterfaceManager* manager = new DBusInterfaceManager(engine);
-}
+#endif

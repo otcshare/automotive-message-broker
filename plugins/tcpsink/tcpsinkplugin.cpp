@@ -19,7 +19,7 @@
 
 
 #include "tcpsinkplugin.h"
-#include <glib/gtypes.h>
+#include <glib.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>

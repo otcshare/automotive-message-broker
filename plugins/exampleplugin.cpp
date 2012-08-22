@@ -99,6 +99,7 @@ PropertyList ExampleSourcePlugin::supported()
 	PropertyList props;
 	props.push_back(VehicleProperty::EngineSpeed);
 	props.push_back(VehicleProperty::VehicleSpeed);
+	props.push_back(VehicleProperty::AccelerationX);
 	
 	return props;
 }
@@ -112,10 +113,12 @@ void ExampleSourcePlugin::randomizeProperties()
 {
 	velocity = 1 + (255.00 * (rand() / (RAND_MAX + 1.0)));
 	engineSpeed = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
+	int accelerationX = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
 	
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
 	
 	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
 	routingEngine->updateProperty(VehicleProperty::EngineSpeed, engineSpeed);
+	routingEngine->updateProperty(VehicleProperty::AccelerationX, accelerationX);
 }

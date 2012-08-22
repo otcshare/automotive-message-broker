@@ -50,7 +50,7 @@ function Vehicle()
         {
             PRINT.pass("The browser is websocket capable");
 	    
-            this.socket = new WebSocket("ws://localhost:23000/echo","http-only");
+            this.socket = new WebSocket("ws://localhost:7681","http-only");
             this.socket.onopen = function()
             {
                 PRINT.pass("Connection OPEN");
@@ -60,10 +60,13 @@ function Vehicle()
             {
                 self.receive(e.data);
             };
-            this.socket.onclose = function()
+            this.socket.onclose = function(e)
             {
-                PRINT.fail("Connection CLOSED");
+                PRINT.fail("Connection CLOSED: " + e.reason + " code: " + e.code);
             };
+            this.socket.onerror = function(evt) {
+		alert(evt);
+            }
         }
         else
         {

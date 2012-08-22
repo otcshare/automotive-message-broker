@@ -25,11 +25,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMap;
 
-AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectPath)
-: mInterfaceName(interfaceName), mObjectPath(objectPath)
+AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectPath,
+											 GDBusConnection* connection)
+	: mInterfaceName(interfaceName), mObjectPath(objectPath), mConnection(connection)
 {
-	mConnection = nullptr;
-
 	interfaceMap[interfaceName] = this;
 	introspectionXml ="<node>" ;
 	introspectionXml += "<interface name='"+ interfaceName + "' >";
@@ -40,8 +39,18 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	string nameToLower = property->name();
 	boost::algorithm::to_lower<string>(nameToLower);
 	
+	string access;
+
+	if(property->access() == AbstractProperty::Read)
+		access = "read";
+	else if(property->access() == AbstractProperty::Write)
+		access = "write";
+	else if(property->access() == AbstractProperty::ReadWrite)
+		access = "readwrite";
+	else throw -1; //FIXME: don't throw
+
 	///see which properties are supported:
-	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='read' />"
+	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
 	"<signal name='" + property->name() + "' >"
 	"	<arg type='"+ property->signature() + "' name='" + nameToLower + "' direction='out' />"
 	"</signal>";
@@ -49,9 +58,12 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	properties[property->name()] = property;
 }
 
-void AbstractDBusInterface::registerObject(GDBusConnection* connection)
+void AbstractDBusInterface::registerObject()
 {
-	mConnection = connection;
+	if(!mConnection)
+	{
+		throw std::runtime_error("forgot to call setDBusConnection on AbstractDBusInterface");
+	}
 	
 	if(introspectionXml.empty())
 	{
@@ -79,7 +91,7 @@ void AbstractDBusInterface::registerObject(GDBusConnection* connection)
 	
 	const GDBusInterfaceVTable vtable = { NULL, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 	
-	guint regId = g_dbus_connection_register_object(connection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
+	guint regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
 	
 	if(error) throw -1;
 	
@@ -123,5 +135,25 @@ gboolean AbstractDBusInterface::setProperty(GDBusConnection* connection, const g
 	}
 
 	return false;
+}
+
+void AbstractDBusInterface::setProperty(string propertyName, GVariant *value)
+{
+	if(properties.count(propertyName))
+	{
+		properties[propertyName]->fromGVariant(value);
+	}
+	else
+	{
+		throw -1;
+	}
+}
+
+GVariant *AbstractDBusInterface::getProperty(string propertyName)
+{
+	if(properties.count(propertyName))
+		return properties[propertyName]->toGVariant();
+	else
+		throw -1;
 }
 

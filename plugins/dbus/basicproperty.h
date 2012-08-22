@@ -16,32 +16,40 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef DBUSSINK_H_
-#define DBUSSINK_H_
+#ifndef _BASICPROPERTY_H_
+#define _BASICPROPERTY_H_
 
-#include "abstractsink.h"
 #include "abstractproperty.h"
-#include <map>
 
-typedef std::map<VehicleProperty::Property, AbstractProperty*> PropertyDBusMap;
-
-class DBusSink : public AbstractSink
-{
-
-public:
-	DBusSink(AbstractRoutingEngine* engine);
-	virtual void supportedChanged(PropertyList supportedProperties) = 0;
-	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid);
-	virtual std::string uuid();
-
-protected:
-	PropertyDBusMap propertyDBusMap;
-};
-
-class DBusSinkManager: public AbstractSinkManager
+template <typename T>
+class BasicProperty: public AbstractProperty
 {
 public:
-	DBusSinkManager(AbstractRoutingEngine* engine);
+	BasicProperty(string propertyName, string signature, Access access, AbstractDBusInterface *interface)
+		:AbstractProperty(propertyName,signature,access,interface)
+	{
+
+	}
+
+	void setValue(T val)
+	{
+		AbstractProperty::setValue<T>(val);
+	}
+
+	T value()
+	{
+		return AbstractProperty::value<T>();
+	}
+
+	virtual GVariant* toGVariant()
+	{
+		return g_variant_new(signature().c_str(), value());
+	}
+
+	virtual void fromGVariant(GVariant *value)
+	{
+
+	}
 };
 
 #endif
