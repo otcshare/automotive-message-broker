@@ -41,7 +41,7 @@ TcpSinkManager::TcpSinkManager(AbstractRoutingEngine* engine):AbstractSinkManage
 	protocollist[0] = { "http-only", websocket_callback, 0 };
 	protocollist[1] = { NULL, NULL, 0 };
 
-	int port = 23000;
+	int port = 7681;
 	const char *interface = "lo";
 	const char *ssl_cert_path = NULL;
 	const char *ssl_key_path = NULL;
