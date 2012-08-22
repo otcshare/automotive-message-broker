@@ -7,88 +7,164 @@
  *
  */
 
-var vehicle;
-var PRINT = {
-    moduleName : "IVI API",
-    logElement : null,
-    init : function(log_id) {
-        this.logElement = document.getElementById(log_id);
-    },
+/* ------------------------ vehicle interface ----------------------------- */
 
-    setModule : function(moduleName) {
-        this.moduleName = moduleName;
-    },
-
-    pass : function(msg) {
-        this.logElement.innerHTML += "<div class='PassClass'> " + this.moduleName + " : Pass : " + msg + "</div>";
-    },
-
-    fail : function(msg) {
-        this.logElement.innerHTML += "<div class='FailClass'> " + this.moduleName + " : Fail : " + msg + "</div>";
-    },
-
-    log : function(msg) {
-        this.logElement.innerHTML += "<div class='LogClass'> " + msg + "</div>";
-    },
-}
-
-var myJSONObject = {
-    "type" : "method",
-    "name": "GetProperty",
-    "Arguments": [
-         "Velocity"
-    ],
-    "transactionid": "0f234002-95b8-48ac-aa06-cb49e372cc1c"
-};
-
-function Vehicle()
+function Vehicle(socketUrl, sCB, eCB, tout)
 {
     var self = this;
- 
-    function init() {
-       if ("WebSocket" in window)
+    this.successCB = sCB;
+    this.errorCB = eCB;
+    this.transactionid = 0;
+    this.methodCalls = [];
+    this.timeouttime = (tout == undefined)?2000:tout;
+    this.retries = 5;
+    this.connected = false;
+
+    this.VehicleMethodCall = function(n, sCB, eCB)
+    {
+        var me = this;
+        this.name = n;
+        this.successCB = sCB;
+        this.errorCB = eCB;
+        this.transactionid = self.transactionid++;
+
+        this.send = function(msg)
         {
-            PRINT.pass("The browser is websocket capable");
-	    
-            this.socket = new WebSocket("ws://localhost:7681","http-only");
-            this.socket.onopen = function()
+            var errCB = (me.errorCB == undefined)?self.errorCB:me.errorCB;
+            if(!self.connected)
             {
-                PRINT.pass("Connection OPEN");
-                this.send(JSON.stringify(myJSONObject));
+                if(errCB != undefined)
+                {
+                    errCB("\""+me.name+"\" method failed because socket is closed");
+                }
+                self.methodCalls.pop(this);
+            }
+            me.timeout = setTimeout(function(){
+                if(errCB != undefined)
+                {
+                    errCB("\""+me.name+"\" method timed out after "+self.timeouttime+"ms");
+                }
+                self.methodCalls.pop(this);
+            }, self.timeouttime);
+            self.socket.send(msg);
+        }
+        this.done = function()
+        {
+            if(me.timeout != undefined)
+            {
+                clearTimeout(me.timeout);
+            }
+        }
+    }
+
+    function init() {
+        if ("WebSocket" in window)
+        {
+            self.socket = new WebSocket(socketUrl);
+            self.socket.onopen = function()
+            {
+                self.connected = true;
+                this.send("client");
+                self.successCB((self.retries < 5)?"(RECONNECTED)":"");
+                self.retries = 5;
             };
-            this.socket.onmessage = function (e) 
+            self.socket.onclose = function()
+            {
+                self.connected = false;
+                self.errorCB("socket closed "+((self.retries > 0)?"retrying in 5 seconds ...":""));
+                if(self.retries > 0)
+                {
+                    setTimeout(function(){
+                        self.retries--;
+                        init();
+                    }, 5000);
+                }
+            };
+            self.socket.onerror = function(e)
+            {
+                self.errorCB(e.data);
+            };
+            self.socket.onmessage = function (e) 
             {
                 self.receive(e.data);
             };
-            this.socket.onclose = function(e)
-            {
-                PRINT.fail("Connection CLOSED: " + e.reason + " code: " + e.code);
-            };
-            this.socket.onerror = function(evt) {
-		alert(evt);
-            }
         }
         else
         {
-            PRINT.fail("This browser doesn't ppear to support websockets!");
+            console.log("This browser doesn't appear to support websockets!");
         }
     }
     init();
 }
 
-Vehicle.prototype.send = function(msg)
+Vehicle.prototype.getSupportedEventTypes = function(type, writeable, successCB, errorCB)
 {
+    var call = new this.VehicleMethodCall("getSupportedEventTypes", successCB, errorCB);
+    this.methodCalls.push(call);
+    var obj = {
+        "type" : "method",
+        "name": "getSupportedEventTypes",
+        "transactionid" : call.transactionid,
+        "data" : type
+    };
+    call.send(JSON.stringify(obj));
+}
 
+Vehicle.prototype.get = function(type, successCB, errorCB)
+{
+    var call = new this.VehicleMethodCall("get", successCB, errorCB);
+    this.methodCalls.push(call);
+    var obj = {
+        "type" : "method",
+        "name": "get",
+        "transactionid" : call.transactionid,
+        "data" : type
+    };
+    call.send(JSON.stringify(obj));
 }
 
 Vehicle.prototype.receive = function(msg)
 {
-    PRINT.log("Message Received: "+msg);
-    var data = JSON.parse(msg);
-    console.log(data);
-}
+    var self = this;
+    var event;
+    try {
+        event = JSON.parse(msg);
+    }
+    catch(e) {
+        self.errCB("GARBAGE MESSAGE: "+msg);
+        return;
+    }
 
-function init() {
-    PRINT.init("result");
-    vehicle = new Vehicle();
+    if((event == undefined)||(event.type == undefined)||
+       (event.name == undefined)||(event.transactionid == undefined))
+    {
+        self.errCB("BADLY FORMED MESSAGE: "+msg);
+        return;
+    }
+    else
+    {
+        if(event.type === "methodReply")
+        {
+            var calls = this.methodCalls;
+            for(i in calls)
+            {
+                var call = calls[i];
+                if((call.transactionid == event.transactionid)&&
+                   (call.name === event.name))
+                {
+                    call.done();
+                    if(event.error != undefined)
+                    {
+                        call.errorCB(event.error);
+                    }
+                    else
+                    {
+                        call.successCB(event.data);
+                    }
+                    this.methodCalls.pop(call);
+                    return;
+                }
+            }
+        }
+    }
 }

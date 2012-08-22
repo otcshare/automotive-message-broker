@@ -1,8 +1,99 @@
-
 .PassClass {
+    font: bold 16px Arial;
     color: green;
 }
 
 .FailClass {
+    font: bold 16px Arial;
     color: red;
+}
+
+.LogClass {
+    font: 16px Arial;
+    color: black;
+}
+
+#tester {
+    position: absolute;
+    -webkit-user-select: none;
+    top: 0px;
+    left: 0%;
+    height: 100%;
+    width: 60%;
+    overflow-y: auto;
+}
+
+#result {
+    position: absolute;
+    top: 0px;
+    left: 60%;
+    height: 98%;
+    width: 39%;
+    padding-top: 1%;
+    background-color: #eeeeee;
+    padding-left: 1%;
+    overflow-y: auto;
+}
+
+.proptest {
+    position: relative;
+    text-align: left;
+    left: 0px;
+    width: 98%;
+    color: #ffffff;
+    font: 18px Arial;
+    line-height: 30px;
+    margin-left: 1%;
+    margin-right: 1%;
+    border: solid 1px #333;
+    background-color: #aaaaaa;
+    overflow: hidden;
+}
+
+.proptest .buttons {
+    position: relative;
+    float: right;
+    width: 240px;
+}
+
+.testbutton {
+    position: relative;
+    float: right;
+    color: #d7d7d7;
+    border: solid 1px #333;
+    text-align: center;
+    text-decoration: none;
+    font: 16px/100% Arial, Helvetica, sans-serif;
+    text-shadow: 0 1px 1px rgba(0,0,0,.3);
+    -webkit-border-radius: 12px;
+    border-radius: 12px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
+    height: 25px;
+    line-height: 24px;
+    cursor: pointer;
+    box-shadow: 2px 2px 14px #000;
+    margin-top: 1%;
+    margin-bottom: 1%;
+    margin-right: 5px;
+}
+
+.testbutton.types {
+    width: 180px;
+}
+
+.testbutton.types:after {
+    content: 'getSupportedEventTypes';
+}
+
+.testbutton.get {
+    width: 40px;
+}
+
+.testbutton.get:after {
+    content: 'get';
+}
+
+.testbutton:active {
+    color: #666;
+    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
 }
