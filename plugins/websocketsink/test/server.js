@@ -96,11 +96,20 @@ VehicleServer.prototype.receive = function(msg)
     PRINT.incoming(msg);
     if(event.name === "getSupportedEventTypes")
     {
+        var data;
+        if(event.writeable)
+        {
+            data = this.vehicleEventType.getValueEventList(event.data);
+        }
+        else
+        {
+            data = this.vehicleEventType.getSupportedEventList(event.data);
+        }
         obj = {
             "type" : "methodReply",
             "name": event.name,
             "transactionid" : event.transactionid,
-            "data" : this.vehicleEventType.getSupportedEventList(event.data)
+            "data" : data
         };
     }
     else if(event.name === "get")
@@ -127,6 +136,24 @@ VehicleServer.prototype.receive = function(msg)
                 "name": event.name,
                 "transactionid" : event.transactionid,
                 "error" : event.data + " is not a valid event"
+            };
+        }
+    }
+    else if(event.name === "set")
+    {
+        if(this.vehicleEventType.isValueEvent(event.data.property))
+        {
+            obj = event;
+            obj.type = "methodReply";
+            this.vehicleEventType.setValue(event.data.property, event.data.value);
+        }
+        else
+        {
+            obj = {
+                "type" : "methodReply",
+                "name": event.name,
+                "transactionid" : event.transactionid,
+                "error" : event.data.property + " is not a writeable event"
             };
         }
     }
