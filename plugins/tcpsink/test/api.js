@@ -49,8 +49,8 @@ function Vehicle()
        if ("WebSocket" in window)
         {
             PRINT.pass("The browser is websocket capable");
-
-            this.socket = new WebSocket("ws://localhost:23000/echo");
+	    
+            this.socket = new WebSocket("ws://localhost:23000/echo","http-only");
             this.socket.onopen = function()
             {
                 PRINT.pass("Connection OPEN");

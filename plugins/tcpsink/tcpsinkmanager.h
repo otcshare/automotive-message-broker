@@ -30,7 +30,9 @@ class TcpSinkManager: public AbstractSinkManager
 {
 public:
 	TcpSinkManager(AbstractRoutingEngine* engine);
+	void addSink(libwebsocket *socket,VehicleProperty::Property property);
 private:
+  AbstractRoutingEngine *m_engine;
 	struct libwebsocket_protocols protocollist[2];
 };
 
