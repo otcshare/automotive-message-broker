@@ -60,7 +60,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		stringstream s;
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"running_status_speedometer\",\"value\":\"" << velocity << "\"}],\"transactionid\":" << id << "}";
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"running_status_speedometer\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << id << "\"}";
 		
 		string replystr = s.str();
 		printf("Reply: %s\n",replystr.c_str());
