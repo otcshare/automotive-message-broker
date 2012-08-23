@@ -28,7 +28,8 @@ class WebSocketSinkManager: public AbstractSinkManager
 {
 public:
 	WebSocketSinkManager(AbstractRoutingEngine* engine);
-	void addSink(libwebsocket *socket,VehicleProperty::Property property);
+	void addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id);
+	void addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid);
 private:
   AbstractRoutingEngine *m_engine;
 	struct libwebsocket_protocols protocollist[2];
