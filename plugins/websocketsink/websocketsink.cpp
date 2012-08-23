@@ -27,13 +27,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sstream>
 
 
 
 
-WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid) : AbstractSink(re)
+WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property) : AbstractSink(re)
 {
 	m_uuid = uuid;
+	m_wsi = wsi;
+	re->subscribeToProperty(property,this);
 }
 string WebSocketSink::uuid()
 {
@@ -41,6 +44,20 @@ string WebSocketSink::uuid()
 }
 void WebSocketSink::propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid)
 {
+  //printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
+		uint16_t velocity = boost::any_cast<uint16_t>(value);
+		stringstream s;
+		
+		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << property << "\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << m_uuid << "\"}";
+		
+		string replystr = s.str();
+		printf("Reply: %s\n",replystr.c_str());
+
+		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+		strcpy(new_response,replystr.c_str());
+		libwebsocket_write(m_wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 }
 void WebSocketSink::supportedChanged(PropertyList supportedProperties)
 {

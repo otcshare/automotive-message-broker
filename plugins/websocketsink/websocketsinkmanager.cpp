@@ -79,7 +79,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 }
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
 {
-	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid);
+	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property);
 }
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
