@@ -22,7 +22,7 @@
 
 #include <string>
 #include <list>
-
+#include <set>
 
 
 class VehicleProperty
@@ -92,5 +92,6 @@ public:
 };
 
 typedef std::list<VehicleProperty::Property> PropertyList;
+typedef std::set<VehicleProperty::Property> PropertySet;
 
 #endif // VEHICLEPROPERTY_H
