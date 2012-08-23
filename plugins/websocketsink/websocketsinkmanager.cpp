@@ -53,17 +53,17 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):Abstra
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
 	AsyncPropertyRequest velocityRequest;
-	velocityRequest.property = VehicleProperty::VehicleSpeed;
+	velocityRequest.property = property;
 	velocityRequest.completed = [socket,id](AsyncPropertyReply* reply) {
 		printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
 		uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-		s << "{\"type\":\"reply\",\"name\":\"Velocity\",\"arguments\":\"[\"" << velocity << "\"],\"transactionid\":\"" << id << "\"}";
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"running_status_speedometer\",\"value\":\"" << velocity << "\"}],\"transactionid\":" << id << "}";
 		
 		string replystr = s.str();
-		
+		printf("Reply: %s\n",replystr.c_str());
 
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -156,6 +156,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			string type;
 			string  name;
 			list<string> arguments;
+			string data;
 			//stringlist arguments
 			string id;
 			json_reader_read_member(reader,"type");
@@ -166,7 +167,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
 			
-			json_reader_read_member(reader,"Arguments");
+			/*json_reader_read_member(reader,"Arguments");
 			g_assert(json_reader_is_array(reader));
 			for(int i=0; i < json_reader_count_elements(reader); i++)
 			{
@@ -176,21 +177,47 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				json_reader_end_element(reader);
 			}
 			json_reader_end_member(reader);
-			
+			*/
+			json_reader_read_member(reader,"data");
+			printf("Data Type Name: %s\n",g_type_name(json_node_get_value_type(json_reader_get_value(reader))));
+			data = json_reader_get_string_value(reader);
+			json_reader_end_member(reader);
+			//running_status_engine_speed
 			
 			
 			json_reader_read_member(reader,"transactionid");
-			id = json_reader_get_string_value(reader);
+			
+			//JsonNode *node = json_reader_get_value(reader);
+			//node->
+			
+			//printf("Type Name: %s\n",gtype);
+			printf("Before\n");
+			//GType gtype = json_reader_get_type();
+			//json_reader_error_get_type();
+			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
+			{
+			  //Type is a string
+			  id = json_reader_get_string_value(reader);
+			}
+			else
+			{
+			  stringstream strstr;
+			  strstr << json_reader_get_int_value(reader);
+			  id = strstr.str();
+			}
+			//printf("After\n");
+			//printf("New %s\n",id.c_str());
+			//json_reader_get
 			json_reader_end_member(reader);
 			
 			
 			if (type == "method")
 			{
-			  if (name == "GetProperty")
+			  if (name == "get")
 			  {
 			    //GetProperty is going to be a singleshot sink.
-			    string arg = arguments.front();
-			    if (arg == "Velocity")
+			    //string arg = arguments.front();
+			    if (data== "running_status_speedometer")
 			    {			   
 			      printf("Found velocity\n");
 			    //m_engine->subscribeToProperty(VehicleProperty::VehicleSpeed,this);
@@ -198,7 +225,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			    
 			    sinkManager->addSingleShotSink(wsi,VehicleProperty::Property::VehicleSpeed,id);
 			    //libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+			    
 			    }
+			    else if (data == "running_status_engine_speed")
+			    {
+			      sinkManager->addSingleShotSink(wsi,VehicleProperty::Property::EngineSpeed,id);
+			    }
+			    //EngineSpeed
+			    //AccelerationX
 			    
 			  }
 			  else if (name == "Subscribe")
