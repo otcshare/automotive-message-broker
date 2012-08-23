@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 ///properties:
 #include "accelerationproperty.h"
+#include "properties.h"
 
 using namespace std;
 
@@ -32,6 +33,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 {
 	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
 	AbstractDBusInterface* acceleration = new AccelerationPropertyInterface(iface->re, connection);
+	VehicleSpeedProperty* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
 
 }
 

@@ -23,7 +23,7 @@
 #include "dbusplugin.h"
 #include "basicproperty.h"
 
-class AccelerationPropertyInterface: public AbstractDBusInterface, public DBusSink
+class AccelerationPropertyInterface: public DBusSink
 {
 public:
 	AccelerationPropertyInterface(AbstractRoutingEngine* re, GDBusConnection* connection);

@@ -21,27 +21,32 @@
 
 #include "abstractsink.h"
 #include "abstractproperty.h"
+#include "abstractdbusinterface.h"
+#include "basicproperty.h"
 #include <map>
 
 typedef std::map<VehicleProperty::Property, AbstractProperty*> PropertyDBusMap;
 
-class DBusSink : public AbstractSink
+class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
 
 public:
-	DBusSink(AbstractRoutingEngine* engine);
-	virtual void supportedChanged(PropertyList supportedProperties) = 0;
+	DBusSink(std::string interface, std::string path, AbstractRoutingEngine* engine, GDBusConnection* connection);
+	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid);
 	virtual std::string uuid();
 
 protected:
 	template <typename T>
-	void wantProperty(VehicleProperty::Property)
+	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-
+		propertyDBusMap[property] = new BasicProperty<T>(propertyName, signature, access, this);
 	}
 
 	PropertyDBusMap propertyDBusMap;
+private:
+
+	bool supported;
 };
 
 class DBusSinkManager: public AbstractSinkManager

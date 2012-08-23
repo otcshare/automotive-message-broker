@@ -21,16 +21,35 @@
 #include "abstractroutingengine.h"
 #include "dbusinterfacemanager.h"
 #include "debugout.h"
+#include "listplusplus.h"
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 {
 	return new DBusSinkManager(routingengine);
 }
 
-DBusSink::DBusSink(AbstractRoutingEngine* engine)
-	: AbstractSink(engine)
+DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection)
+	:AbstractDBusInterface(interface, path, connection),
+	  AbstractSink(engine), supported(false)
 {
 
+}
+
+void DBusSink::supportedChanged(PropertyList supportedProperties)
+{
+
+	for(PropertyDBusMap::iterator itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
+	{
+		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr).first))
+		{
+			routingEngine->subscribeToProperty((*itr).first, this);
+			supported = true;
+		}
+	}
+
+
+	if(supported)
+		registerObject();
 }
 
 void DBusSink::propertyChanged(VehicleProperty::Property property, boost::any value, string uuid)

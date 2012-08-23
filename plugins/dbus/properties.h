@@ -21,28 +21,19 @@
 
 #include "dbusplugin.h"
 #include "abstractdbusinterface.h"
+#include "abstractroutingengine.h"
 
-class VehicleSpeedProperty: public AbstractDBusInterface, public DBusSink
+class VehicleSpeedProperty: public DBusSink
 {
 public:
-	AccelerationPropertyInterface(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:AbstractDBusInterface("org.automotive.acceleration","/org/automotive/acceleration", connection),
-		  DBusSink(re)
+	VehicleSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.vehicleSpeed","/org/automotive/vehiclespeed", re, connection)
 	{
+		wantProperty<uint16_t>(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 
-	void supportedChanged(PropertyList supportedProperties)
-	{
-		for(PropertyDBusMap itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
-		{
-			if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr)))
-			{
-				routingEngine->subscribeToProperty((*itr), this);
 
-			}
-		}
-	}
 };
 
 #endif
