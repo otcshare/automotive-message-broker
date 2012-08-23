@@ -150,8 +150,7 @@ function error(msg)
     PRINT.fail(msg);
 }
 
-function init() {
+function init(url, protocol) {
     PRINT.init("result");
-    window.vehicle = new Vehicle("ws://localhost:23000/vehicle",
-        start, error);
+    window.vehicle = new Vehicle(start, error, url, protocol);
 }
