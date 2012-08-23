@@ -35,36 +35,59 @@ public:
 
 	typedef std::string Property;
 
-	//enum Property
-	//{
+	/// Various property types:
+
 	static const Property NoValue;
-	static const Property VehicleSpeed; /**< Vehicle Velocity in km/h */
-	static const Property EngineSpeed;/**< Engine Speed in rotations per minute */
-	static const Property TransmissionShiftPosition; /**< Transmission Shift Position
-									* 0 = Neutral
-									* 1 = 1st
-									* 2 = 2nd
-									* ...
-									* 64 = Drive
-									* 128 = Reverse
-									* 255 = Park
-									*/
 
-		static const Property ThrottlePosition; /**< Throttle position 0-100% */
-		static const Property WheelBrake; /**< Wheel brake position.  Engaged = true, Idle = false */
-		static const Property SteeringWheelAngle; /**< Steering wheel angle (0-359) */
-		static const Property TurnSignal; /**< 0=off, 1=right, 2=left, 3=hazard */
-		static const Property ClutchStatus; /**< Clutch pedal status 0=off, 1=on */
-		static const Property EngineOilPressure; /**< Oil pressure TODO: units */
-		static const Property EngineCoolantTemperature; /**< Engine coolant temperature in degrees celcius **/
-		static const Property MachineGunTurretStatus; /**< 0=off, 1=on */
-		static const Property AccelerationX; /**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
-		static const Property AccelerationY; /**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
-		static const Property AccelerationZ; /**< Acceleration on the 'z' axis in 1/1000 gravitational acceleration "g-force" */
-	//};
+	/**< Vehicle Velocity in km/h */
+	static const Property VehicleSpeed;
 
-	static std::string name(Property prop);
-	static Property value(std::string name);
+	/**< Engine Speed in rotations per minute */
+	static const Property EngineSpeed;
+
+	 /**< Transmission Shift Position
+	 * 0 = Neutral
+	 * 1 = 1st
+	 * 2 = 2nd
+	 * ...
+	 * 64 = Drive
+	 * 128 = Reverse
+	 * 255 = Park
+	 */
+	static const Property TransmissionShiftPosition;
+
+	/**< Throttle position 0-100% */
+	static const Property ThrottlePosition;
+
+	/**< Wheel brake position.  Engaged = true, Idle = false */
+	static const Property WheelBrake;
+
+	/**< Steering wheel angle (0-359) */
+	static const Property SteeringWheelAngle;
+
+	/**< 0=off, 1=right, 2=left, 3=hazard */
+	static const Property TurnSignal;
+
+	/**< Clutch pedal status 0=off, 1=on */
+	static const Property ClutchStatus;
+
+	 /**< Oil pressure TODO: units */
+	static const Property EngineOilPressure;
+
+	/**< Engine coolant temperature in degrees celcius **/
+	static const Property EngineCoolantTemperature;
+
+	/**< 0=off, 1=on */
+	static const Property MachineGunTurretStatus;
+
+	/**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
+	static const Property AccelerationX;
+
+	/**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
+	static const Property AccelerationY;
+
+	/**< Acceleration on the 'z' axis in 1/1000 gravitational acceleration "g-force" */
+	static const Property AccelerationZ;
     
 };
 

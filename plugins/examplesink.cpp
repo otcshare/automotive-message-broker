@@ -51,7 +51,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 void ExampleSink::propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid)
 {
-	DebugOut()<<VehicleProperty::name(property)<<" value: "<<boost::any_cast<uint16_t>(value)<<endl;
+	DebugOut()<<property<<" value: "<<boost::any_cast<uint16_t>(value)<<endl;
 }
 
 std::string ExampleSink::uuid()

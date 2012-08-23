@@ -43,7 +43,7 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 	{
 		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((*itr)))
 		{
-			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<VehicleProperty::name((*itr))<<endl;
+			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<(*itr)<<endl;
 			mMasterPropertyList.push_back((*itr));
 		}
 	}
@@ -154,7 +154,7 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 {
 	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
-		DebugOut()<<__FUNCTION__<<"(): property not supported: "<<VehicleProperty::name(property)<<endl;
+		DebugOut()<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
 		return; 
 	}
 	
@@ -176,13 +176,11 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		DebugOut()<<__FUNCTION__<<"property not supported: "<<VehicleProperty::name(property);
+		DebugOut()<<__FUNCTION__<<"property not supported: "<<property;
 		return; 
 	}
-	
-	SinkList list = propertySinkMap[property];
-	
-	ListPlusPlus<AbstractSink*>(&list).removeOne(self);
+		
+	ListPlusPlus<AbstractSink*>(&propertySinkMap[property]).removeOne(self);
 	
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{

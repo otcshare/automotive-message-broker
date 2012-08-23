@@ -42,12 +42,3 @@ VehicleProperty::VehicleProperty()
 
 }
 
-string VehicleProperty::name(VehicleProperty::Property prop)
-{
-	return "";
-}
-
-VehicleProperty::Property VehicleProperty::value(string name)
-{
-	return VehicleProperty::NoValue;
-}
