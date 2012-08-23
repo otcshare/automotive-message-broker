@@ -62,7 +62,6 @@ function Vehicle(sCB, eCB, url, protocol)
 
     this.iSuccessCB = sCB;
     this.iErrorCB = eCB;
-    this.transactionid = 0;
 
     /* variables for call management, supports up to 100 simultaneously */
     this.methodIdx = 0;
@@ -161,9 +160,22 @@ function Vehicle(sCB, eCB, url, protocol)
     init();
 }
 
+Vehicle.prototype.generateTransactionId = function()
+{
+    var i, val = [];
+    for(i = 0; i < 8; i++)
+    {
+       var num = Math.floor((Math.random()+1)*65536);
+       val[i] = num.toString(16).substring(1);
+    }
+    var uuid = val[0]+val[1]+"-"+
+               val[2]+"-"+val[3]+"-"+val[4]+"-"+
+               val[5]+val[6]+val[7];
+    return uuid;
+}
+
 Vehicle.prototype.send = function(obj, successCB, errorCB)
 {
-    obj.transactionid = this.transactionid++;
     if(!this.connected)
     {
         if(errorCB != undefined)
@@ -187,7 +199,7 @@ Vehicle.prototype.getSupportedEventTypes = function(type, writeable, successCB, 
         "type" : "method",
         "name" : "getSupportedEventTypes",
         "writeable" : writeable,
-        "transactionid" : 0,
+        "transactionid" : this.generateTransactionId(),
         "data" : type
     };
     this.send(obj, successCB, errorCB);
@@ -198,7 +210,7 @@ Vehicle.prototype.get = function(type, successCB, errorCB)
     var obj = {
         "type" : "method",
         "name": "get",
-        "transactionid" : 0,
+        "transactionid" : this.generateTransactionId(),
         "data" : type
     };
     this.send(obj, successCB, errorCB);
@@ -209,7 +221,7 @@ Vehicle.prototype.set = function(type, value, successCB, errorCB)
     var obj = {
         "type" : "method",
         "name": "set",
-        "transactionid" : 0,
+        "transactionid" : this.generateTransactionId(),
         "data" : {"property" : type, "value" : value}
     };
     this.send(obj, successCB, errorCB);
