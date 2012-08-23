@@ -101,11 +101,11 @@ boost::any WheelSourcePlugin::getProperty(VehicleProperty::Property property)
 {
 	if(property == VehicleProperty::VehicleSpeed)
 	{
-		return 0;//velocity;
+		return (uint16_t)0;//velocity;
 	}
 	else if(property == VehicleProperty::EngineSpeed)
 	{
-		return 0;//engineSpeed;
+		return (uint16_t)0;//engineSpeed;
 	}
 }
 
@@ -113,12 +113,12 @@ void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
-		reply->value = 0;//velocity;
+		reply->value = (uint16_t)0;//velocity;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::EngineSpeed)
 	{
-		reply->value = 0;//engineSpeed;
+		reply->value = (uint16_t)0;//engineSpeed;
 		reply->completed(reply);
 	}
 }
@@ -156,7 +156,7 @@ void WheelSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property p
 	mRequests.erase(property);
 }
 
-void WheelSourcePlugin::newPropertyValue(VehicleProperty::Property prop, boost::any)
+void WheelSourcePlugin::newPropertyValue(VehicleProperty::Property prop, boost::any value)
 {
 	if (mRequests.find(prop) != mRequests.end()){
 		//TODO: Send out new subscribed value
@@ -219,7 +219,7 @@ WheelPrivate::~WheelPrivate()
 
 boost::any WheelPrivate::getProperty(VehicleProperty::Property propType)
 {
-	
+	return (uint16_t)0;
 }
 
 void WheelPrivate::gotData(GAsyncResult *res)
