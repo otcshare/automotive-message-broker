@@ -31,13 +31,13 @@
 
 
 
-WebSocketSink::WebSocketSink(AbstractRoutingEngine* re) : AbstractSink(re)
+WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid) : AbstractSink(re)
 {
-
+	m_uuid = uuid;
 }
 string WebSocketSink::uuid()
 {
-	return "e43f6cad-60e3-4454-9638-01ffa9ab8c8f";
+	return m_uuid;
 }
 void WebSocketSink::propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid)
 {
