@@ -59,7 +59,6 @@ function VehicleServer(socketUrl)
             self.socket.onopen = function()
             {
                 PRINT.pass("Server READY");
-                this.send("server");
             };
             self.socket.onclose = function()
             {
@@ -173,5 +172,5 @@ VehicleServer.prototype.receive = function(msg)
 window.addEventListener('load', function () {
     "use strict";
     PRINT.init("result");
-    var server = new VehicleServer("ws://localhost:23000/vehicle");
+    var server = new VehicleServer("ws://localhost:23023/vehicle?server");
 });

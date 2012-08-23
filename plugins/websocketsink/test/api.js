@@ -7,24 +7,85 @@
  *
  */
 
-/* ------------------------ vehicle interface ----------------------------- */
+/*****************************************************************************
+* Class name: Vehicle
+* Description:
+*    A javascript implementation of the IVI vehicle API that communicates
+*    to the automotive message broker through a websocket
+* Optional constructor arguments:
+*    sCB: success callback, called when socket is connected, argument is 
+*         success message string
+*    eCB: error callback, called on socket close or error, argument is error
+*         message string
+*    url: the URL to use for the websocket, in the form "ws://host:port/script"
+*    protocol: the protocol to use for the websocket, default is "http-only"
+*
+* [Public Member functions]
+*  Function name: getSupportedEventTypes(type, writeable, successCB, errorCB)
+*    Description:
+*        Retrieves a list of vehicle events for the requested type
+*    Required arguments:
+*        type: target event or group to query (use empty string for all events)
+*        writeable: if true, return only writeable events, otherwise get all
+*        successCB: success callback, gets called with a string list of names
+*              for all the events and event groups that are children of the 
+*              target. e.g. "vehicle_info" returns all events/groups with the 
+*              vehicle_info prefix. If the target is an event group, it's
+*              omitted from the returned list
+*        errorCB: error callback, called with error message string
+*
+*  Function name: get(type, successCB, errorCB)
+*    Description:
+*        Retrieves a list of event/value pairs for a target event or event group
+*    Required arguments:
+*        type: target event group to query (use empty string for all events)
+*        successCB: success callback, gets called with the event/value pair list
+*                   for all event children of the target. The list is the in the 
+*                   form of data[n].name/data[n].value
+*        errorCB: error callback, called with error message string
+*
+*  Function name: set(type, value, successCB, errorCB)
+*    Description:
+*        Sets a single event's value (triggers error if it's read-only)
+*    Required arguments:
+*        type: target event to set (an event group will trigger an error)
+*        successCB: success callback, gets called with the event/value pair
+*                   that was successfully set in the form data.name/data.value
+*        errorCB: error callback, called with error message string
+*
+******************************************************************************/
 
-function Vehicle(socketUrl, sCB, eCB, calltimeout)
+function Vehicle(sCB, eCB, url, protocol)
 {
+    /* store a copy of Vehicle this for reference in callbacks */
     var self = this;
+
     this.iSuccessCB = sCB;
     this.iErrorCB = eCB;
-    this.retries = 5;
-    this.connected = false;
     this.transactionid = 0;
-    this.methodCalls = [];
-    this.methodIdx = 0;
-    this.timeouttime = (calltimeout == undefined)?5000:calltimeout;
 
+    /* variables for call management, supports up to 100 simultaneously */
+    this.methodIdx = 0;
+    this.methodCalls = [];
     for(var i = 0; i < 100; i++)
     {
         this.methodCalls[i] = null;
     }
+
+    /* number of connection retries to attempt if the socket closes */
+    this.retries = 5;
+    this.connected = false;
+
+    /* timeout for method calls in milliseconds */
+    this.timeouttime = 5000;
+
+    /* default values for WebSocket */
+    this.socketUrl = "ws://localhost:23000/vehicle";
+    this.socketProtocol = "http-only";
+
+    /* override the websocket address if parameters are given */
+    if(url != undefined) this.socketUrl = url;
+    if(protocol != undefined) this.socketProtocol = protocol;
 
     this.VehicleMethodCall = function(id, name, successCB, errorCB)
     {
@@ -57,11 +118,17 @@ function Vehicle(socketUrl, sCB, eCB, calltimeout)
     function init() {
         if ("WebSocket" in window)
         {
-            self.socket = new WebSocket(socketUrl,"http-only");
+            if(self.socketProtocol.length > 0)
+            {
+                self.socket = new WebSocket(self.socketUrl, self.socketProtocol);
+            }
+            else
+            {
+                self.socket = new WebSocket(self.socketUrl);
+            }
             self.socket.onopen = function()
             {
                 self.connected = true;
-                this.send("client");
                 self.iSuccessCB((self.retries < 5)?"(RECONNECTED)":"");
                 self.retries = 5;
             };
