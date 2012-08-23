@@ -223,13 +223,13 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			    //m_engine->subscribeToProperty(VehicleProperty::VehicleSpeed,this);
 			      
 			    
-			    sinkManager->addSingleShotSink(wsi,VehicleProperty::Property::VehicleSpeed,id);
+				sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
 			    //libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 			    
 			    }
 			    else if (data == "running_status_engine_speed")
 			    {
-			      sinkManager->addSingleShotSink(wsi,VehicleProperty::Property::EngineSpeed,id);
+				  sinkManager->addSingleShotSink(wsi,VehicleProperty::EngineSpeed,id);
 			    }
 			    //EngineSpeed
 			    //AccelerationX
