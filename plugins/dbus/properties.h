@@ -16,38 +16,33 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef DBUSSINK_H_
-#define DBUSSINK_H_
+#ifndef _PROPERTIES_H_H_H_
+#define _PROPERTIES_H_H_H_
 
-#include "abstractsink.h"
-#include "abstractproperty.h"
-#include <map>
+#include "dbusplugin.h"
+#include "abstractdbusinterface.h"
 
-typedef std::map<VehicleProperty::Property, AbstractProperty*> PropertyDBusMap;
-
-class DBusSink : public AbstractSink
+class VehicleSpeedProperty: public AbstractDBusInterface, public DBusSink
 {
-
 public:
-	DBusSink(AbstractRoutingEngine* engine);
-	virtual void supportedChanged(PropertyList supportedProperties) = 0;
-	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid);
-	virtual std::string uuid();
-
-protected:
-	template <typename T>
-	void wantProperty(VehicleProperty::Property)
+	AccelerationPropertyInterface(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:AbstractDBusInterface("org.automotive.acceleration","/org/automotive/acceleration", connection),
+		  DBusSink(re)
 	{
-
+		supportedChanged(re->supported());
 	}
 
-	PropertyDBusMap propertyDBusMap;
-};
+	void supportedChanged(PropertyList supportedProperties)
+	{
+		for(PropertyDBusMap itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
+		{
+			if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr)))
+			{
+				routingEngine->subscribeToProperty((*itr), this);
 
-class DBusSinkManager: public AbstractSinkManager
-{
-public:
-	DBusSinkManager(AbstractRoutingEngine* engine);
+			}
+		}
+	}
 };
 
 #endif

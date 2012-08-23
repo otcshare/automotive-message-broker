@@ -1,5 +1,5 @@
 {
 	"sources" : [ "../plugins/examplesourceplugin.so" ],
-	"sinks": [ "../plugins/examplesinkplugin.so", "../plugins/dbus/dbussinkplugin.so" ,"../plugins/tcpsink/websocketsinkplugin.so" ]
+	"sinks": [ "../plugins/examplesinkplugin.so", "../plugins/dbus/dbussinkplugin.so" ,"../plugins/websocketsink/websocketsinkplugin.so" ]
 }
 
