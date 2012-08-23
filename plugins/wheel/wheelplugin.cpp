@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <stdexcept>
 #include <boost/assert.hpp>
+#include <boost/bimap.hpp>
+#include <boost/unordered_map.hpp>
 #include <glib.h>
 
 #include <gio/gunixinputstream.h>
@@ -36,44 +38,51 @@ using namespace std;
 
 
 #define JSNAMELEN 128
+#define LG27 "G27 Racing Wheel"
 
+enum PropLocation {
+	Button=0,
+	Axis
+};
+
+const boost::bimap<VehicleProperty::Property, int> ButtonMap;
+const boost::bimap<VehicleProperty::Property, int> AxisMap;
 
 class WheelPrivate
 {
 
 public:
-	WheelPrivate();
+	WheelPrivate(WheelSourcePlugin *parent);
 	~WheelPrivate();
 
-	void gotData(GAsyncResult *res);
+	boost::any getProperty(VehicleProperty::Property propType);
+
+	friend void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData);
+
 
 private:
-	struct js_event jsEvent;
+	void gotData(GAsyncResult *res);
+
+	WheelSourcePlugin *wsp;
 	GInputStream *gis;
+	struct js_event jsEvent;
+	VehicleProperty::Property btnMap[16];
 	int *axis;
 	char *button;
 
 };
 
 
-static gboolean timeoutCallback(gpointer data)
-{
-	WheelSourcePlugin* src = (WheelSourcePlugin*)data;
-	
-	//src->randomizeProperties();
-	
-	return true;
-}
-
 WheelSourcePlugin::WheelSourcePlugin(AbstractRoutingEngine* re)
-:AbstractSource(re), velocity(0), engineSpeed(0), wheel(new WheelPrivate())
+:AbstractSource(re)
 {
 	re->setSupported(supported(), this);
+	this->mWheel = new WheelPrivate(this);
 }
 
 WheelSourcePlugin::~WheelSourcePlugin()
 {
-	delete this->wheel;
+	delete this->mWheel;
 }
 
 
@@ -81,7 +90,6 @@ WheelSourcePlugin::~WheelSourcePlugin()
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine)
 {
 	return new WheelSourcePlugin(routingengine);
-	
 }
 
 string WheelSourcePlugin::uuid()
@@ -93,11 +101,11 @@ boost::any WheelSourcePlugin::getProperty(VehicleProperty::Property property)
 {
 	if(property == VehicleProperty::VehicleSpeed)
 	{
-		return velocity;
+		return 0;//velocity;
 	}
 	else if(property == VehicleProperty::EngineSpeed)
 	{
-		return engineSpeed;
+		return 0;//engineSpeed;
 	}
 }
 
@@ -105,12 +113,12 @@ void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
-		reply->value = velocity;
+		reply->value = 0;//velocity;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::EngineSpeed)
 	{
-		reply->value = engineSpeed;
+		reply->value = 0;//engineSpeed;
 		reply->completed(reply);
 	}
 }
@@ -122,7 +130,7 @@ void WheelSourcePlugin::setProperty(VehicleProperty::Property , boost::any )
 
 void WheelSourcePlugin::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	mRequests.push_back(property);
+	mRequests.insert(property);
 }
 
 PropertyList WheelSourcePlugin::supported()
@@ -145,7 +153,14 @@ PropertyList WheelSourcePlugin::supported()
 
 void WheelSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	mRequests.remove(property);
+	mRequests.erase(property);
+}
+
+void WheelSourcePlugin::newPropertyValue(VehicleProperty::Property prop, boost::any)
+{
+	if (mRequests.find(prop) != mRequests.end()){
+		//TODO: Send out new subscribed value
+	}
 }
 
 //PIMPL:
@@ -162,8 +177,8 @@ void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData)
 
 }
 
-WheelPrivate::WheelPrivate()
-:gis(nullptr), axis(nullptr), button(nullptr)
+WheelPrivate::WheelPrivate(WheelSourcePlugin *parent)
+:gis(nullptr), axis(nullptr), button(nullptr), wsp(parent)
 {
 
 	unsigned char numAxes = 0;
@@ -184,10 +199,10 @@ WheelPrivate::WheelPrivate()
 	ioctl(fd, JSIOCGBUTTONS, &numButtons);
 	ioctl(fd, JSIOCGNAME(JSNAMELEN), name);
 
-	cout << "Driver version: " << (version >> 16) << "." << ((version >> 8) & 0xFF) << "." << (version & 0xFF) << "\n";
-	cout << "JS Name: " << name << "\n";
-	cout << "JS Axes/Buttons: " << (int)numAxes << "/" << (int)numButtons << "\n";
-	cout << "Converting FD to GIO Input Stream...\n";
+	cout << "Driver version: " << (version >> 16) << "." << ((version >> 8) & 0xFF) << "." << (version & 0xFF) << endl;
+	cout << "JS Name: " << name << endl;
+	cout << "JS Axes/Buttons: " << (int)numAxes << "/" << (int)numButtons << endl;
+	cout << "Converting FD to GIO Input Stream..." << endl;
 	this->axis = (int *)calloc(numAxes, sizeof(int));
 	this->button = (char *)calloc(numButtons, sizeof(char));
 	this->gis = g_unix_input_stream_new(fd, TRUE);
@@ -197,9 +212,14 @@ WheelPrivate::WheelPrivate()
 
 WheelPrivate::~WheelPrivate()
 {
-	
 	if (this->gis)
 		g_input_stream_close_async(this->gis, G_PRIORITY_DEFAULT, NULL, NULL, NULL);
+}
+
+
+boost::any WheelPrivate::getProperty(VehicleProperty::Property propType)
+{
+	
 }
 
 void WheelPrivate::gotData(GAsyncResult *res)
@@ -220,14 +240,18 @@ void WheelPrivate::gotData(GAsyncResult *res)
 		switch (this->jsEvent.type & ~JS_EVENT_INIT) {
 			case JS_EVENT_BUTTON:
 				this->button[this->jsEvent.number] = this->jsEvent.value;
-				cout << "Got button event, btn# " << (int)this->jsEvent.number << ", val " << this->jsEvent.value << "\n";
+				cout << "Got button event, btn# " << (int)this->jsEvent.number << ", val " << this->jsEvent.value << endl;
+				//TODO: Transcribe button # to vehicle property
+				//wsp->newPropertyValue(someProp, this->axis[this->jsEvent.number]);
 				break;
 			case JS_EVENT_AXIS:
 				this->axis[this->jsEvent.number] = this->jsEvent.value;
-				cout << "Got axis event, axis# " << (int)this->jsEvent.number << ", val " << this->jsEvent.value << "\n";
+				cout << "Got axis event, axis# " << (int)this->jsEvent.number << ", val " << this->jsEvent.value << endl;
+				//TODO: Transcribe axis # to vehicle property
+				//wsp->newPropertyValue(someProp, this->axis[this->jsEvent.number]);
 				break;
 			default:
-				cout << "Got JS event that wasn't button or axis!\n";
+				cout << "Got JS event that wasn't button or axis!" << endl;
 				break;
 		}
 	}

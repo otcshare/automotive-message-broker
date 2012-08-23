@@ -43,12 +43,15 @@ public:
 	
 	void propertyChanged(VehicleProperty::Property property, boost::any value, string uuid) {}
 	void supportedChanged(PropertyList) {}
+
+	friend class WheelPrivate;
 	
 private:
-	WheelPrivate *wheel;
-	PropertyList mRequests;
-	uint16_t velocity;
-	uint16_t engineSpeed;
+
+	void newPropertyValue(VehicleProperty::Property, boost::any);
+
+	WheelPrivate *mWheel;
+	PropertySet mRequests;
 };
 
 #endif // WHEELPLUGIN_H
