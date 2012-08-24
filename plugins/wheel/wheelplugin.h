@@ -44,11 +44,9 @@ public:
 	void propertyChanged(VehicleProperty::Property property, boost::any value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 
-	friend class WheelPrivate;
+	friend class WheelPrivate;	
 	
 private:
-
-	void newPropertyValue(VehicleProperty::Property, boost::any);
 
 	WheelPrivate *mWheel;
 	PropertySet mRequests;

@@ -72,19 +72,19 @@ private:
 	void newButtonValue(char number, bool val);
 	void newAxisValue(char number, int val);
 
-	void machineGuns(bool val);
+	void changeMachineGuns(bool val);
 	void changeTurnSignal(TurnSignal dir, bool val);
 	void changeGear(int gear);
 	void changeOilPressure(bool increase);
 	void changeCoolantTemp(bool increase);
 
-	void turnSteeringWheel(int val);
-	void clutch(int val);
+	void changeSteeringAngle(int val);
+	void changeClutch(int val);
 	void changeThrottle(int val);
-	void brake(int val);
+	void changeBrake(int val);
 
-	int calcCarSpeed();
-	int calcRPM();
+	uint16_t calcCarSpeed();
+	uint16_t calcRPM();
 
 	AbstractRoutingEngine *re;
 	GInputStream *gis;
@@ -93,11 +93,17 @@ private:
 	int *axis;
 	char *button;
 
-	int oilPSI;
-	int coolantTemp;
-	int turnSignal;
-	int currentGear;
-	int throttle;
+	uint16_t machineGuns;
+	uint16_t turnSignal;
+	uint16_t currentGear;
+	uint16_t oilPSI;
+	uint16_t coolantTemp;
+	uint16_t steeringAngle;
+	uint16_t throttle;
+	bool clutch;
+	bool oldClutch;
+	bool brake;
+	bool oldBrake;
 
 };
 
@@ -128,28 +134,13 @@ string WheelSourcePlugin::uuid()
 
 boost::any WheelSourcePlugin::getProperty(VehicleProperty::Property property)
 {
-	if(property == VehicleProperty::VehicleSpeed)
-	{
-		return (uint16_t)0;//velocity;
-	}
-	else if(property == VehicleProperty::EngineSpeed)
-	{
-		return (uint16_t)0;//engineSpeed;
-	}
+	return this->mWheel->getProperty(property);
 }
 
 void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
-	if(reply->property == VehicleProperty::VehicleSpeed)
-	{
-		reply->value = (uint16_t)0;//velocity;
-		reply->completed(reply);
-	}
-	else if(reply->property == VehicleProperty::EngineSpeed)
-	{
-		reply->value = (uint16_t)0;//engineSpeed;
-		reply->completed(reply);
-	}
+	reply->value = this->mWheel->getProperty(reply->property);
+	reply->completed(reply);
 }
 
 void WheelSourcePlugin::setProperty(VehicleProperty::Property , boost::any )
@@ -185,13 +176,6 @@ void WheelSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property p
 	mRequests.erase(property);
 }
 
-void WheelSourcePlugin::newPropertyValue(VehicleProperty::Property prop, boost::any value)
-{
-	if (mRequests.find(prop) != mRequests.end()){
-		//TODO: Send out new subscribed value
-	}
-}
-
 //PIMPL:
 
 
@@ -208,7 +192,9 @@ void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData)
 
 WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route)
 :re(route), gis(nullptr), axis(nullptr), button(nullptr),
-oilPSI(10), coolantTemp(100), turnSignal(0), throttle(0)
+oilPSI(10), coolantTemp(100), turnSignal(0), throttle(0),
+machineGuns(false), currentGear(0), steeringAngle(0),
+clutch(false), oldClutch(false), brake(false), oldBrake(false)
 {
 
 	unsigned char numAxes = 0;
@@ -249,7 +235,30 @@ WheelPrivate::~WheelPrivate()
 
 boost::any WheelPrivate::getProperty(VehicleProperty::Property propType)
 {
-	return (uint16_t)0;
+	if (propType == VehicleProperty::VehicleSpeed)
+		return this->calcCarSpeed();
+	else if (propType == VehicleProperty::EngineSpeed)
+		return this->calcRPM();
+	else if (propType == VehicleProperty::TransmissionShiftPosition)
+		return this->currentGear;
+	else if (propType == VehicleProperty::ThrottlePosition)
+		return this->throttle;
+	else if (propType == VehicleProperty::WheelBrake)
+		return this->brake;
+	else if (propType == VehicleProperty::SteeringWheelAngle)
+		return this->steeringAngle;
+	else if (propType == VehicleProperty::TurnSignal)
+		return this->turnSignal;
+	else if (propType == VehicleProperty::ClutchStatus)
+		return this->clutch;
+	else if (propType == VehicleProperty::EngineOilPressure)
+		return this->oilPSI;
+	else if (propType == VehicleProperty::EngineCoolantTemperature)
+		return this->coolantTemp;
+	else if (propType == VehicleProperty::MachineGunTurretStatus)
+		return this->machineGuns;
+	else
+		cout << "Unhandled getProperty type: " << propType << endl;
 }
 
 void WheelPrivate::newButtonValue(char number, bool val)
@@ -272,10 +281,10 @@ void WheelPrivate::newButtonValue(char number, bool val)
 		case 10://Gear attach red button row, 4th btn from left (right button)
 			break;
 		case 4:	//Right paddle shifter
-			this->machineGuns(val);
+			this->changeMachineGuns(val);
 			break;
 		case 5:	//Left paddle shifter
-			this->machineGuns(val);
+			this->changeMachineGuns(val);
 			break;
 		case 6:	//Right upper wheel button
 			this->changeTurnSignal(TS_RIGHT, val);
@@ -328,7 +337,6 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			cout << "Got unknown button number: " << (int)number << endl;
 			break;
 	}
-
 }
 
 void WheelPrivate::newAxisValue(char number, int val)
@@ -336,10 +344,10 @@ void WheelPrivate::newAxisValue(char number, int val)
 	switch (number) {
 		case 0:	//Wheel angle, -32767 - 32767
 			//VehicleProperty::SteeringWheelAngle
-			this->turnSteeringWheel(val);
+			this->changeSteeringAngle(val);
 			break;
 		case 1:	//Clutch, -32767 (depressed) - 32767 (undepressed)
-			this->clutch(val);
+			this->changeClutch(val);
 			break;
 		case 2:	//Throttle, -32767 (depressed) - 32767 (undepressed)
 			//VehicleProperty::VehicleSpeed
@@ -347,7 +355,7 @@ void WheelPrivate::newAxisValue(char number, int val)
 			this->changeThrottle(val);
 			break;
 		case 3:	//Brake, -32767 (depressed) - 32767 (undepressed)
-			this->brake(val);
+			this->changeBrake(val);
 			break;
 		case 4:	//D-Pad L/R, -32767 (L), 0 (Released), 32767 (R)
 			break;
@@ -398,9 +406,10 @@ void WheelPrivate::gotData(GAsyncResult *res)
 //Data handling functions
 
 
-void WheelPrivate::machineGuns(bool val)
+void WheelPrivate::changeMachineGuns(bool val)
 {
-	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, (bool)(val ? 1 : 0));
+	this->machineGuns = val;
+	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, this->machineGuns);
 }
 
 void WheelPrivate::changeTurnSignal(TurnSignal dir, bool val)
@@ -412,61 +421,68 @@ void WheelPrivate::changeTurnSignal(TurnSignal dir, bool val)
 		else
 			tsVal = 1;
 	}
-	this->re->updateProperty(VehicleProperty::TurnSignal, (uint16_t)tsVal);
+	this->turnSignal = tsVal;
+	this->re->updateProperty(VehicleProperty::TurnSignal, this->turnSignal);
 }
 
 void WheelPrivate::changeGear(int gear)
 {
 	this->currentGear = gear;
-	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, (uint16_t)gear);
-	this->re->updateProperty(VehicleProperty::VehicleSpeed, (uint16_t)this->calcCarSpeed());
+	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, this->currentGear);
+	this->re->updateProperty(VehicleProperty::VehicleSpeed, this->calcCarSpeed());
 }
 
 void WheelPrivate::changeOilPressure(bool increase)
 {
-	this->re->updateProperty(VehicleProperty::EngineOilPressure, (uint16_t)(increase ? ++this->oilPSI : --this->oilPSI));
+	this->re->updateProperty(VehicleProperty::EngineOilPressure, (increase ? ++this->oilPSI : --this->oilPSI));
 }
 
 void WheelPrivate::changeCoolantTemp(bool increase)
 {
-	this->re->updateProperty(VehicleProperty::EngineCoolantTemperature, (uint16_t)(increase ? ++this->coolantTemp : --this->coolantTemp));
+	this->re->updateProperty(VehicleProperty::EngineCoolantTemperature, (increase ? ++this->coolantTemp : --this->coolantTemp));
 }
 
 
-void WheelPrivate::turnSteeringWheel(int val)
+void WheelPrivate::changeSteeringAngle(int val)
 {
-	double angle = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
-	this->re->updateProperty(VehicleProperty::SteeringWheelAngle, (uint16_t)angle);
+	this->steeringAngle = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
+	this->re->updateProperty(VehicleProperty::SteeringWheelAngle, this->steeringAngle);
 }
 
-void WheelPrivate::clutch(int val)
+void WheelPrivate::changeClutch(int val)
 {
-	this->re->updateProperty(VehicleProperty::ClutchStatus, (bool)(val < 20000));
+	this->oldClutch = this->clutch;
+	this->clutch = (val < 20000);
+	if (this->oldClutch != this->clutch)
+		this->re->updateProperty(VehicleProperty::ClutchStatus, this->clutch);
 }
 
 void WheelPrivate::changeThrottle(int val)
 {
 	this->throttle = ((double)(val - 32767)/(double)-65534.0)*(double)100.0;
 
-	this->re->updateProperty(VehicleProperty::ThrottlePosition, (uint16_t)this->throttle);
-	this->re->updateProperty(VehicleProperty::EngineSpeed, (uint16_t)this->calcRPM());
-	this->re->updateProperty(VehicleProperty::VehicleSpeed, (uint16_t)this->calcCarSpeed());
+	this->re->updateProperty(VehicleProperty::ThrottlePosition, this->throttle);
+	this->re->updateProperty(VehicleProperty::EngineSpeed, this->calcRPM());
+	this->re->updateProperty(VehicleProperty::VehicleSpeed, this->calcCarSpeed());
 }
 
-void WheelPrivate::brake(int val)
+void WheelPrivate::changeBrake(int val)
 {
-	this->re->updateProperty(VehicleProperty::WheelBrake, (val < 20000));
+	this->oldBrake = this->brake;
+	this->brake = (val < 20000);
+	if (this->oldBrake != this->brake)
+		this->re->updateProperty(VehicleProperty::WheelBrake, this->brake);
 }
 
 
-int WheelPrivate::calcCarSpeed()
+uint16_t WheelPrivate::calcCarSpeed()
 {
 //	cout << "Calc Car Speed, rpm: " << this->calcRPM() << ", gearRatio: " << gearRatio[this->currentGear == 128 ? 7 : this->currentGear] << " current gear: " << this->currentGear << endl;
 	return (this->calcRPM() * gearRatio[this->currentGear == 128 ? 7 : this->currentGear])/100;
 
 }
 
-int WheelPrivate::calcRPM()
+uint16_t WheelPrivate::calcRPM()
 {
 //	cout << "Calc rpm, throttle: " << this->throttle << endl;
 	return this->throttle * 100;
