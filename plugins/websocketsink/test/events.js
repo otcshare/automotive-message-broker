@@ -268,6 +268,23 @@ VehicleEventType.prototype.getValueEventList = function(val)
     return list;
 }
 
+VehicleEventType.prototype.getValuesEventList = function(vals)
+{
+    var i, j, list = [];
+    for(i = 0; i < vals.length; i++)
+    {
+        var sublist = this.getValueEventList(vals[i]);
+        for(j = 0; j < sublist.length; j++)
+        {
+            if(list.indexOf(sublist[j]) < 0)
+            {
+                list[list.length] = sublist[j];
+            }
+        }
+    }
+    return list;
+}
+
 VehicleEventType.prototype.isValueEvent = function(val)
 {
     var list = this.getValueEventList(val);
@@ -277,6 +294,11 @@ VehicleEventType.prototype.isValueEvent = function(val)
 VehicleEventType.prototype.getValue = function(prop)
 {
     return this.value[prop];
+}
+
+VehicleEventType.prototype.isValid = function(prop)
+{
+    return (this.event.indexOf(prop) >= 0);
 }
 
 VehicleEventType.prototype.setValue = function(prop, newval)

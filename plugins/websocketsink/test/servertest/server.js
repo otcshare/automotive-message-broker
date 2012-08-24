@@ -51,10 +51,48 @@ function VehicleServer(socketUrl)
 {
     var self = this;
     this.vehicleEventType = new VehicleEventType();
- 
+    this.subscriptions = [];
+
+    this.Signal = function(name)
+    {
+        var me = this;
+        this.users = 0;
+        this.name = name;
+        this.start = function() {
+            if(me.users <= 0)
+            {
+                var interval = Math.floor(Math.random()*5000) + 1000;
+                me.timer = setInterval(function() {
+                    var value = parseInt(self.vehicleEventType.getValue(me.name)) + 1;
+                    self.vehicleEventType.setValue(me.name, value);
+                    var obj = {
+                        "type" : "valuechanged",
+                        "name": me.name,
+                        "data" : value
+                    };
+                    self.socket.send(JSON.stringify(obj));
+                }, interval);
+            }
+            me.users = 1;
+        }
+        this.stop = function() {
+            me.users--;
+            if((me.users <= 0)&&(me.timer != undefined))
+            {
+                clearInterval(me.timer);
+            }
+        }
+    }
+
     function init() {
         if ("WebSocket" in window)
         {
+            var list = self.vehicleEventType.getValueEventList();
+            for(var i = 0; i < list.length; i++)
+            {
+                self.subscriptions[i] = new self.Signal(list[i]);
+            }
+
             self.socket = new WebSocket(socketUrl);
             self.socket.onopen = function()
             {
@@ -79,6 +117,28 @@ function VehicleServer(socketUrl)
         }
     }
     init();
+}
+
+VehicleServer.prototype.subscribe = function(list)
+{
+    for(var i = 0; i < this.subscriptions.length; i++)
+    {
+        if(list.indexOf(this.subscriptions[i].name) >= 0)
+        {
+            this.subscriptions[i].start();
+        }
+    }
+}
+
+VehicleServer.prototype.unsubscribe = function(list)
+{
+    for(var i = 0; i < this.subscriptions.length; i++)
+    {
+        if(list.indexOf(this.subscriptions[i].name) >= 0)
+        {
+            this.subscriptions[i].stop();
+        }
+    }
 }
 
 VehicleServer.prototype.receive = function(msg)
@@ -113,7 +173,7 @@ VehicleServer.prototype.receive = function(msg)
     }
     else if(event.name === "get")
     {
-        var names = this.vehicleEventType.getValueEventList(event.data);
+        var names = this.vehicleEventType.getValuesEventList(event.data);
         if(names.length > 0)
         {
             obj = {
@@ -140,11 +200,61 @@ VehicleServer.prototype.receive = function(msg)
     }
     else if(event.name === "set")
     {
-        if(this.vehicleEventType.isValueEvent(event.data.property))
+        var bad = [];
+        var good = [];
+        for(var i = 0; i < event.data.length; i++)
         {
-            obj = event;
-            obj.type = "methodReply";
-            this.vehicleEventType.setValue(event.data.property, event.data.value);
+            if((event.data[i].value != undefined) && 
+               this.vehicleEventType.isValueEvent(event.data[i].property))
+            {
+                this.vehicleEventType.setValue(event.data[i].property, parseInt(event.data[i].value));
+                good[good.length] = event.data[i].property;
+            }
+            else
+            {
+                bad[bad.length] = event.data[i].property;
+            }
+        }
+
+        obj = {
+            "type" : "methodReply",
+            "name": event.name,
+            "transactionid" : event.transactionid
+        };
+
+        if(bad.length > 0)
+        {
+            obj.error = "Failed to set:";
+            for(var i = 0; i < bad.length; i++)
+            {
+                obj.error += " "+bad[i];
+            }
+        }
+
+        if(good.length > 0)
+        {
+            obj.data = "Successfully set:";
+            for(var i = 0; i < good.length; i++)
+            {
+                obj.data += " "+good[i];
+            }
+        }
+    }
+    else if(event.name === "subscribe")
+    {
+        var names = this.vehicleEventType.getValuesEventList(event.data);
+        if(names.length > 0)
+        {
+            obj = {
+                "type" : "methodReply",
+                "name": event.name,
+                "transactionid" : event.transactionid,
+                "data" : names
+            };
+            for(i in names)
+            {
+                this.subscribe(names[i]);
+            }
         }
         else
         {
@@ -152,7 +262,33 @@ VehicleServer.prototype.receive = function(msg)
                 "type" : "methodReply",
                 "name": event.name,
                 "transactionid" : event.transactionid,
-                "error" : event.data.property + " is not a writeable event"
+                "error" : "no valid events provided"
+            };
+        }
+    }
+    else if(event.name === "unsubscribe")
+    {
+        var names = this.vehicleEventType.getValuesEventList(event.data);
+        if(names.length > 0)
+        {
+            obj = {
+                "type" : "methodReply",
+                "name": event.name,
+                "transactionid" : event.transactionid,
+                "data" : names
+            };
+            for(i in names)
+            {
+                this.unsubscribe(names[i]);
+            }
+        }
+        else
+        {
+            obj = {
+                "type" : "methodReply",
+                "name": event.name,
+                "transactionid" : event.transactionid,
+                "error" : "no valid events provided"
             };
         }
     }

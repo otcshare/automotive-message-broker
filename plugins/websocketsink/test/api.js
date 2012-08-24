@@ -34,24 +34,48 @@
 *              omitted from the returned list
 *        errorCB: error callback, called with error message string
 *
-*  Function name: get(type, successCB, errorCB)
+*  Function name: get(eventlist, successCB, errorCB)
 *    Description:
-*        Retrieves a list of event/value pairs for a target event or event group
+*        Retrieves a list of event/value pairs for a target list of event names
 *    Required arguments:
-*        type: target event group to query (use empty string for all events)
+*        eventlist[]: list of events to read (use empty string for all events)
 *        successCB: success callback, gets called with the event/value pair list
-*                   for all event children of the target. The list is the in the 
+*                   for all requested events. The list is the in the 
 *                   form of data[n].name/data[n].value
 *        errorCB: error callback, called with error message string
 *
-*  Function name: set(type, value, successCB, errorCB)
+*  Function name: set(eventlist, valuelist, successCB, errorCB)
 *    Description:
-*        Sets a single event's value (triggers error if it's read-only)
+*        Sets a gourp of event's values (triggers error on read-only events)
 *    Required arguments:
-*        type: target event to set (an event group will trigger an error)
-*        successCB: success callback, gets called with the event/value pair
-*                   that was successfully set in the form data.name/data.value
+*        eventlist: target events to set
+*        valuelist: target event values
+*        successCB: success callback, gets called with the eventlist
+*                   that was successfully set
 *        errorCB: error callback, called with error message string
+*
+*  Function name: subscribe(eventlist, successCB, errorCB)
+*    Description:
+*        Subscribe to a list of events so you can listen to value changes, they
+*        can be monitored with document.addEventListener(eventname, callback, false);
+*        The Event object passed to the callback has two parameters, e.name and 
+*        e.value. Events are sent to the handler individually.
+*    Required arguments:
+*        eventlist: target events to listen to
+*        successCB: success callback, gets called with the eventlist
+*                   that was successfully subscribed
+*        errorCB: error callback, called with the eventlist that failed to subscribe
+*
+*  Function name: unsubscribe(eventlist, successCB, errorCB)
+*    Description:
+*        Unsubscribe to a list of events to let the server know you're not listening, 
+*        they should stop being sent from the server if no other clients are using them,
+*        but will at least stop being triggered in your app.
+*    Required arguments:
+*        eventlist: target events to stop listening to
+*        successCB: success callback, gets called with the eventlist
+*                   that was successfully unsubscribed
+*        errorCB: error callback, called with the eventlist that failed to unsubscribe
 *
 ******************************************************************************/
 
@@ -205,26 +229,75 @@ Vehicle.prototype.getSupportedEventTypes = function(type, writeable, successCB, 
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.get = function(type, successCB, errorCB)
+Vehicle.prototype.get = function(namelist, successCB, errorCB)
 {
+    if(namelist.length <= 0)
+    {
+        return;
+    }
+
     var obj = {
         "type" : "method",
         "name": "get",
         "transactionid" : this.generateTransactionId(),
-        "data" : type
+        "data" : namelist
     };
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.set = function(type, value, successCB, errorCB)
+Vehicle.prototype.set = function(namelist, valuelist, successCB, errorCB)
 {
+    if((namelist.length != valuelist.length)||(namelist.length <= 0))
+    {
+        return;
+    }
+
     var obj = {
         "type" : "method",
         "name": "set",
         "transactionid" : this.generateTransactionId(),
-        "data" : {"property" : type, "value" : value}
+        "data" : []
+    };
+    var list = [];
+    for(var i = 0; i < namelist.length; i++)
+    {
+        var val = {"property" : namelist[i], "value" : valuelist[i]};
+        list[list.length] = val;
+    }
+    obj.data = list;
+    this.send(obj, successCB, errorCB);
+}
+
+Vehicle.prototype.subscribe = function(namelist, successCB, errorCB)
+{
+    var obj = {
+        "type" : "method",
+        "name": "subscribe",
+        "transactionid" : this.generateTransactionId(),
+        "data" : namelist
     };
     this.send(obj, successCB, errorCB);
+}
+
+Vehicle.prototype.unsubscribe = function(namelist, successCB, errorCB)
+{
+    var obj = {
+        "type" : "method",
+        "name": "unsubscribe",
+        "transactionid" : this.generateTransactionId(),
+        "data" : namelist
+    };
+    this.send(obj, successCB, errorCB);
+}
+
+Vehicle.prototype.sendEvent = function(name, value)
+{
+    var evt = document.createEvent("Event");
+    evt.initEvent(name, true, true);
+    evt.name = name;
+    evt.value = value;
+    document.dispatchEvent(evt);
+    console.log(evt);
 }
 
 Vehicle.prototype.receive = function(msg)
@@ -240,7 +313,7 @@ Vehicle.prototype.receive = function(msg)
     }
 
     if((event == undefined)||(event.type == undefined)||
-       (event.name == undefined)||(event.transactionid == undefined))
+       (event.name == undefined))
     {
         self.iErrorCB("BADLY FORMED MESSAGE: "+msg);
         return;
@@ -260,13 +333,17 @@ Vehicle.prototype.receive = function(msg)
                     {
                         call.errorCB(event.error);
                     }
-                    else
+                    if(event.data != undefined)
                     {
                         call.successCB(event.data);
                     }
                     return;
                 }
             }
+        }
+        else if(event.type === "valuechanged")
+        {
+            self.sendEvent(event.name, event.data);
         }
     }
 }
