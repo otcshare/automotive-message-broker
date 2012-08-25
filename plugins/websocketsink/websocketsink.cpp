@@ -36,6 +36,8 @@ WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string 
 {
 	m_uuid = uuid;
 	m_wsi = wsi;
+	m_property = property;
+	m_re = re;
 	re->subscribeToProperty(property,this);
 }
 string WebSocketSink::uuid()
@@ -77,6 +79,10 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, boost::a
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
 		libwebsocket_write(m_wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+}
+WebSocketSink::~WebSocketSink()
+{
+	m_re->unsubscribeToProperty(m_property,this);
 }
 void WebSocketSink::supportedChanged(PropertyList supportedProperties)
 {

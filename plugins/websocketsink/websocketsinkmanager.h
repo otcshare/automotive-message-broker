@@ -21,7 +21,9 @@
 
 #include <abstractroutingengine.h>
 #include <abstractsink.h>
+#include "websocketsink.h"
 #include <gio/gio.h>
+#include <map>
 #include <libwebsockets.h>
 
 class WebSocketSinkManager: public AbstractSinkManager
@@ -30,6 +32,8 @@ public:
 	WebSocketSinkManager(AbstractRoutingEngine* engine);
 	void addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id);
 	void addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid);
+	void removeSink(libwebsocket* socket,VehicleProperty::Property property,string uuid);
+	map<std::string,WebSocketSink*> m_sinkMap;
 private:
   AbstractRoutingEngine *m_engine;
 	struct libwebsocket_protocols protocollist[2];
