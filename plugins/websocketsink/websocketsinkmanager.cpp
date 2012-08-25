@@ -268,7 +268,10 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			else
 			{
 				string path = json_reader_get_string_value(reader);
-				data.push_back(path);
+				if (path != "")
+				{
+					data.push_back(path);
+				}
 			}
 			json_reader_end_member(reader);
 			//printf("Data Type Name: %s\n",g_type_name(json_node_get_value_type(json_reader_get_value(reader))));
@@ -375,21 +378,29 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				else if (name == "getSupportedEventTypes")
 				{
 					string typessupported = "";
-					if (data.front()== "running_status_speedometer")
+					if (data.size() == 0)
 					{
-						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+					  typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
 					}
-					else if (data.front()== "running_status_engine_speed")
+					else
 					{
-						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
-					}
-					else if (data.front() == "running_status_steering_wheel_angle")
-					{
-						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
-					}
-					else if (data.front() == "running_status_transmission_gear_status")
-					{
-						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+					
+						if (data.front()== "running_status_speedometer")
+						{
+							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+						}
+						else if (data.front()== "running_status_engine_speed")
+						{
+							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+						}
+						else if (data.front() == "running_status_steering_wheel_angle")
+						{
+							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+						}
+						else if (data.front() == "running_status_transmission_gear_status")
+						{
+							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+						}
 					}
 					stringstream s;
 					//s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"],\"transactionid\":\"" << id << "\"}";
