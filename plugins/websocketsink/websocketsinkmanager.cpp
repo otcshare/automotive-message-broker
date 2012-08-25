@@ -22,6 +22,7 @@
 #include <sstream>
 #include <json-glib/json-glib.h>
 
+#define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 
 //Global variables, these will be moved into the class
 struct pollfd pollfds[100];
@@ -54,13 +55,31 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 {
 	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = property;
-	velocityRequest.completed = [socket,id](AsyncPropertyReply* reply) {
+	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply)
+	{
 		printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
 		uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"running_status_speedometer\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << id << "\"}";
+		string tmpstr = "";
+		if (property == VehicleProperty::VehicleSpeed)
+		{
+			tmpstr = "running_status_speedometer";
+		}
+		else if (property == VehicleProperty::EngineSpeed)
+		{
+			tmpstr = "running_status_engine_speed";
+		}
+		else if (property == VehicleProperty::SteeringWheelAngle)
+		{
+			tmpstr = "running_status_steering_wheel_angle";
+		}
+		else if (property == VehicleProperty::TransmissionShiftPosition)
+		{
+			tmpstr = "running_status_transmission_gear_status";
+		}
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << id << "\"}";
 		
 		string replystr = s.str();
 		printf("Reply: %s\n",replystr.c_str());
@@ -77,9 +96,65 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 }
+void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid)
+{
+	if (m_sinkMap.find(property) != m_sinkMap.end())
+	{
+		WebSocketSink* sink = m_sinkMap[property];
+		delete sink;
+		m_sinkMap.erase(property);
+		stringstream s;
+		s << "{\"type\":\"methodReply\",\"name\":\"unsubscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
+		
+		string replystr = s.str();
+		printf("Reply: %s\n",replystr.c_str());
+
+		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+		strcpy(new_response,replystr.c_str());
+		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+
+	}
+}
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
 {
-	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid);
+	stringstream s;
+	
+	//TODO: Dirty hack hardcoded stuff, jsut to make it work.
+	string tmpstr = "";
+	if (property == VehicleProperty::VehicleSpeed)
+	{
+		tmpstr = "running_status_speedometer";
+	}
+	else if (property == VehicleProperty::EngineSpeed)
+	{
+		tmpstr = "running_status_engine_speed";
+	}
+	else if (property == VehicleProperty::SteeringWheelAngle)
+	{
+		tmpstr = "running_status_steering_wheel_angle";
+	}
+	else if (property == VehicleProperty::TransmissionShiftPosition)
+	{
+		tmpstr = "running_status_transmission_gear_status";
+	}
+	
+	
+		    
+		    
+		    
+	s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << tmpstr << "\"],\"transactionid\":\"" << uuid << "\"}";
+	
+	string replystr = s.str();
+	printf("Reply: %s\n",replystr.c_str());
+
+	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(new_response,replystr.c_str());
+	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+
+	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property);
+	m_sinkMap[property] = sink;
 }
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
@@ -101,146 +176,99 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
-		  printf("Client writable\n");
+			printf("Client writable\n");
 		}
 		case LWS_CALLBACK_SERVER_WRITEABLE:
 		{
-		  printf("Server writable\n");
+			printf("Server writable\n");
 		}
 		
 		case LWS_CALLBACK_RECEIVE:
 		{
-		  printf("Data Received: %s\n",(char*)in);
+			printf("Data Received: %s\n",(char*)in);
 		}
 		case LWS_CALLBACK_HTTP:
 		{
 			//TODO: Verify that ALL requests get sent via LWS_CALLBACK_HTTP, so we can use that instead of LWS_CALLBACK_RECIEVE
-			printf("requested URI: %s\n", (char*)in);
-			
-			/*{
-			  "type":"method",
-			  "name":"GetProperty",
-			  "Arguments":["Velocity"],
-			  "transactionid":"0f234002-95b8-48ac-aa06-cb49e372cc1c"
-			  }
-			  */
-			JsonParser* parser = json_parser_new();
+			//TODO: Do we want exceptions, or just to return an invalid json reply? Probably an invalid json reply.
+			DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Requested: " << (char*)in;
 			GError* error = nullptr;
+			
+			
+			JsonParser* parser = json_parser_new();
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
-			  printf("Error loading JSON\n");
-			  return 0;
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON";
+				return 0;
 			}
 			
 			JsonNode* node = json_parser_get_root(parser);
-			
 			if(node == nullptr)
 			{
-				printf("Error getting root node of json\n");
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json";
+				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
-				//throw std::runtime_error("Unable to get JSON root object");
 			
 			JsonReader* reader = json_reader_new(node);
-			
 			if(reader == nullptr)
 			{
-				printf("json_reader is null!\n");
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!";
+				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
-				//throw std::runtime_error("Unable to create JSON reader");
 			
-			//DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
 			
-			gchar** members = json_reader_list_members(reader);
+			
+			
+			
 			string type;
-			string  name;
-			list<string> arguments;
-			string data;
-			//stringlist arguments
-			string id;
 			json_reader_read_member(reader,"type");
 			type = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
 			
+			string  name;
 			json_reader_read_member(reader,"name");
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
-			
-			/*json_reader_read_member(reader,"Arguments");
-			g_assert(json_reader_is_array(reader));
-			for(int i=0; i < json_reader_count_elements(reader); i++)
-			{
-				json_reader_read_element(reader,i);
-				string path = json_reader_get_string_value(reader);
-				arguments.push_back(path);
-				json_reader_end_element(reader);
-			}
-			json_reader_end_member(reader);
-			*/
+
+			list<string> data;
 			json_reader_read_member(reader,"data");
-			printf("Data Type Name: %s\n",g_type_name(json_node_get_value_type(json_reader_get_value(reader))));
-			data = json_reader_get_string_value(reader);
-			json_reader_end_member(reader);
-			//running_status_engine_speed
-			
-			
-			json_reader_read_member(reader,"transactionid");
-			
-			//JsonNode *node = json_reader_get_value(reader);
-			//node->
-			
-			//printf("Type Name: %s\n",gtype);
-			printf("Before\n");
-			//GType gtype = json_reader_get_type();
-			//json_reader_error_get_type();
-			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
+			if (json_reader_is_array(reader))
 			{
-			  //Type is a string
-			  id = json_reader_get_string_value(reader);
+				for(int i=0; i < json_reader_count_elements(reader); i++)
+				{
+					json_reader_read_element(reader,i);
+					string path = json_reader_get_string_value(reader);
+					data.push_back(path);
+					json_reader_end_element(reader);
+				}
 			}
 			else
 			{
-			  stringstream strstr;
-			  strstr << json_reader_get_int_value(reader);
-			  id = strstr.str();
+				string path = json_reader_get_string_value(reader);
+				if (path != "")
+				{
+					data.push_back(path);
+				}
 			}
-			//printf("After\n");
-			//printf("New %s\n",id.c_str());
-			//json_reader_get
 			json_reader_end_member(reader);
 			
-			
-			if (type == "method")
+			string id;
+			json_reader_read_member(reader,"transactionid");
+			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
 			{
-			  if (name == "get")
-			  {
-			    //GetProperty is going to be a singleshot sink.
-			    //string arg = arguments.front();
-			    if (data== "running_status_speedometer")
-			    {			   
-			      printf("Found velocity\n");
-			    //m_engine->subscribeToProperty(VehicleProperty::VehicleSpeed,this);
-			      
-			    
-				sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
-			    //libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-			    
-			    }
-			    else if (data == "running_status_engine_speed")
-			    {
-				  sinkManager->addSingleShotSink(wsi,VehicleProperty::EngineSpeed,id);
-			    }
-			    //EngineSpeed
-			    //AccelerationX
-			    
-			  }
-			  else if (name == "Subscribe")
-			  {
-			    //Subscribe is a permanent sink, until unsubscription.
-			    sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
-			  }
+				//Type is a string
+				id = json_reader_get_string_value(reader);
 			}
+			else
+			{
+				//Type is an integer
+				stringstream strstr;
+				strstr << json_reader_get_int_value(reader);
+				id = strstr.str();
+			}
+			json_reader_end_member(reader);
 			
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
@@ -248,12 +276,133 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			
 			g_object_unref(reader);
 			g_object_unref(parser);
+			
+			
+			if (type == "method")
+			{
+				if (name == "get")
+				{
+					if (data.size() > 0)
+					{
+						//GetProperty is going to be a singleshot sink.
+						//string arg = arguments.front();
+						if (data.front()== "running_status_speedometer")
+						{			   
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
+						}
+						else if (data.front() == "running_status_engine_speed")
+						{
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::EngineSpeed,id);
+						}
+						else if (data.front() == "running_status_steering_wheel_angle")
+						{
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::SteeringWheelAngle,id);
+						}
+						else if (data.front() == "running_status_transmission_gear_status")
+						{
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
+						}
+					}
+					else
+					{
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id;
+					}
+				}
+				else if (name == "subscribe")
+				{
+					if (data.front()== "running_status_speedometer")
+					{
+						sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
+					}
+					else if (data.front()== "running_status_engine_speed")
+					{
+						sinkManager->addSink(wsi,VehicleProperty::EngineSpeed,id);
+					}
+					else if (data.front() == "running_status_steering_wheel_angle")
+					{
+						sinkManager->addSink(wsi,VehicleProperty::SteeringWheelAngle,id);
+					}
+					else if (data.front() == "running_status_transmission_gear_status")
+					{
+						sinkManager->addSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
+					}
+					else
+					{
+						//Unsupported subscription type.
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported subscription type:" << data.front();
+					}
+				}
+				else if (name == "unsubscribe")
+				{
+					if (data.front()== "running_status_speedometer")
+					{
+						sinkManager->removeSink(wsi,VehicleProperty::VehicleSpeed,id);
+					}
+					else if (data.front()== "running_status_engine_speed")
+					{
+						sinkManager->removeSink(wsi,VehicleProperty::EngineSpeed,id);
+					}
+					else if (data.front() == "running_status_steering_wheel_angle")
+					{
+						sinkManager->removeSink(wsi,VehicleProperty::SteeringWheelAngle,id);
+					}
+					else if (data.front() == "running_status_transmission_gear_status")
+					{
+						sinkManager->removeSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
+					}
+					else
+					{
+						//Unsupported unsubscribe
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported unsubscription type:" << data.front();
+					}
+				}
+				else if (name == "getSupportedEventTypes")
+				{
+					string typessupported = "";
+					if (data.size() == 0)
+					{
+						//Send what properties we support
+						typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
+					}
+					else
+					{
+						//Send what events a particular property supports
+						if (data.front()== "running_status_speedometer")
+						{
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+						}
+						else if (data.front()== "running_status_engine_speed")
+						{
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+						}
+						else if (data.front() == "running_status_steering_wheel_angle")
+						{
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+						}
+						else if (data.front() == "running_status_transmission_gear_status")
+						{
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+						}
+					}
+					stringstream s;
+					string s2;
+
+					s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
+					string replystr = s.str();
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr;
+					//printf("Reply: %s\n",replystr.c_str());
+					char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+					strcpy(new_response,replystr.c_str());
+					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);	    
+				}
+			}
 			break;
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//Add a FD to the poll list.
-			printf("Adding poll\n");
+			//printf("Adding poll\n");
 			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
 			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
 			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
@@ -264,7 +413,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_DEL_POLL_FD:
 		{
-			//Remove FD from the poll list.
+			//Remove FD from the poll list. I'm not convinced this is needed anymore
 			for (int n = 0; n < count_pollfds; n++)
 			{
 				if (pollfds[n].fd == (int)(long)user)
@@ -313,9 +462,9 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	libwebsocket_service_fd(context,&pollstruct);
 	if (condition == G_IO_HUP)
 	{
-	  //Hang up. Returning false closes out the GIOChannel.
-	  printf("Callback on G_IO_HUP\n");
-	  return false;
+		//Hang up. Returning false closes out the GIOChannel.
+		printf("Callback on G_IO_HUP\n");
+		return false;
 	}
 	
 	return true;
