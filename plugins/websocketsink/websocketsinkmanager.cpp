@@ -22,6 +22,7 @@
 #include <sstream>
 #include <json-glib/json-glib.h>
 
+#define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 
 //Global variables, these will be moved into the class
 struct pollfd pollfds[100];
@@ -189,72 +190,50 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_HTTP:
 		{
 			//TODO: Verify that ALL requests get sent via LWS_CALLBACK_HTTP, so we can use that instead of LWS_CALLBACK_RECIEVE
-			printf("requested URI: %s\n", (char*)in);
-			
-			/*{
-			  "type":"method",
-			  "name":"GetProperty",
-			  "Arguments":["Velocity"],
-			  "transactionid":"0f234002-95b8-48ac-aa06-cb49e372cc1c"
-			  }
-			  */
-			JsonParser* parser = json_parser_new();
+			//TODO: Do we want exceptions, or just to return an invalid json reply? Probably an invalid json reply.
+			DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Requested: " << (char*)in;
 			GError* error = nullptr;
+			
+			
+			JsonParser* parser = json_parser_new();
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
-				printf("Error loading JSON\n");
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON";
 				return 0;
 			}
 			
 			JsonNode* node = json_parser_get_root(parser);
-			
 			if(node == nullptr)
 			{
-				printf("Error getting root node of json\n");
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json";
+				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
-				//throw std::runtime_error("Unable to get JSON root object");
 			
 			JsonReader* reader = json_reader_new(node);
-			
 			if(reader == nullptr)
 			{
-				printf("json_reader is null!\n");
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!";
+				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
-				//throw std::runtime_error("Unable to create JSON reader");
 			
-			//DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
 			
-			gchar** members = json_reader_list_members(reader);
+			
+			
+			
 			string type;
-			string  name;
-			list<string> data;
-			//string data;
-			//stringlist arguments
-			string id;
 			json_reader_read_member(reader,"type");
 			type = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
 			
+			string  name;
 			json_reader_read_member(reader,"name");
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
-			
-			/*json_reader_read_member(reader,"Arguments");
-			g_assert(json_reader_is_array(reader));
-			for(int i=0; i < json_reader_count_elements(reader); i++)
-			{
-				json_reader_read_element(reader,i);
-				string path = json_reader_get_string_value(reader);
-				arguments.push_back(path);
-				json_reader_end_element(reader);
-			}
-			json_reader_end_member(reader);
-			*/
+
+			list<string> data;
 			json_reader_read_member(reader,"data");
-			
-			//g_assert();
 			if (json_reader_is_array(reader))
 			{
 				for(int i=0; i < json_reader_count_elements(reader); i++)
@@ -274,21 +253,9 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				}
 			}
 			json_reader_end_member(reader);
-			//printf("Data Type Name: %s\n",g_type_name(json_node_get_value_type(json_reader_get_value(reader))));
-			//data = json_reader_get_string_value(reader);
-			//json_reader_end_member(reader);
-			//running_status_engine_speed
 			
-			
+			string id;
 			json_reader_read_member(reader,"transactionid");
-			
-			//JsonNode *node = json_reader_get_value(reader);
-			//node->
-			
-			//printf("Type Name: %s\n",gtype);
-			//printf("Before\n");
-			//GType gtype = json_reader_get_type();
-			//json_reader_error_get_type();
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
 			{
 				//Type is a string
@@ -296,14 +263,19 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			}
 			else
 			{
+				//Type is an integer
 				stringstream strstr;
 				strstr << json_reader_get_int_value(reader);
 				id = strstr.str();
 			}
-			//printf("After\n");
-			//printf("New %s\n",id.c_str());
-			//json_reader_get
 			json_reader_end_member(reader);
+			
+			///TODO: this will probably explode:
+			//mlc: I agree with Kevron here, it does explode.
+			//if(error) g_error_free(error);
+			
+			g_object_unref(reader);
+			g_object_unref(parser);
 			
 			
 			if (type == "method")
@@ -331,15 +303,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 							sinkManager->addSingleShotSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
 						}
 					}
-					//EngineSpeed
-					//AccelerationX
-					
+					else
+					{
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id;
+					}
 				}
 				else if (name == "subscribe")
 				{
 					if (data.front()== "running_status_speedometer")
 					{
-						//Subscribe is a permanent sink, until unsubscription.
 						sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
 					}
 					else if (data.front()== "running_status_engine_speed")
@@ -354,12 +326,16 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						sinkManager->addSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
 					}
+					else
+					{
+						//Unsupported subscription type.
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported subscription type:" << data.front();
+					}
 				}
 				else if (name == "unsubscribe")
 				{
 					if (data.front()== "running_status_speedometer")
 					{
-						//Subscribe is a permanent sink, until unsubscription.
 						sinkManager->removeSink(wsi,VehicleProperty::VehicleSpeed,id);
 					}
 					else if (data.front()== "running_status_engine_speed")
@@ -374,17 +350,23 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						sinkManager->removeSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
 					}
+					else
+					{
+						//Unsupported unsubscribe
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported unsubscription type:" << data.front();
+					}
 				}
 				else if (name == "getSupportedEventTypes")
 				{
 					string typessupported = "";
 					if (data.size() == 0)
 					{
-					  typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
+						//Send what properties we support
+						typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
 					}
 					else
 					{
-					
+						//Send what events a particular property supports
 						if (data.front()== "running_status_speedometer")
 						{
 							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
@@ -403,31 +385,24 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						}
 					}
 					stringstream s;
-					//s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"],\"transactionid\":\"" << id << "\"}";
-					s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
-				      
-					string replystr = s.str();
-					printf("Reply: %s\n",replystr.c_str());
+					string s2;
 
+					s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
+					string replystr = s.str();
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr;
+					//printf("Reply: %s\n",replystr.c_str());
 					char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 					strcpy(new_response,replystr.c_str());
 					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);	    
 				}
 			}
-			
-			///TODO: this will probably explode:
-			//mlc: I agree with Kevron here, it does explode.
-			//if(error) g_error_free(error);
-			
-			g_object_unref(reader);
-			g_object_unref(parser);
 			break;
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//Add a FD to the poll list.
-			printf("Adding poll\n");
+			//printf("Adding poll\n");
 			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
 			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
 			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
@@ -438,7 +413,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_DEL_POLL_FD:
 		{
-			//Remove FD from the poll list.
+			//Remove FD from the poll list. I'm not convinced this is needed anymore
 			for (int n = 0; n < count_pollfds; n++)
 			{
 				if (pollfds[n].fd == (int)(long)user)

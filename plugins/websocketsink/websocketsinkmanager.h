@@ -25,6 +25,8 @@
 #include <gio/gio.h>
 #include <map>
 #include <libwebsockets.h>
+#include "debugout.h"
+#include <stdexcept>
 
 class WebSocketSinkManager: public AbstractSinkManager
 {
