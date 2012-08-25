@@ -387,19 +387,19 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					
 						if (data.front()== "running_status_speedometer")
 						{
-							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
 						}
 						else if (data.front()== "running_status_engine_speed")
 						{
-							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
 						}
 						else if (data.front() == "running_status_steering_wheel_angle")
 						{
-							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
 						}
 						else if (data.front() == "running_status_transmission_gear_status")
 						{
-							typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
 						}
 					}
 					stringstream s;
