@@ -54,7 +54,8 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 {
 	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = property;
-	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply) {
+	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply)
+	{
 		printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
 		uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
@@ -63,19 +64,19 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		string tmpstr = "";
 		if (property == VehicleProperty::VehicleSpeed)
 		{
-		  tmpstr = "running_status_speedometer";
+			tmpstr = "running_status_speedometer";
 		}
 		else if (property == VehicleProperty::EngineSpeed)
 		{
-		  tmpstr = "running_status_engine_speed";
+			tmpstr = "running_status_engine_speed";
 		}
 		else if (property == VehicleProperty::SteeringWheelAngle)
 		{
-		  tmpstr = "running_status_steering_wheel_angle";
+			tmpstr = "running_status_steering_wheel_angle";
 		}
 		else if (property == VehicleProperty::TransmissionShiftPosition)
 		{
-		  tmpstr = "running_status_transmission_gear_status";
+			tmpstr = "running_status_transmission_gear_status";
 		}
 		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << id << "\"}";
 		
@@ -116,40 +117,40 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 }
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
 {
-  		stringstream s;
-		
-		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-		string tmpstr = "";
-		if (property == VehicleProperty::VehicleSpeed)
-		{
-		  tmpstr = "running_status_speedometer";
-		}
-		else if (property == VehicleProperty::EngineSpeed)
-		{
-		  tmpstr = "running_status_engine_speed";
-		}
-		else if (property == VehicleProperty::SteeringWheelAngle)
-		{
-		  tmpstr = "running_status_steering_wheel_angle";
-		}
-		else if (property == VehicleProperty::TransmissionShiftPosition)
-		{
-		  tmpstr = "running_status_transmission_gear_status";
-		}
-		
-		
-			    
-			    
-			    
-		s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << tmpstr << "\"],\"transactionid\":\"" << uuid << "\"}";
-		
-		string replystr = s.str();
-		printf("Reply: %s\n",replystr.c_str());
+	stringstream s;
+	
+	//TODO: Dirty hack hardcoded stuff, jsut to make it work.
+	string tmpstr = "";
+	if (property == VehicleProperty::VehicleSpeed)
+	{
+		tmpstr = "running_status_speedometer";
+	}
+	else if (property == VehicleProperty::EngineSpeed)
+	{
+		tmpstr = "running_status_engine_speed";
+	}
+	else if (property == VehicleProperty::SteeringWheelAngle)
+	{
+		tmpstr = "running_status_steering_wheel_angle";
+	}
+	else if (property == VehicleProperty::TransmissionShiftPosition)
+	{
+		tmpstr = "running_status_transmission_gear_status";
+	}
+	
+	
+		    
+		    
+		    
+	s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << tmpstr << "\"],\"transactionid\":\"" << uuid << "\"}";
+	
+	string replystr = s.str();
+	printf("Reply: %s\n",replystr.c_str());
 
-		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-		strcpy(new_response,replystr.c_str());
-		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(new_response,replystr.c_str());
+	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property);
 	m_sinkMap[property] = sink;
@@ -174,16 +175,16 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
-		  printf("Client writable\n");
+			printf("Client writable\n");
 		}
 		case LWS_CALLBACK_SERVER_WRITEABLE:
 		{
-		  printf("Server writable\n");
+			printf("Server writable\n");
 		}
 		
 		case LWS_CALLBACK_RECEIVE:
 		{
-		  printf("Data Received: %s\n",(char*)in);
+			printf("Data Received: %s\n",(char*)in);
 		}
 		case LWS_CALLBACK_HTTP:
 		{
@@ -201,8 +202,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			GError* error = nullptr;
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
-			  printf("Error loading JSON\n");
-			  return 0;
+				printf("Error loading JSON\n");
+				return 0;
 			}
 			
 			JsonNode* node = json_parser_get_root(parser);
@@ -256,13 +257,13 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			//g_assert();
 			if (json_reader_is_array(reader))
 			{
-			for(int i=0; i < json_reader_count_elements(reader); i++)
-			{
-				json_reader_read_element(reader,i);
-				string path = json_reader_get_string_value(reader);
-				data.push_back(path);
-				json_reader_end_element(reader);
-			}
+				for(int i=0; i < json_reader_count_elements(reader); i++)
+				{
+					json_reader_read_element(reader,i);
+					string path = json_reader_get_string_value(reader);
+					data.push_back(path);
+					json_reader_end_element(reader);
+				}
 			}
 			else
 			{
@@ -287,14 +288,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			//json_reader_error_get_type();
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
 			{
-			  //Type is a string
-			  id = json_reader_get_string_value(reader);
+				//Type is a string
+				id = json_reader_get_string_value(reader);
 			}
 			else
 			{
-			  stringstream strstr;
-			  strstr << json_reader_get_int_value(reader);
-			  id = strstr.str();
+				stringstream strstr;
+				strstr << json_reader_get_int_value(reader);
+				id = strstr.str();
 			}
 			//printf("After\n");
 			//printf("New %s\n",id.c_str());
@@ -304,107 +305,104 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			
 			if (type == "method")
 			{
-			  if (name == "get")
-			  {
-			    if (data.size() > 0)
-			    {
-			    //GetProperty is going to be a singleshot sink.
-			    //string arg = arguments.front();
-			    if (data.front()== "running_status_speedometer")
-			    {			   
-				sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
-			    }
-			    else if (data.front() == "running_status_engine_speed")
-			    {
-				  sinkManager->addSingleShotSink(wsi,VehicleProperty::EngineSpeed,id);
-			    }
-			    else if (data.front() == "running_status_steering_wheel_angle")
-			    {
-			      sinkManager->addSingleShotSink(wsi,VehicleProperty::SteeringWheelAngle,id);
-			    }
-			    else if (data.front() == "running_status_transmission_gear_status")
-			    {
-			      sinkManager->addSingleShotSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
-			    }
-			    }
-			    //EngineSpeed
-			    //AccelerationX
-			    
-			  }
-			  else if (name == "subscribe")
-			  {
-			    if (data.front()== "running_status_speedometer")
-			    {
-			    //Subscribe is a permanent sink, until unsubscription.
-			    sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
-			    }
-			    else if (data.front()== "running_status_engine_speed")
-			    {
-			      sinkManager->addSink(wsi,VehicleProperty::EngineSpeed,id);
-			    }
-			    else if (data.front() == "running_status_steering_wheel_angle")
-			    {
-			      sinkManager->addSink(wsi,VehicleProperty::SteeringWheelAngle,id);
-			    }
-			    else if (data.front() == "running_status_transmission_gear_status")
-			    {
-			      sinkManager->addSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
-			    }
-			  }
-			  else if (name == "unsubscribe")
-			  {
-			    if (data.front()== "running_status_speedometer")
-			    {
-			    //Subscribe is a permanent sink, until unsubscription.
-			    sinkManager->removeSink(wsi,VehicleProperty::VehicleSpeed,id);
-			    }
-			    else if (data.front()== "running_status_engine_speed")
-			    {
-			      sinkManager->removeSink(wsi,VehicleProperty::EngineSpeed,id);
-			    }
-			    else if (data.front() == "running_status_steering_wheel_angle")
-			    {
-			      sinkManager->removeSink(wsi,VehicleProperty::SteeringWheelAngle,id);
-			    }
-			    else if (data.front() == "running_status_transmission_gear_status")
-			    {
-			      sinkManager->removeSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
-			    }
-			  }
-			  else if (name == "getSupportedEventTypes")
-			  {
-			    string typessupported = "";
-			    if (data.front()== "running_status_speedometer")
-			    {
-				    typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
-			    }
-			    else if (data.front()== "running_status_engine_speed")
-			    {
-			      typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
-			    }
-			    else if (data.front() == "running_status_steering_wheel_angle")
-			    {
-			      typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
-			    }
-			    else if (data.front() == "running_status_transmission_gear_status")
-			    {
-			      typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
-			    }
-			    
+				if (name == "get")
+				{
+					if (data.size() > 0)
+					{
+						//GetProperty is going to be a singleshot sink.
+						//string arg = arguments.front();
+						if (data.front()== "running_status_speedometer")
+						{			   
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
+						}
+						else if (data.front() == "running_status_engine_speed")
+						{
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::EngineSpeed,id);
+						}
+						else if (data.front() == "running_status_steering_wheel_angle")
+						{
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::SteeringWheelAngle,id);
+						}
+						else if (data.front() == "running_status_transmission_gear_status")
+						{
+							sinkManager->addSingleShotSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
+						}
+					}
+					//EngineSpeed
+					//AccelerationX
+					
+				}
+				else if (name == "subscribe")
+				{
+					if (data.front()== "running_status_speedometer")
+					{
+						//Subscribe is a permanent sink, until unsubscription.
+						sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
+					}
+					else if (data.front()== "running_status_engine_speed")
+					{
+						sinkManager->addSink(wsi,VehicleProperty::EngineSpeed,id);
+					}
+					else if (data.front() == "running_status_steering_wheel_angle")
+					{
+						sinkManager->addSink(wsi,VehicleProperty::SteeringWheelAngle,id);
+					}
+					else if (data.front() == "running_status_transmission_gear_status")
+					{
+						sinkManager->addSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
+					}
+				}
+				else if (name == "unsubscribe")
+				{
+					if (data.front()== "running_status_speedometer")
+					{
+						//Subscribe is a permanent sink, until unsubscription.
+						sinkManager->removeSink(wsi,VehicleProperty::VehicleSpeed,id);
+					}
+					else if (data.front()== "running_status_engine_speed")
+					{
+						sinkManager->removeSink(wsi,VehicleProperty::EngineSpeed,id);
+					}
+					else if (data.front() == "running_status_steering_wheel_angle")
+					{
+						sinkManager->removeSink(wsi,VehicleProperty::SteeringWheelAngle,id);
+					}
+					else if (data.front() == "running_status_transmission_gear_status")
+					{
+						sinkManager->removeSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
+					}
+				}
+				else if (name == "getSupportedEventTypes")
+				{
+					string typessupported = "";
+					if (data.front()== "running_status_speedometer")
+					{
+						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+					}
+					else if (data.front()== "running_status_engine_speed")
+					{
+						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+					}
+					else if (data.front() == "running_status_steering_wheel_angle")
+					{
+						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+					}
+					else if (data.front() == "running_status_transmission_gear_status")
+					{
+						typessupported = "\"get\",\"subscribe\",\"getSupportedEventTypes\"";
+					}
+					stringstream s;
+					//s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"],\"transactionid\":\"" << id << "\"}";
+					s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
+				      
+					string replystr = s.str();
+					printf("Reply: %s\n",replystr.c_str());
 
-			    
-				stringstream s;
-				//s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"],\"transactionid\":\"" << id << "\"}";
-				s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
-				
-				string replystr = s.str();
-				printf("Reply: %s\n",replystr.c_str());
-
-				char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-				new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-				strcpy(new_response,replystr.c_str());
-				libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);	    
-			  }
+					char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+					strcpy(new_response,replystr.c_str());
+					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);	    
+				}
 			}
 			
 			///TODO: this will probably explode:
@@ -478,9 +476,9 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	libwebsocket_service_fd(context,&pollstruct);
 	if (condition == G_IO_HUP)
 	{
-	  //Hang up. Returning false closes out the GIOChannel.
-	  printf("Callback on G_IO_HUP\n");
-	  return false;
+		//Hang up. Returning false closes out the GIOChannel.
+		printf("Callback on G_IO_HUP\n");
+		return false;
 	}
 	
 	return true;
