@@ -49,7 +49,26 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, boost::a
 		stringstream s;
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << property << "\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << m_uuid << "\"}";
+		string tmpstr = "";
+		if (property == VehicleProperty::VehicleSpeed)
+		{
+		  tmpstr = "running_status_speedometer";
+		}
+		else if (property == VehicleProperty::EngineSpeed)
+		{
+		  tmpstr = "running_status_engine_speed";
+		}
+		else if (property == VehicleProperty::SteeringWheelAngle)
+		{
+		  tmpstr = "running_status_steering_wheel_angle";
+		}
+		else if (property == VehicleProperty::TransmissionShiftPosition)
+		{
+		  tmpstr = "running_status_transmission_gear_status";
+		}
+		
+		
+		s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << velocity << "\",\"transactionid\":\"" << m_uuid << "\"}";
 		
 		string replystr = s.str();
 		printf("Reply: %s\n",replystr.c_str());
