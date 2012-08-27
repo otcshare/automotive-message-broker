@@ -176,8 +176,8 @@ function subscribe(eventlist)
             {
                 var sub = data[i]+"_subscribe";
                 var unsub = data[i]+"_unsubscribe";
-                document.getElementById(sub).className = "testbutton subscribe disable"
-                document.getElementById(unsub).className = "testbutton unsubscribe";
+//                document.getElementById(sub).className = "testbutton subscribe disable"
+//                document.getElementById(unsub).className = "testbutton unsubscribe";
                 document.addEventListener(data[i], eventListener, false);
             }
         },
@@ -189,6 +189,12 @@ function subscribe(eventlist)
 
 function unsubscribe(eventlist)
 {
+    /* kill the handers first, so even if the service fails to acknowledge */
+    /* we've stopped listening */
+    for(var i = 0; i < eventlist.length; i++)
+    {
+        document.removeEventListener(eventlist[i], eventListener, false);
+    }
     window.vehicle.unsubscribe(eventlist,
         function(data) {
             PRINT.pass("Unsubscribe success for: "+data);
@@ -196,9 +202,8 @@ function unsubscribe(eventlist)
             {
                 var sub = data[i]+"_subscribe";
                 var unsub = data[i]+"_unsubscribe";
-                document.getElementById(unsub).className = "testbutton unsubscribe disable";
-                document.getElementById(sub).className = "testbutton subscribe";
-                document.removeEventListener(data[i], eventListener, false);
+//                document.getElementById(unsub).className = "testbutton unsubscribe disable";
+//                document.getElementById(sub).className = "testbutton subscribe";
             }
         },
         function(msg) {
