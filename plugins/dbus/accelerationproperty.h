@@ -33,9 +33,9 @@ public:
 
 private:
 
-	BasicProperty<int> * accelerationX;
-	BasicProperty<int> * accelerationY;
-	BasicProperty<int> * accelerationZ;
+	BasicProperty<uint16_t> * accelerationX;
+	BasicProperty<uint16_t> * accelerationY;
+	BasicProperty<uint16_t> * accelerationZ;
 	bool supported;
 };
 

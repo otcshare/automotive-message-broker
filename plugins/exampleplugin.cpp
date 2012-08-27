@@ -26,6 +26,10 @@ using namespace std;
 
 #include "debugout.h"
 
+uint16_t accelerationX = 0;
+uint16_t transmissionShiftPostion = 0;
+uint16_t steeringWheelAngle=0;
+
 static gboolean timeoutCallback(gpointer data)
 {
 	ExampleSourcePlugin* src = (ExampleSourcePlugin*)data;
@@ -82,6 +86,21 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->value = engineSpeed;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::AccelerationX)
+	{
+		reply->value = accelerationX;
+		reply->completed(reply);
+	}
+	else if(reply->property == VehicleProperty::TransmissionShiftPosition)
+	{
+		reply->value = transmissionShiftPostion;
+		reply->completed(reply);
+	}
+	else if(reply->property == VehicleProperty::SteeringWheelAngle)
+	{
+		reply->value = steeringWheelAngle;
+		reply->completed(reply);
+	}
 }
 
 void ExampleSourcePlugin::setProperty(VehicleProperty::Property , boost::any )
@@ -115,9 +134,9 @@ void ExampleSourcePlugin::randomizeProperties()
 {
 	velocity = 1 + (255.00 * (rand() / (RAND_MAX + 1.0)));
 	engineSpeed = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
-	int accelerationX = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
-	int transmissionShiftPostion = 1 + (6.00 * (rand() / (RAND_MAX + 1.0)));
-	int steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
+	accelerationX = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
+	transmissionShiftPostion = 1 + (6.00 * (rand() / (RAND_MAX + 1.0)));
+	steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
 	
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
