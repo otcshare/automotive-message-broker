@@ -128,6 +128,10 @@ int main(int argc, char **argv)
 #endif
 	
 	g_type_init();
+
+	/* Register signal handler */
+	signal(SIGINT, interrupt);
+	signal(SIGTERM, interrupt);
 	
 	PluginLoader loader(config, new Core());
 	
