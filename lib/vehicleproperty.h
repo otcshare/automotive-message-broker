@@ -100,6 +100,8 @@ public:
 
 	/**< Mass Air Flow.  TODO: units */
 	static const Property MassAirFlow;
+
+	static std::list<VehicleProperty::Property> capabilities();
     
 };
 

@@ -44,3 +44,25 @@ VehicleProperty::VehicleProperty()
 
 }
 
+std::list<VehicleProperty::Property> VehicleProperty::capabilities()
+{
+	PropertyList mProperties;
+
+	mProperties.push_back(VehicleSpeed);
+	mProperties.push_back(EngineSpeed);
+	mProperties.push_back(TransmissionShiftPosition);
+	mProperties.push_back(TransmissionGearPosition);
+	mProperties.push_back(ThrottlePosition);
+	mProperties.push_back(WheelBrake);
+	mProperties.push_back(SteeringWheelAngle);
+	mProperties.push_back(TurnSignal);
+	mProperties.push_back(ClutchStatus);
+	mProperties.push_back((EngineOilPressure));
+	mProperties.push_back(EngineCoolantTemperature);
+	mProperties.push_back(AccelerationX);
+	mProperties.push_back(AccelerationY);
+	mProperties.push_back(AccelerationZ);
+	mProperties.push_back(MassAirFlow);
+
+	return mProperties;
+}
