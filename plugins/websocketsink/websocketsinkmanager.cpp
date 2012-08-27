@@ -21,7 +21,7 @@
 #include "websocketsink.h"
 #include <sstream>
 #include <json-glib/json-glib.h>
-
+#include <listplusplus.h>
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 
 //Global variables, these will be moved into the class
@@ -78,6 +78,18 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		else if (property == VehicleProperty::TransmissionShiftPosition)
 		{
 			tmpstr = "running_status_transmission_gear_status";
+		}
+		else
+		{
+			//PropertyList foo = VehicleProperty::capabilities();
+			//if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+			//{
+			  tmpstr = property;
+			//}
+			//else
+			//{
+				
+			//}
 		}
 		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << id << "\"}";
 		
@@ -137,6 +149,10 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	else if (property == VehicleProperty::TransmissionShiftPosition)
 	{
 		tmpstr = "running_status_transmission_gear_status";
+	}
+	else
+	{
+		tmpstr = property;
 	}
 	
 	
@@ -302,6 +318,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						{
 							sinkManager->addSingleShotSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
 						}
+						else
+						{
+						  PropertyList foo = VehicleProperty::capabilities();
+						  if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
+						  {
+						    sinkManager->addSingleShotSink(wsi,data.front(),id);
+						  }
+						}
 					}
 					else
 					{
@@ -329,7 +353,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					else
 					{
 						//Unsupported subscription type.
-						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported subscription type:" << data.front();
+						PropertyList foo = VehicleProperty::capabilities();
+						if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
+						{
+							sinkManager->addSink(wsi,data.front(),id);
+						}
+						else
+						{
+							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported subscription type:" << data.front();
+						}
 					}
 				}
 				else if (name == "unsubscribe")
@@ -352,8 +384,16 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					}
 					else
 					{
-						//Unsupported unsubscribe
-						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported unsubscription type:" << data.front();
+						PropertyList foo = VehicleProperty::capabilities();
+						if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
+						{
+							sinkManager->removeSink(wsi,data.front(),id);
+						}
+						else
+						{
+							//Unsupported unsubscribe
+							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported unsubscription type:" << data.front();
+						}
 					}
 				}
 				else if (name == "getSupportedEventTypes")
@@ -363,6 +403,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						//Send what properties we support
 						typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
+						PropertyList foo = VehicleProperty::capabilities();
+						//ListPlusPlus<VehicleProperty::Property>(&foo)
+						PropertyList::const_iterator i=foo.cbegin();
+						while (i != foo.cend())
+						{
+							typessupported.append(",\"").append((*i)).append("\"");
+							i++;
+						}
 					}
 					else
 					{
@@ -382,6 +430,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						else if (data.front() == "running_status_transmission_gear_status")
 						{
 							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+						}
+						else
+						{
+							PropertyList foo = VehicleProperty::capabilities();
+							if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
+							{
+								//sinkManager->addSingleShotSink(wsi,data.front(),id);
+								typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+							}
 						}
 					}
 					stringstream s;
