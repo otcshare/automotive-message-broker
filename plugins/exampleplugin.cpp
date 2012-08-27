@@ -100,6 +100,8 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::EngineSpeed);
 	props.push_back(VehicleProperty::VehicleSpeed);
 	props.push_back(VehicleProperty::AccelerationX);
+	props.push_back(VehicleProperty::TransmissionShiftPosition);
+	props.push_back(VehicleProperty::SteeringWheelAngle);
 	
 	return props;
 }
@@ -114,6 +116,8 @@ void ExampleSourcePlugin::randomizeProperties()
 	velocity = 1 + (255.00 * (rand() / (RAND_MAX + 1.0)));
 	engineSpeed = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
 	int accelerationX = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
+	int transmissionShiftPostion = 1 + (6.00 * (rand() / (RAND_MAX + 1.0)));
+	int steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
 	
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
@@ -121,4 +125,6 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
 	routingEngine->updateProperty(VehicleProperty::EngineSpeed, engineSpeed);
 	routingEngine->updateProperty(VehicleProperty::AccelerationX, accelerationX);
+	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, steeringWheelAngle);
+	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition, transmissionShiftPostion);
 }

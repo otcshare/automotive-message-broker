@@ -21,21 +21,23 @@
 
 using namespace std;
 
- const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
- const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
- const VehicleProperty::Property VehicleProperty::EngineSpeed = "EngineSpeed";
- const VehicleProperty::Property VehicleProperty::TransmissionShiftPosition = "TransmissionShiftPosition";
- const VehicleProperty::Property VehicleProperty::ThrottlePosition = "ThrottlePosition";
- const VehicleProperty::Property VehicleProperty::WheelBrake = "WheelBrake";
- const VehicleProperty::Property VehicleProperty::SteeringWheelAngle = "SteeringWheelAngle";
- const VehicleProperty::Property VehicleProperty::TurnSignal = "TurnSignal";
- const VehicleProperty::Property VehicleProperty::ClutchStatus = "ClutchStatus";
- const VehicleProperty::Property VehicleProperty::EngineOilPressure = "EngineOilPressure";
- const VehicleProperty::Property VehicleProperty::EngineCoolantTemperature = "EngineCoolantTemperature";
- const VehicleProperty::Property VehicleProperty::MachineGunTurretStatus = "MachineGunTurretStatus";
- const VehicleProperty::Property VehicleProperty::AccelerationX = "AccelerationX";
- const VehicleProperty::Property VehicleProperty::AccelerationY = "AccelerationY";
- const VehicleProperty::Property VehicleProperty::AccelerationZ = "AccelerationZ";
+const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
+const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
+const VehicleProperty::Property VehicleProperty::EngineSpeed = "EngineSpeed";
+const VehicleProperty::Property VehicleProperty::TransmissionShiftPosition = "TransmissionShiftPosition";
+const VehicleProperty::Property VehicleProperty::TransmissionGearPosition = "TransmissionGearPostion";
+const VehicleProperty::Property VehicleProperty::ThrottlePosition = "ThrottlePosition";
+const VehicleProperty::Property VehicleProperty::WheelBrake = "WheelBrake";
+const VehicleProperty::Property VehicleProperty::SteeringWheelAngle = "SteeringWheelAngle";
+const VehicleProperty::Property VehicleProperty::TurnSignal = "TurnSignal";
+const VehicleProperty::Property VehicleProperty::ClutchStatus = "ClutchStatus";
+const VehicleProperty::Property VehicleProperty::EngineOilPressure = "EngineOilPressure";
+const VehicleProperty::Property VehicleProperty::EngineCoolantTemperature = "EngineCoolantTemperature";
+const VehicleProperty::Property VehicleProperty::MachineGunTurretStatus = "MachineGunTurretStatus";
+const VehicleProperty::Property VehicleProperty::AccelerationX = "AccelerationX";
+const VehicleProperty::Property VehicleProperty::AccelerationY = "AccelerationY";
+const VehicleProperty::Property VehicleProperty::AccelerationZ = "AccelerationZ";
+const VehicleProperty::Property VehicleProperty::MassAirFlow = "MassAirFlow";
 
 VehicleProperty::VehicleProperty()
 {

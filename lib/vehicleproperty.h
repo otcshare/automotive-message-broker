@@ -56,6 +56,15 @@ public:
 	 */
 	static const Property TransmissionShiftPosition;
 
+	/**< Transmission Gear Position
+	* 0 = Neutral
+	* 1 = 1st
+	* 2 = 2nd
+	* ...
+	* 64 = CVT
+	*/
+	static const Property TransmissionGearPosition;
+
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
 
@@ -88,6 +97,9 @@ public:
 
 	/**< Acceleration on the 'z' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationZ;
+
+	/**< Mass Air Flow.  TODO: units */
+	static const Property MassAirFlow;
     
 };
 
