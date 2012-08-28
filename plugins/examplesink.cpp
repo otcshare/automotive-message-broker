@@ -46,7 +46,8 @@ PropertyList ExampleSink::subscriptions()
 
 void ExampleSink::supportedChanged(PropertyList supportedProperties)
 {
-
+	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
+	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 }
 
 void ExampleSink::propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid)
