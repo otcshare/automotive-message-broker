@@ -19,3 +19,5 @@ target_link_libraries(examplesinkplugin -lamb -L${CMAKE_CURRENT_BINARY_DIR}/lib 
 add_subdirectory(wheel)
 add_subdirectory(dbus)
 add_subdirectory(websocketsink)
+
+add_subdirectory(websocketsourceplugin)
