@@ -18,6 +18,7 @@
 
 
 #include "vehicleproperty.h"
+#include <map>
 
 using namespace std;
 
@@ -65,4 +66,27 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 	mProperties.push_back(MassAirFlow);
 
 	return mProperties;
+}
+
+AbstractPropertyType VehicleProperty::getPropertyTypeForPropertyNameValue(VehicleProperty::Property name, std::string value)
+{
+	std::map<VehicleProperty::Property, AbstractPropertyType> theMap;
+
+	theMap[VehicleSpeed] = VehicleSpeedType(value);
+	theMap[EngineSpeed] = EngineSpeedType(value);
+	theMap[TransmissionShiftPosition] = TransmissionShiftPositionType(value);
+	theMap[TransmissionGearPosition] = TransmissionGearPositionType(value);
+	theMap[ThrottlePosition] = ThrottlePositionType(value);
+	theMap[WheelBrake] = WheelBrakeType(value);
+	theMap[SteeringWheelAngle] = SteeringWheelAngleType(value);
+	theMap[TurnSignal] = TurnSignalType(value);
+	theMap[ClutchStatus] = ClutchStatusType(value);
+	theMap[EngineOilPressure] = EngineOilPressureType(value);
+	theMap[EngineCoolantTemperature] = EngineCoolantTemperatureType(value);
+	theMap[AccelerationX] = AccelerationType(value);
+	theMap[AccelerationY] = AccelerationType(value);
+	theMap[AccelerationZ] = AccelerationType(value);
+	theMap[MassAirFlow] = MassAirFlowType(value);
+
+	return theMap[name];
 }

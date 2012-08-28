@@ -104,7 +104,7 @@ public:
 
 	/**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationX;
-	typedef BasicPropertyType<uint16_t> AcclerationType;
+	typedef BasicPropertyType<uint16_t> AccelerationType;
 
 	/**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationY;
@@ -117,6 +117,8 @@ public:
 	typedef BasicPropertyType<uint16_t> MassAirFlowType;
 
 	static std::list<VehicleProperty::Property> capabilities();
+
+	static AbstractPropertyType getPropertyTypeForPropertyNameValue(Property name, std::string value);
     
 };
 

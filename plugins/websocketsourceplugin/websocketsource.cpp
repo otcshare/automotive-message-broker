@@ -211,8 +211,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			//data.front()
 			try
 			{
-				uint16_t val = boost::lexical_cast<uint16_t,string>(data.front());
-				m_re->updateProperty(name,boost::any(val));
+				m_re->updateProperty(name,VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front()));
 			}
 			catch (exception ex)
 			{
@@ -423,7 +422,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	}*/
 }
 
-void WebSocketSource::setProperty(VehicleProperty::Property , boost::any )
+void WebSocketSource::setProperty(VehicleProperty::Property , AbstractPropertyType )
 {
 
 }

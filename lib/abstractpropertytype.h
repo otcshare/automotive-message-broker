@@ -22,6 +22,7 @@
 #include <string>
 #include <sstream>
 #include <boost/any.hpp>
+#include <boost/lexical_cast.hpp>
 
 class AbstractPropertyType
 {
@@ -67,6 +68,11 @@ public:
 		:AbstractPropertyType()
 	{
 		setValue(val);
+	}
+
+	BasicPropertyType(std::string val)
+	{
+		setValue(boost::lexical_cast<T,std::string>(val));
 	}
 
 	std::string toString()
