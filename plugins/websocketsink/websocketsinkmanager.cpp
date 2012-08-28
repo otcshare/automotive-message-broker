@@ -54,7 +54,36 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):Abstra
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
 	AsyncPropertyRequest velocityRequest;
-	velocityRequest.property = property;
+	if (property == "running_status_speedometer")
+	{
+		velocityRequest.property = VehicleProperty::VehicleSpeed;
+	}
+	else if (property == "running_status_engine_speed")
+	{
+		velocityRequest.property = VehicleProperty::EngineSpeed;
+	}
+	else if ("running_status_steering_wheel_angle")
+	{
+		velocityRequest.property = VehicleProperty::SteeringWheelAngle;
+	}
+	else if ("running_status_transmission_gear_status")
+	{
+		velocityRequest.property = VehicleProperty::TransmissionShiftPosition;
+	}
+	else
+	{
+		PropertyList foo = VehicleProperty::capabilities();
+		if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+		{
+			velocityRequest.property = property;
+		}
+		else
+		{
+			//Invalid property requested.
+			return;
+		}
+		
+	}
 	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply)
 	{
 		printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
@@ -63,7 +92,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		string tmpstr = "";
-		if (property == VehicleProperty::VehicleSpeed)
+		/*if (property == VehicleProperty::VehicleSpeed)
 		{
 			tmpstr = "running_status_speedometer";
 		}
@@ -90,7 +119,8 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 			//{
 				
 			//}
-		}
+		}*/
+		tmpstr = property;
 		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << id << "\"}";
 		
 		string replystr = s.str();
@@ -134,32 +164,37 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	
 	//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 	string tmpstr = "";
-	if (property == VehicleProperty::VehicleSpeed)
+	if (property == "running_status_speedometer")
 	{
-		tmpstr = "running_status_speedometer";
+		tmpstr = VehicleProperty::VehicleSpeed;
 	}
-	else if (property == VehicleProperty::EngineSpeed)
+	else if (property == "running_status_engine_speed")
 	{
-		tmpstr = "running_status_engine_speed";
+		tmpstr = VehicleProperty::EngineSpeed;
 	}
-	else if (property == VehicleProperty::SteeringWheelAngle)
+	else if ("running_status_steering_wheel_angle")
 	{
-		tmpstr = "running_status_steering_wheel_angle";
+		tmpstr = VehicleProperty::SteeringWheelAngle;
 	}
-	else if (property == VehicleProperty::TransmissionShiftPosition)
+	else if ("running_status_transmission_gear_status")
 	{
-		tmpstr = "running_status_transmission_gear_status";
+		tmpstr = VehicleProperty::TransmissionShiftPosition;
 	}
 	else
 	{
-		tmpstr = property;
+		PropertyList foo = VehicleProperty::capabilities();
+		if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+		{
+			tmpstr = property;
+		}
+		else
+		{
+			//Invalid property requested.
+			return;
+		}
+		
 	}
-	
-	
-		    
-		    
-		    
-	s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << tmpstr << "\"],\"transactionid\":\"" << uuid << "\"}";
+	s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
 	
 	string replystr = s.str();
 	printf("Reply: %s\n",replystr.c_str());
@@ -169,7 +204,7 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	strcpy(new_response,replystr.c_str());
 	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 
-	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property);
+	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
 	m_sinkMap[property] = sink;
 }
 
@@ -302,7 +337,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						//GetProperty is going to be a singleshot sink.
 						//string arg = arguments.front();
-						if (data.front()== "running_status_speedometer")
+						sinkManager->addSingleShotSink(wsi,data.front(),id);
+						/*if (data.front()== "running_status_speedometer")
 						{			   
 							sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
 						}
@@ -325,7 +361,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						  {
 						    sinkManager->addSingleShotSink(wsi,data.front(),id);
 						  }
-						}
+						}*/
 					}
 					else
 					{
@@ -334,6 +370,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				}
 				else if (name == "subscribe")
 				{
+					sinkManager->addSink(wsi,data.front(),id);
+				  /*
 					if (data.front()== "running_status_speedometer")
 					{
 						sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
@@ -362,11 +400,12 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						{
 							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported subscription type:" << data.front();
 						}
-					}
+					}*/
 				}
 				else if (name == "unsubscribe")
 				{
-					if (data.front()== "running_status_speedometer")
+					sinkManager->removeSink(wsi,data.front(),id);
+					/*if (data.front()== "running_status_speedometer")
 					{
 						sinkManager->removeSink(wsi,VehicleProperty::VehicleSpeed,id);
 					}
@@ -394,7 +433,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 							//Unsupported unsubscribe
 							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported unsubscription type:" << data.front();
 						}
-					}
+					}*/
 				}
 				else if (name == "getSupportedEventTypes")
 				{

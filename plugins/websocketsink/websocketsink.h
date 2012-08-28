@@ -27,13 +27,14 @@ class WebSocketSink : public AbstractSink
 {
 
 public:
-	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property);
+	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty);
 	~WebSocketSink();
 	string uuid() ;
 	void propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid);
 	void supportedChanged(PropertyList supportedProperties);
 	PropertyList subscriptions();
 private:
+	string m_amdbproperty;
 	AbstractRoutingEngine *m_re;
 	libwebsocket *m_wsi;
 	string m_uuid;

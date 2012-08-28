@@ -32,13 +32,14 @@
 
 
 
-WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property) : AbstractSink(re)
+WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty) : AbstractSink(re)
 {
+	m_amdbproperty = ambdproperty;
 	m_uuid = uuid;
 	m_wsi = wsi;
 	m_property = property;
 	m_re = re;
-	re->subscribeToProperty(property,this);
+	re->subscribeToProperty(ambdproperty,this);
 }
 string WebSocketSink::uuid()
 {
@@ -51,22 +52,10 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, boost::a
 	stringstream s;
 	
 	//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-	string tmpstr = "";
-	if (property == VehicleProperty::VehicleSpeed)
+	std::string tmpstr="";
+	if (m_property != property)
 	{
-		tmpstr = "running_status_speedometer";
-	}
-	else if (property == VehicleProperty::EngineSpeed)
-	{
-		tmpstr = "running_status_engine_speed";
-	}
-	else if (property == VehicleProperty::SteeringWheelAngle)
-	{
-		tmpstr = "running_status_steering_wheel_angle";
-	}
-	else if (property == VehicleProperty::TransmissionShiftPosition)
-	{
-		tmpstr = "running_status_transmission_gear_status";
+		tmpstr = m_property;
 	}
 	else
 	{
@@ -86,7 +75,7 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, boost::a
 }
 WebSocketSink::~WebSocketSink()
 {
-	m_re->unsubscribeToProperty(m_property,this);
+	m_re->unsubscribeToProperty(m_amdbproperty,this);
 }
 void WebSocketSink::supportedChanged(PropertyList supportedProperties)
 {
