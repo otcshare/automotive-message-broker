@@ -236,9 +236,9 @@ WheelPrivate::~WheelPrivate()
 boost::any WheelPrivate::getProperty(VehicleProperty::Property propType)
 {
 	if (propType == VehicleProperty::VehicleSpeed)
-		return BasicPropertyType<uint16_t>(this->calcCarSpeed())
+		return BasicPropertyType<uint16_t>(this->calcCarSpeed());
 	else if (propType == VehicleProperty::EngineSpeed)
-		return this->calcRPM();
+		return BasicPropertyType<uint16_t>(this->calcRPM());
 	else if (propType == VehicleProperty::TransmissionShiftPosition)
 		return this->currentGear;
 	else if (propType == VehicleProperty::ThrottlePosition)
