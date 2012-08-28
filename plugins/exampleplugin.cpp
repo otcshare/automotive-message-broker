@@ -30,6 +30,7 @@ uint16_t accelerationX = 0;
 uint16_t transmissionShiftPostion = 0;
 uint16_t steeringWheelAngle=0;
 uint16_t throttlePos = 0;
+uint16_t engineCoolant = 40;
 
 static gboolean timeoutCallback(gpointer data)
 {
@@ -123,6 +124,7 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::TransmissionShiftPosition);
 	props.push_back(VehicleProperty::SteeringWheelAngle);
 	props.push_back(VehicleProperty::ThrottlePosition);
+	props.push_back(VehicleProperty::EngineCoolantTemperature);
 	
 	return props;
 }
@@ -140,6 +142,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	transmissionShiftPostion = 1 + (6.00 * (rand() / (RAND_MAX + 1.0)));
 	steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
 	throttlePos = 1 + (100.00 * (rand() / (RAND_MAX + 1.0)));
+	engineCoolant = 1 + (40.00 * (rand() / (RAND_MAX + 140.0)));
 	
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
@@ -150,4 +153,5 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, steeringWheelAngle);
 	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition, transmissionShiftPostion);
 	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, throttlePos);
+	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, engineCoolant);
 }
