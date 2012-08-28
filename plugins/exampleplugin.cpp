@@ -45,7 +45,6 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re)
 :AbstractSource(re), velocity(0), engineSpeed(0)
 {
 	re->setSupported(supported(), this);
-	
 	debugOut("setting timeout");
 	g_timeout_add(1000, timeoutCallback, this );
 	

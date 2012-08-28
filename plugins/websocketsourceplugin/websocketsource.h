@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <abstractsource.h>
 #include <string>
+#include <libwebsockets.h>
 
 
 class WebSocketSource : public AbstractSource
@@ -39,14 +40,20 @@ public:
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
-	
+	libwebsocket *clientsocket;
+	PropertyList queuedRequests;
+	bool clientConnected;
+	void checkSubscriptions();
+	PropertyList activeRequests;
+	PropertyList removeRequests;
+	void setSupported(PropertyList list);
 	void propertyChanged(VehicleProperty::Property property, boost::any value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
 	//void randomizeProperties();
 private:
-  	
-PropertyList mRequests;
+  	PropertyList m_supportedProperties;
+
 };
 
 #endif // WEBSOCKETSOURCE_H

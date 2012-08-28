@@ -36,6 +36,7 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine): AbstractSink(engine)
 	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<boost::any_cast<uint16_t>(reply->value)<<endl; };
 
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
+	routingEngine->registerSink(this);
 }
 
 
@@ -46,6 +47,7 @@ PropertyList ExampleSink::subscriptions()
 
 void ExampleSink::supportedChanged(PropertyList supportedProperties)
 {
+  printf("Support changed!\n");
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 }

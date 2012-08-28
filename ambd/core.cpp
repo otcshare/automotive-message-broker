@@ -182,6 +182,7 @@ void Core::setProperty(VehicleProperty::Property property, boost::any value)
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
+  printf("Subscribing\n");
 	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
 		DebugOut()<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
