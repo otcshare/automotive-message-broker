@@ -170,6 +170,15 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 		propertySinkMap[property].push_back(self);
 	}
 	
+	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = (*itr);
+		PropertyList properties = src->supported();
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		{
+			src->subscribeToPropertyChanges(property);
+		}
+	}
 }
 
 void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
