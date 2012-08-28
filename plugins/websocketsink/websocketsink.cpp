@@ -68,6 +68,10 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, boost::a
 	{
 		tmpstr = "running_status_transmission_gear_status";
 	}
+	else
+	{
+		tmpstr = property;
+	}
 	
 	
 	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << velocity << "\",\"transactionid\":\"" << m_uuid << "\"}";
