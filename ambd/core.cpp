@@ -37,7 +37,9 @@ Core::~Core()
 
 void Core::setSupported(PropertyList supported, AbstractSource* source)
 {
-	mSources.push_back(source);
+
+	if(!ListPlusPlus<AbstractSource*>(&mSources).contains(source))
+		mSources.push_back(source);
 		
 	for(PropertyList::iterator itr = supported.begin(); itr != supported.end(); itr++)
 	{
@@ -45,6 +47,30 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 		{
 			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<(*itr)<<endl;
 			mMasterPropertyList.push_back((*itr));
+		}
+	}
+
+	/// tell all new sinks about the newly supported properties.
+
+	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
+	{
+		(*itr)->supportedChanged(mMasterPropertyList);
+	}
+
+	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
+
+	for(map<VehicleProperty::Property, SinkList>::iterator itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
+	{
+		VehicleProperty::Property  property = (*itr).first;
+
+		for(SourceList::iterator source = mSources.begin(); source != mSources.end(); source++)
+		{
+			PropertyList properties = (*source)->supported();
+
+			if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+			{
+				(*source)->subscribeToPropertyChanges(property);
+			}
 		}
 	}
 }
@@ -107,18 +133,22 @@ void Core::updateProperty(VehicleProperty::Property property, boost::any value)
 	}
 }
 
-boost::any Core::getProperty(VehicleProperty::Property property)
+void Core::registerSink(AbstractSink *self)
 {
-	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+	if(!ListPlusPlus<AbstractSink*>(&mSinks).contains(self))
 	{
-		AbstractSource* src = (*itr);
-		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
-		{
-			return src->getProperty(property);
-		}
+		mSinks.push_back(self);
 	}
 }
+
+void Core::unregisterSink(AbstractSink *self)
+{
+	if(ListPlusPlus<AbstractSink*>(&mSinks).contains(self))
+	{
+		ListPlusPlus<AbstractSink*>(&mSinks).removeOne(self);
+	}
+}
+
 
 AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 {

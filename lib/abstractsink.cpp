@@ -23,12 +23,12 @@
 AbstractSink::AbstractSink(AbstractRoutingEngine* engine)
 :routingEngine(engine)
 {
-
+	routingEngine->registerSink(this);
 }
 
 AbstractSink::~AbstractSink()
 {
-
+	routingEngine->unregisterSink(this);
 }
 
 AbstractSinkManager::AbstractSinkManager(AbstractRoutingEngine* engine)

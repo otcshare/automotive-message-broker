@@ -58,8 +58,8 @@ public:
 	virtual void updateProperty(VehicleProperty::Property property, boost::any value) = 0;
 	
 	/// sinks:
-
-	virtual boost::any getProperty(VehicleProperty::Property) = 0;
+	virtual void registerSink(AbstractSink* self) = 0;
+	virtual void  unregisterSink(AbstractSink* self) = 0;
 	virtual AsyncPropertyReply *getPropertyAsync(AsyncPropertyRequest request) = 0;
 	virtual void setProperty(VehicleProperty::Property, boost::any) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
