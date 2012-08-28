@@ -21,13 +21,14 @@
 #include <libwebsockets.h>
 #include <iostream>
 #include <boost/assert.hpp>
+#include <boost/lexical_cast.hpp>
 #include <glib.h>
 #include <sstream>
 #include <json-glib/json-glib.h>
 #include "debugout.h"
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 libwebsocket_context *context;
-
+AbstractRoutingEngine *m_re;
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
 	//This is the polling function. If it return false, glib will stop polling this FD.
@@ -173,6 +174,18 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		
 		if (type == "valuechanged")
 		{
+			//Name should be a valid property
+			//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
+			//data.front()
+			try
+			{
+				uint16_t val = boost::lexical_cast<uint16_t,string>(data.front());
+				m_re->updateProperty(name,boost::any(val));
+			}
+			catch (exception ex)
+			{
+				printf("Exception %s\n",ex.what());
+			}
 			if (name == "get")
 			{
 				if (data.size() > 0)
@@ -180,26 +193,20 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				}
 			}
 		}
-
-	  break;
+		break;
 	}
 	case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
 	{
-	    printf("Requested extension: %s\n",(char*)in);
-	    return 0;
-	  break;
+		printf("Requested extension: %s\n",(char*)in);
+		return 0;
+		break;
 	}
 	case LWS_CALLBACK_ADD_POLL_FD:
 	{
-	
-	  //Add a FD to the poll list.
-			//printf("Adding poll\n");
+		//Add a FD to the poll list.
 		GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
 		g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
 		g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
-		//pollfds[count_pollfds].fd = (int)(long)user;
-		//pollfds[count_pollfds].events = (int)len;
-		//pollfds[count_pollfds++].revents = 0;
 		break;
 	}
 	return 0;
@@ -219,12 +226,90 @@ static struct libwebsocket_protocols protocols[] = {
 };
 WebSocketSource::WebSocketSource(AbstractRoutingEngine *re) : AbstractSource(re)
 {
-  
-  context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,
-				protocols, libwebsocket_internal_extensions,
-							 NULL, NULL, -1, -1, 0);
+	m_re = re;  
+	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
+	
+	//Read JSON that will tell us what to do:
+	
+	GError* error = nullptr;
+	JsonParser* parser = json_parser_new();
+	if (!json_parser_load_from_file(parser,"websocketsource.conf",&error))
+	{
+		g_error_free(error);
+		if (!json_parser_load_from_file(parser,"../../plugins/websocketsourceplugin/websocketsource.conf",&error))
+		{
+			g_error_free(error);
+			if (!json_parser_load_from_file(parser,"/etc/ambd/websocketsource.conf",&error))
+			{
+				g_error_free(error);
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON";
+			}
+		}
+	}
+	/*if (!json_parser_load_from_data(parser,(char*)in,len,&error))
+	{
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON";
+		return 0;
+	}*/
+	JsonNode* node = json_parser_get_root(parser);
+	if(node == nullptr)
+	{
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json";
+		//throw std::runtime_error("Unable to get JSON root object");
+		return;
+	}
+	JsonReader* reader = json_reader_new(node);
+	if(reader == nullptr)
+	{
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!";
+		//throw std::runtime_error("Unable to create JSON reader");
+		return;
+	}
+	
+	
+	list<string> data;
+	json_reader_read_member(reader,"sinks");
+	if (json_reader_is_array(reader))
+	{
+		for(int i=0; i < json_reader_count_elements(reader); i++)
+		{
+			json_reader_read_element(reader,i);
+			json_reader_read_member(reader,"ip");
+			string ip = json_reader_get_string_value(reader);
+			json_reader_end_member(reader);
+			
+			json_reader_read_member(reader,"port");
+			int port = json_reader_get_int_value(reader);
+			json_reader_end_member(reader);
+			printf("Connecting to %s on port %i\n",ip.c_str(),port);
+			libwebsocket *wsi_dumb = libwebsocket_client_connect(context, ip.c_str(), port, 0,"/", "localhost", "websocket",protocols[0].name, -1);
+			
+			json_reader_end_element(reader);
+		}
+	}
+	else
+	{
+		//string path = json_reader_get_string_value(reader);
+		//if (path != "")
+		//{
+		//	data.push_back(path);
+		//}
+	}
+	json_reader_end_member(reader);
+	/*string type;
+	json_reader_read_member(reader,"type");
+	type = json_reader_get_string_value(reader);
+	json_reader_end_member(reader);
+	
+	string  name;
+	json_reader_read_member(reader,"name");
+	name = json_reader_get_string_value(reader);
+	json_reader_end_member(reader);
+	*/	
+		
+	
 	re->setSupported(supported(), this);
-	libwebsocket *wsi_dumb = libwebsocket_client_connect(context, "127.0.0.1", 23000, 0,"/", "localhost", "websocket",protocols[0].name, -1);
+	
 }
 PropertyList WebSocketSource::supported()
 {
@@ -261,6 +346,7 @@ boost::any WebSocketSource::getProperty(VehicleProperty::Property property)
 }
 void WebSocketSource::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
+	printf("Subscribed to property: %s\n",property.c_str());
 	mRequests.push_back(property);
 }
 
