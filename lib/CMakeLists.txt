@@ -1,6 +1,6 @@
 
-set(amb_sources abstractroutingengine.cpp listplusplus.cpp abstractsink.cpp vehicleproperty.cpp abstractsource.cpp debugout.cpp)
-set(amb_headers_install vehicleproperty.h debugout.h abstractsource.h)
+set(amb_sources abstractpropertytype.cpp abstractroutingengine.cpp listplusplus.cpp abstractsink.cpp vehicleproperty.cpp abstractsource.cpp debugout.cpp)
+set(amb_headers_install abstractpropertytype.h abstractroutingengine.h listplusplus.h abstractsink.h vehicleproperty.h debugout.h abstractsource.h)
 include_directories( ${include_dirs} )
 add_library(amb SHARED ${amb_sources})
 

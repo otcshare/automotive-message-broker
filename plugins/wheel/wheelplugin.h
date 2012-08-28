@@ -36,12 +36,12 @@ public:
 	string uuid();
 	boost::any getProperty(VehicleProperty::Property property);
 	void getPropertyAsync(AsyncPropertyReply *reply);
-	void setProperty(VehicleProperty::Property, boost::any);
+	void setProperty(VehicleProperty::Property, AbstractPropertyType);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
 	
-	void propertyChanged(VehicleProperty::Property property, boost::any value, string uuid) {}
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 
 	friend class WheelPrivate;	

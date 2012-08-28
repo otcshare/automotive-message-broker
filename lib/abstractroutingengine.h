@@ -23,6 +23,7 @@
 #include <boost/any.hpp>
 #include <functional>
 #include "vehicleproperty.h"
+#include "abstractpropertytype.h"
 
 class AbstractSink;
 class AbstractSource;
@@ -47,7 +48,7 @@ public:
 		this->completed = request.completed;
 	}
 
-	boost::any value;
+	AbstractPropertyType value;
 };
 
 class AbstractRoutingEngine
@@ -55,13 +56,13 @@ class AbstractRoutingEngine
 public:
 	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
 	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
-	virtual void updateProperty(VehicleProperty::Property property, boost::any value) = 0;
+	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType value) = 0;
 	
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;
 	virtual void  unregisterSink(AbstractSink* self) = 0;
 	virtual AsyncPropertyReply *getPropertyAsync(AsyncPropertyRequest request) = 0;
-	virtual void setProperty(VehicleProperty::Property, boost::any) = 0;
+	virtual void setProperty(VehicleProperty::Property, AbstractPropertyType) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual PropertyList supported() = 0;

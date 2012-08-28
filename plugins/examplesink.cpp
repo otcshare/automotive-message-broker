@@ -33,7 +33,7 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine): AbstractSink(engine)
 
 	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
-	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<boost::any_cast<uint16_t>(reply->value)<<endl; };
+	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<reply->value.toString()<<endl; };
 
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 	routingEngine->registerSink(this);
@@ -52,9 +52,9 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 }
 
-void ExampleSink::propertyChanged(VehicleProperty::Property property, boost::any value, std::string uuid)
+void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, std::string uuid)
 {
-	DebugOut()<<property<<" value: "<<boost::any_cast<uint16_t>(value)<<endl;
+	DebugOut()<<property<<" value: "<<value.toString()<<endl;
 }
 
 std::string ExampleSink::uuid()

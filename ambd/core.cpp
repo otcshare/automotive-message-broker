@@ -121,7 +121,7 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	}
 }
 
-void Core::updateProperty(VehicleProperty::Property property, boost::any value)
+void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyType value)
 {
 	SinkList list = propertySinkMap[property];
 	
@@ -167,7 +167,7 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 	return reply;
 }
 
-void Core::setProperty(VehicleProperty::Property property, boost::any value)
+void Core::setProperty(VehicleProperty::Property property, AbstractPropertyType value)
 {
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{

@@ -62,7 +62,7 @@ public:
 	WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route);
 	~WheelPrivate();
 
-	boost::any getProperty(VehicleProperty::Property propType);
+	AbstractPropertyType getProperty(VehicleProperty::Property propType);
 
 	friend void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData);
 
@@ -132,7 +132,7 @@ string WheelSourcePlugin::uuid()
 	return "c0ffee8a-c605-4a06-9034-59c1deadbeef";
 }
 
-boost::any WheelSourcePlugin::getProperty(VehicleProperty::Property property)
+AbstractPropertyType WheelSourcePlugin::getProperty(VehicleProperty::Property property)
 {
 	return this->mWheel->getProperty(property);
 }
@@ -143,7 +143,7 @@ void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	reply->completed(reply);
 }
 
-void WheelSourcePlugin::setProperty(VehicleProperty::Property , boost::any )
+void WheelSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType )
 {
 
 }
@@ -236,7 +236,7 @@ WheelPrivate::~WheelPrivate()
 boost::any WheelPrivate::getProperty(VehicleProperty::Property propType)
 {
 	if (propType == VehicleProperty::VehicleSpeed)
-		return this->calcCarSpeed();
+		return BasicPropertyType<uint16_t>(this->calcCarSpeed())
 	else if (propType == VehicleProperty::EngineSpeed)
 		return this->calcRPM();
 	else if (propType == VehicleProperty::TransmissionShiftPosition)

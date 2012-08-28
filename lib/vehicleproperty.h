@@ -24,6 +24,7 @@
 #include <list>
 #include <set>
 
+#include <abstractpropertytype.h>
 
 class VehicleProperty
 {
@@ -41,9 +42,11 @@ public:
 
 	/**< Vehicle Velocity in km/h */
 	static const Property VehicleSpeed;
+	typedef BasicPropertyType<uint16_t> VehicleSpeedType;
 
 	/**< Engine Speed in rotations per minute */
 	static const Property EngineSpeed;
+	typedef BasicPropertyType<uint16_t> EngineSpeedType;
 
 	 /**< Transmission Shift Position
 	 * 0 = Neutral
@@ -55,6 +58,7 @@ public:
 	 * 255 = Park
 	 */
 	static const Property TransmissionShiftPosition;
+	typedef BasicPropertyType<unsigned char> TransmissionShiftPositionType;
 
 	/**< Transmission Gear Position
 	* 0 = Neutral
@@ -64,18 +68,23 @@ public:
 	* 64 = CVT
 	*/
 	static const Property TransmissionGearPosition;
+	typedef BasicPropertyType<unsigned char> TransmissionGearPositionType;
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
+	typedef BasicPropertyType<unsigned char> ThrottlePositionType;
 
 	/**< Wheel brake position.  Engaged = true, Idle = false */
 	static const Property WheelBrake;
+	typedef BasicPropertyType<bool> WheelBrakeType;
 
 	/**< Steering wheel angle (0-359) */
 	static const Property SteeringWheelAngle;
+	typedef BasicPropertyType<uint16_t> SteeringWheelAngleType;
 
 	/**< 0=off, 1=right, 2=left, 3=hazard */
 	static const Property TurnSignal;
+	typedef BasicPropertyType<unsigned char> TurnSignalType;
 
 	/**< Clutch pedal status 0=off, 1=on */
 	static const Property ClutchStatus;

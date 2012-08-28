@@ -26,6 +26,7 @@
 #include <boost/any.hpp>
 
 #include "vehicleproperty.h"
+#include "abstractpropertytype.h"
 
 using namespace std;
 
@@ -44,7 +45,7 @@ public:
 	///Pure virtual methods:
 	
 	virtual string uuid() = 0;
-	virtual void propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid) = 0;
+	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, string  uuid) = 0;
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	
 protected:
