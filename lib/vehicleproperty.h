@@ -88,18 +88,23 @@ public:
 
 	/**< Clutch pedal status 0=off, 1=on */
 	static const Property ClutchStatus;
+	typedef BasicPropertyType<bool> ClutchStatusType;
 
 	 /**< Oil pressure TODO: units */
 	static const Property EngineOilPressure;
+	typedef BasicPropertyType<uint16_t> EngineOilPressureType;
 
 	/**< Engine coolant temperature in degrees celcius **/
 	static const Property EngineCoolantTemperature;
+	typedef BasicPropertyType<int> EngineCoolantTemperatureType;
 
 	/**< 0=off, 1=on */
 	static const Property MachineGunTurretStatus;
+	typedef BasicPropertyType<bool> MachineGunTurretStatusType;
 
 	/**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationX;
+	typedef BasicPropertyType<uint16_t> AcclerationType;
 
 	/**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationY;
@@ -109,6 +114,7 @@ public:
 
 	/**< Mass Air Flow.  TODO: units */
 	static const Property MassAirFlow;
+	typedef BasicPropertyType<uint16_t> MassAirFlowType;
 
 	static std::list<VehicleProperty::Property> capabilities();
     

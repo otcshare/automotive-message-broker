@@ -34,7 +34,7 @@ public:
 	~WheelSourcePlugin();
 	
 	string uuid();
-	boost::any getProperty(VehicleProperty::Property property);
+	AbstractPropertyType getProperty(VehicleProperty::Property property);
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void setProperty(VehicleProperty::Property, AbstractPropertyType);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);

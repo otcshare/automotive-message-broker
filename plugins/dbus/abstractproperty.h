@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <glib.h>
 
 #include "debugout.h"
+#include "abstractpropertytype.h"
 
 class AbstractDBusInterface;
 
@@ -68,7 +69,7 @@ public:
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
-	void setValue(boost::any val)
+	void setValue(AbstractPropertyType val)
 	{
 		mValue = val;
 		updateValue();
@@ -84,7 +85,7 @@ public:
 	template<typename T>
 	T value()
 	{
-		return boost::any_cast<T>(mValue);
+		return mValue.value<T>();
 	}
 	
 protected: ///methods:
@@ -93,7 +94,7 @@ protected: ///methods:
 	
 protected:
 	
-	boost::any mValue;
+	AbstractPropertyType mValue;
 	string mPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;

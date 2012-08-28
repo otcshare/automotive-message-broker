@@ -30,7 +30,7 @@ public:
 	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty);
 	~WebSocketSink();
 	string uuid() ;
-	void propertyChanged(VehicleProperty::Property property, boost::any value, string  uuid);
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, string  uuid);
 	void supportedChanged(PropertyList supportedProperties);
 	PropertyList subscriptions();
 private:

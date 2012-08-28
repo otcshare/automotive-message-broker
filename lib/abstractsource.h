@@ -44,7 +44,6 @@ public:
 	
 	///pure virtual methods:
 
-	virtual AbstractPropertyType getProperty(VehicleProperty::Property) = 0;
 	virtual void getPropertyAsync(AsyncPropertyReply *reply) = 0;
 	virtual void setProperty(VehicleProperty::Property property, AbstractPropertyType value) = 0;
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property) = 0;
