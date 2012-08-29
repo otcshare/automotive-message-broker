@@ -45,7 +45,7 @@ public:
 	///Pure virtual methods:
 	
 	virtual string uuid() = 0;
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, string  uuid) = 0;
+	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) = 0;
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	
 protected:

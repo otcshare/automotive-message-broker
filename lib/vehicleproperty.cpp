@@ -68,25 +68,24 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 	return mProperties;
 }
 
-AbstractPropertyType VehicleProperty::getPropertyTypeForPropertyNameValue(VehicleProperty::Property name, std::string value)
+AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(VehicleProperty::Property name, std::string value)
 {
-	std::map<VehicleProperty::Property, AbstractPropertyType> theMap;
 
-	theMap[VehicleSpeed] = VehicleSpeedType(value);
-	theMap[EngineSpeed] = EngineSpeedType(value);
-	theMap[TransmissionShiftPosition] = TransmissionShiftPositionType(value);
-	theMap[TransmissionGearPosition] = TransmissionGearPositionType(value);
-	theMap[ThrottlePosition] = ThrottlePositionType(value);
-	theMap[WheelBrake] = WheelBrakeType(value);
-	theMap[SteeringWheelAngle] = SteeringWheelAngleType(value);
-	theMap[TurnSignal] = TurnSignalType(value);
-	theMap[ClutchStatus] = ClutchStatusType(value);
-	theMap[EngineOilPressure] = EngineOilPressureType(value);
-	theMap[EngineCoolantTemperature] = EngineCoolantTemperatureType(value);
-	theMap[AccelerationX] = AccelerationType(value);
-	theMap[AccelerationY] = AccelerationType(value);
-	theMap[AccelerationZ] = AccelerationType(value);
-	theMap[MassAirFlow] = MassAirFlowType(value);
+	if(name == VehicleSpeed ) return new VehicleSpeedType(value);
+	else if(name == EngineSpeed) return new EngineSpeedType(value);
+	else if(name == TransmissionShiftPosition) return new TransmissionShiftPositionType(value);
+	else if(name == TransmissionGearPosition) return new TransmissionGearPositionType(value);
+	else if(name == ThrottlePosition) return new ThrottlePositionType(value);
+	else if(name == WheelBrake) return new WheelBrakeType(value);
+	else if(name == SteeringWheelAngle) return new SteeringWheelAngleType(value);
+	else if(name == TurnSignal) return new TurnSignalType(value);
+	else if(name == ClutchStatus) return new ClutchStatusType(value);
+	else if(name == EngineOilPressure) return new EngineOilPressureType(value);
+	else if(name == EngineCoolantTemperature) return new EngineCoolantTemperatureType(value);
+	else if(name == AccelerationX) return new AccelerationType(value);
+	else if(name == AccelerationY) return new AccelerationType(value);
+	else if(name == AccelerationZ) return new AccelerationType(value);
+	else if(name == MassAirFlow) return new MassAirFlowType(value);
 
-	return theMap[name];
+	return nullptr;
 }

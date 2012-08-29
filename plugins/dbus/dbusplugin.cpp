@@ -52,7 +52,7 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 		registerObject();
 }
 
-void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, string uuid)
+void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
 {
 	if(!propertyDBusMap.count(property))
 		return;

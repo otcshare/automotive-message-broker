@@ -68,32 +68,37 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
-		reply->value = BasicPropertyType<uint16_t>(velocity);
+		VehicleProperty::VehicleSpeedType temp(velocity);
+		reply->value = &temp;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::EngineSpeed)
 	{
-		reply->value = BasicPropertyType<uint16_t>(engineSpeed);
+		VehicleProperty::EngineSpeedType temp(engineSpeed);
+		reply->value = &temp;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::AccelerationX)
 	{
-		reply->value = BasicPropertyType<uint16_t>(accelerationX);
+		VehicleProperty::AccelerationType temp(accelerationX);
+		reply->value = &temp;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::TransmissionShiftPosition)
 	{
-		reply->value = BasicPropertyType<uint16_t>(transmissionShiftPostion);
+		VehicleProperty::TransmissionShiftPositionType temp(transmissionShiftPostion);
+		reply->value = &temp;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::SteeringWheelAngle)
 	{
-		reply->value = BasicPropertyType<uint16_t>(steeringWheelAngle);
+		VehicleProperty::SteeringWheelAngleType temp(steeringWheelAngle);
+		reply->value = &temp;
 		reply->completed(reply);
 	}
 }
 
-void ExampleSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType )
+void ExampleSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType *)
 {
 
 }
@@ -135,11 +140,19 @@ void ExampleSourcePlugin::randomizeProperties()
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
 	
-	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, BasicPropertyType<uint16_t>(velocity));
-	routingEngine->updateProperty(VehicleProperty::EngineSpeed, BasicPropertyType<uint16_t>(engineSpeed));
-	routingEngine->updateProperty(VehicleProperty::AccelerationX, BasicPropertyType<uint16_t>(accelerationX));
-	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, BasicPropertyType<uint16_t>(steeringWheelAngle));
-	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition, BasicPropertyType<uint16_t>(transmissionShiftPostion));
-	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, BasicPropertyType<uint16_t>(throttlePos));
-	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, BasicPropertyType<uint16_t>(engineCoolant));
+	VehicleProperty::VehicleSpeedType vel(velocity);
+	VehicleProperty::EngineSpeedType es(engineSpeed);
+	VehicleProperty::AccelerationType ac(accelerationX);
+	VehicleProperty::SteeringWheelAngleType swa(steeringWheelAngle);
+	VehicleProperty::TransmissionShiftPositionType tsp(transmissionShiftPostion);
+	VehicleProperty::ThrottlePositionType tp(throttlePos);
+	VehicleProperty::EngineCoolantTemperatureType ec(engineCoolant);
+
+	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel);
+	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es);
+	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac);
+	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa);
+	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp);
+	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp);
+	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec);
 }

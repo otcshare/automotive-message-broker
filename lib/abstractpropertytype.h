@@ -21,6 +21,7 @@
 
 #include <string>
 #include <sstream>
+#include <stdexcept>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -72,7 +73,9 @@ public:
 
 	BasicPropertyType(std::string val)
 	{
-		setValue(boost::lexical_cast<T,std::string>(val));
+		if(!val.empty() && val != "")
+			setValue(boost::lexical_cast<T,std::string>(val));
+		else throw std::runtime_error("value cannot be empty");
 	}
 
 	std::string toString()

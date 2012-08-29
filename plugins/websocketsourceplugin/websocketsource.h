@@ -36,7 +36,7 @@ public:
     string uuid();
 	boost::any getProperty(VehicleProperty::Property property);
 	void getPropertyAsync(AsyncPropertyReply *reply);
-	void setProperty(VehicleProperty::Property, AbstractPropertyType);
+	void setProperty(VehicleProperty::Property, AbstractPropertyType*);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
@@ -47,7 +47,7 @@ public:
 	PropertyList activeRequests;
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, string uuid) {}
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
 	//void randomizeProperties();

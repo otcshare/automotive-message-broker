@@ -69,7 +69,7 @@ public:
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
-	void setValue(AbstractPropertyType val)
+	void setValue(AbstractPropertyType* val)
 	{
 		mValue = val;
 		updateValue();
@@ -85,7 +85,7 @@ public:
 	template<typename T>
 	T value()
 	{
-		return mValue.value<T>();
+		return mValue->value<T>();
 	}
 	
 protected: ///methods:
@@ -94,7 +94,7 @@ protected: ///methods:
 	
 protected:
 	
-	AbstractPropertyType mValue;
+	AbstractPropertyType * mValue;
 	string mPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;

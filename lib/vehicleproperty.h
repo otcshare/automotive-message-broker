@@ -118,7 +118,7 @@ public:
 
 	static std::list<VehicleProperty::Property> capabilities();
 
-	static AbstractPropertyType getPropertyTypeForPropertyNameValue(Property name, std::string value);
+	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
     
 };
 

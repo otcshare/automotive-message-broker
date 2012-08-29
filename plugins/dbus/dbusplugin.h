@@ -33,7 +33,7 @@ class DBusSink : public AbstractSink, public AbstractDBusInterface
 public:
 	DBusSink(std::string interface, std::string path, AbstractRoutingEngine* engine, GDBusConnection* connection);
 	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, std::string uuid);
+	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid);
 	virtual std::string uuid();
 
 protected:

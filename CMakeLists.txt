@@ -1,6 +1,8 @@
 project(automotive-message-broker)
 cmake_minimum_required(VERSION 2.8)
 
+set(CMAKE_BUILD_TYPE, Debug)
+
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")

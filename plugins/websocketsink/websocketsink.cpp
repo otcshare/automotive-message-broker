@@ -45,7 +45,7 @@ string WebSocketSink::uuid()
 {
 	return m_uuid;
 }
-void WebSocketSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType value, string  uuid)
+void WebSocketSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string  uuid)
 {
   //printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
 	//uint16_t velocity = boost::any_cast<uint16_t>(value);
@@ -65,7 +65,7 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, Abstract
 	}
 	
 	
-	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << value.toString() << "\",\"transactionid\":\"" << m_uuid << "\"}";
+	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << value->toString() << "\",\"transactionid\":\"" << m_uuid << "\"}";
 	
 	string replystr = s.str();
 	printf("Reply: %s\n",replystr.c_str());

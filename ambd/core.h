@@ -36,14 +36,14 @@ public:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
 	void updateSupported(PropertyList added, PropertyList removed);
-	void updateProperty(VehicleProperty::Property property, AbstractPropertyType value);
+	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value);
 	
 	/// sinks:
 	
 	void registerSink(AbstractSink *self);
 	void unregisterSink(AbstractSink *self);
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
-	void setProperty(VehicleProperty::Property,AbstractPropertyType);
+	void setProperty(VehicleProperty::Property,AbstractPropertyType*);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	PropertyList supported() { return mMasterPropertyList; }

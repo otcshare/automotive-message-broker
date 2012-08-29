@@ -212,7 +212,9 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			//data.front()
 			try
 			{
-				m_re->updateProperty(name,VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front()));
+				AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front());
+				m_re->updateProperty(name, type);
+				delete type;
 			}
 			catch (exception ex)
 			{
@@ -425,7 +427,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	}*/
 }
 
-void WebSocketSource::setProperty(VehicleProperty::Property , AbstractPropertyType )
+void WebSocketSource::setProperty(VehicleProperty::Property , AbstractPropertyType * )
 {
 
 }

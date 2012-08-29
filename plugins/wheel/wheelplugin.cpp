@@ -62,7 +62,7 @@ public:
 	WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route);
 	~WheelPrivate();
 
-	AbstractPropertyType getProperty(VehicleProperty::Property propType);
+	AbstractPropertyType *getProperty(VehicleProperty::Property propType);
 
 	friend void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData);
 
@@ -137,9 +137,11 @@ void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 
 	reply->value = this->mWheel->getProperty(reply->property);
 	reply->completed(reply);
+
+	delete reply->value;
 }
 
-void WheelSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType )
+void WheelSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType * )
 {
 
 }
@@ -229,34 +231,34 @@ WheelPrivate::~WheelPrivate()
 }
 
 
-AbstractPropertyType WheelPrivate::getProperty(VehicleProperty::Property propType)
+AbstractPropertyType *WheelPrivate::getProperty(VehicleProperty::Property propType)
 {
 	if (propType == VehicleProperty::VehicleSpeed)
-		return VehicleProperty::VehicleSpeedType(this->calcCarSpeed());
+		return new VehicleProperty::VehicleSpeedType(this->calcCarSpeed());
 	else if (propType == VehicleProperty::EngineSpeed)
-		return VehicleProperty::EngineSpeedType(this->calcRPM());
+		return new VehicleProperty::EngineSpeedType(this->calcRPM());
 	else if (propType == VehicleProperty::TransmissionShiftPosition)
-		return VehicleProperty::TransmissionShiftPositionType(this->currentGear);
+		return new VehicleProperty::TransmissionShiftPositionType(this->currentGear);
 	else if (propType == VehicleProperty::ThrottlePosition)
-		return VehicleProperty::ThrottlePositionType(this->throttle);
+		return new VehicleProperty::ThrottlePositionType(this->throttle);
 	else if (propType == VehicleProperty::WheelBrake)
-		return VehicleProperty::WheelBrakeType(this->brake);
+		return new VehicleProperty::WheelBrakeType(this->brake);
 	else if (propType == VehicleProperty::SteeringWheelAngle)
-		return VehicleProperty::SteeringWheelAngleType(this->steeringAngle);
+		return new VehicleProperty::SteeringWheelAngleType(this->steeringAngle);
 	else if (propType == VehicleProperty::TurnSignal)
-		return VehicleProperty::TurnSignalType(this->turnSignal);
+		return new VehicleProperty::TurnSignalType(this->turnSignal);
 	else if (propType == VehicleProperty::ClutchStatus)
-		return VehicleProperty::ClutchStatusType(this->clutch);
+		return new VehicleProperty::ClutchStatusType(this->clutch);
 	else if (propType == VehicleProperty::EngineOilPressure)
-		return VehicleProperty::EngineOilPressureType(this->oilPSI);
+		return new VehicleProperty::EngineOilPressureType(this->oilPSI);
 	else if (propType == VehicleProperty::EngineCoolantTemperature)
-		return VehicleProperty::EngineCoolantTemperatureType(this->coolantTemp);
+		return new VehicleProperty::EngineCoolantTemperatureType(this->coolantTemp);
 	else if (propType == VehicleProperty::MachineGunTurretStatus)
-		return VehicleProperty::MachineGunTurretStatusType(this->machineGuns);
+		return new VehicleProperty::MachineGunTurretStatusType(this->machineGuns);
 	else
 		cout << "Unhandled getProperty type: " << propType << endl;
 
-	return AbstractPropertyType();
+	return nullptr;
 }
 
 void WheelPrivate::newButtonValue(char number, bool val)
@@ -407,7 +409,8 @@ void WheelPrivate::gotData(GAsyncResult *res)
 void WheelPrivate::changeMachineGuns(bool val)
 {
 	this->machineGuns = val;
-	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, VehicleProperty::MachineGunTurretStatusType(this->machineGuns));
+	VehicleProperty::MachineGunTurretStatusType temp(this->machineGuns);
+	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, &temp);
 }
 
 void WheelPrivate::changeTurnSignal(TurnSignal dir, bool val)
@@ -420,31 +423,37 @@ void WheelPrivate::changeTurnSignal(TurnSignal dir, bool val)
 			tsVal = 1;
 	}
 	this->turnSignal = tsVal;
-	this->re->updateProperty(VehicleProperty::TurnSignal, VehicleProperty::TurnSignalType(this->turnSignal));
+	VehicleProperty::TurnSignalType temp(this->turnSignal);
+	this->re->updateProperty(VehicleProperty::TurnSignal, &temp);
 }
 
 void WheelPrivate::changeGear(int gear)
 {
 	this->currentGear = gear;
-	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, VehicleProperty::TransmissionShiftPositionType(this->currentGear));
-	this->re->updateProperty(VehicleProperty::VehicleSpeed, VehicleProperty::VehicleSpeedType(this->calcCarSpeed()));
+	VehicleProperty::TransmissionShiftPositionType tempTrans(this->currentGear);
+	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
+	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, &tempTrans);
+	this->re->updateProperty(VehicleProperty::VehicleSpeed, &tempSpeed);
 }
 
 void WheelPrivate::changeOilPressure(bool increase)
 {
-	this->re->updateProperty(VehicleProperty::EngineOilPressure, VehicleProperty::EngineOilPressureType(increase ? ++this->oilPSI : --this->oilPSI));
+	VehicleProperty::EngineOilPressureType temp(increase ? ++this->oilPSI : --this->oilPSI);
+	this->re->updateProperty(VehicleProperty::EngineOilPressure, &temp);
 }
 
 void WheelPrivate::changeCoolantTemp(bool increase)
 {
-	this->re->updateProperty(VehicleProperty::EngineCoolantTemperature, VehicleProperty::EngineCoolantTemperatureType(increase ? ++this->coolantTemp : --this->coolantTemp));
+	 VehicleProperty::EngineCoolantTemperatureType temp(increase ? ++this->coolantTemp : --this->coolantTemp);
+	this->re->updateProperty(VehicleProperty::EngineCoolantTemperature, &temp);
 }
 
 
 void WheelPrivate::changeSteeringAngle(int val)
 {
 	this->steeringAngle = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
-	this->re->updateProperty(VehicleProperty::SteeringWheelAngle, VehicleProperty::SteeringWheelAngleType(this->steeringAngle));
+	VehicleProperty::SteeringWheelAngleType temp(this->steeringAngle);
+	this->re->updateProperty(VehicleProperty::SteeringWheelAngle, &temp);
 }
 
 void WheelPrivate::changeClutch(int val)
@@ -452,16 +461,23 @@ void WheelPrivate::changeClutch(int val)
 	this->oldClutch = this->clutch;
 	this->clutch = (val < 20000);
 	if (this->oldClutch != this->clutch)
-		this->re->updateProperty(VehicleProperty::ClutchStatus, VehicleProperty::ClutchStatusType(this->clutch));
+	{
+		VehicleProperty::ClutchStatusType temp(this->clutch);
+		this->re->updateProperty(VehicleProperty::ClutchStatus, &temp);
+	}
 }
 
 void WheelPrivate::changeThrottle(int val)
 {
 	this->throttle = ((double)(val - 32767)/(double)-65534.0)*(double)100.0;
 
-	this->re->updateProperty(VehicleProperty::ThrottlePosition, VehicleProperty::ThrottlePositionType(this->throttle));
-	this->re->updateProperty(VehicleProperty::EngineSpeed, VehicleProperty::EngineSpeedType(this->calcRPM()));
-	this->re->updateProperty(VehicleProperty::VehicleSpeed, VehicleProperty::VehicleSpeedType(this->calcCarSpeed()));
+	VehicleProperty::ThrottlePositionType tempThrottle(this->throttle);
+	VehicleProperty::EngineSpeedType tempRpm(this->calcRPM());
+	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
+
+	this->re->updateProperty(VehicleProperty::ThrottlePosition, &tempThrottle);
+	this->re->updateProperty(VehicleProperty::EngineSpeed, &tempRpm);
+	this->re->updateProperty(VehicleProperty::VehicleSpeed, &tempSpeed);
 }
 
 void WheelPrivate::changeBrake(int val)
@@ -469,7 +485,10 @@ void WheelPrivate::changeBrake(int val)
 	this->oldBrake = this->brake;
 	this->brake = (val < 20000);
 	if (this->oldBrake != this->brake)
-		this->re->updateProperty(VehicleProperty::WheelBrake, VehicleProperty::WheelBrakeType(this->brake));
+	{
+		VehicleProperty::WheelBrakeType temp(this->brake);
+		this->re->updateProperty(VehicleProperty::WheelBrake, &temp);
+	}
 }
 
 
