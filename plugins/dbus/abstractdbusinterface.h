@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <unordered_map>
 #include <gio/gio.h>
 #include <boost/any.hpp>
+#include <nullptr.h>
 
 class AbstractProperty;
 
