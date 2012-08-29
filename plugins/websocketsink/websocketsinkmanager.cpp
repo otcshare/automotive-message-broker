@@ -86,8 +86,8 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	}
 	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply)
 	{
-		printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
-		uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
+		printf("Got property:%s\n",reply->value.toString().c_str());
+		//uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
@@ -121,7 +121,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 			//}
 		}*/
 		tmpstr = property;
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << velocity << "\"}],\"transactionid\":\"" << id << "\"}";
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << reply->value.toString() << "\"}],\"transactionid\":\"" << id << "\"}";
 		
 		string replystr = s.str();
 		printf("Reply: %s\n",replystr.c_str());

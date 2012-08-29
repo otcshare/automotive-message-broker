@@ -206,6 +206,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		
 		if (type == "valuechanged")
 		{
+		  printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
 			//Name should be a valid property
 			//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
 			//data.front()
@@ -217,17 +218,19 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			{
 				printf("Exception %s\n",ex.what());
 			}
-			if (name == "get")
+			printf("Done\n");
+			/*if (name == "get")
 			{
 				if (data.size() > 0)
 				{
 				}
-			}
+			}*/
 		}
 		else if (type == "methodReply")
 		{
 			if (name == "getSupportedEventTypes")
 			{
+			  printf("Got supported events!\n");
 				PropertyList props;
 				while (data.size() > 0)
 				{
