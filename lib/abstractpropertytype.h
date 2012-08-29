@@ -41,6 +41,11 @@ public:
 		return boost::any_cast<T>(mValue);
 	}
 
+	boost::any anyValue()
+	{
+		return mValue;
+	}
+
 protected:
 
 	boost::any mValue;
