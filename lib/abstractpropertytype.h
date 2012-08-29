@@ -28,10 +28,7 @@
 class AbstractPropertyType
 {
 public:
-	virtual std::string toString()
-	{
-		return "";
-	}
+	virtual std::string toString() = 0;
 
 	void setValue(boost::any val)
 	{
