@@ -59,7 +59,7 @@ public:
 	 * 255 = Park
 	 */
 	static const Property TransmissionShiftPosition;
-	typedef BasicPropertyType<unsigned char> TransmissionShiftPositionType;
+	typedef BasicPropertyType<uint16_t> TransmissionShiftPositionType;
 
 	/**< Transmission Gear Position
 	* 0 = Neutral
@@ -85,7 +85,7 @@ public:
 
 	/**< 0=off, 1=right, 2=left, 3=hazard */
 	static const Property TurnSignal;
-	typedef BasicPropertyType<unsigned char> TurnSignalType;
+	typedef BasicPropertyType<uint16_t> TurnSignalType;
 
 	/**< Clutch pedal status 0=off, 1=on */
 	static const Property ClutchStatus;
