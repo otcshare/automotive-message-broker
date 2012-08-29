@@ -1,5 +1,5 @@
 {
-	"sources" : [ "../plugins/examplesourceplugin.so" ],
+	"sources" : [ "../plugins/obd2plugin/obd2sourceplugin.so" ],
 	"sinks": [ "../plugins/websocketsink/websocketsinkplugin.so" ]
 }
 
