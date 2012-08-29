@@ -69,11 +69,11 @@ public:
 	* 64 = CVT
 	*/
 	static const Property TransmissionGearPosition;
-	typedef BasicPropertyType<unsigned char> TransmissionGearPositionType;
+	typedef BasicPropertyType<uint16_t> TransmissionGearPositionType;
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
-	typedef BasicPropertyType<unsigned char> ThrottlePositionType;
+	typedef BasicPropertyType<uint16_t> ThrottlePositionType;
 
 	/**< Wheel brake position.  Engaged = true, Idle = false */
 	static const Property WheelBrake;
