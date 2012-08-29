@@ -62,11 +62,11 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	{
 		velocityRequest.property = VehicleProperty::EngineSpeed;
 	}
-	else if ("running_status_steering_wheel_angle")
+	else if (property == "running_status_steering_wheel_angle")
 	{
 		velocityRequest.property = VehicleProperty::SteeringWheelAngle;
 	}
-	else if ("running_status_transmission_gear_status")
+	else if (property == "running_status_transmission_gear_status")
 	{
 		velocityRequest.property = VehicleProperty::TransmissionShiftPosition;
 	}
@@ -172,11 +172,11 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	{
 		tmpstr = VehicleProperty::EngineSpeed;
 	}
-	else if ("running_status_steering_wheel_angle")
+	else if (property == "running_status_steering_wheel_angle")
 	{
 		tmpstr = VehicleProperty::SteeringWheelAngle;
 	}
-	else if ("running_status_transmission_gear_status")
+	else if (property == "running_status_transmission_gear_status")
 	{
 		tmpstr = VehicleProperty::TransmissionShiftPosition;
 	}
