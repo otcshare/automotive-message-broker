@@ -550,7 +550,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
-	if (condition != G_IO_IN && condition != G_IO_OUT)
+	if (condition != G_IO_IN)
 	{
 		//Don't need to do anything
 		if (condition == G_IO_HUP)
