@@ -228,15 +228,18 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
 			printf("Client writable\n");
+			break;
 		}
 		case LWS_CALLBACK_SERVER_WRITEABLE:
 		{
 			printf("Server writable\n");
+			break;
 		}
 		
 		case LWS_CALLBACK_RECEIVE:
 		{
 			printf("Data Received: %s\n",(char*)in);
+			break;
 		}
 		case LWS_CALLBACK_HTTP:
 		{
