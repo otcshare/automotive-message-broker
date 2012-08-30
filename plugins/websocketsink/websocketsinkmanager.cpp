@@ -239,7 +239,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_RECEIVE:
 		{
 			printf("Data Received: %s\n",(char*)in);
-			break;
+			//The lack of a break; here is intentional.
 		}
 		case LWS_CALLBACK_HTTP:
 		{
@@ -550,8 +550,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
-	if (condition != G_IO_IN)
-	{
+	//if (condition != G_IO_IN)
+	//{
 		//Don't need to do anything
 		if (condition == G_IO_HUP)
 		{
@@ -559,8 +559,8 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 			printf("Callback on G_IO_HUP\n");
 			return false;
 		}
-		return true;
-	}
+		//return true;
+	//}
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	printf("Polling...%i\n",condition);
 	lws_tokens token;
