@@ -44,7 +44,18 @@ public:
 	
 	///Pure virtual methods:
 	
+	/*! uuid() is a unique identifier
+	  * @return a guid-style unique identifier
+	  */
 	virtual string uuid() = 0;
+
+	/*! propertyChanged is called when a subscribed to property changes.
+	  * @see AbstractRoutingEngine::subscribeToPropertyChanges()
+	  * @param property name that changed
+	  * @param value value of the property that changed. this is a temporary pointer that will be destroyed.
+	  * Do not destroy it.  If you need to store the value use value.anyValue() or value.value<T>() to copy.
+	  * @param uuid Unique identifier representing the source
+	  */
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) = 0;
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	

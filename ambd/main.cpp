@@ -189,7 +189,7 @@ void printhelp(const char *argv0)
 	printf("Usage: %s [args]\n"
 	"   [-d|--daemonise]\n"
 	"   [-v|--version]\n"
-	"   [-p]--plugin <pathtoplugin> \t]"
+	"   [-c]--config </path/to/config> \t]"
 	"   [-h|--help]\n"
 	, argv0);
 }
