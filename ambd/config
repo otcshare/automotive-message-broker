@@ -1,0 +1,5 @@
+{
+	"sources" : [ "/usr/lib/automotive-message-broker/examplesourceplugin.so" ],
+	"sinks": [ "/usr/lib/automotive-message-broker/examplesinkplugin.so", "/usr/lib/automotive-message-broker/dbussinkplugin.so" ,"/usr/lib/automotive-message-broker/websocketsinkplugin.so" ]
+}
+
