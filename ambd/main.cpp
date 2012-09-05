@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
 	bool isdeamonize=false;
 	int optc;
-	string config;
+	string config="/etc/ambd/config";
 	
 	while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
 	{
