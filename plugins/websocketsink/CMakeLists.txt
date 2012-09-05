@@ -2,7 +2,7 @@ include(CheckIncludeFiles)
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
 
 check_include_files(libwebsockets.h HAVE_WEBSOCKETS)
-
+set(CMAKE_CXX_FLAGS "-g")
 set(websocketsinkplugin_headers websocketsink.h websocketmanager.h)
 set(websocketsinkplugin_sources websocketsinkmanager.cpp websocketsink.cpp)
 add_library(websocketsinkplugin MODULE ${websocketsinkplugin_sources})

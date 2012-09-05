@@ -34,9 +34,15 @@ public:
 	WebSocketSinkManager(AbstractRoutingEngine* engine);
 	void addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id);
 	void addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid);
+	void disconnectAll(libwebsocket* socket);
 	void removeSink(libwebsocket* socket,VehicleProperty::Property property,string uuid);
+	void addPoll(int fd);
+	void removePoll(int fd);
+	void init();
 	map<std::string,WebSocketSink*> m_sinkMap;
 private:
+	map<int,GIOChannel*> m_ioChannelMap;
+	map<int,guint> m_ioSourceMap;
   AbstractRoutingEngine *m_engine;
 	struct libwebsocket_protocols protocollist[2];
 };

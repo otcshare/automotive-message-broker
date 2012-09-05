@@ -38,7 +38,13 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):Abstra
 {
 	m_engine = engine;
 	
-	//Protocol list for libwebsockets.
+	
+	//Create a listening socket on port 23000 on localhost.
+	
+}
+void WebSocketSinkManager::init()
+{
+  	//Protocol list for libwebsockets.
 	protocollist[0] = { "http-only", websocket_callback, 0 };
 	protocollist[1] = { NULL, NULL, 0 };
 
@@ -47,8 +53,7 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):Abstra
 	const char *ssl_cert_path = NULL;
 	const char *ssl_key_path = NULL;
 	int options = 0;
-	
-	//Create a listening socket on port 23000 on localhost.
+
 	context = libwebsocket_create_context(port, interface, protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
 }
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
@@ -211,11 +216,60 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 {
 	sinkManager = new WebSocketSinkManager(routingengine);
+	sinkManager->init();
 	return sinkManager;
 }
+void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
+{
+	for (map<std::string,WebSocketSink*>::const_iterator i=m_sinkMap.cbegin(); i != m_sinkMap.cend();i++)
+	{
+		if ((*i).second->socket() == socket)
+		{
+			//This is the sink in question.
+			WebSocketSink* sink = (*i).second;
+			delete sink;
+			m_sinkMap.erase((*i).first);
+			printf("Sink removed\n");
+		}
+	}
+}
+void WebSocketSinkManager::addPoll(int fd)
+{
+	GIOChannel *chan = g_io_channel_unix_new(fd);
+	guint sourceid = g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,chan);
+	g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
+	m_ioChannelMap[fd] = chan;
+	m_ioSourceMap[fd] = sourceid;
+}
+void WebSocketSinkManager::removePoll(int fd)
+{
+	g_io_channel_shutdown(m_ioChannelMap[fd],false,0);
+	printf("Shutting down IO Channel\n");
+	g_source_remove(m_ioSourceMap[fd]); //Since the watch owns the GIOChannel, this should unref it enough to dissapear.
+	for (map<int,guint>::const_iterator i=m_ioSourceMap.cbegin();i!=m_ioSourceMap.cend();i++)
+	{
+		if((*i).first == fd)
+		{
+			printf("Erasing source\n");
+			m_ioSourceMap.erase(i);
+			i--;
+		}
+	}
+	for (map<int,GIOChannel*>::const_iterator i=m_ioChannelMap.cbegin();i!=m_ioChannelMap.cend();i++)
+	{
+		if((*i).first == fd)
+		{
+			printf("Erasing channel\n");
+			m_ioChannelMap.erase(i);
+			i--;
+		}
+	}
+}
+
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len)
 {
 	printf("Switch: %i\n",reason);
+
 	
 	switch (reason)
 	{
@@ -223,6 +277,19 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		{
 			//Connection has been established.
 			printf("Connection established\n");
+			break;
+		}
+		case LWS_CALLBACK_CLOSED:
+		{
+			//Connection is closed, we need to remove all related sinks
+			sinkManager->disconnectAll(wsi);
+			/*g_io_
+			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
+			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
+			pollfds[count_pollfds].fd = (int)(long)user;
+			pollfds[count_pollfds].events = (int)len;
+// 			pollfds[count_pollfds++].revents = 0;*/
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
@@ -500,20 +567,31 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
+		  printf("Adding poll %i\n",sinkManager);
+		  if (sinkManager != 0)
+		  {
+		    
 			//Add a FD to the poll list.
 			//printf("Adding poll\n");
-			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
+			sinkManager->addPoll((int)(long)user);
+		  }
+			/*GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
 			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
 			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,0);
+			g_io_channel_close();
 			pollfds[count_pollfds].fd = (int)(long)user;
 			pollfds[count_pollfds].events = (int)len;
-			pollfds[count_pollfds++].revents = 0;
+			pollfds[count_pollfds++].revents = 0;*/
 			break;
 		}
 		case LWS_CALLBACK_DEL_POLL_FD:
 		{
+			sinkManager->removePoll((int)(long)user);
 			//Remove FD from the poll list. I'm not convinced this is needed anymore
-			for (int n = 0; n < count_pollfds; n++)
+			//g_io_
+			/*for (int n = 0; n < count_pollfds; n++)
 			{
 				if (pollfds[n].fd == (int)(long)user)
 				{
@@ -524,14 +602,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					}
 				}
 			}
-			count_pollfds--;
+			count_pollfds--;*/
 			break;
 		}
 		case LWS_CALLBACK_SET_MODE_POLL_FD:
 		{
 			//Set the poll mode
-			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
-			g_io_add_watch(chan,(GIOCondition)(int)len,(GIOFunc)gioPollingFunc,0);
+			//GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
+			//g_io_add_watch(chan,(GIOCondition)(int)len,(GIOFunc)gioPollingFunc,0);
 			break;
 		}
 		case LWS_CALLBACK_CLEAR_MODE_POLL_FD:
@@ -550,6 +628,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
+  printf("Polling...%i\n",condition);
 	if (condition != G_IO_IN)
 	{
 		//Don't need to do anything

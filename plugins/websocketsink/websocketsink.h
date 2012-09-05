@@ -33,6 +33,7 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string  uuid);
 	void supportedChanged(PropertyList supportedProperties);
 	PropertyList subscriptions();
+	libwebsocket *socket() { return m_wsi; }
 private:
 	string m_amdbproperty;
 	AbstractRoutingEngine *m_re;
