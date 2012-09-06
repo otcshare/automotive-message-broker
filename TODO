@@ -1,0 +1,4 @@
+- Enable per-plugin configuration
+- Enable websocketsink plugin to listen on a configurable interface
+- Enable websocketsource plugin to connect to a configurable host
+- websocketsink unsubscribe on disconnect
