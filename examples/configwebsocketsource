@@ -1,0 +1,5 @@
+{
+	"sources" : [ "../plugins/websocketsourceplugin/websocketsourceplugin.so" ],
+	"sinks": [ "../plugins/examplesinkplugin.so" ]
+}
+

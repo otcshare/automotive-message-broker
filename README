@@ -17,14 +17,13 @@ sudo make install
 
 To run:
 
-ambd -c /path/to/config
+ambd
 
 ambd can load different plugins.  The config file specifies what plugins to use.  The default config located in
-the root soure directory loads the example plugins.  You can change this or use your own config to have ambd 
-use your own plugins.  For example:
+/etc/ambd/config.  You can change this or use your own config to have ambd use your own plugins.  For example:
 
 # copy the config to your own config
-cp config myconfig
+cp /etc/ambd/config myconfig
 
 # edit myconfig and specify the path to your plugin:
 # change the line: 
@@ -37,6 +36,16 @@ Now you can run ambd with:
 ambd -c /path/to/myconfig
 
 also see ambd -h
+
+
+Running on multiple machines
+
+ambd can run on multiple machines and share data across a network.  This is primarily done through the websocket
+sink and source plugins.  The server machine, the machine with physical access to data, runs the 
+websocket sink plugin and the client, the machine elsewhere on the network, runs the websocket source plugin.
+
+There are example configurations in the source called "configwebsocketsink" and "configwebsocketsource" that
+show how to configure ambd.  These are found in the examples folder.
 
 TODO: link to website for questions/comments
 
