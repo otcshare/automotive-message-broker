@@ -218,7 +218,8 @@ void WebSocketSinkManager::removePoll(int fd)
 	g_io_channel_shutdown(m_ioChannelMap[fd],false,0);
 	printf("Shutting down IO Channel\n");
 	g_source_remove(m_ioSourceMap[fd]); //Since the watch owns the GIOChannel, this should unref it enough to dissapear.
-	for (map<int,guint>::const_iterator i=m_ioSourceMap.cbegin();i!=m_ioSourceMap.cend();i++)
+	//for (map<int,guint>::const_iterator i=m_ioSourceMap.cbegin();i!=m_ioSourceMap.cend();i++)
+	for (map<int,guint>::iterator i=m_ioSourceMap.begin();i!=m_ioSourceMap.end();i++)
 	{
 		if((*i).first == fd)
 		{
@@ -227,7 +228,8 @@ void WebSocketSinkManager::removePoll(int fd)
 			i--;
 		}
 	}
-	for (map<int,GIOChannel*>::const_iterator i=m_ioChannelMap.cbegin();i!=m_ioChannelMap.cend();i++)
+	//for (map<int,GIOChannel*>::const_iterator i=m_ioChannelMap.cbegin();i!=m_ioChannelMap.cend();i++)
+	for (map<int,GIOChannel*>::iterator i=m_ioChannelMap.begin();i!=m_ioChannelMap.end();i++)
 	{
 		if((*i).first == fd)
 		{
