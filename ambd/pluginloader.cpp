@@ -77,17 +77,34 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re): f_crea
 	g_assert(json_reader_is_array(reader));
 	
 	
-	
 	for(int i=0; i < json_reader_count_elements(reader); i++)
 	{
 		json_reader_read_element(reader,i);
 		
+		gchar** srcMembers = json_reader_list_members(reader);
+
+		std::map<std::string, std::string> configurationMap;
+
+		for(int i=0; i< json_reader_count_members(reader); i++)
+		{
+			json_reader_read_member(reader,srcMembers[i]);
+			configurationMap[srcMembers[i]] = json_reader_get_string_value(reader);
+			DebugOut()<<"plugin config key: "<<srcMembers[i]<<" value: "<<configurationMap[srcMembers[i]]<<endl;
+			json_reader_end_member(reader);
+		}
+
+		json_reader_read_member(reader, "path");
 		string path = json_reader_get_string_value(reader);
+		json_reader_end_member(reader);
+
 		AbstractSource* plugin = loadPlugin<AbstractSource*>(path);
 		
 		if(plugin != nullptr)
+		{
 			mSources.push_back(plugin);
-		
+			plugin->setConfiguration(configurationMap);
+		}
+
 		json_reader_end_element(reader);
 	}
 			
@@ -96,23 +113,37 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re): f_crea
 	///read the sinks:
 		
 	json_reader_read_member(reader,"sinks");
-			
+
 	for(int i=0; i < json_reader_count_elements(reader); i++)
 	{
 		json_reader_read_element(reader,i);
-		
+
+		gchar** srcMembers = json_reader_list_members(reader);
+
+		std::map<std::string, std::string> configurationMap;
+
+		for(int i=0; i< json_reader_count_members(reader); i++)
+		{
+			json_reader_read_member(reader,srcMembers[i]);
+			configurationMap[srcMembers[i]] = json_reader_get_string_value(reader);
+			json_reader_end_member(reader);
+		}
+
+		json_reader_read_member(reader, "path");
 		string path = json_reader_get_string_value(reader);
+		json_reader_end_member(reader);
+
 		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path);
-		
+		plugin->setConfiguration(configurationMap);
+
 		if(plugin == nullptr)
 		{
 			throw std::runtime_error("plugin is not a SinkManager");
 		}
-		
+
 		json_reader_end_element(reader);
-		
 	}
-	
+
 	json_reader_end_member(reader);
 	
 	///TODO: this will probably explode:

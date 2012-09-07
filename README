@@ -47,5 +47,13 @@ websocket sink plugin and the client, the machine elsewhere on the network, runs
 There are example configurations in the source called "configwebsocketsink" and "configwebsocketsource" that
 show how to configure ambd.  These are found in the examples folder.
 
+Here's an example on how to run:
+
+cd automotive-message-broker/examples
+ambd -c configwebsocketsink
+
+(in another terminal)
+ambd -c configwebsocketsource
+
 TODO: link to website for questions/comments
 

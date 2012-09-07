@@ -31,10 +31,20 @@ AbstractSink::~AbstractSink()
 	routingEngine->unregisterSink(this);
 }
 
+void AbstractSink::setConfiguration(map<string, string> config)
+{
+	configuration = config;
+}
+
 AbstractSinkManager::AbstractSinkManager(AbstractRoutingEngine* engine)
 :routingEngine(engine)
 {
 
+}
+
+void AbstractSinkManager::setConfiguration(map<string, string> config)
+{
+	configuration = config;
 }
 
 

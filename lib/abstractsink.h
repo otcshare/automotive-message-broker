@@ -22,6 +22,7 @@
 
 #include <string>
 #include <list>
+#include <map>
 #include <functional>
 #include <boost/any.hpp>
 
@@ -59,8 +60,12 @@ public:
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) = 0;
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	
+
+	void setConfiguration(map<string, string> config);
+
 protected:
 	AbstractRoutingEngine* routingEngine;
+	map<string, string> configuration;
 };
 
 class AbstractSinkManager
@@ -68,9 +73,12 @@ class AbstractSinkManager
 public:
 	
 	AbstractSinkManager(AbstractRoutingEngine* engine);
+
+	virtual void setConfiguration(map<string, string> config);
 	
 protected:
 	AbstractRoutingEngine* routingEngine;
+	map<string, string> configuration;
 };
 
 #endif // ABSTRACTSINK_H
