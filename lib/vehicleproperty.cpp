@@ -39,6 +39,7 @@ const VehicleProperty::Property VehicleProperty::AccelerationX = "AccelerationX"
 const VehicleProperty::Property VehicleProperty::AccelerationY = "AccelerationY";
 const VehicleProperty::Property VehicleProperty::AccelerationZ = "AccelerationZ";
 const VehicleProperty::Property VehicleProperty::MassAirFlow = "MassAirFlow";
+const VehicleProperty::Property VehicleProperty::ButtonEvent = "ButtonEvent";
 
 VehicleProperty::VehicleProperty()
 {
@@ -64,6 +65,7 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 	mProperties.push_back(AccelerationY);
 	mProperties.push_back(AccelerationZ);
 	mProperties.push_back(MassAirFlow);
+	mProperties.push_back(ButtonEvent);
 
 	return mProperties;
 }
@@ -86,6 +88,7 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 	else if(name == AccelerationY) return new AccelerationType(value);
 	else if(name == AccelerationZ) return new AccelerationType(value);
 	else if(name == MassAirFlow) return new MassAirFlowType(value);
+	else if(name == ButtonEvent) return new ButtonEventType(value);
 
 	return nullptr;
 }

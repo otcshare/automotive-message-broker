@@ -27,6 +27,24 @@
 
 #include <abstractpropertytype.h>
 
+namespace ButtonEvents {
+enum ButtonEventType {
+	PlayButton = 1,
+	SkipButton = 1 << 1,
+	PrevButton = 1 << 2,
+	PauseButton = 1 << 3,
+	Preset1Button = 1 << 4,
+	Preset2Button = 1 << 5,
+	Preset3Button = 1 << 6,
+	Preset4Button = 1 << 7,
+	StopButton = 1 << 8,
+	NavigateUpButton = 1 << 9,
+	NavigateDownButton = 1 << 10,
+	NavigateLeftButton = 1 << 11,
+	NavigateRightButton = 1 << 12
+};
+}
+
 class VehicleProperty
 {
 
@@ -116,6 +134,10 @@ public:
 	/**< Mass Air Flow.  TODO: units */
 	static const Property MassAirFlow;
 	typedef BasicPropertyType<uint16_t> MassAirFlowType;
+
+	/**< Button Event @see ButtonEvents::ButtonEventType */
+	static const Property ButtonEvent;
+	typedef BasicPropertyType<int> ButtonEventType;
 
 	static std::list<VehicleProperty::Property> capabilities();
 
