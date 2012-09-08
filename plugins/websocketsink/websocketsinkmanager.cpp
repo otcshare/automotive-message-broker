@@ -41,6 +41,7 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):Abstra
 	
 	//Create a listening socket on port 23000 on localhost.
 	
+	
 }
 void WebSocketSinkManager::init()
 {
@@ -48,13 +49,35 @@ void WebSocketSinkManager::init()
 	protocollist[0] = { "http-only", websocket_callback, 0 };
 	protocollist[1] = { NULL, NULL, 0 };
 
+
+	
+}
+void WebSocketSinkManager::setConfiguration(map<string, string> config)
+{
+// 	//Config has been passed, let's start stuff up.
+	configuration = config;
+	
+	//Default values
 	int port = 23000;
-	const char *interface = "lo";
+	std::string interface = "lo";
 	const char *ssl_cert_path = NULL;
 	const char *ssl_key_path = NULL;
 	int options = 0;
-
-	context = libwebsocket_create_context(port, interface, protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
+	
+	//Try to load config
+	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	{
+		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		if ((*i).first == "interface")
+		{
+			interface = (*i).second;
+		}
+		if ((*i).first == "port")
+		{
+			port = boost::lexical_cast<int>((*i).second);
+		}
+	}
+	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
 }
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
@@ -184,7 +207,6 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
 	m_sinkMap[property] = sink;
 }
-
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 {
 	sinkManager = new WebSocketSinkManager(routingengine);

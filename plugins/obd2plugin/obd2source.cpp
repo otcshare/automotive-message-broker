@@ -57,37 +57,12 @@ void threadLoop(gpointer data)
 	GAsyncQueue *privSubscriptionAddQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionAddQueue);
 	GAsyncQueue *privSubscriptionRemoveQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionRemoveQueue);
 	obdLib *obd = new obdLib();
-	obd->openPort("/dev/pts/7",115200);
-	std::vector<unsigned char> replyVector;
-	std::string reply;
-	obd->sendObdRequestString("ATZ\r",4,&replyVector,500,3);
-	for (unsigned int i=0;i<replyVector.size();i++)
-	{
-		reply += replyVector[i];
-	}
-	if (reply.find("ELM") == -1)
-	{
-		//No reply found
-		printf("Error!\n");
-	}
-	else
-	{
-		printf("Reply to reset: %s\n",reply.c_str());
-	}
-	if (!sendElmCommand(obd,"ATE0"))
-	{
-	  printf("Error sending echo\n");
-	}
-	if (!sendElmCommand(obd,"ATH0"))
-	{
-	  printf("Error sending headers off\n");
-	}
-	if (!sendElmCommand(obd,"ATL0"))
-	{
-	  printf("Error turning linefeeds off\n");
-	}
+	
 	std::list<std::string> reqList;
 	std::list<std::string> repeatReqList;
+	std::map<std::string,std::string> commandMap;
+	std::vector<unsigned char> replyVector;
+	std::string reply;
 	while (true)
 	{
 		//gpointer query = g_async_queue_pop(privCommandQueue);
@@ -107,6 +82,46 @@ void threadLoop(gpointer data)
 			printf("Got request!\n");
 			ObdRequest *req = (ObdRequest*)query;
 			repeatReqList.push_back(req->req);
+			delete req;
+		}
+		query = g_async_queue_try_pop(privCommandQueue);
+		if (query != nullptr)
+		{
+			printf("Got Command!\n");
+			ObdRequest *req = (ObdRequest*)query;
+			//commandMap[req->req] = req->arg;
+			if (req->req == "connect")
+			{
+				std::string port = req->arg;
+				obd->openPort(port.c_str(),115200);
+				
+				obd->sendObdRequestString("ATZ\r",4,&replyVector,500,3);
+				for (unsigned int i=0;i<replyVector.size();i++)
+				{
+					reply += replyVector[i];
+				}
+				if (reply.find("ELM") == -1)
+				{
+					//No reply found
+					printf("Error!\n");
+				}
+				else
+				{
+					printf("Reply to reset: %s\n",reply.c_str());
+				}
+				if (!sendElmCommand(obd,"ATE0"))
+				{
+				  printf("Error sending echo\n");
+				}
+				if (!sendElmCommand(obd,"ATH0"))
+				{
+				  printf("Error sending headers off\n");
+				}
+				if (!sendElmCommand(obd,"ATL0"))
+				{
+				  printf("Error turning linefeeds off\n");
+				}
+			}
 			delete req;
 		}
 		for (std::list<std::string>::const_iterator i=reqList.cbegin();i!= reqList.cend();i++)
@@ -187,7 +202,29 @@ void OBD2Source::setSupported(PropertyList list)
 	m_supportedProperties = list;
 	m_re->updateSupported(list,PropertyList());
 }
-
+void OBD2Source::setConfiguration(map<string, string> config)
+{
+// 	//Config has been passed, let's start stuff up.
+	configuration = config;
+	
+	//Default values
+	std::string port = "/dev/ttyUSB0";
+	
+	//Try to load config
+	printf("OBD2Source::setConfiguration\n");
+	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	{
+		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		if ((*i).first == "port")
+		{
+			port = (*i).second;
+			ObdRequest *requ = new ObdRequest();
+			requ->req = "connect";
+			requ->arg = port;
+			g_async_queue_push(commandQueue,requ);
+		}
+	}
+}
 OBD2Source::OBD2Source(AbstractRoutingEngine *re) : AbstractSource(re)
 {
 	g_timeout_add(250, updateProperties, this );

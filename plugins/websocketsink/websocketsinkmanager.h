@@ -40,6 +40,7 @@ public:
 	void removePoll(int fd);
 	void init();
 	map<std::string,WebSocketSink*> m_sinkMap;
+	void setConfiguration(map<string, string> config);
 private:
 	map<int,GIOChannel*> m_ioChannelMap;
 	map<int,guint> m_ioSourceMap;

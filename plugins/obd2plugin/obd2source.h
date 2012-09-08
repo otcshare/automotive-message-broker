@@ -37,6 +37,7 @@ class ObdRequest
 {
 public:
   std::string req;
+  std::string arg;
 };
 
 class ObdReply
@@ -74,7 +75,9 @@ public:
 	GAsyncQueue* subscriptionRemoveQueue;
 	GAsyncQueue* singleShotQueue;
 	GAsyncQueue* responseQueue;
+	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
+	std::string m_port;
 private:
 	PropertyList m_supportedProperties;
 	GMutex *threadQueueMutex;
