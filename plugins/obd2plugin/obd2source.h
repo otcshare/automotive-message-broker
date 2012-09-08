@@ -66,6 +66,8 @@ public:
 	PropertyList activeRequests;
 	void engineSpeed(double speed);
 	void vehicleSpeed(int speed);
+	void mafValue(double maf);
+	void engineCoolantTemp(int temp);
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}

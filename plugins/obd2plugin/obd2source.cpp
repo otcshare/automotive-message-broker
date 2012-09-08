@@ -154,6 +154,22 @@ void threadLoop(gpointer data)
 				      rep->reply = boost::lexical_cast<string>(mph);
 				      g_async_queue_push(privResponseQueue,rep);
 				}
+				else if (replyVector[1] == 0x05)
+				{
+					int temp = replyVector[2] - 40;
+					ObdReply *rep = new ObdReply();
+					rep->req = "05";
+					rep->reply = boost::lexical_cast<string>(temp);
+					g_async_queue_push(privResponseQueue,rep);
+				}
+				else if (replyVector[1] == 0x10)
+				{
+					double maf = ((replyVector[2] << 8) + replyVector[3]) / 100.0;
+					ObdReply *rep = new ObdReply();
+					rep->req = "10";
+					rep->reply = boost::lexical_cast<string>(maf);
+					g_async_queue_push(privResponseQueue,rep);
+				}
 				else
 				{
 					printf("Unknown response type: %i\n",replyVector[1]);
@@ -175,7 +191,11 @@ static gboolean updateProperties(gpointer data)
 	if (retval != nullptr)
 	{
 		ObdReply *reply = (ObdReply*)retval;
-		if (reply->req == "0C")
+		if (reply->req == "05")
+		{
+			src->engineCoolantTemp(boost::lexical_cast<int>(reply->reply));
+		}
+		else if (reply->req == "0C")
 		{
 			src->engineSpeed(boost::lexical_cast<float>(reply->reply));
 		}
@@ -183,10 +203,23 @@ static gboolean updateProperties(gpointer data)
 		{
 			src->vehicleSpeed(boost::lexical_cast<int>(reply->reply));
 		}
+		else if (reply->req == "10")
+		{
+			src->mafValue(boost::lexical_cast<float>(reply->reply));
+		}
 	}
 	return true;
 }
-
+void OBD2Source::mafValue(double maf)
+{
+	VehicleProperty::VehicleSpeedType emaf(maf);
+	m_re->updateProperty(VehicleProperty::MassAirFlow,&emaf);
+}
+void OBD2Source::engineCoolantTemp(int temp)
+{
+	VehicleProperty::VehicleSpeedType etemp(temp);
+	m_re->updateProperty(VehicleProperty::EngineCoolantTemperature,&etemp);
+}
 void OBD2Source::engineSpeed(double speed)
 {
 	VehicleProperty::VehicleSpeedType espeed(speed);
@@ -289,8 +322,10 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re) : AbstractSource(re)
 	}
 	json_reader_end_member(reader);
 	*/
-	m_supportedProperties.push_back(VehicleProperty::EngineSpeed);
-	m_supportedProperties.push_back(VehicleProperty::VehicleSpeed);
+	m_supportedProperties.push_back(VehicleProperty::EngineSpeed); //0D
+	m_supportedProperties.push_back(VehicleProperty::VehicleSpeed); //0C
+	m_supportedProperties.push_back(VehicleProperty::EngineCoolantTemperature); //05
+	m_supportedProperties.push_back(VehicleProperty::MassAirFlow); //10
 	re->setSupported(supported(), this);
 	/*if (openPort(std::string("/dev/pts/7"),115200))
 	{
@@ -302,13 +337,21 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re) : AbstractSource(re)
 	responseQueue = g_async_queue_new();
 	singleShotQueue = g_async_queue_new();
 	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
-	ObdRequest *requ = new ObdRequest();
+	/*ObdRequest *requ = new ObdRequest();
 	requ->req = "010C\r";
 	g_async_queue_push(subscriptionAddQueue,requ);
 	
 	requ = new ObdRequest();
 	requ->req = "010D\r";
 	g_async_queue_push(subscriptionAddQueue,requ);
+	
+	requ = new ObdRequest();
+	requ->req = "0105\r";
+	g_async_queue_push(subscriptionAddQueue,requ);
+	
+	requ = new ObdRequest();
+	requ->req = "0110\r";
+	g_async_queue_push(subscriptionAddQueue,requ);*/
 }
 
 PropertyList OBD2Source::supported()
@@ -327,10 +370,33 @@ string OBD2Source::uuid()
 void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	//printf("Subscribed to property: %s\n",property.c_str());
-	queuedRequests.push_back(property);
-	if (clientConnected)
+	if (property == VehicleProperty::EngineSpeed)
 	{
-		
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "010C\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else if (property == VehicleProperty::MassAirFlow)
+	{
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "0110\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else if (property == VehicleProperty::VehicleSpeed)
+	{
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "010D\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else if (property == VehicleProperty::EngineCoolantTemperature)
+	{
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "0105\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else
+	{
+		printf("Unsupported property: %s\n",property.c_str());
 	}
 }
 
