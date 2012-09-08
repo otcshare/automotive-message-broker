@@ -133,6 +133,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		
 		//TODO: run valgrind on this. libwebsocket's documentation says NOTHING about this, yet malloc insists it's true.
 		//delete new_response; <- Unneeded. Apparently libwebsocket free's it.
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING); //Needs to subtract pre-padding, to get back to the start of the pointer.
 		
 	};
 
@@ -155,7 +156,7 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
 		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	}
 }
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
@@ -203,7 +204,7 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
 	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
 	m_sinkMap[property] = sink;
 }
@@ -500,6 +501,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 					strcpy(new_response,replystr.c_str());
 					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);	    
+					delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 				}
 			}
 			break;

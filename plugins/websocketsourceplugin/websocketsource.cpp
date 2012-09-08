@@ -67,6 +67,7 @@ void WebSocketSource::checkSubscriptions()
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
 		libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	}
 }
 void WebSocketSource::setConfiguration(map<string, string> config)
@@ -145,6 +146,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
 	libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);  
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 
 	  break;
 	}
