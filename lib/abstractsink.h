@@ -61,7 +61,7 @@ public:
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	
 
-	void setConfiguration(map<string, string> config);
+	virtual void setConfiguration(map<string, string> config);
 
 protected:
 	AbstractRoutingEngine* routingEngine;

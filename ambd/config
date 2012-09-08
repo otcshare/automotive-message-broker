@@ -6,16 +6,17 @@
 		}
 	],
 	"sinks": [
-		{ "name" : "ExampleSink",
-			 "path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so" 
+		{ 
+			"name" : "ExampleSink",
+			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so" 
 		},
 		{
-			 "name" : "DBusSink",
-			 "path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so" 
+			"name" : "DBusSink",
+			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so" 
 		},
 		{
-			 "name" : "WebSocketSink",
-			 "path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so"
+			"name" : "WebSocketSink",
+			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so"
 		} 
 	]
 }
