@@ -35,6 +35,7 @@ public:
 	PropertyList subscriptions();
 	libwebsocket *socket() { return m_wsi; }
 private:
+	char *webSocketBuffer;
 	string m_amdbproperty;
 	AbstractRoutingEngine *m_re;
 	libwebsocket *m_wsi;

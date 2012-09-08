@@ -1,5 +1,5 @@
 {
-	"sources" : [ "../plugins/websocketsourceplugin/websocketsourceplugin.so" ],
-	"sinks": [ "../plugins/examplesinkplugin.so" ]
+	"sources" : [ {"name":"WebSocketSource","ip":"127.0.0.1","port":"23000","path":"/usr/lib/automotive-message-broker/websocketsourceplugin.so" }],
+	"sinks": [ {"name":"ExampleSink","path":"/usr/lib/automotive-message-broker/examplesinkplugin.so"} ]
 }
 
