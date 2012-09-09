@@ -139,6 +139,30 @@ public:
 	static const Property ButtonEvent;
 	typedef BasicPropertyType<int> ButtonEventType;
 
+	/**< Air intake temperature in degrees celcius */
+	static const Property AirIntakeTemperature;
+	typedef BasicPropertyType<int> AirIntakeTemperatureType;
+
+	/**< Battery voltage in volts */
+	static const Property BatteryVoltage;
+	typedef BasicPropertyType<double> BatteryVoltageType;
+
+	/**< Interior Air Temperature in degrees celcius */
+	static const Property InteriorTemperature;
+	typedef BasicPropertyType<int> InteriorTemperatureType;
+
+	/**< Engine Oil Temperature in degrees celcius */
+	static const Property EngineOilTemperature;
+	typedef BasicPropertyType<int> EngineOilTemperatureType;
+
+	/**< Vehicle Identification Number (ISO 3779) 17 chars**/
+	static const Property VIN;
+	typedef StringPropertyType VINType;
+
+	/**< World Manufacturer Identifier (SAE) 3 characters. */
+	static const Property WMI;
+	typedef StringPropertyType WMIType;
+
 	static std::list<VehicleProperty::Property> capabilities();
 
 	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);

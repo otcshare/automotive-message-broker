@@ -40,6 +40,12 @@ const VehicleProperty::Property VehicleProperty::AccelerationY = "AccelerationY"
 const VehicleProperty::Property VehicleProperty::AccelerationZ = "AccelerationZ";
 const VehicleProperty::Property VehicleProperty::MassAirFlow = "MassAirFlow";
 const VehicleProperty::Property VehicleProperty::ButtonEvent = "ButtonEvent";
+const VehicleProperty::Property VehicleProperty::AirIntakeTemperature = "AirIntakeTemperature";
+const VehicleProperty::Property VehicleProperty::BatteryVoltage = "BatteryVoltage";
+const VehicleProperty::Property VehicleProperty::InteriorTemperature = "InteriorTemperature";
+const VehicleProperty::Property VehicleProperty::EngineOilTemperature = "EngineOilTemperature";
+const VehicleProperty::Property VehicleProperty::VIN = "VIN";
+const VehicleProperty::Property VehicleProperty::WMI = "WMI";
 
 VehicleProperty::VehicleProperty()
 {
@@ -66,6 +72,12 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 	mProperties.push_back(AccelerationZ);
 	mProperties.push_back(MassAirFlow);
 	mProperties.push_back(ButtonEvent);
+	mProperties.push_back(AirIntakeTemperature);
+	mProperties.push_back(BatteryVoltage);
+	mProperties.push_back(InteriorTemperature);
+	mProperties.push_back(EngineOilTemperature);
+	mProperties.push_back(VIN);
+	mProperties.push_back(WMI);
 
 	return mProperties;
 }
@@ -88,7 +100,13 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 	else if(name == AccelerationY) return new AccelerationType(value);
 	else if(name == AccelerationZ) return new AccelerationType(value);
 	else if(name == MassAirFlow) return new MassAirFlowType(value);
-	else if(name == ButtonEvent) return new ButtonEventType(value);
+	else if(name == AirIntakeTemperature) return new AirIntakeTemperatureType(value);
+	else if(name == BatteryVoltage) return new BatteryVoltageType(value);
+	else if(name == InteriorTemperature) return new InteriorTemperatureType(value);
+	else if(name == EngineOilTemperature) return new EngineOilTemperatureType(value);
+	else if(name == VIN) return new VINType(value);
+	else if(name == WMI) return new WMIType(value);
+
 
 	return nullptr;
 }
