@@ -1,0 +1,190 @@
+* Mon Sep 10 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120910.223349@2021380
+- Merge branch 'upstream' into release
+- const value()
+- fixed websocketsource cmake
+- added packaging directory
+- added more properties
+- Addition of only requesting OBD2 values after a subscription request
+- Change in the libwebsocket_write call to fix string length, due to passing a pointer in the middle of a string.
+- Fix for huge memory leak, and more config changes
+- Changes for new config values
+- made setConfiguration virtual
+- Change for setConfiguration to be handled properly for settings
+- new configuration format
+- added button events
+- Fix compile error due to const iterator issues in websocketsinkmanager
+- added todo
+- moved example configs to subfolder. updated readme
+- fix the target_link_library for example plugins
+- Code cleanup
+- Fix for GIOChannel watch's hanging around longer than they should be
+- fixed parallalel building and make install
+- install all the files
+- fixed printhelp() with config option.  thanks geoffroy
+- Fix for gioPolling final
+- Fix for some weird issues with the switch
+- Change for gioPollingFunc to keep it from blocking
+- Changed where obd2plugin looks for obdlib.h
+- Merge branch 'master' of https://github.com/malcom2073/automotive-message-broker into mal2
+- Change for switch falling through
+- Change for GIO to only poll libwebsockets when it actually needs to
+- Change for GIO to only poll libwebsockets when it actually needs to
+- fixed type for transshift/gear part 2
+- fixed type for transshift/gear
+- Fix for bad if/else statements found by Kevron
+- Fix for bad if/else statements found by Kevron
+- Fix for bad if/else statements found by Kevron
+- use nullptr.h
+- define nullptr if using < gcc 4.6
+- Addition of new obd2 plugin
+- Addition of new obd2 plugin
+- fixed dbus plugin not to use the temp pointer
+- some additional updates
+- use pointer to avoid implicit casting fail
+- Merge branch 'mal'; commit '1aad5d5' into propertytype
+- Fixes for new AbstractPropertyType
+- it compiles
+- added missings
+- more updating. still broken
+- Add two new configs for source/sink websocket tests
+- sinks auto-register with the routing engine
+- Fixes for issues concerning subscriptions and websocketsource
+- example sink reacts to supported changed
+- Changes to allow websocketsourceplugin to operate properly, and load from a config file
+- subscribeToProperty being called on the source now
+- some more changes
+- Addition of new websocketsource plugin
+- Fixing a bug where a AMBD property request was being replied as a genivi request
+- major breakage ahead...
+- example supports engine coolant
+- example does throttle
+- Fix for subscriptions not working properly due to non-standard AMB properties not being supported
+- Addition of handling of generic string properties. If they're supported by AMBD, they'll be supported through
+- added capabilities call to VehicleProperty
+- checked in a small fix to the api.js to handle when the service doesn't return the proper acknowledgement on unsubscribe
+- added signal handler for sigterm and sigint
+- fixed types expressed in the example source plugin
+- updated example to produce fake data for wheel and transmission shift properties
+- Merge pull request #7 from malcom2073/master
+- Addition of new debugging output, and better error handling
+- Added unsubscribe supportedeventtype
+- Addition of getSupportedEventTypes with no data field for listing supported properties
+- Code formatting cleanup
+- Changes for unsubscribe to work properly, as well as getSupportedEventTypes
+- Fix for current subscription changes to api.js. Added steering wheel angle and transmission status
+- Clean up the boost::any casting a bit Fulfill property get requests
+- Add event propogation of all data items from the wheel
+- change get and set to allow an array of events, added subscribe and unsubscribe for an array of events, upgraded the index.html tester to all selecting a list of any events to do get, subscribe, and unsubscribe on. Added an input field for each event to allow the tester to set the value to whatever they want. The fields update on get or a valuechanged event on subscribe, when the value changes it flashes red so you can confirm the data is coming in easily.
+- Change for subscription requests to now operate properly
+- Make the boost::any conversions actually work in WheelSource
+- fixed unsubscribe
+- Make WheelPlugin actually read JS events, print out event info Make basic framework for processing received JS events TODO: Button/Axis mapping to VehicleProperty values
+- Add PropertySet typedef to VehicleProperty
+- made VehicleProperty::Property strings
+- added vehiclespeed property
+- Merge remote-tracking branch 'origin/master' into wheelsource
+- Make wheelsourceplugin actually read JS events (currently just prints out)
+- Merge pull request #6 from malcom2073/master
+- Slight change to support uuid string transactionids from the client websocket
+- Changes to support latest websocket protocol api. Now supports running_status_speedometer and running_status_engine_speed
+- in api.js, changed transactionid to a uuid
+- in api.js, changed transactionid to a uuid
+- added better comments to api.js and moved server test code into subdir
+- added better comments to api.js and moved server test code into subdir
+- made websockets work out of the box
+- made websockets work out of the box
+- Additions for creating new WebsockSink class instances per tcp connection
+- missing files added
+- missing files added
+- added check header so cmake will fail if you are missing libwebsockets
+- added check header so cmake will fail if you are missing libwebsockets
+- added set functionality, the basics are in place for hooking up the backend service
+- added set functionality, the basics are in place for hooking up the backend service
+- latest vehicle api supports getevent types and get
+- latest vehicle api supports getevent types and get
+- Update README
+- Update README
+- Update README
+- Update README
+- Merge pull request #5 from malcom2073/master
+- Update README
+- Update README
+- Update README
+- Update README
+- Name change for tcpsink to be websocketsink
+- Merge pull request #4 from malcom2073/master
+- Change for websocket port to be 7681
+- Merge remote-tracking branch 'origin'
+- Add opening of joystick dev file, and reading of various JS info
+- Add opening of joystick dev file, and reading of various JS info
+- Changes for api.js to set protocol, config to include tcpsink plugin, and tcpsinkplugin to handle incoming json requests
+- initial working dbus plugin
+- Merge branch 'par_build_fix'
+- added properties to support wheel
+- Fix parallel build issue (issue #3)
+- mikeleib'd
+- adding missing files
+- updated dbus plugin
+- Fix tcpsinkplugin build on glib 2.32.3
+- Update README
+- added reference/test javascript api to websocket plugin
+- dbus plugin updates
+- added dbus sink subdir
+- Merge pull request #2 from malcom2073/master
+- Initial commit of tcpsink, a websocket providing sink plugin.
+- added dbus plugin
+- Merge pull request #1 from jausmus/wheelsource
+- Add wheel plugin subdir for wheel source plugin Modify plugins/CMakeLists.txt to include wheel subdir
+- added some properties to support the logitec wheel
+- changed async reply callback argument
+- added async and sync property getter
+- fixed compile error due to hardcoded path
+- missing this
+- basic routing working
+- adding example config
+- use map instead of unordered_map
+- cleaned up headers
+- added abstract routing engine class
+- revamped plugin interfaces
+- more progress on core
+- missed these files
+- more progress
+- more code added to core
+- started core routing engine
+- plugins load ftw
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- updated architecture presentation
+- initial config reading
+- a bit more progress on the plugin loader
+- some serious changes
+- acceleration type double
+- set default values for each property
+- fixed dbus signal emition
+- Fixed pkgconfig and header issues
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker
+- Version bump 0.2
+- Version bump 0.2
+- removed wheeltick from docs
+- removed wheeltick
+- more properties added to running status
+- added engine oil property stub
+- added new properties and assignment overloads
+- lots of new properties to running status
+- trip meter property
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker
+- some changes to abstract property
+- Updated readme with project description.
+- added explainatory presentation document
+- added fuel economy property
+- added EngineSpeed and VehiclePowerMode properties
+- some updates to docs
+- added README
+- added COPYING file with license
+- all files have license comments
+- fixed compile errors and added dist target
+- fixed crasher; implemented setProperty; updated Docs
+- added runtime options
+- cleanup and project rename
+- initial add
+- initial project import from KDevelop
+
