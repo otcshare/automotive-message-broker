@@ -36,7 +36,7 @@ public:
 	}
 
 	template <typename T>
-	T value()
+	T value() const
 	{
 		return boost::any_cast<T>(mValue);
 	}
@@ -105,7 +105,7 @@ public:
 
 	StringPropertyType & operator = (StringPropertyType const & other)
 	{
-		//setValue(other.value<std::string>());
+		setValue(other.value<std::string>());
 		return *this;
 	}
 
