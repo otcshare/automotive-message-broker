@@ -1,3 +1,18 @@
+* Tue Sep 11 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120911.205626@d545a4c
+- Merge branch 'upstream' into release
+- updated examples with more properties
+- demosink uses strings for turn signal
+- added wheel example and fixed example websocketsource config
+- fixed enums in wheel
+- Merge branch 'mal'
+- Merge branch 'master' of https://github.com/malcom2073/automotive-message-broker into mal
+- fixed up AbstractPropertyType so it can use enums
+- Fix for bug involving websocket messages being incomplete
+- changelog update
+- Merge branch 'master' of https://github.com/malcom2073/automotive-message-broker into mal
+- Fix for bad if/else statements found by Kevron
+- Addition of new obd2 plugin
+
 * Mon Sep 10 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120910.223349@2021380
 - Merge branch 'upstream' into release
 - const value()
