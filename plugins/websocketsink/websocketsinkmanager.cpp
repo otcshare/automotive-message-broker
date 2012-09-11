@@ -129,7 +129,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
-		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response-LWS_SEND_BUFFER_PRE_PADDING), LWS_WRITE_TEXT);
+		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 		
 		//TODO: run valgrind on this. libwebsocket's documentation says NOTHING about this, yet malloc insists it's true.
 		//delete new_response; <- Unneeded. Apparently libwebsocket free's it.
@@ -155,7 +155,7 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
-		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response-LWS_SEND_BUFFER_PRE_PADDING), LWS_WRITE_TEXT);
+		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	}
 }
@@ -203,7 +203,7 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
-	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response-LWS_SEND_BUFFER_PRE_PADDING), LWS_WRITE_TEXT);
+	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
 	m_sinkMap[property] = sink;
@@ -500,7 +500,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 					strcpy(new_response,replystr.c_str());
-					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response-LWS_SEND_BUFFER_PRE_PADDING), LWS_WRITE_TEXT);
+					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 					delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 				}
 			}
