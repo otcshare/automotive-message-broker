@@ -45,6 +45,16 @@ enum ButtonEventType {
 };
 }
 
+namespace TurnSignals {
+enum TurnSignalType
+{
+	Off=0,
+	Right=1,
+	Left=2,
+	Hazard=3
+};
+}
+
 class VehicleProperty
 {
 
@@ -103,7 +113,7 @@ public:
 
 	/**< 0=off, 1=right, 2=left, 3=hazard */
 	static const Property TurnSignal;
-	typedef BasicPropertyType<uint16_t> TurnSignalType;
+	typedef BasicPropertyType<TurnSignals::TurnSignalType> TurnSignalType;
 
 	/**< Clutch pedal status 0=off, 1=on */
 	static const Property ClutchStatus;
@@ -137,7 +147,7 @@ public:
 
 	/**< Button Event @see ButtonEvents::ButtonEventType */
 	static const Property ButtonEvent;
-	typedef BasicPropertyType<int> ButtonEventType;
+	typedef BasicPropertyType<ButtonEvents::ButtonEventType> ButtonEventType;
 
 	/**< Air intake temperature in degrees celcius */
 	static const Property AirIntakeTemperature;
@@ -165,6 +175,10 @@ public:
 
 	static std::list<VehicleProperty::Property> capabilities();
 
+	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
+	  * with the value specified by 'value'.  Ownership of the returned AbstractPropertyType* is
+	  * transfered to the caller.
+	  */
 	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
     
 };

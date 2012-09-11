@@ -40,7 +40,13 @@ public:
 	ExampleSinkManager(AbstractRoutingEngine* engine)
 	:AbstractSinkManager(engine)
 	{
-		new ExampleSink(engine);
+
+	}
+
+	void setConfiguration(map<string, string> config)
+	{
+		ExampleSink* sink = new ExampleSink(routingEngine);
+		sink->setConfiguration(config);
 	}
 };
 

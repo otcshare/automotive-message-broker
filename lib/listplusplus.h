@@ -45,7 +45,6 @@ public:
 		}
 	}
 	
-	
 	bool contains(T value)
 	{
 		return (std::find(mList->begin(), mList->end(), value) != mList->end());

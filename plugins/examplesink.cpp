@@ -31,11 +31,29 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine): AbstractSink(engine)
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 
-	/*AsyncPropertyRequest velocityRequest;
+	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
-	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; };
+	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; delete reply; };
 
-	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);*/
+	routingEngine->getPropertyAsync(velocityRequest);
+
+	AsyncPropertyRequest vinRequest;
+	vinRequest.property = VehicleProperty::VIN;
+	vinRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"VIN Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+
+	routingEngine->getPropertyAsync(vinRequest);
+
+	AsyncPropertyRequest wmiRequest;
+	wmiRequest.property = VehicleProperty::WMI;
+	wmiRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"WMI Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+
+	routingEngine->getPropertyAsync(wmiRequest);
+
+	AsyncPropertyRequest batteryVoltageRequest;
+	batteryVoltageRequest.property = VehicleProperty::BatteryVoltage;
+	batteryVoltageRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"BatteryVoltage Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+
+	routingEngine->getPropertyAsync(batteryVoltageRequest);
 
 }
 

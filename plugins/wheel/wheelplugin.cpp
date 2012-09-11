@@ -38,11 +38,6 @@ using namespace std;
 #define JSNAMELEN 128
 #define LG27 "G27 Racing Wheel"
 
-enum TurnSignal {
-	TS_RIGHT=1,
-	TS_LEFT=2
-};
-
 double gearRatio[8] = {
 	0.0,	//Neutral
 	1.0/4.12,	//First
@@ -73,7 +68,7 @@ private:
 	void newAxisValue(char number, int val);
 
 	void changeMachineGuns(bool val);
-	void changeTurnSignal(TurnSignal dir, bool val);
+	void changeTurnSignal(TurnSignals::TurnSignalType dir, bool val);
 	void changeGear(int gear);
 	void changeOilPressure(bool increase);
 	void changeCoolantTemp(bool increase);
@@ -94,7 +89,7 @@ private:
 	char *button;
 
 	uint16_t machineGuns;
-	uint16_t turnSignal;
+	TurnSignals::TurnSignalType turnSignal;
 	uint16_t currentGear;
 	uint16_t oilPSI;
 	uint16_t coolantTemp;
@@ -190,7 +185,7 @@ void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData)
 
 WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route)
 :re(route), gis(nullptr), axis(nullptr), button(nullptr),
-oilPSI(10), coolantTemp(100), turnSignal(0), throttle(0),
+oilPSI(10), coolantTemp(100), turnSignal(TurnSignals::Off), throttle(0),
 machineGuns(false), currentGear(0), steeringAngle(0),
 clutch(false), oldClutch(false), brake(false), oldBrake(false)
 {
@@ -287,7 +282,7 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			this->changeMachineGuns(val);
 			break;
 		case 6:	//Right upper wheel button
-			this->changeTurnSignal(TS_RIGHT, val);
+			this->changeTurnSignal(TurnSignals::Right, val);
 			break;
 		case 18://Right middle wheel button
 			//Oil pressure up
@@ -300,7 +295,7 @@ void WheelPrivate::newButtonValue(char number, bool val)
 				this->changeCoolantTemp(true);
 			break;
 		case 7:	//Left upper wheel button
-			this->changeTurnSignal(TS_LEFT, val);
+			this->changeTurnSignal(TurnSignals::Left, val);
 			break;
 		case 20://Left middle wheel button
 			//Oil pressure down
@@ -413,14 +408,14 @@ void WheelPrivate::changeMachineGuns(bool val)
 	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, &temp);
 }
 
-void WheelPrivate::changeTurnSignal(TurnSignal dir, bool val)
+void WheelPrivate::changeTurnSignal(TurnSignals::TurnSignalType dir, bool val)
 {
-	int tsVal=0;
+	TurnSignals::TurnSignalType tsVal= TurnSignals::Off;
 	if (val) {
-		if (dir == TS_LEFT)
-			tsVal = 2;
+		if (dir == TurnSignals::Left)
+			tsVal = TurnSignals::Left;
 		else
-			tsVal = 1;
+			tsVal = TurnSignals::Right;
 	}
 	this->turnSignal = tsVal;
 	VehicleProperty::TurnSignalType temp(this->turnSignal);

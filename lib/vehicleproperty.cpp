@@ -100,6 +100,7 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 	else if(name == AccelerationY) return new AccelerationType(value);
 	else if(name == AccelerationZ) return new AccelerationType(value);
 	else if(name == MassAirFlow) return new MassAirFlowType(value);
+	else if(name == ButtonEvent) return new ButtonEventType(value);
 	else if(name == AirIntakeTemperature) return new AirIntakeTemperatureType(value);
 	else if(name == BatteryVoltage) return new BatteryVoltageType(value);
 	else if(name == InteriorTemperature) return new InteriorTemperatureType(value);
