@@ -3,8 +3,6 @@
 		{
 			"name" : "WebsocketSouce",
 			"path" : "/usr/lib/automotive-message-broker/websocketsourceplugin.so",
-			"ip":"127.0.0.1",
-			"port":"23000"
 		}
 	],
 	"sinks": [
