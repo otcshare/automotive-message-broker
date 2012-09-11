@@ -38,11 +38,6 @@ using namespace std;
 #define JSNAMELEN 128
 #define LG27 "G27 Racing Wheel"
 
-enum TurnSignal {
-	TS_RIGHT=1,
-	TS_LEFT=2
-};
-
 double gearRatio[8] = {
 	0.0,	//Neutral
 	1.0/4.12,	//First
@@ -73,7 +68,7 @@ private:
 	void newAxisValue(char number, int val);
 
 	void changeMachineGuns(bool val);
-	void changeTurnSignal(TurnSignal dir, bool val);
+	void changeTurnSignal(TurnSignals::TurnSignalType dir, bool val);
 	void changeGear(int gear);
 	void changeOilPressure(bool increase);
 	void changeCoolantTemp(bool increase);
@@ -287,7 +282,7 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			this->changeMachineGuns(val);
 			break;
 		case 6:	//Right upper wheel button
-			this->changeTurnSignal(TS_RIGHT, val);
+			this->changeTurnSignal(TurnSignals::Right, val);
 			break;
 		case 18://Right middle wheel button
 			//Oil pressure up
@@ -300,7 +295,7 @@ void WheelPrivate::newButtonValue(char number, bool val)
 				this->changeCoolantTemp(true);
 			break;
 		case 7:	//Left upper wheel button
-			this->changeTurnSignal(TS_LEFT, val);
+			this->changeTurnSignal(TurnSignals::Left, val);
 			break;
 		case 20://Left middle wheel button
 			//Oil pressure down
@@ -413,7 +408,7 @@ void WheelPrivate::changeMachineGuns(bool val)
 	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, &temp);
 }
 
-void WheelPrivate::changeTurnSignal(TurnSignal dir, bool val)
+void WheelPrivate::changeTurnSignal(TurnSignals::TurnSignalType dir, bool val)
 {
 	TurnSignals::TurnSignalType tsVal= TurnSignals::Off;
 	if (val) {
