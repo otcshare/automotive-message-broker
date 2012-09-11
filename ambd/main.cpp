@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 
 	bool isdeamonize=false;
 	int optc;
-	string config;
+	string config="/etc/ambd/config";
 	
 	while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
 	{
@@ -189,7 +189,7 @@ void printhelp(const char *argv0)
 	printf("Usage: %s [args]\n"
 	"   [-d|--daemonise]\n"
 	"   [-v|--version]\n"
-	"   [-p]--plugin <pathtoplugin> \t]"
+	"   [-c]--config </path/to/config> \t]\n"
 	"   [-h|--help]\n"
 	, argv0);
 }

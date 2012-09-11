@@ -36,7 +36,7 @@ public:
 	}
 
 	template <typename T>
-	T value()
+	T value() const
 	{
 		return boost::any_cast<T>(mValue);
 	}
@@ -87,6 +87,34 @@ public:
 
 		return stream.str();
 	}
+};
+
+class StringPropertyType: public AbstractPropertyType
+{
+public:
+	StringPropertyType(std::string val)
+		:AbstractPropertyType()
+	{
+		setValue(val);
+	}
+
+	StringPropertyType(StringPropertyType const & other)
+	{
+		setValue(other.value<std::string>());
+	}
+
+	StringPropertyType & operator = (StringPropertyType const & other)
+	{
+		setValue(other.value<std::string>());
+		return *this;
+	}
+
+
+	std::string toString()
+	{
+		return value<std::string>();
+	}
+
 };
 
 #endif

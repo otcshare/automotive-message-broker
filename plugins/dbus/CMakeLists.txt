@@ -8,6 +8,6 @@ set(dbussinkplugin_sources dbusplugin.cpp abstractproperty.cpp abstractdbusinter
 
 add_library(dbussinkplugin MODULE ${dbussinkplugin_sources})
 set_target_properties(dbussinkplugin PROPERTIES PREFIX "")
-target_link_libraries(dbussinkplugin -lamb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES})
+target_link_libraries(dbussinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES})
 
-
+install (TARGETS dbussinkplugin LIBRARY DESTINATION lib/automotive-message-broker)

@@ -29,14 +29,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <termios.h>
-#include <obdlib.h>
-#include <glib/gasyncqueue.h>
+#include "obdlib.h"
+#include <glib.h>
 
 
 class ObdRequest
 {
 public:
   std::string req;
+  std::string arg;
 };
 
 class ObdReply
@@ -65,6 +66,8 @@ public:
 	PropertyList activeRequests;
 	void engineSpeed(double speed);
 	void vehicleSpeed(int speed);
+	void mafValue(double maf);
+	void engineCoolantTemp(int temp);
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
@@ -74,7 +77,9 @@ public:
 	GAsyncQueue* subscriptionRemoveQueue;
 	GAsyncQueue* singleShotQueue;
 	GAsyncQueue* responseQueue;
+	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
+	std::string m_port;
 private:
 	PropertyList m_supportedProperties;
 	GMutex *threadQueueMutex;

@@ -1,0 +1,15 @@
+{
+	"sources" : [ 
+		{
+			"name" : "WebsocketSouce",
+			"path" : "/usr/lib/automotive-message-broker/websocketsourceplugin.so"
+		}
+	],
+	"sinks": [
+		{
+			 "name" : "ExampleSink",
+			 "path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
+		} 
+	]
+}
+

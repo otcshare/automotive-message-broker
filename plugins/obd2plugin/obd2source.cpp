@@ -57,37 +57,12 @@ void threadLoop(gpointer data)
 	GAsyncQueue *privSubscriptionAddQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionAddQueue);
 	GAsyncQueue *privSubscriptionRemoveQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionRemoveQueue);
 	obdLib *obd = new obdLib();
-	obd->openPort("/dev/pts/7",115200);
-	std::vector<unsigned char> replyVector;
-	std::string reply;
-	obd->sendObdRequestString("ATZ\r",4,&replyVector,500,3);
-	for (unsigned int i=0;i<replyVector.size();i++)
-	{
-		reply += replyVector[i];
-	}
-	if (reply.find("ELM") == -1)
-	{
-		//No reply found
-		printf("Error!\n");
-	}
-	else
-	{
-		printf("Reply to reset: %s\n",reply.c_str());
-	}
-	if (!sendElmCommand(obd,"ATE0"))
-	{
-	  printf("Error sending echo\n");
-	}
-	if (!sendElmCommand(obd,"ATH0"))
-	{
-	  printf("Error sending headers off\n");
-	}
-	if (!sendElmCommand(obd,"ATL0"))
-	{
-	  printf("Error turning linefeeds off\n");
-	}
+	
 	std::list<std::string> reqList;
 	std::list<std::string> repeatReqList;
+	std::map<std::string,std::string> commandMap;
+	std::vector<unsigned char> replyVector;
+	std::string reply;
 	while (true)
 	{
 		//gpointer query = g_async_queue_pop(privCommandQueue);
@@ -107,6 +82,46 @@ void threadLoop(gpointer data)
 			printf("Got request!\n");
 			ObdRequest *req = (ObdRequest*)query;
 			repeatReqList.push_back(req->req);
+			delete req;
+		}
+		query = g_async_queue_try_pop(privCommandQueue);
+		if (query != nullptr)
+		{
+			printf("Got Command!\n");
+			ObdRequest *req = (ObdRequest*)query;
+			//commandMap[req->req] = req->arg;
+			if (req->req == "connect")
+			{
+				std::string port = req->arg;
+				obd->openPort(port.c_str(),115200);
+				
+				obd->sendObdRequestString("ATZ\r",4,&replyVector,500,3);
+				for (unsigned int i=0;i<replyVector.size();i++)
+				{
+					reply += replyVector[i];
+				}
+				if (reply.find("ELM") == -1)
+				{
+					//No reply found
+					printf("Error!\n");
+				}
+				else
+				{
+					printf("Reply to reset: %s\n",reply.c_str());
+				}
+				if (!sendElmCommand(obd,"ATE0"))
+				{
+				  printf("Error sending echo\n");
+				}
+				if (!sendElmCommand(obd,"ATH0"))
+				{
+				  printf("Error sending headers off\n");
+				}
+				if (!sendElmCommand(obd,"ATL0"))
+				{
+				  printf("Error turning linefeeds off\n");
+				}
+			}
 			delete req;
 		}
 		for (std::list<std::string>::const_iterator i=reqList.cbegin();i!= reqList.cend();i++)
@@ -139,6 +154,22 @@ void threadLoop(gpointer data)
 				      rep->reply = boost::lexical_cast<string>(mph);
 				      g_async_queue_push(privResponseQueue,rep);
 				}
+				else if (replyVector[1] == 0x05)
+				{
+					int temp = replyVector[2] - 40;
+					ObdReply *rep = new ObdReply();
+					rep->req = "05";
+					rep->reply = boost::lexical_cast<string>(temp);
+					g_async_queue_push(privResponseQueue,rep);
+				}
+				else if (replyVector[1] == 0x10)
+				{
+					double maf = ((replyVector[2] << 8) + replyVector[3]) / 100.0;
+					ObdReply *rep = new ObdReply();
+					rep->req = "10";
+					rep->reply = boost::lexical_cast<string>(maf);
+					g_async_queue_push(privResponseQueue,rep);
+				}
 				else
 				{
 					printf("Unknown response type: %i\n",replyVector[1]);
@@ -160,7 +191,11 @@ static gboolean updateProperties(gpointer data)
 	if (retval != nullptr)
 	{
 		ObdReply *reply = (ObdReply*)retval;
-		if (reply->req == "0C")
+		if (reply->req == "05")
+		{
+			src->engineCoolantTemp(boost::lexical_cast<int>(reply->reply));
+		}
+		else if (reply->req == "0C")
 		{
 			src->engineSpeed(boost::lexical_cast<float>(reply->reply));
 		}
@@ -168,10 +203,23 @@ static gboolean updateProperties(gpointer data)
 		{
 			src->vehicleSpeed(boost::lexical_cast<int>(reply->reply));
 		}
+		else if (reply->req == "10")
+		{
+			src->mafValue(boost::lexical_cast<float>(reply->reply));
+		}
 	}
 	return true;
 }
-
+void OBD2Source::mafValue(double maf)
+{
+	VehicleProperty::VehicleSpeedType emaf(maf);
+	m_re->updateProperty(VehicleProperty::MassAirFlow,&emaf);
+}
+void OBD2Source::engineCoolantTemp(int temp)
+{
+	VehicleProperty::VehicleSpeedType etemp(temp);
+	m_re->updateProperty(VehicleProperty::EngineCoolantTemperature,&etemp);
+}
 void OBD2Source::engineSpeed(double speed)
 {
 	VehicleProperty::VehicleSpeedType espeed(speed);
@@ -187,7 +235,29 @@ void OBD2Source::setSupported(PropertyList list)
 	m_supportedProperties = list;
 	m_re->updateSupported(list,PropertyList());
 }
-
+void OBD2Source::setConfiguration(map<string, string> config)
+{
+// 	//Config has been passed, let's start stuff up.
+	configuration = config;
+	
+	//Default values
+	std::string port = "/dev/ttyUSB0";
+	
+	//Try to load config
+	printf("OBD2Source::setConfiguration\n");
+	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	{
+		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		if ((*i).first == "port")
+		{
+			port = (*i).second;
+			ObdRequest *requ = new ObdRequest();
+			requ->req = "connect";
+			requ->arg = port;
+			g_async_queue_push(commandQueue,requ);
+		}
+	}
+}
 OBD2Source::OBD2Source(AbstractRoutingEngine *re) : AbstractSource(re)
 {
 	g_timeout_add(250, updateProperties, this );
@@ -252,8 +322,10 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re) : AbstractSource(re)
 	}
 	json_reader_end_member(reader);
 	*/
-	m_supportedProperties.push_back(VehicleProperty::EngineSpeed);
-	m_supportedProperties.push_back(VehicleProperty::VehicleSpeed);
+	m_supportedProperties.push_back(VehicleProperty::EngineSpeed); //0D
+	m_supportedProperties.push_back(VehicleProperty::VehicleSpeed); //0C
+	m_supportedProperties.push_back(VehicleProperty::EngineCoolantTemperature); //05
+	m_supportedProperties.push_back(VehicleProperty::MassAirFlow); //10
 	re->setSupported(supported(), this);
 	/*if (openPort(std::string("/dev/pts/7"),115200))
 	{
@@ -265,13 +337,21 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re) : AbstractSource(re)
 	responseQueue = g_async_queue_new();
 	singleShotQueue = g_async_queue_new();
 	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
-	ObdRequest *requ = new ObdRequest();
+	/*ObdRequest *requ = new ObdRequest();
 	requ->req = "010C\r";
 	g_async_queue_push(subscriptionAddQueue,requ);
 	
 	requ = new ObdRequest();
 	requ->req = "010D\r";
 	g_async_queue_push(subscriptionAddQueue,requ);
+	
+	requ = new ObdRequest();
+	requ->req = "0105\r";
+	g_async_queue_push(subscriptionAddQueue,requ);
+	
+	requ = new ObdRequest();
+	requ->req = "0110\r";
+	g_async_queue_push(subscriptionAddQueue,requ);*/
 }
 
 PropertyList OBD2Source::supported()
@@ -290,10 +370,33 @@ string OBD2Source::uuid()
 void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	//printf("Subscribed to property: %s\n",property.c_str());
-	queuedRequests.push_back(property);
-	if (clientConnected)
+	if (property == VehicleProperty::EngineSpeed)
 	{
-		
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "010C\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else if (property == VehicleProperty::MassAirFlow)
+	{
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "0110\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else if (property == VehicleProperty::VehicleSpeed)
+	{
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "010D\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else if (property == VehicleProperty::EngineCoolantTemperature)
+	{
+		ObdRequest *requ = new ObdRequest();
+		requ->req = "0105\r";
+		g_async_queue_push(subscriptionAddQueue,requ);
+	}
+	else
+	{
+		printf("Unsupported property: %s\n",property.c_str());
 	}
 }
 

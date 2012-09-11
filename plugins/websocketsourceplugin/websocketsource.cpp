@@ -31,7 +31,19 @@ libwebsocket_context *context;
 WebSocketSource *source;
 AbstractRoutingEngine *m_re;
 
-
+static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len);
+static struct libwebsocket_protocols protocols[] = {
+	{
+		"http-only",
+		callback_http_only,
+		0,
+	},
+	{  /* end of list */
+		NULL,
+		NULL,
+		0
+	}
+};
 
 void WebSocketSource::checkSubscriptions()
 {
@@ -54,10 +66,32 @@ void WebSocketSource::checkSubscriptions()
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
-libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);  
+		libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	}
 }
-
+void WebSocketSource::setConfiguration(map<string, string> config)
+{
+	printf("WebSocketSource::setConfiguration has been called\n");
+	std::string ip;
+	int port;
+	configuration = config;
+	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	{
+		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		if ((*i).first == "ip")
+		{
+			ip = (*i).second;
+		}
+		if ((*i).first == "port")
+		{
+			port = boost::lexical_cast<int>((*i).second);
+		}
+	}
+	printf("Connecting to websocket server at %s port %i\n",ip.c_str(),port);
+	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, 0,"/", "localhost", "websocket",protocols[0].name, -1);
+	
+}
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
 	//This is the polling function. If it return false, glib will stop polling this FD.
@@ -111,7 +145,8 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
-	libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);  
+	libwebsocket_write(wsi, (unsigned char*)(new_response), strlen(new_response), LWS_WRITE_TEXT);  
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 
 	  break;
 	}
@@ -270,18 +305,6 @@ void WebSocketSource::setSupported(PropertyList list)
 	m_re->updateSupported(list,PropertyList());
 }
 
-static struct libwebsocket_protocols protocols[] = {
-	{
-		"http-only",
-		callback_http_only,
-		0,
-	},
-	{  /* end of list */
-		NULL,
-		NULL,
-		0
-	}
-};
 WebSocketSource::WebSocketSource(AbstractRoutingEngine *re) : AbstractSource(re)
 {
 	clientConnected = false;
@@ -289,68 +312,9 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re) : AbstractSource(re)
 	m_re = re;  
 	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
 	
-	//Read JSON that will tell us what to do:
-	
-	GError* error = nullptr;
-	JsonParser* parser = json_parser_new();
-	if (!json_parser_load_from_file(parser,"websocketsource.conf",&error))
-	{
-		g_error_free(error);
-		if (!json_parser_load_from_file(parser,"../../plugins/websocketsourceplugin/websocketsource.conf",&error))
-		{
-			g_error_free(error);
-			if (!json_parser_load_from_file(parser,"/etc/ambd/websocketsource.conf",&error))
-			{
-				g_error_free(error);
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON";
-				return;
-			}
-		}
-	}
-	/*if (!json_parser_load_from_data(parser,(char*)in,len,&error))
-	{
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON";
-		return 0;
-	}*/
-	JsonNode* node = json_parser_get_root(parser);
-	if(node == nullptr)
-	{
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json";
-		//throw std::runtime_error("Unable to get JSON root object");
-		return;
-	}
-	JsonReader* reader = json_reader_new(node);
-	if(reader == nullptr)
-	{
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!";
-		//throw std::runtime_error("Unable to create JSON reader");
-		return;
-	}
-	
-	
-	list<string> data;
-	json_reader_read_member(reader,"sinks");
-	if (json_reader_is_array(reader))
-	{
-		for(int i=0; i < json_reader_count_elements(reader); i++)
-		{
-			json_reader_read_element(reader,i);
-			json_reader_read_member(reader,"ip");
-			string ip = json_reader_get_string_value(reader);
-			json_reader_end_member(reader);
-			
-			json_reader_read_member(reader,"port");
-			int port = json_reader_get_int_value(reader);
-			json_reader_end_member(reader);
-			printf("Connecting to %s on port %i\n",ip.c_str(),port);
-			clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, 0,"/", "localhost", "websocket",protocols[0].name, -1);
-			
-			json_reader_end_element(reader);
-		}
-	}
-	json_reader_end_member(reader);
 	
 	re->setSupported(supported(), this);
+	printf("websocketsource loaded!!!\n");
 	
 }
 PropertyList WebSocketSource::supported()

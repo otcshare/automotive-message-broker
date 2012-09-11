@@ -38,18 +38,46 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):Abstra
 {
 	m_engine = engine;
 	
-	//Protocol list for libwebsockets.
+	
+	//Create a listening socket on port 23000 on localhost.
+	
+	
+}
+void WebSocketSinkManager::init()
+{
+  	//Protocol list for libwebsockets.
 	protocollist[0] = { "http-only", websocket_callback, 0 };
 	protocollist[1] = { NULL, NULL, 0 };
 
+
+	
+}
+void WebSocketSinkManager::setConfiguration(map<string, string> config)
+{
+// 	//Config has been passed, let's start stuff up.
+	configuration = config;
+	
+	//Default values
 	int port = 23000;
-	const char *interface = "lo";
+	std::string interface = "lo";
 	const char *ssl_cert_path = NULL;
 	const char *ssl_key_path = NULL;
 	int options = 0;
 	
-	//Create a listening socket on port 23000 on localhost.
-	context = libwebsocket_create_context(port, interface, protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
+	//Try to load config
+	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	{
+		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		if ((*i).first == "interface")
+		{
+			interface = (*i).second;
+		}
+		if ((*i).first == "port")
+		{
+			port = boost::lexical_cast<int>((*i).second);
+		}
+	}
+	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
 }
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
@@ -92,34 +120,6 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		string tmpstr = "";
-		/*if (property == VehicleProperty::VehicleSpeed)
-		{
-			tmpstr = "running_status_speedometer";
-		}
-		else if (property == VehicleProperty::EngineSpeed)
-		{
-			tmpstr = "running_status_engine_speed";
-		}
-		else if (property == VehicleProperty::SteeringWheelAngle)
-		{
-			tmpstr = "running_status_steering_wheel_angle";
-		}
-		else if (property == VehicleProperty::TransmissionShiftPosition)
-		{
-			tmpstr = "running_status_transmission_gear_status";
-		}
-		else
-		{
-			//PropertyList foo = VehicleProperty::capabilities();
-			//if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
-			//{
-			  tmpstr = property;
-			//}
-			//else
-			//{
-				
-			//}
-		}*/
 		tmpstr = property;
 		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\"}],\"transactionid\":\"" << id << "\"}";
 		
@@ -133,6 +133,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		
 		//TODO: run valgrind on this. libwebsocket's documentation says NOTHING about this, yet malloc insists it's true.
 		//delete new_response; <- Unneeded. Apparently libwebsocket free's it.
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING); //Needs to subtract pre-padding, to get back to the start of the pointer.
 		
 	};
 
@@ -155,7 +156,7 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
 		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	}
 }
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
@@ -203,19 +204,69 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
 	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
 	m_sinkMap[property] = sink;
 }
-
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 {
 	sinkManager = new WebSocketSinkManager(routingengine);
+	sinkManager->init();
 	return sinkManager;
 }
+void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
+{
+	for (map<std::string,WebSocketSink*>::const_iterator i=m_sinkMap.cbegin(); i != m_sinkMap.cend();i++)
+	{
+		if ((*i).second->socket() == socket)
+		{
+			//This is the sink in question.
+			WebSocketSink* sink = (*i).second;
+			delete sink;
+			m_sinkMap.erase((*i).first);
+			printf("Sink removed\n");
+		}
+	}
+}
+void WebSocketSinkManager::addPoll(int fd)
+{
+	GIOChannel *chan = g_io_channel_unix_new(fd);
+	guint sourceid = g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,chan);
+	g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
+	m_ioChannelMap[fd] = chan;
+	m_ioSourceMap[fd] = sourceid;
+}
+void WebSocketSinkManager::removePoll(int fd)
+{
+	g_io_channel_shutdown(m_ioChannelMap[fd],false,0);
+	printf("Shutting down IO Channel\n");
+	g_source_remove(m_ioSourceMap[fd]); //Since the watch owns the GIOChannel, this should unref it enough to dissapear.
+	//for (map<int,guint>::const_iterator i=m_ioSourceMap.cbegin();i!=m_ioSourceMap.cend();i++)
+	for (map<int,guint>::iterator i=m_ioSourceMap.begin();i!=m_ioSourceMap.end();i++)
+	{
+		if((*i).first == fd)
+		{
+			printf("Erasing source\n");
+			m_ioSourceMap.erase(i);
+			i--;
+		}
+	}
+	//for (map<int,GIOChannel*>::const_iterator i=m_ioChannelMap.cbegin();i!=m_ioChannelMap.cend();i++)
+	for (map<int,GIOChannel*>::iterator i=m_ioChannelMap.begin();i!=m_ioChannelMap.end();i++)
+	{
+		if((*i).first == fd)
+		{
+			printf("Erasing channel\n");
+			m_ioChannelMap.erase(i);
+			i--;
+		}
+	}
+}
+
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len)
 {
 	printf("Switch: %i\n",reason);
+
 	
 	switch (reason)
 	{
@@ -225,18 +276,34 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			printf("Connection established\n");
 			break;
 		}
+		case LWS_CALLBACK_CLOSED:
+		{
+			//Connection is closed, we need to remove all related sinks
+			sinkManager->disconnectAll(wsi);
+			/*g_io_
+			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
+			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
+			pollfds[count_pollfds].fd = (int)(long)user;
+			pollfds[count_pollfds].events = (int)len;
+// 			pollfds[count_pollfds++].revents = 0;*/
+			break;
+		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
 			printf("Client writable\n");
+			break;
 		}
 		case LWS_CALLBACK_SERVER_WRITEABLE:
 		{
 			printf("Server writable\n");
+			break;
 		}
 		
 		case LWS_CALLBACK_RECEIVE:
 		{
 			printf("Data Received: %s\n",(char*)in);
+			//The lack of a break; here is intentional.
 		}
 		case LWS_CALLBACK_HTTP:
 		{
@@ -370,80 +437,24 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				}
 				else if (name == "subscribe")
 				{
+					//Websocket wants to subscribe to an event, data.front();
 					sinkManager->addSink(wsi,data.front(),id);
-				  /*
-					if (data.front()== "running_status_speedometer")
-					{
-						sinkManager->addSink(wsi,VehicleProperty::VehicleSpeed,id);
-					}
-					else if (data.front()== "running_status_engine_speed")
-					{
-						sinkManager->addSink(wsi,VehicleProperty::EngineSpeed,id);
-					}
-					else if (data.front() == "running_status_steering_wheel_angle")
-					{
-						sinkManager->addSink(wsi,VehicleProperty::SteeringWheelAngle,id);
-					}
-					else if (data.front() == "running_status_transmission_gear_status")
-					{
-						sinkManager->addSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
-					}
-					else
-					{
-						//Unsupported subscription type.
-						PropertyList foo = VehicleProperty::capabilities();
-						if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
-						{
-							sinkManager->addSink(wsi,data.front(),id);
-						}
-						else
-						{
-							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported subscription type:" << data.front();
-						}
-					}*/
 				}
 				else if (name == "unsubscribe")
 				{
+					//Websocket wants to unsubscribe to an event, data.front();
 					sinkManager->removeSink(wsi,data.front(),id);
-					/*if (data.front()== "running_status_speedometer")
-					{
-						sinkManager->removeSink(wsi,VehicleProperty::VehicleSpeed,id);
-					}
-					else if (data.front()== "running_status_engine_speed")
-					{
-						sinkManager->removeSink(wsi,VehicleProperty::EngineSpeed,id);
-					}
-					else if (data.front() == "running_status_steering_wheel_angle")
-					{
-						sinkManager->removeSink(wsi,VehicleProperty::SteeringWheelAngle,id);
-					}
-					else if (data.front() == "running_status_transmission_gear_status")
-					{
-						sinkManager->removeSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
-					}
-					else
-					{
-						PropertyList foo = VehicleProperty::capabilities();
-						if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
-						{
-							sinkManager->removeSink(wsi,data.front(),id);
-						}
-						else
-						{
-							//Unsupported unsubscribe
-							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Unsupported unsubscription type:" << data.front();
-						}
-					}*/
 				}
 				else if (name == "getSupportedEventTypes")
 				{
+					//If data.front() dosen't contain a property name, return a list of properties supported.
+					//if it does, then return the event types that particular property supports.
 					string typessupported = "";
 					if (data.size() == 0)
 					{
 						//Send what properties we support
 						typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
 						PropertyList foo = VehicleProperty::capabilities();
-						//ListPlusPlus<VehicleProperty::Property>(&foo)
 						PropertyList::const_iterator i=foo.cbegin();
 						while (i != foo.cend())
 						{
@@ -482,7 +493,6 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					}
 					stringstream s;
 					string s2;
-
 					s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
 					string replystr = s.str();
 					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr;
@@ -490,45 +500,29 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 					strcpy(new_response,replystr.c_str());
-					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);	    
+					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+					delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 				}
 			}
 			break;
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
-			//Add a FD to the poll list.
-			//printf("Adding poll\n");
-			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
-			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
-			pollfds[count_pollfds].fd = (int)(long)user;
-			pollfds[count_pollfds].events = (int)len;
-			pollfds[count_pollfds++].revents = 0;
+			printf("Adding poll %i\n",sinkManager);
+			if (sinkManager != 0)
+			{
+				sinkManager->addPoll((int)(long)user);
+			}
 			break;
 		}
 		case LWS_CALLBACK_DEL_POLL_FD:
 		{
-			//Remove FD from the poll list. I'm not convinced this is needed anymore
-			for (int n = 0; n < count_pollfds; n++)
-			{
-				if (pollfds[n].fd == (int)(long)user)
-				{
-					while (n < count_pollfds)
-					{
-						pollfds[n] = pollfds[n + 1];
-						n++;
-					}
-				}
-			}
-			count_pollfds--;
+			sinkManager->removePoll((int)(long)user);
 			break;
 		}
 		case LWS_CALLBACK_SET_MODE_POLL_FD:
 		{
 			//Set the poll mode
-			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
-			g_io_add_watch(chan,(GIOCondition)(int)len,(GIOFunc)gioPollingFunc,0);
 			break;
 		}
 		case LWS_CALLBACK_CLEAR_MODE_POLL_FD:
@@ -547,6 +541,17 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
+	if (condition != G_IO_IN)
+	{
+		//Don't need to do anything
+		if (condition == G_IO_HUP)
+		{
+			//Hang up. Returning false closes out the GIOChannel.
+			printf("Callback on G_IO_HUP\n");
+			return false;
+		}
+		return true;
+	}
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	printf("Polling...%i\n",condition);
 	lws_tokens token;
@@ -556,13 +561,6 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	pollstruct.events = condition;
 	pollstruct.revents = condition;
 	libwebsocket_service_fd(context,&pollstruct);
-	if (condition == G_IO_HUP)
-	{
-		//Hang up. Returning false closes out the GIOChannel.
-		printf("Callback on G_IO_HUP\n");
-		return false;
-	}
-	
 	return true;
 }
 

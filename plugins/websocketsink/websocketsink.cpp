@@ -74,6 +74,7 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, Abstract
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
 	libwebsocket_write(m_wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 }
 WebSocketSink::~WebSocketSink()
 {

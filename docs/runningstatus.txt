@@ -95,7 +95,7 @@ Properties	byte VehiclePowerMode [readonly]
 			
 		struct{ byte, byte, byte } EngineOil [readonly]
 		
-			Remaining Oil Percentage (byte)
+			Remaining Oil life remaining; percentage (byte)
 			Engine Oil Temperature (byte) in degrees C
 			Engine Oil Pressure in kPa (uint16)
 			

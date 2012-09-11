@@ -27,6 +27,24 @@
 
 #include <abstractpropertytype.h>
 
+namespace ButtonEvents {
+enum ButtonEventType {
+	PlayButton = 1,
+	SkipButton = 1 << 1,
+	PrevButton = 1 << 2,
+	PauseButton = 1 << 3,
+	Preset1Button = 1 << 4,
+	Preset2Button = 1 << 5,
+	Preset3Button = 1 << 6,
+	Preset4Button = 1 << 7,
+	StopButton = 1 << 8,
+	NavigateUpButton = 1 << 9,
+	NavigateDownButton = 1 << 10,
+	NavigateLeftButton = 1 << 11,
+	NavigateRightButton = 1 << 12
+};
+}
+
 class VehicleProperty
 {
 
@@ -59,7 +77,7 @@ public:
 	 * 255 = Park
 	 */
 	static const Property TransmissionShiftPosition;
-	typedef BasicPropertyType<unsigned char> TransmissionShiftPositionType;
+	typedef BasicPropertyType<uint16_t> TransmissionShiftPositionType;
 
 	/**< Transmission Gear Position
 	* 0 = Neutral
@@ -69,11 +87,11 @@ public:
 	* 64 = CVT
 	*/
 	static const Property TransmissionGearPosition;
-	typedef BasicPropertyType<unsigned char> TransmissionGearPositionType;
+	typedef BasicPropertyType<uint16_t> TransmissionGearPositionType;
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
-	typedef BasicPropertyType<unsigned char> ThrottlePositionType;
+	typedef BasicPropertyType<uint16_t> ThrottlePositionType;
 
 	/**< Wheel brake position.  Engaged = true, Idle = false */
 	static const Property WheelBrake;
@@ -85,7 +103,7 @@ public:
 
 	/**< 0=off, 1=right, 2=left, 3=hazard */
 	static const Property TurnSignal;
-	typedef BasicPropertyType<unsigned char> TurnSignalType;
+	typedef BasicPropertyType<uint16_t> TurnSignalType;
 
 	/**< Clutch pedal status 0=off, 1=on */
 	static const Property ClutchStatus;
@@ -116,6 +134,34 @@ public:
 	/**< Mass Air Flow.  TODO: units */
 	static const Property MassAirFlow;
 	typedef BasicPropertyType<uint16_t> MassAirFlowType;
+
+	/**< Button Event @see ButtonEvents::ButtonEventType */
+	static const Property ButtonEvent;
+	typedef BasicPropertyType<int> ButtonEventType;
+
+	/**< Air intake temperature in degrees celcius */
+	static const Property AirIntakeTemperature;
+	typedef BasicPropertyType<int> AirIntakeTemperatureType;
+
+	/**< Battery voltage in volts */
+	static const Property BatteryVoltage;
+	typedef BasicPropertyType<double> BatteryVoltageType;
+
+	/**< Interior Air Temperature in degrees celcius */
+	static const Property InteriorTemperature;
+	typedef BasicPropertyType<int> InteriorTemperatureType;
+
+	/**< Engine Oil Temperature in degrees celcius */
+	static const Property EngineOilTemperature;
+	typedef BasicPropertyType<int> EngineOilTemperatureType;
+
+	/**< Vehicle Identification Number (ISO 3779) 17 chars**/
+	static const Property VIN;
+	typedef StringPropertyType VINType;
+
+	/**< World Manufacturer Identifier (SAE) 3 characters. */
+	static const Property WMI;
+	typedef StringPropertyType WMIType;
 
 	static std::list<VehicleProperty::Property> capabilities();
 
