@@ -1,7 +1,7 @@
 {
 	"sources" : [ 
 		{
-			"name" : "WebsocketSouce",
+			"name" : "WebsocketSource",
 			"path" : "/usr/lib/automotive-message-broker/websocketsourceplugin.so",
 			"port" : "23000",
 			"ip" : "127.0.0.1"
