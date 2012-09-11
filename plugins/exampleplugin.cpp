@@ -66,6 +66,7 @@ string ExampleSourcePlugin::uuid()
 
 void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
+	DebugOut()<<"ExampleSource: getPropertyAsync called for property: "<<reply->property<<endl;
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
 		VehicleProperty::VehicleSpeedType temp(velocity);
@@ -96,6 +97,24 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->value = &temp;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::VIN)
+	{
+		VehicleProperty::VINType temp("abc00000000000000");
+		reply->value = &temp;
+		reply->completed(reply);
+	}
+	else if(reply->property == VehicleProperty::WMI)
+	{
+		VehicleProperty::WMIType temp("abc");
+		reply->value = &temp;
+		reply->completed(reply);
+	}
+	else if(reply->property == VehicleProperty::BatteryVoltage)
+	{
+		VehicleProperty::BatteryVoltageType temp(12.6);
+		reply->value = &temp;
+		reply->completed(reply);
+	}
 }
 
 void ExampleSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType *)
@@ -118,6 +137,9 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::SteeringWheelAngle);
 	props.push_back(VehicleProperty::ThrottlePosition);
 	props.push_back(VehicleProperty::EngineCoolantTemperature);
+	props.push_back(VehicleProperty::VIN);
+	props.push_back(VehicleProperty::WMI);
+	props.push_back(VehicleProperty::BatteryVoltage);
 	
 	return props;
 }

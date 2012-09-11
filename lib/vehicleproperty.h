@@ -175,6 +175,10 @@ public:
 
 	static std::list<VehicleProperty::Property> capabilities();
 
+	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
+	  * with the value specified by 'value'.  Ownership of the returned AbstractPropertyType* is
+	  * transfered to the caller.
+	  */
 	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
     
 };
