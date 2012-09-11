@@ -94,7 +94,7 @@ private:
 	char *button;
 
 	uint16_t machineGuns;
-	uint16_t turnSignal;
+	TurnSignals::TurnSignalType turnSignal;
 	uint16_t currentGear;
 	uint16_t oilPSI;
 	uint16_t coolantTemp;
@@ -190,7 +190,7 @@ void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData)
 
 WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route)
 :re(route), gis(nullptr), axis(nullptr), button(nullptr),
-oilPSI(10), coolantTemp(100), turnSignal(0), throttle(0),
+oilPSI(10), coolantTemp(100), turnSignal(TurnSignals::Off), throttle(0),
 machineGuns(false), currentGear(0), steeringAngle(0),
 clutch(false), oldClutch(false), brake(false), oldBrake(false)
 {
@@ -415,12 +415,12 @@ void WheelPrivate::changeMachineGuns(bool val)
 
 void WheelPrivate::changeTurnSignal(TurnSignal dir, bool val)
 {
-	int tsVal=0;
+	TurnSignals::TurnSignalType tsVal= TurnSignals::Off;
 	if (val) {
-		if (dir == TS_LEFT)
-			tsVal = 2;
+		if (dir == TurnSignals::Left)
+			tsVal = TurnSignals::Left;
 		else
-			tsVal = 1;
+			tsVal = TurnSignals::Right;
 	}
 	this->turnSignal = tsVal;
 	VehicleProperty::TurnSignalType temp(this->turnSignal);

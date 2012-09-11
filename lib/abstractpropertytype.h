@@ -24,6 +24,8 @@
 #include <stdexcept>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/utility.hpp>
+#include <type_traits>
 
 class AbstractPropertyType
 {
@@ -76,7 +78,9 @@ public:
 	BasicPropertyType(std::string val)
 	{
 		if(!val.empty() && val != "")
-			setValue(boost::lexical_cast<T,std::string>(val));
+		{
+			serialize<T>(val);
+		}
 		else throw std::runtime_error("value cannot be empty");
 	}
 
@@ -86,6 +90,28 @@ public:
 		stream<<value<T>();
 
 		return stream.str();
+	}
+
+private:
+
+	template <class N>
+	void serialize(std::string val,  typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	{
+		int someTemp;
+
+		std::stringstream stream(val);
+
+		stream>>someTemp;
+		setValue((N)someTemp);
+	}
+
+	template <class N>
+	void serialize(std::string  val,  typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	{
+		std::stringstream stream(val);
+		N someTemp;
+		stream>>someTemp;
+		setValue(someTemp);
 	}
 };
 
