@@ -49,13 +49,15 @@ string findReplace(string str, string tofind, string replacewith, string exclusi
 		i+=replacewith.size();
 	}
 
+	return str;
 }
 
 
 DemoSink::DemoSink(AbstractRoutingEngine* re)
 :AbstractSink(re)
 {
-
+	routingEngine->subscribeToProperty(VehicleProperty::ButtonEvent, this);
+	routingEngine->subscribeToProperty(VehicleProperty::TurnSignal, this);
 }
 
 DemoSink::~DemoSink()
@@ -76,16 +78,32 @@ string DemoSink::uuid()
 void DemoSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
 {
 	std::string app = configuration["script"];
+	std::string strValue = value->toString();
+	if(property == VehicleProperty::TurnSignal)
+	{
+		if(value->value<TurnSignals::TurnSignalType>() == TurnSignals::Right)
+		{
+			strValue = "Right";
+		}
+		else if(value->value<TurnSignals::TurnSignalType>() == TurnSignals::Left)
+		{
+			strValue = "Left";
+		}
+		else if(value->value<TurnSignals::TurnSignalType>() == TurnSignals::Off)
+		{
+			strValue = "Off";
+		}
+	}
 
-	string cmdline = findReplace(app,"%1",value->toString());
+	string cmdline = findReplace(app,"%1",strValue);
 	GError* error = NULL;
 
-	g_spawn_command_line_async(cmdline.c_str(), &error);
+	if(!g_spawn_command_line_async(cmdline.c_str(), &error))
+		DebugOut()<<"Failed to launch command: "<<cmdline<<endl;
 
 }
 
 void DemoSink::supportedChanged(PropertyList list)
 {
-	routingEngine->subscribeToProperty(VehicleProperty::ButtonEvent, this);
-	routingEngine->subscribeToProperty(VehicleProperty::TurnSignal, this);
+
 }

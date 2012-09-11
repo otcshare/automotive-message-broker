@@ -31,11 +31,11 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine): AbstractSink(engine)
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 
-	/*AsyncPropertyRequest velocityRequest;
+	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
-	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; };
+	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; delete reply; };
 
-	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);*/
+	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 
 }
 

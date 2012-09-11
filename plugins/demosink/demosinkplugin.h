@@ -49,7 +49,13 @@ public:
 	DemoSinkManager(AbstractRoutingEngine* engine)
 	:AbstractSinkManager(engine)
 	{
-		new DemoSink(engine);
+
+	}
+
+	void setConfiguration(map<string, string> config)
+	{
+		DemoSink* sink = new DemoSink(routingEngine);
+		sink->setConfiguration(config);
 	}
 };
 
