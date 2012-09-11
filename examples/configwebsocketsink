@@ -7,8 +7,10 @@
 	],
 	"sinks": [
 		{
-			 "name" : "WebSocketSink",
-			 "path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so"
+			"name" : "WebSocketSink",
+			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
+			"interface" : "lo",
+			"port" : "23000"
 		} 
 	]
 }
