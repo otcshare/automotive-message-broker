@@ -80,6 +80,8 @@ public:
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
 	std::string m_port;
+	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
+	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
 private:
 	PropertyList m_supportedProperties;
 	GMutex *threadQueueMutex;
