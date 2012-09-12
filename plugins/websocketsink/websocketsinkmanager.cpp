@@ -517,7 +517,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//printf("Adding poll %i\n",sinkManager);
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << sinkManager << "\n";
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << (int)sinkManager << "\n";
 			if (sinkManager != 0)
 			{
 				sinkManager->addPoll((int)(long)user);
