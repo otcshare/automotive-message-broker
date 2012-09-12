@@ -67,7 +67,8 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	//Try to load config
 	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
 	{
-		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
 		if ((*i).first == "interface")
 		{
 			interface = (*i).second;
@@ -124,7 +125,8 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\"}],\"transactionid\":\"" << id << "\"}";
 		
 		string replystr = s.str();
-		printf("Reply: %s\n",replystr.c_str());
+		//printf("Reply: %s\n",replystr.c_str());
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
 
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -150,7 +152,8 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		s << "{\"type\":\"methodReply\",\"name\":\"unsubscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
 		
 		string replystr = s.str();
-		printf("Reply: %s\n",replystr.c_str());
+		//printf("Reply: %s\n",replystr.c_str());
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
 
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -198,7 +201,8 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
 	
 	string replystr = s.str();
-	printf("Reply: %s\n",replystr.c_str());
+	//printf("Reply: %s\n",replystr.c_str());
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
 
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -224,7 +228,8 @@ void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 			WebSocketSink* sink = (*i).second;
 			delete sink;
 			m_sinkMap.erase((*i).first);
-			printf("Sink removed\n");
+			//printf("Sink removed\n");
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed\n";
 		}
 	}
 }
@@ -239,14 +244,16 @@ void WebSocketSinkManager::addPoll(int fd)
 void WebSocketSinkManager::removePoll(int fd)
 {
 	g_io_channel_shutdown(m_ioChannelMap[fd],false,0);
-	printf("Shutting down IO Channel\n");
+	//printf("Shutting down IO Channel\n");
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Shutting down IO Channel\n";
 	g_source_remove(m_ioSourceMap[fd]); //Since the watch owns the GIOChannel, this should unref it enough to dissapear.
 	//for (map<int,guint>::const_iterator i=m_ioSourceMap.cbegin();i!=m_ioSourceMap.cend();i++)
 	for (map<int,guint>::iterator i=m_ioSourceMap.begin();i!=m_ioSourceMap.end();i++)
 	{
 		if((*i).first == fd)
 		{
-			printf("Erasing source\n");
+			//printf("Erasing source\n");
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Erasing source\n";
 			m_ioSourceMap.erase(i);
 			i--;
 		}
@@ -256,7 +263,8 @@ void WebSocketSinkManager::removePoll(int fd)
 	{
 		if((*i).first == fd)
 		{
-			printf("Erasing channel\n");
+			//printf("Erasing channel\n");
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Erasing channel\n";
 			m_ioChannelMap.erase(i);
 			i--;
 		}
@@ -265,7 +273,7 @@ void WebSocketSinkManager::removePoll(int fd)
 
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len)
 {
-	printf("Switch: %i\n",reason);
+	//printf("Switch: %i\n",reason);
 
 	
 	switch (reason)
@@ -273,7 +281,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_CLIENT_WRITEABLE:
 		{
 			//Connection has been established.
-			printf("Connection established\n");
+			//printf("Connection established\n");
 			break;
 		}
 		case LWS_CALLBACK_CLOSED:
@@ -291,39 +299,39 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
-			printf("Client writable\n");
+			//printf("Client writable\n");
 			break;
 		}
 		case LWS_CALLBACK_SERVER_WRITEABLE:
 		{
-			printf("Server writable\n");
+			//printf("Server writable\n");
 			break;
 		}
 		
 		case LWS_CALLBACK_RECEIVE:
 		{
-			printf("Data Received: %s\n",(char*)in);
+			//printf("Data Received: %s\n",(char*)in);
 			//The lack of a break; here is intentional.
 		}
 		case LWS_CALLBACK_HTTP:
 		{
 			//TODO: Verify that ALL requests get sent via LWS_CALLBACK_HTTP, so we can use that instead of LWS_CALLBACK_RECIEVE
 			//TODO: Do we want exceptions, or just to return an invalid json reply? Probably an invalid json reply.
-			DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Requested: " << (char*)in;
+			DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Requested: " << (char*)in << "\n";
 			GError* error = nullptr;
 			
 			
 			JsonParser* parser = json_parser_new();
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON";
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
 				return 0;
 			}
 			
 			JsonNode* node = json_parser_get_root(parser);
 			if(node == nullptr)
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json";
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json\n";
 				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
@@ -331,7 +339,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			JsonReader* reader = json_reader_new(node);
 			if(reader == nullptr)
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!";
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!\n";
 				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
@@ -432,7 +440,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					}
 					else
 					{
-						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id;
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id << "\n";
 					}
 				}
 				else if (name == "subscribe")
@@ -495,7 +503,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					string s2;
 					s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
 					string replystr = s.str();
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr;
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr << "\n";
 					//printf("Reply: %s\n",replystr.c_str());
 					char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -508,7 +516,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
-			printf("Adding poll %i\n",sinkManager);
+			//printf("Adding poll %i\n",sinkManager);
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << sinkManager << "\n";
 			if (sinkManager != 0)
 			{
 				sinkManager->addPoll((int)(long)user);
@@ -532,7 +541,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		default:
 		{
-			printf("Unhandled callback: %i\n",reason);
+			//printf("Unhandled callback: %i\n",reason);
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unhandled callback:" << reason << "\n";
 			break;
 		}
 	}
@@ -547,13 +557,13 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 		if (condition == G_IO_HUP)
 		{
 			//Hang up. Returning false closes out the GIOChannel.
-			printf("Callback on G_IO_HUP\n");
+			//printf("Callback on G_IO_HUP\n");
 			return false;
 		}
 		return true;
 	}
 	//This is the polling function. If it return false, glib will stop polling this FD.
-	printf("Polling...%i\n",condition);
+	//printf("Polling...%i\n",condition);
 	lws_tokens token;
 	struct pollfd pollstruct;
 	int newfd = g_io_channel_unix_get_fd(source);
