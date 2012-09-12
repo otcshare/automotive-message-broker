@@ -1,3 +1,17 @@
+* Wed Sep 12 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120911.205626@03b4484
+- Merge branch 'upstream' into release
+- Merge branch 'mal'
+- made awesome debugout
+- Code cleanup, comments, and change of ALL printf's to DebugOut() calls
+- adding democonfig
+- Fix for typo in config
+- Addition of obdsource
+- Change for websocket options
+- simple rundemo script
+- Addition of all OBD2 properties in the TODO file, async and standard requests
+- updated changelog
+- Fix
+
 * Tue Sep 11 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120911.205626@d545a4c
 - Merge branch 'upstream' into release
 - updated examples with more properties
