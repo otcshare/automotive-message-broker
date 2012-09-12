@@ -45,6 +45,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "pluginloader.h"
 #include "core.h"
+#include <debugout.h>
 
 using namespace std;
 
@@ -71,13 +72,14 @@ void daemonize();
 
 void printhelp(const char *argv0);
 
-static const char shortopts[] = "hvdc:";
+static const char shortopts[] = "hvDc:d:";
 
 static const struct option longopts[] = {
 	{ "help", no_argument, NULL, 'h' }, ///< Print the help text
 	{ "version", no_argument, NULL, 'v' }, ///< Print the version text
-	{ "daemonise", no_argument, NULL, 'd' }, ///< Daemonise
+	{ "daemonise", no_argument, NULL, 'D' }, ///< Daemonise
 	{ "config", required_argument, NULL, 'c' },
+	{ "debug", required_argument, NULL, 'd' },
 	{ NULL, 0, NULL, 0 } ///< End
 };
 
@@ -86,13 +88,14 @@ int main(int argc, char **argv)
 
 	bool isdeamonize=false;
 	int optc;
+	int th = 0;
 	string config="/etc/ambd/config";
-	
+
 	while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
 	{
 		switch (optc)
 		{
-			case 'd':
+			case 'D':
 				isdeamonize = true;
 				break;
 				
@@ -104,6 +107,10 @@ int main(int argc, char **argv)
 			case 'c':
 				cout<<"Config: "<<optarg<<endl;
 				config=optarg;
+				break;
+			case 'd':
+				th = atoi(optarg);
+				DebugOut::setDebugThreshhold(th);
 				break;
 			default:
 				cerr<<"Unknown option "<<optc<<endl;
@@ -187,10 +194,11 @@ void daemonize()
 void printhelp(const char *argv0)
 {
 	printf("Usage: %s [args]\n"
-	"   [-d|--daemonise]\n"
-	"   [-v|--version]\n"
-	"   [-c]--config </path/to/config> \t]\n"
-	"   [-h|--help]\n"
-	, argv0);
+		   "   [-D|--daemonise]\n"
+		   "   [-v|--version]\n"
+		   "   [-c|--config </path/to/config> \t]\n"
+		   "   [-d|--debug <level (0-5)>\t]\n"
+		   "   [-h|--help]\n"
+		   , argv0);
 }
 

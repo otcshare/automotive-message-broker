@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <string>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -29,22 +30,38 @@ void debugOut(string message);
 class DebugOut 
 {
 public: 
-	DebugOut() { }
+	DebugOut(int debugLevel = 4) { mDebugLevel = debugLevel; }
+				
+	DebugOut const& operator << (string message) const
+	{
+		if(mDebugLevel <= debugThreshhold)
+			 out<<message<<" ";
+		return *this;
+	}
+
+	DebugOut const& operator << (ostream & (*manip)(std::ostream&)) const
+	{
+		if(mDebugLevel <= debugThreshhold)
+			 out<<endl;
+		return *this;
+	}
 	
-	DebugOut(string message)
+	DebugOut const & operator << (uint16_t val) const
 	{
-		debugOut(message);
+		if(mDebugLevel <= debugThreshhold)
+			 out<<val<<" ";
+		return *this;
 	}
-		
-	ostream & operator << (string message)
+
+	static void setDebugThreshhold(int th)
 	{
-		return cout<<message<<" ";
+		debugThreshhold = th;
 	}
-	
-	ostream & operator << (uint16_t val)
-	{
-		return cout<<val<<" ";
-	}
+
+private:
+	static int debugThreshhold;
+	static ostream &out;
+	int mDebugLevel;
 };
 
 
