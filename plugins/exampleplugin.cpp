@@ -31,6 +31,7 @@ uint16_t transmissionShiftPostion = 0;
 uint16_t steeringWheelAngle=0;
 uint16_t throttlePos = 0;
 uint16_t engineCoolant = 40;
+bool machineGun = false;
 
 static gboolean timeoutCallback(gpointer data)
 {
@@ -140,6 +141,7 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::VIN);
 	props.push_back(VehicleProperty::WMI);
 	props.push_back(VehicleProperty::BatteryVoltage);
+	props.push_back(VehicleProperty::MachineGunTurretStatus);
 	
 	return props;
 }
@@ -169,6 +171,9 @@ void ExampleSourcePlugin::randomizeProperties()
 	VehicleProperty::TransmissionShiftPositionType tsp(transmissionShiftPostion);
 	VehicleProperty::ThrottlePositionType tp(throttlePos);
 	VehicleProperty::EngineCoolantTemperatureType ec(engineCoolant);
+	VehicleProperty::MachineGunTurretStatusType mgt(machineGun);
+
+	machineGun = !machineGun;
 
 	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel);
 	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es);
@@ -177,4 +182,5 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp);
 	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp);
 	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec);
+	routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }
