@@ -65,6 +65,7 @@ rm -rf %{buildroot}
 %config %{_sysconfdir}/ambd/config
 %{_bindir}/*
 %{_libdir}/libamb.so*
+%{_libdir}/systemd/system/*
 
 %files devel
 %defattr(-,root,root,-)
