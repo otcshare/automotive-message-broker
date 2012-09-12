@@ -20,6 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
+int DebugOut::debugThreshhold = 0;
+ostream & DebugOut::out = cout;
+
 void debugOut(string message)
 {
 	cout<<"DEBUG: "<<message<<endl;
