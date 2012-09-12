@@ -1,3 +1,9 @@
+* Wed Sep 12 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120912.231933@81ea024
+- updated spec
+- Merge branch 'upstream' into release
+- updated chlog
+- fixed compile error
+
 * Wed Sep 12 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120911.205626@03b4484
 - Merge branch 'upstream' into release
 - Merge branch 'mal'
