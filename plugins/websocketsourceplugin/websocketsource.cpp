@@ -78,7 +78,7 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	std::string ip;
 	int port;
 	configuration = config;
-	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting for WebSocketSource:" << (*i).first << ":" << (*i).second << "\n";
 		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());

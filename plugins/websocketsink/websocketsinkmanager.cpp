@@ -65,7 +65,7 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	int options = 0;
 	
 	//Try to load config
-	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
@@ -228,6 +228,7 @@ void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 			WebSocketSink* sink = (*i).second;
 			delete sink;
 			m_sinkMap.erase((*i).first);
+			i--;
 			//printf("Sink removed\n");
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed\n";
 		}
