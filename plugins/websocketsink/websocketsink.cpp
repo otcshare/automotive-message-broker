@@ -28,7 +28,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sstream>
-
+#include "debugout.h"
 
 
 
@@ -68,7 +68,9 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, Abstract
 	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << value->toString() << "\",\"transactionid\":\"" << m_uuid << "\"}";
 	
 	string replystr = s.str();
-	printf("Reply: %s\n",replystr.c_str());
+	//printf("Reply: %s\n",replystr.c_str());
+	
+	DebugOut() << "Reply:" << replystr << "\n";
 
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
