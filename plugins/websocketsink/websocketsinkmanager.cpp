@@ -446,12 +446,18 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				else if (name == "subscribe")
 				{
 					//Websocket wants to subscribe to an event, data.front();
-					sinkManager->addSink(wsi,data.front(),id);
+					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					{
+						sinkManager->addSink(wsi,(*i),id);
+					}
 				}
 				else if (name == "unsubscribe")
 				{
 					//Websocket wants to unsubscribe to an event, data.front();
-					sinkManager->removeSink(wsi,data.front(),id);
+					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					{
+						sinkManager->removeSink(wsi,(*i),id);
+					}
 				}
 				else if (name == "getSupportedEventTypes")
 				{
@@ -517,7 +523,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//printf("Adding poll %i\n",sinkManager);
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << (int)sinkManager << "\n";
+			//DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << (int)sinkManager << "\n";
 			if (sinkManager != 0)
 			{
 				sinkManager->addPoll((int)(long)user);
