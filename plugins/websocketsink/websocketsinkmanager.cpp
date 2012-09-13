@@ -108,7 +108,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		}
 		else
 		{
-			//Invalid property requested.
+			DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
 			return;
 		}
 		
@@ -220,7 +220,7 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 }
 void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 {
-	for (map<std::string,WebSocketSink*>::iterator i=m_sinkMap.begin(); i != m_sinkMap.end();i++)
+	for (auto i=m_sinkMap.begin(); i != m_sinkMap.end();i++)
 	{
 		if ((*i).second->socket() == socket)
 		{
