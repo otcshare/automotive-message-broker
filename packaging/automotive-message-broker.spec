@@ -1,11 +1,12 @@
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system.
-Version:    0.1
+Version:    0.3
 Release:    1
 Group:      System/Base
 License:    LGPL v2.1
 URL:        https://github.com/otcshare/automotive-message-broker
 Source0:    %{name}-%{version}.tar.bz2
+Requires: automotive-message-broker-plugins
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
