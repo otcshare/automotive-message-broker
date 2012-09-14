@@ -195,7 +195,18 @@ clutch(false), oldClutch(false), brake(false), oldBrake(false)
 	int version = 0;
 	int fd;
 	char name[JSNAMELEN] = "Unknown";
-
+	struct js_corr cal[6];
+	int i, j;
+	//FIXME: Ugly as all get-out, but gets the job done quick...
+	unsigned int calData[36] = {
+		1, 0, 8191, 8192, 65542, 65534,
+		1, 0, 127, 128, 4227201, 4194176,
+		1, 0, 127, 128, 4227201, 4194176,
+		1, 0, 127, 128, 4227201, 4194176,
+		1, 0, 0, 0, 536854528, 536854528,
+		1, 0, 0, 0, 536854528, 536854528
+	};
+	
 
 	//FIXME: Support config file with joystick device mapping, button/axis mappings, etc.
 	if ((fd = open("/dev/input/js0", O_RDONLY)) < 0) {
@@ -207,6 +218,24 @@ clutch(false), oldClutch(false), brake(false), oldBrake(false)
 	ioctl(fd, JSIOCGAXES, &numAxes);
 	ioctl(fd, JSIOCGBUTTONS, &numButtons);
 	ioctl(fd, JSIOCGNAME(JSNAMELEN), name);
+
+	for (i = 0; i < 6; i++) {
+		int k = 0;
+
+                cal[i].type = calData[(i*6)+k];
+		k++;
+                cal[i].prec = calData[(i*6)+k];
+		k++;
+
+                for(j = 0; j < 4; j++) {
+			cal[i].coef[j] = calData[(i*6)+k];
+			k++;
+                }
+        }
+	if (ioctl(fd, JSIOCSCORR, &cal) < 0) {
+		throw std::runtime_error("Could not set calibration data!");
+		return;
+	}
 
 	cout << "Driver version: " << (version >> 16) << "." << ((version >> 8) & 0xFF) << "." << (version & 0xFF) << endl;
 	cout << "JS Name: " << name << endl;
