@@ -80,6 +80,7 @@ private:
 
 	uint16_t calcCarSpeed();
 	uint16_t calcRPM();
+	void checkButtonEvents();
 
 	AbstractRoutingEngine *re;
 	GInputStream *gis;
@@ -160,6 +161,7 @@ PropertyList WheelSourcePlugin::supported()
 	props.push_back(VehicleProperty::EngineOilPressure);
 	props.push_back(VehicleProperty::EngineCoolantTemperature);
 	props.push_back(VehicleProperty::MachineGunTurretStatus);
+	props.push_back(VehicleProperty::ButtonEvent);
 
 	return props;
 }
@@ -195,7 +197,18 @@ clutch(false), oldClutch(false), brake(false), oldBrake(false)
 	int version = 0;
 	int fd;
 	char name[JSNAMELEN] = "Unknown";
-
+	struct js_corr cal[6];
+	int i, j;
+	//FIXME: Ugly as all get-out, but gets the job done quick...
+	unsigned int calData[36] = {
+		1, 0, 8191, 8192, 65542, 65534,
+		1, 0, 127, 128, 4227201, 4194176,
+		1, 0, 127, 128, 4227201, 4194176,
+		1, 0, 127, 128, 4227201, 4194176,
+		1, 0, 0, 0, 536854528, 536854528,
+		1, 0, 0, 0, 536854528, 536854528
+	};
+	
 
 	//FIXME: Support config file with joystick device mapping, button/axis mappings, etc.
 	if ((fd = open("/dev/input/js0", O_RDONLY)) < 0) {
@@ -207,6 +220,24 @@ clutch(false), oldClutch(false), brake(false), oldBrake(false)
 	ioctl(fd, JSIOCGAXES, &numAxes);
 	ioctl(fd, JSIOCGBUTTONS, &numButtons);
 	ioctl(fd, JSIOCGNAME(JSNAMELEN), name);
+
+	for (i = 0; i < 6; i++) {
+		int k = 0;
+
+                cal[i].type = calData[(i*6)+k];
+		k++;
+                cal[i].prec = calData[(i*6)+k];
+		k++;
+
+                for(j = 0; j < 4; j++) {
+			cal[i].coef[j] = calData[(i*6)+k];
+			k++;
+                }
+        }
+	if (ioctl(fd, JSIOCSCORR, &cal) < 0) {
+		throw std::runtime_error("Could not set calibration data!");
+		return;
+	}
 
 	cout << "Driver version: " << (version >> 16) << "." << ((version >> 8) & 0xFF) << "." << (version & 0xFF) << endl;
 	cout << "JS Name: " << name << endl;
@@ -262,18 +293,23 @@ void WheelPrivate::newButtonValue(char number, bool val)
 		case 0:	//Gear attach diamond down
 			break;
 		case 1:	//Gear attach diamond left
+			checkButtonEvents();
 			break;
 		case 2:	//Gear attach diamond right
 			break;
 		case 3:	//Gear attach diamond up
 			break;
 		case 11://Gear attach red button row, left button
+			checkButtonEvents();
 			break;
 		case 8:	//Gear attach red button row, 2nd btn from left
+			checkButtonEvents();
 			break;
 		case 9:	//Gear attach red button row, 3rd btn from left
+			checkButtonEvents();
 			break;
 		case 10://Gear attach red button row, 4th btn from left (right button)
+			checkButtonEvents();
 			break;
 		case 4:	//Right paddle shifter
 			this->changeMachineGuns(val);
@@ -500,3 +536,29 @@ uint16_t WheelPrivate::calcRPM()
 	return this->throttle * 100;
 }
 
+void WheelPrivate::checkButtonEvents()
+{
+	//cout << "checkButtonEvents, b1/b11/b8/b9/b10 " << (int)this->button[1] << " " << (int)this->button[11] << " " << (int)this->button[8] << " " << (int)this->button[9] << " " << (int)this->button[10] << endl;
+	if (this->button[1]) {
+		if (this->button[11]) {
+		//	cout << "Inside button 11!" << endl;
+			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset1Button);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+		}
+		if (this->button[8]) {
+		//	cout << "Inside button 8!" << endl;
+			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset2Button);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+		}
+		if (this->button[9]) {
+		//	cout << "Inside button 9!" << endl;
+			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset3Button);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+		}
+		if (this->button[10]) {
+		//	cout << "Inside button 10!" << endl;
+			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset4Button);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+		}
+	}
+}

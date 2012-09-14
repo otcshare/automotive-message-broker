@@ -65,7 +65,7 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	int options = 0;
 	
 	//Try to load config
-	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
@@ -108,7 +108,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		}
 		else
 		{
-			//Invalid property requested.
+			DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
 			return;
 		}
 		
@@ -220,7 +220,7 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
 }
 void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 {
-	for (map<std::string,WebSocketSink*>::const_iterator i=m_sinkMap.cbegin(); i != m_sinkMap.cend();i++)
+	for (auto i=m_sinkMap.begin(); i != m_sinkMap.end();i++)
 	{
 		if ((*i).second->socket() == socket)
 		{
@@ -228,6 +228,7 @@ void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 			WebSocketSink* sink = (*i).second;
 			delete sink;
 			m_sinkMap.erase((*i).first);
+			i--;
 			//printf("Sink removed\n");
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed\n";
 		}
@@ -446,12 +447,18 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				else if (name == "subscribe")
 				{
 					//Websocket wants to subscribe to an event, data.front();
-					sinkManager->addSink(wsi,data.front(),id);
+					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					{
+						sinkManager->addSink(wsi,(*i),id);
+					}
 				}
 				else if (name == "unsubscribe")
 				{
 					//Websocket wants to unsubscribe to an event, data.front();
-					sinkManager->removeSink(wsi,data.front(),id);
+					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					{
+						sinkManager->removeSink(wsi,(*i),id);
+					}
 				}
 				else if (name == "getSupportedEventTypes")
 				{
@@ -517,7 +524,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//printf("Adding poll %i\n",sinkManager);
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << (int)sinkManager << "\n";
+			//DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << (int)sinkManager << "\n";
 			if (sinkManager != 0)
 			{
 				sinkManager->addPoll((int)(long)user);

@@ -151,11 +151,11 @@ void threadLoop(gpointer data)
 			delete req;
 		}
 		
-		for (std::list<std::string>::const_iterator i=reqList.cbegin();i!= reqList.cend();i++)
+		for (std::list<std::string>::iterator i=reqList.begin();i!= reqList.end();i++)
 		{
 			repeatReqList.push_back(*i);
 		}
-		for (std::list<std::string>::const_iterator i=repeatReqList.cbegin();i!= repeatReqList.cend();i++)
+		for (std::list<std::string>::iterator i=repeatReqList.begin();i!= repeatReqList.end();i++)
 		{
 			//printf("Req: %s\n",(*i).c_str());
 			if ((*i) == "ATRV\r")
@@ -379,7 +379,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	
 	//Try to load config
 	//printf("OBD2Source::setConfiguration\n");
-	for (map<string,string>::const_iterator i=configuration.cbegin();i!=configuration.cend();i++)
+	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";

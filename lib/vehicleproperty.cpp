@@ -76,6 +76,7 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 	mProperties.push_back(BatteryVoltage);
 	mProperties.push_back(InteriorTemperature);
 	mProperties.push_back(EngineOilTemperature);
+	mProperties.push_back(MachineGunTurretStatus);
 	mProperties.push_back(VIN);
 	mProperties.push_back(WMI);
 
