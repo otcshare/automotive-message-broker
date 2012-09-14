@@ -18,3 +18,23 @@ if [[ ${BUTTONVALUE} = Off ]]
 then
 	killall gst-launch-0.10
 fi
+
+if [[ ${BUTTONVALUE} = "Button1" ]]; then
+	#Run script 1 here
+	echo "Button 1 script!"
+fi
+
+if [[ ${BUTTONVALUE} = "Button2" ]]; then
+	#Run script 2 here
+	echo "Button 2 script!"
+fi
+
+if [[ ${BUTTONVALUE} = "Button3" ]]; then
+	#Run script 3 here
+	echo "Button 3 script!"
+fi
+
+if [[ ${BUTTONVALUE} = "Button4" ]]; then
+	#Run script 4 here
+	echo "Button 4 script!"
+fi

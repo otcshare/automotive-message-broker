@@ -79,6 +79,7 @@ void DemoSink::propertyChanged(VehicleProperty::Property property, AbstractPrope
 {
 	std::string app = configuration["script"];
 	std::string strValue = value->toString();
+
 	if(property == VehicleProperty::TurnSignal)
 	{
 		if(value->value<TurnSignals::TurnSignalType>() == TurnSignals::Right)
@@ -93,6 +94,15 @@ void DemoSink::propertyChanged(VehicleProperty::Property property, AbstractPrope
 		{
 			strValue = "Off";
 		}
+	} else if (property == VehicleProperty::ButtonEvent) {
+		if (value->value<ButtonEvents::ButtonEventType>() == ButtonEvents::Preset1Button)
+			strValue = "Button1";
+		else if (value->value<ButtonEvents::ButtonEventType>() == ButtonEvents::Preset2Button)
+			strValue = "Button2";
+		else if (value->value<ButtonEvents::ButtonEventType>() == ButtonEvents::Preset3Button)
+			strValue = "Button3";
+		else if (value->value<ButtonEvents::ButtonEventType>() == ButtonEvents::Preset4Button)
+			strValue = "Button4";
 	}
 
 	string cmdline = findReplace(app,"%1",strValue);
