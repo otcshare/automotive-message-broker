@@ -7,9 +7,9 @@ Description=Automotive Message Broker
 After=syslog.target 
 
 [Service]
-Type=dbus
+#Type=dbus
 ExecStart=/usr/bin/ambd 
-BusName=org.automotive
+#BusName=org.automotive
 
 [Install]
 WantedBy=multi-user.target
