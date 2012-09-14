@@ -17,6 +17,7 @@
 		{
 			"name" : "WebSocketSink",
 			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so"
+			"interface" : "lo"
 		} 
 	]
 }
