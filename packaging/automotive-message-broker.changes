@@ -1,3 +1,28 @@
+* Fri Sep 14 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120912.232202@8d10311
+- Merge branch 'upstream' into release
+- fixed config
+- mkdir first
+- Merge branch 'upstream' into release
+- make link
+- don't do dbus by default
+- don't install service in wrong place
+- Merge branch 'upstream' into release
+- updated version number in spec
+- install service in right place so it starts
+- version bump 0.3
+- Add button event generation for Button[1-4]Preset to wheel plugin Make demo sink plugin listen for the above ButtonEvents Make rundemo script react to the above buttons
+- Add hard-coded calibration values to wheel plugin for G27 racing wheel
+- Fixed one last printf
+- Merge remote-tracking branch 'origin/master'
+- added debug
+- Fix for const_iterator that should be iterator
+- Fix for const_iterator that should be iterator
+- fixed capabilities
+- Fix for only a single subscription being operated on
+- Fix for only a single subscription being operated on
+- added mg to example plugin
+- updated chlog
+
 * Wed Sep 12 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120912.231933@81ea024
 - updated spec
 - Merge branch 'upstream' into release
