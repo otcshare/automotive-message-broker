@@ -28,7 +28,7 @@ class ExampleSourcePlugin: public AbstractSource
 {
 
 public:
-	ExampleSourcePlugin(AbstractRoutingEngine* re);
+	ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, string> config);
 	
 	string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);

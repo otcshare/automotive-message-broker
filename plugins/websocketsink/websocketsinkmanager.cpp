@@ -34,14 +34,14 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data);
 
 
 
-WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):AbstractSinkManager(engine)
+WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config):AbstractSinkManager(engine, config)
 {
 	m_engine = engine;
 	
 	
 	//Create a listening socket on port 23000 on localhost.
 	
-	
+
 }
 void WebSocketSinkManager::init()
 {
@@ -50,7 +50,7 @@ void WebSocketSinkManager::init()
 	protocollist[1] = { NULL, NULL, 0 };
 
 
-	
+	setConfiguration(configuration);
 }
 void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
@@ -212,9 +212,9 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
 	m_sinkMap[property] = sink;
 }
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	sinkManager = new WebSocketSinkManager(routingengine);
+	sinkManager = new WebSocketSinkManager(routingengine, config);
 	sinkManager->init();
 	return sinkManager;
 }

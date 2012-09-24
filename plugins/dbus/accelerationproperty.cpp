@@ -20,7 +20,7 @@
 #include "listplusplus.h"
 
 AccelerationPropertyInterface::AccelerationPropertyInterface(AbstractRoutingEngine *re, GDBusConnection* connection)
-	:DBusSink("org.automotive.acceleration","/org/automotive/acceleration", re, connection),
+	:DBusSink("org.automotive.acceleration","/org/automotive/acceleration", re, connection, map<string, string> ()),
 	  accelerationX(nullptr), accelerationY(nullptr), accelerationZ(nullptr)
 {
 	supportedChanged(re->supported());

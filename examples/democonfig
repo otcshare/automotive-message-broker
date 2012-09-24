@@ -2,13 +2,15 @@
 	"sources" : [ 
 		{
 			"name" : "WheelSource",
-			"path" : "/usr/lib/automotive-message-broker/wheelsourceplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/wheelsourceplugin.so",
+			"device" : "/dev/input/js1"
 		}
 	],
 	"sinks": [
 		{
 			"name" : "WebSocketSink",
-			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
+			"interface" : "lo"
 		} ,
 		{
 			"path" : "/usr/lib/automotive-message-broker/demosinkplugin.so",

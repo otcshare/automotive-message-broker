@@ -397,7 +397,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	requ->arg = port + ":" + baud;
 	g_async_queue_push(commandQueue,requ);
 }
-OBD2Source::OBD2Source(AbstractRoutingEngine *re) : AbstractSource(re)
+OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {
 	g_timeout_add(50, updateProperties, this );
 	clientConnected = false;
@@ -429,9 +429,9 @@ PropertyList OBD2Source::supported()
 {
 	return m_supportedProperties;
 }
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new OBD2Source(routingengine);
+	return new OBD2Source(routingengine, config);
 	
 }
 string OBD2Source::uuid()

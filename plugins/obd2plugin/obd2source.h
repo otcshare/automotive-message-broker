@@ -53,7 +53,7 @@ class OBD2Source : public AbstractSource
 {
 
 public:
-	OBD2Source(AbstractRoutingEngine* re);
+	OBD2Source(AbstractRoutingEngine* re, map<string, string> config);
 	string uuid();
 	int portHandle;
 	void getPropertyAsync(AsyncPropertyReply *reply);

@@ -23,14 +23,14 @@
 #include "debugout.h"
 #include "listplusplus.h"
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new DBusSinkManager(routingengine);
+	return new DBusSinkManager(routingengine, config);
 }
 
-DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection)
+DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config)
 	:AbstractDBusInterface(interface, path, connection),
-	  AbstractSink(engine), supported(false)
+	  AbstractSink(engine, config), supported(false)
 {
 
 }
@@ -66,8 +66,8 @@ std::string DBusSink::uuid()
 	return "c2e6cafa-eef5-4b8a-99a0-0f2c9be1057d";
 }
 
-DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine)
-	:AbstractSinkManager(engine)
+DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, string> config)
+	:AbstractSinkManager(engine, config)
 {
 	DBusInterfaceManager* manager = new DBusInterfaceManager(engine);
 }

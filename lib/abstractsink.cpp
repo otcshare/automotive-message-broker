@@ -20,8 +20,8 @@
 #include "abstractsink.h"
 #include "abstractroutingengine.h"
 
-AbstractSink::AbstractSink(AbstractRoutingEngine* engine)
-:routingEngine(engine)
+AbstractSink::AbstractSink(AbstractRoutingEngine* engine, map<string, string> config)
+	:routingEngine(engine), configuration(config)
 {
 	routingEngine->registerSink(this);
 }
@@ -36,15 +36,11 @@ void AbstractSink::setConfiguration(map<string, string> config)
 	configuration = config;
 }
 
-AbstractSinkManager::AbstractSinkManager(AbstractRoutingEngine* engine)
+AbstractSinkManager::AbstractSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
 :routingEngine(engine)
-{
-
-}
-
-void AbstractSinkManager::setConfiguration(map<string, string> config)
 {
 	configuration = config;
 }
+
 
 

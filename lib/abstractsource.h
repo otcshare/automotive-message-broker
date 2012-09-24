@@ -39,7 +39,7 @@ class AbstractSource: public AbstractSink
 {
 
 public:
-	AbstractSource(AbstractRoutingEngine* engine);
+	AbstractSource(AbstractRoutingEngine* engine, map<string, string> config);
 	virtual ~AbstractSource();
 	
 	///pure virtual methods:
@@ -55,7 +55,7 @@ protected:
 	AbstractRoutingEngine* routingEngine;
 	
 private:
-	AbstractSource():AbstractSink(nullptr) { }
+	AbstractSource():AbstractSink(nullptr, map<string,string>()) { }
 };
 
 #endif // ABSTRACTSOURCE_H
