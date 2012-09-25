@@ -40,7 +40,7 @@ class TirePressureProperty: public DBusSink
 {
 public:
 	TirePressureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.tirePressure","/org/automotive/maintainance/tirePressure", re, connection)
+		:DBusSink("org.automotive.tirePressure","/org/automotive/maintainance/tirePressure", re, connection, map<string, string>())
 	{
 		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftFront,"LeftFront", "i", AbstractProperty::Read);
 		wantProperty<uint16_t>(VehicleProperty::TirePressureRightFront,"RightFront", "i", AbstractProperty::Read);
