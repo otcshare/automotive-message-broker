@@ -1,7 +1,7 @@
 Automotive Message Broker is a vehicle network abstraction system.  It brokers information from the vehicle
 to applications.
 
-Automotive Message Broker is built using CMake.  
+Automotive Message Broker is built using CMake and requires libltdl (libtool), json-glib, and boost packages.  
 
 To build:
 
