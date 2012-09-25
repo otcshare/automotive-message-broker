@@ -26,6 +26,8 @@
 #include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include "debugout.h"
+#include "bluetooth.hpp"
+
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
 
@@ -72,7 +74,7 @@ void threadLoop(gpointer data)
 		if (query != nullptr)
 		{
 			//printf("Got request!\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got single shot request!\n";
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got single shot request!"<<endl;
 			ObdRequest *req = (ObdRequest*)query;
 			repeatReqList.push_back(req->req);
 			delete req;
@@ -80,8 +82,9 @@ void threadLoop(gpointer data)
 		query = g_async_queue_try_pop(privSubscriptionAddQueue);
 		if (query != nullptr)
 		{
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got subscription request\n";
+
 			ObdRequest *req = (ObdRequest*)query;
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got subscription request for "<<req->req<<endl;
 			reqList.push_back(req->req);
 			delete req;
 		}
@@ -93,7 +96,7 @@ void threadLoop(gpointer data)
 			ObdRequest *req = (ObdRequest*)query;
 			//commandMap[req->req] = req->arg;
 			//printf("Command: %s\n",req->req.c_str());
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << "\n";
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << endl;
 			if (req->req == "connect")
 			{
 				//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
@@ -329,11 +332,10 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 {
 	//m_re->updateProperty(property,&value);
 	m_re->updateProperty(property,value); 
-	if (propertyReplyMap.find(property) != propertyReplyMap.cend())
+	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
 		propertyReplyMap[property]->value = value;
 		propertyReplyMap[property]->completed(propertyReplyMap[property]);
-		delete propertyReplyMap[property];
 		propertyReplyMap.erase(property);
 	}
 }
@@ -382,8 +384,8 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
-		if ((*i).first == "port")
+		DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
+		if ((*i).first == "device")
 		{
 			port = (*i).second;
 		}
@@ -392,6 +394,22 @@ void OBD2Source::setConfiguration(map<string, string> config)
 			baud = (*i).second;
 		}
 	}
+
+	if(port.find(":") != string::npos)
+	{
+		///TODO: bluetooth!!
+		DebugOut()<<"bluetooth device?"<<endl;
+		ObdBluetoothDevice bt;
+
+		std::string tempPort = bt.getDeviceForAddress(port);
+		if(tempPort != "")
+		{
+			DebugOut(3)<<"Using bluetooth device \""<<port<<"\" bound to: "<<tempPort<<endl;
+			port = tempPort;
+		}
+		else throw std::runtime_error("Device Error");
+	}
+
 	ObdRequest *requ = new ObdRequest();
 	requ->req = "connect";
 	requ->arg = port + ":" + baud;
@@ -423,6 +441,8 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 	responseQueue = g_async_queue_new();
 	singleShotQueue = g_async_queue_new();
 	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
+
+	setConfiguration(config);
 }
 
 PropertyList OBD2Source::supported()

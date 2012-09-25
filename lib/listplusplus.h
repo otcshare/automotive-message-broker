@@ -54,4 +54,10 @@ private:
 	std::list<T> *mList;
 };
 
+template <class T, class V>
+bool contains(T iteratable, V value)
+{
+	return (std::find(iteratable.begin(), iteratable.end(), value) != iteratable.end());
+}
+
 #endif // LISTPLUSPLUS_H
