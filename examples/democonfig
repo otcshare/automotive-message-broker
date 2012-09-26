@@ -8,7 +8,8 @@
 	"sinks": [
 		{
 			"name" : "WebSocketSink",
-			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
+			"interface" : "eth0"
 		} ,
 		{
 			"path" : "/usr/lib/automotive-message-broker/demosinkplugin.so",

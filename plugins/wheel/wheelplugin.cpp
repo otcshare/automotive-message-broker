@@ -341,7 +341,7 @@ void WheelPrivate::newButtonValue(char number, bool val)
 		case 21://Left lower wheel button
 			//Coolant temperature down
 			if (val)
-				this->changeCoolantTemp(true);
+                this->changeCoolantTemp(false);
 			break;
 		case 12://1st gear
 			this->changeGear((val ? 1 : 0));
