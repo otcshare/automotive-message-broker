@@ -24,6 +24,7 @@
 #include <string>
 #include <list>
 #include <set>
+#include <sstream>
 
 #include <abstractpropertytype.h>
 
@@ -172,6 +173,15 @@ public:
 	/**< World Manufacturer Identifier (SAE) 3 characters. */
 	static const Property WMI;
 	typedef StringPropertyType WMIType;
+
+	/**< Tire pressure in kPa */
+	static const Property TirePressureLeftFront;
+	static const Property TirePressureRightFront;
+	static const Property TirePressureLeftRear;
+	static const Property TirePressureRightRear;
+	typedef BasicPropertyType<uint16_t> TirePressureType;
+
+
 
 	static std::list<VehicleProperty::Property> capabilities();
 

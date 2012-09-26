@@ -27,13 +27,27 @@ class VehicleSpeedProperty: public DBusSink
 {
 public:
 	VehicleSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.vehicleSpeed","/org/automotive/vehiclespeed", re, connection)
+		:DBusSink("org.automotive.vehicleSpeed","/org/automotive/runningstatus/vehiclespeed", re, connection)
 	{
 		wantProperty<uint16_t>(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 
 
+};
+
+class TirePressureProperty: public DBusSink
+{
+public:
+	TirePressureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.tirePressure","/org/automotive/maintainance/tirePressure", re, connection)
+	{
+		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftFront,"LeftFront", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TirePressureRightFront,"RightFront", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftRear,"LeftRear", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TirePressureRightRear,"RightRear", "i", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
 };
 
 #endif
