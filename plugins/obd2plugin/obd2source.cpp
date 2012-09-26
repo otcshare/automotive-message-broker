@@ -59,6 +59,9 @@ void threadLoop(gpointer data)
 	GAsyncQueue *privSubscriptionAddQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionAddQueue);
 	GAsyncQueue *privSubscriptionRemoveQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionRemoveQueue);
 	obdLib *obd = new obdLib();
+
+	obd->setCommsCallback([](const char* mssg, void* data) { DebugOut(6)<<mssg<<endl; },NULL);
+	obd->setDebugCallback([](const char* mssg, void* data, obdLib::DebugLevel debugLevel) { DebugOut(debugLevel)<<mssg<<endl; },NULL);
 	
 	std::list<std::string> reqList;
 	std::list<std::string> repeatReqList;
@@ -91,8 +94,6 @@ void threadLoop(gpointer data)
 		query = g_async_queue_try_pop(privCommandQueue);
 		if (query != nullptr)
 		{
-			//printf("Got Command!\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got command\n";
 			ObdRequest *req = (ObdRequest*)query;
 			//commandMap[req->req] = req->arg;
 			//printf("Command: %s\n",req->req.c_str());
@@ -119,20 +120,25 @@ void threadLoop(gpointer data)
 				{
 					//printf("Reply to reset: %s\n",reply.c_str());
 				}
+				if (!sendElmCommand(obd,"ATSP0"))
+				{
+					//printf("Error sending echo\n");
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error setting auto protocol"<<endl;
+				}
 				if (!sendElmCommand(obd,"ATE0"))
 				{
 					//printf("Error sending echo\n");
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off echo\n";
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off echo"<<endl;
 				}
 				if (!sendElmCommand(obd,"ATH0"))
 				{
 					//printf("Error sending headers off\n");
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off headers\n";
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off headers"<<endl;
 				}
 				if (!sendElmCommand(obd,"ATL0"))
 				{
 					//printf("Error turning linefeeds off\n");
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off linefeeds\n";
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off linefeeds"<<endl;
 				}
 			}
 			delete req;
@@ -262,7 +268,7 @@ void threadLoop(gpointer data)
 				
 			}
 			
-			//printf("Reply: %i %i\n",replyVector[2],replyVector[3]);
+			DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
 		}
 		usleep(10000);
 		repeatReqList.clear();
@@ -417,7 +423,6 @@ void OBD2Source::setConfiguration(map<string, string> config)
 }
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {
-	g_timeout_add(50, updateProperties, this );
 	clientConnected = false;
 	m_re = re;  
 	
@@ -443,6 +448,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
 
 	setConfiguration(config);
+	g_timeout_add(50, updateProperties, this );
 }
 
 PropertyList OBD2Source::supported()
