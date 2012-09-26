@@ -21,12 +21,12 @@
 #include "abstractroutingengine.h"
 #include "debugout.h"
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new ExampleSinkManager(routingengine);
+	return new ExampleSinkManager(routingengine, config);
 }
 
-ExampleSink::ExampleSink(AbstractRoutingEngine* engine): AbstractSink(engine)
+ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> config): AbstractSink(engine, config)
 {
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);

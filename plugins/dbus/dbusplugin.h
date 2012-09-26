@@ -31,7 +31,7 @@ class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
 
 public:
-	DBusSink(std::string interface, std::string path, AbstractRoutingEngine* engine, GDBusConnection* connection);
+	DBusSink(std::string interface, std::string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid);
 	virtual std::string uuid();
@@ -52,7 +52,7 @@ private:
 class DBusSinkManager: public AbstractSinkManager
 {
 public:
-	DBusSinkManager(AbstractRoutingEngine* engine);
+	DBusSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
 };
 
 #endif

@@ -28,7 +28,7 @@ class DemoSink: public AbstractSink
 {
 
 public:
-	DemoSink(AbstractRoutingEngine* re);
+	DemoSink(AbstractRoutingEngine* re, map<string, string> config);
 	~DemoSink();
 	
 	string uuid();
@@ -46,15 +46,15 @@ private:
 class DemoSinkManager: public AbstractSinkManager
 {
 public:
-	DemoSinkManager(AbstractRoutingEngine* engine)
-	:AbstractSinkManager(engine)
+	DemoSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
+	:AbstractSinkManager(engine, config)
 	{
 
 	}
 
 	void setConfiguration(map<string, string> config)
 	{
-		DemoSink* sink = new DemoSink(routingEngine);
+		DemoSink* sink = new DemoSink(routingEngine, config);
 		sink->setConfiguration(config);
 	}
 };

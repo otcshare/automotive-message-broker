@@ -104,8 +104,8 @@ private:
 };
 
 
-WheelSourcePlugin::WheelSourcePlugin(AbstractRoutingEngine* re)
-:AbstractSource(re)
+WheelSourcePlugin::WheelSourcePlugin(AbstractRoutingEngine* re, map<string, string> config)
+:AbstractSource(re, config)
 {
 	re->setSupported(supported(), this);
 	this->mWheel = new WheelPrivate(this, re);
@@ -118,9 +118,9 @@ WheelSourcePlugin::~WheelSourcePlugin()
 
 
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new WheelSourcePlugin(routingengine);
+	return new WheelSourcePlugin(routingengine, config);
 }
 
 string WheelSourcePlugin::uuid()
@@ -211,7 +211,14 @@ clutch(false), oldClutch(false), brake(false), oldBrake(false)
 	
 
 	//FIXME: Support config file with joystick device mapping, button/axis mappings, etc.
-	if ((fd = open("/dev/input/js0", O_RDONLY)) < 0) {
+	std::string jsdev = parent->getConfiguration()["device"];
+
+	DebugOut(0)<<"JSDev: "<<jsdev<<endl;
+
+	if(jsdev == "")
+		jsdev = "/dev/input/js0";
+
+	if ((fd = open(jsdev.c_str(), O_RDONLY)) < 0) {
 		throw std::runtime_error("Could not find a joystick class device!");	//FIXME: Later, don't throw, watch input devices, and jump on to any JS devices that appear
 		return;
 	}

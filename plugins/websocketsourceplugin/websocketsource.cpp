@@ -308,7 +308,7 @@ void WebSocketSource::setSupported(PropertyList list)
 	m_re->updateSupported(list,PropertyList());
 }
 
-WebSocketSource::WebSocketSource(AbstractRoutingEngine *re) : AbstractSource(re)
+WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {
 	clientConnected = false;
 	source = this;
@@ -324,9 +324,9 @@ PropertyList WebSocketSource::supported()
 {
 	return m_supportedProperties;
 }
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new WebSocketSource(routingengine);
+	return new WebSocketSource(routingengine, config);
 	
 }
 string WebSocketSource::uuid()

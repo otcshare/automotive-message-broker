@@ -40,7 +40,7 @@ class AbstractSink
 {
 
 public:
-	AbstractSink(AbstractRoutingEngine* engine);
+	AbstractSink(AbstractRoutingEngine* engine, map<string, string> config);
 	virtual ~AbstractSink();
 	
 	///Pure virtual methods:
@@ -72,9 +72,7 @@ class AbstractSinkManager
 {
 public:
 	
-	AbstractSinkManager(AbstractRoutingEngine* engine);
-
-	virtual void setConfiguration(map<string, string> config);
+	AbstractSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
 	
 protected:
 	AbstractRoutingEngine* routingEngine;

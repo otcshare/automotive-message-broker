@@ -53,8 +53,8 @@ string findReplace(string str, string tofind, string replacewith, string exclusi
 }
 
 
-DemoSink::DemoSink(AbstractRoutingEngine* re)
-:AbstractSink(re)
+DemoSink::DemoSink(AbstractRoutingEngine* re, map<string, string> config)
+:AbstractSink(re, config)
 {
 	routingEngine->subscribeToProperty(VehicleProperty::ButtonEvent, this);
 	routingEngine->subscribeToProperty(VehicleProperty::TurnSignal, this);
@@ -65,9 +65,9 @@ DemoSink::~DemoSink()
 
 }
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new DemoSinkManager(routingengine);
+	return new DemoSinkManager(routingengine, config);
 }
 
 string DemoSink::uuid()
