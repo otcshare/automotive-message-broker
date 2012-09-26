@@ -166,6 +166,7 @@ void WebSocketSinkManager::setValue(string property,string value)
 {
 	AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
 	m_engine->setProperty(property, type);
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "AbstractRoutingEngine::setProperty called with arguments:" << property << value << "\n";
 	delete type;
 	
 }
@@ -487,9 +488,10 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 							list<string>::iterator d = value.begin();
 							for (list<string>::iterator i=key.begin();i!=key.end();i++)
 							{
-								(*i);
+								DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "websocketsinkmanager setting" << (*i) << "to" << (*d) << "\n";
+								//(*i);
 								sinkManager->setValue((*i),(*d));
-								(*d);
+								//(*d);
 								d++;
 							}
 							
