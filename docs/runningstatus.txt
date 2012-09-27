@@ -2,33 +2,48 @@ Running Status hierarchy
 =================
 
 Service         org.automotive
-Interface       org.automotive.runningStatus
-Object path     /runningStatus
+Object path     /org/automotive/runningStatus/*
 
-Properties	byte VehiclePowerMode [readonly]
+Interface:	org.automotive.vehiclePowerMode
+Object path:	/org/automotive/runningStatus/vehiclePowerMode
+Properties:	
+
+		byte VehiclePowerMode [readonly]
 			
 			Off = 0,
 			Accessory1 = 1,
 			Accessory2 = 2,
 			Run = 3
-				
+
+Interface:      org.automotive.vehicleSpeed
+Object path:    /org/automotive/runningStatus/vehicleSpeed
+Properties: 	
+
 		uint16 VehicleSpeed [readonly]
 		
 			Velocity of vehicle in kph.
+
+Interface:      org.automotive.engineSpeed    
+Object path:    /org/automotive/runningStatus/engineSpeed    
+Properties:    	
 
 		uint16 EngineSpeed [readonly]
 		
 			Engine speed in rotations per minute (RPM)
 			
-		uint16 FuelConsumption [readonly]
-		
-			Fuel Economy in ml of fuel per minute.
-			
+Interface:      org.automotive.tripMeter
+Object path:    /org/automotive/runningStatus/tripMeter
+Properties:     
+
 		array{uint32} TripMeter [readonly]
 		
 			Distance from trip meter(s) in km.
 			
-		byte TransmissionShiftPosition [readonly]
+Interface:      org.automotive.transmission
+Object path:    /org/automotive/runningStatus/transmission
+Properties:     
+
+		byte ShiftPosition [readonly]
 		
 			Neutral = 0,
 			1st = 1,
@@ -44,70 +59,163 @@ Properties	byte VehiclePowerMode [readonly]
 			Drive = 64,
 			Reverse = 128,
 			Park = 255
+
+		byte GearPosition [readonly]
+
+			Neutral = 0,
+			1st = 1,
+			2nd = 2,
+			3rd = 3,
+			4th = 4,
+			5th = 5,
+			6th = 6,
+			7th = 7,
+			8th = 8,
+			9th = 9,
+			10th = 10,
+			CVT = 64,
+			Reverse = 128
+
+		byte Mode [readonly]
+
+			0 = normal,
+			1 = sports,
+			2 = economy,
+			3 = oem custom,
+			4 = oem custom2
+			...
+			255 =
+						
+Interface:	org.automotive.cruiseControlStatus
+Object path:	/org/automotive/runningStatus/cruiseControlStatus
+Properties:	
+
+		bool Activated [readonly]
+
+			true = engaged, false not engaged
+
+		uint16 Speed [readonly]
 			
-			For transmissions with no gear (ie CVT), 'Drive' and 'Reverse' will be used.
-			
-		struct{bool, uint16} CruiseControlStatus [readonly]
+			Speed in kph.
 		
-			Activated/Deactivated, Speed in kph.
 			
+Interface:      org.automotive.wheelBrake
+Object path:    /org/automotive/runningStatus/wheelBrake
+Properties:
+
 		bool WheelBrake [readonly]
 		
 			Engaged = true
 			Idle = false
 			
-		dict{byte, bool} LightStatus [readonly]
-		
-			Dictionary of Light (uint16) and Status On=true/Off=false
-			Light Type:
-			Head = 0,
-			RightTurn = 1,
-			LeftTurn = 2,
-			Brake = 3,
-			Fog = 4,
-			Hazard = 5,
-			Parking = 6,
-			HighBeam = 7
+Interface:      org.automotive.lightstatus
+Object path:    /org/automotive/runningStatus/lightstatus
+Properties:
+
+		bool Head 	[readonly]
+		bool RightTurn 	[readonly]
+		bool LeftTurn  	[readonly]
+		bool Brake	[readonly]
+		bool Fog	[readonly]
+		bool Hazard	[readonly]
+		bool Parking 	[readonly]
+		bool HighBeam 	[readonly]
 			
-		dict{byte, bool} InteriorLightStatus [readonly]
-		
-			Interior Light (uint16), On = true / Off = false
-			Interior Light Type:
-			Driver = 0,
-			Passenger = 1,
-			Center = 2
+Interface:      org.automotive.interiorLightStatus
+Object path:    /org/automotive/runningStatus/interiorLightStatus
+Properties:	
+
+		bool Driver 	[readonly]
+		bool Passenger 	[readonly]
+		bool Center  	[readonly]
+
 			
+Interface:      org.automotive.horn
+Object path:    /org/automotive/runningStatus/horn
+Properties:     
 		bool Horn [readonly]
 			
 			On = true / Off = false
 			
+Interface:      org.automotive.chime
+Object path:    /org/automotive/runningStatus/chime
+Properties:
+
 		bool Chime [readonly]
 		
 			On = true / Off = false
 			
-		byte FuelLevel [readonly]
+Interface:      org.automotive.fuel
+Object path:    /org/automotive/runningStatus/fuel
+Properties:	
+
+		byte Level [readonly]
 		
 			Remaining percentage of fuel.
 			
-		uint16 FuelRange [readonly]
+		uint16 Range [readonly]
 		
 			Estimated fuel range with available fuel in km
+
+		uint16 InstantConsumption [readonly]
+
+			Fuel consumption in meters per liter of fuel.
+
+		uint16 AverageConsumption [readonly]
+
+			Average fuel consumption in meters per liter of fuel since last reset
 			
-		struct{ byte, byte, byte } EngineOil [readonly]
+Interface:      org.automotive.engineOil
+Object path:    /org/automotive/runningStatus/engineOil
+Properties:	
+
+		byte Remaining [readonly]
 		
-			Remaining Oil life remaining; percentage (byte)
-			Engine Oil Temperature (byte) in degrees C
-			Engine Oil Pressure in kPa (uint16)
+			Remaining Oil life remaining; percentage
+
+		byte Temperature [readonly]
+
+			Engine Oil Temperature in degrees C
+
+		uint16 Pressure [readonly]
+
+			Engine Oil Pressure in kPa 
 			
-		struct{ byte, byte } EngineCoolant [readonly]
+
+Interface:      org.automotive.engineCoolant
+Object path:    /org/automotive/runningStatus/engineCoolant
+Properties:	
+
+		byte Level [readonly]
 		
-			Level (byte)
-			Temperature (byte)
+			Level of Engine Coolant (percentage of full)
+
+		byte Temperature [readonly]
+
+			Temperature of Engine Coolant in degrees C
 			
-		struct{ double, double, double } Acceleration [readonly]
+Interface:      org.automotive.acceleration
+Object path:    /org/automotive/runningStatus/acceleration
+Properties:	
+
+		double X [readonly]
 		
-			X, Y and Z acceleration in m/s*s
+			lateral acceleration as 1/1000 G
+
+		double Y [readonly]
+	
+			longitudinal acceleration as 1/1000 G
 		
+		double Z [readonly]
+
+			vertical accelaration as 1/1000 G
+
+
+		
+Interface:      org.automotive.steeringWheelAngle
+Object path:    /org/automotive/runningStatus/steeringWheelAngle
+Properties:
+
 		uint16 SteeringWheelAngle [readonly]
 		
 			Angle of the steering wheel (0-360)
