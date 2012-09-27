@@ -1,3 +1,1 @@
-- websocket sink plugin to support "set" methods
-- obdII plugin debugging and fixing
 - test for memory leaks in websocket sink plugin
