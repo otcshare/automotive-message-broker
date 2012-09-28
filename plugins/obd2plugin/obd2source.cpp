@@ -27,6 +27,7 @@
 #include <listplusplus.h>
 #include "debugout.h"
 #include "bluetooth.hpp"
+#include "asyncqueuewatcher.h"
 
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
@@ -275,12 +276,12 @@ void threadLoop(gpointer data)
 	}
 	
 }
-static gboolean updateProperties(gpointer data)
+static void updateProperties(gpointer retval, gpointer data)
 {
 	OBD2Source* src = (OBD2Source*)data;
 	
 	//src->randomizeProperties();
-	gpointer retval = g_async_queue_try_pop(src->responseQueue);
+	//gpointer retval = g_async_queue_try_pop(src->responseQueue);
 	if (retval != nullptr)
 	{
 		ObdReply *reply = (ObdReply*)retval;
@@ -332,7 +333,6 @@ static gboolean updateProperties(gpointer data)
 		//46 interior temp
 		delete reply;
 	}
-	return true;
 }
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
 {
@@ -448,7 +448,8 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
 
 	setConfiguration(config);
-	g_timeout_add(50, updateProperties, this );
+
+	AsyncQueueWatcher watcher(responseQueue, (AsyncQueueWatcherCallback) updateProperties, this);
 }
 
 PropertyList OBD2Source::supported()
