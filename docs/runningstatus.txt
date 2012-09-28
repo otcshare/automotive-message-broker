@@ -29,7 +29,7 @@ Properties:
 
 		uint16 EngineSpeed [readonly]
 		
-			Engine speed in rotations per minute (RPM)
+			Engine speed in revolutions per minute (RPM)
 			
 Interface:      org.automotive.tripMeter
 Object path:    /org/automotive/runningStatus/tripMeter
