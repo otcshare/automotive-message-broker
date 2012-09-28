@@ -1,3 +1,4 @@
 - test for memory leaks in websocket sink plugin
 - per-source property filtering in routing engine
-
+- historic data "get" interface in routing engine
+- sqlite database storage plugin

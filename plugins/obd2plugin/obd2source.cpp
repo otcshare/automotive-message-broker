@@ -269,7 +269,7 @@ void threadLoop(gpointer data)
 				
 			}
 			
-			DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
+			//DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
 		}
 		if(!reqList.size()) usleep(10000);
 		repeatReqList.clear();

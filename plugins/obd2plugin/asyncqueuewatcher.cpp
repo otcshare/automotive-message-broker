@@ -19,15 +19,16 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "asyncqueuewatcher.h"
 
 struct QueueWatch{
-	GAsyncQueue* queue;
 	GSource source;
+	GAsyncQueue* queue;
 };
 
 static gboolean prepare (GSource *source, gint *timeout)
 {
 	QueueWatch *watch = (QueueWatch *)source;
 	*timeout = -1;
-	return (g_async_queue_length (watch->queue) > 0);
+	int size = g_async_queue_length (watch->queue);
+	return (size > 0);
 }
 
 static gboolean check (GSource *source)
