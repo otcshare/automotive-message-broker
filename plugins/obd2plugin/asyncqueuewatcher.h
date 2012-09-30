@@ -18,17 +18,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef ASYNCQUEUEWATCHER_H_
 #define ASYNCQUEUEWATCHER_H_
 
-#include <glib.h>
+#include <glibmm/main.h>
 
 typedef void (*AsyncQueueWatcherCallback) (gpointer, void* data);
 
-class AsyncQueueWatcher
+class AsyncQueueWatcher: public Glib::Source
 {
 public:
-	AsyncQueueWatcher(GAsyncQueue* queue, AsyncQueueWatcherCallback callback, void* data);
+	AsyncQueueWatcher(GAsyncQueue* q, AsyncQueueWatcherCallback cb, void* data);
+
+	bool prepare(int& timeout);
+	bool check();
+	bool dispatch(sigc::slot_base* slot);
 
 private:
 	int id;
+	GAsyncQueue* queue;
+	AsyncQueueWatcherCallback callback;
+	void* userData;
 };
 
 

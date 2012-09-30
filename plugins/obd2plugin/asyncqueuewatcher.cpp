@@ -18,74 +18,43 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "asyncqueuewatcher.h"
 
-struct QueueWatch{
-	GSource source;
-	GAsyncQueue* queue;
-};
-
-static gboolean prepare (GSource *source, gint *timeout)
+AsyncQueueWatcher::AsyncQueueWatcher(GAsyncQueue *q, AsyncQueueWatcherCallback cb, void *data)
+	:Glib::Source()
 {
-	QueueWatch *watch = (QueueWatch *)source;
-	*timeout = -1;
-	int size = g_async_queue_length (watch->queue);
+	queue = g_async_queue_ref(q);
+	userData = data;
+	callback = cb;
+	set_priority(G_PRIORITY_DEFAULT);
+	//set_can_recurse(true);
+
+}
+
+bool AsyncQueueWatcher::prepare(int &timeout)
+{
+	timeout = -1;
+	int size = g_async_queue_length (queue);
 	return (size > 0);
 }
 
-static gboolean check (GSource *source)
+bool AsyncQueueWatcher::check()
 {
-	QueueWatch *watch = (QueueWatch *)source;
-	return (g_async_queue_length (watch->queue) > 0);
+	return (g_async_queue_length (queue) > 0);
 }
 
-static gboolean dispatch (GSource *source, GSourceFunc callback, gpointer data)
+bool AsyncQueueWatcher::dispatch(sigc::slot_base *)
 {
-	QueueWatch *watch = (QueueWatch *)source;
-	AsyncQueueWatcherCallback cb = (AsyncQueueWatcherCallback)callback;
-
-	gpointer item = g_async_queue_try_pop (watch->queue);
+	gpointer item = g_async_queue_try_pop (queue);
 
 	if (item == NULL)
 	{
 		return true;
 	}
 
-	if (cb == NULL)
+	if (callback == NULL)
 	{
 		return false;
 	}
 
-	cb(item, data);
+	callback(item, userData);
 	return true;
-}
-
-static void finalize (GSource *source)
-{
-	QueueWatch *watch = (QueueWatch *)source;
-
-	if (watch->queue) {
-		g_async_queue_unref(watch->queue);
-		watch->queue = NULL;
-	}
-}
-
-static GSourceFuncs funcs = {
-	prepare,
-	check,
-	dispatch,
-	finalize
-};
-
-
-AsyncQueueWatcher::AsyncQueueWatcher(GAsyncQueue *queue, AsyncQueueWatcherCallback callback, void *data)
-{
-	GSource *src = g_source_new(&funcs, sizeof(QueueWatch));
-
-	QueueWatch* watch = (QueueWatch*)src;
-	watch->queue = g_async_queue_ref(queue);
-
-	g_source_set_callback(src, (GSourceFunc)callback, data, NULL);
-
-	id = g_source_attach(src,NULL);
-
-	g_source_unref(src);
 }
