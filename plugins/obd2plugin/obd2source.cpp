@@ -27,7 +27,7 @@
 #include <listplusplus.h>
 #include "debugout.h"
 #include "bluetooth.hpp"
-#include "asyncqueuewatcher.h"
+
 
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
