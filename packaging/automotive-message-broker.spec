@@ -6,7 +6,10 @@ Group:      System/Base
 License:    LGPL v2.1
 URL:        https://github.com/otcshare/automotive-message-broker
 Source0:    %{name}-%{version}.tar.bz2
+<<<<<<< HEAD
 Requires: automotive-message-broker-plugins
+=======
+>>>>>>> 202138019d2cdf47f9aba356f0333edc9739a268
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 BuildRequires:  cmake
@@ -55,9 +58,12 @@ make %{?jobs:-j%jobs}
 rm -rf %{buildroot}
 %make_install
 
+<<<<<<< HEAD
 mkdir -p %{buildroot}/usr/lib/systemd/system/network.target.wants
 ln -s ../ambd.service %{buildroot}/usr/lib/systemd/system/network.target.wants/ambd.service
 
+=======
+>>>>>>> 202138019d2cdf47f9aba356f0333edc9739a268
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
@@ -69,7 +75,10 @@ ln -s ../ambd.service %{buildroot}/usr/lib/systemd/system/network.target.wants/a
 %config %{_sysconfdir}/ambd/config
 %{_bindir}/*
 %{_libdir}/libamb.so*
+<<<<<<< HEAD
 %{_libdir}/systemd/system/*
+=======
+>>>>>>> 202138019d2cdf47f9aba356f0333edc9739a268
 
 %files devel
 %defattr(-,root,root,-)
