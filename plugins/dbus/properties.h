@@ -27,7 +27,7 @@ class VehicleSpeedProperty: public DBusSink
 {
 public:
 	VehicleSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.vehicleSpeed","/org/automotive/runningstatus/vehiclespeed", re, connection, map<string, string>())
+		:DBusSink("org.automotive.vehicleSpeed","/org/automotive/runningstatus/vehicleSpeed", re, connection, map<string, string>())
 	{
 		wantProperty<uint16_t>(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
 		supportedChanged(re->supported());
