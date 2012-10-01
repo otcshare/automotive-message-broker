@@ -1,3 +1,24 @@
+* Wed Sep 26 2012 tripzero <kevron_m_rees@linux.intel.com> ba9f4a4
+- atsp0 ftw
+- fixed compile errors introduced by foolishly merging
+- fixed mergers
+- obd source support bluetooth devices
+- Update README
+- config required to construct plugins.  device config added to wheel plugin
+- added tire pressure properties
+- fixed up engine coolant down button
+- added maketag
+- updated chlog
+- mkdir first
+- make link
+- updated version number in spec
+- updated chlog
+- updated spec
+- updated chlog
+- updated changelog
+- changelog update
+- added packaging directory
+
 * Fri Sep 14 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120912.232202@8d10311
 - Merge branch 'upstream' into release
 - fixed config
