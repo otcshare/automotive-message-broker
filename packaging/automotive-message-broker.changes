@@ -1,3 +1,9 @@
+* Mon Oct 01 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20121001.202146@cd77669
+- fixed merge
+- changes
+- Merge branch 'upstream' into release
+- added packaging directory
+
 * Mon Oct 01 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120926.232908@e180e9d
 - updated spec version
 - Merge branch 'upstream' into release
