@@ -1,3 +1,31 @@
+* Mon Oct 01 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120926.232908@e180e9d
+- updated spec version
+- Merge branch 'upstream' into release
+- changes
+- version bump
+- report out property updates per second
+- removed glibmm requirement
+- made obd2 updates happen on an idle callback
+- obdII is b0rked but getting closer
+- Update docs/runningstatus.txt
+- only sleep if list is empty
+- integrated obdII source with mainloop
+- updated draft running status dbus doc
+- updated TODO
+- Added debug output confirming set working
+- Fix for "set" requests
+- added maketag
+- updated chlog
+- mkdir first
+- make link
+- updated version number in spec
+- updated chlog
+- updated spec
+- updated chlog
+- updated changelog
+- changelog update
+- added packaging directory
+
 * Wed Sep 26 2012 tripzero <kevron_m_rees@linux.intel.com> ba9f4a4
 - atsp0 ftw
 - fixed compile errors introduced by foolishly merging
