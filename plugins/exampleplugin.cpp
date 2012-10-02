@@ -182,5 +182,5 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp);
 	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp);
 	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec);
-	routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
+    //routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }
