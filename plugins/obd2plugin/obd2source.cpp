@@ -36,7 +36,7 @@ bool sendElmCommand(obdLib *obd,std::string command)
 {
   	std::vector<unsigned char> replyVector;
 	std::string reply;
-	obd->sendObdRequestString(command.append("\r").c_str(),command.length()+1,&replyVector,500,3);
+	obd->sendObdRequestString(command.append("\r").c_str(),command.length()+1,&replyVector,10,3);
 	for (unsigned int i=0;i<replyVector.size();i++)
 	{
 		reply += replyVector[i];
