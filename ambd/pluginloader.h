@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
-typedef void* create_t(AbstractRoutingEngine*);
+typedef void* create_t(AbstractRoutingEngine*, map<string, string> );
 
 
 class PluginLoader
@@ -51,7 +51,7 @@ public:
 private: ///methods:
 	
 	template<class T>
-	T loadPlugin(string pluginName)
+	T loadPlugin(string pluginName, map<string, string> config)
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 		
@@ -79,7 +79,7 @@ private: ///methods:
 		
 		if(f_create) 
 		{
-			void* obj = f_create(routingEngine);
+			void* obj = f_create(routingEngine, config);
 			return static_cast<T>( obj );
 		}
 		

@@ -3,8 +3,8 @@
 		{
 			"name" : "OBD2Source",
 			"path" : "/usr/lib/automotive-message-broker/obd2sourceplugin.so",
-			"port" : "/dev/ttyUSB0",
-			"ip" : "115200"
+			"device" : "/dev/ttyUSB0",
+			"baud" : "115200"
 		}
 	],
 	"sinks": [

@@ -34,14 +34,14 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data);
 
 
 
-WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine):AbstractSinkManager(engine)
+WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config):AbstractSinkManager(engine, config)
 {
 	m_engine = engine;
 	
 	
 	//Create a listening socket on port 23000 on localhost.
 	
-	
+
 }
 void WebSocketSinkManager::init()
 {
@@ -50,7 +50,7 @@ void WebSocketSinkManager::init()
 	protocollist[1] = { NULL, NULL, 0 };
 
 
-	
+	setConfiguration(configuration);
 }
 void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
@@ -162,6 +162,14 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	}
 }
+void WebSocketSinkManager::setValue(string property,string value)
+{
+	AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
+	m_engine->setProperty(property, type);
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "AbstractRoutingEngine::setProperty called with arguments:" << property << value << "\n";
+	delete type;
+	
+}
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
 {
 	stringstream s;
@@ -212,9 +220,9 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
 	m_sinkMap[property] = sink;
 }
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	sinkManager = new WebSocketSinkManager(routingengine);
+	sinkManager = new WebSocketSinkManager(routingengine, config);
 	sinkManager->init();
 	return sinkManager;
 }
@@ -360,14 +368,33 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			json_reader_end_member(reader);
 
 			list<string> data;
+			list<string> key;
+			list<string> value;
 			json_reader_read_member(reader,"data");
 			if (json_reader_is_array(reader))
 			{
 				for(int i=0; i < json_reader_count_elements(reader); i++)
 				{
 					json_reader_read_element(reader,i);
-					string path = json_reader_get_string_value(reader);
-					data.push_back(path);
+					if (json_reader_is_value(reader))
+					{
+						//Raw string value
+						string path = json_reader_get_string_value(reader);
+						data.push_back(path);
+						
+					}
+					else
+					{
+						//Not a raw string value, then it's "property/value" kvp, for "set" requests
+						json_reader_read_member(reader,"property");
+						string keystr = json_reader_get_string_value(reader);
+						key.push_back(keystr);
+						json_reader_end_member(reader);
+						json_reader_read_member(reader,"value");
+						string valuestr = json_reader_get_string_value(reader);
+						value.push_back(valuestr);
+						json_reader_end_member(reader);
+					}
 					json_reader_end_element(reader);
 				}
 			}
@@ -442,6 +469,33 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					else
 					{
 						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id << "\n";
+					}
+				}
+				else if (name == "set")
+				{
+					if (data.size() > 0)
+					{
+					  //Should not happen
+					}
+					else if (value.size() > 0)
+					{
+						if (key.size() != value.size())
+						{
+							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "\"set\" method called with an invalid key value pair count\n";
+						}
+						else
+						{
+							list<string>::iterator d = value.begin();
+							for (list<string>::iterator i=key.begin();i!=key.end();i++)
+							{
+								DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "websocketsinkmanager setting" << (*i) << "to" << (*d) << "\n";
+								//(*i);
+								sinkManager->setValue((*i),(*d));
+								//(*d);
+								d++;
+							}
+							
+						}
 					}
 				}
 				else if (name == "subscribe")

@@ -19,8 +19,8 @@
 
 #include "abstractsource.h"
 
-AbstractSource::AbstractSource(AbstractRoutingEngine* engine)
-: AbstractSink(engine), routingEngine(engine)
+AbstractSource::AbstractSource(AbstractRoutingEngine* engine, map<string, string> config)
+	: AbstractSink(engine,config), routingEngine(engine)
 {
 	
 }

@@ -27,7 +27,7 @@ class ExampleSink : public AbstractSink
 {
 
 public:
-	ExampleSink(AbstractRoutingEngine* engine);
+	ExampleSink(AbstractRoutingEngine* engine, map<string, string> config);
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
@@ -37,16 +37,10 @@ public:
 class ExampleSinkManager: public AbstractSinkManager
 {
 public:
-	ExampleSinkManager(AbstractRoutingEngine* engine)
-	:AbstractSinkManager(engine)
+	ExampleSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
+	:AbstractSinkManager(engine, config)
 	{
-
-	}
-
-	void setConfiguration(map<string, string> config)
-	{
-		ExampleSink* sink = new ExampleSink(routingEngine);
-		sink->setConfiguration(config);
+		new ExampleSink(routingEngine, config);
 	}
 };
 

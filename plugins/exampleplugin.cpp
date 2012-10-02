@@ -42,8 +42,8 @@ static gboolean timeoutCallback(gpointer data)
 	return true;
 }
 
-ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re)
-:AbstractSource(re), velocity(0), engineSpeed(0)
+ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, string> config)
+:AbstractSource(re, config), velocity(0), engineSpeed(0)
 {
 	re->setSupported(supported(), this);
 	debugOut("setting timeout");
@@ -53,9 +53,9 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re)
 
 
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine)
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new ExampleSourcePlugin(routingengine);
+	return new ExampleSourcePlugin(routingengine, config);
 	
 }
 

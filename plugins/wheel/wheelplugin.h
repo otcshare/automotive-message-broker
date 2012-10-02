@@ -30,7 +30,7 @@ class WheelSourcePlugin: public AbstractSource
 {
 
 public:
-	WheelSourcePlugin(AbstractRoutingEngine* re);
+	WheelSourcePlugin(AbstractRoutingEngine* re, map<string, string> config);
 	~WheelSourcePlugin();
 	
 	string uuid();
@@ -42,6 +42,8 @@ public:
 	
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
+
+	map<string, string> getConfiguration() { return configuration; }
 
 	friend class WheelPrivate;	
 	

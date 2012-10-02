@@ -2,15 +2,19 @@
 	"sources" : [ 
 		{
 			"name" : "WheelSource",
-			"path" : "/usr/lib/automotive-message-broker/wheelsourceplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/wheelsourceplugin.so",
+			"device" : "/dev/input/js0"
 		}
 	],
 	"sinks": [
 		{
 			"name" : "WebSocketSink",
 			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
-			"interface" : "wlan0"
+			"interface" : "lo"
 		} ,
+		{
+                        "path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
+                },
 		{
 			"path" : "/usr/lib/automotive-message-broker/demosinkplugin.so",
 			"script" : "./rundemo %1"

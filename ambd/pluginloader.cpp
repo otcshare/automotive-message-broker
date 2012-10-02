@@ -97,12 +97,11 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re): f_crea
 		string path = json_reader_get_string_value(reader);
 		json_reader_end_member(reader);
 
-		AbstractSource* plugin = loadPlugin<AbstractSource*>(path);
+		AbstractSource* plugin = loadPlugin<AbstractSource*>(path,configurationMap);
 		
 		if(plugin != nullptr)
 		{
 			mSources.push_back(plugin);
-			plugin->setConfiguration(configurationMap);
 		}
 
 		json_reader_end_element(reader);
@@ -133,14 +132,12 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re): f_crea
 		string path = json_reader_get_string_value(reader);
 		json_reader_end_member(reader);
 
-		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path);
+		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path, configurationMap);
 
 		if(plugin == nullptr)
 		{
 			throw std::runtime_error("plugin is not a SinkManager");
 		}
-
-		plugin->setConfiguration(configurationMap);
 
 		json_reader_end_element(reader);
 	}

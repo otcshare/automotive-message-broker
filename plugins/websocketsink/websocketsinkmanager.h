@@ -31,7 +31,7 @@
 class WebSocketSinkManager: public AbstractSinkManager
 {
 public:
-	WebSocketSinkManager(AbstractRoutingEngine* engine);
+	WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
 	void addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id);
 	void addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid);
 	void disconnectAll(libwebsocket* socket);
@@ -41,6 +41,7 @@ public:
 	void init();
 	map<std::string,WebSocketSink*> m_sinkMap;
 	void setConfiguration(map<string, string> config);
+	void setValue(string property,string value);
 private:
 	map<int,GIOChannel*> m_ioChannelMap;
 	map<int,guint> m_ioSourceMap;

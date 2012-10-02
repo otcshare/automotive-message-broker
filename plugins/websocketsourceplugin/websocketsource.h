@@ -32,7 +32,7 @@ class WebSocketSource : public AbstractSource
 {
 
 public:
-    WebSocketSource(AbstractRoutingEngine* re);
+	WebSocketSource(AbstractRoutingEngine* re, map<string, string> config);
     string uuid();
 	boost::any getProperty(VehicleProperty::Property property);
 	void getPropertyAsync(AsyncPropertyReply *reply);

@@ -46,6 +46,10 @@ const VehicleProperty::Property VehicleProperty::InteriorTemperature = "Interior
 const VehicleProperty::Property VehicleProperty::EngineOilTemperature = "EngineOilTemperature";
 const VehicleProperty::Property VehicleProperty::VIN = "VIN";
 const VehicleProperty::Property VehicleProperty::WMI = "WMI";
+const VehicleProperty::Property VehicleProperty::TirePressureLeftFront = "TirePressureLeftFront";
+const VehicleProperty::Property VehicleProperty::TirePressureRightFront = "TirePressureRightFront";
+const VehicleProperty::Property VehicleProperty::TirePressureLeftRear = "TirePressureLeftRear";
+const VehicleProperty::Property VehicleProperty::TirePressureRightRear = "TirePressureRightRear";
 
 VehicleProperty::VehicleProperty()
 {
@@ -79,6 +83,10 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 	mProperties.push_back(MachineGunTurretStatus);
 	mProperties.push_back(VIN);
 	mProperties.push_back(WMI);
+	mProperties.push_back(TirePressureLeftFront);
+	mProperties.push_back(TirePressureRightFront);
+	mProperties.push_back(TirePressureLeftRear);
+	mProperties.push_back(TirePressureRightRear);
 
 	return mProperties;
 }
@@ -108,6 +116,10 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 	else if(name == EngineOilTemperature) return new EngineOilTemperatureType(value);
 	else if(name == VIN) return new VINType(value);
 	else if(name == WMI) return new WMIType(value);
+	else if(name == TirePressureLeftFront) return new TirePressureType(value);
+	else if(name == TirePressureRightFront) return new TirePressureType(value);
+	else if(name == TirePressureLeftRear) return new TirePressureType(value);
+	else if(name == TirePressureRightRear) return new TirePressureType(value);
 
 
 	return nullptr;

@@ -19,14 +19,33 @@
 
 #include "core.h"
 #include <functional>
+#include <glib.h>
 #include "listplusplus.h"
 #include "debugout.h"
 
 using namespace std::placeholders;
 
-Core::Core()
+int lastpps=0;
+
+static int PPSUpdate(void* data)
 {
-	
+	int* pps = (int*)data;
+
+	int temp = *pps;
+
+	if(temp > 0 && temp != lastpps)
+	{
+		lastpps = temp;
+		DebugOut(1)<<"Property updates per second: "<<temp<<endl;
+	}
+
+	*pps = 0;
+}
+
+Core::Core()
+	:propertiesPerSecond(0)
+{
+	g_timeout_add(1000,PPSUpdate,&propertiesPerSecond);
 }
 
 Core::~Core()
@@ -126,7 +145,9 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 	SinkList list = propertySinkMap[property];
 	
 	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<property<<endl;
-	
+
+	propertiesPerSecond++;
+
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{
 		(*itr)->propertyChanged(property, value,(*itr)->uuid());
@@ -182,7 +203,7 @@ void Core::setProperty(VehicleProperty::Property property, AbstractPropertyType 
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
-  printf("Subscribing\n");
+	printf("Subscribing\n");
 	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
 		DebugOut()<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
