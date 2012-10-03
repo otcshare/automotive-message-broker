@@ -27,7 +27,7 @@ using namespace std;
 #include "debugout.h"
 
 uint16_t accelerationX = 0;
-uint16_t transmissionShiftPostion = 0;
+Transmission::TransmissionPositions transmissionShiftPostion = Transmission::Neutral;
 uint16_t steeringWheelAngle=0;
 uint16_t throttlePos = 0;
 uint16_t engineCoolant = 40;
@@ -156,7 +156,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	velocity = 1 + (255.00 * (rand() / (RAND_MAX + 1.0)));
 	engineSpeed = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
 	accelerationX = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
-	transmissionShiftPostion = 1 + (6.00 * (rand() / (RAND_MAX + 1.0)));
+	transmissionShiftPostion = Transmission::TransmissionPositions(1 + (6.00 * (rand() / (RAND_MAX + 1.0))));
 	steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
 	throttlePos = 1 + (100.00 * (rand() / (RAND_MAX + 1.0)));
 	engineCoolant = 1 + (40.00 * (rand() / (RAND_MAX + 140.0)));

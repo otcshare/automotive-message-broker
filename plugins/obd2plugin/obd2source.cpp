@@ -32,6 +32,8 @@
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
 
+int calledPersecond = 0;
+
 bool sendElmCommand(obdLib *obd,std::string command)
 {
   	std::vector<unsigned char> replyVector;
@@ -276,8 +278,10 @@ void threadLoop(gpointer data)
 	}
 	
 }
+
 static int updateProperties(/*gpointer retval,*/ gpointer data)
 {
+
 	OBD2Source* src = (OBD2Source*)data;
 	
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
@@ -454,6 +458,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 
 	//g_timeout_add(1,updateProperties, this);
 	g_idle_add(updateProperties, this);
+	//g_timeout_add(1000,calcCPS,NULL);
 
 }
 

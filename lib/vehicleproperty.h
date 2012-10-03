@@ -56,6 +56,28 @@ enum TurnSignalType
 };
 }
 
+namespace Transmission {
+enum TransmissionPositions
+{
+	Neutral = 0,
+	First,
+	Second,
+	Third,
+	Forth,
+	Fifth,
+	Sixth,
+	Seventh,
+	Eighth,
+	Ninth,
+	Tenth,
+	CVT = 64,
+	Drive = 96,
+	Reverse = 128,
+	Park = 255
+
+};
+}
+
 class VehicleProperty
 {
 
@@ -83,12 +105,12 @@ public:
 	 * 1 = 1st
 	 * 2 = 2nd
 	 * ...
-	 * 64 = Drive
+	 * 96 = Drive
 	 * 128 = Reverse
 	 * 255 = Park
 	 */
 	static const Property TransmissionShiftPosition;
-	typedef BasicPropertyType<uint16_t> TransmissionShiftPositionType;
+	typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionShiftPositionType;
 
 	/**< Transmission Gear Position
 	* 0 = Neutral
@@ -96,9 +118,10 @@ public:
 	* 2 = 2nd
 	* ...
 	* 64 = CVT
+	* 128 = Reverse
 	*/
 	static const Property TransmissionGearPosition;
-	typedef BasicPropertyType<uint16_t> TransmissionGearPositionType;
+	typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
