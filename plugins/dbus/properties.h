@@ -50,6 +50,17 @@ public:
 	}
 };
 
+class VehiclePowerModeProperty: public DBusSink
+{
+public:
+	VehiclePowerModeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.tirePressure","/org/automotive/maintainance/tirePressure", re, connection, map<string, string>())
+	{
+		wantProperty<uint16_t>(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+};
+
 
 
 #endif

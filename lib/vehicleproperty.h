@@ -31,6 +31,7 @@
 
 namespace ButtonEvents {
 enum ButtonEventType {
+	NoButton = 0,
 	PlayButton = 1,
 	SkipButton = 1 << 1,
 	PrevButton = 1 << 2,
@@ -76,6 +77,16 @@ enum TransmissionPositions
 	Reverse = 128,
 	Park = 255
 
+};
+}
+
+namespace Power {
+enum PowerModes
+{
+	Off = 0,
+	Accessory1 = 1,
+	Accessory2 = 2,
+	Run = 3
 };
 }
 
@@ -206,6 +217,9 @@ public:
 	static const Property TirePressureRightRear;
 	typedef BasicPropertyType<uint16_t> TirePressureType;
 
+	static const Property VehiclePowerMode;
+	typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
+
 
 
 	static std::list<VehicleProperty::Property> capabilities();
@@ -221,7 +235,7 @@ public:
 private:
 
 	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;
-    
+	static std::list<VehicleProperty::Property> mCapabilities;
 };
 
 typedef std::list<VehicleProperty::Property> PropertyList;
