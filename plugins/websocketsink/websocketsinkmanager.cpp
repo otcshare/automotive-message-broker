@@ -78,7 +78,7 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 			port = boost::lexical_cast<int>((*i).second);
 		}
 	}
-	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
+	context = libwebsocket_create_context(port, interface.c_str(), protocollist, ssl_cert_path, ssl_key_path, -1, -1, options);
 }
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
@@ -341,12 +341,6 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			//printf("Client writable\n");
 			break;
 		}
-		case LWS_CALLBACK_SERVER_WRITEABLE:
-		{
-			//printf("Server writable\n");
-			break;
-		}
-		
 		case LWS_CALLBACK_RECEIVE:
 		{
 			//printf("Data Received: %s\n",(char*)in);
