@@ -285,12 +285,6 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			}
 			break;
 		}
-		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
-		{
-			//printf("Requested extension: %s\n",(char*)in);
-			return 0;
-			break;
-		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//Add a FD to the poll list.
@@ -313,7 +307,7 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	clientConnected = false;
 	source = this;
 	m_re = re;  
-	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
+	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, NULL, NULL, -1, -1, 0);
 	
 	setConfiguration(config);
 	re->setSupported(supported(), this);

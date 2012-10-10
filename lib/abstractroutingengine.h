@@ -20,6 +20,9 @@
 #ifndef ABSTRACTROUTINGENGINE_H
 #define ABSTRACTROUTINGENGINE_H
 
+#include "sys/types.h"
+#include <stdlib.h>
+
 #include <boost/any.hpp>
 #include <functional>
 #include <time.h>

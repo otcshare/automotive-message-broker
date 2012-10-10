@@ -27,6 +27,8 @@
 #include <libwebsockets.h>
 #include "debugout.h"
 #include <stdexcept>
+#include "sys/types.h"
+#include <stdlib.h>
 
 class WebSocketSinkManager: public AbstractSinkManager
 {
