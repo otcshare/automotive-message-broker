@@ -78,6 +78,13 @@ enum TransmissionPositions
 	Park = 255
 
 };
+enum Mode {
+	Normal=0,
+	Sports = 1,
+	Economy = 2,
+	OEMCustom1 = 3,
+	OEMCustom2 = 4
+};
 }
 
 namespace Power {
@@ -135,6 +142,9 @@ public:
 	*/
 	static const Property TransmissionGearPosition;
 	typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
+
+	static const Property TransmissionMode;
+	typedef BasicPropertyType<Transmission::Mode> TransmissionModeType;
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;

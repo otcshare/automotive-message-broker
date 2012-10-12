@@ -87,4 +87,21 @@ public:
 	}
 };
 
+class TransmissionProperty: public DBusSink
+{
+public:
+	TransmissionProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	:DBusSink("org.automotive.transmission","/org/automotive/runningstatus/transmission", re, connection, map<string, string>())
+	{
+		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionShiftPosition,
+														  "ShiftPosition", "y", AbstractProperty::Read);
+		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionGearPosition,
+														  "GearPosition", "y", AbstractProperty::Read);
+		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionMode,
+														  "Mode", "y", AbstractProperty::Read);
+
+		supportedChanged(re->supported());
+	}
+};
+
 #endif
