@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2012 Intel Corporation
+Copyright (C) 2012 Tim Trampedach
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
