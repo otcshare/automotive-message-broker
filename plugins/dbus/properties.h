@@ -42,10 +42,10 @@ public:
 	TirePressureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.tirePressure","/org/automotive/maintainance/tirePressure", re, connection, map<string, string>())
 	{
-		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftFront,"LeftFront", "i", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TirePressureRightFront,"RightFront", "i", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftRear,"LeftRear", "i", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TirePressureRightRear,"RightRear", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftFront,"LeftFront", "q", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TirePressureRightFront,"RightFront", "q", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftRear,"LeftRear", "q", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TirePressureRightRear,"RightRear", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -54,13 +54,37 @@ class VehiclePowerModeProperty: public DBusSink
 {
 public:
 	VehiclePowerModeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.tirePressure","/org/automotive/maintainance/tirePressure", re, connection, map<string, string>())
+		:DBusSink("org.automotive.vehiclePowerMode","/org/automotive/runningstatus/vehiclePowerMode", re, connection, map<string, string>())
 	{
 		wantProperty<uint16_t>(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+class TripMeterProperty: public DBusSink
+{
+public:
+	TripMeterProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	:DBusSink("org.automotive.tripMeter","/org/automotive/runningstatus/tripMeter", re, connection, map<string, string>())
+	{
+		wantProperty<uint16_t>(VehicleProperty::TripMeterA, "A", "q", AbstractProperty::ReadWrite);
+		wantProperty<uint16_t>(VehicleProperty::TripMeterB, "B", "q", AbstractProperty::ReadWrite);
+		wantProperty<uint16_t>(VehicleProperty::TripMeterC, "C", "q", AbstractProperty::ReadWrite);
+		supportedChanged(re->supported());
+	}
+};
 
+class AccelerationProperty: public DBusSink
+{
+public:
+	AccelerationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	:DBusSink("org.automotive.acceleration","/org/automotive/runningstatus/acceleration", re, connection, map<string, string>())
+	{
+		wantProperty<uint16_t>(VehicleProperty::AccelerationX, "X", "q", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::AccelerationY, "Y", "q", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::AccelerationZ, "Z", "q", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+};
 
 #endif

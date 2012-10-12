@@ -26,14 +26,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "accelerationproperty.h"
 #include "properties.h"
 
+#define ConstructProperty(property) \
+	new property(iface->re, connection);
+
 using namespace std;
 
 static void
 on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
 	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
-	AbstractDBusInterface* acceleration = new AccelerationPropertyInterface(iface->re, connection);
-	VehicleSpeedProperty* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
+
+	AbstractDBusInterface* acceleration = new AccelerationProperty(iface->re, connection);
+	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
+	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);
+	ConstructProperty(VehiclePowerModeProperty);
+	ConstructProperty(TripMeterProperty);
+
 
 }
 
