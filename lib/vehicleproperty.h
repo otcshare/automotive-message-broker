@@ -233,12 +233,12 @@ public:
 	static const Property TirePressureRightRear;
 	typedef BasicPropertyType<uint16_t> TirePressureType;
 
-	/**< Tire pressure in kPa */
+	/**< Tire temperature in degrees C */
 	static const Property TireTemperatureLeftFront;
 	static const Property TireTemperatureRightFront;
 	static const Property TireTemperatureLeftRear;
 	static const Property TireTemperatureRightRear;
-	typedef BasicPropertyType<uint16_t> TireTemperature;
+	typedef BasicPropertyType<uint16_t> TireTemperatureType;
 	
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes
@@ -266,7 +266,6 @@ public:
 	static const Property LightParking;
 	static const Property LightHighBeam;
 	typedef BasicPropertyType<bool> LightStatusType;
-
 	static const Property InteriorLightDriver;
 	static const Property InteriorLightCenter;
 	static const Property InteriorLightPassenger;
