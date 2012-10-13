@@ -28,24 +28,33 @@ class TpmsPlugin: public AbstractSource
 {
 
 public:
-	TpmsPlugin(AbstractRoutingEngine* re);
-
-    string uuid();
-	PropertyList supported();
+	TpmsPlugin(AbstractRoutingEngine* re, map<string, string> config);
+	
+	string uuid();
+	void getPropertyAsync(AsyncPropertyReply *reply);
+	void setProperty(VehicleProperty::Property, AbstractPropertyType*);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
+	PropertyList supported();
 	
-	void getPropertyAsync(AsyncPropertyReply *reply);
-    void setProperty(VehicleProperty::Property, AbstractPropertyType*);
-
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
-	
+
+    int readValues();
 	
 private:
 	PropertyList mRequests;
-    float leftFrontPressure, rightFrontPressure, leftRearPressure, rightRearPressure;
-    float leftFrontTemperature, rightFrontTemperature, leftRearTemperature, rightRearTemperature;
+    float lfPressure, rfPressure, lrPressure, rrPressure;
+    float lfTemperature, rfTemperature, lrTemperature, rrTemperature;
+    struct libusb_device_handle *mDeviceHandle;
+
+    int findDevice();
+    int detachDevice();
+    int exitClean(int deinit);
+
+    int readUsbSensor(int sid, unsigned char *buf);
+
+    string sensorNumberToString(int snid);
 };
 
 #endif // TPMSPLUGIN_H
