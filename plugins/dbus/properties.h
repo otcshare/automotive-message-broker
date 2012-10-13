@@ -104,6 +104,21 @@ public:
 	}
 };
 
+class TireTemperatureProperty: public DBusSink
+{
+public:
+	TireTemperatureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.tireTemperature","/org/automotive/maintainance/tireTemperature", re, connection, map<string, string>())
+	{
+		wantProperty<uint16_t>(VehicleProperty::TireTemperatureLeftFront,"LeftFront", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TireTemperatureRightFront,"RightFront", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TireTemperatureLeftRear,"LeftRear", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::TireTemperatureRightRear,"RightRear", "i", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+};
+
+
 class CruiseControlProperty: public DBusSink
 {
 public:
@@ -126,7 +141,6 @@ public:
 		supportedChanged(re->supported());
 	}
 };
-
 class LightStatusProperty: public DBusSink
 {
 public:
