@@ -64,7 +64,7 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 	{
 		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((*itr)))
 		{
-			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<(*itr)<<endl;
+			DebugOut()<<__FUNCTION__<<"() adding support for property "<<(*itr)<<endl;
 			mMasterPropertyList.push_back((*itr));
 		}
 	}
