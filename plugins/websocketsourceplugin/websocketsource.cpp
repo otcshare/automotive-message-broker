@@ -94,7 +94,7 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	//printf("Connecting to websocket server at %s port %i\n",ip.c_str(),port);
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Connecting to websocket server at" << ip << ":" << port << "\n";
 	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, 0,"/", "localhost", "websocket",protocols[0].name, -1);
-	
+
 }
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
@@ -116,7 +116,7 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	if (condition == G_IO_IN)
 	{
 	}
-	
+
 	return true;
 }
 
@@ -141,7 +141,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming connection" << "\n";
 			stringstream s;
 			s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
-		
+
 			string replystr = s.str();
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
 			char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
@@ -162,7 +162,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
 				return 0;
 			}
-			
+
 			JsonNode* node = json_parser_get_root(parser);
 			if(node == nullptr)
 			{
@@ -170,7 +170,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
-			
+
 			JsonReader* reader = json_reader_new(node);
 			if(reader == nullptr)
 			{
@@ -178,16 +178,16 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
-			
-			
-			
-			
-			
+
+
+
+
+
 			string type;
 			json_reader_read_member(reader,"type");
 			type = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
-			
+
 			string  name;
 			json_reader_read_member(reader,"name");
 			name = json_reader_get_string_value(reader);
@@ -214,7 +214,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				}
 			}
 			json_reader_end_member(reader);
-			
+
 			string id;
 			json_reader_read_member(reader,"transactionid");
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
@@ -230,15 +230,15 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				id = strstr.str();
 			}
 			json_reader_end_member(reader);
-			
+
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
 			//if(error) g_error_free(error);
-			
+
 			g_object_unref(reader);
 			g_object_unref(parser);
-			
-			
+
+
 			if (type == "valuechanged")
 			{
 				//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
@@ -277,12 +277,18 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						string val = data.front();
 						data.pop_front();	
 						props.push_back(val);
-						
+
 					}
 					source->setSupported(props);
 					//m_re->updateSupported(m_supportedProperties,PropertyList());
 				}
 			}
+			break;
+		}
+		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
+		{
+			//printf("Requested extension: %s\n",(char*)in);
+			return 0;
 			break;
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
@@ -307,13 +313,13 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	clientConnected = false;
 	source = this;
 	m_re = re;  
-	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, NULL, NULL, -1, -1, 0);
-	
+	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
+
 	setConfiguration(config);
 	re->setSupported(supported(), this);
 
 	//printf("websocketsource loaded!!!\n");
-	
+
 }
 PropertyList WebSocketSource::supported()
 {
