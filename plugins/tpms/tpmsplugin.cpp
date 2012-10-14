@@ -239,27 +239,27 @@ int TpmsPlugin::readValues()
 
       switch (snum) {
       case 1:
-        lfPressure = ((float)buf[0]-40) * PRESSURE_SCALE;
+        lfPressure = ((float)buf[0]-40) * PRESSURE_SCALE * KPA_MULTIPLIER;
         lfTemperature = (float)buf[1]-40;
-        sprintf(print_string, "TPMS: Left front pressure = %5.2f bar, temperature = %5.1f degrees Celsius", lfPressure, lfTemperature);
+        sprintf(print_string, "TPMS: Left front pressure = %5.1f kPa, temperature = %5.1f degrees Celsius", lfPressure, lfTemperature);
         DebugOut() << print_string << endl;
         break;
       case 2:
-        rfPressure = (buf[0]-40) * PRESSURE_SCALE;
+        rfPressure = (buf[0]-40) * PRESSURE_SCALE * KPA_MULTIPLIER;
         rfTemperature = buf[1]-40;
-        sprintf(print_string, "TPMS: Right front pressure = %5.2f bar, temperature = %5.1f degrees Celsius", rfPressure, rfTemperature);
+        sprintf(print_string, "TPMS: Right front pressure = %5.1f kPa, temperature = %5.1f degrees Celsius", rfPressure, rfTemperature);
         DebugOut() << print_string << endl;
         break;
       case 3:
-        lrPressure = (buf[0]-40) * PRESSURE_SCALE;
+        lrPressure = (buf[0]-40) * PRESSURE_SCALE * KPA_MULTIPLIER;
         lrTemperature = buf[1]-40;
-        sprintf(print_string, "TPMS: Left rear pressure = %5.2f bar, temperature = %5.1f degrees Celsius", lrPressure, lrTemperature);
+        sprintf(print_string, "TPMS: Left rear pressure = %5.1f kPa, temperature = %5.1f degrees Celsius", lrPressure, lrTemperature);
         DebugOut() << print_string << endl;
         break;
       case 4:
-        rrPressure = (buf[0]-40) * PRESSURE_SCALE;
+        rrPressure = (buf[0]-40) * PRESSURE_SCALE * KPA_MULTIPLIER;
         rrTemperature = buf[1]-40;
-        sprintf(print_string, "TPMS: Right rear pressure = %5.2f bar, temperature = %5.1f degrees Celsius", rrPressure, rrTemperature);
+        sprintf(print_string, "TPMS: Right rear pressure = %5.1f kPa, temperature = %5.1f degrees Celsius", rrPressure, rrTemperature);
         DebugOut() << print_string << endl;
         break;
       }
