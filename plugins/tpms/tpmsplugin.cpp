@@ -34,7 +34,7 @@ using namespace std;
 #define DEVICE_PID 0x0001
 
 #define MAX_SENSORS 4
-#define READ_INTERVAL 10
+
 //timeout for performing interrupt r/w operations in milliseconds
 #define INTR_TIMEOUT 1000
 
@@ -58,8 +58,8 @@ TpmsPlugin::TpmsPlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSource(re, config)
 {
 	re->setSupported(supported(), this);
-	debugOut("setting timeout");
-	g_timeout_add(1000, timeoutCallback, this );
+	g_timeout_add(5000, timeoutCallback, this );
+	DebugOut() << "TPMS: set to read sensor every 5 seconds" << endl;
 
     lfPressure = rfPressure = lrPressure = rrPressure = 0;
     lfTemperature = rfTemperature = lrTemperature = rrTemperature = 0;
@@ -235,28 +235,37 @@ int TpmsPlugin::readValues()
     // only do this if sensor is available
     if (buf[3] != 0xff) {
       string mode_string;
+      char print_string[100];
 
       switch (snum) {
       case 1:
-        lfPressure = (buf[0]-40) * PRESSURE_SCALE * PSI_MULTIPLIER;
-        lfTemperature = buf[1]-40;
-        DebugOut() << "TPMS debug: pressure = " << lfPressure << " temperature = " << lfTemperature << endl;
+        lfPressure = ((float)buf[0]-40) * PRESSURE_SCALE;
+        lfTemperature = (float)buf[1]-40;
+        sprintf(print_string, "TPMS: Left front pressure = %5.2f bar, temperature = %5.1f degrees Celsius", lfPressure, lfTemperature);
+        DebugOut() << print_string << endl;
         break;
       case 2:
-        rfPressure = (buf[0]-40) * PRESSURE_SCALE * PSI_MULTIPLIER;
+        rfPressure = (buf[0]-40) * PRESSURE_SCALE;
         rfTemperature = buf[1]-40;
+        sprintf(print_string, "TPMS: Right front pressure = %5.2f bar, temperature = %5.1f degrees Celsius", rfPressure, rfTemperature);
+        DebugOut() << print_string << endl;
         break;
       case 3:
-        lrPressure = (buf[0]-40) * PRESSURE_SCALE * PSI_MULTIPLIER;
+        lrPressure = (buf[0]-40) * PRESSURE_SCALE;
         lrTemperature = buf[1]-40;
+        sprintf(print_string, "TPMS: Left rear pressure = %5.2f bar, temperature = %5.1f degrees Celsius", lrPressure, lrTemperature);
+        DebugOut() << print_string << endl;
         break;
       case 4:
-        rrPressure = (buf[0]-40) * PRESSURE_SCALE * PSI_MULTIPLIER;
+        rrPressure = (buf[0]-40) * PRESSURE_SCALE;
         rrTemperature = buf[1]-40;
+        sprintf(print_string, "TPMS: Right rear pressure = %5.2f bar, temperature = %5.1f degrees Celsius", rrPressure, rrTemperature);
+        DebugOut() << print_string << endl;
         break;
       }
 
       // make sensor mode human-readable
+      // FIXME: for future reference, modes not being used
       switch (buf[3]) {
         case 0x01: mode_string = "normal"; break;
         case 0x02: mode_string = "pressure_alert"; break;
@@ -270,8 +279,22 @@ int TpmsPlugin::readValues()
   }
 
   VehicleProperty::TirePressureType lfPres(lfPressure);
+  VehicleProperty::TirePressureType rfPres(rfPressure);
+  VehicleProperty::TirePressureType lrPres(lrPressure);
+  VehicleProperty::TirePressureType rrPres(rrPressure);
+  VehicleProperty::TireTemperatureType lfTemp(lfTemperature);
+  VehicleProperty::TireTemperatureType rfTemp(rfTemperature);
+  VehicleProperty::TireTemperatureType lrTemp(lrTemperature);
+  VehicleProperty::TireTemperatureType rrTemp(rrTemperature);
 
   routingEngine->updateProperty(VehicleProperty::TirePressureLeftFront, &lfPres);
+  routingEngine->updateProperty(VehicleProperty::TirePressureRightFront, &rfPres);
+  routingEngine->updateProperty(VehicleProperty::TirePressureLeftRear, &lrPres);
+  routingEngine->updateProperty(VehicleProperty::TirePressureRightRear, &rrPres);
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftFront, &lfTemp);
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightFront, &rfTemp);
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftRear, &lrTemp);
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightRear, &rrTemp);
 
   return 0;
 }
