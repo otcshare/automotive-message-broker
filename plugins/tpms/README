@@ -22,7 +22,7 @@ HOW TO USE
 ==========
 Depending on system configuration, the ambd module may need to be run as root to get access 
 to the USB driver. Once loaded, the module reads data every 5 seconds for broadcasting. The 
-tire pressure is in bar and the tire temperature in degrees Celsius.
+tire pressure is in kPa and the tire temperature in degrees Celsius.
 
 KNOWN ISSUES
 ============
