@@ -104,4 +104,15 @@ public:
 	}
 };
 
+class CruiseControlProperty: public DBusSink
+{
+public:
+	CruiseControlProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	:DBusSink("org.automotive.cruiseControlStatus","/org/automotive/runningstatus/cruiseControlStatus", re, connection, map<string, string>())
+	{
+		wantProperty<bool>(VehicleProperty::CruiseControlActive, "Activated", "b", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::CruiseControlSpeed, "Speed", "q", AbstractProperty::Read);
+	}
+};
+
 #endif

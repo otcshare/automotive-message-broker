@@ -63,6 +63,8 @@ const VehicleProperty::Property VehicleProperty::VehiclePowerMode = "VehiclePowe
 const VehicleProperty::Property VehicleProperty::TripMeterA = "TripMeterA";
 const VehicleProperty::Property VehicleProperty::TripMeterB = "TripMeterB";
 const VehicleProperty::Property VehicleProperty::TripMeterC = "TripMeterC";
+const VehicleProperty::Property VehicleProperty::CruiseControlActive = "CruiseControlActive";
+const VehicleProperty::Property VehicleProperty::CruiseControlSpeed = "CruiseControlSpeed";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 
@@ -99,6 +101,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterC,TripMeterType,0);
+	REGISTERPROPERTY(CruiseControlActive,false);
+	REGISTERPROPERTY(CruiseControlSpeed,0);
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
