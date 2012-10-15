@@ -28,7 +28,7 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DBusSinkManager(routingengine, config);
 }
 
-DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config)
+DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
 	:AbstractDBusInterface(interface, path, connection),
 	  AbstractSink(engine, config), supported(false)
 {
