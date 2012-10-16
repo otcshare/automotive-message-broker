@@ -57,10 +57,6 @@ static gboolean timeoutCallback(gpointer data)
 TpmsPlugin::TpmsPlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSource(re, config)
 {
-	re->setSupported(supported(), this);
-	g_timeout_add(5000, timeoutCallback, this );
-	DebugOut() << "TPMS: set to read sensor every 5 seconds" << endl;
-
     lfPressure = rfPressure = lrPressure = rrPressure = 0;
     lfTemperature = rfTemperature = lrTemperature = rrTemperature = 0;
 
@@ -68,27 +64,35 @@ TpmsPlugin::TpmsPlugin(AbstractRoutingEngine* re, map<string, string> config)
     
     r = libusb_init(NULL);
     if (r < 0) {
-      DebugOut() << "TPMS: Failed to initialize libusb" << endl;
+      DebugOut() << "TPMS: Plugin load failure. Failed to initialize libusb" << endl;
     }
+    else {
+      r = findDevice();
+      if (r < 0) {
+        DebugOut() << "TPMS: Plugin load failure. Could not find/open device - run as root?" << endl;
+      }
+      else {
+        // need to detach device from kernel driver before claiming the interface
+        r = detachDevice();
+        if (r < 0) {
+          DebugOut() << "TPMS: Plugin load failure. USB device detach failed with code " << r << endl;
+        }
+        else {
+          r = libusb_claim_interface(mDeviceHandle, 0);
+          if (r < 0) {
+            DebugOut() << "TPMS: Plugin load failure. usb_claim_interface error " << r << endl;
+          }
+          else {
+            DebugOut() << "TPMS: USB interface initialized" << endl;	
 
-    r = findDevice();
-    if (r < 0) {
-      DebugOut() << "TPMS: Could not find/open device - run as root?" << endl;
+            re->setSupported(supported(), this);
+            g_timeout_add(5000, timeoutCallback, this );
+            DebugOut() << "TPMS: set to read sensor every 5 seconds" << endl;
+          }
+        }
+      }
     }
-    
-    // need to detach device from kernel driver before claiming the interface
-    r = detachDevice();
-    if (r < 0) {
-      DebugOut() << "TPMS: USB device detach failed with code " << r << endl;
-    }
-
-    r = libusb_claim_interface(mDeviceHandle, 0);
-    if (r < 0) {
-      DebugOut() << "TPMS: usb_claim_interface error " << r << endl;
-    }
-    DebugOut() << "TPMS: USB interface initialized" << endl;	
 }
-
 
 
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
@@ -192,7 +196,8 @@ int TpmsPlugin::findDevice(void)
 
   DebugOut() << "TPMS: Trying to open USB device with VID: " << deviceVid << " PID: " << devicePid << endl;
   mDeviceHandle = libusb_open_device_with_vid_pid(NULL, DEVICE_VID, DEVICE_PID);
-  return mDeviceHandle ? 0 : 1;
+
+  return mDeviceHandle ? 0 : -1;
 }
 
 
