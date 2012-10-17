@@ -228,18 +228,27 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 }
 void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 {
+	std::list<WebSocketSink*> toDeleteList;
+
 	for (auto i=m_sinkMap.begin(); i != m_sinkMap.end();i++)
 	{
 		if ((*i).second->socket() == socket)
 		{
 			//This is the sink in question.
 			WebSocketSink* sink = (*i).second;
-			delete sink;
-			m_sinkMap.erase((*i).first);
-			i--;
-			//printf("Sink removed\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed\n";
+			if(!ListPlusPlus<WebSocketSink*>(&toDeleteList).contains(sink))
+			{
+				toDeleteList.push_back(sink);
+			}
+			m_sinkMap.erase(i);
+			i=m_sinkMap.begin();
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed"<<endl;
 		}
+	}
+
+	for(auto i=toDeleteList.begin();i!=toDeleteList.end();i++)
+	{
+		delete *i;
 	}
 }
 void WebSocketSinkManager::addPoll(int fd)

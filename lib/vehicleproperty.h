@@ -88,6 +88,12 @@ enum Mode {
 }
 
 namespace Power {
+/**< Vehicle Power Modes
+ * Off = Vehicle is off and key is in the "off" position.
+ * Accessory1 = Vehicle is off and key is in Accessory1 position.
+ * Accessory2 = Vehicle is off and key is in Accessory2 position.
+ * Run = Vehichle is running.  Key is in the running position.
+ */
 enum PowerModes
 {
 	Off = 0,
@@ -227,6 +233,9 @@ public:
 	static const Property TirePressureRightRear;
 	typedef BasicPropertyType<uint16_t> TirePressureType;
 
+	/**< Vehicle Power Mode.
+	 *@see Power::PowerModes
+	 */
 	static const Property VehiclePowerMode;
 	typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
@@ -254,6 +263,8 @@ public:
 	static const Property InteriorLightDriver;
 	static const Property InteriorLightCenter;
 	static const Property InteriorLightPassenger;
+
+
 
 	static std::list<VehicleProperty::Property> capabilities();
 

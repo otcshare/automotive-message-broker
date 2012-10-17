@@ -39,7 +39,7 @@ public:
 	void addPoll(int fd);
 	void removePoll(int fd);
 	void init();
-	map<std::string,WebSocketSink*> m_sinkMap;
+	map<std::string, WebSocketSink*> m_sinkMap;
 	void setConfiguration(map<string, string> config);
 	void setValue(string property,string value);
 private:
