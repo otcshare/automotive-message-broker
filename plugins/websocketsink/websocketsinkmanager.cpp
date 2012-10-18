@@ -145,9 +145,15 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 {
 	if (m_sinkMap.find(property) != m_sinkMap.end())
 	{
-		WebSocketSink* sink = m_sinkMap[property];
-		delete sink;
+		list<WebSocketSink*> sinks = m_sinkMap[property];
+
+		for(auto i = sinks.begin(); i != sinks.end(); i++)
+		{
+			delete *i;
+		}
+
 		m_sinkMap.erase(property);
+
 		stringstream s;
 		s << "{\"type\":\"methodReply\",\"name\":\"unsubscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
 		
@@ -218,7 +224,7 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
-	m_sinkMap[property] = sink;
+	m_sinkMap[property].push_back(sink);
 }
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -232,17 +238,22 @@ void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 
 	for (auto i=m_sinkMap.begin(); i != m_sinkMap.end();i++)
 	{
-		if ((*i).second->socket() == socket)
+		std::list<WebSocketSink*> *sinks = & (*i).second;
+		for (auto sinkItr =  sinks->begin(); sinkItr != sinks->end(); sinkItr++)
 		{
-			//This is the sink in question.
-			WebSocketSink* sink = (*i).second;
-			if(!ListPlusPlus<WebSocketSink*>(&toDeleteList).contains(sink))
+			if ((*sinkItr)->socket() == socket)
 			{
-				toDeleteList.push_back(sink);
+				//This is the sink in question.
+				WebSocketSink* sink = (*sinkItr);
+				if(!ListPlusPlus<WebSocketSink*>(&toDeleteList).contains(sink))
+				{
+					toDeleteList.push_back(sink);
+				}
+
+				sinks->erase(sinkItr);
+				sinkItr = sinks->begin();
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed"<<endl;
 			}
-			m_sinkMap.erase(i);
-			i=m_sinkMap.begin();
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed"<<endl;
 		}
 	}
 
