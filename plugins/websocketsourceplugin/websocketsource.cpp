@@ -315,8 +315,9 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	m_re = re;  
 	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
 	
-	
+	setConfiguration(config);
 	re->setSupported(supported(), this);
+
 	//printf("websocketsource loaded!!!\n");
 	
 }
@@ -333,17 +334,7 @@ string WebSocketSource::uuid()
 {
 	return "d293f670-f0b3-11e1-aff1-0800200c9a66";
 }
-boost::any WebSocketSource::getProperty(VehicleProperty::Property property)
-{
-	if(property == VehicleProperty::VehicleSpeed)
-	{
-		//return velocity;
-	}
-	else if(property == VehicleProperty::EngineSpeed)
-	{
-		//return engineSpeed;
-	}
-}
+
 void WebSocketSource::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	//printf("Subscribed to property: %s\n",property.c_str());
@@ -367,34 +358,15 @@ void WebSocketSource::unsubscribeToPropertyChanges(VehicleProperty::Property pro
 
 void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 {
-	/*if(reply->property == VehicleProperty::VehicleSpeed)
-	{
-		reply->value = velocity;
-		reply->completed(reply);
-	}
-	else if(reply->property == VehicleProperty::EngineSpeed)
-	{
-		reply->value = engineSpeed;
-		reply->completed(reply);
-	}
-	else if(reply->property == VehicleProperty::AccelerationX)
-	{
-		reply->value = accelerationX;
-		reply->completed(reply);
-	}
-	else if(reply->property == VehicleProperty::TransmissionShiftPosition)
-	{
-		reply->value = transmissionShiftPostion;
-		reply->completed(reply);
-	}
-	else if(reply->property == VehicleProperty::SteeringWheelAngle)
-	{
-		reply->value = steeringWheelAngle;
-		reply->completed(reply);
-	}*/
+	///TODO: fill in
+}
+
+void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
+{
+	///TODO: fill in
 }
 
 void WebSocketSource::setProperty(VehicleProperty::Property , AbstractPropertyType * )
 {
-
+	///TODO: fill in
 }

@@ -34,8 +34,8 @@ class WebSocketSource : public AbstractSource
 public:
 	WebSocketSource(AbstractRoutingEngine* re, map<string, string> config);
     string uuid();
-	boost::any getProperty(VehicleProperty::Property property);
 	void getPropertyAsync(AsyncPropertyReply *reply);
+	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	void setProperty(VehicleProperty::Property, AbstractPropertyType*);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
@@ -50,7 +50,7 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(map<string, string> config);
-	//void randomizeProperties();
+
 private:
   	PropertyList m_supportedProperties;
 

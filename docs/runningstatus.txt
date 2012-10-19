@@ -35,9 +35,12 @@ Interface:      org.automotive.tripMeter
 Object path:    /org/automotive/runningStatus/tripMeter
 Properties:     
 
-		array{uint32} TripMeter [readonly]
+		uint32 A [readwrite]
 		
-			Distance from trip meter(s) in km.
+			Distance from trip meter(s) in km.  This can be only set to "0".
+
+		uint32 B [readwrite]
+		uint32 C [readwrite]
 			
 Interface:      org.automotive.transmission
 Object path:    /org/automotive/runningStatus/transmission
@@ -103,7 +106,7 @@ Interface:      org.automotive.wheelBrake
 Object path:    /org/automotive/runningStatus/wheelBrake
 Properties:
 
-		bool WheelBrake [readonly]
+		bool Engaged [readonly]
 		
 			Engaged = true
 			Idle = false
@@ -113,8 +116,8 @@ Object path:    /org/automotive/runningStatus/lightstatus
 Properties:
 
 		bool Head 	[readonly]
-		bool RightTurn 	[readonly]
 		bool LeftTurn  	[readonly]
+		bool RightTurn 	[readonly]
 		bool Brake	[readonly]
 		bool Fog	[readonly]
 		bool Hazard	[readonly]
@@ -157,13 +160,18 @@ Properties:
 		
 			Estimated fuel range with available fuel in km
 
-		uint16 InstantConsumption [readonly]
+		double InstantConsumption [readonly]
 
-			Fuel consumption in meters per liter of fuel.
+			Instant fuel consumption in milliliters per second
 
-		uint16 AverageConsumption [readonly]
+		uint16 InstantEconomy [readonly]
 
-			Average fuel consumption in meters per liter of fuel since last reset
+			Fuel 'economy' in kilometers per liter of fuel.
+
+		uint16 AverageEconomy [readwrite]
+
+			Average fuel economy in kilometers per liter of fuel since last reset.
+			Setting this to anything will reset the value.
 			
 Interface:      org.automotive.engineOil
 Object path:    /org/automotive/runningStatus/engineOil

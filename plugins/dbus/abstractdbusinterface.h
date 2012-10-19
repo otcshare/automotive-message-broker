@@ -43,11 +43,14 @@ public:
 	}
 
 	void registerObject();
+	void unregisterObject();
 	
 	void addProperty(AbstractProperty* property);
 	virtual void updateValue(AbstractProperty* property);
 	
 protected:
+
+	void startRegistration();
 	
 	static GVariant *getProperty(GDBusConnection * connection, const gchar * sender, const gchar *objectPath,
 								 const gchar *interfaceName, const gchar * propertyName, GError** error,
@@ -67,6 +70,7 @@ private:
 	string introspectionXml;
 	GDBusConnection * mConnection;
 	static unordered_map<string, AbstractDBusInterface*> interfaceMap;
+	guint regId;
 };
 
 #endif // ABSTRACTDBUSINTERFACE_H
