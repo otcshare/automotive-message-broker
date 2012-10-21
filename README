@@ -27,9 +27,9 @@ cp /etc/ambd/config myconfig
 
 # edit myconfig and specify the path to your plugin:
 # change the line: 
-"sources" : [ "../plugins/examplesourceplugin.so" ],
+"sources" : [ { "path" : "../plugins/examplesourceplugin.so" } ],
 # to:
-"sources" : [ "/path/to/mysourceplugin.so" ],
+"sources" : [ { "path" : "/path/to/mysourceplugin.so" } ],
 
 Now you can run ambd with:
 
