@@ -4,3 +4,4 @@
 - per-source property filtering in routing engine
 - historic data "get" interface in routing engine
 - sqlite database storage plugin
+- connect/disconnect on first/last subscription in obd2source
