@@ -388,6 +388,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	//Default values
 	std::string port = "/dev/ttyUSB0";
 	std::string baud = "115200";
+	std::string btadapter = "";
 	
 	//Try to load config
 	//printf("OBD2Source::setConfiguration\n");
@@ -399,9 +400,14 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		{
 			port = (*i).second;
 		}
-		if ((*i).first == "baud")
+		else if ((*i).first == "baud")
 		{
 			baud = (*i).second;
+		}
+
+		else if ((*i).first == "bluetoothAdapter")
+		{
+			btadapter = (*i).second;
 		}
 	}
 
@@ -411,7 +417,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		DebugOut()<<"bluetooth device?"<<endl;
 		ObdBluetoothDevice bt;
 
-		std::string tempPort = bt.getDeviceForAddress(port);
+		std::string tempPort = bt.getDeviceForAddress(port, btadapter);
 		if(tempPort != "")
 		{
 			DebugOut(3)<<"Using bluetooth device \""<<port<<"\" bound to: "<<tempPort<<endl;
