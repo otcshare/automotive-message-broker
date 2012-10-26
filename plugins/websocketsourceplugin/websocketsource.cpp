@@ -325,11 +325,7 @@ PropertyList WebSocketSource::supported()
 {
 	return m_supportedProperties;
 }
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
-{
-	return new WebSocketSource(routingengine, config);
-	
-}
+
 string WebSocketSource::uuid()
 {
 	return "d293f670-f0b3-11e1-aff1-0800200c9a66";
@@ -366,7 +362,14 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	///TODO: fill in
 }
 
-void WebSocketSource::setProperty(VehicleProperty::Property , AbstractPropertyType * )
+AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest request )
 {
 	///TODO: fill in
+	return NULL;
+}
+
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+{
+	return new WebSocketSource(routingengine, config);
+
 }

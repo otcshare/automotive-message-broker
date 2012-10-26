@@ -715,7 +715,17 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 	g_async_queue_push(singleShotQueue,requ);
 }
 
-void OBD2Source::setProperty(VehicleProperty::Property , AbstractPropertyType * )
+AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 {
+	AsyncPropertyReply* reply = new AsyncPropertyReply (request);
+	reply->success = false;
+	try
+	{
+		reply->completed(reply);
+	}
+	catch (...)
+	{
 
+	}
+	return reply;
 }

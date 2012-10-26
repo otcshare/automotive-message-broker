@@ -126,7 +126,7 @@ void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 }
 
-void ExampleSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType *)
+AsyncPropertyReply *ExampleSourcePlugin::setProperty(AsyncSetPropertyRequest request )
 {
 
 }

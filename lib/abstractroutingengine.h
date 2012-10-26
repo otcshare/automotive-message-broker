@@ -31,7 +31,13 @@ class AbstractSource;
 class AsyncPropertyReply;
 
 
-typedef std::function<void (AsyncPropertyReply*)> CompletedSignal;
+typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
+
+class PropertyValueTime {
+public:
+	AbstractPropertyType* value;
+	time_t timestamp;
+};
 
 class AsyncPropertyRequest
 {
@@ -57,13 +63,32 @@ public:
 	}
 
 	VehicleProperty::Property property;
-	CompletedSignal completed;
+	GetPropertyCompletedSignal completed;
 };
 
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
 	AsyncPropertyReply(const AsyncPropertyRequest &request)
+		:AsyncPropertyRequest(request), value(NULL), success(false)
+	{
+
+	}
+
+	AbstractPropertyType* value;
+	bool success;
+};
+
+class AsyncSetPropertyRequest: public AsyncPropertyRequest
+{
+public:
+	AsyncSetPropertyRequest()
+		:value(NULL)
+	{
+
+	}
+
+	AsyncSetPropertyRequest(const AsyncPropertyRequest &request)
 		:AsyncPropertyRequest(request), value(NULL)
 	{
 
@@ -110,7 +135,7 @@ public:
 
 	}
 
-	std::list<AbstractPropertyType*> values;
+	std::list<PropertyValueTime*> values;
 };
 
 class AbstractRoutingEngine
@@ -123,9 +148,9 @@ public:
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;
 	virtual void  unregisterSink(AbstractSink* self) = 0;
-	virtual AsyncPropertyReply *getPropertyAsync(AsyncPropertyRequest request) = 0;
+	virtual AsyncPropertyReply * getPropertyAsync(AsyncPropertyRequest request) = 0;
 	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
-	virtual void setProperty(VehicleProperty::Property, AbstractPropertyType*) = 0;
+	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual PropertyList supported() = 0;
