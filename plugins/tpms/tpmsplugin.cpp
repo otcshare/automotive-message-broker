@@ -156,12 +156,18 @@ void TpmsPlugin::getPropertyAsync(AsyncPropertyReply *reply)
       DebugOut() << "TPMS: no such getProperty type: " << reply->property << endl;
       reply->value = nullptr;
       reply->completed(reply);
-    }
+	}
 }
 
-void TpmsPlugin::setProperty(VehicleProperty::Property , AbstractPropertyType *)
+void TpmsPlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
+	///not supported
+	reply->completed(reply);
+}
 
+AsyncPropertyReply *TpmsPlugin::setProperty(AsyncSetPropertyRequest request )
+{
+	return NULL;
 }
 
 void TpmsPlugin::subscribeToPropertyChanges(VehicleProperty::Property property)

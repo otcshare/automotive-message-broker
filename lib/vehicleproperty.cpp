@@ -113,6 +113,10 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(TirePressureRightFront, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftRear, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureRightRear, TirePressureType, 0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftFront,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureRightFront,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftRear,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureRightRear,TireTemperatureType,0);
 	registerProperty( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
 	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
@@ -136,19 +140,10 @@ VehicleProperty::VehicleProperty()
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 {
 	return mCapabilities;
-	mProperties.push_back(TireTemperatureLeftFront);
-	mProperties.push_back(TireTemperatureRightFront);
-	mProperties.push_back(TireTemperatureLeftRear);
-	mProperties.push_back(TireTemperatureRightRear);
 }
 
 AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(VehicleProperty::Property name, std::string value)
 {
-
-	else if(name == TireTemperatureLeftFront) return new TireTemperatureType(value);
-	else if(name == TireTemperatureRightFront) return new TireTemperatureType(value);
-	else if(name == TireTemperatureLeftRear) return new TireTemperatureType(value);
-	else if(name == TireTemperatureRightRear) return new TireTemperatureType(value);
 	if(registeredPropertyFactoryMap.count(name) > 0)
 	{
 		VehicleProperty::PropertyTypeFactoryCallback cb = registeredPropertyFactoryMap[name];
