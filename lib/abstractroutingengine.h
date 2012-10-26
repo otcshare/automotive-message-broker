@@ -22,6 +22,7 @@
 
 #include <boost/any.hpp>
 #include <functional>
+#include <time.h>
 #include "vehicleproperty.h"
 #include "abstractpropertytype.h"
 
@@ -35,6 +36,26 @@ typedef std::function<void (AsyncPropertyReply*)> CompletedSignal;
 class AsyncPropertyRequest
 {
 public:
+	AsyncPropertyRequest()
+		:property(VehicleProperty::NoValue)
+	{
+
+	}
+
+	AsyncPropertyRequest(const AsyncPropertyRequest &request)
+	{
+		this->property = request.property;
+		this->completed = request.completed;
+	}
+
+	AsyncPropertyRequest & operator = (const AsyncPropertyRequest & other)
+	{
+		this->property = other.property;
+		this->completed = other.completed;
+
+		return *this;
+	}
+
 	VehicleProperty::Property property;
 	CompletedSignal completed;
 };
@@ -42,13 +63,54 @@ public:
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
-	AsyncPropertyReply(AsyncPropertyRequest request)
+	AsyncPropertyReply(const AsyncPropertyRequest &request)
+		:AsyncPropertyRequest(request), value(NULL)
+	{
+
+	}
+
+	AbstractPropertyType* value;
+};
+
+class AsyncRangePropertyRequest: public AsyncPropertyRequest
+{
+public:
+	AsyncRangePropertyRequest()
+		:begin(0), end(0)
+	{
+
+	}
+
+	AsyncRangePropertyRequest(const AsyncPropertyRequest &request)
+		:AsyncPropertyRequest(request), begin(0), end(0)
 	{
 		this->property = request.property;
 		this->completed = request.completed;
 	}
 
-	AbstractPropertyType* value;
+	AsyncRangePropertyRequest(const AsyncRangePropertyRequest &request)
+		:AsyncPropertyRequest(request)
+	{
+		this->property = request.property;
+		this->completed = request.completed;
+		this->begin = request.begin;
+		this->end = request.end;
+	}
+
+	time_t begin;
+	time_t end;
+};
+
+class AsyncRangePropertyReply: public AsyncRangePropertyRequest
+{
+public:
+	AsyncRangePropertyReply(AsyncRangePropertyRequest request)
+		:AsyncRangePropertyRequest(request)
+	{
+
+	}
+
+	std::list<AbstractPropertyType*> values;
 };
 
 class AbstractRoutingEngine
@@ -62,6 +124,7 @@ public:
 	virtual void registerSink(AbstractSink* self) = 0;
 	virtual void  unregisterSink(AbstractSink* self) = 0;
 	virtual AsyncPropertyReply *getPropertyAsync(AsyncPropertyRequest request) = 0;
+	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
 	virtual void setProperty(VehicleProperty::Property, AbstractPropertyType*) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;

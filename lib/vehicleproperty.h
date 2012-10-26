@@ -25,11 +25,13 @@
 #include <list>
 #include <set>
 #include <sstream>
+#include <map>
 
 #include <abstractpropertytype.h>
 
 namespace ButtonEvents {
 enum ButtonEventType {
+	NoButton = 0,
 	PlayButton = 1,
 	SkipButton = 1 << 1,
 	PrevButton = 1 << 2,
@@ -56,6 +58,51 @@ enum TurnSignalType
 };
 }
 
+namespace Transmission {
+enum TransmissionPositions
+{
+	Neutral = 0,
+	First,
+	Second,
+	Third,
+	Forth,
+	Fifth,
+	Sixth,
+	Seventh,
+	Eighth,
+	Ninth,
+	Tenth,
+	CVT = 64,
+	Drive = 96,
+	Reverse = 128,
+	Park = 255
+
+};
+enum Mode {
+	Normal=0,
+	Sports = 1,
+	Economy = 2,
+	OEMCustom1 = 3,
+	OEMCustom2 = 4
+};
+}
+
+namespace Power {
+/**< Vehicle Power Modes
+ * Off = Vehicle is off and key is in the "off" position.
+ * Accessory1 = Vehicle is off and key is in Accessory1 position.
+ * Accessory2 = Vehicle is off and key is in Accessory2 position.
+ * Run = Vehichle is running.  Key is in the running position.
+ */
+enum PowerModes
+{
+	Off = 0,
+	Accessory1 = 1,
+	Accessory2 = 2,
+	Run = 3
+};
+}
+
 class VehicleProperty
 {
 
@@ -65,6 +112,7 @@ public:
 	VehicleProperty();
 
 	typedef std::string Property;
+	typedef std::function<AbstractPropertyType* (void)> PropertyTypeFactoryCallback;
 
 	/// Various property types:
 
@@ -83,12 +131,12 @@ public:
 	 * 1 = 1st
 	 * 2 = 2nd
 	 * ...
-	 * 64 = Drive
+	 * 96 = Drive
 	 * 128 = Reverse
 	 * 255 = Park
 	 */
 	static const Property TransmissionShiftPosition;
-	typedef BasicPropertyType<uint16_t> TransmissionShiftPositionType;
+	typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionShiftPositionType;
 
 	/**< Transmission Gear Position
 	* 0 = Neutral
@@ -96,9 +144,13 @@ public:
 	* 2 = 2nd
 	* ...
 	* 64 = CVT
+	* 128 = Reverse
 	*/
 	static const Property TransmissionGearPosition;
-	typedef BasicPropertyType<uint16_t> TransmissionGearPositionType;
+	typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
+
+	static const Property TransmissionMode;
+	typedef BasicPropertyType<Transmission::Mode> TransmissionModeType;
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
@@ -181,6 +233,37 @@ public:
 	static const Property TirePressureRightRear;
 	typedef BasicPropertyType<uint16_t> TirePressureType;
 
+	/**< Vehicle Power Mode.
+	 *@see Power::PowerModes
+	 */
+	static const Property VehiclePowerMode;
+	typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
+
+	static const Property TripMeterA;
+	static const Property TripMeterB;
+	static const Property TripMeterC;
+	typedef BasicPropertyType<uint16_t> TripMeterType;
+
+	static const Property CruiseControlActive;
+	typedef BasicPropertyType<bool> CruiseControlActiveType;
+
+	static const Property CruiseControlSpeed;
+	typedef BasicPropertyType<uint16_t> CruiseControlSpeedType;
+
+	static const Property LightHead;
+	static const Property LightRightTurn;
+	static const Property LightLeftTurn;
+	static const Property LightBrake;
+	static const Property LightFog;
+	static const Property LightHazard;
+	static const Property LightParking;
+	static const Property LightHighBeam;
+	typedef BasicPropertyType<bool> LightStatusType;
+
+	static const Property InteriorLightDriver;
+	static const Property InteriorLightCenter;
+	static const Property InteriorLightPassenger;
+
 
 
 	static std::list<VehicleProperty::Property> capabilities();
@@ -190,7 +273,13 @@ public:
 	  * transfered to the caller.
 	  */
 	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
-    
+
+	static void registerProperty(Property name, PropertyTypeFactoryCallback factory);
+
+private:
+
+	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;
+	static std::list<VehicleProperty::Property> mCapabilities;
 };
 
 typedef std::list<VehicleProperty::Property> PropertyList;

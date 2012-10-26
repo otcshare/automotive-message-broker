@@ -30,8 +30,7 @@ AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string object
 	: mInterfaceName(interfaceName), mObjectPath(objectPath), mConnection(connection)
 {
 	interfaceMap[interfaceName] = this;
-	introspectionXml ="<node>" ;
-	introspectionXml += "<interface name='"+ interfaceName + "' >";
+	startRegistration();
 }
 
 void AbstractDBusInterface::addProperty(AbstractProperty* property)
@@ -91,11 +90,16 @@ void AbstractDBusInterface::registerObject()
 	
 	const GDBusInterfaceVTable vtable = { NULL, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 	
-	guint regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
+	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
 	
 	if(error) throw -1;
 	
 	g_assert(regId > 0);
+}
+
+void AbstractDBusInterface::unregisterObject()
+{
+	g_dbus_connection_unregister_object(mConnection, regId);
 }
 
 void AbstractDBusInterface::updateValue(AbstractProperty *property)
@@ -112,6 +116,13 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	{
 		throw -1;
 	}
+}
+
+void AbstractDBusInterface::startRegistration()
+{
+	unregisterObject();
+	introspectionXml ="<node>" ;
+	introspectionXml += "<interface name='"+ mInterfaceName + "' >";
 }
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)

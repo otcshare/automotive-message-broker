@@ -27,7 +27,7 @@ using namespace std;
 #include "debugout.h"
 
 uint16_t accelerationX = 0;
-uint16_t transmissionShiftPostion = 0;
+Transmission::TransmissionPositions transmissionShiftPostion = Transmission::Neutral;
 uint16_t steeringWheelAngle=0;
 uint16_t throttlePos = 0;
 uint16_t engineCoolant = 40;
@@ -68,6 +68,9 @@ string ExampleSourcePlugin::uuid()
 void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	DebugOut()<<"ExampleSource: getPropertyAsync called for property: "<<reply->property<<endl;
+
+
+
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
 		VehicleProperty::VehicleSpeedType temp(velocity);
@@ -100,7 +103,7 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	}
 	else if(reply->property == VehicleProperty::VIN)
 	{
-		VehicleProperty::VINType temp("abc00000000000000");
+		VehicleProperty::VINType temp("ABC00000000000000");
 		reply->value = &temp;
 		reply->completed(reply);
 	}
@@ -116,6 +119,11 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->value = &temp;
 		reply->completed(reply);
 	}
+}
+
+void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
+{
+
 }
 
 void ExampleSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType *)
@@ -156,7 +164,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	velocity = 1 + (255.00 * (rand() / (RAND_MAX + 1.0)));
 	engineSpeed = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
 	accelerationX = 1 + (15000.00 * (rand() / (RAND_MAX + 1.0)));
-	transmissionShiftPostion = 1 + (6.00 * (rand() / (RAND_MAX + 1.0)));
+	transmissionShiftPostion = Transmission::TransmissionPositions(1 + (6.00 * (rand() / (RAND_MAX + 1.0))));
 	steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
 	throttlePos = 1 + (100.00 * (rand() / (RAND_MAX + 1.0)));
 	engineCoolant = 1 + (40.00 * (rand() / (RAND_MAX + 140.0)));
@@ -182,5 +190,5 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp);
 	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp);
 	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec);
-    //routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
+	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }

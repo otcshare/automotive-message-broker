@@ -45,6 +45,7 @@ public:
 	///pure virtual methods:
 
 	virtual void getPropertyAsync(AsyncPropertyReply *reply) = 0;
+	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply) = 0;
 	virtual void setProperty(VehicleProperty::Property property, AbstractPropertyType* value) = 0;
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property) = 0;

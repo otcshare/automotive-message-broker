@@ -1,4 +1,6 @@
+- bluetooth adapter setting in obd2source
 - test for memory leaks in websocket sink plugin
+- implement websocket source getProperty methods and setProperty
 - per-source property filtering in routing engine
 - historic data "get" interface in routing engine
 - sqlite database storage plugin
