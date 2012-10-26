@@ -388,6 +388,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	//Default values
 	std::string port = "/dev/ttyUSB0";
 	std::string baud = "115200";
+	std::string btadapter = "";
 	
 	//Try to load config
 	//printf("OBD2Source::setConfiguration\n");
@@ -399,9 +400,14 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		{
 			port = (*i).second;
 		}
-		if ((*i).first == "baud")
+		else if ((*i).first == "baud")
 		{
 			baud = (*i).second;
+		}
+
+		else if ((*i).first == "bluetoothAdapter")
+		{
+			btadapter = (*i).second;
 		}
 	}
 
@@ -411,7 +417,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		DebugOut()<<"bluetooth device?"<<endl;
 		ObdBluetoothDevice bt;
 
-		std::string tempPort = bt.getDeviceForAddress(port);
+		std::string tempPort = bt.getDeviceForAddress(port, btadapter);
 		if(tempPort != "")
 		{
 			DebugOut(3)<<"Using bluetooth device \""<<port<<"\" bound to: "<<tempPort<<endl;
@@ -430,16 +436,14 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 {
 	clientConnected = false;
 	m_re = re;  
-	
-	m_supportedProperties.push_back(VehicleProperty::EngineSpeed); //0D
-	m_supportedProperties.push_back(VehicleProperty::VehicleSpeed); //0C
-	m_supportedProperties.push_back(VehicleProperty::EngineCoolantTemperature); //05
-	m_supportedProperties.push_back(VehicleProperty::MassAirFlow); //10
-	m_supportedProperties.push_back(VehicleProperty::VIN);
-	m_supportedProperties.push_back(VehicleProperty::WMI);
-	m_supportedProperties.push_back(VehicleProperty::EngineOilTemperature);
-	m_supportedProperties.push_back(VehicleProperty::InteriorTemperature);
-	m_supportedProperties.push_back(VehicleProperty::BatteryVoltage);
+
+	Obd2Amb obd2amb;
+
+	for(auto itr = obd2amb.propertyPidMap.begin(); itr != obd2amb.propertyPidMap.end(); itr++)
+	{
+		m_supportedProperties.push_back((*itr).first);
+	}
+
 	re->setSupported(supported(), this);
 	/*if (openPort(std::string("/dev/pts/7"),115200))
 	{
@@ -477,29 +481,29 @@ string OBD2Source::uuid()
 }
 void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	//printf("Subscribed to property: %s\n",property.c_str());
+	/*//printf("Subscribed to property: %s\n",property.c_str());
 	if (property == VehicleProperty::EngineSpeed)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "010C\r";
+		requ->req = "010C1\r";
 		g_async_queue_push(subscriptionAddQueue,requ);
 	}
 	else if (property == VehicleProperty::MassAirFlow)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "0110\r";
+		requ->req = "01101\r";
 		g_async_queue_push(subscriptionAddQueue,requ);
 	}
 	else if (property == VehicleProperty::VehicleSpeed)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "010D\r";
+		requ->req = "010D1\r";
 		g_async_queue_push(subscriptionAddQueue,requ);
 	}
 	else if (property == VehicleProperty::EngineCoolantTemperature)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "0105\r";
+		requ->req = "01051\r";
 		g_async_queue_push(subscriptionAddQueue,requ);
 	}
 	else if (property == VehicleProperty::VIN)
@@ -513,13 +517,13 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 	else if (property == VehicleProperty::EngineOilTemperature)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "015C\r";
+		requ->req = "015C1\r";
 		g_async_queue_push(subscriptionAddQueue,requ);
 	}
 	else if (property == VehicleProperty::InteriorTemperature)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "0146\r";
+		requ->req = "01461\r";
 		g_async_queue_push(subscriptionAddQueue,requ);
 	}
 	else if (property == VehicleProperty::BatteryVoltage)
@@ -533,10 +537,32 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 	m_supportedProperties.push_back(VehicleProperty::EngineOilTemperature);
 	m_supportedProperties.push_back(VehicleProperty::InteriorTemperature);
 	m_supportedProperties.push_back(VehicleProperty::BatteryVoltage);*/
-	else
+	/*else
 	{
 		//printf("Unsupported property: %s\n",property.c_str());
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unsupported property requested:" << property << "\n";
+	}*/
+
+	if (property == VehicleProperty::VIN)
+	{
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "VIN subscription requested... but there's no point!"<<endl;
+	}
+	else if (property == VehicleProperty::WMI)
+	{
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "WMI subscription requested... but there's no point!"<<endl;
+	}
+	else
+	{
+		if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+		{
+			DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
+			return;
+		}
+
+		Obd2Amb obd2amb;
+		ObdRequest *requ = new ObdRequest();
+		requ->req = obd2amb.propertyPidMap[property];
+		g_async_queue_push(subscriptionAddQueue,requ);
 	}
 }
 
@@ -544,28 +570,28 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	//
-	if (property == VehicleProperty::EngineSpeed)
+	/*if (property == VehicleProperty::EngineSpeed)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "010C\r";
+		requ->req = "010C1\r";
 		g_async_queue_push(subscriptionRemoveQueue,requ);
 	}
 	else if (property == VehicleProperty::MassAirFlow)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "0110\r";
+		requ->req = "01101\r";
 		g_async_queue_push(subscriptionRemoveQueue,requ);
 	}
 	else if (property == VehicleProperty::VehicleSpeed)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "010D\r";
+		requ->req = "010D1\r";
 		g_async_queue_push(subscriptionRemoveQueue,requ);
 	}
 	else if (property == VehicleProperty::EngineCoolantTemperature)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "0105\r";
+		requ->req = "01051\r";
 		g_async_queue_push(subscriptionRemoveQueue,requ);
 	}
 	else if (property == VehicleProperty::VIN)
@@ -583,13 +609,13 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 	else if (property == VehicleProperty::EngineOilTemperature)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "015C\r";
+		requ->req = "015C1\r";
 		g_async_queue_push(subscriptionRemoveQueue,requ);
 	}
 	else if (property == VehicleProperty::InteriorTemperature)
 	{
 		ObdRequest *requ = new ObdRequest();
-		requ->req = "0146\r";
+		requ->req = "01461\r";
 		g_async_queue_push(subscriptionRemoveQueue,requ);
 	}
 	else if (property == VehicleProperty::BatteryVoltage)
@@ -598,6 +624,18 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 		requ->req = "ATRV\r";
 		g_async_queue_push(subscriptionRemoveQueue,requ);
 	}
+	*/
+
+	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+	{
+		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
+		return;
+	}
+
+	Obd2Amb obd2amb;
+	ObdRequest *requ = new ObdRequest();
+	requ->req = obd2amb.propertyPidMap[property];
+	g_async_queue_push(subscriptionRemoveQueue,requ);
 }
 
 
@@ -605,8 +643,9 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	propertyReplyMap[reply->property] = reply;
 	VehicleProperty::Property property = reply->property;
+
 	//TODO: There is a much better way to do this, but for now it's hardcoded.
-	if (property == VehicleProperty::EngineSpeed)
+	/*if (property == VehicleProperty::EngineSpeed)
 	{
 		ObdRequest *requ = new ObdRequest();
 		requ->req = "010C\r";
@@ -660,6 +699,20 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 		requ->req = "ATRV\r";
 		g_async_queue_push(singleShotQueue,requ);
 	}
+	*/
+
+	///Here's a better way:
+
+	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+	{
+		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
+		return;
+	}
+
+	Obd2Amb obd2amb;
+	ObdRequest *requ = new ObdRequest();
+	requ->req = obd2amb.propertyPidMap[property];
+	g_async_queue_push(singleShotQueue,requ);
 }
 
 void OBD2Source::setProperty(VehicleProperty::Property , AbstractPropertyType * )

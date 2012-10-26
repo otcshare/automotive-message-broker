@@ -117,7 +117,7 @@ int obdLib::openPort(const char *portName,int baudrate)
 	if (portHandle < 0)
 	{
 		//printf("Error opening Com: %s\n",portName);
-		debug(obdLib::DEBUG_ERROR,"Error opening com port %s",portName);
+		debug(obdLib::DEBUG_ERROR, "Error opening device %s - %s",portName, strerror( errno ));
 
 		return -1;
 	}

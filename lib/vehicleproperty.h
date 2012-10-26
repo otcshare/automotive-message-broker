@@ -264,7 +264,8 @@ public:
 	static const Property InteriorLightCenter;
 	static const Property InteriorLightPassenger;
 
-
+	static const Property EngineLoad;
+	typedef BasicPropertyType<uint16_t> EngineLoadType;
 
 	static std::list<VehicleProperty::Property> capabilities();
 

@@ -76,7 +76,7 @@ const VehicleProperty::Property VehicleProperty::LightBrake= "LightBrake";
 const VehicleProperty::Property VehicleProperty::InteriorLightDriver = "InteriorLightDriver";
 const VehicleProperty::Property VehicleProperty::InteriorLightCenter = "InteriorLightCenter";
 const VehicleProperty::Property VehicleProperty::InteriorLightPassenger = "InteriorLightPassenger";
-
+const VehicleProperty::Property VehicleProperty::EngineLoad = "EngineLoad";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 
@@ -126,6 +126,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(InteriorLightDriver, LightStatusType, false);
 	REGISTERPROPERTYWITHTYPE(InteriorLightPassenger, LightStatusType, false);
 	REGISTERPROPERTYWITHTYPE(InteriorLightCenter, LightStatusType, false);
+	REGISTERPROPERTY(EngineLoad,0);
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
