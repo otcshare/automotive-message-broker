@@ -18,6 +18,7 @@ set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE P
 
 option(use_qtcore "Use QCoreApplication mainloop " OFF)
 option(tpms_plugin "TPMS plugin " OFF)
+option(obd2_plugin "OBD-II plugin" OFF)
 
 find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
