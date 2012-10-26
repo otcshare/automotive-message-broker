@@ -205,15 +205,15 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 	return reply;
 }
 
-void Core::setProperty(VehicleProperty::Property property, AbstractPropertyType *value)
+AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 {
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
 		{
-			src->setProperty(property, value);
+			return src->setProperty(request);
 		}
 	}
 }

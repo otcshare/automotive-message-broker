@@ -137,7 +137,7 @@ void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	delete reply->value;
 }
 
-void WheelSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType * )
+AsyncPropertyReply *WheelSourcePlugin::setProperty(AsyncSetPropertyRequest request )
 {
 
 }

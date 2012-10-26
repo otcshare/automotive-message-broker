@@ -44,7 +44,7 @@ public:
 	void unregisterSink(AbstractSink *self);
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
 	AsyncRangePropertyReply* getRangePropertyAsync(AsyncRangePropertyRequest request);
-	void setProperty(VehicleProperty::Property,AbstractPropertyType*);
+	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	PropertyList supported() { return mMasterPropertyList; }

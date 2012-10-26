@@ -171,7 +171,17 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 void WebSocketSinkManager::setValue(string property,string value)
 {
 	AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
-	m_engine->setProperty(property, type);
+
+	AsyncSetPropertyRequest request;
+	request.property = property;
+	request.value = type;
+	request.completed = [](AsyncPropertyReply* reply)
+	{
+		///TODO: do something here on !reply->success
+		delete reply;
+	};
+
+	m_engine->setProperty(request);
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "AbstractRoutingEngine::setProperty called with arguments:" << property << value << "\n";
 	delete type;
 	
