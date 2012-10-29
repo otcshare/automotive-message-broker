@@ -81,6 +81,13 @@ const VehicleProperty::Property VehicleProperty::InteriorLightDriver = "Interior
 const VehicleProperty::Property VehicleProperty::InteriorLightCenter = "InteriorLightCenter";
 const VehicleProperty::Property VehicleProperty::InteriorLightPassenger = "InteriorLightPassenger";
 const VehicleProperty::Property VehicleProperty::EngineLoad = "EngineLoad";
+const VehicleProperty::Property VehicleProperty::Horn = "Horn";
+const VehicleProperty::Property VehicleProperty::FuelLevel = "FuelLevel";
+const VehicleProperty::Property VehicleProperty::FuelConsumption = "FuelConsumption";
+const VehicleProperty::Property VehicleProperty::FuelRange = "FuelRange";
+const VehicleProperty::Property VehicleProperty::FuelEconomy = "FuelEconomy";
+const VehicleProperty::Property VehicleProperty::FuelAverageEconomy = "FuelAverageEconomy";
+const VehicleProperty::Property VehicleProperty::EngineOilRemaining = "EngineOilRemaining";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 
@@ -97,6 +104,8 @@ VehicleProperty::VehicleProperty()
 	registerProperty(TurnSignal, [](){ return new TurnSignalType(TurnSignals::Off); });
 	registerProperty(ClutchStatus, [](){ return new ClutchStatusType(false); });
 	registerProperty(EngineOilPressure, [](){ return new EngineOilPressureType(0); });
+	registerProperty(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
+	REGISTERPROPERTY(EngineOilRemaining,0);
 	registerProperty(EngineCoolantTemperature, [](){ return new EngineCoolantTemperatureType(0); });
 	registerProperty(MachineGunTurretStatus, [](){ return new MachineGunTurretStatusType(false); });
 	registerProperty(AccelerationX, [](){ return new AccelerationType(0); });
@@ -106,7 +115,6 @@ VehicleProperty::VehicleProperty()
 	registerProperty(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
 	registerProperty(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
 	registerProperty(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
-	registerProperty(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
 	registerProperty(VIN, [](){ return new VINType(""); });
 	registerProperty(WMI, [](){ return new WMIType(""); });
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftFront, TirePressureType, 0);
@@ -135,6 +143,14 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(InteriorLightPassenger, LightStatusType, false);
 	REGISTERPROPERTYWITHTYPE(InteriorLightCenter, LightStatusType, false);
 	REGISTERPROPERTY(EngineLoad,0);
+	REGISTERPROPERTY(Horn,false);
+	REGISTERPROPERTY(FuelLevel, 0);
+	REGISTERPROPERTY(FuelRange, 0);
+	REGISTERPROPERTY(FuelConsumption, 0);
+	REGISTERPROPERTY(FuelEconomy, 0);
+	REGISTERPROPERTY(FuelAverageEconomy, 0);
+
+
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
