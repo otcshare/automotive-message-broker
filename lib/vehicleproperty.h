@@ -218,6 +218,9 @@ public:
 	static const Property EngineOilTemperature;
 	typedef BasicPropertyType<int> EngineOilTemperatureType;
 
+	static const Property EngineOilRemaining;
+	typedef BasicPropertyType<uint16_t> EngineOilRemainingType;
+
 	/**< Vehicle Identification Number (ISO 3779) 17 chars**/
 	static const Property VIN;
 	typedef StringPropertyType VINType;
@@ -272,6 +275,24 @@ public:
 
 	static const Property EngineLoad;
 	typedef BasicPropertyType<uint16_t> EngineLoadType;
+
+	static const Property Horn;
+	typedef BasicPropertyType<bool> HornType;
+
+	static const Property FuelLevel;
+	typedef BasicPropertyType<uint16_t> FuelLevelType;
+
+	static const Property FuelRange;
+	typedef BasicPropertyType<uint16_t> FuelRangeType;
+
+	static const Property FuelConsumption;
+	typedef BasicPropertyType<uint16_t> FuelConsumptionType;
+
+	static const Property FuelEconomy;
+	typedef BasicPropertyType<uint16_t> FuelEconomyType;
+
+	static const Property FuelAverageEconomy;
+	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
 	static std::list<VehicleProperty::Property> capabilities();
 
