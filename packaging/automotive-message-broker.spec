@@ -9,6 +9,7 @@ Source0:    %{name}-%{version}.tar.bz2
 Requires: automotive-message-broker-plugins
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+Requires:	json-glib
 BuildRequires:  cmake
 BuildRequires:  boost-devel
 BuildRequires:  json-glib-devel
