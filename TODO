@@ -5,6 +5,8 @@
 - sqlite database storage plugin
 - connect/disconnect on first/last subscription in obd2source
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
+- timestamp on property get/update operations
+- squence on property get/update operation
 - fix issue regarding obd2 thread loop not exiting sometimes
 - optimize CPU performance in obd2source
 - obd2source blacklist unsupported: persistent blacklist mapped to VIN?
