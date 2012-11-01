@@ -4,3 +4,5 @@
 - per-source property filtering in routing engine
 - historic data "get" interface in routing engine
 - sqlite database storage plugin
+- timestamp on property get/update operations
+- squence on property get/update operation
