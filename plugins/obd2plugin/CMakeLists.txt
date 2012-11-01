@@ -1,3 +1,5 @@
+if(obd2_plugin)
+
 include(CheckIncludeFiles)
 
 
@@ -14,3 +16,5 @@ set_target_properties(obd2sourceplugin PROPERTIES PREFIX "")
 target_link_libraries(obd2sourceplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES} ${gio-unix_LIBRARIES} )
 
 install(TARGETS obd2sourceplugin LIBRARY DESTINATION lib/automotive-message-broker)
+
+endif(obd2_plugin)

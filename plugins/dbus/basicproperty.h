@@ -56,10 +56,18 @@ public:
 		AbstractPropertyType* apt = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName,"");
 		apt->setValue(val);
 
-		routingEngine->setProperty(mAmbPropertyName, apt);
+		AsyncSetPropertyRequest request;
+		request.property = mAmbPropertyName;
+		request.value = apt;
+		request.completed = [apt](AsyncPropertyReply* reply)
+		{
+			if(!reply->success) {
+				//TODO: throw DBus exception
+			}
+			delete apt;
+		};
 
-		///delete this because we should be done
-		delete apt;
+		routingEngine->setProperty(request);
 	}
 
 private:

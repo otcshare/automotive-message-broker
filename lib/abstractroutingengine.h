@@ -20,6 +20,9 @@
 #ifndef ABSTRACTROUTINGENGINE_H
 #define ABSTRACTROUTINGENGINE_H
 
+#include "sys/types.h"
+#include <stdlib.h>
+
 #include <boost/any.hpp>
 #include <functional>
 #include <time.h>
@@ -29,9 +32,17 @@
 class AbstractSink;
 class AbstractSource;
 class AsyncPropertyReply;
+class AsyncRangePropertyReply;
 
 
-typedef std::function<void (AsyncPropertyReply*)> CompletedSignal;
+typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
+typedef std::function<void (AsyncRangePropertyReply*)> GetRangedPropertyCompletedSignal;
+
+class PropertyValueTime {
+public:
+	AbstractPropertyType* value;
+	time_t timestamp;
+};
 
 class AsyncPropertyRequest
 {
@@ -57,13 +68,32 @@ public:
 	}
 
 	VehicleProperty::Property property;
-	CompletedSignal completed;
+	GetPropertyCompletedSignal completed;
 };
 
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
 	AsyncPropertyReply(const AsyncPropertyRequest &request)
+		:AsyncPropertyRequest(request), value(NULL), success(false)
+	{
+
+	}
+
+	AbstractPropertyType* value;
+	bool success;
+};
+
+class AsyncSetPropertyRequest: public AsyncPropertyRequest
+{
+public:
+	AsyncSetPropertyRequest()
+		:value(NULL)
+	{
+
+	}
+
+	AsyncSetPropertyRequest(const AsyncPropertyRequest &request)
 		:AsyncPropertyRequest(request), value(NULL)
 	{
 
@@ -72,7 +102,7 @@ public:
 	AbstractPropertyType* value;
 };
 
-class AsyncRangePropertyRequest: public AsyncPropertyRequest
+class AsyncRangePropertyRequest
 {
 public:
 	AsyncRangePropertyRequest()
@@ -81,15 +111,8 @@ public:
 
 	}
 
-	AsyncRangePropertyRequest(const AsyncPropertyRequest &request)
-		:AsyncPropertyRequest(request), begin(0), end(0)
-	{
-		this->property = request.property;
-		this->completed = request.completed;
-	}
-
 	AsyncRangePropertyRequest(const AsyncRangePropertyRequest &request)
-		:AsyncPropertyRequest(request)
+
 	{
 		this->property = request.property;
 		this->completed = request.completed;
@@ -97,6 +120,8 @@ public:
 		this->end = request.end;
 	}
 
+	VehicleProperty::Property property;
+	GetRangedPropertyCompletedSignal completed;
 	time_t begin;
 	time_t end;
 };
@@ -105,12 +130,13 @@ class AsyncRangePropertyReply: public AsyncRangePropertyRequest
 {
 public:
 	AsyncRangePropertyReply(AsyncRangePropertyRequest request)
-		:AsyncRangePropertyRequest(request)
+		:AsyncRangePropertyRequest(request), success(false)
 	{
 
 	}
 
-	std::list<AbstractPropertyType*> values;
+	std::list<PropertyValueTime*> values;
+	bool success;
 };
 
 class AbstractRoutingEngine
@@ -123,9 +149,9 @@ public:
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;
 	virtual void  unregisterSink(AbstractSink* self) = 0;
-	virtual AsyncPropertyReply *getPropertyAsync(AsyncPropertyRequest request) = 0;
+	virtual AsyncPropertyReply * getPropertyAsync(AsyncPropertyRequest request) = 0;
 	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
-	virtual void setProperty(VehicleProperty::Property, AbstractPropertyType*) = 0;
+	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual PropertyList supported() = 0;

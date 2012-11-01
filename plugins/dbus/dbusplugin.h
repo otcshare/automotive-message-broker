@@ -43,10 +43,14 @@ protected:
 		propertyDBusMap[property] = new BasicProperty<T>(routingEngine, property, propertyName, signature, access, this);
 	}
 
-	virtual void setProperty(VehicleProperty::Property name, AbstractPropertyType* value)
+	/*virtual void setProperty(VehicleProperty::Property name, AbstractPropertyType* value)
 	{
-		routingEngine->setProperty(name, value);
-	}
+		AsyncSetPropertyRequest request;
+		request.property = name;
+		request.value = value;
+		request.completed = [](AsyncPropertyReply* reply) { delete reply; };
+		routingEngine->setProperty(request);
+	}*/
 
 	PropertyDBusMap propertyDBusMap;
 private:

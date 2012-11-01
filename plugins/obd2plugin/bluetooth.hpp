@@ -10,9 +10,9 @@
 class ObdBluetoothDevice
 {
 public:
-	std::string getDeviceForAddress(std::string address)
-	{
 
+	std::string getDeviceForAddress( std::string address,std::string adapterAddy = "")
+	{
 		GError* error = NULL;
 		OrgBluezManager* manager = org_bluez_manager_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
 																				 G_DBUS_PROXY_FLAGS_NONE,
@@ -28,14 +28,30 @@ public:
 		error = NULL;
 
 		gchar* adapterPath;
-		if(!org_bluez_manager_call_default_adapter_sync(manager,&adapterPath,NULL,&error))
+
+		if(adapterAddy != "")
 		{
-			DebugOut(0)<<"Error getting bluetooth default adapter: "<<error->message<<endl;
-			g_error_free(error);
-			return "";
+			if(!org_bluez_manager_call_find_adapter_sync(manager,adapterAddy.c_str(), &adapterPath, NULL, &error))
+			{
+				DebugOut(0)<<"Error getting bluetooth adapter ("<<adapterAddy<<"): "<<error->message<<endl;
+				g_error_free(error);
+				return "";
+			}
+
+			error = NULL;
 		}
 
-		error = NULL;
+		else
+		{
+			if(!org_bluez_manager_call_default_adapter_sync(manager,&adapterPath, NULL, &error))
+			{
+				DebugOut(0)<<"Error getting bluetooth default adapter: "<<error->message<<endl;
+				g_error_free(error);
+				return "";
+			}
+
+			error = NULL;
+		}
 
 		OrgBluezAdapter* adapter = org_bluez_adapter_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
 																				 G_DBUS_PROXY_FLAGS_NONE,
@@ -81,6 +97,7 @@ public:
 
 		return serialDeviceName;
 	}
+
 };
 
 

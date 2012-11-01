@@ -218,6 +218,9 @@ public:
 	static const Property EngineOilTemperature;
 	typedef BasicPropertyType<int> EngineOilTemperatureType;
 
+	static const Property EngineOilRemaining;
+	typedef BasicPropertyType<uint16_t> EngineOilRemainingType;
+
 	/**< Vehicle Identification Number (ISO 3779) 17 chars**/
 	static const Property VIN;
 	typedef StringPropertyType VINType;
@@ -231,8 +234,15 @@ public:
 	static const Property TirePressureRightFront;
 	static const Property TirePressureLeftRear;
 	static const Property TirePressureRightRear;
-	typedef BasicPropertyType<uint16_t> TirePressureType;
+	typedef BasicPropertyType<float> TirePressureType;
 
+	/**< Tire temperature in degrees C */
+	static const Property TireTemperatureLeftFront;
+	static const Property TireTemperatureRightFront;
+	static const Property TireTemperatureLeftRear;
+	static const Property TireTemperatureRightRear;
+	typedef BasicPropertyType<float> TireTemperatureType;
+	
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes
 	 */
@@ -259,12 +269,30 @@ public:
 	static const Property LightParking;
 	static const Property LightHighBeam;
 	typedef BasicPropertyType<bool> LightStatusType;
-
 	static const Property InteriorLightDriver;
 	static const Property InteriorLightCenter;
 	static const Property InteriorLightPassenger;
 
+	static const Property EngineLoad;
+	typedef BasicPropertyType<uint16_t> EngineLoadType;
 
+	static const Property Horn;
+	typedef BasicPropertyType<bool> HornType;
+
+	static const Property FuelLevel;
+	typedef BasicPropertyType<uint16_t> FuelLevelType;
+
+	static const Property FuelRange;
+	typedef BasicPropertyType<uint16_t> FuelRangeType;
+
+	static const Property FuelConsumption;
+	typedef BasicPropertyType<uint16_t> FuelConsumptionType;
+
+	static const Property FuelEconomy;
+	typedef BasicPropertyType<uint16_t> FuelEconomyType;
+
+	static const Property FuelAverageEconomy;
+	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
 	static std::list<VehicleProperty::Property> capabilities();
 

@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <abstractsource.h>
 #include <string>
+#include <sstream>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -36,6 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class ObdRequest
 {
 public:
+  VehicleProperty::Property property;
   std::string req;
   std::string arg;
 };
@@ -43,11 +45,77 @@ public:
 class ObdReply
 {
 public:
+  VehicleProperty::Property property;
   std::string req;
   std::string reply;
 };
 
 
+class Obd2Amb
+{
+public:
+
+	typedef function<std::string (std::string)> ConversionFunction;
+
+	Obd2Amb()
+	{
+		propertyPidMap[VehicleProperty::VehicleSpeed] = "010D1\r";
+		propertyPidMap[VehicleProperty::EngineSpeed] = "010C1\r";
+		propertyPidMap[VehicleProperty::MassAirFlow] = "01101\r";
+		propertyPidMap[VehicleProperty::AirIntakeTemperature] = "010F1\r";
+		propertyPidMap[VehicleProperty::ThrottlePosition] = "01111\r";
+		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
+		propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
+		propertyPidMap[VehicleProperty::EngineLoad] = "01041/r";
+		propertyPidMap[VehicleProperty::VIN] = "0902/r";
+		propertyPidMap[VehicleProperty::WMI] = "0902/r";
+		propertyPidMap[VehicleProperty::EngineOilTemperature] = "015C1\r";
+		propertyPidMap[VehicleProperty::InteriorTemperature] = "01461\r";
+		propertyPidMap[VehicleProperty::FuelConsumption] = "01101\r";
+
+
+
+		propertyConversionMap[VehicleProperty::VehicleSpeed] = [](std::string input)
+		{
+			///velocity is used in other equations.  We'll save it off in a static variable:
+			stringstream vssConvert(input);
+
+			vssConvert>>velocity;
+
+			return input;
+		};
+
+		propertyConversionMap[VehicleProperty::WMI] = [](std::string input)
+		{
+			return input.substr(0,3);
+		};
+
+		propertyConversionMap[VehicleProperty::FuelConsumption] = [](std::string input)
+		{
+			double maf;
+			stringstream mafConvert(input);
+
+			mafConvert>>maf;
+
+			mafConvert<<1 / (14.75 * 6.26) * maf * 0/60;
+
+			return mafConvert.str();
+		};
+
+
+
+	}
+
+
+
+	map<VehicleProperty::Property, std::string> propertyPidMap;
+	map<VehicleProperty::Property, ConversionFunction> propertyConversionMap;
+
+private:
+
+	static uint16_t velocity;
+	static double fuelConsumptionOldTime;
+};
 
 class OBD2Source : public AbstractSource
 {
@@ -58,7 +126,7 @@ public:
 	int portHandle;
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply){}
-	void setProperty(VehicleProperty::Property, AbstractPropertyType*);
+	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
