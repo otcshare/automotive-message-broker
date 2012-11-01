@@ -45,6 +45,7 @@ public:
 	map<std::string, list<WebSocketSink*> > m_sinkMap;
 	void setConfiguration(map<string, string> config);
 	void setValue(string property,string value);
+	list<VehicleProperty::Property> getSupportedProperties();
 private:
 	map<int,GIOChannel*> m_ioChannelMap;
 	map<int,guint> m_ioSourceMap;

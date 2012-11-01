@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "exampleplugin.h"
+#include "timestamp.h"
 
 #include <iostream>
 #include <boost/assert.hpp>
@@ -154,6 +155,11 @@ PropertyList ExampleSourcePlugin::supported()
 	return props;
 }
 
+int ExampleSourcePlugin::supportedOperations()
+{
+	return Get | Set | GetRanged;
+}
+
 void ExampleSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	mRequests.remove(property);
@@ -183,12 +189,20 @@ void ExampleSourcePlugin::randomizeProperties()
 
 	machineGun = !machineGun;
 
-	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel);
-	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es);
-	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac);
-	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa);
-	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp);
-	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp);
-	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec);
+	vel.timestamp = amb::currentTime();
+	es.timestamp = amb::currentTime();
+	ac.timestamp = amb::currentTime();
+	swa.timestamp = amb::currentTime();
+	tsp.timestamp = amb::currentTime();
+	tp.timestamp = amb::currentTime();
+	ec.timestamp = amb::currentTime();
+
+	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel, uuid());
+	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es, uuid());
+	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac, uuid());
+	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa, uuid());
+	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp, uuid());
+	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp, uuid());
+	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid());
 	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }

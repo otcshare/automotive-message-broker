@@ -3,7 +3,7 @@
 		{
 			"name" : "OBD2Source",
 			"path" : "/usr/lib/automotive-message-broker/obd2sourceplugin.so",
-			"device" : "/dev/ttyUSB0",
+			"device" : "/dev/pts/5",
 			"baud" : "115200",
 			"bluetoothAdapter" : ""
 		}

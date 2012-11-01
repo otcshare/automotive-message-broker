@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 using namespace std;
 
 #include "debugout.h"
+#include "timestamp.h"
 
 #define ENDPOINT_IN             0x81
 #define ENDPOINT_OUT            0x01
@@ -298,14 +299,14 @@ int TpmsPlugin::readValues()
   VehicleProperty::TireTemperatureType lrTemp(lrTemperature);
   VehicleProperty::TireTemperatureType rrTemp(rrTemperature);
 
-  routingEngine->updateProperty(VehicleProperty::TirePressureLeftFront, &lfPres);
-  routingEngine->updateProperty(VehicleProperty::TirePressureRightFront, &rfPres);
-  routingEngine->updateProperty(VehicleProperty::TirePressureLeftRear, &lrPres);
-  routingEngine->updateProperty(VehicleProperty::TirePressureRightRear, &rrPres);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftFront, &lfTemp);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightFront, &rfTemp);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftRear, &lrTemp);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightRear, &rrTemp);
+  routingEngine->updateProperty(VehicleProperty::TirePressureLeftFront, &lfPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TirePressureRightFront, &rfPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TirePressureLeftRear, &lrPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TirePressureRightRear, &rrPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftFront, &lfTemp, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightFront, &rfTemp, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftRear, &lrTemp, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightRear, &rrTemp, uuid());
 
   return 0;
 }
