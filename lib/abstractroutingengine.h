@@ -40,8 +40,13 @@ typedef std::function<void (AsyncRangePropertyReply*)> GetRangedPropertyComplete
 
 class PropertyValueTime {
 public:
+	~PropertyValueTime()
+	{
+		delete value;
+	}
+
 	AbstractPropertyType* value;
-	time_t timestamp;
+	double timestamp;
 };
 
 class AsyncPropertyRequest
@@ -122,8 +127,8 @@ public:
 
 	VehicleProperty::Property property;
 	GetRangedPropertyCompletedSignal completed;
-	time_t begin;
-	time_t end;
+	double begin;
+	double end;
 };
 
 class AsyncRangePropertyReply: public AsyncRangePropertyRequest
@@ -133,6 +138,16 @@ public:
 		:AsyncRangePropertyRequest(request), success(false)
 	{
 
+	}
+
+	~AsyncRangePropertyReply()
+	{
+		for(auto itr = values.begin(); itr != values.end(); itr++)
+		{
+			delete (*itr);
+		}
+
+		values.clear();
 	}
 
 	std::list<PropertyValueTime*> values;
