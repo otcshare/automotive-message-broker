@@ -1,6 +1,5 @@
-
 /*
-Copyright (C) 2012 Intel Corporation
+Copyright (C) 2012 Tim Trampedach
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -17,43 +16,46 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-#ifndef WEBSOCKETSOURCE_H
-#define WEBSOCKETSOURCE_H
-
-
+#ifndef TPMSPLUGIN_H
+#define TPMSPLUGIN_H
 
 #include <abstractsource.h>
 #include <string>
-#include <libwebsockets.h>
 
+using namespace std;
 
-class WebSocketSource : public AbstractSource
+class TpmsPlugin: public AbstractSource
 {
 
 public:
-	WebSocketSource(AbstractRoutingEngine* re, map<string, string> config);
-    string uuid();
+	TpmsPlugin(AbstractRoutingEngine* re, map<string, string> config);
+	
+	string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
-	libwebsocket *clientsocket;
-	PropertyList queuedRequests;
-	bool clientConnected;
-	void checkSubscriptions();
-	PropertyList activeRequests;
-	PropertyList removeRequests;
-	void setSupported(PropertyList list);
+	
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
-	void setConfiguration(map<string, string> config);
 
+    int readValues();
+	
 private:
-  	PropertyList m_supportedProperties;
+	PropertyList mRequests;
+    float lfPressure, rfPressure, lrPressure, rrPressure;
+    float lfTemperature, rfTemperature, lrTemperature, rrTemperature;
+    struct libusb_device_handle *mDeviceHandle;
 
+    int findDevice();
+    int detachDevice();
+    int exitClean(int deinit);
+
+    int readUsbSensor(int sid, unsigned char *buf);
+
+    string sensorNumberToString(int snid);
 };
 
-#endif // WEBSOCKETSOURCE_H
+#endif // TPMSPLUGIN_H

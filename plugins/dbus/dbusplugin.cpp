@@ -28,7 +28,7 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DBusSinkManager(routingengine, config);
 }
 
-DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config)
+DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
 	:AbstractDBusInterface(interface, path, connection),
 	  AbstractSink(engine, config), supported(false)
 {
@@ -37,12 +37,14 @@ DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine,
 
 void DBusSink::supportedChanged(PropertyList supportedProperties)
 {
+	startRegistration();
 
 	for(PropertyDBusMap::iterator itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
 	{
 		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr).first))
 		{
 			routingEngine->subscribeToProperty((*itr).first, this);
+			addProperty((*itr).second);
 			supported = true;
 		}
 	}

@@ -20,15 +20,17 @@
 #define _BASICPROPERTY_H_
 
 #include "abstractproperty.h"
+#include "vehicleproperty.h"
+#include "abstractroutingengine.h"
 
 template <typename T>
 class BasicProperty: public AbstractProperty
 {
 public:
-	BasicProperty(string propertyName, string signature, Access access, AbstractDBusInterface *interface)
-		:AbstractProperty(propertyName,signature,access,interface)
+	BasicProperty(AbstractRoutingEngine* re, string ambPropertyName, string propertyName, string signature, Access access, AbstractDBusInterface *interface)
+		:AbstractProperty(propertyName, signature, access, interface)
 	{
-
+		mAmbPropertyName = ambPropertyName;
 	}
 
 	void setValue(T val)
@@ -48,8 +50,29 @@ public:
 
 	virtual void fromGVariant(GVariant *value)
 	{
+		T val;
+		g_variant_get(value,signature().c_str(), &val);
 
+		AbstractPropertyType* apt = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName,"");
+		apt->setValue(val);
+
+		AsyncSetPropertyRequest request;
+		request.property = mAmbPropertyName;
+		request.value = apt;
+		request.completed = [apt](AsyncPropertyReply* reply)
+		{
+			if(!reply->success) {
+				//TODO: throw DBus exception
+			}
+			delete apt;
+		};
+
+		routingEngine->setProperty(request);
 	}
+
+private:
+	VehicleProperty::Property mAmbPropertyName;
+	AbstractRoutingEngine* routingEngine;
 };
 
 #endif

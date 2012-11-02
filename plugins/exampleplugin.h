@@ -32,7 +32,8 @@ public:
 	
 	string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
-	void setProperty(VehicleProperty::Property, AbstractPropertyType*);
+	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
+	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();

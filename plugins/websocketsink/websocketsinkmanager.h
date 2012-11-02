@@ -27,19 +27,22 @@
 #include <libwebsockets.h>
 #include "debugout.h"
 #include <stdexcept>
+#include "sys/types.h"
+#include <stdlib.h>
 
 class WebSocketSinkManager: public AbstractSinkManager
 {
 public:
 	WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
 	void addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id);
+	void addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property,double start, double end, string id);
 	void addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid);
 	void disconnectAll(libwebsocket* socket);
 	void removeSink(libwebsocket* socket,VehicleProperty::Property property,string uuid);
 	void addPoll(int fd);
 	void removePoll(int fd);
 	void init();
-	map<std::string,WebSocketSink*> m_sinkMap;
+	map<std::string, list<WebSocketSink*> > m_sinkMap;
 	void setConfiguration(map<string, string> config);
 	void setValue(string property,string value);
 private:

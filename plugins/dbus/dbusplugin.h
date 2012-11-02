@@ -40,8 +40,17 @@ protected:
 	template <typename T>
 	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new BasicProperty<T>(propertyName, signature, access, this);
+		propertyDBusMap[property] = new BasicProperty<T>(routingEngine, property, propertyName, signature, access, this);
 	}
+
+	/*virtual void setProperty(VehicleProperty::Property name, AbstractPropertyType* value)
+	{
+		AsyncSetPropertyRequest request;
+		request.property = name;
+		request.value = value;
+		request.completed = [](AsyncPropertyReply* reply) { delete reply; };
+		routingEngine->setProperty(request);
+	}*/
 
 	PropertyDBusMap propertyDBusMap;
 private:

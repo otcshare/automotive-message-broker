@@ -37,10 +37,10 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data);
 WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config):AbstractSinkManager(engine, config)
 {
 	m_engine = engine;
-	
-	
+
+
 	//Create a listening socket on port 23000 on localhost.
-	
+
 
 }
 void WebSocketSinkManager::init()
@@ -56,14 +56,14 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
 	configuration = config;
-	
+
 	//Default values
 	int port = 23000;
 	std::string interface = "lo";
 	const char *ssl_cert_path = NULL;
 	const char *ssl_key_path = NULL;
 	int options = 0;
-	
+
 	//Try to load config
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
@@ -80,6 +80,7 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	}
 	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
 }
+
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
 	AsyncPropertyRequest velocityRequest;
@@ -111,19 +112,19 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 			DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
 			return;
 		}
-		
+
 	}
 	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply)
 	{
 		printf("Got property:%s\n",reply->value->toString().c_str());
 		//uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
-		
+
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		string tmpstr = "";
 		tmpstr = property;
 		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\"}],\"transactionid\":\"" << id << "\"}";
-		
+
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
@@ -132,25 +133,108 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
 		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-		
+
 		//TODO: run valgrind on this. libwebsocket's documentation says NOTHING about this, yet malloc insists it's true.
 		//delete new_response; <- Unneeded. Apparently libwebsocket free's it.
 		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING); //Needs to subtract pre-padding, to get back to the start of the pointer.
-		
+		delete reply;
 	};
 
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 }
+
+void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property, double start, double end, string id)
+{
+	AsyncRangePropertyRequest rangedRequest;
+
+	rangedRequest.begin = start;
+	rangedRequest.end = end;
+
+	if (property == "running_status_speedometer")
+	{
+		rangedRequest.property = VehicleProperty::VehicleSpeed;
+	}
+	else if (property == "running_status_engine_speed")
+	{
+		rangedRequest.property = VehicleProperty::EngineSpeed;
+	}
+	else if (property == "running_status_steering_wheel_angle")
+	{
+		rangedRequest.property = VehicleProperty::SteeringWheelAngle;
+	}
+	else if (property == "running_status_transmission_gear_status")
+	{
+		rangedRequest.property = VehicleProperty::TransmissionShiftPosition;
+	}
+	else
+	{
+		PropertyList foo = VehicleProperty::capabilities();
+		if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+		{
+			rangedRequest.property = property;
+		}
+		else
+		{
+			DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
+			return;
+		}
+
+	}
+	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
+	{
+		stringstream s;
+
+		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
+		stringstream data ("[");
+		std::list<PropertyValueTime*> values = reply->values;
+		for(auto itr = values.begin(); itr != values.end(); itr++)
+		{
+			if(itr != values.begin())
+			{
+				data<<",";
+			}
+
+			data << "{ \"value\" : " << "\"" << (*itr)->value->toString() << "\", \"time\" : \"" << (*itr)->timestamp << "\" }";
+		}
+
+		data<<"]";
+
+		s << "{\"type\":\"methodReply\",\"name\":\"getHistory\",\"data\":"<<data<<",\"transactionid\":\"" << id << "\"}";
+
+		string replystr = s.str();
+		//printf("Reply: %s\n",replystr.c_str());
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+
+		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+		strcpy(new_response,replystr.c_str());
+		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+
+		//TODO: run valgrind on this. libwebsocket's documentation says NOTHING about this, yet malloc insists it's true.
+		//delete new_response; <- Unneeded. Apparently libwebsocket free's it.
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING); //Needs to subtract pre-padding, to get back to the start of the pointer.
+		delete reply;
+	};
+
+	AsyncRangePropertyReply* reply = routingEngine->getRangePropertyAsync(rangedRequest);
+}
+
 void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid)
 {
 	if (m_sinkMap.find(property) != m_sinkMap.end())
 	{
-		WebSocketSink* sink = m_sinkMap[property];
-		delete sink;
+		list<WebSocketSink*> sinks = m_sinkMap[property];
+
+		for(auto i = sinks.begin(); i != sinks.end(); i++)
+		{
+			delete *i;
+		}
+
 		m_sinkMap.erase(property);
+
 		stringstream s;
 		s << "{\"type\":\"methodReply\",\"name\":\"unsubscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
-		
+
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
@@ -165,15 +249,25 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 void WebSocketSinkManager::setValue(string property,string value)
 {
 	AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
-	m_engine->setProperty(property, type);
+
+	AsyncSetPropertyRequest request;
+	request.property = property;
+	request.value = type;
+	request.completed = [](AsyncPropertyReply* reply)
+	{
+		///TODO: do something here on !reply->success
+		delete reply;
+	};
+
+	m_engine->setProperty(request);
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "AbstractRoutingEngine::setProperty called with arguments:" << property << value << "\n";
 	delete type;
-	
+
 }
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
 {
 	stringstream s;
-	
+
 	//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 	string tmpstr = "";
 	if (property == "running_status_speedometer")
@@ -204,10 +298,10 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 			//Invalid property requested.
 			return;
 		}
-		
+
 	}
 	s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
-	
+
 	string replystr = s.str();
 	//printf("Reply: %s\n",replystr.c_str());
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
@@ -218,7 +312,7 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
-	m_sinkMap[property] = sink;
+	m_sinkMap[property].push_back(sink);
 }
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -228,18 +322,32 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 }
 void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 {
+	std::list<WebSocketSink*> toDeleteList;
+
 	for (auto i=m_sinkMap.begin(); i != m_sinkMap.end();i++)
 	{
-		if ((*i).second->socket() == socket)
+		std::list<WebSocketSink*> *sinks = & (*i).second;
+		for (auto sinkItr =  sinks->begin(); sinkItr != sinks->end(); sinkItr++)
 		{
-			//This is the sink in question.
-			WebSocketSink* sink = (*i).second;
-			delete sink;
-			m_sinkMap.erase((*i).first);
-			i--;
-			//printf("Sink removed\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed\n";
+			if ((*sinkItr)->socket() == socket)
+			{
+				//This is the sink in question.
+				WebSocketSink* sink = (*sinkItr);
+				if(!ListPlusPlus<WebSocketSink*>(&toDeleteList).contains(sink))
+				{
+					toDeleteList.push_back(sink);
+				}
+
+				sinks->erase(sinkItr);
+				sinkItr = sinks->begin();
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sink removed"<<endl;
+			}
 		}
+	}
+
+	for(auto i=toDeleteList.begin();i!=toDeleteList.end();i++)
+	{
+		delete *i;
 	}
 }
 void WebSocketSinkManager::addPoll(int fd)
@@ -284,7 +392,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 {
 	//printf("Switch: %i\n",reason);
 
-	
+
 	switch (reason)
 	{
 		case LWS_CALLBACK_CLIENT_WRITEABLE:
@@ -316,7 +424,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			//printf("Server writable\n");
 			break;
 		}
-		
+
 		case LWS_CALLBACK_RECEIVE:
 		{
 			//printf("Data Received: %s\n",(char*)in);
@@ -328,15 +436,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			//TODO: Do we want exceptions, or just to return an invalid json reply? Probably an invalid json reply.
 			DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Requested: " << (char*)in << "\n";
 			GError* error = nullptr;
-			
-			
+
+
 			JsonParser* parser = json_parser_new();
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
 				return 0;
 			}
-			
+
 			JsonNode* node = json_parser_get_root(parser);
 			if(node == nullptr)
 			{
@@ -344,7 +452,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
-			
+
 			JsonReader* reader = json_reader_new(node);
 			if(reader == nullptr)
 			{
@@ -352,22 +460,22 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
-			
-			
-			
-			
-			
+
+
+
+
+
 			string type;
 			json_reader_read_member(reader,"type");
 			type = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
-			
+
 			string  name;
 			json_reader_read_member(reader,"name");
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
 
-			list<string> data;
+			vector<string> data;
 			list<string> key;
 			list<string> value;
 			json_reader_read_member(reader,"data");
@@ -381,7 +489,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						//Raw string value
 						string path = json_reader_get_string_value(reader);
 						data.push_back(path);
-						
+
 					}
 					else
 					{
@@ -407,7 +515,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				}
 			}
 			json_reader_end_member(reader);
-			
+
 			string id;
 			json_reader_read_member(reader,"transactionid");
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
@@ -423,15 +531,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				id = strstr.str();
 			}
 			json_reader_end_member(reader);
-			
+
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
 			//if(error) g_error_free(error);
-			
+
 			g_object_unref(reader);
 			g_object_unref(parser);
-			
-			
+
+
 			if (type == "method")
 			{
 				if (name == "get")
@@ -441,30 +549,6 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						//GetProperty is going to be a singleshot sink.
 						//string arg = arguments.front();
 						sinkManager->addSingleShotSink(wsi,data.front(),id);
-						/*if (data.front()== "running_status_speedometer")
-						{			   
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
-						}
-						else if (data.front() == "running_status_engine_speed")
-						{
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::EngineSpeed,id);
-						}
-						else if (data.front() == "running_status_steering_wheel_angle")
-						{
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::SteeringWheelAngle,id);
-						}
-						else if (data.front() == "running_status_transmission_gear_status")
-						{
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
-						}
-						else
-						{
-						  PropertyList foo = VehicleProperty::capabilities();
-						  if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
-						  {
-						    sinkManager->addSingleShotSink(wsi,data.front(),id);
-						  }
-						}*/
 					}
 					else
 					{
@@ -494,14 +578,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 								//(*d);
 								d++;
 							}
-							
+
 						}
 					}
 				}
 				else if (name == "subscribe")
 				{
 					//Websocket wants to subscribe to an event, data.front();
-					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					for (auto i=data.begin();i!=data.end();i++)
 					{
 						sinkManager->addSink(wsi,(*i),id);
 					}
@@ -509,9 +593,27 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				else if (name == "unsubscribe")
 				{
 					//Websocket wants to unsubscribe to an event, data.front();
-					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					for (auto i=data.begin();i!=data.end();i++)
 					{
 						sinkManager->removeSink(wsi,(*i),id);
+					}
+				}
+				else if (name == "getHistory")
+				{
+					if(data.size() == 3)
+					{
+						std::string property = data[0];
+						std::string startStr = data[1];
+						std::string endStr = data[2];
+
+						sinkManager->addSingleShotRangedSink(wsi,property,
+															 boost::lexical_cast<double,std::string>(startStr),
+															 boost::lexical_cast<double,std::string>(endStr), id);
+					}
+
+					else
+					{
+						//TODO: error, "invalid arguments" should be sent in reply to this.
 					}
 				}
 				else if (name == "getSupportedEventTypes")
@@ -571,6 +673,10 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					strcpy(new_response,replystr.c_str());
 					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 					delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+				}
+				else
+				{
+					DebugOut(0)<<"Unknown method called."<<endl;
 				}
 			}
 			break;
@@ -634,4 +740,3 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	libwebsocket_service_fd(context,&pollstruct);
 	return true;
 }
-

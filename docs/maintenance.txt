@@ -35,5 +35,12 @@ Properties	uint32 Odometer [readonly]
 			LeftRear = 2,
 			RightRear = 3
 
-				
+        dict( byte, double } TireTemperature [readonly]
+
+            Tire (byte), Temperature (C)
+            Tire:
+            LeftFront = 0,
+            RightFront = 1,
+            LeftRear = 2,
+            RightRear = 3				
 			

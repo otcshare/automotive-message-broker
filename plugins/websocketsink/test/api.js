@@ -44,6 +44,19 @@
 *                   form of data[n].name/data[n].value
 *        errorCB: error callback, called with error message string
 *
+*  Function name: getHistory(event, startTime, endTime, successCB, errorCB)
+*    Description:
+*        Retrieves a list of event/value pairs for a target list of event names
+*    Required arguments:
+*        event: event to read
+*        startTime: start date/time
+*        endTime: end date/time
+*        successCB: success callback, gets called with the event/value pair list
+*                   for all requested events. The list is the in the
+*                   form of data[n].name/data[n].value
+*        errorCB: error callback, called with error message string
+*
+*
 *  Function name: set(eventlist, valuelist, successCB, errorCB)
 *    Description:
 *        Sets a gourp of event's values (triggers error on read-only events)
@@ -245,6 +258,19 @@ Vehicle.prototype.get = function(namelist, successCB, errorCB)
     this.send(obj, successCB, errorCB);
 }
 
+Vehicle.prototype.getHistory = function(event, startTime, endTime, successCB, errorCB)
+{
+    var obj = {
+        "type" : "method",
+        "name": "getHistory",
+        "transactionid" : this.generateTransactionId(),
+        "data" : [event, (startTime.getTime()/1000).toString(), (endTime.getTime()/1000).toString()]
+    };
+
+    this.send(obj, successCB, errorCB);
+
+}
+
 Vehicle.prototype.set = function(namelist, valuelist, successCB, errorCB)
 {
     if((namelist.length != valuelist.length)||(namelist.length <= 0))
@@ -312,8 +338,8 @@ Vehicle.prototype.receive = function(msg)
         return;
     }
 
-    if((event == undefined)||(event.type == undefined)||
-       (event.name == undefined))
+    if((event === undefined)||(event.type === undefined)||
+       (event.name === undefined))
     {
         self.iErrorCB("BADLY FORMED MESSAGE: "+msg);
         return;

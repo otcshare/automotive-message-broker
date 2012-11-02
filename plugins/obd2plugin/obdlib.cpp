@@ -117,7 +117,7 @@ int obdLib::openPort(const char *portName,int baudrate)
 	if (portHandle < 0)
 	{
 		//printf("Error opening Com: %s\n",portName);
-		debug(obdLib::DEBUG_ERROR,"Error opening com port %s",portName);
+		debug(obdLib::DEBUG_ERROR, "Error opening device %s - %s",portName, strerror( errno ));
 
 		return -1;
 	}
@@ -512,7 +512,7 @@ obdLib::ObdError obdLib::lastError()
 }
 bool obdLib::sendObdRequest(const char *req,int length,std::vector<byte> *reply)
 {
-	return sendObdRequest(req,length,reply,100,5);
+	return sendObdRequest(req,length,reply,10,5);
 }
 
 

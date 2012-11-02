@@ -64,7 +64,7 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 	{
 		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((*itr)))
 		{
-			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<(*itr)<<endl;
+			DebugOut()<<__FUNCTION__<<"() adding support for property "<<(*itr)<<endl;
 			mMasterPropertyList.push_back((*itr));
 		}
 	}
@@ -188,15 +188,32 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 	return reply;
 }
 
-void Core::setProperty(VehicleProperty::Property property, AbstractPropertyType *value)
+AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest request)
+{
+	AsyncRangePropertyReply * reply = new AsyncRangePropertyReply(request);
+
+	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = (*itr);
+		PropertyList properties = src->supported();
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
+		{
+			src->getRangePropertyAsync(reply);
+		}
+	}
+
+	return reply;
+}
+
+AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 {
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
 		{
-			src->setProperty(property, value);
+			return src->setProperty(request);
 		}
 	}
 }
