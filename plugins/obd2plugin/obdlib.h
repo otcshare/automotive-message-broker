@@ -105,6 +105,7 @@ public:
 	void setPortHandle(HANDLE hdnl);
 	int initPort();
 	int closePort();
+	bool connected();
 	void flush();
 	void setDebugCallback(void (*callbackptr)(const char*,void*,obdLib::DebugLevel),void *);
 	void setCommsCallback(void (*callbackptr)(const char*,void*),void*);

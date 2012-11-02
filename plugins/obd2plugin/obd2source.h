@@ -33,23 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "obdlib.h"
 #include <glib.h>
 
-
-class ObdRequest
-{
-public:
-  VehicleProperty::Property property;
-  std::string req;
-  std::string arg;
-};
-
-class ObdReply
-{
-public:
-  VehicleProperty::Property property;
-  std::string req;
-  std::string reply;
-};
-
+#include "obdpid.h"
 
 class Obd2Amb
 {
@@ -57,64 +41,31 @@ public:
 
 	typedef function<std::string (std::string)> ConversionFunction;
 
+
 	Obd2Amb()
 	{
-		propertyPidMap[VehicleProperty::VehicleSpeed] = "010D1\r";
-		propertyPidMap[VehicleProperty::EngineSpeed] = "010C1\r";
-		propertyPidMap[VehicleProperty::MassAirFlow] = "01101\r";
-		propertyPidMap[VehicleProperty::AirIntakeTemperature] = "010F1\r";
-		propertyPidMap[VehicleProperty::ThrottlePosition] = "01111\r";
-		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
-		propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
-		propertyPidMap[VehicleProperty::EngineLoad] = "01041/r";
-		propertyPidMap[VehicleProperty::VIN] = "0902/r";
-		propertyPidMap[VehicleProperty::WMI] = "0902/r";
-		propertyPidMap[VehicleProperty::EngineOilTemperature] = "015C1\r";
-		propertyPidMap[VehicleProperty::InteriorTemperature] = "01461\r";
-		propertyPidMap[VehicleProperty::FuelConsumption] = "01101\r";
-
-
-
-		propertyConversionMap[VehicleProperty::VehicleSpeed] = [](std::string input)
-		{
-			///velocity is used in other equations.  We'll save it off in a static variable:
-			stringstream vssConvert(input);
-
-			vssConvert>>velocity;
-
-			return input;
-		};
-
-		propertyConversionMap[VehicleProperty::WMI] = [](std::string input)
-		{
-			return input.substr(0,3);
-		};
-
-		propertyConversionMap[VehicleProperty::FuelConsumption] = [](std::string input)
-		{
-			double maf;
-			stringstream mafConvert(input);
-
-			mafConvert>>maf;
-
-			mafConvert<<1 / (14.75 * 6.26) * maf * 0/60;
-
-			return mafConvert.str();
-		};
-
-
-
+		supportedPidsList.push_back(new VehicleSpeedPid());
+		supportedPidsList.push_back(new EngineSpeedPid());
+		supportedPidsList.push_back(new MassAirFlowPid());
+		supportedPidsList.push_back(new VinPid());
+		supportedPidsList.push_back(new WmiPid());
+		supportedPidsList.push_back(new FuelConsumptionPid());
+		supportedPidsList.push_back(new EngineCoolantPid());
 	}
 
+	static ObdPid* createPidforProperty(VehicleProperty::Property property)
+	{
+		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
+		{
+			if((*itr)->property == property)
+			{
+				ObdPid* obj = *itr;
+				return obj->create();
+			}
+		}
+	}
 
-
-	map<VehicleProperty::Property, std::string> propertyPidMap;
-	map<VehicleProperty::Property, ConversionFunction> propertyConversionMap;
-
-private:
-
-	static uint16_t velocity;
-	static double fuelConsumptionOldTime;
+	static std::list<ObdPid*> supportedPidsList;
 };
 
 class OBD2Source : public AbstractSource
@@ -151,6 +102,8 @@ public:
 	std::string m_port;
 	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
+	obdLib * obd;
+
 private:
 	PropertyList m_supportedProperties;
 	GMutex *threadQueueMutex;
