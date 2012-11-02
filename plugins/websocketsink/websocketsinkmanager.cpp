@@ -80,6 +80,7 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	}
 	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
 }
+
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
 {
 	AsyncPropertyRequest velocityRequest;
@@ -136,11 +137,88 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		//TODO: run valgrind on this. libwebsocket's documentation says NOTHING about this, yet malloc insists it's true.
 		//delete new_response; <- Unneeded. Apparently libwebsocket free's it.
 		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING); //Needs to subtract pre-padding, to get back to the start of the pointer.
-
+		delete reply;
 	};
 
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 }
+
+void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property, double start, double end, string id)
+{
+	AsyncRangePropertyRequest rangedRequest;
+
+	rangedRequest.begin = start;
+	rangedRequest.end = end;
+
+	if (property == "running_status_speedometer")
+	{
+		rangedRequest.property = VehicleProperty::VehicleSpeed;
+	}
+	else if (property == "running_status_engine_speed")
+	{
+		rangedRequest.property = VehicleProperty::EngineSpeed;
+	}
+	else if (property == "running_status_steering_wheel_angle")
+	{
+		rangedRequest.property = VehicleProperty::SteeringWheelAngle;
+	}
+	else if (property == "running_status_transmission_gear_status")
+	{
+		rangedRequest.property = VehicleProperty::TransmissionShiftPosition;
+	}
+	else
+	{
+		PropertyList foo = VehicleProperty::capabilities();
+		if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+		{
+			rangedRequest.property = property;
+		}
+		else
+		{
+			DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
+			return;
+		}
+
+	}
+	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
+	{
+		stringstream s;
+
+		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
+		stringstream data ("[");
+		std::list<PropertyValueTime*> values = reply->values;
+		for(auto itr = values.begin(); itr != values.end(); itr++)
+		{
+			if(itr != values.begin())
+			{
+				data<<",";
+			}
+
+			data << "{ \"value\" : " << "\"" << (*itr)->value->toString() << "\", \"time\" : \"" << (*itr)->timestamp << "\" }";
+		}
+
+		data<<"]";
+
+		s << "{\"type\":\"methodReply\",\"name\":\"getHistory\",\"data\":"<<data<<",\"transactionid\":\"" << id << "\"}";
+
+		string replystr = s.str();
+		//printf("Reply: %s\n",replystr.c_str());
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+
+		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+		strcpy(new_response,replystr.c_str());
+		libwebsocket_write(socket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+
+		//TODO: run valgrind on this. libwebsocket's documentation says NOTHING about this, yet malloc insists it's true.
+		//delete new_response; <- Unneeded. Apparently libwebsocket free's it.
+		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING); //Needs to subtract pre-padding, to get back to the start of the pointer.
+		delete reply;
+	};
+
+	AsyncRangePropertyReply* reply = routingEngine->getRangePropertyAsync(rangedRequest);
+}
+
 void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid)
 {
 	if (m_sinkMap.find(property) != m_sinkMap.end())
@@ -397,7 +475,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
 
-			list<string> data;
+			vector<string> data;
 			list<string> key;
 			list<string> value;
 			json_reader_read_member(reader,"data");
@@ -471,30 +549,6 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						//GetProperty is going to be a singleshot sink.
 						//string arg = arguments.front();
 						sinkManager->addSingleShotSink(wsi,data.front(),id);
-						/*if (data.front()== "running_status_speedometer")
-						{			   
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::VehicleSpeed,id);
-						}
-						else if (data.front() == "running_status_engine_speed")
-						{
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::EngineSpeed,id);
-						}
-						else if (data.front() == "running_status_steering_wheel_angle")
-						{
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::SteeringWheelAngle,id);
-						}
-						else if (data.front() == "running_status_transmission_gear_status")
-						{
-							sinkManager->addSingleShotSink(wsi,VehicleProperty::TransmissionShiftPosition,id);
-						}
-						else
-						{
-						  PropertyList foo = VehicleProperty::capabilities();
-						  if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
-						  {
-						    sinkManager->addSingleShotSink(wsi,data.front(),id);
-						  }
-						}*/
 					}
 					else
 					{
@@ -531,7 +585,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				else if (name == "subscribe")
 				{
 					//Websocket wants to subscribe to an event, data.front();
-					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					for (auto i=data.begin();i!=data.end();i++)
 					{
 						sinkManager->addSink(wsi,(*i),id);
 					}
@@ -539,9 +593,27 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				else if (name == "unsubscribe")
 				{
 					//Websocket wants to unsubscribe to an event, data.front();
-					for (list<string>::iterator i=data.begin();i!=data.end();i++)
+					for (auto i=data.begin();i!=data.end();i++)
 					{
 						sinkManager->removeSink(wsi,(*i),id);
+					}
+				}
+				else if (name == "getHistory")
+				{
+					if(data.size() == 3)
+					{
+						std::string property = data[0];
+						std::string startStr = data[1];
+						std::string endStr = data[2];
+
+						sinkManager->addSingleShotRangedSink(wsi,property,
+															 boost::lexical_cast<double,std::string>(startStr),
+															 boost::lexical_cast<double,std::string>(endStr), id);
+					}
+
+					else
+					{
+						//TODO: error, "invalid arguments" should be sent in reply to this.
 					}
 				}
 				else if (name == "getSupportedEventTypes")
@@ -601,6 +673,10 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					strcpy(new_response,replystr.c_str());
 					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 					delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+				}
+				else
+				{
+					DebugOut(0)<<"Unknown method called."<<endl;
 				}
 			}
 			break;
