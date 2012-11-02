@@ -2,13 +2,14 @@ Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system.
 Version:    0.4.0
 Release:    1
-Group:      System/Base
+Group:      System Environment/Daemons
 License:    LGPL v2.1
 URL:        https://github.com/otcshare/automotive-message-broker
 Source0:    %{name}-%{version}.tar.bz2
 Requires: automotive-message-broker-plugins
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
+Requires:	json-glib
 BuildRequires:  cmake
 BuildRequires:  boost-devel
 BuildRequires:  json-glib-devel
@@ -20,7 +21,7 @@ Automotive Message Broker is a vehicle network abstraction system.
 It brokers information from the vehicle to applications.
 
 %package devel
-Summary:    automoive-message-broker development files
+Summary:    automotive-message-broker development files
 Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
@@ -28,8 +29,8 @@ Requires:   %{name} = %{version}-%{release}
 Development files for the automotive-message-broker
 
 %package doc
-Summary:    Documentation for the API
-Group:      System/Base
+Summary:    Documentation for the automotive-message-broker API
+Group:      Documentation
 Requires:   %{name} = %{version}-%{release}
 
 %description doc
@@ -37,7 +38,7 @@ Document files that describe the D-Bus API exposed by automotive-message-broker
 
 %package plugins
 Summary:    Various plugins for automotive-message-broker
-Group:      System/Base
+Group:      System Environment/Daemons
 Requires:   %{name} = %{version}-%{release}
 
 %description plugins
@@ -55,8 +56,8 @@ make %{?jobs:-j%jobs}
 rm -rf %{buildroot}
 %make_install
 
-mkdir -p %{buildroot}/usr/lib/systemd/system/network.target.wants
-ln -s ../ambd.service %{buildroot}/usr/lib/systemd/system/network.target.wants/ambd.service
+mkdir -p %{buildroot}%{_libdir}/systemd/system/network.target.wants
+ln -s ../ambd.service %{buildroot}%{_libdir}/systemd/system/network.target.wants/ambd.service
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
