@@ -1,3 +1,83 @@
+* Fri Nov 02 2012 tripzero <kevron_m_rees@linux.intel.com> 1.0_branch@7de9474
+- new version
+- Manual merge
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker into release
+- version bump 0.5.0
+- added getHistory support to websocket sink plugin and added api to test api.js
+- Adding json-glib as a runtime requirement.
+- added a bunch of properties and consolodated some things in obd2source
+- updated tpms plugin so it compiles
+- refactored setProperty: made it async with callback
+- updated todo
+- some enhancements to obd2source
+- updated TODO
+- configurable bt adapter
+- Update TODO
+- Update README
+- Update spec file:  - Use valid Tizen Group  - Fix typo  - Use macro instead of hardcoded path in %install section
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- report why cannot connect to obdII device
+- solved possible memory leak in websocketsink
+- TPMS compile switch with default OFF
+- fixed websocketsource. possibly removed mem leak
+- gracefully handle no-root and no-device situations
+- added light status and updated fuel docs
+- cruise control properties
+- fix kPa
+- pressures all in kPa
+- updates to support all 4 tires and pressures
+- some basic info about the plugin
+- convert tire types to float
+- merge
+- merge
+- fix typo
+- add tire temperature parameters
+- tire temperature values added
+- tire temperature values added
+- tire temperature values added
+- working USB TPMS sensor reading
+- only export dbus properties that are supported
+- USB module compile & link from TPMS plugin
+- added trip meter property
+- changed trip meter to finite set of trips
+- made adding properties more straightforward
+- cleanup
+- adding files for TPMS USB framework
+- basic TPMS plugin framework without USB sensor interaction
+- changes to allow build on Ubuntu 12.04
+- added property registration system
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker
+- property changes
+- removed 100ms delay
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- removed 500ms blocking call when sending things to obd2
+- fixed spec from merge
+- more changes to changes
+- Merge changes
+- Merge changes
+- Merge changes
+- Merge "added maketag"
+- Merge changes Ibab9e115,I4028a068,Iaec87c6c,I03a7ebde,I2ca0262d,I65c6147e,Ie1f8ec4e,I8bf5640b,I8a6ed52b,Iba369a37
+- Merge changes Iba9f4a4a,Ic07308c7,Icfe8b20e,Ic0d8a7d4
+- Merge "Update README"
+- Merge "added tire pressure properties"
+- Merge "fixed up engine coolant down button"
+- updated chlog
+- Merge branch 'upstream' into release
+- mkdir first
+- Merge branch 'upstream' into release
+- make link
+- Merge branch 'upstream' into release
+- updated version number in spec
+- updated chlog
+- updated spec
+- Merge branch 'upstream' into release
+- updated chlog
+- Merge branch 'upstream' into release
+- updated changelog
+- Merge branch 'upstream' into release
+- changelog update
+
 * Mon Oct 01 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20121001.202146@cd77669
 - fixed merge
 - changes
