@@ -213,6 +213,12 @@ int obdLib::closePort()
 	#endif
 	return 0;
 }
+
+bool obdLib::connected()
+{
+
+}
+
 int obdLib::initPort()
 {
 	sendObdRequest("atz\r",4);
@@ -372,11 +378,9 @@ bool obdLib::sendObdRequestString(const char *req,int length,std::vector<byte> *
 #endif
 	if (len < 0)
 	{
-		printf("No Write\n");
-		//delete tmp;
-		//delete totalReply;
-		//m_lastError = SERIALWRITEERROR;
-		//return false;
+		debug(obdLib::DEBUG_ERROR,"Serial write error: %s", strerror(errno));
+
+		return false;
 	}
 	if (sleeptime == -1)
 	{
