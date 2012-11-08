@@ -123,7 +123,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		string tmpstr = "";
 		tmpstr = property;
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\"}],\"transactionid\":\"" << id << "\"}";
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"property\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\"}],\"transactionid\":\"" << id << "\"}";
 
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
