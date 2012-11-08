@@ -194,27 +194,71 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			json_reader_end_member(reader);
 
 			list<string> data;
-			json_reader_read_member(reader,"data");
-			if (json_reader_is_array(reader))
+			list<pair<string,string> > pairdata;
+			if (name == "get")
 			{
-				for(int i=0; i < json_reader_count_elements(reader); i++)
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_array(reader))
 				{
-					json_reader_read_element(reader,i);
-					string path = json_reader_get_string_value(reader);
-					data.push_back(path);
-					json_reader_end_element(reader);
+					for(int i=0; i < json_reader_count_elements(reader); i++)
+					{
+					  
+						pair<string,string> pair;
+						json_reader_read_element(reader,i);
+						
+						json_reader_read_member(reader,"property");
+						pair.first = json_reader_get_string_value(reader);
+						json_reader_end_member(reader);
+						
+						json_reader_read_member(reader,"value");
+						pair.second = json_reader_get_string_value(reader);
+						json_reader_end_member(reader);
+						
+						json_reader_end_element(reader);
+						
+						pairdata.push_back(pair);
+					}
 				}
+				else
+				{
+					pair<string,string> pair;
+					
+					json_reader_read_member(reader,"property");
+					pair.first = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+						
+					json_reader_read_member(reader,"value");
+					pair.second = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+					
+					pairdata.push_back(pair);
+				}
+				json_reader_end_member(reader);
 			}
 			else
 			{
-				string path = json_reader_get_string_value(reader);
-				if (path != "")
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_array(reader))
 				{
-					data.push_back(path);
+					for(int i=0; i < json_reader_count_elements(reader); i++)
+					{
+						json_reader_read_element(reader,i);
+						string path = json_reader_get_string_value(reader);
+						data.push_back(path);
+						json_reader_end_element(reader);
+					}
 				}
+				else
+				{
+					string path = json_reader_get_string_value(reader);
+					if (path != "")
+					{
+						data.push_back(path);
+					}
+				}
+				json_reader_end_member(reader);
 			}
-			json_reader_end_member(reader);
-
+			
 			string id;
 			json_reader_read_member(reader,"transactionid");
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
@@ -281,6 +325,23 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					}
 					source->setSupported(props);
 					//m_re->updateSupported(m_supportedProperties,PropertyList());
+				}
+				else if (name == "get")
+				{
+					
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size();
+					while (pairdata.size() > 0)
+					{
+						pair<string,string> pair = pairdata.front();
+						pairdata.pop_front();
+						if (source->propertyReplyMap.find(pair.first) != source->propertyReplyMap.end())
+						{
+							source->propertyReplyMap[pair.first]->value = VehicleProperty::getPropertyTypeForPropertyNameValue(source->propertyReplyMap[pair.first]->property,pair.second);
+							source->propertyReplyMap[pair.first]->completed(source->propertyReplyMap[pair.first]);
+							source->propertyReplyMap.erase(pair.first);
+						}
+					}
+					//data will contain a property/value map.
 				}
 			}
 			break;
@@ -355,6 +416,25 @@ void WebSocketSource::unsubscribeToPropertyChanges(VehicleProperty::Property pro
 void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	///TODO: fill in
+	//s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
+	//m_re->getPropertyAsync();
+	/*reply.value = 1;
+	  reply->completed(reply);
+	  reply->completed = [](AsyncPropertyReply* reply) {
+	  DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
+	  delete reply;
+	};*/
+	propertyReplyMap[reply->property] = reply;
+	stringstream s;  
+	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
+	string replystr = s.str();
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+	//printf("Reply: %s\n",replystr.c_str());
+	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(new_response,replystr.c_str());
+	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 }
 
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -365,7 +445,20 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest request )
 {
 	///TODO: fill in
-	return NULL;
+	AsyncPropertyReply* reply = new AsyncPropertyReply(request);
+	reply->success = true;
+	stringstream s;
+	s << "{\"type\":\"method\",\"name\":\"set\",\"data\":[\"property\" : \"" << request.property << "\",\"value\" : \"" << request.value << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
+	string replystr = s.str();
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+	//printf("Reply: %s\n",replystr.c_str());
+	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(new_response,replystr.c_str());
+	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+	reply->completed(reply);
+	return reply;
 }
 
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
