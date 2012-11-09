@@ -11,14 +11,14 @@ To use the OBD-II Source plugin, add the following config to your /etc/ambd/conf
 
 
 "sources" : [
-				{
-						"name" : "OBD2Source",
-						"path" : "/usr/lib/automotive-message-broker/obd2sourceplugin.so",
-						"device" : "/dev/ttyUSB0",
-						"baud" : "9600",
-						"bluetoothAdapter" : ""
-				}
-		]
+		{
+			"name" : "OBD2Source",
+			"path" : "/usr/lib/automotive-message-broker/obd2sourceplugin.so",
+			"device" : "/dev/ttyUSB0",
+			"baud" : "9600",
+			"bluetoothAdapter" : ""
+		}
+	]
 
 Configuration Key Definitions:
 "name"
@@ -39,7 +39,7 @@ Hardware address of the bluetooth adapter to use.  If value is blank (ie "blueto
 
 Performance
 
-Performance will vary with the scantool.  Here are the current performance numbers per tested scantool:
+Performance will vary with the scantool and the vehicle.  Here are the current performance numbers per tested scantool using the ECUSim2000 from scantool.net:
 
 scantool - properties/second = (pids/s) - baud
 
