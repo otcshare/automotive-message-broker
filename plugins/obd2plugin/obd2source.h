@@ -150,6 +150,7 @@ public:
 	//void randomizeProperties();
 	std::string m_port;
 	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
+	list<VehicleProperty::Property> propertySubscriptionList;
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
 private:
 	PropertyList m_supportedProperties;
