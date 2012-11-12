@@ -54,9 +54,12 @@ public:
 class Obd2Amb
 {
 public:
+<<<<<<< HEAD
 
 	typedef function<std::string (std::string)> ConversionFunction;
 
+=======
+>>>>>>> temp2321
 	Obd2Amb()
 	{
 		propertyPidMap[VehicleProperty::VehicleSpeed] = "010D1\r";
@@ -64,13 +67,18 @@ public:
 		propertyPidMap[VehicleProperty::MassAirFlow] = "01101\r";
 		propertyPidMap[VehicleProperty::AirIntakeTemperature] = "010F1\r";
 		propertyPidMap[VehicleProperty::ThrottlePosition] = "01111\r";
+<<<<<<< HEAD
 		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
 		propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
+=======
+		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";	propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
+>>>>>>> temp2321
 		propertyPidMap[VehicleProperty::EngineLoad] = "01041/r";
 		propertyPidMap[VehicleProperty::VIN] = "0902/r";
 		propertyPidMap[VehicleProperty::WMI] = "0902/r";
 		propertyPidMap[VehicleProperty::EngineOilTemperature] = "015C1\r";
 		propertyPidMap[VehicleProperty::InteriorTemperature] = "01461\r";
+<<<<<<< HEAD
 		propertyPidMap[VehicleProperty::FuelConsumption] = "01101\r";
 
 
@@ -115,6 +123,11 @@ private:
 
 	static uint16_t velocity;
 	static double fuelConsumptionOldTime;
+=======
+	}
+
+	map<VehicleProperty::Property, std::string> propertyPidMap;
+>>>>>>> temp2321
 };
 
 class OBD2Source : public AbstractSource

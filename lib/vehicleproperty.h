@@ -275,6 +275,7 @@ public:
 
 	static const Property EngineLoad;
 	typedef BasicPropertyType<uint16_t> EngineLoadType;
+<<<<<<< HEAD
 
 	static const Property Horn;
 	typedef BasicPropertyType<bool> HornType;
@@ -293,6 +294,8 @@ public:
 
 	static const Property FuelAverageEconomy;
 	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
+=======
+>>>>>>> temp2321
 
 	static std::list<VehicleProperty::Property> capabilities();
 

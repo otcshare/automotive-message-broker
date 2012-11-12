@@ -571,11 +571,19 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 	if (property == VehicleProperty::VIN)
 	{
+<<<<<<< HEAD
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "VIN subscription requested... but there's no point!"<<endl;
 	}
 	else if (property == VehicleProperty::WMI)
 	{
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "WMI subscription requested... but there's no point!"<<endl;
+=======
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "VIN subscription requested... but there's no point!\n";
+	}
+	else if (property == VehicleProperty::WMI)
+	{
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "WMI subscription requested... but there's no point!\n";
+>>>>>>> temp2321
 	}
 	else
 	{
@@ -660,7 +668,10 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 
 	Obd2Amb obd2amb;
 	ObdRequest *requ = new ObdRequest();
+<<<<<<< HEAD
 	requ->property = property;
+=======
+>>>>>>> temp2321
 	requ->req = obd2amb.propertyPidMap[property];
 	g_async_queue_push(subscriptionRemoveQueue,requ);
 }
@@ -738,7 +749,10 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 
 	Obd2Amb obd2amb;
 	ObdRequest *requ = new ObdRequest();
+<<<<<<< HEAD
 	requ->property = property;
+=======
+>>>>>>> temp2321
 	requ->req = obd2amb.propertyPidMap[property];
 	g_async_queue_push(singleShotQueue,requ);
 }
