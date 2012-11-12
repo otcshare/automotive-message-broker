@@ -35,9 +35,12 @@ Interface:      org.automotive.tripMeter
 Object path:    /org/automotive/runningStatus/tripMeter
 Properties:     
 
-		array{uint32} TripMeter [readonly]
+		uint32 A [readonly]
 		
 			Distance from trip meter(s) in km.
+
+		uint32 B [readonly]
+		uint32 C [readonly]
 			
 Interface:      org.automotive.transmission
 Object path:    /org/automotive/runningStatus/transmission
