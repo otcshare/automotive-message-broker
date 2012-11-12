@@ -37,12 +37,14 @@ DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine,
 
 void DBusSink::supportedChanged(PropertyList supportedProperties)
 {
+	startRegistration();
 
 	for(PropertyDBusMap::iterator itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
 	{
 		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr).first))
 		{
 			routingEngine->subscribeToProperty((*itr).first, this);
+			addProperty((*itr).second);
 			supported = true;
 		}
 	}

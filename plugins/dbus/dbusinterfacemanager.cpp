@@ -41,8 +41,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);
 	ConstructProperty(VehiclePowerModeProperty);
 	ConstructProperty(TripMeterProperty);
-
-
+	ConstructProperty(TransmissionProperty);
 }
 
 static void
@@ -62,7 +61,7 @@ DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine)
 {
 	g_type_init();
 
-	ownerId = g_bus_own_name(G_BUS_TYPE_SESSION,
+	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
 					DBusServiceName,
 					G_BUS_NAME_OWNER_FLAGS_NONE,
 					on_bus_acquired,
@@ -71,7 +70,6 @@ DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine)
 					this,
 					NULL);
 
-	///TODO: instantiate other interfaces here!
 }
 
 DBusInterfaceManager::~DBusInterfaceManager()
