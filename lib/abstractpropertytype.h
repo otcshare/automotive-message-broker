@@ -32,6 +32,8 @@ class AbstractPropertyType
 public:
 	virtual std::string toString() = 0;
 
+	virtual void fromString(std::string)= 0;
+
 	void setValue(boost::any val)
 	{
 		mValue = val;
@@ -84,6 +86,14 @@ public:
 		else throw std::runtime_error("value cannot be empty");
 	}
 
+	void fromString(std::string val)
+	{
+		if(!val.empty() && val != "")
+		{
+			serialize<T>(val);
+		}
+	}
+
 	std::string toString()
 	{
 		std::stringstream stream;
@@ -133,6 +143,11 @@ public:
 	{
 		setValue(other.value<std::string>());
 		return *this;
+	}
+
+	void fromString(std::string val)
+	{
+		setValue(val);
 	}
 
 

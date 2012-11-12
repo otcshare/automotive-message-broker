@@ -22,6 +22,8 @@
 
 using namespace std;
 
+std::map<VehicleProperty::Property, VehicleProperty::PropertyTypeFactoryCallback> VehicleProperty::registeredPropertyFactoryMap;
+
 const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
 const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
 const VehicleProperty::Property VehicleProperty::EngineSpeed = "EngineSpeed";
@@ -69,7 +71,7 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 	mProperties.push_back(SteeringWheelAngle);
 	mProperties.push_back(TurnSignal);
 	mProperties.push_back(ClutchStatus);
-	mProperties.push_back((EngineOilPressure));
+	mProperties.push_back(EngineOilPressure);
 	mProperties.push_back(EngineCoolantTemperature);
 	mProperties.push_back(AccelerationX);
 	mProperties.push_back(AccelerationY);
@@ -121,6 +123,29 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 	else if(name == TirePressureLeftRear) return new TirePressureType(value);
 	else if(name == TirePressureRightRear) return new TirePressureType(value);
 
+	else
+	{
+		if(registeredPropertyFactoryMap.count(name) > 0)
+		{
+			VehicleProperty::PropertyTypeFactoryCallback cb = registeredPropertyFactoryMap[name];
+			if ( cb != NULL )
+			{
+				AbstractPropertyType* type = cb();
+				if(type == NULL)
+					throw std::runtime_error("Cannot return NULL in a PropertyTypeFactory");
+
+				type->fromString(value);
+
+				return type;
+			}
+
+		}
+	}
 
 	return nullptr;
+}
+
+void VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
+{
+	registeredPropertyFactoryMap[name] = factory;
 }

@@ -25,6 +25,7 @@
 #include <list>
 #include <set>
 #include <sstream>
+#include <map>
 
 #include <abstractpropertytype.h>
 
@@ -87,6 +88,7 @@ public:
 	VehicleProperty();
 
 	typedef std::string Property;
+	typedef std::function<AbstractPropertyType* (void)> PropertyTypeFactoryCallback;
 
 	/// Various property types:
 
@@ -213,6 +215,12 @@ public:
 	  * transfered to the caller.
 	  */
 	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
+
+	static void registerProperty(Property name, PropertyTypeFactoryCallback factory);
+
+private:
+
+	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;
     
 };
 
