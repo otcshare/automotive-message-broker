@@ -66,7 +66,10 @@ public:
 		propertyPidMap[VehicleProperty::ThrottlePosition] = "01111\r";
 		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
 		propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
+<<<<<<< HEAD
 		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";	propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
+=======
+>>>>>>> temp2351
 		propertyPidMap[VehicleProperty::EngineLoad] = "01041/r";
 		propertyPidMap[VehicleProperty::VIN] = "0902/r";
 		propertyPidMap[VehicleProperty::WMI] = "0902/r";
@@ -109,18 +112,12 @@ public:
 
 
 
-	map<VehicleProperty::Property, std::string> propertyPidMap;
 	map<VehicleProperty::Property, ConversionFunction> propertyConversionMap;
 
 private:
 
 	static uint16_t velocity;
 	static double fuelConsumptionOldTime;
-=======
-	}
-
-	map<VehicleProperty::Property, std::string> propertyPidMap;
->>>>>>> temp2321
 };
 
 class OBD2Source : public AbstractSource
