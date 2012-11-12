@@ -512,7 +512,7 @@ obdLib::ObdError obdLib::lastError()
 }
 bool obdLib::sendObdRequest(const char *req,int length,std::vector<byte> *reply)
 {
-	return sendObdRequest(req,length,reply,100,5);
+	return sendObdRequest(req,length,reply,10,5);
 }
 
 
