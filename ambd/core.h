@@ -43,6 +43,7 @@ public:
 	void registerSink(AbstractSink *self);
 	void unregisterSink(AbstractSink *self);
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
+	AsyncRangePropertyReply* getRangePropertyAsync(AsyncRangePropertyRequest request);
 	void setProperty(VehicleProperty::Property,AbstractPropertyType*);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);

@@ -68,6 +68,9 @@ string ExampleSourcePlugin::uuid()
 void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	DebugOut()<<"ExampleSource: getPropertyAsync called for property: "<<reply->property<<endl;
+
+
+
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
 		VehicleProperty::VehicleSpeedType temp(velocity);
@@ -116,6 +119,11 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->value = &temp;
 		reply->completed(reply);
 	}
+}
+
+void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
+{
+
 }
 
 void ExampleSourcePlugin::setProperty(VehicleProperty::Property , AbstractPropertyType *)
@@ -182,5 +190,5 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp);
 	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp);
 	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec);
-	routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
+	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }
