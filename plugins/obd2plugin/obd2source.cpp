@@ -576,11 +576,6 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 	else if (property == VehicleProperty::WMI)
 	{
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "WMI subscription requested... but there's no point!"<<endl;
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "VIN subscription requested... but there's no point!\n";
-	}
-	else if (property == VehicleProperty::WMI)
-	{
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "WMI subscription requested... but there's no point!\n";
 	}
 	else
 	{
