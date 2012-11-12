@@ -235,6 +235,12 @@ public:
 	static const Property TripMeterC;
 	typedef BasicPropertyType<uint16_t> TripMeterType;
 
+	static const Property CruiseControlActive;
+	typedef BasicPropertyType<bool> CruiseControlActiveType;
+
+	static const Property CruiseControlSpeed;
+	typedef BasicPropertyType<uint16_t> CruiseControlSpeedType;
+
 	static std::list<VehicleProperty::Property> capabilities();
 
 	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
