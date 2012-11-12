@@ -91,7 +91,7 @@ private:
 
 	uint16_t machineGuns;
 	TurnSignals::TurnSignalType turnSignal;
-	uint16_t currentGear;
+	Transmission::TransmissionPositions currentGear;
 	uint16_t oilPSI;
 	uint16_t coolantTemp;
 	uint16_t steeringAngle;
@@ -188,7 +188,7 @@ void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData)
 WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route)
 :re(route), gis(nullptr), axis(nullptr), button(nullptr),
 oilPSI(10), coolantTemp(100), turnSignal(TurnSignals::Off), throttle(0),
-machineGuns(false), currentGear(0), steeringAngle(0),
+machineGuns(false), currentGear(Transmission::Neutral), steeringAngle(0),
 clutch(false), oldClutch(false), brake(false), oldBrake(false)
 {
 
@@ -372,7 +372,7 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			this->changeGear((val ? 128 : 0));
 			break;
 		default:
-			cout << "Got unknown button number: " << (int)number << endl;
+			DebugOut() << "Got unknown button number: " << (int)number << endl;
 			break;
 	}
 }
@@ -467,7 +467,7 @@ void WheelPrivate::changeTurnSignal(TurnSignals::TurnSignalType dir, bool val)
 
 void WheelPrivate::changeGear(int gear)
 {
-	this->currentGear = gear;
+	this->currentGear = (Transmission::TransmissionPositions)gear;
 	VehicleProperty::TransmissionShiftPositionType tempTrans(this->currentGear);
 	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
 	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, &tempTrans);

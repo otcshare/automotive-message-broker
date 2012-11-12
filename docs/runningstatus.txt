@@ -56,7 +56,7 @@ Properties:
 			8th = 8,
 			9th = 9,
 			10th = 10,
-			Drive = 64,
+			Drive = 96,
 			Reverse = 128,
 			Park = 255
 
