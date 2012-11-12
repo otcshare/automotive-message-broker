@@ -32,10 +32,6 @@
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
 
-uint16_t Obd2Amb::velocity = 0;
-double Obd2Amb::fuelConsumptionOldTime = 0;
-
-
 int calledPersecond = 0;
 
 bool sendElmCommand(obdLib *obd,std::string command)
@@ -209,7 +205,6 @@ void threadLoop(gpointer data)
 					double rpm = ((replyVector[2] << 8) + replyVector[3]) / 4.0;
 					ObdReply *rep = new ObdReply();
 					rep->req = "0C";
-					rep->property = VehicleProperty::EngineSpeed;
 					rep->reply = boost::lexical_cast<string>(rpm);
 					g_async_queue_push(privResponseQueue,rep);
 					//printf("RPM: %f\n",rpm);
@@ -219,7 +214,6 @@ void threadLoop(gpointer data)
 				      int mph = replyVector[2];
 				      ObdReply *rep = new ObdReply();
 				      rep->req = "0D";
-					  rep->property = VehicleProperty::VehicleSpeed;
 				      rep->reply = boost::lexical_cast<string>(mph);
 				      g_async_queue_push(privResponseQueue,rep);
 				}
@@ -228,7 +222,6 @@ void threadLoop(gpointer data)
 					int temp = replyVector[2] - 40;
 					ObdReply *rep = new ObdReply();
 					rep->req = "05";
-					rep->property = VehicleProperty::EngineCoolantTemperature;
 					rep->reply = boost::lexical_cast<string>(temp);
 					g_async_queue_push(privResponseQueue,rep);
 				}
@@ -237,14 +230,13 @@ void threadLoop(gpointer data)
 					double maf = ((replyVector[2] << 8) + replyVector[3]) / 100.0;
 					ObdReply *rep = new ObdReply();
 					rep->req = "10";
-					rep->property = VehicleProperty::MassAirFlow;
 					rep->reply = boost::lexical_cast<string>(maf);
 					g_async_queue_push(privResponseQueue,rep);
 				}
 				else
 				{
 					//printf("Unknown response type: %i\n",replyVector[1]);
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unknown response type" << replyVector[1] << endl;
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unknown response type" << replyVector[1] << "\n";
 				}
 			}
 			else if (replyVector[0] == 0x49)
@@ -295,24 +287,7 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{
 		ObdReply *reply = (ObdReply*)retval;
-
-		Obd2Amb obd2amb;
-
-		if(obd2amb.propertyPidMap.count(reply->property) != 0)
-		{
-			std::string convValue = reply->reply;
-
-			if(obd2amb.propertyConversionMap.count(reply->property))
-			{
-				convValue = obd2amb.propertyConversionMap[reply->property](reply->reply);
-			}
-
-
-			AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, convValue);
-			src->updateProperty(reply->property, value);
-		}
-
-		/*if (reply->req == "05")
+		if (reply->req == "05")
 		{
 			VehicleProperty::EngineCoolantTemperatureType speed(reply->reply);
 			src->updateProperty(VehicleProperty::EngineCoolantTemperature,&speed);
@@ -357,8 +332,7 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 			src->updateProperty(VehicleProperty::InteriorTemperature,&temp);
 		}
 		//5C -- engine oil temp
-		//46 interior temp*/
-
+		//46 interior temp
 		delete reply;
 	}
 
@@ -660,7 +634,6 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 
 	Obd2Amb obd2amb;
 	ObdRequest *requ = new ObdRequest();
-	requ->property = property;
 	requ->req = obd2amb.propertyPidMap[property];
 	g_async_queue_push(subscriptionRemoveQueue,requ);
 }
@@ -738,22 +711,11 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 
 	Obd2Amb obd2amb;
 	ObdRequest *requ = new ObdRequest();
-	requ->property = property;
 	requ->req = obd2amb.propertyPidMap[property];
 	g_async_queue_push(singleShotQueue,requ);
 }
 
-AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
+void OBD2Source::setProperty(VehicleProperty::Property , AbstractPropertyType * )
 {
-	AsyncPropertyReply* reply = new AsyncPropertyReply (request);
-	reply->success = false;
-	try
-	{
-		reply->completed(reply);
-	}
-	catch (...)
-	{
 
-	}
-	return reply;
 }
