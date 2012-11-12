@@ -65,6 +65,18 @@ const VehicleProperty::Property VehicleProperty::TripMeterB = "TripMeterB";
 const VehicleProperty::Property VehicleProperty::TripMeterC = "TripMeterC";
 const VehicleProperty::Property VehicleProperty::CruiseControlActive = "CruiseControlActive";
 const VehicleProperty::Property VehicleProperty::CruiseControlSpeed = "CruiseControlSpeed";
+const VehicleProperty::Property VehicleProperty::LightHead = "LightHead";
+const VehicleProperty::Property VehicleProperty::LightLeftTurn = "LightLeftTurn";
+const VehicleProperty::Property VehicleProperty::LightRightTurn = "LightRightTurn";
+const VehicleProperty::Property VehicleProperty::LightParking = "LightParking";
+const VehicleProperty::Property VehicleProperty::LightFog = "LightFog";
+const VehicleProperty::Property VehicleProperty::LightHazard= "LightHazard";
+const VehicleProperty::Property VehicleProperty::LightHighBeam = "LightHighBeam";
+const VehicleProperty::Property VehicleProperty::LightBrake= "LightBrake";
+const VehicleProperty::Property VehicleProperty::InteriorLightDriver = "InteriorLightDriver";
+const VehicleProperty::Property VehicleProperty::InteriorLightCenter = "InteriorLightCenter";
+const VehicleProperty::Property VehicleProperty::InteriorLightPassenger = "InteriorLightPassenger";
+
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 
@@ -101,8 +113,19 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterC,TripMeterType,0);
-	REGISTERPROPERTY(CruiseControlActive,false);
+	REGISTERPROPERTY(CruiseControlActive, false);
 	REGISTERPROPERTY(CruiseControlSpeed,0);
+	REGISTERPROPERTYWITHTYPE(LightHead, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightLeftTurn,LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightRightTurn, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightParking, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightFog, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightHazard, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightHighBeam, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightBrake, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(InteriorLightDriver, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(InteriorLightPassenger, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(InteriorLightCenter, LightStatusType, false);
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
@@ -126,7 +149,6 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 
 			return type;
 		}
-
 	}
 
 	return nullptr;

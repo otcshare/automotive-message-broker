@@ -241,6 +241,20 @@ public:
 	static const Property CruiseControlSpeed;
 	typedef BasicPropertyType<uint16_t> CruiseControlSpeedType;
 
+	static const Property LightHead;
+	static const Property LightRightTurn;
+	static const Property LightLeftTurn;
+	static const Property LightBrake;
+	static const Property LightFog;
+	static const Property LightHazard;
+	static const Property LightParking;
+	static const Property LightHighBeam;
+	typedef BasicPropertyType<bool> LightStatusType;
+
+	static const Property InteriorLightDriver;
+	static const Property InteriorLightCenter;
+	static const Property InteriorLightPassenger;
+
 	static std::list<VehicleProperty::Property> capabilities();
 
 	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name

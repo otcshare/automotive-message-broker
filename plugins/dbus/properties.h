@@ -112,6 +112,49 @@ public:
 	{
 		wantProperty<bool>(VehicleProperty::CruiseControlActive, "Activated", "b", AbstractProperty::Read);
 		wantProperty<uint16_t>(VehicleProperty::CruiseControlSpeed, "Speed", "q", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+};
+
+class WheelBrakeProperty: public DBusSink
+{
+public:
+	WheelBrakeProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+		:DBusSink("org.automotive.wheelBrake","/org/automotive/runningstatus/wheelBrake", re, connection, map<string, string>())
+	{
+		wantProperty<bool>(VehicleProperty::WheelBrake, "Engaged", "b", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+};
+
+class LightStatusProperty: public DBusSink
+{
+public:
+	LightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+		:DBusSink("org.automotive.lightStatus","/org/automotive/runningstatus/lightStatus", re, connection, map<string, string>())
+	{
+		wantProperty<bool>(VehicleProperty::LightHead, "Head", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::LightRightTurn, "RightTurn", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::LightLeftTurn, "LeftTurn", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::LightBrake, "Brake", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::LightFog, "Fog", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::LightHazard, "Hazard", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::LightParking, "Parking", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::LightHighBeam, "HighBeam", "b", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+};
+
+class InteriorLightStatusProperty: public DBusSink
+{
+public:
+	InteriorLightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+		:DBusSink("org.automotive.interiorLightStatus","/org/automotive/runningstatus/interiorLightStatus", re, connection, map<string, string>())
+	{
+		wantProperty<bool>(VehicleProperty::InteriorLightPassenger, "Passenger", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::InteriorLightPassenger, "Driver", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::InteriorLightCenter, "Center", "b", AbstractProperty::Read);
+		supportedChanged(re->supported());
 	}
 };
 
