@@ -81,7 +81,6 @@ const VehicleProperty::Property VehicleProperty::InteriorLightDriver = "Interior
 const VehicleProperty::Property VehicleProperty::InteriorLightCenter = "InteriorLightCenter";
 const VehicleProperty::Property VehicleProperty::InteriorLightPassenger = "InteriorLightPassenger";
 const VehicleProperty::Property VehicleProperty::EngineLoad = "EngineLoad";
-<<<<<<< HEAD
 const VehicleProperty::Property VehicleProperty::Horn = "Horn";
 const VehicleProperty::Property VehicleProperty::FuelLevel = "FuelLevel";
 const VehicleProperty::Property VehicleProperty::FuelConsumption = "FuelConsumption";
@@ -89,8 +88,6 @@ const VehicleProperty::Property VehicleProperty::FuelRange = "FuelRange";
 const VehicleProperty::Property VehicleProperty::FuelEconomy = "FuelEconomy";
 const VehicleProperty::Property VehicleProperty::FuelAverageEconomy = "FuelAverageEconomy";
 const VehicleProperty::Property VehicleProperty::EngineOilRemaining = "EngineOilRemaining";
-=======
->>>>>>> temp2321
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 
@@ -146,17 +143,12 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(InteriorLightPassenger, LightStatusType, false);
 	REGISTERPROPERTYWITHTYPE(InteriorLightCenter, LightStatusType, false);
 	REGISTERPROPERTY(EngineLoad,0);
-<<<<<<< HEAD
 	REGISTERPROPERTY(Horn,false);
 	REGISTERPROPERTY(FuelLevel, 0);
 	REGISTERPROPERTY(FuelRange, 0);
 	REGISTERPROPERTY(FuelConsumption, 0);
 	REGISTERPROPERTY(FuelEconomy, 0);
 	REGISTERPROPERTY(FuelAverageEconomy, 0);
-
-
-=======
->>>>>>> temp2321
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
