@@ -35,12 +35,12 @@ Interface:      org.automotive.tripMeter
 Object path:    /org/automotive/runningStatus/tripMeter
 Properties:     
 
-		uint32 A [readonly]
+		uint32 A [readwrite]
 		
-			Distance from trip meter(s) in km.
+			Distance from trip meter(s) in km.  This can be only set to "0".
 
-		uint32 B [readonly]
-		uint32 C [readonly]
+		uint32 B [readwrite]
+		uint32 C [readwrite]
 			
 Interface:      org.automotive.transmission
 Object path:    /org/automotive/runningStatus/transmission

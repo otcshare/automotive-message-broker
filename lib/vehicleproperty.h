@@ -220,7 +220,10 @@ public:
 	static const Property VehiclePowerMode;
 	typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
-
+	static const Property TripMeterA;
+	static const Property TripMeterB;
+	static const Property TripMeterC;
+	typedef BasicPropertyType<uint16_t> TripMeterType;
 
 	static std::list<VehicleProperty::Property> capabilities();
 

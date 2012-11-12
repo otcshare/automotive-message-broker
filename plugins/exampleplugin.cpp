@@ -100,7 +100,7 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	}
 	else if(reply->property == VehicleProperty::VIN)
 	{
-		VehicleProperty::VINType temp("abc00000000000000");
+		VehicleProperty::VINType temp("ABC00000000000000");
 		reply->value = &temp;
 		reply->completed(reply);
 	}

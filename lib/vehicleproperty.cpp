@@ -59,13 +59,15 @@ const VehicleProperty::Property VehicleProperty::TirePressureRightFront = "TireP
 const VehicleProperty::Property VehicleProperty::TirePressureLeftRear = "TirePressureLeftRear";
 const VehicleProperty::Property VehicleProperty::TirePressureRightRear = "TirePressureRightRear";
 const VehicleProperty::Property VehicleProperty::VehiclePowerMode = "VehiclePowerMode";
+const VehicleProperty::Property VehicleProperty::TripMeterA = "TripMeterA";
+const VehicleProperty::Property VehicleProperty::TripMeterB = "TripMeterB";
+const VehicleProperty::Property VehicleProperty::TripMeterC = "TripMeterC";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 
 VehicleProperty::VehicleProperty()
 {
 	registerProperty( VehicleSpeed, [](){ return new VehicleSpeedType(0); });
-
 	registerProperty(EngineSpeed, [](){ return new EngineSpeedType(0); });
 	registerProperty(TransmissionShiftPosition, [](){ return new TransmissionShiftPositionType(Transmission::Neutral); });
 	registerProperty(TransmissionGearPosition, [](){ return new TransmissionGearPositionType(Transmission::Neutral); });
@@ -92,6 +94,9 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftRear, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureRightRear, TirePressureType, 0);
 	registerProperty( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
+	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
+	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
+	REGISTERPROPERTYWITHTYPE(TripMeterC,TripMeterType,0);
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
