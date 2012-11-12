@@ -56,6 +56,8 @@ private:
 	
 	SourceList mSources;
 	SinkList mSinks;
+
+	int propertiesPerSecond;
 	
 	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
     

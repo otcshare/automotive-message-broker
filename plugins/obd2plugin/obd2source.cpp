@@ -28,6 +28,7 @@
 #include "debugout.h"
 #include "bluetooth.hpp"
 
+
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
 
@@ -35,7 +36,7 @@ bool sendElmCommand(obdLib *obd,std::string command)
 {
   	std::vector<unsigned char> replyVector;
 	std::string reply;
-	obd->sendObdRequestString(command.append("\r").c_str(),command.length()+1,&replyVector,500,3);
+	obd->sendObdRequestString(command.append("\r").c_str(),command.length()+1,&replyVector,10,3);
 	for (unsigned int i=0;i<replyVector.size();i++)
 	{
 		reply += replyVector[i];
@@ -268,20 +269,18 @@ void threadLoop(gpointer data)
 				
 			}
 			
-			DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
+			//DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
 		}
-		usleep(10000);
+		if(!reqList.size()) usleep(10000);
 		repeatReqList.clear();
 	}
 	
 }
-static gboolean updateProperties(gpointer data)
+static int updateProperties(/*gpointer retval,*/ gpointer data)
 {
 	OBD2Source* src = (OBD2Source*)data;
 	
-	//src->randomizeProperties();
-	gpointer retval = g_async_queue_try_pop(src->responseQueue);
-	if (retval != nullptr)
+	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{
 		ObdReply *reply = (ObdReply*)retval;
 		if (reply->req == "05")
@@ -332,6 +331,7 @@ static gboolean updateProperties(gpointer data)
 		//46 interior temp
 		delete reply;
 	}
+
 	return true;
 }
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
@@ -421,6 +421,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	requ->arg = port + ":" + baud;
 	g_async_queue_push(commandQueue,requ);
 }
+
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {
 	clientConnected = false;
@@ -448,7 +449,12 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
 
 	setConfiguration(config);
-	g_timeout_add(50, updateProperties, this );
+
+	//AsyncQueueWatcher * watcher = new AsyncQueueWatcher(responseQueue, (AsyncQueueWatcherCallback) updateProperties, this);
+
+	//g_timeout_add(1,updateProperties, this);
+	g_idle_add(updateProperties, this);
+
 }
 
 PropertyList OBD2Source::supported()
