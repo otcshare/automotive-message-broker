@@ -75,7 +75,6 @@ public:
 		propertyPidMap[VehicleProperty::FuelConsumption] = "01101\r";
 
 
-
 		propertyConversionMap[VehicleProperty::VehicleSpeed] = [](std::string input)
 		{
 			///velocity is used in other equations.  We'll save it off in a static variable:
@@ -110,6 +109,7 @@ public:
 
 
 	map<VehicleProperty::Property, ConversionFunction> propertyConversionMap;
+	map<VehicleProperty::Property, std::string> propertyPidMap;
 
 private:
 
