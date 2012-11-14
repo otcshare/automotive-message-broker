@@ -81,6 +81,7 @@ ln -s ../ambd.service %{buildroot}%{_libdir}/systemd/system/network.target.wants
 %files plugins
 %defattr(-,root,root,-)
 %{_libdir}/%{name}/*.so
+/etc/dbus-1/system.d/amb.conf
 
 %files doc
 %defattr(-,root,root,-)
