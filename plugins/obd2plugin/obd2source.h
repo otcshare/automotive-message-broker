@@ -65,11 +65,8 @@ public:
 		propertyPidMap[VehicleProperty::AirIntakeTemperature] = "010F1\r";
 		propertyPidMap[VehicleProperty::ThrottlePosition] = "01111\r";
 		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
-		propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
-<<<<<<< HEAD
-		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";	propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "0105a\r";
-=======
->>>>>>> temp2351
+		propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "01051\r";
+		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
 		propertyPidMap[VehicleProperty::EngineLoad] = "01041/r";
 		propertyPidMap[VehicleProperty::VIN] = "0902/r";
 		propertyPidMap[VehicleProperty::WMI] = "0902/r";
