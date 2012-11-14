@@ -26,6 +26,7 @@
 #include <set>
 #include <sstream>
 #include <map>
+#include <functional>
 
 #include <abstractpropertytype.h>
 
