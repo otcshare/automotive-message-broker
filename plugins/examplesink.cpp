@@ -21,6 +21,9 @@
 #include "abstractroutingengine.h"
 #include "debugout.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new ExampleSinkManager(routingengine, config);
@@ -54,6 +57,26 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 	batteryVoltageRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"BatteryVoltage Async request completed: "<<reply->value->toString()<<endl; delete reply; };
 
 	routingEngine->getPropertyAsync(batteryVoltageRequest);
+
+	boost::posix_time::ptime start(boost::gregorian::date(2012,10,20));
+	boost::posix_time::ptime end(boost::gregorian::date(2012,10,21));
+
+	AsyncRangePropertyRequest vehicleSpeedFromLastWeek;
+	tm tmStart = boost::posix_time::to_tm(start);
+	tm tmEnd = boost::posix_time::to_tm(end);
+	vehicleSpeedFromLastWeek.begin = mktime(&tmStart);
+	vehicleSpeedFromLastWeek.end = mktime(&tmEnd);
+	vehicleSpeedFromLastWeek.property = VehicleProperty::VehicleSpeed;
+	vehicleSpeedFromLastWeek.completed = [](AsyncRangePropertyReply* reply)
+	{
+		std::list<PropertyValueTime*> values = reply->values;
+		for(auto itr = values.begin(); itr != values.end(); itr++)
+		{
+			DebugOut(0)<<"Velocity value from last week: "<<(*itr)->value->toString()<<" time: "<<(*itr)->timestamp<<endl;
+		}
+	};
+
+	routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);
 
 }
 
