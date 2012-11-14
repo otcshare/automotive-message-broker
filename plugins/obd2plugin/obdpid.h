@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <vehicleproperty.h>
+#include "obdlib.h"
 #include <time.h>
 
 class ObdPid
@@ -16,10 +17,31 @@ public:
 	{
 
 	}
-
+	static ByteArray cleanup(ByteArray replyVector)
+	{
+		ByteArray tmp;
+		for (int i=0;i<replyVector.size();i++)
+		{
+			if ((replyVector[i] != 0x20) && (replyVector[i] != '\r') && (replyVector[i] != '\n'))
+			{
+				tmp.push_back(replyVector[i]);
+			}
+		}
+		return tmp;
+	}
+	static ByteArray compress(ByteArray replyVector)
+	{
+		ByteArray tmp;
+		for (int i=0;i<replyVector.size();i++)
+		{
+			tmp.push_back(obdLib::byteArrayToByte(replyVector[i],replyVector[i+1]));
+			i++;
+		}
+		return tmp;
+	}
 	virtual ObdPid* create() = 0;
 
-	virtual void parse(ByteArray replyVector) = 0;
+	virtual bool tryParse(ByteArray replyVector) = 0;
 
 	VehicleProperty::Property property;
 	std::string pid;
@@ -55,11 +77,21 @@ public:
 	{
 
 	}
-
-	void parse(ByteArray replyVector)
+	bool tryParse(ByteArray replyVector)
 	{
-		int mph = replyVector[2];
+		ByteArray tmp = compress(cleanup(replyVector));
+		for (int i=0;i<tmp.size();i++)
+		{
+		  printf("%i ",tmp[i]);
+		}
+		printf("\n");
+		if (tmp[1] != 0x0D)
+		{
+			return false;
+		}
+		int mph = tmp[2];
 		value = boost::lexical_cast<std::string>(mph);
+		return true;
 	}
 };
 
@@ -72,11 +104,16 @@ public:
 	{
 
 	}
-
-	void parse(ByteArray replyVector)
+	bool tryParse(ByteArray replyVector)
 	{
-		double rpm = ((replyVector[2] << 8) + replyVector[3]) / 4.0;
+		ByteArray tmp = compress(cleanup(replyVector));
+		if (tmp[1] != 0x0C)
+		{
+			return false;
+		}
+		double rpm = ((tmp[2] << 8) + tmp[3]) / 4.0;
 		value = boost::lexical_cast<std::string>(rpm);
+		return false;
 	}
 };
 
@@ -89,11 +126,16 @@ public:
 	{
 
 	}
-
-	void parse(ByteArray replyVector)
+	bool tryParse(ByteArray replyVector)
 	{
-		int temp = replyVector[2] - 40;
+		ByteArray tmp = compress(cleanup(replyVector));
+		if (tmp[1] != 0x05)
+		{
+			return false;
+		}
+		int temp = tmp[2] - 40;
 		value = boost::lexical_cast<std::string>(temp);
+		return false;
 	}
 };
 
@@ -106,11 +148,16 @@ public:
 	{
 
 	}
-
-	virtual void parse(ByteArray replyVector)
+	bool tryParse(ByteArray replyVector)
 	{
-		maf = ((replyVector[2] << 8) + replyVector[3]) / 100.0;
+		ByteArray tmp = compress(cleanup(replyVector));
+		if (tmp[1] != 0x10)
+		{
+			return false;
+		}
+		maf = ((tmp[2] << 8) + tmp[3]) / 100.0;
 		value = boost::lexical_cast<std::string>(maf);
+		return false;
 	}
 
 protected:
@@ -126,10 +173,9 @@ public:
 	{
 
 	}
-
-	virtual void parse(ByteArray replyVector)
+	bool tryParse(ByteArray replyVector)
 	{
-		MassAirFlowPid::parse(replyVector);
+		MassAirFlowPid::tryParse(replyVector);
 		timespec t;
 		clock_gettime(CLOCK_REALTIME, &t);
 
@@ -141,6 +187,7 @@ public:
 		double consumption = 1 / (14.75 * 6.26) * maf * diffTime/60;
 
 		value = boost::lexical_cast<std::string>(consumption);
+		return false;
 	}
 
 private:
@@ -158,25 +205,30 @@ public:
 	{
 		type = 0x49;
 	}
-
-	virtual void parse(ByteArray replyVector)
+	bool tryParse(ByteArray replyVector)
 	{
 		std::string vinstring;
-		for (int j=0;j<replyVector.size();j++)
+		ByteArray tmp = compress(cleanup(replyVector));
+		if (tmp[0] != 0x49 && tmp[1] != 0x02)
 		{
-			if(replyVector[j] == 0x49 && replyVector[j+1] == 0x02)
+			return false;
+		}
+		for (int j=0;j<tmp.size();j++)
+		{
+			if(tmp[j] == 0x49 && tmp[j+1] == 0x02)
 			{
 				//We're at a reply header
 				j+=3;
 			}
-			if (replyVector[j] != 0x00)
+			if (tmp[j] != 0x00)
 			{
-				vinstring += (char)replyVector[j];
+				vinstring += (char)tmp[j];
 				//printf("VIN: %i %c\n",replyVector[j],replyVector[j]);
 			}
 		}
 
 		value = vinstring;
+		return false;
 	}
 
 };
@@ -190,12 +242,12 @@ public:
 	{
 		property = VehicleProperty::WMI;
 	}
-
-	virtual void parse(ByteArray replyVector)
+	bool tryParse(ByteArray replyVector)
 	{
-		VinPid::parse(replyVector);
+		VinPid::tryParse(replyVector);
 
 		value = value.substr(0,3);
+		return false;
 	}
 
 };

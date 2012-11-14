@@ -32,7 +32,7 @@
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
 
-std::list<ObdPid*> Obd2Amb::supportedPidsList;
+//std::list<ObdPid*> Obd2Amb::supportedPidsList;
 Obd2Amb *obd2AmbInstance = new Obd2Amb;
 
 int calledPersecond = 0;
@@ -62,9 +62,11 @@ void connect(obdLib* obd, std::string device, std::string strbaud)
 {
 	//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
 	std::string port = device;
+	DebugOut() << "Obd2Source::Connect()" << device << strbaud << "\n";
 	int baud = boost::lexical_cast<int>(strbaud);
 	obd->openPort(port.c_str(),baud);
-
+ObdPid::ByteArray replyVector;
+std::string reply;
 	obd->sendObdRequestString("ATZ\r",4,&replyVector,500,3);
 	for (unsigned int i=0;i<replyVector.size();i++)
 	{
@@ -118,6 +120,9 @@ void threadLoop(gpointer data)
 	std::list<ObdPid*> repeatReqList;
 	ObdPid::ByteArray replyVector;
 	std::string reply;
+	std::string port;
+	std::string baud;
+	bool connected=false;
 	while (true)
 	{
 		//gpointer query = g_async_queue_pop(privCommandQueue);
@@ -136,19 +141,31 @@ void threadLoop(gpointer data)
 		{
 
 			ObdPid *req = (ObdPid*)query;
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got subscription request for "<<req->req<<endl;
+			//DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got subscription request for "<<req->req<<endl;
 			reqList.push_back(req);
 		}
 		query = g_async_queue_try_pop(privCommandQueue);
 		if (query != nullptr)
 		{
-			ObdPid *req = (ObdPid*)query;
+			//ObdPid *req = (ObdPid*)query;
+			CommandRequest *req = (CommandRequest*)query;
 			//commandMap[req->req] = req->arg;
 			//printf("Command: %s\n",req->req.c_str());
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->property << endl;
-			if (req->property == "connect")
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << endl;
+			if (req->req == "connect")
 			{
-				connect(obd);
+				connect(obd,req->arglist[0],req->arglist[1]);
+				connected = true;
+			}
+			else if (req->req == "setportandbaud")
+			{
+				port = req->arglist[0];
+				baud = req->arglist[1];
+			}
+			else if (req->req == "disconnect")
+			{
+				obd->closePort();
+				connected = false;
 			}
 			delete req;
 		}
@@ -156,27 +173,50 @@ void threadLoop(gpointer data)
 		if (query != nullptr)
 		{
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got unsubscription request\n";
-			ObdRequest *req = (ObdRequest*)query;
-			for (std::list<std::string>::iterator i=reqList.begin();i!= reqList.end();i++)
+			ObdPid *req = (ObdPid*)query;
+			for (std::list<ObdPid*>::iterator i=reqList.begin();i!= reqList.end();i++)
 			{
-				if ((*i) == req->req)
+				if ((*i)->property == req->property)
 				{
 					reqList.erase(i);
+					delete (*i);
 					i--;
 				}
 			}
 			//reqList.push_back(req->req);
 			delete req;
 		}
-		
-		for (std::list<std::string>::iterator i=reqList.begin();i!= reqList.end();i++)
+		if (reqList.size() > 0 && !connected)
+		{
+			CommandRequest *req = new CommandRequest();
+			req->req = "connect";
+			req->arglist.push_back(port);
+			req->arglist.push_back(baud);
+			g_async_queue_push(privCommandQueue,req);
+			continue;
+		}
+		for (std::list<ObdPid*>::iterator i=reqList.begin();i!= reqList.end();i++)
 		{
 			repeatReqList.push_back(*i);
 		}
-		for (std::list<std::string>::iterator i=repeatReqList.begin();i!= repeatReqList.end();i++)
+		for (std::list<ObdPid*>::iterator i=repeatReqList.begin();i!= repeatReqList.end();i++)
 		{
+			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector))
+			{
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid << "!\n";
+				continue;
+			}
+			//ObdPid *pid = ObdPid::pidFromReply(replyVector);
+			ObdPid *pid = obd2AmbInstance->createPidFromReply(replyVector);
+			if (!pid)
+			{
+				//Invalid reply
+				DebugOut() << "Invalid reply\n";
+				continue;
+			}
+			g_async_queue_push(privResponseQueue,pid);
 			//printf("Req: %s\n",(*i).c_str());
-			if ((*i) == "ATRV\r")
+			/*if ((*i) == "ATRV\r")
 			{
 				//printf("Requesting voltage...\n");
 				if (!obd->sendObdRequestString((*i).c_str(),(*i).length(),&replyVector))
@@ -191,73 +231,29 @@ void threadLoop(gpointer data)
 					replystring += replyVector[j];
 				}
 				//printf("Voltage reply: %s\n",replystring.c_str());
-				replystring.substr(0,replystring.find("V"));
-				ObdReply *rep = new ObdReply();
+				replystring.substr(0,replystring.find("V"));*/
+				/*ObdReply *rep = new ObdReply();
 				rep->req = "ATRV\r";
 				rep->reply = replystring;
-				g_async_queue_push(privResponseQueue,rep);
-			}
+				g_async_queue_push(privResponseQueue,rep);*/
+			/*}
 			if (!obd->sendObdRequest((*i).c_str(),(*i).length(),&replyVector))
 			{
 				//printf("Error sending obd2 request\n");
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error sending OBD2 request\n";
 				continue;
-			}
+			}*/
 			//printf("Reply: %i %i\n",replyVector[0],replyVector[1]);
-			if (replyVector[0] == 0x41)
-			{
-				if (replyVector[1] == 0x0C)
-				{
-					double rpm = ((replyVector[2] << 8) + replyVector[3]) / 4.0;
-					ObdReply *rep = new ObdReply();
-					rep->req = "0C";
-					rep->property = VehicleProperty::EngineSpeed;
-					rep->reply = boost::lexical_cast<string>(rpm);
-					g_async_queue_push(privResponseQueue,rep);
-					//printf("RPM: %f\n",rpm);
-				}
-				else if (replyVector[1] == 0x0D)
-				{
-				      int mph = replyVector[2];
-				      ObdReply *rep = new ObdReply();
-				      rep->req = "0D";
-					  rep->property = VehicleProperty::VehicleSpeed;
-				      rep->reply = boost::lexical_cast<string>(mph);
-				      g_async_queue_push(privResponseQueue,rep);
-				}
-				else if (replyVector[1] == 0x05)
-				{
-					int temp = replyVector[2] - 40;
-					ObdReply *rep = new ObdReply();
-					rep->req = "05";
-					rep->property = VehicleProperty::EngineCoolantTemperature;
-					rep->reply = boost::lexical_cast<string>(temp);
-					g_async_queue_push(privResponseQueue,rep);
-				}
-				else if (replyVector[1] == 0x10)
-				{
-					double maf = ((replyVector[2] << 8) + replyVector[3]) / 100.0;
-					ObdReply *rep = new ObdReply();
-					rep->req = "10";
-					rep->property = VehicleProperty::MassAirFlow;
-					rep->reply = boost::lexical_cast<string>(maf);
-					g_async_queue_push(privResponseQueue,rep);
-				}
-				else
-				{
-					//printf("Unknown response type: %i\n",replyVector[1]);
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unknown response type" << replyVector[1] << endl;
-				}
-			}
+				/*
+			/*
 			else if (replyVector[0] == 0x49)
 			{
-				/*
+			  /*
 				49 02 01 00 00 00 31 
 				49 02 02 47 31 4A 43 
 				49 02 03 35 34 34 34 
 				49 02 04 52 37 32 35 
 				49 02 05 32 33 36 37 
-				*/
 				//VIN number reply
 				string vinstring;
 				for (int j=0;j<replyVector.size();j++)
@@ -273,18 +269,16 @@ void threadLoop(gpointer data)
 						//printf("VIN: %i %c\n",replyVector[j],replyVector[j]);
 					}
 				}
-				ObdReply *rep = new ObdReply();
+				/*ObdReply *rep = new ObdReply();
 				rep->req = "0902";
 				rep->reply = vinstring;
-				g_async_queue_push(privResponseQueue,rep);
-				//printf("VIN Number: %i %s\n",replyVector.size(),vinstring.c_str());
+				g_async_queue_push(privResponseQueue,rep);*/
 				
-			}
-			
 			//DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
 		}
 		if(!reqList.size()) usleep(10000);
 		repeatReqList.clear();
+		
 	}
 	
 }
@@ -410,7 +404,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	//printf("OBD2Source::setConfiguration\n");
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
-		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
 		DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
 		if ((*i).first == "device")
 		{
@@ -442,7 +436,15 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		else throw std::runtime_error("Device Error");
 	}
 
-	connect(obd, port, baud);
+	//connect(obd, port, baud);
+	CommandRequest *req = new CommandRequest();
+	req->req = "setportandbaud";
+	req->arglist.push_back(port);
+	req->arglist.push_back(baud);
+	g_async_queue_push(commandQueue,req);
+	
+	m_port = port;
+	m_baud = baud;
 	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
 	g_idle_add(updateProperties, this);
 }
@@ -568,7 +570,7 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 		}
 
 
-		ObdPid *pid = Obd2Amb::createPidforProperty(property);
+		ObdPid *pid = obd2AmbInstance->createPidforProperty(property);
 		g_async_queue_push(subscriptionAddQueue,pid);
 	}
 }
@@ -639,7 +641,7 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 		return;
 	}
 
-	ObdPid *pid = Obd2Amb::createPidforProperty(property);
+	ObdPid *pid = obd2AmbInstance->createPidforProperty(property);
 	g_async_queue_push(subscriptionRemoveQueue,pid);
 }
 
@@ -714,7 +716,7 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 		return;
 	}
 
-	ObdPid* requ = Obd2Amb::createPidforProperty(property);
+	ObdPid* requ = obd2AmbInstance->createPidforProperty(property);
 	g_async_queue_push(singleShotQueue,requ);
 }
 
