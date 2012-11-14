@@ -56,6 +56,7 @@ make %{?jobs:-j%jobs}
 rm -rf %{buildroot}
 %make_install
 
+mkdir -p %{buildroot}%{_libdir}/systemd/system/network.target.wants
 ln -s ../ambd.service %{buildroot}%{_libdir}/systemd/system/network.target.wants/ambd.service
 
 %post -p /sbin/ldconfig
