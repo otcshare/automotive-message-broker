@@ -35,13 +35,39 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "obdpid.h"
 
+class ObdRequest
+{
+public:
+  VehicleProperty::Property property;
+  std::string req;
+  std::string arg;
+};
+
+
+class CommandRequest
+{
+public:
+  std::string req;
+  std::vector<std::string> arglist;
+};
+
+class ObdReply
+{
+public:
+  VehicleProperty::Property property;
+  std::string req;
+  std::string reply;
+};
+
+
+
 class Obd2Amb
 {
 public:
 
 	typedef function<std::string (std::string)> ConversionFunction;
 
-
+	typedef std::vector<unsigned char> ByteArray;
 	Obd2Amb()
 	{
 		supportedPidsList.push_back(new VehicleSpeedPid());
@@ -52,8 +78,22 @@ public:
 		supportedPidsList.push_back(new FuelConsumptionPid());
 		supportedPidsList.push_back(new EngineCoolantPid());
 	}
-
-	static ObdPid* createPidforProperty(VehicleProperty::Property property)
+	ObdPid* createPidFromReply(ByteArray replyVector)
+	{
+		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
+		{
+			if (!(*itr)->tryParse(replyVector))
+			{
+				continue;
+			}
+			
+			ObdPid* pid = (*itr)->create();
+			pid->tryParse(replyVector);
+			return pid;
+		}
+		return 0;
+	}
+	ObdPid* createPidforProperty(VehicleProperty::Property property)
 	{
 		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
 		{
@@ -65,7 +105,7 @@ public:
 		}
 	}
 
-	static std::list<ObdPid*> supportedPidsList;
+	std::list<ObdPid*> supportedPidsList;
 };
 
 class OBD2Source : public AbstractSource
@@ -100,6 +140,7 @@ public:
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
 	std::string m_port;
+	std::string m_baud;
 	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
 	obdLib * obd;

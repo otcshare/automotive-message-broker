@@ -1,4 +1,4 @@
-if(obd2_plugin)
+#if(obd2_plugin)
 
 include(CheckIncludeFiles)
 
@@ -17,4 +17,4 @@ target_link_libraries(obd2sourceplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${l
 
 install(TARGETS obd2sourceplugin LIBRARY DESTINATION lib/automotive-message-broker)
 
-endif(obd2_plugin)
+#endif(obd2_plugin)
