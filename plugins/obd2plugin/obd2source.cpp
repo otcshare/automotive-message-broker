@@ -195,6 +195,13 @@ void threadLoop(gpointer data)
 			g_async_queue_push(privCommandQueue,req);
 			continue;
 		}
+		else if (reqList.size() == 0 && connected)
+		{
+			CommandRequest *req = new CommandRequest();
+			req->req = "disconnect";
+			g_async_queue_push(privCommandQueue,req);
+			continue;
+		}
 		for (std::list<ObdPid*>::iterator i=reqList.begin();i!= reqList.end();i++)
 		{
 			repeatReqList.push_back(*i);
@@ -276,7 +283,10 @@ void threadLoop(gpointer data)
 				
 			//DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
 		}
-		if(!reqList.size()) usleep(10000);
+		if (!connected)
+		{
+			usleep(10000);
+		}
 		repeatReqList.clear();
 		
 	}
