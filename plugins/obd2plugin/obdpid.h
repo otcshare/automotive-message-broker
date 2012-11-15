@@ -100,7 +100,7 @@ class EngineSpeedPid: public CopyMe<EngineSpeedPid>
 public:
 
 	EngineSpeedPid()
-		:CopyMe(VehicleProperty::VehicleSpeed,"010C1\r",0x0D)
+		:CopyMe(VehicleProperty::EngineSpeed,"010C1\r",0x0D)
 	{
 
 	}
@@ -122,7 +122,7 @@ class EngineCoolantPid: public CopyMe<EngineCoolantPid>
 public:
 
 	EngineCoolantPid()
-		:CopyMe(VehicleProperty::VehicleSpeed,"01051\r",0x0D)
+		:CopyMe(VehicleProperty::EngineCoolantTemperature,"01051\r",0x0D)
 	{
 
 	}
@@ -144,7 +144,7 @@ class MassAirFlowPid: public CopyMe<MassAirFlowPid>
 public:
 
 	MassAirFlowPid()
-		:CopyMe(VehicleProperty::VehicleSpeed,"01101\r",0x0D)
+		:CopyMe(VehicleProperty::MassAirFlow,"01101\r",0x0D)
 	{
 
 	}
