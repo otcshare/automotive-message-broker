@@ -113,6 +113,7 @@ class OBD2Source : public AbstractSource
 
 public:
 	OBD2Source(AbstractRoutingEngine* re, map<string, string> config);
+	~OBD2Source();
 	string uuid();
 	int portHandle;
 	void getPropertyAsync(AsyncPropertyReply *reply);
@@ -144,6 +145,8 @@ public:
 	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
 	obdLib * obd;
+	bool m_threadLive;
+	GThread *m_gThread;
 
 private:
 	PropertyList m_supportedProperties;

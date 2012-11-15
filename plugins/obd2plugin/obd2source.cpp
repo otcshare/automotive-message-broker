@@ -112,6 +112,7 @@ void threadLoop(gpointer data)
 	GAsyncQueue *privSubscriptionAddQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionAddQueue);
 	GAsyncQueue *privSubscriptionRemoveQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionRemoveQueue);
 	obdLib *obd = new obdLib();
+	OBD2Source *source = (OBD2Source*)data;
 
 	obd->setCommsCallback([](const char* mssg, void* data) { DebugOut(6)<<mssg<<endl; },NULL);
 	obd->setDebugCallback([](const char* mssg, void* data, obdLib::DebugLevel debugLevel) { DebugOut(debugLevel)<<mssg<<endl; },NULL);
@@ -123,7 +124,7 @@ void threadLoop(gpointer data)
 	std::string port;
 	std::string baud;
 	bool connected=false;
-	while (true)
+	while (source->m_threadLive)
 	{
 		//gpointer query = g_async_queue_pop(privCommandQueue);
 		
@@ -290,7 +291,10 @@ void threadLoop(gpointer data)
 		repeatReqList.clear();
 		
 	}
-	
+	if (connected)
+	{
+		obd->closePort();
+	}
 }
 
 static int updateProperties(/*gpointer retval,*/ gpointer data)
@@ -455,7 +459,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	
 	m_port = port;
 	m_baud = baud;
-	g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
+	m_gThread = g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
 	g_idle_add(updateProperties, this);
 }
 
@@ -464,6 +468,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 	clientConnected = false;
 	m_re = re;  
 
+	m_threadLive = true;
 	Obd2Amb obd2amb;
 	obd = new obdLib();
 
@@ -484,6 +489,12 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 	singleShotQueue = g_async_queue_new();
 
 	setConfiguration(config);
+}
+OBD2Source::~OBD2Source()
+{
+	DebugOut() << "OBD2Source Desctructor called!!!\n";
+	m_threadLive = false;
+	g_thread_join(m_gThread);
 }
 
 PropertyList OBD2Source::supported()
