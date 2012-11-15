@@ -80,11 +80,11 @@ public:
 	bool tryParse(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-		for (int i=0;i<tmp.size();i++)
-		{
-		  printf("%i ",tmp[i]);
-		}
-		printf("\n");
+		//for (int i=0;i<tmp.size();i++)
+		//{
+		  //printf("%i ",tmp[i]);
+		//}
+		//printf("\n");
 		if (tmp[1] != 0x0D)
 		{
 			return false;

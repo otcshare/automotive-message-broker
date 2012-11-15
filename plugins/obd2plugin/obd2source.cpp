@@ -418,7 +418,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	//printf("OBD2Source::setConfiguration\n");
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
-		printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
+		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
 		DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
 		if ((*i).first == "device")
 		{
@@ -460,7 +460,8 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	m_port = port;
 	m_baud = baud;
 	m_gThread = g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
-	g_idle_add(updateProperties, this);
+	//g_idle_add(updateProperties, this);
+	g_timeout_add(10,updateProperties,this);
 }
 
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
@@ -492,7 +493,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 }
 OBD2Source::~OBD2Source()
 {
-	DebugOut() << "OBD2Source Desctructor called!!!\n";
+	DebugOut() << "OBD2Source Destructor called!!!\n";
 	m_threadLive = false;
 	g_thread_join(m_gThread);
 }
