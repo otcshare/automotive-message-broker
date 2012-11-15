@@ -153,6 +153,19 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re): f_crea
 	
 }
 
+PluginLoader::~PluginLoader()
+{
+	for(auto itr = mSinks.begin(); itr != mSinks.end(); itr++)
+	{
+		delete *itr;
+	}
+
+	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		delete *itr;
+	}
+}
+
 SinkList PluginLoader::sinks()
 {
 	return mSinks;

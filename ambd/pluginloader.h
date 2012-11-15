@@ -41,6 +41,7 @@ class PluginLoader
 
 public:
 	PluginLoader(string configFile, AbstractRoutingEngine* routingEngine);
+	~PluginLoader();
 
 	SourceList sources();
 	SinkList sinks();
