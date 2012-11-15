@@ -219,7 +219,7 @@ void threadLoop(gpointer data)
 			if (!pid)
 			{
 				//Invalid reply
-				DebugOut() << "Invalid reply\n";
+				DebugOut() << "Invalid reply"<<endl;
 				continue;
 			}
 			g_async_queue_push(privResponseQueue,pid);

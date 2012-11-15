@@ -113,7 +113,7 @@ public:
 		}
 		double rpm = ((tmp[2] << 8) + tmp[3]) / 4.0;
 		value = boost::lexical_cast<std::string>(rpm);
-		return false;
+		return true;
 	}
 };
 
@@ -135,7 +135,7 @@ public:
 		}
 		int temp = tmp[2] - 40;
 		value = boost::lexical_cast<std::string>(temp);
-		return false;
+		return true;
 	}
 };
 
@@ -157,7 +157,7 @@ public:
 		}
 		maf = ((tmp[2] << 8) + tmp[3]) / 100.0;
 		value = boost::lexical_cast<std::string>(maf);
-		return false;
+		return true;
 	}
 
 protected:
@@ -187,7 +187,7 @@ public:
 		double consumption = 1 / (14.75 * 6.26) * maf * diffTime/60;
 
 		value = boost::lexical_cast<std::string>(consumption);
-		return false;
+		return true;
 	}
 
 private:
@@ -228,7 +228,7 @@ public:
 		}
 
 		value = vinstring;
-		return false;
+		return true;
 	}
 
 };
@@ -247,7 +247,7 @@ public:
 		VinPid::tryParse(replyVector);
 
 		value = value.substr(0,3);
-		return false;
+		return true;
 	}
 
 };
