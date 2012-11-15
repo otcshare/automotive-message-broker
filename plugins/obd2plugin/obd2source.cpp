@@ -493,7 +493,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : 
 }
 OBD2Source::~OBD2Source()
 {
-	DebugOut() << "OBD2Source Destructor called!!!\n";
+	DebugOut() << "OBD2Source Destructor called!!!"<<endl;
 	m_threadLive = false;
 	g_thread_join(m_gThread);
 }
