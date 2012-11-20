@@ -27,7 +27,7 @@
 #include <listplusplus.h>
 #include "debugout.h"
 #include "bluetooth.hpp"
-
+#include "timestamp.h"
 
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
@@ -365,7 +365,7 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
 {
 	//m_re->updateProperty(property,&value);
-	m_re->updateProperty(property,value); 
+	m_re->updateProperty(property,value,uuid(),amb::currentTime(),0);
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
 		propertyReplyMap[property]->value = value;
@@ -376,22 +376,22 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 void OBD2Source::mafValue(double maf)
 {
 	VehicleProperty::VehicleSpeedType emaf(maf);
-	m_re->updateProperty(VehicleProperty::MassAirFlow,&emaf);
+	m_re->updateProperty(VehicleProperty::MassAirFlow,&emaf,uuid(),amb::currentTime(),0);
 }
 void OBD2Source::engineCoolantTemp(int temp)
 {
 	VehicleProperty::VehicleSpeedType etemp(temp);
-	m_re->updateProperty(VehicleProperty::EngineCoolantTemperature,&etemp);
+	m_re->updateProperty(VehicleProperty::EngineCoolantTemperature,&etemp,uuid(),amb::currentTime(),0);
 }
 void OBD2Source::engineSpeed(double speed)
 {
 	VehicleProperty::VehicleSpeedType espeed(speed);
-	m_re->updateProperty(VehicleProperty::EngineSpeed,&espeed);
+	m_re->updateProperty(VehicleProperty::EngineSpeed,&espeed,uuid(),amb::currentTime(),0);
 }
 void OBD2Source::vehicleSpeed(int speed)
 {
 	VehicleProperty::EngineSpeedType vspeed(speed);
-	m_re->updateProperty(VehicleProperty::VehicleSpeed,&vspeed);
+	m_re->updateProperty(VehicleProperty::VehicleSpeed,&vspeed,uuid(),amb::currentTime(),0);
 }
 void OBD2Source::setSupported(PropertyList list)
 {

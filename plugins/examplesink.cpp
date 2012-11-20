@@ -93,7 +93,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 }
 
-void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
+void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid, double timestamp, uint32_t sequence)
 {
 	DebugOut()<<property<<" value: "<<value->toString()<<endl;
 }

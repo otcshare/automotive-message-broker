@@ -17,31 +17,118 @@
 */
 
 
-#ifndef EXAMPLESINK_H
-#define EXAMPLESINK_H
+#ifndef DATABASESINK_H
+#define DATABASESINK_H
 
 #include "abstractsink.h"
+#include "basedb.hpp"
 
+#include <glib.h>
 
-class ExampleSink : public AbstractSink
+template <typename T>
+class Queue
 {
-
 public:
-	ExampleSink(AbstractRoutingEngine* engine, map<string, string> config);
-	virtual PropertyList subscriptions();
-	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
-	virtual std::string uuid();
+	Queue()
+	{
+		mutex = g_mutex_new();
+	}
+
+	int count()
+	{
+		g_mutex_lock(mutex);
+		int ret = mQueue.count();
+		g_mutex_unlock(mutex);
+
+		return ret;
+	}
+
+	T pop()
+	{
+		g_mutex_lock(mutex);
+
+		while(!mQueue.size())
+		{
+			g_cond_wait(&cond, mutex);
+		}
+
+		auto itr = mQueue.begin();
+
+		T item = *itr;
+
+		mQueue.erase(itr);
+
+		g_mutex_unlock(mutex);
+
+		return item;
+	}
+
+	void append(T item)
+	{
+		g_mutex_lock(mutex);
+
+		g_cond_signal(&cond);
+
+		mQueue.append(item);
+
+		g_mutex_unlock(mutex);
+	}
+
+private:
+	GMutex * mutex;
+	GCond cond;
+	std::vector<T> mQueue;
 };
 
-class ExampleSinkManager: public AbstractSinkManager
+class DBObject {
+public:
+	DBObject(): time(0),quit(false) {}
+	std::string key;
+	std::string value;
+	std::string source;
+	double time;
+	uint32_t sequence;
+	bool quit;
+};
+
+class Shared
 {
 public:
-	ExampleSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
+	Shared()
+	{
+		db = new BaseDB;
+	}
+
+	BaseDB * db;
+	Queue<DBObject*> queue;
+};
+
+class DatabaseSink : public AbstractSink
+{
+
+public:
+	DatabaseSink(AbstractRoutingEngine* engine, map<string, string> config);
+	~DatabaseSink();
+	virtual PropertyList subscriptions();
+	virtual void supportedChanged(PropertyList supportedProperties);
+	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid, double timestamp, uint32_t sequence);
+	virtual std::string uuid();
+
+private:
+	PropertyList mSubscriptions;
+	Shared *shared;
+	GThread* thread;
+
+};
+
+class DatabaseSinkManager: public AbstractSinkManager
+{
+public:
+	DatabaseSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
 	:AbstractSinkManager(engine, config)
 	{
-		new ExampleSink(routingEngine, config);
+		new DatabaseSink(routingEngine, config);
 	}
 };
 
-#endif // EXAMPLESINK_H
+#endif // DATABASESINK_H

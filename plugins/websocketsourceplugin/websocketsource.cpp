@@ -25,6 +25,8 @@
 #include <sstream>
 #include <json-glib/json-glib.h>
 #include <listplusplus.h>
+#include <timestamp.h>
+
 #include "debugout.h"
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 libwebsocket_context *context;
@@ -59,6 +61,7 @@ void WebSocketSource::checkSubscriptions()
 		}
 		activeRequests.push_back(prop);
 		stringstream s;
+		///TODO: fix transid here:
 		s << "{\"type\":\"method\",\"name\":\"subscribe\",\"data\":[\"" << prop << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
 
 		string replystr = s.str();
@@ -249,7 +252,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				try
 				{
 					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front());
-					m_re->updateProperty(name, type);
+					m_re->updateProperty(name, type, source->uuid(), amb::currentTime(), 0);
 					delete type;
 				}
 				catch (exception ex)

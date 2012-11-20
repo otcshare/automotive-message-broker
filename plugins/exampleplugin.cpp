@@ -17,6 +17,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "exampleplugin.h"
+#include "timestamp.h"
 
 #include <iostream>
 #include <boost/assert.hpp>
@@ -183,12 +184,12 @@ void ExampleSourcePlugin::randomizeProperties()
 
 	machineGun = !machineGun;
 
-	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel);
-	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es);
-	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac);
-	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa);
-	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp);
-	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp);
-	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec);
+	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel, uuid(),amb::currentTime(), 0);
+	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es, uuid(),amb::currentTime(), 0);
+	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac, uuid(),amb::currentTime(), 0);
+	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa, uuid(),amb::currentTime(), 0);
+	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp, uuid(),amb::currentTime(), 0);
+	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp, uuid(),amb::currentTime(), 0);
+	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid(),amb::currentTime(), 0);
 	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }

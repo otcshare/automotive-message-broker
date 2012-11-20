@@ -57,7 +57,7 @@ public:
 	  * Do not destroy it.  If you need to store the value use value.anyValue() or value.value<T>() to copy.
 	  * @param uuid Unique identifier representing the source
 	  */
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) = 0;
+	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid, double timestamp, uint32_t sequence) = 0;
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	
 

@@ -140,7 +140,7 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	}
 }
 
-void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyType *value)
+void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid, double timestamp, uint32_t sequence)
 {
 	SinkList list = propertySinkMap[property];
 	
@@ -150,7 +150,7 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{
-		(*itr)->propertyChanged(property, value,(*itr)->uuid());
+		(*itr)->propertyChanged(property, value, uuid, timestamp, sequence);
 	}
 }
 

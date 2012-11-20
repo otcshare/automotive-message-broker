@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 using namespace std;
 
 #include "debugout.h"
-
+#include "timestamp.h"
 
 #define JSNAMELEN 128
 #define LG27 "G27 Racing Wheel"
@@ -100,6 +100,7 @@ private:
 	bool oldClutch;
 	bool brake;
 	bool oldBrake;
+	AbstractSource* mParent;
 
 };
 
@@ -189,7 +190,7 @@ WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *rou
 :re(route), gis(nullptr), axis(nullptr), button(nullptr),
 oilPSI(10), coolantTemp(100), turnSignal(TurnSignals::Off), throttle(0),
 machineGuns(false), currentGear(Transmission::Neutral), steeringAngle(0),
-clutch(false), oldClutch(false), brake(false), oldBrake(false)
+  clutch(false), oldClutch(false), brake(false), oldBrake(false), mParent(parent)
 {
 
 	unsigned char numAxes = 0;
@@ -448,7 +449,7 @@ void WheelPrivate::changeMachineGuns(bool val)
 {
 	this->machineGuns = val;
 	VehicleProperty::MachineGunTurretStatusType temp(this->machineGuns);
-	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, &temp);
+	this->re->updateProperty(VehicleProperty::MachineGunTurretStatus, &temp, mParent->uuid(), amb::currentTime(), 0);
 }
 
 void WheelPrivate::changeTurnSignal(TurnSignals::TurnSignalType dir, bool val)
@@ -462,7 +463,7 @@ void WheelPrivate::changeTurnSignal(TurnSignals::TurnSignalType dir, bool val)
 	}
 	this->turnSignal = tsVal;
 	VehicleProperty::TurnSignalType temp(this->turnSignal);
-	this->re->updateProperty(VehicleProperty::TurnSignal, &temp);
+	this->re->updateProperty(VehicleProperty::TurnSignal, &temp, mParent->uuid(), amb::currentTime(), 0);
 }
 
 void WheelPrivate::changeGear(int gear)
@@ -470,20 +471,20 @@ void WheelPrivate::changeGear(int gear)
 	this->currentGear = (Transmission::TransmissionPositions)gear;
 	VehicleProperty::TransmissionShiftPositionType tempTrans(this->currentGear);
 	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
-	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, &tempTrans);
-	this->re->updateProperty(VehicleProperty::VehicleSpeed, &tempSpeed);
+	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, &tempTrans, mParent->uuid(), amb::currentTime(), 0);
+	this->re->updateProperty(VehicleProperty::VehicleSpeed, &tempSpeed, mParent->uuid(), amb::currentTime(), 0);
 }
 
 void WheelPrivate::changeOilPressure(bool increase)
 {
 	VehicleProperty::EngineOilPressureType temp(increase ? ++this->oilPSI : --this->oilPSI);
-	this->re->updateProperty(VehicleProperty::EngineOilPressure, &temp);
+	this->re->updateProperty(VehicleProperty::EngineOilPressure, &temp, mParent->uuid(), amb::currentTime(), 0);
 }
 
 void WheelPrivate::changeCoolantTemp(bool increase)
 {
 	 VehicleProperty::EngineCoolantTemperatureType temp(increase ? ++this->coolantTemp : --this->coolantTemp);
-	this->re->updateProperty(VehicleProperty::EngineCoolantTemperature, &temp);
+	this->re->updateProperty(VehicleProperty::EngineCoolantTemperature, &temp, mParent->uuid(), amb::currentTime(), 0);
 }
 
 
@@ -491,7 +492,7 @@ void WheelPrivate::changeSteeringAngle(int val)
 {
 	this->steeringAngle = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
 	VehicleProperty::SteeringWheelAngleType temp(this->steeringAngle);
-	this->re->updateProperty(VehicleProperty::SteeringWheelAngle, &temp);
+	this->re->updateProperty(VehicleProperty::SteeringWheelAngle, &temp, mParent->uuid(), amb::currentTime(), 0);
 }
 
 void WheelPrivate::changeClutch(int val)
@@ -501,7 +502,7 @@ void WheelPrivate::changeClutch(int val)
 	if (this->oldClutch != this->clutch)
 	{
 		VehicleProperty::ClutchStatusType temp(this->clutch);
-		this->re->updateProperty(VehicleProperty::ClutchStatus, &temp);
+		this->re->updateProperty(VehicleProperty::ClutchStatus, &temp, mParent->uuid(), amb::currentTime(), 0);
 	}
 }
 
@@ -513,9 +514,9 @@ void WheelPrivate::changeThrottle(int val)
 	VehicleProperty::EngineSpeedType tempRpm(this->calcRPM());
 	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
 
-	this->re->updateProperty(VehicleProperty::ThrottlePosition, &tempThrottle);
-	this->re->updateProperty(VehicleProperty::EngineSpeed, &tempRpm);
-	this->re->updateProperty(VehicleProperty::VehicleSpeed, &tempSpeed);
+	this->re->updateProperty(VehicleProperty::ThrottlePosition, &tempThrottle, mParent->uuid(), amb::currentTime(), 0);
+	this->re->updateProperty(VehicleProperty::EngineSpeed, &tempRpm, mParent->uuid(), amb::currentTime(), 0);
+	this->re->updateProperty(VehicleProperty::VehicleSpeed, &tempSpeed, mParent->uuid(), amb::currentTime(), 0);
 }
 
 void WheelPrivate::changeBrake(int val)
@@ -525,7 +526,7 @@ void WheelPrivate::changeBrake(int val)
 	if (this->oldBrake != this->brake)
 	{
 		VehicleProperty::WheelBrakeType temp(this->brake);
-		this->re->updateProperty(VehicleProperty::WheelBrake, &temp);
+		this->re->updateProperty(VehicleProperty::WheelBrake, &temp, mParent->uuid(), amb::currentTime(), 0);
 	}
 }
 
@@ -550,22 +551,22 @@ void WheelPrivate::checkButtonEvents()
 		if (this->button[11]) {
 		//	cout << "Inside button 11!" << endl;
 			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset1Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid(), amb::currentTime(), 0);
 		}
 		if (this->button[8]) {
 		//	cout << "Inside button 8!" << endl;
 			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset2Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid(), amb::currentTime(), 0);
 		}
 		if (this->button[9]) {
 		//	cout << "Inside button 9!" << endl;
 			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset3Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid(), amb::currentTime(), 0);
 		}
 		if (this->button[10]) {
 		//	cout << "Inside button 10!" << endl;
 			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset4Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton);
+			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid(), amb::currentTime(), 0);
 		}
 	}
 }

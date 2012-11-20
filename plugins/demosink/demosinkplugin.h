@@ -33,7 +33,7 @@ public:
 	
 	string uuid();
 	
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid);
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid, double, uint32_t);
 	void supportedChanged(PropertyList);
 
 	friend class WheelPrivate;	
