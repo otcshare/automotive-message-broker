@@ -157,13 +157,39 @@ void threadLoop(gpointer data)
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << endl;
 			if (req->req == "connect")
 			{
-				connect(obd,req->arglist[0],req->arglist[1]);
+				
+				if (source->m_isBluetooth)
+				{
+					ObdBluetoothDevice bt;
+					std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
+					if(tempPort != "")
+					{
+						DebugOut(3)<<"Using bluetooth device \""<<source->m_btDeviceAddress<<"\" bound to: "<<tempPort<<endl;
+						port = tempPort;
+					}
+				}
+				else
+				{
+					port = req->arglist[0];
+					baud = req->arglist[1];
+				}
+				connect(obd,port,baud);
 				connected = true;
 			}
 			else if (req->req == "connectifnot")
 			{
 				if (!connected)
 				{
+					if (source->m_isBluetooth)
+					{
+						ObdBluetoothDevice bt;
+						std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
+						if(tempPort != "")
+						{
+							DebugOut(3)<<"Using bluetooth device \""<<source->m_btDeviceAddress<<"\" bound to: "<<tempPort<<endl;
+							port = tempPort;
+						}
+					}
 					connect(obd,port,baud);
 					connected = true;
 				}
@@ -455,6 +481,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	std::string port = "/dev/ttyUSB0";
 	std::string baud = "115200";
 	std::string btadapter = "";
+	m_isBluetooth = false;
 	
 	//Try to load config
 	//printf("OBD2Source::setConfiguration\n");
@@ -479,6 +506,9 @@ void OBD2Source::setConfiguration(map<string, string> config)
 
 	if(port.find(":") != string::npos)
 	{
+		m_btDeviceAddress = port;
+		m_btAdapterAddress = btadapter;
+		m_isBluetooth = true;
 		///TODO: bluetooth!!
 		DebugOut()<<"bluetooth device?"<<endl;
 		ObdBluetoothDevice bt;
