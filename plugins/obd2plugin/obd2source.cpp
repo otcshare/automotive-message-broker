@@ -102,6 +102,7 @@ std::string reply;
 		//printf("Error turning linefeeds off\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off linefeeds"<<endl;
 	}
+	obd->sendObdRequestString("010C1\r",6,&replyVector,500,5);
 }
 
 void threadLoop(gpointer data)
@@ -201,6 +202,7 @@ void threadLoop(gpointer data)
 			}
 			else if (req->req == "disconnect")
 			{
+				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Using queued disconnect" << (ulong)req << "\n";
 				obd->closePort();
 				ObdBluetoothDevice bt;
 				bt.disconnect(source->m_btDeviceAddress, source->m_btAdapterAddress);
@@ -280,7 +282,9 @@ void threadLoop(gpointer data)
 				else
 				{
 				}
+				
 				CommandRequest *req = new CommandRequest();
+				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Queuing up a disconnect" << (ulong)req << "\n";
 				req->req = "disconnect";
 				g_async_queue_push(privCommandQueue,req);
 				i = repeatReqList.end();
