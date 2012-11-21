@@ -202,6 +202,8 @@ void threadLoop(gpointer data)
 			else if (req->req == "disconnect")
 			{
 				obd->closePort();
+				ObdBluetoothDevice bt;
+				bt.disconnect(source->m_btDeviceAddress, source->m_btAdapterAddress);
 				connected = false;
 			}
 			delete req;
