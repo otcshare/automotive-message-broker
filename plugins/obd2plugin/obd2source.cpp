@@ -158,6 +158,14 @@ void threadLoop(gpointer data)
 				connect(obd,req->arglist[0],req->arglist[1]);
 				connected = true;
 			}
+			else if (req->req == "connectifnot")
+			{
+				if (!connected)
+				{
+					connect(obd,req->arglist[0],req->arglist[1]);
+					connected = true;
+				}
+			}
 			else if (req->req == "setportandbaud")
 			{
 				port = req->arglist[0];
@@ -189,18 +197,23 @@ void threadLoop(gpointer data)
 		}
 		if (reqList.size() > 0 && !connected)
 		{
-			CommandRequest *req = new CommandRequest();
+			/*CommandRequest *req = new CommandRequest();
 			req->req = "connect";
 			req->arglist.push_back(port);
 			req->arglist.push_back(baud);
 			g_async_queue_push(privCommandQueue,req);
-			continue;
+			continue;*/
 		}
 		else if (reqList.size() == 0 && connected)
 		{
 			CommandRequest *req = new CommandRequest();
 			req->req = "disconnect";
 			g_async_queue_push(privCommandQueue,req);
+			continue;
+		}
+		if (!connected)
+		{
+			usleep(10000);
 			continue;
 		}
 		for (std::list<ObdPid*>::iterator i=reqList.begin();i!= reqList.end();i++)
@@ -211,7 +224,11 @@ void threadLoop(gpointer data)
 		{
 			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector))
 			{
+				//This only happens during a error with the com port. Close it and re-open it later.
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid << "!\n";
+				CommandRequest *req = new CommandRequest();
+				req->req = "disconnect";
+				g_async_queue_push(privCommandQueue,req);
 				continue;
 			}
 			//ObdPid *pid = ObdPid::pidFromReply(replyVector);
@@ -283,10 +300,6 @@ void threadLoop(gpointer data)
 				g_async_queue_push(privResponseQueue,rep);*/
 				
 			//DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
-		}
-		if (!connected)
-		{
-			usleep(10000);
 		}
 		repeatReqList.clear();
 		
@@ -596,6 +609,9 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 		ObdPid *pid = obd2AmbInstance->createPidforProperty(property);
 		g_async_queue_push(subscriptionAddQueue,pid);
+		CommandRequest *req = new CommandRequest();
+		req->req = "connectifnot";
+		g_async_queue_push(commandQueue,req);
 	}
 }
 
@@ -742,6 +758,9 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 
 	ObdPid* requ = obd2AmbInstance->createPidforProperty(property);
 	g_async_queue_push(singleShotQueue,requ);
+	CommandRequest *req = new CommandRequest();
+	req->req = "connectifnot";
+	g_async_queue_push(commandQueue,req);
 }
 
 AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
