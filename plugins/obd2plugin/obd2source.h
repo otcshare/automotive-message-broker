@@ -151,7 +151,8 @@ public:
 private:
 	PropertyList m_supportedProperties;
 	GMutex *threadQueueMutex;
-	
+	VehicleProperty::Property Obd2Connect;
+	typedef BasicPropertyType<bool> Obd2ConnectType;
 
 };
 

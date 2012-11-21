@@ -464,8 +464,10 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	g_timeout_add(10,updateProperties,this);
 }
 
-OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
+OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
+	: AbstractSource(re, config), Obd2Connect("Obd2Connect")
 {
+	VehicleProperty::registerProperty(Obd2Connect,[](){ return new Obd2ConnectType(false); });
 	clientConnected = false;
 	m_re = re;  
 

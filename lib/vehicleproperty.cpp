@@ -18,7 +18,11 @@
 
 
 #include "vehicleproperty.h"
+#include "listplusplus.h"
+#include "debugout.h"
+
 #include <map>
+
 
 #define REGISTERPROPERTY(property, defaultValue) \
 	registerProperty(property, []() { return new property ## Type(defaultValue); });
@@ -180,6 +184,12 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 
 void VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
 {
+	if(ListPlusPlus<Property>(&mCapabilities).contains(name))
+	{
+		DebugOut(0)<<__FUNCTION__<<" ERROR: property '"<<name<<"'' already registered."<<endl;
+		return;
+	}
+
 	registeredPropertyFactoryMap[name] = factory;
 	mCapabilities.push_back(name);
 }
