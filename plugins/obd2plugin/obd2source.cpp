@@ -124,6 +124,7 @@ void threadLoop(gpointer data)
 	std::string port;
 	std::string baud;
 	bool connected=false;
+	int emptycount = 0;
 	while (source->m_threadLive)
 	{
 		//gpointer query = g_async_queue_pop(privCommandQueue);
@@ -162,7 +163,7 @@ void threadLoop(gpointer data)
 			{
 				if (!connected)
 				{
-					connect(obd,req->arglist[0],req->arglist[1]);
+					connect(obd,port,baud);
 					connected = true;
 				}
 			}
@@ -206,6 +207,13 @@ void threadLoop(gpointer data)
 		}
 		else if (reqList.size() == 0 && connected)
 		{
+			emptycount++;
+			if (emptycount < 1000)
+			{
+				usleep(10000);
+				continue;
+			}
+			emptycount = 0;
 			CommandRequest *req = new CommandRequest();
 			req->req = "disconnect";
 			g_async_queue_push(privCommandQueue,req);
@@ -226,6 +234,14 @@ void threadLoop(gpointer data)
 			{
 				//This only happens during a error with the com port. Close it and re-open it later.
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid << "!\n";
+				if (obd->lastError() == obdLib::NODATA)
+				{
+					continue;
+				}
+				else if (obd->lastError() == obdLib::TIMEOUT)
+				{
+					continue;
+				}
 				CommandRequest *req = new CommandRequest();
 				req->req = "disconnect";
 				g_async_queue_push(privCommandQueue,req);
