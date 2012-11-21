@@ -50,6 +50,7 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid,double, uint32_t) {}
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(map<string, string> config);
+	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 
 private:
   	PropertyList m_supportedProperties;
