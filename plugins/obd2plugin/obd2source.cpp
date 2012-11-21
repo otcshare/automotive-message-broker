@@ -125,6 +125,7 @@ void threadLoop(gpointer data)
 	std::string baud;
 	bool connected=false;
 	int emptycount = 0;
+	int timeoutCount = 0;
 	while (source->m_threadLive)
 	{
 		//gpointer query = g_async_queue_pop(privCommandQueue);
@@ -236,17 +237,29 @@ void threadLoop(gpointer data)
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid << "!\n";
 				if (obd->lastError() == obdLib::NODATA)
 				{
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::NODATA for pid" << (*i)->pid << "\n";
 					continue;
 				}
 				else if (obd->lastError() == obdLib::TIMEOUT)
 				{
-					continue;
+					timeoutCount++;
+					if (timeoutCount < 2)
+					{
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::TIMEOUT for pid" << (*i)->pid << "\n";
+						continue;
+					}
+				}
+				else
+				{
 				}
 				CommandRequest *req = new CommandRequest();
 				req->req = "disconnect";
 				g_async_queue_push(privCommandQueue,req);
+				i = repeatReqList.end();
+				i--;
 				continue;
 			}
+			timeoutCount = 0;
 			//ObdPid *pid = ObdPid::pidFromReply(replyVector);
 			ObdPid *pid = obd2AmbInstance->createPidFromReply(replyVector);
 			if (!pid)

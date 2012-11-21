@@ -426,7 +426,7 @@ bool obdLib::sendObdRequestString(const char *req,int length,std::vector<byte> *
 
 		if (len < 0)
 		{
-			printf("No Read\n");
+			//printf("No Read\n");
 			perror("Error");
 			delete[] tmp;
 			delete[] totalReply;
@@ -439,7 +439,7 @@ bool obdLib::sendObdRequestString(const char *req,int length,std::vector<byte> *
 		#ifdef WINVER
 			Sleep(10);
 		#else
-			printf("Timeout\n");
+			//printf("Timeout\n");
 			usleep(10000);
 		#endif
 		}
