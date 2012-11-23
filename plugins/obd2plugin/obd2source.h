@@ -138,6 +138,8 @@ public:
 	GAsyncQueue* subscriptionRemoveQueue;
 	GAsyncQueue* singleShotQueue;
 	GAsyncQueue* responseQueue;
+	std::list<std::string> m_blacklistPidList;
+	std::map<std::string,int> m_blacklistPidCountMap;
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
 	std::string m_port;

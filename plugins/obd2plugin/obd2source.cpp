@@ -259,8 +259,19 @@ void threadLoop(gpointer data)
 		{
 			repeatReqList.push_back(*i);
 		}
+		int badloop = 0;
 		for (std::list<ObdPid*>::iterator i=repeatReqList.begin();i!= repeatReqList.end();i++)
 		{
+			if (source->m_blacklistPidCountMap.find((*i)->pid) != source->m_blacklistPidCountMap.end())
+			{
+				//Don't erase the pid, just skip over it.
+				int count = (*source->m_blacklistPidCountMap.find((*i)->pid)).second;
+				if (count > 10)
+				{
+					continue;
+				}
+			}
+			badloop++;
 			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector))
 			{
 				//This only happens during a error with the com port. Close it and re-open it later.
@@ -268,6 +279,21 @@ void threadLoop(gpointer data)
 				if (obd->lastError() == obdLib::NODATA)
 				{
 					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::NODATA for pid" << (*i)->pid << "\n";
+					if (source->m_blacklistPidCountMap.find((*i)->pid) != source->m_blacklistPidCountMap.end())
+					{
+						//pid value i not yet in the list.
+						int count = (*source->m_blacklistPidCountMap.find((*i)->pid)).second;
+						if (count > 10)
+						{
+							
+						}
+						source->m_blacklistPidCountMap.erase(source->m_blacklistPidCountMap.find((*i)->pid));
+						source->m_blacklistPidCountMap.insert(pair<std::string,int>((*i)->pid,count));
+					}
+					else
+					{
+						source->m_blacklistPidCountMap.insert(pair<std::string,int>((*i)->pid,1));
+					}
 					continue;
 				}
 				else if (obd->lastError() == obdLib::TIMEOUT)
@@ -290,6 +316,11 @@ void threadLoop(gpointer data)
 				i = repeatReqList.end();
 				i--;
 				continue;
+			}
+			if (source->m_blacklistPidCountMap.find((*i)->pid) != source->m_blacklistPidCountMap.end())
+			{
+				//If we get the pid response, then we want to clear out the blacklist list.
+				source->m_blacklistPidCountMap.erase(source->m_blacklistPidCountMap.find((*i)->pid));
 			}
 			timeoutCount = 0;
 			//ObdPid *pid = ObdPid::pidFromReply(replyVector);
@@ -361,6 +392,11 @@ void threadLoop(gpointer data)
 				g_async_queue_push(privResponseQueue,rep);*/
 				
 			//DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
+		}
+		if (badloop == 0)
+		{
+			//We had zero non-blacklisted events. Pause for a moment here to keep from burning CPU.
+			usleep(10000);
 		}
 		repeatReqList.clear();
 		
