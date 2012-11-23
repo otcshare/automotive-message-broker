@@ -709,6 +709,15 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 
 		ObdPid *pid = obd2AmbInstance->createPidforProperty(property);
+		
+		//If the pid is currently in the blacklist map, erase it. This allows for applications
+		//to "un-blacklist" a pid by re-subscribing to it.
+		if (m_blacklistPidCountMap.find(pid->pid) != m_blacklistPidCountMap.end())
+		{
+			m_blacklistPidCountMap.erase(m_blacklistPidCountMap.find(pid->pid));
+		}
+					
+					
 		g_async_queue_push(subscriptionAddQueue,pid);
 		CommandRequest *req = new CommandRequest();
 		req->req = "connectifnot";
