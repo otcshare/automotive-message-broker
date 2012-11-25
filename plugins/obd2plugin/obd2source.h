@@ -77,6 +77,7 @@ public:
 		supportedPidsList.push_back(new WmiPid());
 		supportedPidsList.push_back(new FuelConsumptionPid());
 		supportedPidsList.push_back(new EngineCoolantPid());
+		supportedPidsList.push_back(new AirIntakeTemperaturePid());
 	}
 	ObdPid* createPidFromReply(ByteArray replyVector)
 	{

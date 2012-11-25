@@ -175,7 +175,9 @@ public:
 	}
 	bool tryParse(ByteArray replyVector)
 	{
-		MassAirFlowPid::tryParse(replyVector);
+		if(!MassAirFlowPid::tryParse(replyVector))
+			return false;
+
 		timespec t;
 		clock_gettime(CLOCK_REALTIME, &t);
 

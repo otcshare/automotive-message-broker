@@ -220,10 +220,10 @@ AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
-	printf("Subscribing\n");
+	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
-		DebugOut()<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
+		DebugOut(1)<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
 		return; 
 	}
 	
@@ -254,7 +254,7 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		DebugOut()<<__FUNCTION__<<"property not supported: "<<property;
+		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property;
 		return; 
 	}
 		
