@@ -561,7 +561,12 @@ void OBD2Source::setConfiguration(map<string, string> config)
 			DebugOut(3)<<"Using bluetooth device \""<<port<<"\" bound to: "<<tempPort<<endl;
 			port = tempPort;
 		}
-		else throw std::runtime_error("Device Error");
+		else
+		{
+			DebugOut(0)<<"Device Error"<<endl;
+			///Don't throw here.
+			//throw std::runtime_error("Device Error");
+		}
 	}
 
 	//connect(obd, port, baud);

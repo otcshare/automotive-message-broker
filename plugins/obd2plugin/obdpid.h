@@ -252,5 +252,27 @@ public:
 
 };
 
+class AirIntakeTemperaturePid: public CopyMe<AirIntakeTemperaturePid>
+{
+public:
+	AirIntakeTemperaturePid()
+		:CopyMe(VehicleProperty::AirIntakeTemperature,"010F1\r",0x0F)
+	{
+
+	}
+
+	bool tryParse(ByteArray replyVector)
+	{
+		ByteArray tmp = compress(cleanup(replyVector));
+
+		if (tmp[1] != id)
+		{
+			return false;
+		}
+		int temp = tmp[2] - 40;
+		value = boost::lexical_cast<std::string>(temp);
+		return true;
+	}
+};
 
 #endif
