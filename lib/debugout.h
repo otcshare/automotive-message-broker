@@ -50,7 +50,16 @@ public:
 		return *this;
 	}
 	
-	DebugOut const & operator << (uint16_t val) const
+	/*DebugOut const & operator << (uint16_t val) const
+	{
+		ostream out(buf);
+
+		if(mDebugLevel <= debugThreshhold)
+			 out<<val<<" ";
+		return *this;
+	}*/
+
+	DebugOut const & operator << (double val) const
 	{
 		ostream out(buf);
 
