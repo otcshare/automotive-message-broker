@@ -416,8 +416,21 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 	{
 		ObdPid *reply = (ObdPid*)retval;
 
-		AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
-		src->updateProperty(reply->property, value);
+		
+		if (src->propertyReplyMap.find(reply->property) != src->propertyReplyMap.end())
+		{
+			AsyncPropertyReply *newreply = src->propertyReplyMap[reply->property];
+			AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
+			newreply->value = value;
+			newreply->success = true;
+			newreply->completed(newreply);
+			src->propertyReplyMap.erase(src->propertyReplyMap.find(reply->property));
+		}
+		else
+		{
+			AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
+			src->updateProperty(reply->property, value);
+		}
 
 
 		/*if (reply->req == "05")
