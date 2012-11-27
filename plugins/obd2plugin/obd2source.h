@@ -79,6 +79,15 @@ public:
 		supportedPidsList.push_back(new EngineCoolantPid());
 		supportedPidsList.push_back(new AirIntakeTemperaturePid());
 	}
+
+	~Obd2Amb()
+	{
+		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
+		{
+			delete *itr;
+		}
+	}
+
 	ObdPid* createPidFromReply(ByteArray replyVector)
 	{
 		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
@@ -98,12 +107,14 @@ public:
 	{
 		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
 		{
-			if((*itr)->property == property)
+			VehicleProperty::Property p = (*itr)->property;
+			if(p == property)
 			{
 				ObdPid* obj = *itr;
 				return obj->create();
 			}
 		}
+		return NULL;
 	}
 
 	std::list<ObdPid*> supportedPidsList;

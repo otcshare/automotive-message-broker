@@ -129,7 +129,7 @@ public:
 	bool tryParse(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != 0x05)
+		if (tmp[1] != id)
 		{
 			return false;
 		}

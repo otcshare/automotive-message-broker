@@ -727,6 +727,11 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 
 		ObdPid *pid = obd2AmbInstance->createPidforProperty(property);
+
+		if(!pid)
+		{
+			return;
+		}
 		
 		//If the pid is currently in the blacklist map, erase it. This allows for applications
 		//to "un-blacklist" a pid by re-subscribing to it.
