@@ -170,6 +170,7 @@ public:
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual PropertyList supported() = 0;
+
 };
 
 #endif // ABSTRACTROUTINGENGINE_H

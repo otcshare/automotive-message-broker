@@ -1,0 +1,20 @@
+#!/bin/bash
+
+
+numclients=$2
+config=$1
+
+#start initial ambd client:
+
+ambd -D -c $config -d5 -l host.output
+
+sleep 10
+
+for (( i=1; i<=$numclients; i++ ))
+do
+	ambd -D -c configwebsocketsource -d2 -l client.$i.output
+done
+
+sleep 60
+
+killall ambd

@@ -162,14 +162,14 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			JsonParser* parser = json_parser_new();
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
 				return 0;
 			}
 
 			JsonNode* node = json_parser_get_root(parser);
 			if(node == nullptr)
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json\n";
 				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
@@ -177,13 +177,13 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			JsonReader* reader = json_reader_new(node);
 			if(reader == nullptr)
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!\n";
 				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
 
 
-
+			DebugOut(5)<<"source received: "<<string((char*)in)<<endl;
 
 
 			string type;
@@ -277,6 +277,19 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			}
 			json_reader_end_member(reader);
 
+			double timestamp=amb::currentTime();
+			json_reader_read_member(reader,"timestamp");
+			if(const GError* err = json_reader_get_error(reader))
+			{
+				DebugOut(0)<<"JSON Parsing error: no timestamp parameter: "<<err->message<<endl;
+				//g_error_free(err);
+			}
+			else
+			{
+				timestamp = atof(json_reader_get_string_value(reader));
+			}
+			json_reader_end_member(reader);
+
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
 			//if(error) g_error_free(error);
@@ -295,7 +308,12 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				try
 				{
 					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front());
-					m_re->updateProperty(name, type, source->uuid(), amb::currentTime(), 0);
+					m_re->updateProperty(name, type, source->uuid(), timestamp, 0);
+
+					double currenttime = amb::currentTime();
+
+					DebugOut(2)<<"websocket source latency: "<<(currenttime - timestamp)*1000<<"ms"<<endl;
+
 					delete type;
 				}
 				catch (exception ex)

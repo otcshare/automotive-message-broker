@@ -72,7 +72,7 @@ void daemonize();
 
 void printhelp(const char *argv0);
 
-static const char shortopts[] = "hvDc:d:";
+static const char shortopts[] = "hvDc:d:l:";
 
 static const struct option longopts[] = {
 	{ "help", no_argument, NULL, 'h' }, ///< Print the help text
@@ -80,6 +80,7 @@ static const struct option longopts[] = {
 	{ "daemonise", no_argument, NULL, 'D' }, ///< Daemonise
 	{ "config", required_argument, NULL, 'c' },
 	{ "debug", required_argument, NULL, 'd' },
+	{ "log", required_argument, NULL, 'l' },
 	{ NULL, 0, NULL, 0 } ///< End
 };
 
@@ -90,6 +91,8 @@ int main(int argc, char **argv)
 	int optc;
 	int th = 0;
 	string config="/etc/ambd/config";
+	ofstream logfile;
+	string logfn;
 
 	while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
 	{
@@ -112,6 +115,9 @@ int main(int argc, char **argv)
 				th = atoi(optarg);
 				DebugOut::setDebugThreshhold(th);
 				break;
+			case 'l':
+				logfn = optarg;
+				break;
 			default:
 				cerr<<"Unknown option "<<optc<<endl;
 				printhelp(argv[0]);
@@ -123,6 +129,12 @@ int main(int argc, char **argv)
 	if(isdeamonize)
 		daemonize();
 	
+	if(!logfn.empty())
+	{
+		logfile.open(logfn, ios::out | ios::trunc);
+		DebugOut::setOutput(logfile);
+	}
+
 	
 #ifdef USE_QT_CORE
 
@@ -159,6 +171,9 @@ int main(int argc, char **argv)
 	
 #endif
 	
+	if(logfile.is_open())
+		logfile.close();
+
 	return 0;
 }
 

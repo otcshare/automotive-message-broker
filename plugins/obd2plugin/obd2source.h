@@ -77,7 +77,17 @@ public:
 		supportedPidsList.push_back(new WmiPid());
 		supportedPidsList.push_back(new FuelConsumptionPid());
 		supportedPidsList.push_back(new EngineCoolantPid());
+		supportedPidsList.push_back(new AirIntakeTemperaturePid());
 	}
+
+	~Obd2Amb()
+	{
+		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
+		{
+			delete *itr;
+		}
+	}
+
 	ObdPid* createPidFromReply(ByteArray replyVector)
 	{
 		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
@@ -97,12 +107,14 @@ public:
 	{
 		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
 		{
-			if((*itr)->property == property)
+			VehicleProperty::Property p = (*itr)->property;
+			if(p == property)
 			{
 				ObdPid* obj = *itr;
 				return obj->create();
 			}
 		}
+		return NULL;
 	}
 
 	std::list<ObdPid*> supportedPidsList;
@@ -138,10 +150,15 @@ public:
 	GAsyncQueue* subscriptionRemoveQueue;
 	GAsyncQueue* singleShotQueue;
 	GAsyncQueue* responseQueue;
+	std::list<std::string> m_blacklistPidList;
+	std::map<std::string,int> m_blacklistPidCountMap;
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
 	std::string m_port;
 	std::string m_baud;
+	bool m_isBluetooth;
+	std::string m_btDeviceAddress;
+	std::string m_btAdapterAddress;
 	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
 	obdLib * obd;
@@ -151,7 +168,8 @@ public:
 private:
 	PropertyList m_supportedProperties;
 	GMutex *threadQueueMutex;
-	
+	VehicleProperty::Property Obd2Connect;
+	typedef BasicPropertyType<bool> Obd2ConnectType;
 
 };
 

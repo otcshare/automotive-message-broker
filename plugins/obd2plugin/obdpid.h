@@ -100,7 +100,7 @@ class EngineSpeedPid: public CopyMe<EngineSpeedPid>
 public:
 
 	EngineSpeedPid()
-		:CopyMe(VehicleProperty::EngineSpeed,"010C1\r",0x0D)
+		:CopyMe(VehicleProperty::EngineSpeed,"010C1\r",0x0C)
 	{
 
 	}
@@ -122,14 +122,14 @@ class EngineCoolantPid: public CopyMe<EngineCoolantPid>
 public:
 
 	EngineCoolantPid()
-		:CopyMe(VehicleProperty::EngineCoolantTemperature,"01051\r",0x0D)
+		:CopyMe(VehicleProperty::EngineCoolantTemperature,"01051\r",0x05)
 	{
 
 	}
 	bool tryParse(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != 0x05)
+		if (tmp[1] != id)
 		{
 			return false;
 		}
@@ -144,7 +144,7 @@ class MassAirFlowPid: public CopyMe<MassAirFlowPid>
 public:
 
 	MassAirFlowPid()
-		:CopyMe(VehicleProperty::MassAirFlow,"01101\r",0x0D)
+		:CopyMe(VehicleProperty::MassAirFlow,"01101\r",0x01)
 	{
 
 	}
@@ -175,7 +175,9 @@ public:
 	}
 	bool tryParse(ByteArray replyVector)
 	{
-		MassAirFlowPid::tryParse(replyVector);
+		if(!MassAirFlowPid::tryParse(replyVector))
+			return false;
+
 		timespec t;
 		clock_gettime(CLOCK_REALTIME, &t);
 
@@ -201,7 +203,7 @@ class VinPid: public CopyMe<VinPid>
 public:
 
 	VinPid()
-		:CopyMe(VehicleProperty::VIN,"0902\r",0x0D)
+		:CopyMe(VehicleProperty::VIN,"0902\r",0x02)
 	{
 		type = 0x49;
 	}
@@ -209,7 +211,7 @@ public:
 	{
 		std::string vinstring;
 		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[0] != 0x49 && tmp[1] != 0x02)
+		if (tmp[0] != 0x49 || tmp[1] != 0x02)
 		{
 			return false;
 		}
@@ -244,13 +246,37 @@ public:
 	}
 	bool tryParse(ByteArray replyVector)
 	{
-		VinPid::tryParse(replyVector);
-
+		if (!VinPid::tryParse(replyVector))
+		{
+			return false;
+		}
 		value = value.substr(0,3);
 		return true;
 	}
 
 };
 
+class AirIntakeTemperaturePid: public CopyMe<AirIntakeTemperaturePid>
+{
+public:
+	AirIntakeTemperaturePid()
+		:CopyMe(VehicleProperty::AirIntakeTemperature,"010F1\r",0x0F)
+	{
+
+	}
+
+	bool tryParse(ByteArray replyVector)
+	{
+		ByteArray tmp = compress(cleanup(replyVector));
+
+		if (tmp[1] != id)
+		{
+			return false;
+		}
+		int temp = tmp[2] - 40;
+		value = boost::lexical_cast<std::string>(temp);
+		return true;
+	}
+};
 
 #endif
