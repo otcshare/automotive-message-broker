@@ -52,6 +52,10 @@ void WebSocketSinkManager::init()
 
 	setConfiguration(configuration);
 }
+list< VehicleProperty::Property > WebSocketSinkManager::getSupportedProperties()
+{
+	return m_engine->supported();
+}
 void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
@@ -625,7 +629,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						//Send what properties we support
 						typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
-						PropertyList foo = VehicleProperty::capabilities();
+						
+						PropertyList foo = sinkManager->getSupportedProperties();
 						PropertyList::const_iterator i=foo.cbegin();
 						while (i != foo.cend())
 						{
@@ -654,7 +659,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						}
 						else
 						{
-							PropertyList foo = VehicleProperty::capabilities();
+							PropertyList foo = sinkManager->getSupportedProperties();
 							if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
 							{
 								//sinkManager->addSingleShotSink(wsi,data.front(),id);
