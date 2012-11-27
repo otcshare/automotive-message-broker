@@ -61,6 +61,8 @@ private:
 	int propertiesPerSecond;
 	
 	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
+
+	std::map<VehicleProperty::Property, std::string> previousValueMap;
     
 };
 

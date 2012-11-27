@@ -148,6 +148,18 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 
 	propertiesPerSecond++;
 
+	/*if(previousValueMap.find(property) != previousValueMap.end())
+	{
+		std::string v = previousValueMap[property];
+		if(v == value->toString())
+		{
+			///no change from last value;
+			return;
+		}
+	}
+
+	previousValueMap[property] = value->toString();*/
+
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{
 		(*itr)->propertyChanged(property, value, uuid, timestamp, sequence);

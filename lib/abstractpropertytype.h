@@ -30,9 +30,11 @@
 class AbstractPropertyType
 {
 public:
-	virtual std::string toString() = 0;
+	virtual std::string toString() const = 0;
 
 	virtual void fromString(std::string)= 0;
+
+	virtual AbstractPropertyType* copy() = 0;
 
 	void setValue(boost::any val)
 	{
@@ -86,6 +88,11 @@ public:
 		else throw std::runtime_error("value cannot be empty");
 	}
 
+	AbstractPropertyType* copy()
+	{
+		return new BasicPropertyType<T>(*this);
+	}
+
 	void fromString(std::string val)
 	{
 		if(!val.empty() && val != "")
@@ -94,7 +101,7 @@ public:
 		}
 	}
 
-	std::string toString()
+	std::string toString() const
 	{
 		std::stringstream stream;
 		stream<<value<T>();
@@ -150,8 +157,12 @@ public:
 		setValue(val);
 	}
 
+	AbstractPropertyType* copy()
+	{
+		return new StringPropertyType(*this);
+	}
 
-	std::string toString()
+	std::string toString() const
 	{
 		return value<std::string>();
 	}
