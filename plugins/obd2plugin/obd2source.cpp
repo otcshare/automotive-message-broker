@@ -417,21 +417,8 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 		ObdPid *reply = (ObdPid*)retval;
 
 		
-		if (src->propertyReplyMap.find(reply->property) != src->propertyReplyMap.end())
-		{
-			AsyncPropertyReply *newreply = src->propertyReplyMap[reply->property];
-			AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
-			newreply->value = value;
-			newreply->success = true;
-			newreply->completed(newreply);
-			src->propertyReplyMap.erase(src->propertyReplyMap.find(reply->property));
-		}
-		else
-		{
-			AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
-			src->updateProperty(reply->property, value);
-		}
-
+		AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
+		src->updateProperty(reply->property, value);
 
 		/*if (reply->req == "05")
 		{
@@ -488,12 +475,16 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
 {
 	//m_re->updateProperty(property,&value);
-	m_re->updateProperty(property,value,uuid(),amb::currentTime(),0);
+	
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
 		propertyReplyMap[property]->value = value;
 		propertyReplyMap[property]->completed(propertyReplyMap[property]);
 		propertyReplyMap.erase(property);
+	}
+	else
+	{
+		m_re->updateProperty(property,value,uuid(),amb::currentTime(),0);
 	}
 }
 void OBD2Source::mafValue(double maf)
