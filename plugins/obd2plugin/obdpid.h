@@ -211,7 +211,7 @@ public:
 	{
 		std::string vinstring;
 		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[0] != 0x49 && tmp[1] != 0x02)
+		if (tmp[0] != 0x49 || tmp[1] != 0x02)
 		{
 			return false;
 		}
@@ -246,8 +246,10 @@ public:
 	}
 	bool tryParse(ByteArray replyVector)
 	{
-		VinPid::tryParse(replyVector);
-
+		if (!VinPid::tryParse(replyVector))
+		{
+			return false;
+		}
 		value = value.substr(0,3);
 		return true;
 	}
