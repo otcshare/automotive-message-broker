@@ -143,7 +143,7 @@ public:
 	void engineCoolantTemp(int temp);
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid,double,uint32_t) {}
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	GAsyncQueue* commandQueue;
 	GAsyncQueue* subscriptionAddQueue;

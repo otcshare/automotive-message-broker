@@ -308,7 +308,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				try
 				{
 					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front());
-					m_re->updateProperty(name, type, source->uuid(), timestamp, 0);
+					m_re->updateProperty(name, type, source->uuid());
 
 					double currenttime = amb::currentTime();
 
@@ -356,9 +356,11 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						pairdata.pop_front();
 						if (source->propertyReplyMap.find(pair.first) != source->propertyReplyMap.end())
 						{
-							source->propertyReplyMap[pair.first]->value = VehicleProperty::getPropertyTypeForPropertyNameValue(source->propertyReplyMap[pair.first]->property,pair.second);
+							AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(source->propertyReplyMap[pair.first]->property,pair.second);
+							source->propertyReplyMap[pair.first]->value = v;
 							source->propertyReplyMap[pair.first]->completed(source->propertyReplyMap[pair.first]);
 							source->propertyReplyMap.erase(pair.first);
+							delete v;
 						}
 					}
 					//data will contain a property/value map.

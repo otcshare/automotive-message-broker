@@ -38,17 +38,6 @@ class AsyncRangePropertyReply;
 typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
 typedef std::function<void (AsyncRangePropertyReply*)> GetRangedPropertyCompletedSignal;
 
-class PropertyValueTime {
-public:
-	~PropertyValueTime()
-	{
-		delete value;
-	}
-
-	AbstractPropertyType* value;
-	double timestamp;
-};
-
 class AsyncPropertyRequest
 {
 public:
@@ -150,7 +139,7 @@ public:
 		values.clear();
 	}
 
-	std::list<PropertyValueTime*> values;
+	std::list<AbstractPropertyType*> values;
 	bool success;
 };
 
@@ -159,7 +148,7 @@ class AbstractRoutingEngine
 public:
 	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
 	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
-	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid, double timestamp, uint32_t sequence) = 0;
+	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid) = 0;
 
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;

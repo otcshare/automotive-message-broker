@@ -75,7 +75,7 @@ string DemoSink::uuid()
 	return "5b0e8a04-d6d7-43af-b827-1663627a25d9";
 }
 
-void DemoSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid, double, uint32_t)
+void DemoSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
 {
 	std::string app = configuration["script"];
 	std::string strValue = value->toString();

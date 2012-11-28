@@ -54,7 +54,7 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 		registerObject();
 }
 
-void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid, double, uint32_t)
+void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
 {
 	if(!propertyDBusMap.count(property))
 		return;

@@ -47,7 +47,7 @@ public:
 	PropertyList activeRequests;
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid,double, uint32_t) {}
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(map<string, string> config);
 	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;

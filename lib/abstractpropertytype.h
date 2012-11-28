@@ -26,19 +26,27 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
 #include <type_traits>
+#include "timestamp.h"
 
 class AbstractPropertyType
 {
 public:
+	AbstractPropertyType(): timestamp(0), sequence(0) {}
+
 	virtual std::string toString() const = 0;
 
 	virtual void fromString(std::string)= 0;
 
 	virtual AbstractPropertyType* copy() = 0;
 
+	double timestamp;
+
+	uint32_t sequence;
+
 	void setValue(boost::any val)
 	{
 		mValue = val;
+		timestamp = amb::currentTime();
 	}
 
 	template <typename T>

@@ -38,7 +38,7 @@ public:
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
 	
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid, double timestamp, uint32_t sequence) {}
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
 	void randomizeProperties();

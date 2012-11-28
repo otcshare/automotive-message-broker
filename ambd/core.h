@@ -36,7 +36,7 @@ public:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
 	void updateSupported(PropertyList added, PropertyList removed);
-	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, string uuid, double timestamp, uint32_t sequence);
+	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, string uuid);
 	
 	/// sinks:
 	

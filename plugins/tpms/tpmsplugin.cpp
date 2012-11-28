@@ -299,14 +299,14 @@ int TpmsPlugin::readValues()
   VehicleProperty::TireTemperatureType lrTemp(lrTemperature);
   VehicleProperty::TireTemperatureType rrTemp(rrTemperature);
 
-  routingEngine->updateProperty(VehicleProperty::TirePressureLeftFront, &lfPres, uuid(), amb::currentTime(), 0);
-  routingEngine->updateProperty(VehicleProperty::TirePressureRightFront, &rfPres, uuid(), amb::currentTime(), 0);
-  routingEngine->updateProperty(VehicleProperty::TirePressureLeftRear, &lrPres, uuid(), amb::currentTime(), 0);
-  routingEngine->updateProperty(VehicleProperty::TirePressureRightRear, &rrPres, uuid(), amb::currentTime(), 0);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftFront, &lfTemp, uuid(), amb::currentTime(), 0);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightFront, &rfTemp, uuid(), amb::currentTime(), 0);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftRear, &lrTemp, uuid(), amb::currentTime(), 0);
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightRear, &rrTemp, uuid(), amb::currentTime(), 0);
+  routingEngine->updateProperty(VehicleProperty::TirePressureLeftFront, &lfPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TirePressureRightFront, &rfPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TirePressureLeftRear, &lrPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TirePressureRightRear, &rrPres, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftFront, &lfTemp, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightFront, &rfTemp, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftRear, &lrTemp, uuid());
+  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightRear, &rrTemp, uuid());
 
   return 0;
 }

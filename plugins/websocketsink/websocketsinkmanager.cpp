@@ -190,7 +190,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		stringstream data ("[");
-		std::list<PropertyValueTime*> values = reply->values;
+		std::list<AbstractPropertyType*> values = reply->values;
 		for(auto itr = values.begin(); itr != values.end(); itr++)
 		{
 			if(itr != values.begin())
@@ -198,7 +198,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 				data<<",";
 			}
 
-			data << "{ \"value\" : " << "\"" << (*itr)->value->toString() << "\", \"time\" : \"" << (*itr)->timestamp << "\" }";
+			data << "{ \"value\" : " << "\"" << (*itr)->toString() << "\", \"time\" : \"" << (*itr)->timestamp << "\" }";
 		}
 
 		data<<"]";

@@ -63,12 +63,14 @@ void DatabaseSink::supportedChanged(PropertyList supportedProperties)
 }
 
 
-void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid, double timestamp, uint32_t sequence)
+void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
 {
 	DBObject* obj = new DBObject;
 	obj->key = property;
 	obj->value = value->toString();
 	obj->source = uuid;
+	obj->time = value->timestamp;
+	obj->sequence = value->sequence;
 }
 
 

@@ -45,7 +45,7 @@ string WebSocketSink::uuid()
 {
 	return m_uuid;
 }
-void WebSocketSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string  uuid, double timestamp, uint32_t sequence)
+void WebSocketSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string  uuid)
 {
   //printf("Got property:%i\n",boost::any_cast<uint16_t>(reply->value));
 	//uint16_t velocity = boost::any_cast<uint16_t>(value);
@@ -66,7 +66,7 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, Abstract
 	
 	s.precision(15);
 	
-	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << value->toString() << "\",\"transactionid\":\"" << m_uuid << "\", \"timestamp\":\""<<timestamp<<"\",\"sequence\":\""<<sequence<<"\"}";
+	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << value->toString() << "\",\"transactionid\":\"" << m_uuid << "\", \"timestamp\":\""<<value->timestamp<<"\",\"sequence\":\""<<value->sequence<<"\"}";
 	
 	string replystr = s.str();
 	//printf("Reply: %s\n",replystr.c_str());

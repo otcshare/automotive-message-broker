@@ -69,10 +69,10 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 	vehicleSpeedFromLastWeek.property = VehicleProperty::VehicleSpeed;
 	vehicleSpeedFromLastWeek.completed = [](AsyncRangePropertyReply* reply)
 	{
-		std::list<PropertyValueTime*> values = reply->values;
+		std::list<AbstractPropertyType*> values = reply->values;
 		for(auto itr = values.begin(); itr != values.end(); itr++)
 		{
-			DebugOut(0)<<"Velocity value from last week: "<<(*itr)->value->toString()<<" time: "<<(*itr)->timestamp<<endl;
+			DebugOut(0)<<"Velocity value from last week: "<<(*itr)->toString()<<" time: "<<(*itr)->timestamp<<endl;
 		}
 	};
 
@@ -93,7 +93,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 }
 
-void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid, double timestamp, uint32_t sequence)
+void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
 {
 	DebugOut()<<property<<" value: "<<value->toString()<<endl;
 }

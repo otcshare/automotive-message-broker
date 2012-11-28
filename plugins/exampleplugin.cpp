@@ -184,12 +184,20 @@ void ExampleSourcePlugin::randomizeProperties()
 
 	machineGun = !machineGun;
 
-	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel, uuid(),amb::currentTime(), 0);
-	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es, uuid(),amb::currentTime(), 0);
-	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac, uuid(),amb::currentTime(), 0);
-	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa, uuid(),amb::currentTime(), 0);
-	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp, uuid(),amb::currentTime(), 0);
-	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp, uuid(),amb::currentTime(), 0);
-	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid(),amb::currentTime(), 0);
+	vel.timestamp = amb::currentTime();
+	es.timestamp = amb::currentTime();
+	ac.timestamp = amb::currentTime();
+	swa.timestamp = amb::currentTime();
+	tsp.timestamp = amb::currentTime();
+	tp.timestamp = amb::currentTime();
+	ec.timestamp = amb::currentTime();
+
+	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel, uuid());
+	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es, uuid());
+	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac, uuid());
+	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa, uuid());
+	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp, uuid());
+	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp, uuid());
+	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid());
 	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }
