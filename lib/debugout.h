@@ -36,6 +36,8 @@ public:
 	{
 		ostream out(buf);
 
+		out.precision(5);
+
 		if(mDebugLevel <= debugThreshhold)
 			 out<<message<<" ";
 		return *this;
@@ -44,6 +46,8 @@ public:
 	DebugOut const& operator << (ostream & (*manip)(std::ostream&)) const
 	{
 		ostream out(buf);
+
+		out.precision(5);
 
 		if(mDebugLevel <= debugThreshhold)
 			 out<<endl;
@@ -62,6 +66,8 @@ public:
 	DebugOut const & operator << (double val) const
 	{
 		ostream out(buf);
+
+		out.precision(5);
 
 		if(mDebugLevel <= debugThreshhold)
 			 out<<val<<" ";
