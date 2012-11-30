@@ -1,10 +1,28 @@
 #include "databasesink.h"
+#include "abstractroutingengine.h"
+
+extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+{
+	return new DatabaseSinkManager(routingengine, config);
+}
 
 DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::string> config)
-	:AbstractSink(engine,config)
+	:AbstractSource(engine,config)
 {
+	databaseName = "storage";
+	tablename = "data";
+	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, time REAL, sequence REAL)";
 	shared = new Shared;
-	shared->db->init("storage","data","CREATE TABLE IF NOT EXISTS vehicledata (key TEXT, value BLOB, time REAL, source TEXT");
+	shared->db->init(databaseName, tablename, tablecreate);
+
+	engine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
+	engine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
+
+	PropertyList props;
+	props.push_back(VehicleProperty::EngineSpeed);
+	props.push_back(VehicleProperty::VehicleSpeed);
+
+	engine->setSupported(supported(),this);
 
 	auto cb = [](gpointer data)
 	{
@@ -47,13 +65,14 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 DatabaseSink::~DatabaseSink()
 {
+	DBObject* obj = new DBObject();
+	obj->quit = true;
 
-}
+	shared->queue.append(obj);
 
+	g_thread_join(thread);
 
-PropertyList DatabaseSink::subscriptions()
-{
-
+	delete shared;
 }
 
 
@@ -62,6 +81,15 @@ void DatabaseSink::supportedChanged(PropertyList supportedProperties)
 
 }
 
+PropertyList DatabaseSink::supported()
+{
+	PropertyList props;
+
+	props.push_back(VehicleProperty::EngineSpeed);
+	props.push_back(VehicleProperty::VehicleSpeed);
+
+	return props;
+}
 
 void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
 {
@@ -71,10 +99,64 @@ void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractP
 	obj->source = uuid;
 	obj->time = value->timestamp;
 	obj->sequence = value->sequence;
+
+	shared->queue.append(obj);
 }
 
 
 std::string DatabaseSink::uuid()
 {
 	return "9f88156e-cb92-4472-8775-9c08addf50d3";
+}
+
+void DatabaseSink::getPropertyAsync(AsyncPropertyReply *reply)
+{
+
+}
+
+void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
+{
+	BaseDB * db = new BaseDB();
+	db->init(databaseName, tablename, tablecreate);
+
+	ostringstream query;
+	query.precision(15);
+
+	query<<"SELECT * from "<<tablename<<" WHERE ";
+
+	if(reply->timeBegin && reply->timeEnd)
+	{
+		query<<" time BETWEEN "<<reply->timeBegin<<" AND "<<reply->timeEnd;
+	}
+
+	if(reply->sequenceBegin >= 0 && reply->sequenceEnd >=0)
+	{
+		query<<" AND sequence BETWEEN "<<reply->sequenceBegin<<" AND "<<reply->sequenceEnd;
+	}
+
+	std::vector<std::vector<string>> data = db->select(query.str());
+
+	for(auto i=0;i<data.size();i++)
+	{
+		for(auto n=0;n<data[i].size();n++)
+			cout<<"Data: "<<data[i][n]<<endl;
+	}
+
+	delete db;
+}
+
+AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
+{
+	AsyncPropertyReply* reply = new AsyncPropertyReply(request);
+	reply->success = false;
+	return reply;
+}
+
+void DatabaseSink::subscribeToPropertyChanges(VehicleProperty::Property )
+{
+
+}
+
+void DatabaseSink::unsubscribeToPropertyChanges(VehicleProperty::Property )
+{
 }

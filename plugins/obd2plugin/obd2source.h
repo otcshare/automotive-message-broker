@@ -134,6 +134,9 @@ public:
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
+
+	int supportedOperations();
+
 	PropertyList queuedRequests;
 	bool clientConnected;
 	PropertyList activeRequests;

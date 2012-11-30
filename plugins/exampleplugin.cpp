@@ -155,6 +155,11 @@ PropertyList ExampleSourcePlugin::supported()
 	return props;
 }
 
+int ExampleSourcePlugin::supportedOperations()
+{
+	return Get | Set | GetRanged;
+}
+
 void ExampleSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	mRequests.remove(property);

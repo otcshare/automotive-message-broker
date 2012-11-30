@@ -180,7 +180,7 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::Get)
 		{
 			src->getPropertyAsync(reply);
 		}
@@ -197,7 +197,7 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::GetRanged)
 		{
 			src->getRangePropertyAsync(reply);
 		}
@@ -212,11 +212,14 @@ AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::Set)
 		{
 			return src->setProperty(request);
 		}
 	}
+
+	DebugOut(0)<<"Error: setProperty opration failed"<<endl;
+	return NULL;
 }
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)

@@ -151,8 +151,8 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 {
 	AsyncRangePropertyRequest rangedRequest;
 
-	rangedRequest.begin = start;
-	rangedRequest.end = end;
+	rangedRequest.timeBegin = start;
+	rangedRequest.timeEnd = end;
 
 	if (property == "running_status_speedometer")
 	{

@@ -609,6 +609,12 @@ PropertyList OBD2Source::supported()
 {
 	return m_supportedProperties;
 }
+
+int OBD2Source::supportedOperations()
+{
+	return Get | Set;
+}
+
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new OBD2Source(routingengine, config);

@@ -167,6 +167,11 @@ PropertyList WheelSourcePlugin::supported()
 	return props;
 }
 
+int WheelSourcePlugin::supportedOperations()
+{
+	return Get | Set;
+}
+
 void WheelSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	mRequests.erase(property);

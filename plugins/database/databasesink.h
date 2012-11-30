@@ -21,6 +21,7 @@
 #define DATABASESINK_H
 
 #include "abstractsink.h"
+#include "abstractsource.h"
 #include "basedb.hpp"
 
 #include <glib.h>
@@ -69,7 +70,7 @@ public:
 
 		g_cond_signal(&cond);
 
-		mQueue.append(item);
+		mQueue.push_back(item);
 
 		g_mutex_unlock(mutex);
 	}
@@ -82,7 +83,7 @@ private:
 
 class DBObject {
 public:
-	DBObject(): time(0),quit(false) {}
+	DBObject(): time(0), sequence(0), quit(false) {}
 	std::string key;
 	std::string value;
 	std::string source;
@@ -103,22 +104,32 @@ public:
 	Queue<DBObject*> queue;
 };
 
-class DatabaseSink : public AbstractSink
+class DatabaseSink : public AbstractSource
 {
 
 public:
 	DatabaseSink(AbstractRoutingEngine* engine, map<string, string> config);
 	~DatabaseSink();
-	virtual PropertyList subscriptions();
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
 	virtual std::string uuid();
+
+	///source role:
+	virtual void getPropertyAsync(AsyncPropertyReply *reply);
+	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
+	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
+	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
+	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
+	virtual PropertyList supported();
+	int supportedOperations() { return GetRanged; }
 
 private:
 	PropertyList mSubscriptions;
 	Shared *shared;
 	GThread* thread;
-
+	std::string databaseName;
+	std::string tablename;
+	std::string tablecreate;
 };
 
 class DatabaseSinkManager: public AbstractSinkManager

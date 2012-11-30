@@ -58,14 +58,10 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 
 	routingEngine->getPropertyAsync(batteryVoltageRequest);
 
-	boost::posix_time::ptime start(boost::gregorian::date(2012,10,20));
-	boost::posix_time::ptime end(boost::gregorian::date(2012,10,21));
-
 	AsyncRangePropertyRequest vehicleSpeedFromLastWeek;
-	tm tmStart = boost::posix_time::to_tm(start);
-	tm tmEnd = boost::posix_time::to_tm(end);
-	vehicleSpeedFromLastWeek.begin = mktime(&tmStart);
-	vehicleSpeedFromLastWeek.end = mktime(&tmEnd);
+
+	vehicleSpeedFromLastWeek.timeBegin = 1354233906.54099;
+	vehicleSpeedFromLastWeek.timeEnd = 1354234153.03318;
 	vehicleSpeedFromLastWeek.property = VehicleProperty::VehicleSpeed;
 	vehicleSpeedFromLastWeek.completed = [](AsyncRangePropertyReply* reply)
 	{

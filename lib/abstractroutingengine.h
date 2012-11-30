@@ -100,7 +100,7 @@ class AsyncRangePropertyRequest
 {
 public:
 	AsyncRangePropertyRequest()
-		:begin(0), end(0)
+		:timeBegin(0), timeEnd(0), sequenceBegin(-1), sequenceEnd(-1)
 	{
 
 	}
@@ -110,14 +110,18 @@ public:
 	{
 		this->property = request.property;
 		this->completed = request.completed;
-		this->begin = request.begin;
-		this->end = request.end;
+		this->timeBegin = request.timeBegin;
+		this->timeEnd = request.timeEnd;
+		this->sequenceBegin = request.sequenceBegin;
+		this->sequenceEnd = request.sequenceEnd;
 	}
 
 	VehicleProperty::Property property;
 	GetRangedPropertyCompletedSignal completed;
-	double begin;
-	double end;
+	double timeBegin;
+	double timeEnd;
+	int32_t sequenceBegin;
+	int32_t sequenceEnd;
 };
 
 class AsyncRangePropertyReply: public AsyncRangePropertyRequest

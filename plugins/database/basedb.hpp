@@ -22,6 +22,7 @@
 
 #include "sqlitedatabase.h"
 #include "sqlitequery.h"
+#include "debugout.h"
 #include <string>
 #include <sstream>
 #include <stdio.h>
@@ -57,7 +58,7 @@ public:
 	
 	virtual ~BaseDB()
 	{
-		printf("BaseDB: Destroying db object. Table: %s",table.c_str());
+		DebugOut()<<"BaseDB: Destroying db object. Table: "<<table<<endl;
 		delete q;
 		delete db;
 	}
@@ -74,20 +75,21 @@ public:
 	virtual void
 	init(string dbname, string tablename, string tablestring)
 	{
-		printf("BaseDB: Initializing db object. Table: %s",tablename.c_str());
+		DebugOut()<<"BaseDB: Initializing db object. Table: "<<tablename.c_str()<<endl;
 		tableString = tablestring;
 		
 		db = new sqlitedatabase();
 		
 		db->init(dbname);
 		
-		printf("BaseDB: Using db/db-file: %s",dbname.c_str());
+		DebugOut()<<"BaseDB: Using db/db-file: "<<dbname.c_str()<<endl;
 		
 		if(! db->Connected())
 		{
-			printf("BaseDB: database not found %s",dbname.c_str());
+			DebugOut(0)<<"BaseDB: database not found "<<dbname<<endl;
+			throw -1;
 		}
-		q = new sqlitequery();;
+		q = new sqlitequery();
 		
 		q->init(db);
 
@@ -97,7 +99,7 @@ public:
 	virtual void
 	reloadTable()
 	{
-		printf("BaseDB: reloading table %s",table.c_str());
+		DebugOut()<<"BaseDB: reloading table "<<table<<endl;
 		dropTable();
 		createTable();
 	}
@@ -106,14 +108,14 @@ public:
 	{
 		bool exists=false;
 		string query = "SELECT * FROM "+table+" LIMIT 0,1";
-		printf("BaseDB: checking for existing table with %s",query.c_str());
+		DebugOut()<<"BaseDB: checking for existing table with "<<query.c_str()<<endl;
 		q->getResult(query);
 		int numrows = q->numRows();
 		if(numrows <= 0 )
 			exists = false;
 		else exists = true;
 
-		printf("BaseDB: Table '%s' exists? %d because %d rows where found.", table.c_str(), exists, numrows);
+		DebugOut()<<"BaseDB: Table '"<<table<<"' exists? "<<exists<<" because "<<numrows<<" rows where found."<<endl;
 		q->freeResult();
 		return exists;
 	}
@@ -146,7 +148,7 @@ public:
 		}
 		endquery<<" )";
 		query+=" )"+endquery.str();
-		printf("BaseDB: %s",query.c_str());
+		DebugOut()<<"BaseDB: "<<query<<endl;
 		q->execute(query);
 	}
 	
@@ -163,7 +165,7 @@ public:
 		endquery<<"'"<<fixInvalids(tempval.str())<<"'";
 		endquery<<" )";
 		query+=" )"+endquery.str();
-		printf("BaseDB: %s",query.c_str());
+		DebugOut()<<"BaseDB: "<<query<<endl;
 		q->execute(query);
 	}
 	
@@ -263,6 +265,40 @@ public:
 		return filename;
 	}
 	
+	vector<vector<string> > select(string query)
+	{
+		DebugOut()<<query<<endl;
+
+		vector<vector<string>> dataMap;
+
+		q->getResult(query);
+
+		if(q->numRows() <= 0)
+		{
+			q->freeResult();
+			return dataMap;
+		}
+
+		int i=0;
+
+		while(q->fetchRow())
+		{
+			string v;
+			dataMap.push_back(vector<string>());
+
+			while((v = q->getStr()) != "")
+			{
+				dataMap[i].push_back(v);
+			}
+			i++;
+		}
+
+		q->freeResult();
+
+		return dataMap;
+
+	}
+
 protected:
 	
 	void
