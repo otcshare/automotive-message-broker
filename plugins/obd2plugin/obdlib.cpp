@@ -160,18 +160,30 @@ int obdLib::openPort(const char *portName,int baudrate)
 	{
 	}
 
-	newtio.c_cflag |= (CLOCAL | CREAD);
+	newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
+	newtio.c_cflag |= CLOCAL | CREAD;
+	newtio.c_cflag &= ~CRTSCTS;
+	newtio.c_cflag &= ~CSTOPB;
+	newtio.c_iflag=IGNBRK;
+	newtio.c_iflag &= ~(IXON|IXOFF|IXANY);
+	newtio.c_lflag=0;
+	newtio.c_oflag=0;
+	newtio.c_cc[VTIME]=1; //1/10th second timeout, reduces CPU usage but still allows for timeouts
+	newtio.c_cc[VMIN]=1; //We want a pure timer timeout
+	
+	
+	/*newtio.c_cflag |= (CLOCAL | CREAD);
 	newtio.c_lflag &= !(ICANON | ECHO | ECHOE | ISIG);
 	newtio.c_oflag &= !(OPOST);
 	newtio.c_cc[VMIN] = 0;
-	newtio.c_cc[VTIME] = 100;
+	newtio.c_cc[VTIME] = 100;*/
 /*
 	newtio.c_cflag &= ~CSIZE; //Disable byte size
 	newtio.c_cflag &= ~PARENB; //Disable parity
 	newtio.c_cflag &= ~CSTOPB; //Disable stop bits
 	newtio.c_cflag |= (CLOCAL | CREAD | CS8); //Set local mode, reader, and 8N1.
 
-	newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); //Disable CANON, echo, and signals
+	newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); //Disausleep(10000);ble CANON, echo, and signals
 
 	newtio.c_oflag &= ~(OPOST); //Disable post processing
 */
@@ -188,6 +200,7 @@ int obdLib::openPort(const char *portName,int baudrate)
 		}
 		debug(obdLib::DEBUG_VERBOSE,"Setting baud rate to %i on port %s\n",baudrate,portName);
 	}
+	fcntl(portHandle, F_SETFL, 0); //Set to blocking
 	tcsetattr(portHandle,TCSANOW,&newtio);
 	//newtio.c_cc[VMIN] = 0; //Minimum number of bytes to read
 	//newtio.c_cc[VTIME] = 100; //Read Timeout (10.0 seconds)
@@ -213,6 +226,12 @@ int obdLib::closePort()
 	#endif
 	return 0;
 }
+
+bool obdLib::connected()
+{
+
+}
+
 int obdLib::initPort()
 {
 	sendObdRequest("atz\r",4);
@@ -372,11 +391,9 @@ bool obdLib::sendObdRequestString(const char *req,int length,std::vector<byte> *
 #endif
 	if (len < 0)
 	{
-		printf("No Write\n");
-		//delete tmp;
-		//delete totalReply;
-		//m_lastError = SERIALWRITEERROR;
-		//return false;
+		debug(obdLib::DEBUG_ERROR,"Serial write error: %s", strerror(errno));
+
+		return false;
 	}
 	if (sleeptime == -1)
 	{
@@ -409,7 +426,7 @@ bool obdLib::sendObdRequestString(const char *req,int length,std::vector<byte> *
 
 		if (len < 0)
 		{
-			printf("No Read\n");
+			//printf("No Read\n");
 			perror("Error");
 			delete[] tmp;
 			delete[] totalReply;
@@ -422,6 +439,7 @@ bool obdLib::sendObdRequestString(const char *req,int length,std::vector<byte> *
 		#ifdef WINVER
 			Sleep(10);
 		#else
+			//printf("Timeout\n");
 			usleep(10000);
 		#endif
 		}

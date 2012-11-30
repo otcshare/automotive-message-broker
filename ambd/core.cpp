@@ -64,7 +64,7 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 	{
 		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((*itr)))
 		{
-			DebugOut()<<__FUNCTION__<<"() adding suport for property "<<(*itr)<<endl;
+			DebugOut()<<__FUNCTION__<<"() adding support for property "<<(*itr)<<endl;
 			mMasterPropertyList.push_back((*itr));
 		}
 	}
@@ -140,7 +140,7 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	}
 }
 
-void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyType *value)
+void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
 {
 	SinkList list = propertySinkMap[property];
 	
@@ -148,9 +148,10 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 
 	propertiesPerSecond++;
 
+
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{
-		(*itr)->propertyChanged(property, value,(*itr)->uuid());
+		(*itr)->propertyChanged(property, value, uuid);
 	}
 }
 
@@ -179,7 +180,7 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::Get)
 		{
 			src->getPropertyAsync(reply);
 		}
@@ -196,7 +197,7 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::GetRanged)
 		{
 			src->getRangePropertyAsync(reply);
 		}
@@ -205,25 +206,28 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 	return reply;
 }
 
-void Core::setProperty(VehicleProperty::Property property, AbstractPropertyType *value)
+AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 {
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::Set)
 		{
-			src->setProperty(property, value);
+			return src->setProperty(request);
 		}
 	}
+
+	DebugOut(0)<<"Error: setProperty opration failed"<<endl;
+	return NULL;
 }
 
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
-	printf("Subscribing\n");
+	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
-		DebugOut()<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
+		DebugOut(1)<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
 		return; 
 	}
 	
@@ -254,7 +258,7 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		DebugOut()<<__FUNCTION__<<"property not supported: "<<property;
+		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property;
 		return; 
 	}
 		

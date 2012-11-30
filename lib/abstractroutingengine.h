@@ -20,6 +20,9 @@
 #ifndef ABSTRACTROUTINGENGINE_H
 #define ABSTRACTROUTINGENGINE_H
 
+#include "sys/types.h"
+#include <stdlib.h>
+
 #include <boost/any.hpp>
 #include <functional>
 #include <time.h>
@@ -29,9 +32,11 @@
 class AbstractSink;
 class AbstractSource;
 class AsyncPropertyReply;
+class AsyncRangePropertyReply;
 
 
-typedef std::function<void (AsyncPropertyReply*)> CompletedSignal;
+typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
+typedef std::function<void (AsyncRangePropertyReply*)> GetRangedPropertyCompletedSignal;
 
 class AsyncPropertyRequest
 {
@@ -57,13 +62,32 @@ public:
 	}
 
 	VehicleProperty::Property property;
-	CompletedSignal completed;
+	GetPropertyCompletedSignal completed;
 };
 
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
 	AsyncPropertyReply(const AsyncPropertyRequest &request)
+		:AsyncPropertyRequest(request), value(NULL), success(false)
+	{
+
+	}
+
+	AbstractPropertyType* value;
+	bool success;
+};
+
+class AsyncSetPropertyRequest: public AsyncPropertyRequest
+{
+public:
+	AsyncSetPropertyRequest()
+		:value(NULL)
+	{
+
+	}
+
+	AsyncSetPropertyRequest(const AsyncPropertyRequest &request)
 		:AsyncPropertyRequest(request), value(NULL)
 	{
 
@@ -72,45 +96,55 @@ public:
 	AbstractPropertyType* value;
 };
 
-class AsyncRangePropertyRequest: public AsyncPropertyRequest
+class AsyncRangePropertyRequest
 {
 public:
 	AsyncRangePropertyRequest()
-		:begin(0), end(0)
+		:timeBegin(0), timeEnd(0), sequenceBegin(-1), sequenceEnd(-1)
 	{
 
-	}
-
-	AsyncRangePropertyRequest(const AsyncPropertyRequest &request)
-		:AsyncPropertyRequest(request), begin(0), end(0)
-	{
-		this->property = request.property;
-		this->completed = request.completed;
 	}
 
 	AsyncRangePropertyRequest(const AsyncRangePropertyRequest &request)
-		:AsyncPropertyRequest(request)
+
 	{
 		this->property = request.property;
 		this->completed = request.completed;
-		this->begin = request.begin;
-		this->end = request.end;
+		this->timeBegin = request.timeBegin;
+		this->timeEnd = request.timeEnd;
+		this->sequenceBegin = request.sequenceBegin;
+		this->sequenceEnd = request.sequenceEnd;
 	}
 
-	time_t begin;
-	time_t end;
+	VehicleProperty::Property property;
+	GetRangedPropertyCompletedSignal completed;
+	double timeBegin;
+	double timeEnd;
+	int32_t sequenceBegin;
+	int32_t sequenceEnd;
 };
 
 class AsyncRangePropertyReply: public AsyncRangePropertyRequest
 {
 public:
 	AsyncRangePropertyReply(AsyncRangePropertyRequest request)
-		:AsyncRangePropertyRequest(request)
+		:AsyncRangePropertyRequest(request), success(false)
 	{
 
 	}
 
+	~AsyncRangePropertyReply()
+	{
+		for(auto itr = values.begin(); itr != values.end(); itr++)
+		{
+			delete (*itr);
+		}
+
+		values.clear();
+	}
+
 	std::list<AbstractPropertyType*> values;
+	bool success;
 };
 
 class AbstractRoutingEngine
@@ -118,17 +152,18 @@ class AbstractRoutingEngine
 public:
 	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
 	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
-	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value) = 0;
+	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid) = 0;
 
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;
 	virtual void  unregisterSink(AbstractSink* self) = 0;
-	virtual AsyncPropertyReply *getPropertyAsync(AsyncPropertyRequest request) = 0;
+	virtual AsyncPropertyReply * getPropertyAsync(AsyncPropertyRequest request) = 0;
 	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
-	virtual void setProperty(VehicleProperty::Property, AbstractPropertyType*) = 0;
+	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual PropertyList supported() = 0;
+
 };
 
 #endif // ABSTRACTROUTINGENGINE_H

@@ -34,6 +34,10 @@ public:
 				
 	DebugOut const& operator << (string message) const
 	{
+		ostream out(buf);
+
+		out.precision(5);
+
 		if(mDebugLevel <= debugThreshhold)
 			 out<<message<<" ";
 		return *this;
@@ -41,13 +45,30 @@ public:
 
 	DebugOut const& operator << (ostream & (*manip)(std::ostream&)) const
 	{
+		ostream out(buf);
+
+		out.precision(5);
+
 		if(mDebugLevel <= debugThreshhold)
 			 out<<endl;
 		return *this;
 	}
 	
-	DebugOut const & operator << (uint16_t val) const
+	/*DebugOut const & operator << (uint16_t val) const
 	{
+		ostream out(buf);
+
+		if(mDebugLevel <= debugThreshhold)
+			 out<<val<<" ";
+		return *this;
+	}*/
+
+	DebugOut const & operator << (double val) const
+	{
+		ostream out(buf);
+
+		out.precision(5);
+
 		if(mDebugLevel <= debugThreshhold)
 			 out<<val<<" ";
 		return *this;
@@ -58,9 +79,14 @@ public:
 		debugThreshhold = th;
 	}
 
+	static void setOutput(ostream &o)
+	{
+		buf = o.rdbuf();
+	}
+
 private:
 	static int debugThreshhold;
-	static ostream &out;
+	static std::streambuf *buf;
 	int mDebugLevel;
 };
 

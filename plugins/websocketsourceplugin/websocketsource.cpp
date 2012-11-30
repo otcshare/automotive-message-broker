@@ -25,6 +25,8 @@
 #include <sstream>
 #include <json-glib/json-glib.h>
 #include <listplusplus.h>
+#include <timestamp.h>
+
 #include "debugout.h"
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 libwebsocket_context *context;
@@ -59,6 +61,7 @@ void WebSocketSource::checkSubscriptions()
 		}
 		activeRequests.push_back(prop);
 		stringstream s;
+		///TODO: fix transid here:
 		s << "{\"type\":\"method\",\"name\":\"subscribe\",\"data\":[\"" << prop << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
 
 		string replystr = s.str();
@@ -94,7 +97,7 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	//printf("Connecting to websocket server at %s port %i\n",ip.c_str(),port);
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Connecting to websocket server at" << ip << ":" << port << "\n";
 	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, 0,"/", "localhost", "websocket",protocols[0].name, -1);
-	
+
 }
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
@@ -116,7 +119,7 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	if (condition == G_IO_IN)
 	{
 	}
-	
+
 	return true;
 }
 
@@ -141,7 +144,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming connection" << "\n";
 			stringstream s;
 			s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
-		
+
 			string replystr = s.str();
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
 			char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
@@ -159,62 +162,105 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			JsonParser* parser = json_parser_new();
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
 				return 0;
 			}
-			
+
 			JsonNode* node = json_parser_get_root(parser);
 			if(node == nullptr)
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json\n";
 				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
-			
+
 			JsonReader* reader = json_reader_new(node);
 			if(reader == nullptr)
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!\n";
 				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
-			
-			
-			
-			
-			
+
+
+			DebugOut(5)<<"source received: "<<string((char*)in)<<endl;
+
+
 			string type;
 			json_reader_read_member(reader,"type");
 			type = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
-			
+
 			string  name;
 			json_reader_read_member(reader,"name");
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
 
 			list<string> data;
-			json_reader_read_member(reader,"data");
-			if (json_reader_is_array(reader))
+			list<pair<string,string> > pairdata;
+			if (name == "get")
 			{
-				for(int i=0; i < json_reader_count_elements(reader); i++)
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_array(reader))
 				{
-					json_reader_read_element(reader,i);
-					string path = json_reader_get_string_value(reader);
-					data.push_back(path);
-					json_reader_end_element(reader);
+					for(int i=0; i < json_reader_count_elements(reader); i++)
+					{
+					  
+						pair<string,string> pair;
+						json_reader_read_element(reader,i);
+						
+						json_reader_read_member(reader,"property");
+						pair.first = json_reader_get_string_value(reader);
+						json_reader_end_member(reader);
+						
+						json_reader_read_member(reader,"value");
+						pair.second = json_reader_get_string_value(reader);
+						json_reader_end_member(reader);
+						
+						json_reader_end_element(reader);
+						
+						pairdata.push_back(pair);
+					}
 				}
+				else
+				{
+					pair<string,string> pair;
+					
+					json_reader_read_member(reader,"property");
+					pair.first = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+						
+					json_reader_read_member(reader,"value");
+					pair.second = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+					
+					pairdata.push_back(pair);
+				}
+				json_reader_end_member(reader);
 			}
 			else
 			{
-				string path = json_reader_get_string_value(reader);
-				if (path != "")
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_array(reader))
 				{
-					data.push_back(path);
+					for(int i=0; i < json_reader_count_elements(reader); i++)
+					{
+						json_reader_read_element(reader,i);
+						string path = json_reader_get_string_value(reader);
+						data.push_back(path);
+						json_reader_end_element(reader);
+					}
 				}
+				else
+				{
+					string path = json_reader_get_string_value(reader);
+					if (path != "")
+					{
+						data.push_back(path);
+					}
+				}
+				json_reader_end_member(reader);
 			}
-			json_reader_end_member(reader);
-			
 			string id;
 			json_reader_read_member(reader,"transactionid");
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
@@ -230,15 +276,28 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				id = strstr.str();
 			}
 			json_reader_end_member(reader);
-			
+
+			double timestamp=amb::currentTime();
+			json_reader_read_member(reader,"timestamp");
+			if(const GError* err = json_reader_get_error(reader))
+			{
+				DebugOut(0)<<"JSON Parsing error: no timestamp parameter: "<<err->message<<endl;
+				//g_error_free(err);
+			}
+			else
+			{
+				timestamp = atof(json_reader_get_string_value(reader));
+			}
+			json_reader_end_member(reader);
+
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
 			//if(error) g_error_free(error);
-			
+
 			g_object_unref(reader);
 			g_object_unref(parser);
-			
-			
+
+
 			if (type == "valuechanged")
 			{
 				//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
@@ -249,7 +308,12 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				try
 				{
 					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front());
-					m_re->updateProperty(name, type);
+					m_re->updateProperty(name, type, source->uuid());
+
+					double currenttime = amb::currentTime();
+
+					DebugOut(2)<<"websocket source latency: "<<(currenttime - timestamp)*1000<<"ms"<<endl;
+
 					delete type;
 				}
 				catch (exception ex)
@@ -277,11 +341,31 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						string val = data.front();
 						data.pop_front();	
 						props.push_back(val);
-						
+
 					}
 					source->setSupported(props);
 					//m_re->updateSupported(m_supportedProperties,PropertyList());
 				}
+				else if (name == "get")
+				{
+					
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size();
+					while (pairdata.size() > 0)
+					{
+						pair<string,string> pair = pairdata.front();
+						pairdata.pop_front();
+						if (source->propertyReplyMap.find(pair.first) != source->propertyReplyMap.end())
+						{
+							AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(source->propertyReplyMap[pair.first]->property,pair.second);
+							source->propertyReplyMap[pair.first]->value = v;
+							source->propertyReplyMap[pair.first]->completed(source->propertyReplyMap[pair.first]);
+							source->propertyReplyMap.erase(pair.first);
+							delete v;
+						}
+					}
+					//data will contain a property/value map.
+				}
+
 			}
 			break;
 		}
@@ -314,22 +398,24 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	source = this;
 	m_re = re;  
 	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
-	
+
 	setConfiguration(config);
 	re->setSupported(supported(), this);
 
 	//printf("websocketsource loaded!!!\n");
-	
+
 }
 PropertyList WebSocketSource::supported()
 {
 	return m_supportedProperties;
 }
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+
+int WebSocketSource::supportedOperations()
 {
-	return new WebSocketSource(routingengine, config);
-	
+	/// TODO: need to do this correctly based on what the host supports.
+	return Get | Set;
 }
+
 string WebSocketSource::uuid()
 {
 	return "d293f670-f0b3-11e1-aff1-0800200c9a66";
@@ -359,6 +445,25 @@ void WebSocketSource::unsubscribeToPropertyChanges(VehicleProperty::Property pro
 void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	///TODO: fill in
+	//s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
+	//m_re->getPropertyAsync();
+	/*reply.value = 1;
+	  reply->completed(reply);
+	  reply->completed = [](AsyncPropertyReply* reply) {
+	  DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
+	  delete reply;
+	};*/
+	propertyReplyMap[reply->property] = reply;
+	stringstream s;  
+	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
+	string replystr = s.str();
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+	//printf("Reply: %s\n",replystr.c_str());
+	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(new_response,replystr.c_str());
+	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 }
 
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -366,7 +471,27 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	///TODO: fill in
 }
 
-void WebSocketSource::setProperty(VehicleProperty::Property , AbstractPropertyType * )
+AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest request )
 {
 	///TODO: fill in
+		AsyncPropertyReply* reply = new AsyncPropertyReply(request);
+	reply->success = true;
+	stringstream s;
+	s << "{\"type\":\"method\",\"name\":\"set\",\"data\":[\"property\" : \"" << request.property << "\",\"value\" : \"" << request.value << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
+	string replystr = s.str();
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+	//printf("Reply: %s\n",replystr.c_str());
+	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(new_response,replystr.c_str());
+	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+	reply->completed(reply);
+	return reply;
+}
+
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+{
+	return new WebSocketSource(routingengine, config);
+
 }

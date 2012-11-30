@@ -1,10 +1,9 @@
 - test for memory leaks in websocket sink plugin
-- implement websocket source getProperty methods and setProperty
+- test websocket source getProperty methods and setProperty
 - per-source property filtering in routing engine
 - historic data "get" interface in routing engine
 - sqlite database storage plugin
-- connect/disconnect on first/last subscription in obd2source
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
-- fix issue regarding obd2 thread loop not exiting sometimes
-- optimize CPU performance in obd2source
-- obd2source blacklist unsupported: persistent blacklist mapped to VIN?
+- timestamp on property get/update operations
+- squence on property get/update operation
+- getSupported websocket call should only return supported not capabilities

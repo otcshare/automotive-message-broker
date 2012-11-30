@@ -18,7 +18,11 @@
 
 
 #include "vehicleproperty.h"
+#include "listplusplus.h"
+#include "debugout.h"
+
 #include <map>
+
 
 #define REGISTERPROPERTY(property, defaultValue) \
 	registerProperty(property, []() { return new property ## Type(defaultValue); });
@@ -59,6 +63,10 @@ const VehicleProperty::Property VehicleProperty::TirePressureLeftFront = "TirePr
 const VehicleProperty::Property VehicleProperty::TirePressureRightFront = "TirePressureRightFront";
 const VehicleProperty::Property VehicleProperty::TirePressureLeftRear = "TirePressureLeftRear";
 const VehicleProperty::Property VehicleProperty::TirePressureRightRear = "TirePressureRightRear";
+const VehicleProperty::Property VehicleProperty::TireTemperatureLeftFront = "TireTemperatureLeftFront";
+const VehicleProperty::Property VehicleProperty::TireTemperatureRightFront = "TireTemperatureRightFront";
+const VehicleProperty::Property VehicleProperty::TireTemperatureLeftRear = "TireTemperatureLeftRear";
+const VehicleProperty::Property VehicleProperty::TireTemperatureRightRear = "TireTemperatureRightRear";
 const VehicleProperty::Property VehicleProperty::VehiclePowerMode = "VehiclePowerMode";
 const VehicleProperty::Property VehicleProperty::TripMeterA = "TripMeterA";
 const VehicleProperty::Property VehicleProperty::TripMeterB = "TripMeterB";
@@ -77,6 +85,13 @@ const VehicleProperty::Property VehicleProperty::InteriorLightDriver = "Interior
 const VehicleProperty::Property VehicleProperty::InteriorLightCenter = "InteriorLightCenter";
 const VehicleProperty::Property VehicleProperty::InteriorLightPassenger = "InteriorLightPassenger";
 const VehicleProperty::Property VehicleProperty::EngineLoad = "EngineLoad";
+const VehicleProperty::Property VehicleProperty::Horn = "Horn";
+const VehicleProperty::Property VehicleProperty::FuelLevel = "FuelLevel";
+const VehicleProperty::Property VehicleProperty::FuelConsumption = "FuelConsumption";
+const VehicleProperty::Property VehicleProperty::FuelRange = "FuelRange";
+const VehicleProperty::Property VehicleProperty::FuelEconomy = "FuelEconomy";
+const VehicleProperty::Property VehicleProperty::FuelAverageEconomy = "FuelAverageEconomy";
+const VehicleProperty::Property VehicleProperty::EngineOilRemaining = "EngineOilRemaining";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 
@@ -93,6 +108,8 @@ VehicleProperty::VehicleProperty()
 	registerProperty(TurnSignal, [](){ return new TurnSignalType(TurnSignals::Off); });
 	registerProperty(ClutchStatus, [](){ return new ClutchStatusType(false); });
 	registerProperty(EngineOilPressure, [](){ return new EngineOilPressureType(0); });
+	registerProperty(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
+	REGISTERPROPERTY(EngineOilRemaining,0);
 	registerProperty(EngineCoolantTemperature, [](){ return new EngineCoolantTemperatureType(0); });
 	registerProperty(MachineGunTurretStatus, [](){ return new MachineGunTurretStatusType(false); });
 	registerProperty(AccelerationX, [](){ return new AccelerationType(0); });
@@ -100,15 +117,19 @@ VehicleProperty::VehicleProperty()
 	registerProperty(AccelerationZ, [](){ return new AccelerationType(0); });
 	registerProperty(MassAirFlow, [](){ return new MassAirFlowType(0); });
 	registerProperty(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
+	REGISTERPROPERTY(AirIntakeTemperature,0)
 	registerProperty(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
 	registerProperty(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
-	registerProperty(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
 	registerProperty(VIN, [](){ return new VINType(""); });
 	registerProperty(WMI, [](){ return new WMIType(""); });
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftFront, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureRightFront, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftRear, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureRightRear, TirePressureType, 0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftFront,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureRightFront,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftRear,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureRightRear,TireTemperatureType,0);
 	registerProperty( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
 	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
@@ -127,6 +148,14 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(InteriorLightPassenger, LightStatusType, false);
 	REGISTERPROPERTYWITHTYPE(InteriorLightCenter, LightStatusType, false);
 	REGISTERPROPERTY(EngineLoad,0);
+	REGISTERPROPERTY(Horn,false);
+	REGISTERPROPERTY(FuelLevel, 0);
+	REGISTERPROPERTY(FuelRange, 0);
+	REGISTERPROPERTY(FuelConsumption, 0);
+	REGISTERPROPERTY(FuelEconomy, 0);
+	REGISTERPROPERTY(FuelAverageEconomy, 0);
+
+
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
@@ -136,7 +165,6 @@ std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 
 AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(VehicleProperty::Property name, std::string value)
 {
-
 	if(registeredPropertyFactoryMap.count(name) > 0)
 	{
 		VehicleProperty::PropertyTypeFactoryCallback cb = registeredPropertyFactoryMap[name];
@@ -157,6 +185,12 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 
 void VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
 {
+	if(ListPlusPlus<Property>(&mCapabilities).contains(name))
+	{
+		DebugOut(0)<<__FUNCTION__<<" ERROR: property '"<<name<<"'' already registered."<<endl;
+		return;
+	}
+
 	registeredPropertyFactoryMap[name] = factory;
 	mCapabilities.push_back(name);
 }
