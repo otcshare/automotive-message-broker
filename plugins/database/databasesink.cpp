@@ -136,10 +136,38 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	std::vector<std::vector<string>> data = db->select(query.str());
 
+	std::list<AbstractPropertyType*> cleanup;
+
 	for(auto i=0;i<data.size();i++)
 	{
-		for(auto n=0;n<data[i].size();n++)
-			cout<<"Data: "<<data[i][n]<<endl;
+		if(data[i].size() != 5)
+			continue;
+
+		DBObject dbobj;
+		dbobj.key = data[i][0];
+		dbobj.value = data[i][1];
+		dbobj.source = data[i][2];
+		dbobj.time = boost::lexical_cast<double>(data[i][3]);
+		dbobj.sequence = boost::lexical_cast<double>(data[i][4]);
+
+		AbstractPropertyType* property = VehicleProperty::getPropertyTypeForPropertyNameValue(dbobj.key,dbobj.value);
+		if(property)
+		{
+			property->timestamp = dbobj.time;
+			property->sequence = dbobj.sequence;
+
+			reply->values.push_back(property);
+			cleanup.push_back(property);
+		}
+	}
+
+	reply->success = true;
+	reply->completed(reply);
+
+	/// reply is owned by the requester of this call.  we own the data:
+	for(auto itr = cleanup.begin(); itr != cleanup.end(); itr++)
+	{
+		delete *itr;
 	}
 
 	delete db;

@@ -99,6 +99,10 @@ public:
 	{
 		db = new BaseDB;
 	}
+	~Shared()
+	{
+		delete db;
+	}
 
 	BaseDB * db;
 	Queue<DBObject*> queue;

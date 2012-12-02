@@ -68,7 +68,8 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 		std::list<AbstractPropertyType*> values = reply->values;
 		for(auto itr = values.begin(); itr != values.end(); itr++)
 		{
-			DebugOut(0)<<"Velocity value from last week: "<<(*itr)->toString()<<" time: "<<(*itr)->timestamp<<endl;
+			auto val = *itr;
+			DebugOut(0)<<"Velocity value from past: "<<val->toString()<<" time: "<<val->timestamp<<endl;
 		}
 	};
 
