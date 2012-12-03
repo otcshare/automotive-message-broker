@@ -123,15 +123,20 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		printf("Got property:%s\n",reply->value->toString().c_str());
 		//uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
-
+		s.precision(15);
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		string tmpstr = "";
 		tmpstr = property;
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\"}],\"transactionid\":\"" << id << "\"}";
+
+		/// TODO: timestamp and sequence need to be inside the "data" object:
+
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"property\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString()
+		  << "\"}],\"transactionid\":\"" << id << "\", \"timestamp\" : \""<<reply->value->timestamp<<"\", "
+		  <<"\"sequence\": \""<<reply->value->sequence<<"\" }";
 
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << endl;
 
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -198,7 +203,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 				data<<",";
 			}
 
-			data << "{ \"value\" : " << "\"" << (*itr)->toString() << "\", \"time\" : \"" << (*itr)->timestamp << "\" }";
+			data << "{ \"value\" : " << "\"" << (*itr)->toString() << "\", \"timestamp\" : \"" << (*itr)->timestamp << "\", \"sequence\" : \""<<(*itr)->sequence<<"\" }";
 		}
 
 		data<<"]";

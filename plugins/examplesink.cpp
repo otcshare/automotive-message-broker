@@ -34,9 +34,26 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 
+}
+
+
+PropertyList ExampleSink::subscriptions()
+{
+
+}
+
+void ExampleSink::supportedChanged(PropertyList supportedProperties)
+{
+	printf("Support changed!\n");
+	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
+	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
+
 	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
-	velocityRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+	velocityRequest.completed = [](AsyncPropertyReply* reply)
+	{
+		DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; delete reply;
+	};
 
 	routingEngine->getPropertyAsync(velocityRequest);
 
@@ -75,19 +92,6 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 
 	routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);
 
-}
-
-
-PropertyList ExampleSink::subscriptions()
-{
-
-}
-
-void ExampleSink::supportedChanged(PropertyList supportedProperties)
-{
-	printf("Support changed!\n");
-	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
-	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 }
 
 void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)

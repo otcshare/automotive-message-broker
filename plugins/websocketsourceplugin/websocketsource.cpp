@@ -162,14 +162,16 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			JsonParser* parser = json_parser_new();
 			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
 			{
-				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON"<<endl;
+				DebugOut(0) << (char*)in <<endl;
+				DebugOut(0) <<error->message<<endl;
 				return 0;
 			}
 
 			JsonNode* node = json_parser_get_root(parser);
 			if(node == nullptr)
 			{
-				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json"<<endl;
 				//throw std::runtime_error("Unable to get JSON root object");
 				return 0;
 			}
@@ -177,7 +179,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			JsonReader* reader = json_reader_new(node);
 			if(reader == nullptr)
 			{
-				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!\n";
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!"<<endl;
 				//throw std::runtime_error("Unable to create JSON reader");
 				return 0;
 			}
@@ -290,6 +292,19 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			}
 			json_reader_end_member(reader);
 
+			uint32_t sequence=0;
+			json_reader_read_member(reader,"sequence");
+			if(const GError* err = json_reader_get_error(reader))
+			{
+				DebugOut(0)<<"JSON Parsing error: no sequence parameter: "<<err->message<<endl;
+				//g_error_free(err);
+			}
+			else
+			{
+				sequence = atof(json_reader_get_string_value(reader));
+			}
+			json_reader_end_member(reader);
+
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
 			//if(error) g_error_free(error);
@@ -308,6 +323,8 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				try
 				{
 					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front());
+					type->timestamp = timestamp;
+					type->sequence = sequence;
 					m_re->updateProperty(name, type, source->uuid());
 
 					double currenttime = amb::currentTime();
@@ -334,7 +351,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				if (name == "getSupportedEventTypes")
 				{
 					//printf("Got supported events!\n");
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupportedEventTypes request\n";
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupportedEventTypes request"<<endl;
 					PropertyList props;
 					while (data.size() > 0)
 					{
@@ -349,7 +366,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				else if (name == "get")
 				{
 					
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size();
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
 					while (pairdata.size() > 0)
 					{
 						pair<string,string> pair = pairdata.front();
@@ -357,6 +374,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						if (source->propertyReplyMap.find(pair.first) != source->propertyReplyMap.end())
 						{
 							AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(source->propertyReplyMap[pair.first]->property,pair.second);
+							v->timestamp = timestamp;
 							source->propertyReplyMap[pair.first]->value = v;
 							source->propertyReplyMap[pair.first]->completed(source->propertyReplyMap[pair.first]);
 							source->propertyReplyMap.erase(pair.first);
@@ -457,7 +475,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	stringstream s;  
 	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
 	string replystr = s.str();
-	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr <<endl;
 	//printf("Reply: %s\n",replystr.c_str());
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
