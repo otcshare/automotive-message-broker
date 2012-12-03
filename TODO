@@ -1,9 +1,3 @@
-- test for memory leaks in websocket sink plugin
-- test websocket source getProperty methods and setProperty
 - per-source property filtering in routing engine
-- historic data "get" interface in routing engine
-- sqlite database storage plugin
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
-- timestamp on property get/update operations
-- squence on property get/update operation
-- getSupported websocket call should only return supported not capabilities
+- websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false
