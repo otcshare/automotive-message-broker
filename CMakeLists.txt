@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.5.0")
+set(PROJECT_VERSION "0.6.0")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
@@ -19,6 +19,10 @@ set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE P
 option(use_qtcore "Use QCoreApplication mainloop " OFF)
 option(tpms_plugin "TPMS plugin " OFF)
 option(obd2_plugin "OBD-II plugin" ON)
+<<<<<<< HEAD
+=======
+option(database_plugin "Database plugins" OFF)
+>>>>>>> release
 
 find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")

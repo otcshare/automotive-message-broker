@@ -36,7 +36,7 @@ public:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
 	void updateSupported(PropertyList added, PropertyList removed);
-	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value);
+	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, string uuid);
 	
 	/// sinks:
 	
@@ -61,6 +61,8 @@ private:
 	int propertiesPerSecond;
 	
 	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
+
+	std::map<VehicleProperty::Property, std::string> previousValueMap;
     
 };
 

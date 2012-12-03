@@ -18,7 +18,11 @@
 
 
 #include "vehicleproperty.h"
+#include "listplusplus.h"
+#include "debugout.h"
+
 #include <map>
+
 
 #define REGISTERPROPERTY(property, defaultValue) \
 	registerProperty(property, []() { return new property ## Type(defaultValue); });
@@ -113,6 +117,7 @@ VehicleProperty::VehicleProperty()
 	registerProperty(AccelerationZ, [](){ return new AccelerationType(0); });
 	registerProperty(MassAirFlow, [](){ return new MassAirFlowType(0); });
 	registerProperty(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
+	REGISTERPROPERTY(AirIntakeTemperature,0)
 	registerProperty(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
 	registerProperty(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
 	registerProperty(VIN, [](){ return new VINType(""); });
@@ -178,6 +183,12 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 
 void VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
 {
+	if(ListPlusPlus<Property>(&mCapabilities).contains(name))
+	{
+		DebugOut(0)<<__FUNCTION__<<" ERROR: property '"<<name<<"'' already registered."<<endl;
+		return;
+	}
+
 	registeredPropertyFactoryMap[name] = factory;
 	mCapabilities.push_back(name);
 }

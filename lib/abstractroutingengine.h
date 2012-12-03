@@ -38,17 +38,6 @@ class AsyncRangePropertyReply;
 typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
 typedef std::function<void (AsyncRangePropertyReply*)> GetRangedPropertyCompletedSignal;
 
-class PropertyValueTime {
-public:
-	~PropertyValueTime()
-	{
-		delete value;
-	}
-
-	AbstractPropertyType* value;
-	double timestamp;
-};
-
 class AsyncPropertyRequest
 {
 public:
@@ -111,7 +100,7 @@ class AsyncRangePropertyRequest
 {
 public:
 	AsyncRangePropertyRequest()
-		:begin(0), end(0)
+		:timeBegin(0), timeEnd(0), sequenceBegin(-1), sequenceEnd(-1)
 	{
 
 	}
@@ -121,14 +110,18 @@ public:
 	{
 		this->property = request.property;
 		this->completed = request.completed;
-		this->begin = request.begin;
-		this->end = request.end;
+		this->timeBegin = request.timeBegin;
+		this->timeEnd = request.timeEnd;
+		this->sequenceBegin = request.sequenceBegin;
+		this->sequenceEnd = request.sequenceEnd;
 	}
 
 	VehicleProperty::Property property;
 	GetRangedPropertyCompletedSignal completed;
-	double begin;
-	double end;
+	double timeBegin;
+	double timeEnd;
+	int32_t sequenceBegin;
+	int32_t sequenceEnd;
 };
 
 class AsyncRangePropertyReply: public AsyncRangePropertyRequest
@@ -150,7 +143,7 @@ public:
 		values.clear();
 	}
 
-	std::list<PropertyValueTime*> values;
+	std::list<AbstractPropertyType*> values;
 	bool success;
 };
 
@@ -159,7 +152,7 @@ class AbstractRoutingEngine
 public:
 	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
 	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
-	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value) = 0;
+	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid) = 0;
 
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;
@@ -170,6 +163,7 @@ public:
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual PropertyList supported() = 0;
+
 };
 
 #endif // ABSTRACTROUTINGENGINE_H

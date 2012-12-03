@@ -35,10 +35,18 @@ class AbstractSource;
 
 typedef list<AbstractSource*> SourceList;
 
+
+
 class AbstractSource: public AbstractSink
 {
 
 public:
+	enum Operations {
+		Get = 0x01,
+		Set = 0x02,
+		GetRanged = 0x04
+	};
+
 	AbstractSource(AbstractRoutingEngine* engine, map<string, string> config);
 	virtual ~AbstractSource();
 	
@@ -50,6 +58,8 @@ public:
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 	virtual PropertyList supported() = 0;
+
+	virtual int supportedOperations() = 0;
 	
 
 protected:

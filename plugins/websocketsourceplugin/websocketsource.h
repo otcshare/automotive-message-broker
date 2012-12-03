@@ -40,6 +40,9 @@ public:
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
+
+	int supportedOperations();
+
 	libwebsocket *clientsocket;
 	PropertyList queuedRequests;
 	bool clientConnected;
@@ -50,6 +53,7 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(map<string, string> config);
+	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 
 private:
   	PropertyList m_supportedProperties;

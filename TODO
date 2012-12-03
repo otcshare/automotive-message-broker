@@ -1,6 +1,5 @@
-- test for memory leaks in websocket sink plugin
-- implement websocket source getProperty methods and setProperty
 - per-source property filtering in routing engine
+<<<<<<< HEAD
 - historic data "get" interface in routing engine
 - sqlite database storage plugin
 - connect/disconnect on first/last subscription in obd2source
@@ -10,3 +9,6 @@
 - fix issue regarding obd2 thread loop not exiting sometimes
 - optimize CPU performance in obd2source
 - obd2source blacklist unsupported: persistent blacklist mapped to VIN?
+=======
+- websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false
+>>>>>>> release

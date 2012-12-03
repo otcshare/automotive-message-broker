@@ -52,6 +52,10 @@ void WebSocketSinkManager::init()
 
 	setConfiguration(configuration);
 }
+list< VehicleProperty::Property > WebSocketSinkManager::getSupportedProperties()
+{
+	return m_engine->supported();
+}
 void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
@@ -119,15 +123,20 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		printf("Got property:%s\n",reply->value->toString().c_str());
 		//uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
-
+		s.precision(15);
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		string tmpstr = "";
 		tmpstr = property;
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"name\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\"}],\"transactionid\":\"" << id << "\"}";
+
+		/// TODO: timestamp and sequence need to be inside the "data" object:
+
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"property\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString()
+		  << "\"}],\"transactionid\":\"" << id << "\", \"timestamp\" : \""<<reply->value->timestamp<<"\", "
+		  <<"\"sequence\": \""<<reply->value->sequence<<"\" }";
 
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << endl;
 
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -147,8 +156,8 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 {
 	AsyncRangePropertyRequest rangedRequest;
 
-	rangedRequest.begin = start;
-	rangedRequest.end = end;
+	rangedRequest.timeBegin = start;
+	rangedRequest.timeEnd = end;
 
 	if (property == "running_status_speedometer")
 	{
@@ -186,7 +195,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		stringstream data ("[");
-		std::list<PropertyValueTime*> values = reply->values;
+		std::list<AbstractPropertyType*> values = reply->values;
 		for(auto itr = values.begin(); itr != values.end(); itr++)
 		{
 			if(itr != values.begin())
@@ -194,7 +203,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 				data<<",";
 			}
 
-			data << "{ \"value\" : " << "\"" << (*itr)->value->toString() << "\", \"time\" : \"" << (*itr)->timestamp << "\" }";
+			data << "{ \"value\" : " << "\"" << (*itr)->toString() << "\", \"timestamp\" : \"" << (*itr)->timestamp << "\", \"sequence\" : \""<<(*itr)->sequence<<"\" }";
 		}
 
 		data<<"]";
@@ -625,7 +634,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						//Send what properties we support
 						typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
-						PropertyList foo = VehicleProperty::capabilities();
+						
+						PropertyList foo = sinkManager->getSupportedProperties();
 						PropertyList::const_iterator i=foo.cbegin();
 						while (i != foo.cend())
 						{
@@ -654,7 +664,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						}
 						else
 						{
-							PropertyList foo = VehicleProperty::capabilities();
+							PropertyList foo = sinkManager->getSupportedProperties();
 							if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
 							{
 								//sinkManager->addSingleShotSink(wsi,data.front(),id);

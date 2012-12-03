@@ -26,17 +26,27 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
 #include <type_traits>
+#include "timestamp.h"
 
 class AbstractPropertyType
 {
 public:
-	virtual std::string toString() = 0;
+	AbstractPropertyType(): timestamp(0), sequence(0) {}
+
+	virtual std::string toString() const = 0;
 
 	virtual void fromString(std::string)= 0;
+
+	virtual AbstractPropertyType* copy() = 0;
+
+	double timestamp;
+
+	uint32_t sequence;
 
 	void setValue(boost::any val)
 	{
 		mValue = val;
+		timestamp = amb::currentTime();
 	}
 
 	template <typename T>
@@ -86,6 +96,11 @@ public:
 		else throw std::runtime_error("value cannot be empty");
 	}
 
+	AbstractPropertyType* copy()
+	{
+		return new BasicPropertyType<T>(*this);
+	}
+
 	void fromString(std::string val)
 	{
 		if(!val.empty() && val != "")
@@ -94,7 +109,7 @@ public:
 		}
 	}
 
-	std::string toString()
+	std::string toString() const
 	{
 		std::stringstream stream;
 		stream<<value<T>();
@@ -150,8 +165,12 @@ public:
 		setValue(val);
 	}
 
+	AbstractPropertyType* copy()
+	{
+		return new StringPropertyType(*this);
+	}
 
-	std::string toString()
+	std::string toString() const
 	{
 		return value<std::string>();
 	}
