@@ -70,33 +70,6 @@ public:
 	typedef std::vector<unsigned char> ByteArray;
 	Obd2Amb()
 	{
-<<<<<<< HEAD
-		propertyPidMap[VehicleProperty::VehicleSpeed] = "010D1\r";
-		propertyPidMap[VehicleProperty::EngineSpeed] = "010C1\r";
-		propertyPidMap[VehicleProperty::MassAirFlow] = "01101\r";
-		propertyPidMap[VehicleProperty::AirIntakeTemperature] = "010F1\r";
-		propertyPidMap[VehicleProperty::ThrottlePosition] = "01111\r";
-		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
-		propertyPidMap[VehicleProperty::EngineCoolantTemperature]  = "01051\r";
-		propertyPidMap[VehicleProperty::BatteryVoltage] = "ATRV\r";
-		propertyPidMap[VehicleProperty::EngineLoad] = "01041/r";
-		propertyPidMap[VehicleProperty::VIN] = "0902/r";
-		propertyPidMap[VehicleProperty::WMI] = "0902/r";
-		propertyPidMap[VehicleProperty::EngineOilTemperature] = "015C1\r";
-		propertyPidMap[VehicleProperty::InteriorTemperature] = "01461\r";
-		propertyPidMap[VehicleProperty::FuelConsumption] = "01101\r";
-
-
-		propertyConversionMap[VehicleProperty::VehicleSpeed] = [](std::string input)
-		{
-			///velocity is used in other equations.  We'll save it off in a static variable:
-			stringstream vssConvert(input);
-
-			vssConvert>>velocity;
-
-			return input;
-		};
-=======
 		supportedPidsList.push_back(new VehicleSpeedPid());
 		supportedPidsList.push_back(new EngineSpeedPid());
 		supportedPidsList.push_back(new MassAirFlowPid());
@@ -106,7 +79,6 @@ public:
 		supportedPidsList.push_back(new EngineCoolantPid());
 		supportedPidsList.push_back(new AirIntakeTemperaturePid());
 	}
->>>>>>> release
 
 	~Obd2Amb()
 	{
@@ -145,19 +117,7 @@ public:
 		return NULL;
 	}
 
-<<<<<<< HEAD
-
-
-	map<VehicleProperty::Property, ConversionFunction> propertyConversionMap;
-	map<VehicleProperty::Property, std::string> propertyPidMap;
-
-private:
-
-	static uint16_t velocity;
-	static double fuelConsumptionOldTime;
-=======
 	std::list<ObdPid*> supportedPidsList;
->>>>>>> release
 };
 
 class OBD2Source : public AbstractSource
