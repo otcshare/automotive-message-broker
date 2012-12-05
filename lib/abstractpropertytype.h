@@ -71,6 +71,7 @@ class BasicPropertyType: public AbstractPropertyType
 {
 public:
 	BasicPropertyType(BasicPropertyType const &other)
+		:AbstractPropertyType()
 	{
 		setValue(other.value<T>());
 	}
@@ -88,6 +89,7 @@ public:
 	}
 
 	BasicPropertyType(std::string val)
+		:AbstractPropertyType()
 	{
 		if(!val.empty() && val != "")
 		{
@@ -150,6 +152,7 @@ public:
 	}
 
 	StringPropertyType(StringPropertyType const & other)
+	:AbstractPropertyType()
 	{
 		setValue(other.value<std::string>());
 	}

@@ -88,7 +88,7 @@ public:
 	std::string value;
 	std::string source;
 	double time;
-	uint32_t sequence;
+	int32_t sequence;
 	bool quit;
 };
 
