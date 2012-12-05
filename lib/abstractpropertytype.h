@@ -31,7 +31,7 @@
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(): timestamp(0), sequence(0) {}
+	AbstractPropertyType(): timestamp(-1), sequence(-1) {}
 
 	virtual std::string toString() const = 0;
 
@@ -41,7 +41,7 @@ public:
 
 	double timestamp;
 
-	uint32_t sequence;
+	int32_t sequence;
 
 	void setValue(boost::any val)
 	{

@@ -21,7 +21,7 @@
 #include "abstractroutingengine.h"
 #include "debugout.h"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <glib.h>
 
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
@@ -33,6 +33,8 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 {
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
+
+	supportedChanged(routingEngine->supported());
 
 }
 
@@ -75,23 +77,31 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 	routingEngine->getPropertyAsync(batteryVoltageRequest);
 
-	AsyncRangePropertyRequest vehicleSpeedFromLastWeek;
-
-	vehicleSpeedFromLastWeek.timeBegin = 1354233906.54099;
-	vehicleSpeedFromLastWeek.timeEnd = 1354234153.03318;
-	vehicleSpeedFromLastWeek.property = VehicleProperty::VehicleSpeed;
-	vehicleSpeedFromLastWeek.completed = [](AsyncRangePropertyReply* reply)
+	auto getRangedCb = [](gpointer data)
 	{
-		std::list<AbstractPropertyType*> values = reply->values;
-		for(auto itr = values.begin(); itr != values.end(); itr++)
+		AbstractRoutingEngine* routingEngine = (AbstractRoutingEngine*)data;
+
+		AsyncRangePropertyRequest vehicleSpeedFromLastWeek;
+
+		vehicleSpeedFromLastWeek.timeBegin = amb::currentTime() - 10;
+		vehicleSpeedFromLastWeek.timeEnd = amb::currentTime();
+		vehicleSpeedFromLastWeek.property = VehicleProperty::VehicleSpeed;
+		vehicleSpeedFromLastWeek.completed = [](AsyncRangePropertyReply* reply)
 		{
-			auto val = *itr;
-			DebugOut(0)<<"Velocity value from past: "<<val->toString()<<" time: "<<val->timestamp<<endl;
-		}
+			std::list<AbstractPropertyType*> values = reply->values;
+			for(auto itr = values.begin(); itr != values.end(); itr++)
+			{
+				auto val = *itr;
+				DebugOut(0)<<"Velocity value from past: "<<val->toString()<<" time: "<<val->timestamp<<endl;
+			}
+		};
+
+		routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);
+
+		return 0;
 	};
 
-	routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);
-
+	g_timeout_add(10000, getRangedCb, routingEngine);
 }
 
 void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
