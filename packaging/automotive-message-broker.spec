@@ -6,7 +6,7 @@ Group:      System Environment/Daemons
 License:    LGPL v2.1
 URL:        https://github.com/otcshare/automotive-message-broker
 Source0:    %{name}-%{version}.tar.bz2
-Source01: ambd
+Source100: ambd
 Requires: automotive-message-broker-plugins
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
