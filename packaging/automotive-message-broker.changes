@@ -1,3 +1,6 @@
+* Fri Dec  7 23:25:26 UTC 2012 - tracy.graydon@intel.com
+- Add libuuid-devel dep and a couple of minor spec changes to fix build issue 
+
 * Thu Dec 06 2012 tripzero <kevron_m_rees@linux.intel.com> b1870c5
 - version bump and install sysvinit
 - uuidhelper
