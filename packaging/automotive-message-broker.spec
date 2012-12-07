@@ -64,7 +64,7 @@ ln -s ../ambd.service %{buildroot}%{_libdir}/systemd/system/network.target.wants
 #hack because systemd isn't in the image:
 
 mkdir -p %{buildroot}/etc/rc.d/init.d
-cp ambd %{buildroot}/etc/rc.d/init.d/ambd
+cp %{Source100} %{buildroot}/etc/rc.d/init.d/ambd
 mkdir -p %{buildroot}/etc/rc.d/rc3.d
 ln -s ../init.d/ambd %{buildroot}/etc/rc.d/rc3.d/S62ambd
 mkdir -p %{buildroot}/etc/rc.d/rc5.d
