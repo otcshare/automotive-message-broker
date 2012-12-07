@@ -1,3 +1,64 @@
+* Thu Dec 06 2012 tripzero <kevron_m_rees@linux.intel.com> b1870c5
+- version bump and install sysvinit
+- uuidhelper
+- fixed initiation of sequence and timestamp defaults
+- example requests ranged from 10s ago after 10s timeout
+- do not blow up if baud is empty
+- version bump 0.6.0
+- fixed tpms plugin
+- Updated todo
+- worked out some bugs with websocket source and sink
+- getRanged works with database sink
+- database plugin works
+- set precision before writing to debug
+- refactored how timestamp and sequence are stored: moved to AbstractProperty
+- fixed merge
+- Merge branch 'malcom'
+- register air intake
+- Change so websocketsink now reports the proper list of supported properties
+- Fix for WMI pid being returned as true when engine coolant temp is selected
+- fixed potential Obd2Amb bug
+- Change for updateProperty shouldn't be called if there is a pending reply
+- check for property changed in core, but don't use right now
+- Change so getPropertyAsync is properly replied to in obd2source
+- fixed currenttime bugs
+- added multisource test script in examples and added --log option
+- worked some debug messages
+- added air intake temp property to obd2source
+- Fix for CopyMe<T> having an error in its constructor paramter
+- Change so re-subscribing to a pid, removes it from the blacklist if it has been tagged as invalid
+- Change for blacklisting OBD2 pids that return NODATA
+- Change for debugging random disconnects
+- Addition for using the bluez bluetooth disconnect feature when OBD disconnects
+- added disconnect call to bluetooth
+- Change so BT rfcomm port name is re-reqested every time a connect is requested
+- register OBD2Connect property
+- Change for removing extra debug output, and fixing disconnect on device removal
+- Fix for an issue where a NODATA response from an OBD2 tool would cause a disconnect
+- Addition of feature to disconnect from OBD port on failure, and reconnect only on new incoming subscriptions
+- Addition of getPropertyAsync and setProperty support through websocketsource
+- Addition of getPropertyAsync and setProperty support through websocketsource
+- initial sequence and timestamp support
+- fixed tryParse returning false issue
+- stub databasekink
+- Fix copy/paste issue preventing OBD2Source from supporting Engine Speed
+- endl
+- Fix for high CPU usage due to change in how updateProperties was called
+- clean up sources and sinks
+- Addition of method for shutting down OBD thread upon closure
+- fixed example config
+- enabled obd2 by default for now
+- fixed include
+- Addition of disconnect on last unsubscribe and extra debugging
+- Continuation of Kevron's refactoring, including connect on first subscribe
+- initial placeholder for database plugin
+- Update plugins/obd2plugin/README
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- updated obd2source readme
+- start of obd2 refactoring
+- fixed todo merge
+- todo updated
+
 * Mon Dec 03 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20121112.191808@cbfefb5
 - version bump in spec
 - version bump 0.6.0
