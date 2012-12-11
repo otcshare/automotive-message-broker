@@ -56,14 +56,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re): f_crea
 		throw std::runtime_error("Unable to create JSON reader");
 	
 	DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
-	
-	gchar** members = json_reader_list_members(reader);
-	
-	for(int i=0; i< json_reader_count_members(reader); i++)
-	{
-		cout<<"member: "<<members[i]<<endl;
-	}
-	
+		
 	json_reader_read_member(reader,"sources");
 	
 	const GError * srcReadError = json_reader_get_error(reader);

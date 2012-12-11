@@ -8,7 +8,8 @@
 	"sinks": [
 		{
 			"name" : "Database",
-			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
+			"properties" : "{ 'properties' : ['VehicleSpeed'] }"
 		},
 		{
 			"name" : "Example Sink",
