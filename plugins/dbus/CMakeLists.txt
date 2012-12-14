@@ -12,3 +12,5 @@ target_link_libraries(dbussinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${lin
 
 install (TARGETS dbussinkplugin LIBRARY DESTINATION lib/automotive-message-broker)
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/amb.conf DESTINATION /etc/dbus-1/system.d )
+
+add_subdirectory(amb-qt)

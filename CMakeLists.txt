@@ -20,6 +20,7 @@ option(use_qtcore "Use QCoreApplication mainloop " OFF)
 option(tpms_plugin "TPMS plugin " OFF)
 option(obd2_plugin "OBD-II plugin" ON)
 option(database_plugin "Database plugins" OFF)
+option(qt_bindings "AMB Qt DBus bindings" OFF)
 
 find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
