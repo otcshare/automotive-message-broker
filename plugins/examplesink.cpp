@@ -61,19 +61,19 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 	AsyncPropertyRequest vinRequest;
 	vinRequest.property = VehicleProperty::VIN;
-	vinRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"VIN Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+	vinRequest.completed = [](AsyncPropertyReply* reply) { DebugOut(1)<<"VIN Async request completed: "<<reply->value->toString()<<endl; delete reply; };
 
 	routingEngine->getPropertyAsync(vinRequest);
 
 	AsyncPropertyRequest wmiRequest;
 	wmiRequest.property = VehicleProperty::WMI;
-	wmiRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"WMI Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+	wmiRequest.completed = [](AsyncPropertyReply* reply) { DebugOut(1)<<"WMI Async request completed: "<<reply->value->toString()<<endl; delete reply; };
 
 	routingEngine->getPropertyAsync(wmiRequest);
 
 	AsyncPropertyRequest batteryVoltageRequest;
 	batteryVoltageRequest.property = VehicleProperty::BatteryVoltage;
-	batteryVoltageRequest.completed = [](AsyncPropertyReply* reply) { DebugOut()<<"BatteryVoltage Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+	batteryVoltageRequest.completed = [](AsyncPropertyReply* reply) { DebugOut(1)<<"BatteryVoltage Async request completed: "<<reply->value->toString()<<endl; delete reply; };
 
 	routingEngine->getPropertyAsync(batteryVoltageRequest);
 
@@ -92,7 +92,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 			for(auto itr = values.begin(); itr != values.end(); itr++)
 			{
 				auto val = *itr;
-				DebugOut(0)<<"Velocity value from past: "<<val->toString()<<" time: "<<val->timestamp<<endl;
+				DebugOut(1)<<"Velocity value from past: "<<val->toString()<<" time: "<<val->timestamp<<endl;
 			}
 		};
 
