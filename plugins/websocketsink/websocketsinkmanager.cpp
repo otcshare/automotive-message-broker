@@ -130,9 +130,11 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 
 		/// TODO: timestamp and sequence need to be inside the "data" object:
 
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":[{\"property\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString()
-		  << "\"}],\"transactionid\":\"" << id << "\", \"timestamp\" : \""<<reply->value->timestamp<<"\", "
-		  <<"\"sequence\": \""<<reply->value->sequence<<"\" }";
+		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":{";
+		s << "\"property\":\"" << tmpstr << "\",\"value\":\"" << reply->value->toString() << "\",\"timestamp\":\""<<reply->value->timestamp<<"\",";
+		s <<"\"sequence\": \""<<reply->value->sequence<<"\"}";
+		s << ",\"transactionid\":\"" << id << "\"}";
+		
 
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
@@ -152,12 +154,14 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 }
 
-void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property, double start, double end, string id)
+void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property, double start, double end, double seqstart,double seqend, string id)
 {
 	AsyncRangePropertyRequest rangedRequest;
 
 	rangedRequest.timeBegin = start;
 	rangedRequest.timeEnd = end;
+	rangedRequest.sequenceBegin = seqstart;
+	rangedRequest.sequenceEnd = seqend;
 
 	if (property == "running_status_speedometer")
 	{
@@ -195,6 +199,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
 		stringstream data ("[");
+		//data << "{ \"property
 		std::list<AbstractPropertyType*> values = reply->values;
 		for(auto itr = values.begin(); itr != values.end(); itr++)
 		{
@@ -208,7 +213,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 
 		data<<"]";
 
-		s << "{\"type\":\"methodReply\",\"name\":\"getHistory\",\"data\":"<<data<<",\"transactionid\":\"" << id << "\"}";
+		s << "{\"type\":\"methodReply\",\"name\":\"getRanged\",\"data\":"<<data<<",\"transactionid\":\"" << id << "\"}";
 
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
@@ -483,48 +488,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			json_reader_read_member(reader,"name");
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
-
-			vector<string> data;
-			list<string> key;
-			list<string> value;
-			json_reader_read_member(reader,"data");
-			if (json_reader_is_array(reader))
-			{
-				for(int i=0; i < json_reader_count_elements(reader); i++)
-				{
-					json_reader_read_element(reader,i);
-					if (json_reader_is_value(reader))
-					{
-						//Raw string value
-						string path = json_reader_get_string_value(reader);
-						data.push_back(path);
-
-					}
-					else
-					{
-						//Not a raw string value, then it's "property/value" kvp, for "set" requests
-						json_reader_read_member(reader,"property");
-						string keystr = json_reader_get_string_value(reader);
-						key.push_back(keystr);
-						json_reader_end_member(reader);
-						json_reader_read_member(reader,"value");
-						string valuestr = json_reader_get_string_value(reader);
-						value.push_back(valuestr);
-						json_reader_end_member(reader);
-					}
-					json_reader_end_element(reader);
-				}
-			}
-			else
-			{
-				string path = json_reader_get_string_value(reader);
-				if (path != "")
-				{
-					data.push_back(path);
-				}
-			}
-			json_reader_end_member(reader);
-
+			
 			string id;
 			json_reader_read_member(reader,"transactionid");
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
@@ -541,6 +505,223 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			}
 			json_reader_end_member(reader);
 
+			
+			if (type == "method" && name == "getRanged")
+			{
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_object(reader))
+				{
+					double timeBegin;
+					double timeEnd;
+					double sequenceBegin;
+					double sequenceEnd;
+					string property;
+					if (json_reader_read_member(reader,"timeBegin"))
+					{
+						timeBegin = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
+						json_reader_end_member(reader);
+					}
+					
+					if (json_reader_read_member(reader,"timeEnd"))
+					{
+						timeEnd = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
+						json_reader_end_member(reader);
+					}
+					if (json_reader_read_member(reader,"sequenceBegin"))
+					{
+						sequenceBegin = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
+						json_reader_end_member(reader);
+					}
+					if (json_reader_read_member(reader,"sequenceEnd"))
+					{
+						sequenceEnd = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
+						json_reader_end_member(reader);
+					}
+					if (json_reader_read_member(reader,"property"))
+					{
+						property = json_reader_get_string_value(reader);
+						json_reader_end_member(reader);
+					}
+					if ((timeBegin < 0 && timeEnd > 0) || (timeBegin > 0 && timeEnd < 0))
+					{
+						//Invalid time begin/end pair
+					}
+					if ((sequenceBegin < 0 && sequenceEnd > 0) || (sequenceBegin > 0 && sequenceEnd < 0))
+					{
+						//Invalid sequence begin/end pair
+					}
+					sinkManager->addSingleShotRangedSink(wsi,property,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
+				}
+				json_reader_end_member(reader);
+			}
+			else
+			{
+
+				vector<string> data;
+				list<string> key;
+				list<string> value;
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_array(reader))
+				{
+					for(int i=0; i < json_reader_count_elements(reader); i++)
+					{
+						json_reader_read_element(reader,i);
+						if (json_reader_is_value(reader))
+						{
+							//Raw string value
+							string path = json_reader_get_string_value(reader);
+							data.push_back(path);
+
+						}
+						else
+						{
+							//Not a raw string value, then it's "property/value" kvp, for "set" requests
+							json_reader_read_member(reader,"property");
+							string keystr = json_reader_get_string_value(reader);
+							key.push_back(keystr);
+							json_reader_end_member(reader);
+							json_reader_read_member(reader,"value");
+							string valuestr = json_reader_get_string_value(reader);
+							value.push_back(valuestr);
+							json_reader_end_member(reader);
+						}
+						json_reader_end_element(reader);
+					}
+				}
+				else
+				{
+					string path = json_reader_get_string_value(reader);
+					if (path != "")
+					{
+						data.push_back(path);
+					}
+				}
+				json_reader_end_member(reader);
+				if (type == "method")
+				{
+					if (name == "get")
+					{
+						if (data.size() > 0)
+						{
+							//GetProperty is going to be a singleshot sink.
+							//string arg = arguments.front();
+							sinkManager->addSingleShotSink(wsi,data.front(),id);
+						}
+						else
+						{
+							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id << "\n";
+						}
+					}
+					else if (name == "set")
+					{
+						if (data.size() > 0)
+						{
+						  //Should not happen
+						}
+						else if (value.size() > 0)
+						{
+							if (key.size() != value.size())
+							{
+								DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "\"set\" method called with an invalid key value pair count\n";
+							}
+							else
+							{
+								list<string>::iterator d = value.begin();
+								for (list<string>::iterator i=key.begin();i!=key.end();i++)
+								{
+									DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "websocketsinkmanager setting" << (*i) << "to" << (*d) << "\n";
+									//(*i);
+									sinkManager->setValue((*i),(*d));
+									//(*d);
+									d++;
+								}
+
+							}
+						}
+					}
+					else if (name == "subscribe")
+					{
+						//Websocket wants to subscribe to an event, data.front();
+						for (auto i=data.begin();i!=data.end();i++)
+						{
+							sinkManager->addSink(wsi,(*i),id);
+						}
+					}
+					else if (name == "unsubscribe")
+					{
+						//Websocket wants to unsubscribe to an event, data.front();
+						for (auto i=data.begin();i!=data.end();i++)
+						{
+							sinkManager->removeSink(wsi,(*i),id);
+						}
+					}
+					else if (name == "getSupportedEventTypes")
+					{
+						//If data.front() dosen't contain a property name, return a list of properties supported.
+						//if it does, then return the event types that particular property supports.
+						string typessupported = "";
+						if (data.size() == 0)
+						{
+							//Send what properties we support
+							typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
+							
+							PropertyList foo = sinkManager->getSupportedProperties();
+							PropertyList::const_iterator i=foo.cbegin();
+							while (i != foo.cend())
+							{
+								typessupported.append(",\"").append((*i)).append("\"");
+								i++;
+							}
+						}
+						else
+						{
+							//Send what events a particular property supports
+							if (data.front()== "running_status_speedometer")
+							{
+								typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+							}
+							else if (data.front()== "running_status_engine_speed")
+							{
+								typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+							}
+							else if (data.front() == "running_status_steering_wheel_angle")
+							{
+								typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+							}
+							else if (data.front() == "running_status_transmission_gear_status")
+							{
+								typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+							}
+							else
+							{
+								PropertyList foo = sinkManager->getSupportedProperties();
+								if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
+								{
+									//sinkManager->addSingleShotSink(wsi,data.front(),id);
+									typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
+								}
+							}
+						}
+						stringstream s;
+						string s2;
+						s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
+						string replystr = s.str();
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr << "\n";
+						//printf("Reply: %s\n",replystr.c_str());
+						char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+						new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+						strcpy(new_response,replystr.c_str());
+						libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+						delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+					}
+					else
+					{
+						DebugOut(0)<<"Unknown method called."<<endl;
+					}
+				}
+			}
+
+			
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
 			//if(error) g_error_free(error);
@@ -549,146 +730,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			g_object_unref(parser);
 
 
-			if (type == "method")
-			{
-				if (name == "get")
-				{
-					if (data.size() > 0)
-					{
-						//GetProperty is going to be a singleshot sink.
-						//string arg = arguments.front();
-						sinkManager->addSingleShotSink(wsi,data.front(),id);
-					}
-					else
-					{
-						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id << "\n";
-					}
-				}
-				else if (name == "set")
-				{
-					if (data.size() > 0)
-					{
-					  //Should not happen
-					}
-					else if (value.size() > 0)
-					{
-						if (key.size() != value.size())
-						{
-							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "\"set\" method called with an invalid key value pair count\n";
-						}
-						else
-						{
-							list<string>::iterator d = value.begin();
-							for (list<string>::iterator i=key.begin();i!=key.end();i++)
-							{
-								DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "websocketsinkmanager setting" << (*i) << "to" << (*d) << "\n";
-								//(*i);
-								sinkManager->setValue((*i),(*d));
-								//(*d);
-								d++;
-							}
-
-						}
-					}
-				}
-				else if (name == "subscribe")
-				{
-					//Websocket wants to subscribe to an event, data.front();
-					for (auto i=data.begin();i!=data.end();i++)
-					{
-						sinkManager->addSink(wsi,(*i),id);
-					}
-				}
-				else if (name == "unsubscribe")
-				{
-					//Websocket wants to unsubscribe to an event, data.front();
-					for (auto i=data.begin();i!=data.end();i++)
-					{
-						sinkManager->removeSink(wsi,(*i),id);
-					}
-				}
-				else if (name == "getHistory")
-				{
-					if(data.size() == 3)
-					{
-						std::string property = data[0];
-						std::string startStr = data[1];
-						std::string endStr = data[2];
-
-						sinkManager->addSingleShotRangedSink(wsi,property,
-															 boost::lexical_cast<double,std::string>(startStr),
-															 boost::lexical_cast<double,std::string>(endStr), id);
-					}
-
-					else
-					{
-						//TODO: error, "invalid arguments" should be sent in reply to this.
-					}
-				}
-				else if (name == "getSupportedEventTypes")
-				{
-					//If data.front() dosen't contain a property name, return a list of properties supported.
-					//if it does, then return the event types that particular property supports.
-					string typessupported = "";
-					if (data.size() == 0)
-					{
-						//Send what properties we support
-						typessupported = "\"running_status_speedometer\",\"running_status_engine_speed\",\"running_status_steering_wheel_angle\",\"running_status_transmission_gear_status\"";
-						
-						PropertyList foo = sinkManager->getSupportedProperties();
-						PropertyList::const_iterator i=foo.cbegin();
-						while (i != foo.cend())
-						{
-							typessupported.append(",\"").append((*i)).append("\"");
-							i++;
-						}
-					}
-					else
-					{
-						//Send what events a particular property supports
-						if (data.front()== "running_status_speedometer")
-						{
-							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
-						}
-						else if (data.front()== "running_status_engine_speed")
-						{
-							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
-						}
-						else if (data.front() == "running_status_steering_wheel_angle")
-						{
-							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
-						}
-						else if (data.front() == "running_status_transmission_gear_status")
-						{
-							typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
-						}
-						else
-						{
-							PropertyList foo = sinkManager->getSupportedProperties();
-							if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
-							{
-								//sinkManager->addSingleShotSink(wsi,data.front(),id);
-								typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
-							}
-						}
-					}
-					stringstream s;
-					string s2;
-					s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
-					string replystr = s.str();
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr << "\n";
-					//printf("Reply: %s\n",replystr.c_str());
-					char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-					new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-					strcpy(new_response,replystr.c_str());
-					libwebsocket_write(wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-					delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
-				}
-				else
-				{
-					DebugOut(0)<<"Unknown method called."<<endl;
-				}
-			}
+			
 			break;
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
