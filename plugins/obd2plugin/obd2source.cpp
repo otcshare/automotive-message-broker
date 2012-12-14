@@ -523,7 +523,8 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		}
 		else if ((*i).first == "baud")
 		{
-			baud = (*i).second;
+			if((*i).second != "")
+				baud = (*i).second;
 		}
 
 		else if ((*i).first == "bluetoothAdapter")

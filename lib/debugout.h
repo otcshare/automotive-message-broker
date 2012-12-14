@@ -36,7 +36,7 @@ public:
 	{
 		ostream out(buf);
 
-		out.precision(5);
+		out.precision(15);
 
 		if(mDebugLevel <= debugThreshhold)
 			 out<<message<<" ";
@@ -47,7 +47,7 @@ public:
 	{
 		ostream out(buf);
 
-		out.precision(5);
+		out.precision(15);
 
 		if(mDebugLevel <= debugThreshhold)
 			 out<<endl;

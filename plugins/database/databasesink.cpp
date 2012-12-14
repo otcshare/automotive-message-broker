@@ -1,6 +1,8 @@
 #include "databasesink.h"
 #include "abstractroutingengine.h"
 
+#include <json-glib/json-glib.h>
+
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new DatabaseSinkManager(routingengine, config);
@@ -14,15 +16,6 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, time REAL, sequence REAL)";
 	shared = new Shared;
 	shared->db->init(databaseName, tablename, tablecreate);
-
-	engine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
-	engine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
-
-	PropertyList props;
-	props.push_back(VehicleProperty::EngineSpeed);
-	props.push_back(VehicleProperty::VehicleSpeed);
-
-	engine->setSupported(supported(),this);
 
 	auto cb = [](gpointer data)
 	{
@@ -61,6 +54,13 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	thread = g_thread_new("dbthread", cb, shared);
 
+	parseConfig();
+
+	for(auto itr=propertiesToSubscribeTo.begin();itr!=propertiesToSubscribeTo.end();itr++)
+	{
+		engine->subscribeToProperty(*itr,this);
+	}
+
 }
 
 DatabaseSink::~DatabaseSink()
@@ -89,6 +89,46 @@ PropertyList DatabaseSink::supported()
 	props.push_back(VehicleProperty::VehicleSpeed);
 
 	return props;
+}
+
+void DatabaseSink::parseConfig()
+{
+	JsonParser* parser = json_parser_new();
+	GError* error = nullptr;
+	if(!json_parser_load_from_data(parser, configuration["properties"].c_str(),configuration["properties"].size(), &error))
+	{
+		DebugOut()<<"Failed to load config: "<<error->message;
+		throw std::runtime_error("Failed to load config");
+	}
+
+	JsonNode* node = json_parser_get_root(parser);
+
+	if(node == nullptr)
+		throw std::runtime_error("Unable to get JSON root object");
+
+	JsonReader* reader = json_reader_new(node);
+
+	if(reader == nullptr)
+		throw std::runtime_error("Unable to create JSON reader");
+
+	json_reader_read_member(reader,"properties");
+
+	g_assert(json_reader_is_array(reader));
+
+	for(int i=0; i < json_reader_count_elements(reader); i++)
+	{
+		json_reader_read_element(reader, i);
+		std::string prop = json_reader_get_string_value(reader);
+		propertiesToSubscribeTo.push_back(prop);
+		json_reader_end_element(reader);
+
+		DebugOut()<<"DatabaseSink logging: "<<prop<<endl;
+	}
+
+	if(error) g_error_free(error);
+
+	g_object_unref(reader);
+	g_object_unref(parser);
 }
 
 void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
@@ -136,10 +176,38 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	std::vector<std::vector<string>> data = db->select(query.str());
 
+	std::list<AbstractPropertyType*> cleanup;
+
 	for(auto i=0;i<data.size();i++)
 	{
-		for(auto n=0;n<data[i].size();n++)
-			cout<<"Data: "<<data[i][n]<<endl;
+		if(data[i].size() != 5)
+			continue;
+
+		DBObject dbobj;
+		dbobj.key = data[i][0];
+		dbobj.value = data[i][1];
+		dbobj.source = data[i][2];
+		dbobj.time = boost::lexical_cast<double>(data[i][3]);
+		dbobj.sequence = boost::lexical_cast<double>(data[i][4]);
+
+		AbstractPropertyType* property = VehicleProperty::getPropertyTypeForPropertyNameValue(dbobj.key, dbobj.value);
+		if(property)
+		{
+			property->timestamp = dbobj.time;
+			property->sequence = dbobj.sequence;
+
+			reply->values.push_back(property);
+			cleanup.push_back(property);
+		}
+	}
+
+	reply->success = true;
+	reply->completed(reply);
+
+	/// reply is owned by the requester of this call.  we own the data:
+	for(auto itr = cleanup.begin(); itr != cleanup.end(); itr++)
+	{
+		delete *itr;
 	}
 
 	delete db;

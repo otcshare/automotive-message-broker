@@ -35,7 +35,7 @@ class WebSocketSinkManager: public AbstractSinkManager
 public:
 	WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
 	void addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id);
-	void addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property,double start, double end, string id);
+	void addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property,double start, double end, double seqstart,double seqend, string id);
 	void addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid);
 	void disconnectAll(libwebsocket* socket);
 	void removeSink(libwebsocket* socket,VehicleProperty::Property property,string uuid);

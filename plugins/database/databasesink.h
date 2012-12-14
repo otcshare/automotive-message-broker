@@ -88,7 +88,7 @@ public:
 	std::string value;
 	std::string source;
 	double time;
-	uint32_t sequence;
+	int32_t sequence;
 	bool quit;
 };
 
@@ -98,6 +98,10 @@ public:
 	Shared()
 	{
 		db = new BaseDB;
+	}
+	~Shared()
+	{
+		delete db;
 	}
 
 	BaseDB * db;
@@ -123,6 +127,10 @@ public:
 	virtual PropertyList supported();
 	int supportedOperations() { return GetRanged; }
 
+private: //methods:
+
+	void parseConfig();
+
 private:
 	PropertyList mSubscriptions;
 	Shared *shared;
@@ -130,6 +138,7 @@ private:
 	std::string databaseName;
 	std::string tablename;
 	std::string tablecreate;
+	std::list<VehicleProperty::Property> propertiesToSubscribeTo;
 };
 
 class DatabaseSinkManager: public AbstractSinkManager

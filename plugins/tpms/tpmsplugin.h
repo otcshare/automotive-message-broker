@@ -42,6 +42,8 @@ public:
 	void supportedChanged(PropertyList) {}
 
     int readValues();
+
+	int supportedOperations() { return Get; }
 	
 private:
 	PropertyList mRequests;

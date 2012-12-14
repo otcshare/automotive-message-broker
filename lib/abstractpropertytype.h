@@ -31,7 +31,7 @@
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(): timestamp(0), sequence(0) {}
+	AbstractPropertyType(): timestamp(-1), sequence(-1) {}
 
 	virtual std::string toString() const = 0;
 
@@ -41,7 +41,7 @@ public:
 
 	double timestamp;
 
-	uint32_t sequence;
+	int32_t sequence;
 
 	void setValue(boost::any val)
 	{
@@ -71,6 +71,7 @@ class BasicPropertyType: public AbstractPropertyType
 {
 public:
 	BasicPropertyType(BasicPropertyType const &other)
+		:AbstractPropertyType()
 	{
 		setValue(other.value<T>());
 	}
@@ -88,6 +89,7 @@ public:
 	}
 
 	BasicPropertyType(std::string val)
+		:AbstractPropertyType()
 	{
 		if(!val.empty() && val != "")
 		{
@@ -150,6 +152,7 @@ public:
 	}
 
 	StringPropertyType(StringPropertyType const & other)
+	:AbstractPropertyType()
 	{
 		setValue(other.value<std::string>());
 	}

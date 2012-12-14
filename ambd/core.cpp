@@ -180,7 +180,11 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::Get)
+		int supportedOps = src->supportedOperations();
+
+		bool supportsGet = supportedOps & AbstractSource::Get;
+
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet)
 		{
 			src->getPropertyAsync(reply);
 		}

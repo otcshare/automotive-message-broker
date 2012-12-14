@@ -66,7 +66,9 @@ void WebSocketSink::propertyChanged(VehicleProperty::Property property, Abstract
 	
 	s.precision(15);
 	
-	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":\"" << value->toString() << "\",\"transactionid\":\"" << m_uuid << "\", \"timestamp\":\""<<value->timestamp<<"\",\"sequence\":\""<<value->sequence<<"\"}";
+	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":";
+	s << "{ \"value\":\"" << value->toString() << "\",\"timestamp\":\""<<value->timestamp<<"\",\"sequence\":\""<<value->sequence<<"\"},";
+	s << "\"transactionid\":\"" << m_uuid << "\"}";
 	
 	string replystr = s.str();
 	//printf("Reply: %s\n",replystr.c_str());
