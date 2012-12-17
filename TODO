@@ -3,3 +3,5 @@
 - websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false
 - enable ssl on websocket by default with option to turn it off
 - investigate and enable use of provisioning in ssl websockets
+- improve tryParse in OBD2source
+

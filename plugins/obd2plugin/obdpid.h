@@ -279,4 +279,54 @@ public:
 	}
 };
 
+class EngineLoadPid: public CopyMe<EngineCoolantPid>
+{
+public:
+	EngineLoadPid()
+		:CopyMe(VehicleProperty::EngineLoad,"01041/r",0x04)
+	{
+
+	}
+
+	bool tryParse(ByteArray replyVector)
+	{
+		ByteArray tmp = compress(cleanup(replyVector));
+
+		if (tmp[1] != id)
+		{
+			return false;
+		}
+
+		int load = tmp[2]*100.0/255.0;
+
+		value = boost::lexical_cast<std::string>(load);
+		return true;
+	}
+};
+
+class ThrottlePositionPid: public CopyMe<ThrottlePositionPid>
+{
+public:
+	ThrottlePositionPid()
+		:CopyMe(VehicleProperty::ThrottlePosition,"01111/r",0x11)
+	{
+
+	}
+
+	bool tryParse(ByteArray replyVector)
+	{
+		ByteArray tmp = compress(cleanup(replyVector));
+
+		if (tmp[1] != id)
+		{
+			return false;
+		}
+
+		int load = tmp[2]*100.0/255.0;
+
+		value = boost::lexical_cast<std::string>(load);
+		return true;
+	}
+};
+
 #endif

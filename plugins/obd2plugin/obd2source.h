@@ -78,6 +78,8 @@ public:
 		supportedPidsList.push_back(new FuelConsumptionPid());
 		supportedPidsList.push_back(new EngineCoolantPid());
 		supportedPidsList.push_back(new AirIntakeTemperaturePid());
+		supportedPidsList.push_back(new EngineLoadPid());
+		supportedPidsList.push_back(new ThrottlePositionPid());
 	}
 
 	~Obd2Amb()
