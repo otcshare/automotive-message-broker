@@ -1,3 +1,5 @@
 - per-source property filtering in routing engine
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
 - websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false
+- enable ssl on websocket by default with option to turn it off
+- investigate and enable use of provisioning in ssl websockets
