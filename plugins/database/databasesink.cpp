@@ -27,6 +27,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 			if( obj->quit )
 			{
+				delete obj;
 				break;
 			}
 
@@ -87,6 +88,7 @@ PropertyList DatabaseSink::supported()
 
 	props.push_back(VehicleProperty::EngineSpeed);
 	props.push_back(VehicleProperty::VehicleSpeed);
+	props.push_back(DatabaseLoggingProperty);
 
 	return props;
 }
@@ -217,6 +219,15 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 {
 	AsyncPropertyReply* reply = new AsyncPropertyReply(request);
 	reply->success = false;
+
+	if(request.property == DatabaseLoggingProperty)
+	{
+		if(request.value->value<bool>())
+		{
+			///TODO: start or stop logging thread
+		}
+	}
+
 	return reply;
 }
 

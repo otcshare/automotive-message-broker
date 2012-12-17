@@ -586,6 +586,8 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
 		m_supportedProperties.push_back((*itr)->property);
 	}
 
+	m_supportedProperties.push_back(Obd2Connect);
+
 	re->setSupported(supported(), this);
 	/*if (openPort(std::string("/dev/pts/7"),115200))
 	{

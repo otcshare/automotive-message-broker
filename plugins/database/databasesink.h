@@ -26,6 +26,8 @@
 
 #include <glib.h>
 
+#define DatabaseLoggingProperty "DatabaseLogging"
+
 template <typename T>
 class Queue
 {
@@ -148,6 +150,7 @@ public:
 	:AbstractSinkManager(engine, config)
 	{
 		new DatabaseSink(routingEngine, config);
+		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new BasicPropertyType<bool>(false);});
 	}
 };
 
