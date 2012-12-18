@@ -112,6 +112,8 @@ void threadLoop(gpointer data)
 	GAsyncQueue *privSingleShotQueue = g_async_queue_ref(((OBD2Source*)data)->singleShotQueue);
 	GAsyncQueue *privSubscriptionAddQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionAddQueue);
 	GAsyncQueue *privSubscriptionRemoveQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionRemoveQueue);
+	GAsyncQueue *privStatusQueue = g_async_queue_ref(((OBD2Source*)data)->statusQueue);
+	
 	obdLib *obd = new obdLib();
 	OBD2Source *source = (OBD2Source*)data;
 
@@ -176,6 +178,10 @@ void threadLoop(gpointer data)
 				}
 				connect(obd,port,baud);
 				connected = true;
+				StatusMessage *statusreq = new StatusMessage();
+				statusreq->statusStr = "connected";
+				g_async_queue_push(privStatusQueue,statusreq);
+				
 			}
 			else if (req->req == "connectifnot")
 			{
@@ -193,6 +199,9 @@ void threadLoop(gpointer data)
 					}
 					connect(obd,port,baud);
 					connected = true;
+					StatusMessage *statusreq = new StatusMessage();
+					statusreq->statusStr = "connected";
+					g_async_queue_push(privStatusQueue,statusreq);
 				}
 			}
 			else if (req->req == "setportandbaud")
@@ -207,6 +216,9 @@ void threadLoop(gpointer data)
 				ObdBluetoothDevice bt;
 				bt.disconnect(source->m_btDeviceAddress, source->m_btAdapterAddress);
 				connected = false;
+				StatusMessage *statusreq = new StatusMessage();
+				statusreq->statusStr = "disconnected";
+				g_async_queue_push(privStatusQueue,statusreq);
 			}
 			delete req;
 		}
@@ -294,6 +306,9 @@ void threadLoop(gpointer data)
 					{
 						source->m_blacklistPidCountMap.insert(pair<std::string,int>((*i)->pid,1));
 					}
+					StatusMessage *statusreq = new StatusMessage();
+					statusreq->statusStr = "error:nodata";
+					g_async_queue_push(privStatusQueue,statusreq);
 					continue;
 				}
 				else if (obd->lastError() == obdLib::TIMEOUT)
@@ -302,6 +317,9 @@ void threadLoop(gpointer data)
 					if (timeoutCount < 2)
 					{
 						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::TIMEOUT for pid" << (*i)->pid << "\n";
+						StatusMessage *statusreq = new StatusMessage();
+						statusreq->statusStr = "error:timeout";
+						g_async_queue_push(privStatusQueue,statusreq);
 						continue;
 					}
 				}
@@ -406,12 +424,29 @@ void threadLoop(gpointer data)
 		obd->closePort();
 	}
 }
-
 static int updateProperties(/*gpointer retval,*/ gpointer data)
 {
 
 	OBD2Source* src = (OBD2Source*)data;
 	
+	
+	StatusMessage *statusreq = new StatusMessage();
+				statusreq->statusStr = "connected";
+				g_async_queue_push(privStatusQueue,statusreq);
+				
+	while (gpointer retval = g_async_queue_try_pop(src->statusQueue))
+	{
+		StatusMessage *reply = (StatusMessage*)retval;
+		if (reply->statusStr == "disconnected")
+		{
+			//TODO: This is where we update Obd2Connected property
+			//src->updateProperty("Obd2Connected",true);
+		}
+		else if (reply->statusStr == "connected")
+		{
+			//TODO: This is where we update Obd2Connected property
+		}
+	}
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{
 		ObdPid *reply = (ObdPid*)retval;
