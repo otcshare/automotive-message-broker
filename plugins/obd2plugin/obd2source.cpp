@@ -432,7 +432,7 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 	
 	StatusMessage *statusreq = new StatusMessage();
 				statusreq->statusStr = "connected";
-				g_async_queue_push(privStatusQueue,statusreq);
+				g_async_queue_push(src->statusQueue,statusreq);
 				
 	while (gpointer retval = g_async_queue_try_pop(src->statusQueue))
 	{
