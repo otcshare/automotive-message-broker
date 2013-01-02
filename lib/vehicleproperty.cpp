@@ -183,16 +183,18 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 	return nullptr;
 }
 
-void VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
+bool VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
 {
 	if(ListPlusPlus<Property>(&mCapabilities).contains(name))
 	{
 		DebugOut(0)<<__FUNCTION__<<" ERROR: property '"<<name<<"'' already registered."<<endl;
-		return;
+		return false;
 	}
 
 	registeredPropertyFactoryMap[name] = factory;
 	mCapabilities.push_back(name);
+
+	return true;
 }
 
 VehicleProperty vehiclePropertyConstruct;

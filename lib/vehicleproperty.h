@@ -303,7 +303,21 @@ public:
 	  */
 	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
 
-	static void registerProperty(Property name, PropertyTypeFactoryCallback factory);
+	/*! registerProperty registers properties with the Vehicle Property system.  Returns true if property
+	 *  has been registered successfully.
+	 *  @param name - name of property.  Name cannot match any existing property or it will be rejected and
+	 *  this method will return false.
+	 *  @param factor - callback function that returns an AbstractPropertyType representation of the value.
+	 *  custom properties will need to return an AbstractPropertyType based object.
+	 *  @example :
+	 *  //In the constructor of a source plugin:
+	 *  ...
+	 *  Property VehicleJetEngineStatus = "VehicleJetEngineStatus";
+	 *  VehicleProperty::registerProperty(VehicleJetEngineStatus, [](){return new BasicPropertyType<bool>(false);});
+	 *  ...
+	 *  //other initialization
+	 */
+	static bool registerProperty(Property name, PropertyTypeFactoryCallback factory);
 
 private:
 
