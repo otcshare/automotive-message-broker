@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDBusInterface>
+#include <QtDebug>
 
 class QDBusInterface;
 
@@ -14,11 +15,18 @@ public:
 
 	QVariant operator()() const
 	{
-		return mInterface->property(mPropertyName.toAscii().data());
+		QVariant value = mInterface->property(mPropertyName.toAscii().data());
+
+		qDebug()<<mInterface->lastError().message();
+
+		return value;
 	}
 
 signals:
 	void propertyChanged(QVariant);
+
+public slots:
+	void propertyChangedSlot(QDBusVariant val);
 
 private:
 	QString mPropertyName;
