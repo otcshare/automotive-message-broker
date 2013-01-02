@@ -47,11 +47,19 @@ Requires:   %{name} = %{version}-%{release}
 %description plugins
 Collection of plugins for automotive-message-broker
 
+%package plugins-database
+Summary:    Database logging plugin for automotive-message-broker
+Group:      System Environment/Daemons  
+Requires:   %{name} = %{version}-%{release}
+
+%description plugins-database
+Database logging plugin for automotive-message-broker
+
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake
+%cmake -Ddatabase_plugin=ON
 
 make %{?jobs:-j%jobs}
 
@@ -97,6 +105,10 @@ ln -s ../init.d/ambd %{buildroot}/etc/rc.d/rc5.d/S62ambd
 %defattr(-,root,root,-)
 %{_libdir}/%{name}/*.so
 /etc/dbus-1/system.d/amb.conf
+
+%files plugins-database
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/databasesinkplugin.so
 
 %files doc
 %defattr(-,root,root,-)
