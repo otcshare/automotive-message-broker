@@ -308,8 +308,11 @@ public:
 	 *  @param name - name of property.  Name cannot match any existing property or it will be rejected and
 	 *  this method will return false.
 	 *  @param factor - callback function that returns an AbstractPropertyType representation of the value.
-	 *  custom properties will need to return an AbstractPropertyType based object.
+	 *  custom properties will need to return a custom AbstractPropertyType based object.
 	 *  @example :
+	 *
+	 *  #include <vehicleproperty.h>
+	 *  #include <abstractpropertytype.h>
 	 *  //In the constructor of a source plugin:
 	 *  ...
 	 *  Property VehicleJetEngineStatus = "VehicleJetEngineStatus";
