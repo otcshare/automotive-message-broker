@@ -18,7 +18,7 @@ BuildRequires:  libtool-ltdl-devel
 BuildRequires:  libuuid-devel
 BuildRequires:  libwebsockets-devel
 BuildRequires:  libuuid-devel
-BuildRequires:  sqlite3-devel
+BuildRequires:  sqlite-devel
 
 %description
 Automotive Message Broker is a vehicle network abstraction system.
@@ -52,7 +52,7 @@ Collection of plugins for automotive-message-broker
 Summary:    Database logging plugin for automotive-message-broker
 Group:      System Environment/Daemons  
 Requires:   %{name} = %{version}-%{release}
-Requires:  sqlite3
+Requires:  sqlite
 
 %description plugins-database
 Database logging plugin for automotive-message-broker
