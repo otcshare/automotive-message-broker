@@ -1,7 +1,7 @@
 Vehicle Information hierarchy
 =================
 
-Service         org.automotive
+Service         org.automotive.message.broker
 Object path     /org/automotive/vehicleInfo/*
 
 

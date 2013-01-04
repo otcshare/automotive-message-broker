@@ -19,4 +19,6 @@ target_link_libraries(amb-qt amb ${QT_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/l
 
 install (TARGETS amb-qt LIBRARY DESTINATION lib)
 
+install (FILES ${ambqt_headers} DESTINATION ${INCLUDE_INSTALL_DIR}/ COMPONENT Devel)
+
 endif(qt_bindings)

@@ -12,17 +12,15 @@ AmbProperty::AmbProperty(QString objectPath, QString interface, QString property
 	if(!mInterface->isValid())
 	{
 		qDebug()<<"Failed to create dbus interface for property "<<propertyName;
+		qDebug()<<"Path: "<<objectPath;
+		qDebug()<<"Interface: "<<interface;
+		qDebug()<<"Error: "<<QDBusConnection::systemBus().lastError().message();
 	}
 
-	QString signalName = "2" + propertyName.toLatin1() + "(QVariant)";
-
-/*	if(!connect(mInterface, signalName.toAscii().data(), this, SIGNAL(propertyChanged(QVariant))))
-	{
-		qDebug()<<"fail fail failed2 to connect to signal";
-	}*/
+	QString signalName = propertyName+"Changed";
 
 
-	if(!QDBusConnection::systemBus().connect("org.automotive.message.broker", objectPath, interface, propertyName, this, SLOT(propertyChangedSlot(QDBusVariant))))
+	if(!QDBusConnection::systemBus().connect("org.automotive.message.broker", objectPath, interface, signalName, this, SLOT(propertyChangedSlot(QDBusVariant,double))))
 	{
 		qDebug()<<"Failed to connect to signal";
 		qDebug()<<"path: "<<objectPath;
@@ -34,7 +32,7 @@ AmbProperty::AmbProperty(QString objectPath, QString interface, QString property
 }
 
 
-void AmbProperty::propertyChangedSlot(QDBusVariant val)
+void AmbProperty::propertyChangedSlot(QDBusVariant val, double ts)
 {
-	propertyChanged(val.variant());
+	propertyChanged(val.variant(), ts);
 }

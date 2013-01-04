@@ -15,18 +15,22 @@ public:
 
 	QVariant operator()() const
 	{
-		QVariant value = mInterface->property(mPropertyName.toAscii().data());
+		if(!mInterface->isValid())
+		{
+			qDebug()<<"error Interface is not valid";
+			return QVariant::Invalid;
+		}
 
-		qDebug()<<mInterface->lastError().message();
+		QVariant value = mInterface->property(mPropertyName.toAscii().data());
 
 		return value;
 	}
 
 signals:
-	void propertyChanged(QVariant);
+	void propertyChanged(QVariant, double);
 
 public slots:
-	void propertyChangedSlot(QDBusVariant val);
+	void propertyChangedSlot(QDBusVariant val, double ts);
 
 private:
 	QString mPropertyName;

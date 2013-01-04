@@ -313,6 +313,7 @@ public:
 	 *
 	 *  #include <vehicleproperty.h>
 	 *  #include <abstractpropertytype.h>
+	 *
 	 *  //In the constructor of a source plugin:
 	 *  ...
 	 *  Property VehicleJetEngineStatus = "VehicleJetEngineStatus";

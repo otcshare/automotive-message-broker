@@ -50,8 +50,9 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 
 	///see which properties are supported:
 	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
-	"<signal name='" + property->name() + "' >"
-	"	<arg type='"+ property->signature() + "' name='" + nameToLower + "' direction='out' />"
+	"<signal name='" + property->name() + "Changed' >"
+	"	<arg type='v' name='" + nameToLower + "' direction='out' />"
+	"	<arg type='d' name='timestamp' direction='out' />"
 	"</signal>";
 	
 	properties[property->name()] = property;
@@ -110,7 +111,17 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	}
 
 	GError *error = NULL;
-	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), property->name().c_str(), g_variant_new("(v)",property->toGVariant()), &error);
+
+	GVariant **params = g_new(GVariant*,2);
+	params[0] = g_variant_new("v",property->toGVariant());
+	params[1] = g_variant_new("d",property->timestamp());
+
+	GVariant *tuple_variant = g_variant_new_tuple(params,2);
+
+	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(), tuple_variant, &error);
+
+	g_free(params);
+	//g_variant_unref(tuple_variant);
 
 	if(error)
 	{

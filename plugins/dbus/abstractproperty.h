@@ -69,9 +69,15 @@ public:
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
-	void setValue(boost::any val)
+	double timestamp()
+	{
+		return mTimestamp;
+	}
+
+	void setValue(boost::any val, double timestmp)
 	{
 		mValue = val;
+		mTimestamp = timestmp;
 		updateValue();
 	}
 
@@ -99,6 +105,7 @@ protected:
 	string mSignature;
 	SetterFunc mSetterFunc;
 	Access mAccess;
+	double mTimestamp;
 	
 	AbstractDBusInterface* mInterface;
 };
