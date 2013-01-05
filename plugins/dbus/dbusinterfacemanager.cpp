@@ -39,9 +39,17 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	AbstractDBusInterface* acceleration = new AccelerationProperty(iface->re, connection);
 	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
 	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);
+	AbstractDBusInterface* engineSpeed = new EngineSpeedProperty(iface->re, connection);
 	ConstructProperty(VehiclePowerModeProperty);
 	ConstructProperty(TripMeterProperty);
 	ConstructProperty(TransmissionProperty);
+	ConstructProperty(TireTemperatureProperty);
+	ConstructProperty(CruiseControlProperty);
+	ConstructProperty(WheelBrakeProperty);
+	ConstructProperty(LightStatusProperty);
+	ConstructProperty(HornProperty);
+	ConstructProperty(FuelProperty);
+	ConstructProperty(EngineOilProperty);
 }
 
 static void

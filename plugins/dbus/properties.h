@@ -36,6 +36,19 @@ public:
 
 };
 
+class EngineSpeedProperty: public DBusSink
+{
+public:
+	EngineSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.engineSpeed","/org/automotive/runningstatus/engineSpeed", re, connection, map<string, string>())
+	{
+		wantProperty<uint16_t>(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+
+
+};
+
 class TirePressureProperty: public DBusSink
 {
 public:
