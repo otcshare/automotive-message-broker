@@ -628,6 +628,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
 	{
 	  printf("Error opening OBD2 port\n");
 	}*/
+	statusQueue = g_async_queue_new();
 	commandQueue = g_async_queue_new();
 	subscriptionAddQueue = g_async_queue_new();
 	subscriptionRemoveQueue = g_async_queue_new();
