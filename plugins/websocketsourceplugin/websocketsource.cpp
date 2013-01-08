@@ -141,6 +141,10 @@ static int checkTimeouts(gpointer data)
 				src->uuidRangedReplyMap.erase((*i).first);
 				src->uuidTimeoutMap.erase((*i).first);
 				i--;
+				if (src->uuidTimeoutMap.size() == 0)
+				{
+					return 0;
+				}
 			}
 			else
 			{
@@ -152,9 +156,14 @@ static int checkTimeouts(gpointer data)
 			//Reply has already come back, ignore and erase from list.
 			src->uuidTimeoutMap.erase((*i).first);
 			i--;
+			if (src->uuidTimeoutMap.size() == 0)
+			{
+				return 0;
+			}
 		}
 
 	}
+	return 0;
 }
 
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len)
