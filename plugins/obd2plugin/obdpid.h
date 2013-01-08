@@ -361,7 +361,7 @@ class EngineLoadPid: public CopyMe<EngineCoolantPid>
 {
 public:
 	EngineLoadPid()
-		:CopyMe(VehicleProperty::EngineLoad,"01041/r",0x04)
+		:CopyMe(VehicleProperty::EngineLoad,"01041\r",0x04)
 	{
 
 	}
@@ -393,7 +393,7 @@ class ThrottlePositionPid: public CopyMe<ThrottlePositionPid>
 {
 public:
 	ThrottlePositionPid()
-		:CopyMe(VehicleProperty::ThrottlePosition,"01111/r",0x11)
+		:CopyMe(VehicleProperty::ThrottlePosition,"01111\r",0x11)
 	{
 
 	}
