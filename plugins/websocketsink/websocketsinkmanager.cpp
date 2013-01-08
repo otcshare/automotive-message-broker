@@ -387,6 +387,10 @@ void WebSocketSinkManager::removePoll(int fd)
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Erasing source\n";
 			m_ioSourceMap.erase(i);
 			i--;
+			if (m_ioSourceMap.size() == 0)
+			{
+				break;
+			}
 		}
 	}
 	//for (map<int,GIOChannel*>::const_iterator i=m_ioChannelMap.cbegin();i!=m_ioChannelMap.cend();i++)
@@ -398,6 +402,10 @@ void WebSocketSinkManager::removePoll(int fd)
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Erasing channel\n";
 			m_ioChannelMap.erase(i);
 			i--;
+			if (m_ioChannelMap.size() == 0)
+			{
+				break;
+			}
 		}
 	}
 }

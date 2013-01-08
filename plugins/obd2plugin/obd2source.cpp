@@ -234,6 +234,10 @@ void threadLoop(gpointer data)
 					reqList.erase(i);
 					delete (*i);
 					i--;
+					if (reqList.size() == 0)
+					{
+						break;
+					}
 				}
 			}
 			//reqList.push_back(req->req);
