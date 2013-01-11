@@ -34,7 +34,7 @@ AbstractRoutingEngine *m_re;
 
 //std::list<ObdPid*> Obd2Amb::supportedPidsList;
 Obd2Amb *obd2AmbInstance = new Obd2Amb;
-
+VehicleProperty::Property Obd2Connected = "Obd2Connected";
 int calledPersecond = 0;
 
 bool sendElmCommand(obdLib *obd,std::string command)
@@ -443,12 +443,14 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 		StatusMessage *reply = (StatusMessage*)retval;
 		if (reply->statusStr == "disconnected")
 		{
-			//TODO: This is where we update Obd2Connected property
-			//src->updateProperty("Obd2Connected",true);
+
+			BasicPropertyType<bool> val(false);
+			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "connected")
 		{
-			//TODO: This is where we update Obd2Connected property
+			BasicPropertyType<bool> val(true);
+			src->updateProperty(Obd2Connected,&val);
 		}
 	}
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
@@ -610,9 +612,9 @@ void OBD2Source::setConfiguration(map<string, string> config)
 }
 
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
-	: AbstractSource(re, config), Obd2Connect("Obd2Connect")
+	: AbstractSource(re, config)
 {
-	VehicleProperty::registerProperty(Obd2Connect,[](){ return new Obd2ConnectType(false); });
+	VehicleProperty::registerProperty(Obd2Connected,[](){ return new Obd2ConnectType(false); });
 	clientConnected = false;
 	m_re = re;  
 
@@ -625,7 +627,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
 		m_supportedProperties.push_back((*itr)->property);
 	}
 
-	m_supportedProperties.push_back(Obd2Connect);
+	m_supportedProperties.push_back(Obd2Connected);
 
 	re->setSupported(supported(), this);
 	/*if (openPort(std::string("/dev/pts/7"),115200))

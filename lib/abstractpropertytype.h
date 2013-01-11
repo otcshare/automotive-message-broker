@@ -26,6 +26,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
 #include <type_traits>
+#include <glibmm/variant.h>
 #include "timestamp.h"
 
 class AbstractPropertyType
@@ -36,6 +37,10 @@ public:
 	virtual std::string toString() const = 0;
 
 	virtual void fromString(std::string)= 0;
+
+	virtual Glib::VariantBase* toVariant() = 0;
+
+	virtual void fromVariant(Glib::VariantBase*) = 0;
 
 	virtual AbstractPropertyType* copy() = 0;
 
@@ -119,7 +124,21 @@ public:
 		return stream.str();
 	}
 
+	Glib::VariantBase* toVariant()
+	{
+		serializeVariant<T>(value<T>());
+
+		return &mVariant;
+	}
+
+	void fromVariant(Glib::VariantBase *v)
+	{
+		setValue(deserializeVariant<T>(v));
+	}
+
 private:
+
+	Glib::VariantBase mVariant;
 
 	template <class N>
 	void serialize(std::string val,  typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
@@ -140,6 +159,33 @@ private:
 		stream>>someTemp;
 		setValue(someTemp);
 	}
+
+	template <class N>
+	void serializeVariant(T val, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	{
+		mVariant = Glib::VariantBase(Glib::Variant<gint16>::create((int)val).gobj());
+	}
+
+	template <class N>
+	void serializeVariant(T val, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	{
+		//mVariant = Glib::Variant<int>::create(0);
+		mVariant = Glib::Variant<T>::create(val);
+	}
+
+	template <class N>
+	T deserializeVariant(Glib::VariantBase* v, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	{
+		return (T)((Glib::Variant<int>::cast_dynamic<Glib::Variant<int> >(*v)).get());
+	}
+
+	template <class N>
+	T deserializeVariant(Glib::VariantBase* v, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	{
+		return Glib::VariantBase::cast_dynamic<Glib::Variant<T> >(*v).get();
+	}
+
+
 };
 
 class StringPropertyType: public AbstractPropertyType
@@ -178,6 +224,21 @@ public:
 		return value<std::string>();
 	}
 
+	Glib::VariantBase* toVariant()
+	{
+		mVariant = Glib::Variant<std::string>::create(toString());
+
+		return &mVariant;
+	}
+
+	void fromVariant(Glib::VariantBase *v)
+	{
+		setValue(std::string(v->print()));
+	}
+
+private:
+
+	Glib::Variant<std::string> mVariant;
 };
 
 #endif

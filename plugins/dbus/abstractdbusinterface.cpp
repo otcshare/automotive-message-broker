@@ -113,7 +113,8 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	GError *error = NULL;
 
 	GVariant **params = g_new(GVariant*,2);
-	params[0] = g_variant_new("v",property->toGVariant());
+	GVariant *val = g_variant_ref(property->toGVariant());
+	params[0] = g_variant_new("v",val);
 	params[1] = g_variant_new("d",property->timestamp());
 
 	GVariant *tuple_variant = g_variant_new_tuple(params,2);
@@ -143,6 +144,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 	{
 		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
 		return value;
+
 	}
 	debugOut("No interface for" + string(interfaceName));
 	return nullptr;
