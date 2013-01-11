@@ -433,11 +433,6 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 
 	OBD2Source* src = (OBD2Source*)data;
 	
-	
-	StatusMessage *statusreq = new StatusMessage();
-				statusreq->statusStr = "connected";
-				g_async_queue_push(src->statusQueue,statusreq);
-				
 	while (gpointer retval = g_async_queue_try_pop(src->statusQueue))
 	{
 		StatusMessage *reply = (StatusMessage*)retval;
