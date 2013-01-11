@@ -1,15 +1,15 @@
 #include "custompropertyinterface.h"
 #include "vehicleproperty.h"
 #include "varianttype.h"
+#include "listplusplus.h"
 
-CustomPropertyInterface::CustomPropertyInterface(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.custom","/org/automotive/custom", re, connection, map<string, string>())
+CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop, AbstractRoutingEngine *re, GDBusConnection *connection)
+	:DBusSink("org.automotive."+prop,"/org/automotive/custom/"+prop, re, connection, map<string, string>())
 {
 	PropertyList list = VehicleProperty::customProperties();
-	for (auto itr = list.begin(); itr != list.end(); itr++)
-	{
-		VehicleProperty::Property prop = *itr;
 
+	if(ListPlusPlus<VehicleProperty::Property>(&list).contains(prop))
+	{
 		propertyDBusMap[prop] = new VariantType(re, prop, VariantType::ReadWrite, this);
 	}
 

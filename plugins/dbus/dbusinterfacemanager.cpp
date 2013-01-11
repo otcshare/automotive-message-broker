@@ -52,7 +52,16 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(HornProperty);
 	ConstructProperty(FuelProperty);
 	ConstructProperty(EngineOilProperty);
-	ConstructProperty(CustomPropertyInterface);
+
+	PropertyList list = VehicleProperty::customProperties();
+
+	for (auto itr = list.begin(); itr != list.end(); itr++)
+	{
+		VehicleProperty::Property prop = *itr;
+
+		new CustomPropertyInterface(prop,iface->re,connection);
+	}
+
 
 }
 

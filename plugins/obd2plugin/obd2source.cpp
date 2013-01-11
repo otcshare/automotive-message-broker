@@ -918,7 +918,30 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 {
 	AsyncPropertyReply* reply = new AsyncPropertyReply (request);
-	reply->success = false;
+
+	if(request.property == Obd2Connected)
+	{
+		if(request.value->value<bool>() == true)
+		{
+			CommandRequest *req = new CommandRequest();
+			req->req = "connectifnot";
+			g_async_queue_push(commandQueue,req);
+		}
+		else
+		{
+			CommandRequest *req = new CommandRequest();
+			req->req = "disconnect";
+			g_async_queue_push(commandQueue,req);
+		}
+
+		reply->success = true;
+	}
+
+	else
+	{
+		reply->success = false;
+	}
+
 	try
 	{
 		reply->completed(reply);
