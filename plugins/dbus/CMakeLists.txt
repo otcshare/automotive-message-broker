@@ -3,8 +3,8 @@ include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
 
 pkg_check_modules(gio REQUIRED gio-2.0)
 
-set(dbussinkplugin_headers dbusplugin.h abstractproperty.h abstractdbusinterface.h dbusinterfacemanager.h basicproperty.h properties.h varianttype.h custompropertyinterface.h)
-set(dbussinkplugin_sources dbusplugin.cpp abstractproperty.cpp abstractdbusinterface.cpp dbusinterfacemanager.cpp basicproperty.cpp properties.cpp varianttype.cpp custompropertyinterface.cpp)
+set(dbussinkplugin_headers dbusplugin.h abstractproperty.h abstractdbusinterface.h dbusinterfacemanager.h basicproperty.h properties.h varianttype.h custompropertyinterface.h environmentproperties.h)
+set(dbussinkplugin_sources dbusplugin.cpp abstractproperty.cpp abstractdbusinterface.cpp dbusinterfacemanager.cpp basicproperty.cpp properties.cpp varianttype.cpp custompropertyinterface.cpp environmentproperties.cpp)
 
 add_library(dbussinkplugin MODULE ${dbussinkplugin_sources})
 set_target_properties(dbussinkplugin PROPERTIES PREFIX "")

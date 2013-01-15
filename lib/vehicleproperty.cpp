@@ -92,6 +92,7 @@ const VehicleProperty::Property VehicleProperty::FuelRange = "FuelRange";
 const VehicleProperty::Property VehicleProperty::FuelEconomy = "FuelEconomy";
 const VehicleProperty::Property VehicleProperty::FuelAverageEconomy = "FuelAverageEconomy";
 const VehicleProperty::Property VehicleProperty::EngineOilRemaining = "EngineOilRemaining";
+const VehicleProperty::Property VehicleProperty::ExteriorBrightness = "ExteriorBrightness";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -155,7 +156,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(FuelConsumption, 0);
 	REGISTERPROPERTY(FuelEconomy, 0);
 	REGISTERPROPERTY(FuelAverageEconomy, 0);
-
+	REGISTERPROPERTY(ExteriorBrightness, 0);
 
 }
 

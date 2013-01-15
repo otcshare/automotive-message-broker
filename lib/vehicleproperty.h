@@ -295,6 +295,9 @@ public:
 	static const Property FuelAverageEconomy;
 	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
+	static const Property ExteriorBrightness;
+	typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
+
 	static std::list<VehicleProperty::Property> capabilities();
 	static std::list<VehicleProperty::Property> customProperties();
 
