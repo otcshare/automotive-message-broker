@@ -10,7 +10,16 @@ CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop,
 
 	if(ListPlusPlus<VehicleProperty::Property>(&list).contains(prop))
 	{
-		propertyDBusMap[prop] = new VariantType(re, prop, VariantType::ReadWrite, this);
+		AbstractPropertyType* temp = VehicleProperty::getPropertyTypeForPropertyNameValue(prop);
+
+		if(!temp)
+		{
+			throw std::runtime_error("Cannot create custom property: " + prop);
+		}
+
+		std::string signature = temp->toVariant()->get_type_string();
+
+		propertyDBusMap[prop] = new VariantType(re, signature, prop, VariantType::ReadWrite, this);
 	}
 
 	supportedChanged(re->supported());

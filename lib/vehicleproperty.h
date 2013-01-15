@@ -302,7 +302,7 @@ public:
 	  * with the value specified by 'value'.  Ownership of the returned AbstractPropertyType* is
 	  * transfered to the caller.
 	  */
-	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
+	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value="");
 
 	/*! registerProperty registers properties with the Vehicle Property system.  Returns true if property
 	 *  has been registered successfully.

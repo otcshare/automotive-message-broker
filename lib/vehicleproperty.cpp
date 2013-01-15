@@ -180,7 +180,8 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 			if(type == NULL)
 				throw std::runtime_error("Cannot return NULL in a PropertyTypeFactory");
 
-			type->fromString(value);
+			if(value != "" )
+				type->fromString(value);
 
 			return type;
 		}

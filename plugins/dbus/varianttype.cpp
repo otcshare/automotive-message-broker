@@ -1,7 +1,7 @@
 #include "varianttype.h"
 
-VariantType::VariantType(AbstractRoutingEngine* re, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, "v", access, interface)
+VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
+	:AbstractProperty(propertyName, signature, access, interface),routingEngine(re)
 {
 //VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName,"")->toVariant()->get_type_string()
 }
@@ -9,12 +9,27 @@ VariantType::VariantType(AbstractRoutingEngine* re, std::string propertyName,  A
 GVariant *VariantType::toGVariant()
 {
 	if(!value())
-		return g_variant_new("v",g_variant_new_int16(0));
+	{
+		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
+
+		return v->toVariant()->gobj();
+	}
 
 	return value()->toVariant()->gobj();
 }
 
-void VariantType::fromGVariant(GVariant *value)
+void VariantType::fromGVariant(GVariant *val)
 {
+	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
+	v->fromVariant( new Glib::VariantBase(val) );
 
+	AsyncSetPropertyRequest request;
+	request.property = mPropertyName;
+	request.value = v;
+	request.completed = [](AsyncPropertyReply* reply)
+	{
+		delete reply;
+	};
+
+	routingEngine->setProperty(request);
 }

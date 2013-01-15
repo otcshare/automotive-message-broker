@@ -100,7 +100,7 @@ public:
 		{
 			serialize<T>(val);
 		}
-		else throw std::runtime_error("value cannot be empty");
+		else setValue(T());
 	}
 
 	AbstractPropertyType* copy()
