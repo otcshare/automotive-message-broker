@@ -15,8 +15,6 @@ public:
 		wantProperty<uint16_t>(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "y", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
-
-
 };
 
 #endif
