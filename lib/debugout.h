@@ -39,7 +39,8 @@ public:
 
 		out.precision(15);
 
-		out<<amb::currentTime()<<" | ";
+		if(mDebugLevel <= debugThreshhold)
+			out<<amb::currentTime()<<" | ";
 	}
 
 	DebugOut const& operator << (string message) const
