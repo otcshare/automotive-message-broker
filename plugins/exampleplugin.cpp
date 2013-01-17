@@ -120,6 +120,12 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->value = &temp;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::ExteriorBrightness)
+	{
+		VehicleProperty::ExteriorBrightnessType temp(1000);
+		reply->value = &temp;
+		reply->completed(reply);
+	}
 }
 
 void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -151,6 +157,7 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::WMI);
 	props.push_back(VehicleProperty::BatteryVoltage);
 	props.push_back(VehicleProperty::MachineGunTurretStatus);
+	props.push_back(VehicleProperty::ExteriorBrightness);
 	
 	return props;
 }

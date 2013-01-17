@@ -24,6 +24,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <fstream>
 #include <string.h>
 #include <cstdarg>
+#include <unistd.h>
+
+
 void (*debugCallback)(const char *,void*,obdLib::DebugLevel) = NULL;
 void (*commsCallback)(const char *,void*) = NULL;
 void *debugUserData = NULL;
@@ -39,6 +42,7 @@ int obdLib::openPort(const char *portName)
 {
 	return openPort(portName,-1);
 }
+
 void obdLib::setDebugCallback(void (*callbackptr)(const char*,void*,obdLib::DebugLevel),void *usrdata)
 {
 	//printf("Calling setDebugCallback: %i\n",debugCallback);

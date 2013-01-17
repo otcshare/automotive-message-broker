@@ -50,7 +50,11 @@ public:
   std::string req;
   std::vector<std::string> arglist;
 };
-
+class StatusMessage
+{
+public:
+  std::string statusStr;
+};
 class ObdReply
 {
 public:
@@ -78,6 +82,8 @@ public:
 		supportedPidsList.push_back(new FuelConsumptionPid());
 		supportedPidsList.push_back(new EngineCoolantPid());
 		supportedPidsList.push_back(new AirIntakeTemperaturePid());
+		supportedPidsList.push_back(new EngineLoadPid());
+		supportedPidsList.push_back(new ThrottlePositionPid());
 	}
 
 	~Obd2Amb()
@@ -149,6 +155,7 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	GAsyncQueue* commandQueue;
+	GAsyncQueue* statusQueue;
 	GAsyncQueue* subscriptionAddQueue;
 	GAsyncQueue* subscriptionRemoveQueue;
 	GAsyncQueue* singleShotQueue;
@@ -171,7 +178,6 @@ public:
 private:
 	PropertyList m_supportedProperties;
 	GMutex *threadQueueMutex;
-	VehicleProperty::Property Obd2Connect;
 	typedef BasicPropertyType<bool> Obd2ConnectType;
 
 };

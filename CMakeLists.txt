@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.6.0")
+set(PROJECT_VERSION "0.6.9")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
@@ -20,6 +20,7 @@ option(use_qtcore "Use QCoreApplication mainloop " OFF)
 option(tpms_plugin "TPMS plugin " OFF)
 option(obd2_plugin "OBD-II plugin" ON)
 option(database_plugin "Database plugins" OFF)
+option(qt_bindings "AMB Qt DBus bindings" OFF)
 
 find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
@@ -27,12 +28,13 @@ find_package(Boost REQUIRED)
 
 pkg_check_modules(glib REQUIRED glib-2.0)
 pkg_check_modules(json REQUIRED json-glib-1.0)
+pkg_check_modules(glibmm REQUIRED glibmm-2.4)
 
 add_definitions(-std=c++0x)
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
-set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${glibmm_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} ${glibmm_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 if(use_qtcore)
 

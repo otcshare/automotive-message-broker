@@ -26,6 +26,7 @@
 #include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include <timestamp.h>
+#include "uuidhelper.h"
 
 #include "debugout.h"
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
@@ -123,6 +124,48 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	return true;
 }
 
+static int checkTimeouts(gpointer data)
+{
+	WebSocketSource *src = (WebSocketSource*)data;
+	for (auto i=src->uuidTimeoutMap.begin();i!= src->uuidTimeoutMap.end();i++)
+	{
+		if (src->uuidRangedReplyMap.find((*i).first) != src->uuidRangedReplyMap.end())
+		{
+			//A source exists!
+			if (amb::currentTime() > (*i).second)
+			{
+				//We've reached timeout
+				DebugOut() << "Timeout reached for request ID:" << (*i).first << "\n";
+				src->uuidRangedReplyMap[(*i).first]->success = false;
+				src->uuidRangedReplyMap[(*i).first]->completed(src->uuidRangedReplyMap[(*i).first]);
+				src->uuidRangedReplyMap.erase((*i).first);
+				src->uuidTimeoutMap.erase((*i).first);
+				i--;
+				if (src->uuidTimeoutMap.size() == 0)
+				{
+					return 0;
+				}
+			}
+			else
+			{
+				//No timeout yet, keep waiting.
+			}
+		}
+		else
+		{
+			//Reply has already come back, ignore and erase from list.
+			src->uuidTimeoutMap.erase((*i).first);
+			i--;
+			if (src->uuidTimeoutMap.size() == 0)
+			{
+				return 0;
+			}
+		}
+
+	}
+	return 0;
+}
+
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len)
 {
 	unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + 4096 + LWS_SEND_BUFFER_POST_PADDING];
@@ -197,72 +240,8 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			json_reader_read_member(reader,"name");
 			name = json_reader_get_string_value(reader);
 			json_reader_end_member(reader);
-
-			list<string> data;
-			list<pair<string,string> > pairdata;
-			if (name == "get")
-			{
-				json_reader_read_member(reader,"data");
-				if (json_reader_is_array(reader))
-				{
-					for(int i=0; i < json_reader_count_elements(reader); i++)
-					{
-					  
-						pair<string,string> pair;
-						json_reader_read_element(reader,i);
-						
-						json_reader_read_member(reader,"property");
-						pair.first = json_reader_get_string_value(reader);
-						json_reader_end_member(reader);
-						
-						json_reader_read_member(reader,"value");
-						pair.second = json_reader_get_string_value(reader);
-						json_reader_end_member(reader);
-						
-						json_reader_end_element(reader);
-						
-						pairdata.push_back(pair);
-					}
-				}
-				else
-				{
-					pair<string,string> pair;
-					
-					json_reader_read_member(reader,"property");
-					pair.first = json_reader_get_string_value(reader);
-					json_reader_end_member(reader);
-						
-					json_reader_read_member(reader,"value");
-					pair.second = json_reader_get_string_value(reader);
-					json_reader_end_member(reader);
-					
-					pairdata.push_back(pair);
-				}
-				json_reader_end_member(reader);
-			}
-			else
-			{
-				json_reader_read_member(reader,"data");
-				if (json_reader_is_array(reader))
-				{
-					for(int i=0; i < json_reader_count_elements(reader); i++)
-					{
-						json_reader_read_element(reader,i);
-						string path = json_reader_get_string_value(reader);
-						data.push_back(path);
-						json_reader_end_element(reader);
-					}
-				}
-				else
-				{
-					string path = json_reader_get_string_value(reader);
-					if (path != "")
-					{
-						data.push_back(path);
-					}
-				}
-				json_reader_end_member(reader);
-			}
+			
+			
 			string id;
 			json_reader_read_member(reader,"transactionid");
 			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
@@ -278,32 +257,182 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				id = strstr.str();
 			}
 			json_reader_end_member(reader);
+			
+			list<pair<string,string> > pairdata;
+			if (type == "valuechanged")
+			{
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_object(reader))
+				{
+					//Proper object.
+					json_reader_read_member(reader,"value");
+					std::string value = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+					
+					json_reader_read_member(reader,"timestamp");
+					std::string timestamp = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+					
+					json_reader_read_member(reader,"sequence");
+					std::string sequence= json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+					//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << "\n";
+					//Name should be a valid property
+					//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
+					//data.front()
+					try
+					{
+						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
+						type->timestamp = boost::lexical_cast<double,std::string>(timestamp);
+						type->sequence = boost::lexical_cast<double,std::string>(sequence);
+						m_re->updateProperty(name, type, source->uuid());
 
-			double timestamp=amb::currentTime();
-			json_reader_read_member(reader,"timestamp");
-			if(const GError* err = json_reader_get_error(reader))
-			{
-				DebugOut(0)<<"JSON Parsing error: no timestamp parameter: "<<err->message<<endl;
-				//g_error_free(err);
-			}
-			else
-			{
-				timestamp = atof(json_reader_get_string_value(reader));
-			}
-			json_reader_end_member(reader);
+						double currenttime = amb::currentTime();
 
-			uint32_t sequence=0;
-			json_reader_read_member(reader,"sequence");
-			if(const GError* err = json_reader_get_error(reader))
-			{
-				DebugOut(0)<<"JSON Parsing error: no sequence parameter: "<<err->message<<endl;
-				//g_error_free(err);
+						DebugOut(2)<<"websocket source latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
+
+						delete type;
+					}
+					catch (exception ex)
+					{
+						//printf("Exception %s\n",ex.what());
+						DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Exception:" << ex.what() << "\n";
+					}
+					//printf("Done\n");
+					/*if (name == "get")
+					{
+						if (data.size() > 0)
+						{
+						}
+					}*/
+				}
 			}
-			else
+			else if (type == "methodReply")
 			{
-				sequence = atof(json_reader_get_string_value(reader));
+				if (name == "getSupportedEventTypes")
+				{
+					json_reader_read_member(reader,"data");
+					//printf("Got supported events!\n");
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupportedEventTypes request"<<endl;
+					PropertyList props;
+					if (json_reader_is_array(reader))
+					{
+						for(int i=0; i < json_reader_count_elements(reader); i++)
+						{
+							json_reader_read_element(reader,i);
+							string path = json_reader_get_string_value(reader);
+							props.push_back(path);
+							json_reader_end_element(reader);
+						}
+					}
+					else
+					{
+						string path = json_reader_get_string_value(reader);
+						if (path != "")
+						{
+							props.push_back(path);;
+						}
+					}
+					json_reader_end_member(reader);
+					source->setSupported(props);
+					//m_re->updateSupported(m_supportedProperties,PropertyList());
+				}
+				else if (name == "getRanged")
+				{
+					json_reader_read_member(reader,"data");
+					if (json_reader_is_array(reader))
+					{
+						std::list<AbstractPropertyType*> propertylist;
+						for(int i=0; i < json_reader_count_elements(reader); i++)
+						{
+							json_reader_read_member(reader,"value");
+							std::string value = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+						
+							json_reader_read_member(reader,"timestamp");
+							std::string timestamp = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							json_reader_read_member(reader,"sequence");
+							std::string sequence = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(source->uuidRangedReplyMap[id]->property,value);
+							propertylist.push_back(type);
+							
+						}
+						if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
+						{
+							source->uuidRangedReplyMap[id]->values = propertylist;
+							source->uuidRangedReplyMap[id]->success = true;
+							source->uuidRangedReplyMap[id]->completed(source->uuidRangedReplyMap[id]);
+							source->uuidRangedReplyMap.erase(id);
+						}
+						else
+						{
+							DebugOut() << "getRanged methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
+						}
+						while (propertylist.size() > 0)
+						{
+							
+							AbstractPropertyType *type = propertylist.front();
+							delete type;
+							propertylist.pop_front();
+						}
+					}
+					json_reader_end_member(reader);
+				}
+				else if (name == "get")
+				{
+					json_reader_read_member(reader,"data");
+					if (json_reader_is_object(reader))
+					{
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
+						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
+						{
+							json_reader_read_member(reader,"property");
+							std::string property = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							      
+							json_reader_read_member(reader,"value");
+							std::string value = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							json_reader_read_member(reader,"timestamp");
+							std::string timestamp = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							
+							json_reader_read_member(reader,"sequence");
+							std::string sequence = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+						      
+							AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
+							v->timestamp = boost::lexical_cast<double,std::string>(timestamp);
+							v->sequence = boost::lexical_cast<double,std::string>(sequence);
+							if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
+							{
+								source->uuidReplyMap[id]->value = v;
+								source->uuidReplyMap[id]->success = true;
+								source->uuidReplyMap[id]->completed(source->uuidReplyMap[id]);
+								source->uuidReplyMap.erase(id);
+								delete v;
+							}
+							else
+							{
+								DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
+							}
+						}
+					}
+					else
+					{
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "GET Method Reply INVALID! Multiple properties detected, only single are supported!!!" << "\n";
+					}
+					json_reader_end_member(reader);
+					//data will contain a property/value map.
+				}
 			}
-			json_reader_end_member(reader);
 
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
@@ -312,79 +441,6 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			g_object_unref(reader);
 			g_object_unref(parser);
 
-
-			if (type == "valuechanged")
-			{
-				//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << data.front() << "\n";
-				//Name should be a valid property
-				//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
-				//data.front()
-				try
-				{
-					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,data.front());
-					type->timestamp = timestamp;
-					type->sequence = sequence;
-					m_re->updateProperty(name, type, source->uuid());
-
-					double currenttime = amb::currentTime();
-
-					DebugOut(2)<<"websocket source latency: "<<(currenttime - timestamp)*1000<<"ms"<<endl;
-
-					delete type;
-				}
-				catch (exception ex)
-				{
-					//printf("Exception %s\n",ex.what());
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Exception:" << ex.what() << "\n";
-				}
-				//printf("Done\n");
-				/*if (name == "get")
-				{
-					if (data.size() > 0)
-					{
-					}
-				}*/
-			}
-			else if (type == "methodReply")
-			{
-				if (name == "getSupportedEventTypes")
-				{
-					//printf("Got supported events!\n");
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupportedEventTypes request"<<endl;
-					PropertyList props;
-					while (data.size() > 0)
-					{
-						string val = data.front();
-						data.pop_front();	
-						props.push_back(val);
-
-					}
-					source->setSupported(props);
-					//m_re->updateSupported(m_supportedProperties,PropertyList());
-				}
-				else if (name == "get")
-				{
-					
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
-					while (pairdata.size() > 0)
-					{
-						pair<string,string> pair = pairdata.front();
-						pairdata.pop_front();
-						if (source->propertyReplyMap.find(pair.first) != source->propertyReplyMap.end())
-						{
-							AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(source->propertyReplyMap[pair.first]->property,pair.second);
-							v->timestamp = timestamp;
-							source->propertyReplyMap[pair.first]->value = v;
-							source->propertyReplyMap[pair.first]->completed(source->propertyReplyMap[pair.first]);
-							source->propertyReplyMap.erase(pair.first);
-							delete v;
-						}
-					}
-					//data will contain a property/value map.
-				}
-
-			}
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
@@ -421,6 +477,7 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	re->setSupported(supported(), this);
 
 	//printf("websocketsource loaded!!!\n");
+	g_timeout_add(1000,checkTimeouts,this); //Do this once per second, check for functions that have timed out and reply with success = false;
 
 }
 PropertyList WebSocketSource::supported()
@@ -471,9 +528,13 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	  DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
 	  delete reply;
 	};*/
-	propertyReplyMap[reply->property] = reply;
+	//propertyReplyMap[reply->property] = reply;
+	std::string uuid = amb::createUuid();
+	uuidReplyMap[uuid] = reply;
+	uuidTimeoutMap[uuid] = amb::currentTime() + 10.0; ///TODO: 10 second timeout, make this configurable?
 	stringstream s;  
-	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
+	
+	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << uuid << "\"}";
 	string replystr = s.str();
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr <<endl;
 	//printf("Reply: %s\n",replystr.c_str());
@@ -487,6 +548,24 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
 	///TODO: fill in
+	std::string uuid = amb::createUuid();
+	uuidRangedReplyMap[uuid] = reply;
+	uuidTimeoutMap[uuid] = amb::currentTime() + 60; ///TODO: 60 second timeout, make this configurable?
+	stringstream s;  
+	s << "{\"type\":\"method\",\"name\":\"getRange\",\"data\": {";
+	s << "\"timeBegin\":\"" << reply->timeBegin << "\",";
+	s << "\"timeEnd\":\"" << reply->timeEnd << "\",";
+	s << "\"sequenceBegin\":\"" << reply->sequenceBegin<< "\",";
+	s << "\"sequenceEnd\":\"" << reply->sequenceEnd << "\"}";
+	s<< ",\"transactionid\":\"" << uuid << "\"}";
+	string replystr = s.str();
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr <<endl;
+	//printf("Reply: %s\n",replystr.c_str());
+	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
+	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(new_response,replystr.c_str());
+	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 }
 
 AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest request )

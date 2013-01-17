@@ -26,6 +26,8 @@
 
 #include <glib.h>
 
+#define DatabaseLoggingProperty "DatabaseLogging"
+
 template <typename T>
 class Queue
 {
@@ -127,6 +129,10 @@ public:
 	virtual PropertyList supported();
 	int supportedOperations() { return GetRanged; }
 
+private: //methods:
+
+	void parseConfig();
+
 private:
 	PropertyList mSubscriptions;
 	Shared *shared;
@@ -134,6 +140,7 @@ private:
 	std::string databaseName;
 	std::string tablename;
 	std::string tablecreate;
+	std::list<VehicleProperty::Property> propertiesToSubscribeTo;
 };
 
 class DatabaseSinkManager: public AbstractSinkManager
@@ -143,6 +150,7 @@ public:
 	:AbstractSinkManager(engine, config)
 	{
 		new DatabaseSink(routingEngine, config);
+		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new BasicPropertyType<bool>(false);});
 	}
 };
 

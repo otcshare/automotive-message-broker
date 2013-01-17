@@ -40,7 +40,7 @@ public:
 
 	T value()
 	{
-		return AbstractProperty::value<T>();
+		return AbstractProperty::anyValue<T>();
 	}
 
 	virtual GVariant* toGVariant()

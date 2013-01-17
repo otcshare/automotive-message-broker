@@ -1,19 +1,62 @@
 Vehicle Information hierarchy
 =================
 
-Service         org.automotive
-Interface       org.automotive.vehicleInfo
-Object path     /
+Service         org.automotive.message.broker
+Object path     /org/automotive/vehicleInfo/*
 
-Properties	string WMI [readonly]
+
+
+Interface:	org.automotive.VehicleId
+Object path:	/org/automotive/vehicleInfo/VehicleId
+Properties:
+
+                string WMI [readonly]
 
 			World Manufacturer Identifier as defined by SAE. 3 characters.
 
-		string VIN [readonly]
+                string VIN [readonly]
 
 			Vehicle Identification Number as defined by ISO 3779. 17 characters.
-			
-		byte VehicleType [readonly]
+
+Interface:	org.automotive.size
+Object path:	/org/automotive/vehicleInfo/size
+Properties:
+
+                int Width [readonly]
+                width in mm
+
+                Height [readonly]
+                height in mm
+
+                Length [readonly]
+                length in mm
+
+Interface:	org.automotive.fuelInfo
+Object path:	/org/automotive/vehicleInfo/FuelInfo
+Properties:
+
+                byte Type [readonly]
+
+                        type of fuel:
+                        Gasoline,
+                        High-Octane,
+                        Diesel,
+                        Electric,
+                        Hydrogen
+
+                byte RefuelPosition [readonly]
+
+                        Position of refueling:
+                        Left,
+                        Right,
+                        Front,
+                        Rear
+
+Interface:	org.automotive.VehicleType
+Object path:	/org/automotive/vehicleInfo/VehicleType
+Properties:
+
+                byte VehicleType [readonly]
 			
 			Vehicle Type: Sedan = 0,
 			Coupe = 1,
@@ -21,7 +64,11 @@ Properties	string WMI [readonly]
 			Roadster = 3,
 			SUV = 4,
 			Truck = 5
-			
+
+Interface:	org.automotive.DoorType
+Object path:	/org/automotive/vehicleInfo/DoorType
+Properties:
+
 		array{ byte } DoorType [readonly]
 			
 			Number of doors in each row.  The index represents the row.  Position '0'
@@ -29,7 +76,11 @@ Properties	string WMI [readonly]
 
 			Example a common mini-van may have DoorType[0] = 2 doors,
 			DoorType[1] = 1 (side door), DoorType[2] = 1 (trunk).
-			
+
+Interface:	org.automotive.EngineType
+Object path:	/org/automotive/vehicleInfo/EngineType
+Properties:
+
 		byte EngineType [readonly]
 		
 			Gasoline = 0,
@@ -37,12 +88,20 @@ Properties	string WMI [readonly]
 			Hybrid = 2,
 			Electric = 3
 	
+Interface:	org.automotive.TransmissionGearType
+Object path:	/org/automotive/vehicleInfo/TransmissionGearType
+Properties:
+
 		byte TransmissionGearType [readonly]
 		
 			Auto = 0,
 			Manual = 1,
 			CVT
 			
+Interface:	org.automotive.WheelInformation
+Object path:	/org/automotive/vehicleInfo/WheelInformation
+Properties:
+
 		struct{ double, double } WheelInformation [readonly]
 		
 			Radius of Wheel, Wheel Track.

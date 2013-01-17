@@ -53,7 +53,12 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(map<string, string> config);
-	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
+	//map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
+	//map<VehicleProperty::Property,AsyncRangePropertyReply*> rangedPropertyReplyMap;
+	map<std::string,AsyncPropertyReply*> uuidReplyMap;
+	map<std::string,double> uuidTimeoutMap;
+	map<std::string,AsyncRangePropertyReply*> uuidRangedReplyMap;
+	
 
 private:
   	PropertyList m_supportedProperties;

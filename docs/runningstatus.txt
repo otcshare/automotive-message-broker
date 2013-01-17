@@ -228,5 +228,19 @@ Properties:
 		
 			Angle of the steering wheel (0-360)
 			
+Interface:      org.automotive.location
+Object path:    /org/automotive/runningStatus/location
+Properties:
 				
-				
+                double Latitude [readonly]
+                        latitude in Deg.Min (-90, +90)
+
+                double Longitude [readonly]
+                        longitude in Deg.Min (-180, +180)
+
+                double Altitude [readonly]
+                        altitude in meters above sea-level (0)
+
+                int Direction [readonly]
+                        direction in degrees (0=north - 359)
+

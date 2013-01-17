@@ -235,14 +235,14 @@ public:
 	static const Property TirePressureRightFront;
 	static const Property TirePressureLeftRear;
 	static const Property TirePressureRightRear;
-	typedef BasicPropertyType<float> TirePressureType;
+	typedef BasicPropertyType<double> TirePressureType;
 
 	/**< Tire temperature in degrees C */
 	static const Property TireTemperatureLeftFront;
 	static const Property TireTemperatureRightFront;
 	static const Property TireTemperatureLeftRear;
 	static const Property TireTemperatureRightRear;
-	typedef BasicPropertyType<float> TireTemperatureType;
+	typedef BasicPropertyType<double> TireTemperatureType;
 	
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes
@@ -295,20 +295,46 @@ public:
 	static const Property FuelAverageEconomy;
 	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
+	static const Property ExteriorBrightness;
+	typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
+
 	static std::list<VehicleProperty::Property> capabilities();
+	static std::list<VehicleProperty::Property> customProperties();
 
 	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
 	  * with the value specified by 'value'.  Ownership of the returned AbstractPropertyType* is
 	  * transfered to the caller.
 	  */
-	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
+	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value="");
 
-	static void registerProperty(Property name, PropertyTypeFactoryCallback factory);
+	/*! registerProperty registers properties with the Vehicle Property system.  Returns true if property
+	 *  has been registered successfully.
+	 *  @param name - name of property.  Name cannot match any existing property or it will be rejected and
+	 *  this method will return false.
+	 *  @param factor - callback function that returns an AbstractPropertyType representation of the value.
+	 *  custom properties will need to return a custom AbstractPropertyType based object.
+	 *  @example :
+	 *
+	 *  #include <vehicleproperty.h>
+	 *  #include <abstractpropertytype.h>
+	 *
+	 *  //In the constructor of a source plugin:
+	 *  ...
+	 *  Property VehicleJetEngineStatus = "VehicleJetEngineStatus";
+	 *  VehicleProperty::registerProperty(VehicleJetEngineStatus, [](){return new BasicPropertyType<bool>(false);});
+	 *  ...
+	 *  //other initialization
+	 */
+	static bool registerProperty(Property name, PropertyTypeFactoryCallback factory);
+
+
 
 private:
+	static bool registerPropertyPriv(Property name, PropertyTypeFactoryCallback factory);
 
 	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;
 	static std::list<VehicleProperty::Property> mCapabilities;
+	static std::list<VehicleProperty::Property> mCustomProperties;
 };
 
 typedef std::list<VehicleProperty::Property> PropertyList;
