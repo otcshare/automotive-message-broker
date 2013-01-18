@@ -19,6 +19,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  libwebsockets-devel
 BuildRequires:  libuuid-devel
 BuildRequires:  sqlite-devel
+BuildRequires:  glibmm-devel
 
 %description
 Automotive Message Broker is a vehicle network abstraction system.
