@@ -295,6 +295,18 @@ public:
 	static const Property FuelAverageEconomy;
 	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
+	static const Property Latitude;
+	typedef BasicPropertyType<double> LatitudeType;
+
+	static const Property Longitude;
+	typedef BasicPropertyType<double> LongitudeType;
+
+	static const Property Altitude;
+	typedef BasicPropertyType<double> AltitudeType;
+
+	static const Property Direction;
+	typedef BasicPropertyType<uint> DirectionType;
+
 	static std::list<VehicleProperty::Property> capabilities();
 
 	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
