@@ -56,6 +56,7 @@ public:
 	//map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 	//map<VehicleProperty::Property,AsyncRangePropertyReply*> rangedPropertyReplyMap;
 	map<std::string,AsyncPropertyReply*> uuidReplyMap;
+	map<std::string,double> uuidTimeoutMap;
 	map<std::string,AsyncRangePropertyReply*> uuidRangedReplyMap;
 	
 

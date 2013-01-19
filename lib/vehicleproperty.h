@@ -235,14 +235,14 @@ public:
 	static const Property TirePressureRightFront;
 	static const Property TirePressureLeftRear;
 	static const Property TirePressureRightRear;
-	typedef BasicPropertyType<float> TirePressureType;
+	typedef BasicPropertyType<double> TirePressureType;
 
 	/**< Tire temperature in degrees C */
 	static const Property TireTemperatureLeftFront;
 	static const Property TireTemperatureRightFront;
 	static const Property TireTemperatureLeftRear;
 	static const Property TireTemperatureRightRear;
-	typedef BasicPropertyType<float> TireTemperatureType;
+	typedef BasicPropertyType<double> TireTemperatureType;
 	
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes
@@ -295,6 +295,9 @@ public:
 	static const Property FuelAverageEconomy;
 	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
+	static const Property ExteriorBrightness;
+	typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
+	
 	static const Property Latitude;
 	typedef BasicPropertyType<double> LatitudeType;
 
@@ -308,12 +311,13 @@ public:
 	typedef BasicPropertyType<uint> DirectionType;
 
 	static std::list<VehicleProperty::Property> capabilities();
+	static std::list<VehicleProperty::Property> customProperties();
 
 	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
 	  * with the value specified by 'value'.  Ownership of the returned AbstractPropertyType* is
 	  * transfered to the caller.
 	  */
-	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value);
+	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value="");
 
 	/*! registerProperty registers properties with the Vehicle Property system.  Returns true if property
 	 *  has been registered successfully.
@@ -335,10 +339,14 @@ public:
 	 */
 	static bool registerProperty(Property name, PropertyTypeFactoryCallback factory);
 
+
+
 private:
+	static bool registerPropertyPriv(Property name, PropertyTypeFactoryCallback factory);
 
 	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;
 	static std::list<VehicleProperty::Property> mCapabilities;
+	static std::list<VehicleProperty::Property> mCustomProperties;
 };
 
 typedef std::list<VehicleProperty::Property> PropertyList;

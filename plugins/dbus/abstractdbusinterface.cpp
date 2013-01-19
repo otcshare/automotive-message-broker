@@ -88,9 +88,18 @@ void AbstractDBusInterface::registerObject()
 	}
 
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, mInterfaceName.c_str());
-	
-	const GDBusInterfaceVTable vtable = { NULL, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
-	
+
+	auto fakeMethodCb = [](GDBusConnection *connection,
+			const gchar *sender,
+			const gchar *object_path,
+			const gchar *interface_name,
+			const gchar *method_name,
+			GVariant *parameters,
+			GDBusMethodInvocation *invocation,
+			gpointer user_data) { };
+
+	const GDBusInterfaceVTable vtable = { fakeMethodCb, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
+
 	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
 	
 	if(error) throw -1;
@@ -113,7 +122,8 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	GError *error = NULL;
 
 	GVariant **params = g_new(GVariant*,2);
-	params[0] = g_variant_new("v",property->toGVariant());
+	GVariant *val = g_variant_ref(property->toGVariant());
+	params[0] = g_variant_new("v",val);
 	params[1] = g_variant_new("d",property->timestamp());
 
 	GVariant *tuple_variant = g_variant_new_tuple(params,2);
@@ -138,11 +148,11 @@ void AbstractDBusInterface::startRegistration()
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
-	*error = NULL;
 	if(interfaceMap.count(interfaceName))
 	{
 		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
 		return value;
+
 	}
 	debugOut("No interface for" + string(interfaceName));
 	return nullptr;

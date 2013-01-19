@@ -25,10 +25,10 @@
 
 
 #define REGISTERPROPERTY(property, defaultValue) \
-	registerProperty(property, []() { return new property ## Type(defaultValue); });
+	registerPropertyPriv(property, []() { return new property ## Type(defaultValue); });
 
 #define REGISTERPROPERTYWITHTYPE(property, type, defaultValue) \
-	registerProperty(property, []() { return new type(defaultValue); });
+	registerPropertyPriv(property, []() { return new type(defaultValue); });
 
 using namespace std;
 
@@ -92,36 +92,38 @@ const VehicleProperty::Property VehicleProperty::FuelRange = "FuelRange";
 const VehicleProperty::Property VehicleProperty::FuelEconomy = "FuelEconomy";
 const VehicleProperty::Property VehicleProperty::FuelAverageEconomy = "FuelAverageEconomy";
 const VehicleProperty::Property VehicleProperty::EngineOilRemaining = "EngineOilRemaining";
+const VehicleProperty::Property VehicleProperty::ExteriorBrightness = "ExteriorBrightness";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
+std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
 
 VehicleProperty::VehicleProperty()
 {
-	registerProperty( VehicleSpeed, [](){ return new VehicleSpeedType(0); });
-	registerProperty(EngineSpeed, [](){ return new EngineSpeedType(0); });
-	registerProperty(TransmissionShiftPosition, [](){ return new TransmissionShiftPositionType(Transmission::Neutral); });
-	registerProperty(TransmissionGearPosition, [](){ return new TransmissionGearPositionType(Transmission::Neutral); });
+	registerPropertyPriv( VehicleSpeed, [](){ return new VehicleSpeedType(0); });
+	registerPropertyPriv(EngineSpeed, [](){ return new EngineSpeedType(0); });
+	registerPropertyPriv(TransmissionShiftPosition, [](){ return new TransmissionShiftPositionType(Transmission::Neutral); });
+	registerPropertyPriv(TransmissionGearPosition, [](){ return new TransmissionGearPositionType(Transmission::Neutral); });
 	REGISTERPROPERTY(TransmissionMode,Transmission::Normal);
-	registerProperty(ThrottlePosition, [](){ return new ThrottlePositionType(0); });
-	registerProperty(WheelBrake, [](){ return new WheelBrakeType(false); });
-	registerProperty(SteeringWheelAngle, [](){ return new SteeringWheelAngleType(0); });
-	registerProperty(TurnSignal, [](){ return new TurnSignalType(TurnSignals::Off); });
-	registerProperty(ClutchStatus, [](){ return new ClutchStatusType(false); });
-	registerProperty(EngineOilPressure, [](){ return new EngineOilPressureType(0); });
-	registerProperty(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
+	registerPropertyPriv(ThrottlePosition, [](){ return new ThrottlePositionType(0); });
+	registerPropertyPriv(WheelBrake, [](){ return new WheelBrakeType(false); });
+	registerPropertyPriv(SteeringWheelAngle, [](){ return new SteeringWheelAngleType(0); });
+	registerPropertyPriv(TurnSignal, [](){ return new TurnSignalType(TurnSignals::Off); });
+	registerPropertyPriv(ClutchStatus, [](){ return new ClutchStatusType(false); });
+	registerPropertyPriv(EngineOilPressure, [](){ return new EngineOilPressureType(0); });
+	registerPropertyPriv(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
 	REGISTERPROPERTY(EngineOilRemaining,0);
-	registerProperty(EngineCoolantTemperature, [](){ return new EngineCoolantTemperatureType(0); });
-	registerProperty(MachineGunTurretStatus, [](){ return new MachineGunTurretStatusType(false); });
-	registerProperty(AccelerationX, [](){ return new AccelerationType(0); });
-	registerProperty(AccelerationY, [](){ return new AccelerationType(0); });
-	registerProperty(AccelerationZ, [](){ return new AccelerationType(0); });
-	registerProperty(MassAirFlow, [](){ return new MassAirFlowType(0); });
-	registerProperty(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
+	registerPropertyPriv(EngineCoolantTemperature, [](){ return new EngineCoolantTemperatureType(0); });
+	registerPropertyPriv(MachineGunTurretStatus, [](){ return new MachineGunTurretStatusType(false); });
+	registerPropertyPriv(AccelerationX, [](){ return new AccelerationType(0); });
+	registerPropertyPriv(AccelerationY, [](){ return new AccelerationType(0); });
+	registerPropertyPriv(AccelerationZ, [](){ return new AccelerationType(0); });
+	registerPropertyPriv(MassAirFlow, [](){ return new MassAirFlowType(0); });
+	registerPropertyPriv(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
 	REGISTERPROPERTY(AirIntakeTemperature,0)
-	registerProperty(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
-	registerProperty(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
-	registerProperty(VIN, [](){ return new VINType(""); });
-	registerProperty(WMI, [](){ return new WMIType(""); });
+	registerPropertyPriv(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
+	registerPropertyPriv(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
+	registerPropertyPriv(VIN, [](){ return new VINType(""); });
+	registerPropertyPriv(WMI, [](){ return new WMIType(""); });
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftFront, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureRightFront, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftRear, TirePressureType, 0);
@@ -130,7 +132,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(TireTemperatureRightFront,TireTemperatureType,0);
 	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftRear,TireTemperatureType,0);
 	REGISTERPROPERTYWITHTYPE(TireTemperatureRightRear,TireTemperatureType,0);
-	registerProperty( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
+	registerPropertyPriv( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
 	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
 	REGISTERPROPERTYWITHTYPE(TripMeterC,TripMeterType,0);
@@ -154,13 +156,18 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(FuelConsumption, 0);
 	REGISTERPROPERTY(FuelEconomy, 0);
 	REGISTERPROPERTY(FuelAverageEconomy, 0);
-
+	REGISTERPROPERTY(ExteriorBrightness, 0);
 
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 {
 	return mCapabilities;
+}
+
+std::list<VehicleProperty::Property> VehicleProperty::customProperties()
+{
+	return mCustomProperties;
 }
 
 AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(VehicleProperty::Property name, std::string value)
@@ -174,7 +181,8 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 			if(type == NULL)
 				throw std::runtime_error("Cannot return NULL in a PropertyTypeFactory");
 
-			type->fromString(value);
+			if(value != "" )
+				type->fromString(value);
 
 			return type;
 		}
@@ -184,6 +192,14 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 }
 
 bool VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
+{
+
+	mCustomProperties.push_back(name);
+
+	return registerPropertyPriv(name, factory);
+}
+
+bool VehicleProperty::registerPropertyPriv(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
 {
 	if(ListPlusPlus<Property>(&mCapabilities).contains(name))
 	{
@@ -195,6 +211,7 @@ bool VehicleProperty::registerProperty(VehicleProperty::Property name, VehiclePr
 	mCapabilities.push_back(name);
 
 	return true;
+
 }
 
 VehicleProperty vehiclePropertyConstruct;

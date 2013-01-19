@@ -15,7 +15,7 @@ public:
 	ObdPid(VehicleProperty::Property prop, std::string p, int i)
 		:property(prop), pid(p), id(i), type(0x41)
 	{
-
+		isValidVal = false;
 	}
 	static ByteArray cleanup(ByteArray replyVector)
 	{
@@ -41,13 +41,24 @@ public:
 	}
 	virtual ObdPid* create() = 0;
 
-	virtual bool tryParse(ByteArray replyVector) = 0;
+	bool tryParse(ByteArray replyVector)
+	{
+		if (!isValid(replyVector))
+		{
+			return false;
+		}
+		parse(replyVector);
+		return true;
+	}
+	virtual void parse(ByteArray replyVector) = 0;
+	virtual bool isValid(ByteArray replyVector) = 0;
 
 	VehicleProperty::Property property;
 	std::string pid;
 	int id;
 	int type;
 	std::string value;
+	bool isValidVal;
 };
 
 template <class T>
@@ -58,7 +69,6 @@ public:
 	CopyMe(VehicleProperty::Property prop, std::string p, int i)
 		:ObdPid(prop, p, i)
 	{
-
 	}
 
 	ObdPid* create()
@@ -77,21 +87,27 @@ public:
 	{
 
 	}
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-		//for (int i=0;i<tmp.size();i++)
-		//{
-		  //printf("%i ",tmp[i]);
-		//}
-		//printf("\n");
-		if (tmp[1] != 0x0D)
+		if (tmp[1] != id)
 		{
+			isValidVal = false;
 			return false;
 		}
+		isValidVal = true;
+		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
 		int mph = tmp[2];
 		value = boost::lexical_cast<std::string>(mph);
-		return true;
 	}
 };
 
@@ -104,16 +120,27 @@ public:
 	{
 
 	}
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != 0x0C)
+		if (tmp[1] != id)
 		{
+			isValidVal = false;
 			return false;
 		}
+		isValidVal = true;
+		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
 		double rpm = ((tmp[2] << 8) + tmp[3]) / 4.0;
 		value = boost::lexical_cast<std::string>(rpm);
-		return true;
 	}
 };
 
@@ -126,16 +153,27 @@ public:
 	{
 
 	}
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
 		if (tmp[1] != id)
 		{
+			isValidVal = false;
 			return false;
 		}
+		isValidVal = true;
+		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
 		int temp = tmp[2] - 40;
 		value = boost::lexical_cast<std::string>(temp);
-		return true;
 	}
 };
 
@@ -148,16 +186,27 @@ public:
 	{
 
 	}
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != 0x10)
+		if (tmp[1] != id)
 		{
+			isValidVal = false;
 			return false;
 		}
+		isValidVal = true;
+		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
 		maf = ((tmp[2] << 8) + tmp[3]) / 100.0;
 		value = boost::lexical_cast<std::string>(maf);
-		return true;
 	}
 
 protected:
@@ -173,11 +222,18 @@ public:
 	{
 
 	}
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
-		if(!MassAirFlowPid::tryParse(replyVector))
-			return false;
-
+		return isValidVal = MassAirFlowPid::isValid(replyVector);
+	}
+	void parse(ByteArray replyVector)
+	{
+	  if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
 		timespec t;
 		clock_gettime(CLOCK_REALTIME, &t);
 
@@ -189,7 +245,6 @@ public:
 		double consumption = 1 / (14.75 * 6.26) * maf * diffTime/60;
 
 		value = boost::lexical_cast<std::string>(consumption);
-		return true;
 	}
 
 private:
@@ -207,14 +262,26 @@ public:
 	{
 		type = 0x49;
 	}
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
-		std::string vinstring;
 		ByteArray tmp = compress(cleanup(replyVector));
 		if (tmp[0] != 0x49 || tmp[1] != 0x02)
 		{
+			isValidVal = false;
 			return false;
 		}
+		isValidVal = true;
+		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		std::string vinstring;
+		ByteArray tmp = compress(cleanup(replyVector));
 		for (int j=0;j<tmp.size();j++)
 		{
 			if(tmp[j] == 0x49 && tmp[j+1] == 0x02)
@@ -230,9 +297,7 @@ public:
 		}
 
 		value = vinstring;
-		return true;
 	}
-
 };
 
 class WmiPid: public VinPid
@@ -244,16 +309,20 @@ public:
 	{
 		property = VehicleProperty::WMI;
 	}
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
-		if (!VinPid::tryParse(replyVector))
-		{
-			return false;
-		}
-		value = value.substr(0,3);
-		return true;
+		return isValidVal = VinPid::isValid(replyVector);
 	}
-
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		VinPid::parse(replyVector);
+		value = value.substr(0,3);
+	}
 };
 
 class AirIntakeTemperaturePid: public CopyMe<AirIntakeTemperaturePid>
@@ -264,18 +333,27 @@ public:
 	{
 
 	}
-
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-
 		if (tmp[1] != id)
 		{
+			isValidVal = false;
 			return false;
 		}
+		isValidVal = true;
+		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
 		int temp = tmp[2] - 40;
 		value = boost::lexical_cast<std::string>(temp);
-		return true;
 	}
 };
 
@@ -283,24 +361,31 @@ class EngineLoadPid: public CopyMe<EngineCoolantPid>
 {
 public:
 	EngineLoadPid()
-		:CopyMe(VehicleProperty::EngineLoad,"01041/r",0x04)
+		:CopyMe(VehicleProperty::EngineLoad,"01041\r",0x04)
 	{
 
 	}
-
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-
 		if (tmp[1] != id)
 		{
+			isValidVal = false;
 			return false;
 		}
-
-		int load = tmp[2]*100.0/255.0;
-
-		value = boost::lexical_cast<std::string>(load);
+		isValidVal = true;
 		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
+		int load = tmp[2]*100.0/255.0;
+		value = boost::lexical_cast<std::string>(load);
 	}
 };
 
@@ -308,24 +393,31 @@ class ThrottlePositionPid: public CopyMe<ThrottlePositionPid>
 {
 public:
 	ThrottlePositionPid()
-		:CopyMe(VehicleProperty::ThrottlePosition,"01111/r",0x11)
+		:CopyMe(VehicleProperty::ThrottlePosition,"01111\r",0x11)
 	{
 
 	}
-
-	bool tryParse(ByteArray replyVector)
+	bool isValid(ByteArray replyVector)
 	{
 		ByteArray tmp = compress(cleanup(replyVector));
-
 		if (tmp[1] != id)
 		{
+			isValidVal = false;
 			return false;
 		}
-
-		int load = tmp[2]*100.0/255.0;
-
-		value = boost::lexical_cast<std::string>(load);
+		isValidVal = true;
 		return true;
+	}
+	void parse(ByteArray replyVector)
+	{
+		if (!isValidVal)
+		{
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		ByteArray tmp = compress(cleanup(replyVector));
+		int temp = tmp[2]*100.0/255.0;
+		value = boost::lexical_cast<std::string>(temp);
 	}
 };
 
