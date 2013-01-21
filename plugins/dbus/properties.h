@@ -224,4 +224,18 @@ public:
 	}
 };
 
+class LocationProperty: public DBusSink
+{
+public:
+	LocationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+			:DBusSink("org.automotive.location", "/org/automotive/runningstatus/location", re, connection, map<string, string>())
+	{
+		wantProperty<double>(VehicleProperty::Latitude, "Latitude", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::Longitude, "Longitude", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::Altitude, "Altitude", "d", AbstractProperty::Read);
+		wantProperty<uint>(VehicleProperty::Direction, "Direction", "y", AbstractProperty::Read);
+		supportedChanged(re->supported());
+	}
+};
+
 #endif
