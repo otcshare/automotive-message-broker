@@ -297,6 +297,18 @@ public:
 
 	static const Property ExteriorBrightness;
 	typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
+	
+	static const Property Latitude;
+	typedef BasicPropertyType<double> LatitudeType;
+
+	static const Property Longitude;
+	typedef BasicPropertyType<double> LongitudeType;
+
+	static const Property Altitude;
+	typedef BasicPropertyType<double> AltitudeType;
+
+	static const Property Direction;
+	typedef BasicPropertyType<uint> DirectionType;
 
 	static std::list<VehicleProperty::Property> capabilities();
 	static std::list<VehicleProperty::Property> customProperties();
