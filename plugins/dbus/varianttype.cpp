@@ -25,16 +25,16 @@ GVariant *VariantType::toGVariant()
 
 		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
 
-		return v->toVariant()->gobj();
+		return v->toVariant();
 	}
 
-	return value()->toVariant()->gobj();
+	return value()->toVariant();
 }
 
 void VariantType::fromGVariant(GVariant *val)
 {
 	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
-	v->fromVariant( new Glib::VariantBase(val) );
+	v->fromVariant( val );
 
 	AsyncSetPropertyRequest request;
 	request.property = mPropertyName;
