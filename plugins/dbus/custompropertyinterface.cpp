@@ -17,7 +17,7 @@ CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop,
 			throw std::runtime_error("Cannot create custom property: " + prop);
 		}
 
-		std::string signature = temp->toVariant()->get_type_string();
+		std::string signature = g_variant_get_type_string(temp->toVariant());
 
 		propertyDBusMap[prop] = new VariantType(re, signature, prop, VariantType::ReadWrite, this);
 	}
