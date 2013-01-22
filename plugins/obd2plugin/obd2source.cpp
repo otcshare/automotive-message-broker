@@ -288,7 +288,7 @@ void threadLoop(gpointer data)
 				}
 			}
 			badloop++;
-			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector))
+			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector,5,3))
 			{
 				//This only happens during a error with the com port. Close it and re-open it later.
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid << endl;
@@ -358,7 +358,7 @@ void threadLoop(gpointer data)
 		if (badloop == 0)
 		{
 			//We had zero non-blacklisted events. Pause for a moment here to keep from burning CPU.
-			usleep(10000);
+			//usleep(10000);
 		}
 		repeatReqList.clear();
 		
@@ -496,7 +496,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	m_baud = baud;
 	m_gThread = g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
 	//g_idle_add(updateProperties, this);
-	g_timeout_add(10,updateProperties,this);
+	g_timeout_add(5,updateProperties,this);
 }
 
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
