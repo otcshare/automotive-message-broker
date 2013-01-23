@@ -78,12 +78,16 @@ void AbstractDBusInterface::registerObject()
 
 	GDBusNodeInfo* introspection = g_dbus_node_info_new_for_xml(introspectionXml.c_str(), &error);
 	
-	if(!introspection)
+	if(!introspection || error)
 	{
-		cerr<<"Error in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<endl;
-		cerr<<error->message<<endl;
-		cerr<<"probably bad xml:"<<endl;
-		cerr<<introspectionXml<<endl;
+
+		DebugOut(0)<<"Error in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<endl;
+		DebugOut(0)<<error->message<<endl;
+		DebugOut(0)<<"probably bad xml:"<<endl;
+		DebugOut(0)<<introspectionXml<<endl;
+
+		g_error_free(error);
+
 		return;
 	}
 
@@ -130,6 +134,8 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(), tuple_variant, &error);
 
+	//g_variant_unref(params[0]);
+	//g_variant_unref(params[1]);
 	g_free(params);
 	g_variant_unref(val);
 
