@@ -76,6 +76,8 @@ public:
 
 	virtual void setValue(AbstractPropertyType* val)
 	{
+		if(mValue) delete mValue;
+
 		mValue = val->copy();
 		mAnyValue = val->anyValue();
 		mTimestamp = val->timestamp;
