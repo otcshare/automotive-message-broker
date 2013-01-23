@@ -395,7 +395,7 @@ static int updateProperties( gpointer data)
 		
 		AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
 		src->updateProperty(reply->property, value);
-
+		delete value;
 		delete reply;
 	}
 

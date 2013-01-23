@@ -131,7 +131,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(), tuple_variant, &error);
 
 	g_free(params);
-	//g_variant_unref(tuple_variant);
+	g_variant_unref(val);
 
 	if(error)
 	{

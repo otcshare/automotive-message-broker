@@ -74,6 +74,7 @@ public:
 
 	}
 
+
 	AbstractPropertyType* value;
 	bool success;
 };
