@@ -25,7 +25,9 @@ GVariant *VariantType::toGVariant()
 
 		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
 
-		return v->toVariant();
+		setValue(v);
+
+		delete v;
 	}
 
 	return value()->toVariant();

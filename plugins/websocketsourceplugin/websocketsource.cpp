@@ -417,12 +417,13 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 								source->uuidReplyMap[id]->success = true;
 								source->uuidReplyMap[id]->completed(source->uuidReplyMap[id]);
 								source->uuidReplyMap.erase(id);
-								delete v;
 							}
 							else
 							{
 								DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
 							}
+
+							delete v;
 						}
 					}
 					else

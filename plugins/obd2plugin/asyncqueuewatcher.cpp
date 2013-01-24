@@ -18,43 +18,72 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "asyncqueuewatcher.h"
 
-AsyncQueueWatcher::AsyncQueueWatcher(GAsyncQueue *q, AsyncQueueWatcherCallback cb, void *data)
-	:Glib::Source()
-{
-	queue = g_async_queue_ref(q);
-	userData = data;
-	callback = cb;
-	set_priority(G_PRIORITY_DEFAULT);
-	//set_can_recurse(true);
+#include <functional>
 
-}
+struct Source: public GSource {
+	AsyncQueueWatcher* queueWatcher;
+};
 
-bool AsyncQueueWatcher::prepare(int &timeout)
+gboolean prepare(GSource* source, gint *timeout)
 {
-	timeout = -1;
-	int size = g_async_queue_length (queue);
+	*timeout = 0;
+	Source* s = static_cast<Source*>(source);
+	int size = g_async_queue_length (s->queueWatcher->queue);
 	return (size > 0);
 }
 
-bool AsyncQueueWatcher::check()
+gboolean check(GSource *source)
 {
-	return (g_async_queue_length (queue) > 0);
+	Source* s = static_cast<Source*>(source);
+	int size = g_async_queue_length (s->queueWatcher->queue);
+	return (size > 0);
 }
 
-bool AsyncQueueWatcher::dispatch(sigc::slot_base *)
+gboolean dispatch(GSource* source, GSourceFunc c, gpointer u)
 {
-	gpointer item = g_async_queue_try_pop (queue);
+	Source* s = static_cast<Source*>(source);
+	int size = g_async_queue_length (s->queueWatcher->queue);
+	gpointer item = g_async_queue_try_pop (s->queueWatcher->queue);
 
 	if (item == NULL)
 	{
 		return true;
 	}
 
-	if (callback == NULL)
+	if (s->queueWatcher->callback == NULL)
 	{
 		return false;
 	}
 
-	callback(item, userData);
+	s->queueWatcher->callback(item, s->queueWatcher->userData);
 	return true;
+}
+
+void finalize(GSource *source)
+{
+
+}
+
+
+AsyncQueueWatcher::AsyncQueueWatcher(GAsyncQueue *q, AsyncQueueWatcherCallback cb, void *data)
+{
+	using namespace std::placeholders;
+
+	queue = g_async_queue_ref(q);
+	userData = data;
+	callback = cb;
+
+	auto foo1 = std::bind(prepare, _1, _2);
+
+	GSourceFuncs vtable;
+	vtable.prepare = prepare;
+	vtable.check = check;
+	vtable.dispatch =  dispatch;
+	vtable.finalize =  finalize;
+
+	Source* src = static_cast<Source*>(g_source_new(&vtable,sizeof(Source)));
+	src->queueWatcher = this;
+	g_source_attach(src,NULL);
+	g_source_set_can_recurse(src, TRUE);
+
 }
