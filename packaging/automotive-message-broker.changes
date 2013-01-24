@@ -1,8 +1,11 @@
-* Mon Jan 21 10:57:00 UTC 2013 - kevron_m_rees@linux.intel.com>
+* Thu Jan 24 14:44:00 UTC 2013 - <kevron_m_rees@linux.intel.com>
+- memory usage fixes
+
+* Mon Jan 21 10:57:00 UTC 2013 - <kevron_m_rees@linux.intel.com>
 - updated to 0.6.9
 
 
-* Wed Jan 3 10:57:00 UTC 2013 - kevron_m_rees@linux.intel.com> 3718d3f
+* Wed Jan 3 10:57:00 UTC 2013 - <kevron_m_rees@linux.intel.com> 3718d3f
 - updated spec to include database package
 
 * Fri Dec  7 23:19:19 UTC 2012 - tracy.graydon@intel.com
