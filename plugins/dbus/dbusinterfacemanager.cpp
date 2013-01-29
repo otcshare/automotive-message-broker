@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "properties.h"
 #include "custompropertyinterface.h"
 #include "environmentproperties.h"
+#include "vehicleinfo.h"
 
 #define ConstructProperty(property) \
 	new property(iface->re, connection);
@@ -53,6 +54,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(FuelProperty);
 	ConstructProperty(EngineOilProperty);
 	ConstructProperty(ExteriorBrightnessProperty);
+	ConstructProperty(VehicleId);
 
 	PropertyList list = VehicleProperty::customProperties();
 

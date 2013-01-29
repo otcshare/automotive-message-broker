@@ -4,14 +4,15 @@
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
 	:AbstractProperty(propertyName, signature, access, interface),routingEngine(re)
 {
+	//set default value:
+	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName));
+
 	AsyncPropertyRequest request;
 	request.property = mPropertyName;
 
-	VariantType* foo = this;
-
-	request.completed = [foo](AsyncPropertyReply* reply)
+	request.completed = [this](AsyncPropertyReply* reply)
 	{
-		foo->setValue(reply->value);
+		setValue(reply->value);
 	};
 
 	re->getPropertyAsync(request);

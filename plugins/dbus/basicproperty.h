@@ -22,15 +22,34 @@
 #include "abstractproperty.h"
 #include "vehicleproperty.h"
 #include "abstractroutingengine.h"
+#include <functional>
 
 template <typename T>
 class BasicProperty: public AbstractProperty
 {
 public:
 	BasicProperty(AbstractRoutingEngine* re, string ambPropertyName, string propertyName, string signature, Access access, AbstractDBusInterface *interface)
-		:AbstractProperty(propertyName, signature, access, interface)
+		:AbstractProperty(propertyName, signature, access, interface), routingEngine(re)
 	{
 		mAmbPropertyName = ambPropertyName;
+		//set default value:
+		AbstractProperty::setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(ambPropertyName));
+
+		using namespace std::placeholders;
+
+		AsyncPropertyRequest request;
+		request.property = ambPropertyName;
+		request.completed = std::bind(&BasicProperty<T>::asyncReply,this,_1);
+		routingEngine->getPropertyAsync(request);
+
+	}
+
+	void asyncReply(AsyncPropertyReply* reply)
+	{
+		if(reply->success)
+			AbstractProperty::setValue(reply->value);
+
+		delete reply;
 	}
 
 	void setValue(T val)
@@ -55,6 +74,65 @@ public:
 
 		AbstractPropertyType* apt = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName,"");
 		apt->setValue(val);
+
+		AsyncSetPropertyRequest request;
+		request.property = mAmbPropertyName;
+		request.value = apt;
+		request.completed = [apt](AsyncPropertyReply* reply)
+		{
+			if(!reply->success) {
+				//TODO: throw DBus exception
+			}
+			delete apt;
+		};
+
+		routingEngine->setProperty(request);
+	}
+
+private:
+	VehicleProperty::Property mAmbPropertyName;
+	AbstractRoutingEngine* routingEngine;
+};
+
+
+class StringDBusProperty: public AbstractProperty
+{
+public:
+
+	StringDBusProperty(AbstractRoutingEngine* re, string ambPropertyName, string propertyName, string signature, Access access, AbstractDBusInterface *interface)
+		:AbstractProperty(propertyName, signature, access, interface), routingEngine(re), mAmbPropertyName(ambPropertyName)
+	{
+		//set default value:
+		AbstractProperty::setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(ambPropertyName));
+
+		AsyncPropertyRequest request;
+		request.property = ambPropertyName;
+		request.completed = [this](AsyncPropertyReply* reply)
+		{
+			AbstractProperty::setValue(reply->value);
+
+			delete reply;
+		};
+
+		routingEngine->getPropertyAsync(request);
+	}
+
+	void setValue(std::string val)
+	{
+		AbstractProperty::setValue<std::string>(val);
+	}
+
+	virtual GVariant* toGVariant()
+	{
+		return g_variant_new(signature().c_str(), value()->toString().c_str());
+	}
+
+	virtual void fromGVariant(GVariant *value)
+	{
+		char *val;
+		g_variant_get(value,signature().c_str(), &val);
+
+		AbstractPropertyType* apt = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName,val);
 
 		AsyncSetPropertyRequest request;
 		request.property = mAmbPropertyName;
