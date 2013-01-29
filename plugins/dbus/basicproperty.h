@@ -39,7 +39,7 @@ public:
 
 		AsyncPropertyRequest request;
 		request.property = ambPropertyName;
-		request.completed = std::bind(&BasicProperty<T>::asyncReply,this,_1);
+		request.completed = std::bind(&BasicProperty<T>::asyncReply, this, _1);
 		routingEngine->getPropertyAsync(request);
 
 	}
