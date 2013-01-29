@@ -99,10 +99,22 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 		{
 			port = boost::lexical_cast<int>((*i).second);
 		}
+		if ((*i).first == "ssl")
+		{
+			if ((*i).second == "true")
+			{
+				m_sslEnabled = true;
+			}
+			else
+			{
+				m_sslEnabled = false;
+			} 
+		}
 	}
 	//printf("Connecting to websocket server at %s port %i\n",ip.c_str(),port);
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Connecting to websocket server at" << ip << ":" << port << "\n";
-	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, 0,"/", "localhost", "websocket",protocols[0].name, -1);
+	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, m_sslEnabled,"/", "localhost", "websocket",protocols[0].name, -1);
+	
 
 }
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
@@ -489,6 +501,7 @@ void WebSocketSource::setSupported(PropertyList list)
 
 WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {
+	m_sslEnabled = false;
 	clientConnected = false;
 	source = this;
 	m_re = re;  

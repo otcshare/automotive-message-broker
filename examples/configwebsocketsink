@@ -10,6 +10,9 @@
 			"name" : "WebSocketSink",
 			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
 			"interface" : "lo",
+			"ssl" : "true",
+			"cert" : "/home/michael/code/Intel/libwebsockets/test-server/libwebsockets-test-server.pem",
+			"key" : "/home/michael/code/Intel/libwebsockets/test-server/libwebsockets-test-server.key.pem",
 			"port" : "23000"
 		} 
 	]

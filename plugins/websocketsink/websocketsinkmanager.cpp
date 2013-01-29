@@ -64,10 +64,10 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	//Default values
 	int port = 23000;
 	std::string interface = "lo";
-	const char *ssl_cert_path = NULL;
-	const char *ssl_key_path = NULL;
+	std::string ssl_cert_path = "/home/michael/code/Intel/libwebsockets/test-server/libwebsockets-test-server.pem";
+	std::string ssl_key_path = "/home/michael/code/Intel/libwebsockets/test-server/libwebsockets-test-server.key.pem";
 	int options = 0;
-
+	bool ssl = false;
 	//Try to load config
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
@@ -81,8 +81,35 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 		{
 			port = boost::lexical_cast<int>((*i).second);
 		}
+		if ((*i).first == "cert")
+		{
+			ssl_cert_path = (*i).second;
+		}
+		if ((*i).first == "key")
+		{
+			ssl_key_path = (*i).second;
+		}
+		if ((*i).first == "ssl")
+		{
+			if ((*i).second == "true")
+			{
+				ssl = true;
+			}
+			else
+			{
+				ssl = false;
+			}
+		}
 	}
-	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
+	if (ssl)
+	{
+		  context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path.c_str(), ssl_key_path.c_str(), -1, -1, options);
+	}
+	else
+	{
+		context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,NULL, NULL, -1, -1, options);
+	}
+	
 }
 
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
