@@ -55,10 +55,10 @@ public:
 	TirePressureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.tirePressure","/org/automotive/maintainance/tirePressure", re, connection, map<string, string>())
 	{
-		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftFront,"LeftFront", "q", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TirePressureRightFront,"RightFront", "q", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TirePressureLeftRear,"LeftRear", "q", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TirePressureRightRear,"RightRear", "q", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TirePressureLeftFront,"LeftFront", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TirePressureRightFront,"RightFront", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TirePressureLeftRear,"LeftRear", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TirePressureRightRear,"RightRear", "d", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -69,7 +69,7 @@ public:
 	VehiclePowerModeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.vehiclePowerMode","/org/automotive/runningstatus/vehiclePowerMode", re, connection, map<string, string>())
 	{
-		wantProperty<uint16_t>(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
+		wantProperty<Power::PowerModes>(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -110,7 +110,7 @@ public:
 														  "ShiftPosition", "y", AbstractProperty::Read);
 		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionGearPosition,
 														  "GearPosition", "y", AbstractProperty::Read);
-		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionMode,
+		wantProperty<Transmission::Mode>(VehicleProperty::TransmissionMode,
 														  "Mode", "y", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
@@ -123,10 +123,10 @@ public:
 	TireTemperatureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.tireTemperature","/org/automotive/maintainance/tireTemperature", re, connection, map<string, string>())
 	{
-		wantProperty<uint16_t>(VehicleProperty::TireTemperatureLeftFront,"LeftFront", "i", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TireTemperatureRightFront,"RightFront", "i", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TireTemperatureLeftRear,"LeftRear", "i", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::TireTemperatureRightRear,"RightRear", "i", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TireTemperatureLeftFront,"LeftFront", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TireTemperatureRightFront,"RightFront", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TireTemperatureLeftRear,"LeftRear", "d", AbstractProperty::Read);
+		wantProperty<double>(VehicleProperty::TireTemperatureRightRear,"RightRear", "d", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -218,7 +218,7 @@ public:
 			:DBusSink("org.automotive.engineOil", "/org/automotive/runningstatus/engineOil", re, connection, map<string, string>())
 	{
 		wantProperty<uint16_t>(VehicleProperty::EngineOilRemaining, "Remaining", "y", AbstractProperty::Read);
-		wantProperty<uint16_t>(VehicleProperty::EngineOilTemperature, "Temperature", "y", AbstractProperty::Read);
+		wantProperty<int>(VehicleProperty::EngineOilTemperature, "Temperature", "i", AbstractProperty::Read);
 		wantProperty<uint16_t>(VehicleProperty::EngineOilPressure, "Pressure", "y", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
