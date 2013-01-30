@@ -123,6 +123,18 @@ enum RefuelPosition
 };
 }
 
+namespace Vehicle {
+enum Type
+{
+	Sedan = 0,
+	Coupe,
+	Cabriole,
+	Roadster,
+	SUV,
+	Truck
+};
+}
+
 class VehicleProperty
 {
 
@@ -339,6 +351,8 @@ public:
 	static const Property VehicleHeight;
 	static const Property VehicleLength;
 	typedef BasicPropertyType<uint> VehicleSizeType;
+
+
 
 	/** END PROPERTIES **/
 

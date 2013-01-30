@@ -91,8 +91,18 @@ const VehicleProperty::Property VehicleProperty::FuelConsumption = "FuelConsumpt
 const VehicleProperty::Property VehicleProperty::FuelRange = "FuelRange";
 const VehicleProperty::Property VehicleProperty::FuelEconomy = "FuelEconomy";
 const VehicleProperty::Property VehicleProperty::FuelAverageEconomy = "FuelAverageEconomy";
+const VehicleProperty::Property VehicleProperty::FuelType = "FuelType";
+const VehicleProperty::Property VehicleProperty::FuelPositionSide = "FuelPositionSide";
 const VehicleProperty::Property VehicleProperty::EngineOilRemaining = "EngineOilRemaining";
 const VehicleProperty::Property VehicleProperty::ExteriorBrightness = "ExteriorBrightness";
+const VehicleProperty::Property VehicleProperty::Latitude = "Latitude";
+const VehicleProperty::Property VehicleProperty::Longitude = "Longitude";
+const VehicleProperty::Property VehicleProperty::Direction = "Direction";
+const VehicleProperty::Property VehicleProperty::Altitude = "Altitude";
+const VehicleProperty::Property VehicleProperty::VehicleWidth = "VehicleWidth";
+const VehicleProperty::Property VehicleProperty::VehicleHeight = "VehicleHeight";
+const VehicleProperty::Property VehicleProperty::VehicleLength = "VehicleLength";
+
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -150,13 +160,23 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(InteriorLightPassenger, LightStatusType, false);
 	REGISTERPROPERTYWITHTYPE(InteriorLightCenter, LightStatusType, false);
 	REGISTERPROPERTY(EngineLoad,0);
-	REGISTERPROPERTY(Horn,false);
+	REGISTERPROPERTY(Horn, false);
 	REGISTERPROPERTY(FuelLevel, 0);
 	REGISTERPROPERTY(FuelRange, 0);
 	REGISTERPROPERTY(FuelConsumption, 0);
 	REGISTERPROPERTY(FuelEconomy, 0);
 	REGISTERPROPERTY(FuelAverageEconomy, 0);
+	REGISTERPROPERTY(FuelType, Fuel::Gasoline);
+	REGISTERPROPERTY(FuelPositionSide, Fuel::Left);
 	REGISTERPROPERTY(ExteriorBrightness, 0);
+	REGISTERPROPERTYWITHTYPE(VehicleWidth,VehicleSizeType,0);
+	REGISTERPROPERTYWITHTYPE(VehicleHeight,VehicleSizeType,0);
+	REGISTERPROPERTYWITHTYPE(VehicleLength,VehicleSizeType,0);
+	REGISTERPROPERTY(Latitude,0);
+	REGISTERPROPERTY(Longitude,0);
+	REGISTERPROPERTY(Altitude,0);
+	REGISTERPROPERTY(Direction,0);
+
 
 }
 
