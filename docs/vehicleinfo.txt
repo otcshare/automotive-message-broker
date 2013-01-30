@@ -10,11 +10,11 @@ Interface:	org.automotive.VehicleId
 Object path:	/org/automotive/vehicleInfo/VehicleId
 Properties:
 
-                string WMI [readonly]
+		string WMI [readonly]
 
 			World Manufacturer Identifier as defined by SAE. 3 characters.
 
-                string VIN [readonly]
+		string VIN [readonly]
 
 			Vehicle Identification Number as defined by ISO 3779. 17 characters.
 
@@ -22,41 +22,41 @@ Interface:	org.automotive.size
 Object path:	/org/automotive/vehicleInfo/size
 Properties:
 
-                int Width [readonly]
-                width in mm
+		int Width [readonly]
+			width in mm
 
-                Height [readonly]
-                height in mm
+		Height [readonly]
+			height in mm
 
-                Length [readonly]
-                length in mm
+		Length [readonly]
+			length in mm
 
 Interface:	org.automotive.fuelInfo
 Object path:	/org/automotive/vehicleInfo/FuelInfo
 Properties:
 
-                byte Type [readonly]
+		byte Type [readonly]
 
-                        type of fuel:
-                        Gasoline,
-                        High-Octane,
-                        Diesel,
-                        Electric,
-                        Hydrogen
+			type of fuel:
+			Gasoline = 0,
+			High-Octane = 1,
+			Diesel = 2,
+			Electric = 3,
+			Hydrogen = 4
 
-                byte RefuelPosition [readonly]
+		byte RefuelPosition [readonly]
 
-                        Position of refueling:
-                        Left,
-                        Right,
-                        Front,
-                        Rear
+			Position of refueling:
+			Left = 0,
+			Right = 1,
+			Front = 2,
+			Rear = 3
 
 Interface:	org.automotive.VehicleType
 Object path:	/org/automotive/vehicleInfo/VehicleType
 Properties:
 
-                byte VehicleType [readonly]
+		byte VehicleType [readonly]
 			
 			Vehicle Type: Sedan = 0,
 			Coupe = 1,

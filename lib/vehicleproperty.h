@@ -104,6 +104,25 @@ enum PowerModes
 };
 }
 
+namespace Fuel{
+enum Type
+{
+	Gasoline = 0,
+	High_Octane,
+	Diesel,
+	Electric,
+	Hydrogen
+};
+
+enum RefuelPosition
+{
+	Left = 0,
+	Right,
+	Front,
+	Rear
+};
+}
+
 class VehicleProperty
 {
 
@@ -295,6 +314,12 @@ public:
 	static const Property FuelAverageEconomy;
 	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
+	static const Property FuelType;
+	typedef BasicPropertyType<Fuel::Type> FuelTypeType;
+
+	static const Property FuelPositionSide;
+	typedef BasicPropertyType<Fuel::RefuelPosition> FuelPositionSideType;
+
 	static const Property ExteriorBrightness;
 	typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
 	
@@ -309,6 +334,14 @@ public:
 
 	static const Property Direction;
 	typedef BasicPropertyType<uint> DirectionType;
+
+	static const Property VehicleWidth;
+	static const Property VehicleHeight;
+	static const Property VehicleLength;
+	typedef BasicPropertyType<uint> VehicleSizeType;
+
+	/** END PROPERTIES **/
+
 
 	static std::list<VehicleProperty::Property> capabilities();
 	static std::list<VehicleProperty::Property> customProperties();
