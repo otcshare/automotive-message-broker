@@ -23,15 +23,15 @@ option(database_plugin "Database plugins" OFF)
 option(qt_bindings "AMB Qt DBus bindings" OFF)
 
 include (CMakeForceCompiler)
-option(ENABLE_ICECC "Enable icecc checking, for distributed compilation" ON)
+option(ENABLE_ICECC "Enable icecc checking, for distributed compilation" OFF)
 
 if (ENABLE_ICECC)
    find_program(ICECC icecc)
     if (ICECC)
-        message(STATUS "icecc found! Distributed compilation for all!")
+        message(STATUS "icecc will be used for distributed compiling")
         cmake_force_cxx_compiler(${ICECC} icecc)
     else(ICECC)
-        message(FATAL_ERROR "icecc NOT found! re-run cmake without -DENABLE_ICECC")
+        message(STATUS "Not using icecc")
     endif(ICECC)
 endif(ENABLE_ICECC)
 
@@ -60,10 +60,11 @@ if(use_qtcore)
 
 endif(use_qtcore)
 
-add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
-
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
 add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
+add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
 add_subdirectory(lib)
 add_subdirectory(ambd)
