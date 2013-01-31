@@ -62,7 +62,7 @@ void connect(obdLib* obd, std::string device, std::string strbaud)
 {
 	//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
 	std::string port = device;
-	DebugOut() << "Obd2Source::Connect()" << device << strbaud << "\n";
+	DebugOut() << "Obd2Source::Connect()" << device << strbaud << endl;
 	int baud = boost::lexical_cast<int>(strbaud);
 	obd->openPort(port.c_str(),baud);
 ObdPid::ByteArray replyVector;
@@ -76,7 +76,7 @@ std::string reply;
 	{
 		//No reply found
 		//printf("Error!\n");
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM\n";
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM"<<endl;
 	}
 	else
 	{
