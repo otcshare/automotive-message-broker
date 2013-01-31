@@ -313,6 +313,13 @@ void threadLoop(gpointer data)
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "error:nodata";
 					g_async_queue_push(privStatusQueue,statusreq);
+					//propertyReplyMap[reply->property] = reply;
+					if (source->propertyReplyMap.find((*i)->property) != source->propertyReplyMap.end())
+					{
+						(*source->propertyReplyMap.find((*i)->property)).second->success = false;
+						(*source->propertyReplyMap.find((*i)->property)).second->completed((*source->propertyReplyMap.find((*i)->property)).second);
+						source->propertyReplyMap.erase(source->propertyReplyMap.find((*i)->property));
+					}
 					continue;
 				}
 				else if (obd->lastError() == obdLib::TIMEOUT)
@@ -324,6 +331,12 @@ void threadLoop(gpointer data)
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "error:timeout";
 						g_async_queue_push(privStatusQueue,statusreq);
+						if (source->propertyReplyMap.find((*i)->property) != source->propertyReplyMap.end())
+						{
+							(*source->propertyReplyMap.find((*i)->property)).second->success = false;
+							(*source->propertyReplyMap.find((*i)->property)).second->completed((*source->propertyReplyMap.find((*i)->property)).second);
+							source->propertyReplyMap.erase(source->propertyReplyMap.find((*i)->property));
+						}
 						continue;
 					}
 				}
