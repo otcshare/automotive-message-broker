@@ -102,7 +102,7 @@ const VehicleProperty::Property VehicleProperty::Altitude = "Altitude";
 const VehicleProperty::Property VehicleProperty::VehicleWidth = "VehicleWidth";
 const VehicleProperty::Property VehicleProperty::VehicleHeight = "VehicleHeight";
 const VehicleProperty::Property VehicleProperty::VehicleLength = "VehicleLength";
-
+const VehicleProperty::Property VehicleProperty::VehicleType = "VehicleType";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -166,8 +166,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(FuelConsumption, 0);
 	REGISTERPROPERTY(FuelEconomy, 0);
 	REGISTERPROPERTY(FuelAverageEconomy, 0);
-	REGISTERPROPERTY(FuelType, Fuel::Gasoline);
-	REGISTERPROPERTY(FuelPositionSide, Fuel::Left);
+	REGISTERPROPERTY(FuelType, Fuel::Unknown);
+	REGISTERPROPERTY(FuelPositionSide, Fuel::UnknownPosition);
 	REGISTERPROPERTY(ExteriorBrightness, 0);
 	REGISTERPROPERTYWITHTYPE(VehicleWidth,VehicleSizeType,0);
 	REGISTERPROPERTYWITHTYPE(VehicleHeight,VehicleSizeType,0);
@@ -176,6 +176,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Longitude,0);
 	REGISTERPROPERTY(Altitude,0);
 	REGISTERPROPERTY(Direction,0);
+	REGISTERPROPERTY(VehicleType,Vehicle::Unknown);
 
 
 }

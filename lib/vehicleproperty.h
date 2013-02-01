@@ -107,6 +107,7 @@ enum PowerModes
 namespace Fuel{
 enum Type
 {
+	Unknown = -1,
 	Gasoline = 0,
 	High_Octane,
 	Diesel,
@@ -116,6 +117,7 @@ enum Type
 
 enum RefuelPosition
 {
+	UnknownPosition = -1,
 	Left = 0,
 	Right,
 	Front,
@@ -126,6 +128,7 @@ enum RefuelPosition
 namespace Vehicle {
 enum Type
 {
+	Unknown = -1,
 	Sedan = 0,
 	Coupe,
 	Cabriole,
@@ -353,6 +356,10 @@ public:
 	typedef BasicPropertyType<uint> VehicleSizeType;
 
 
+	static const Property VehicleType;
+	typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
+
+
 
 	/** END PROPERTIES **/
 
@@ -377,7 +384,7 @@ public:
 	 *  #include <vehicleproperty.h>
 	 *  #include <abstractpropertytype.h>
 	 *
-	 *  //In the constructor of a source plugin:
+	 *  //Somewhere in a source plugin:
 	 *  ...
 	 *  Property VehicleJetEngineStatus = "VehicleJetEngineStatus";
 	 *  VehicleProperty::registerProperty(VehicleJetEngineStatus, [](){return new BasicPropertyType<bool>(false);});
