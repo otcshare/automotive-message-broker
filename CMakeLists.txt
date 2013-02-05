@@ -37,6 +37,23 @@ endif(ENABLE_ICECC)
 
 find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
+
+if(libtool_LIBRARY)
+     message(STATUS "libtool found")
+else(libtool_LIBRARY)
+     message(FATAL_ERROR "libtool missing.  please install libtool")
+endif(libtool_LIBRARY)
+
+find_library(uuid_LIBRARY uuid DOC "Uuid libraries")
+find_path(uuid_INCLUDE_DIR uuid/uuid.h DOC "Libtool headers")
+
+if(uuid_LIBRARY)
+     message(STATUS "uuid found")
+else(uuid_LIBRARY)
+     message(FATAL_ERROR "uuid missing.  please install uuid-dev")
+endif(uuid_LIBRARY)
+
+
 find_package(Boost REQUIRED)
 
 pkg_check_modules(glib REQUIRED glib-2.0)
@@ -45,8 +62,8 @@ pkg_check_modules(json REQUIRED json-glib-1.0)
 add_definitions(-std=c++0x)
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
-set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${uuid_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} ${uuid_LIBRARY} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 if(use_qtcore)
 
