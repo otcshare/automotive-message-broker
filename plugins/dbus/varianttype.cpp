@@ -10,10 +10,8 @@ VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::
 	AsyncPropertyRequest request;
 	request.property = mPropertyName;
 
-	request.completed = [this](AsyncPropertyReply* reply)
-	{
-		setValue(reply->value);
-	};
+	using namespace std::placeholders;
+	request.completed = std::bind(&VariantType::asyncReply, this, _1);
 
 	re->getPropertyAsync(request);
 
@@ -48,4 +46,11 @@ void VariantType::fromGVariant(GVariant *val)
 	};
 
 	routingEngine->setProperty(request);
+}
+
+void VariantType::asyncReply(AsyncPropertyReply * reply)
+{
+	setValue(reply->value);
+
+	delete reply;
 }
