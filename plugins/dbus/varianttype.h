@@ -13,6 +13,7 @@ public:
 	void fromGVariant(GVariant *value);
 
 private:
+	void asyncReply(AsyncPropertyReply*);
 	AbstractRoutingEngine* routingEngine;
 
 };
