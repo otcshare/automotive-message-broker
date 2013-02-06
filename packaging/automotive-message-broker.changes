@@ -1,5 +1,6 @@
 * Wed Feb 06 10:38:00 PST 2013 - <kevron.m.rees@intel.com>
 - dbus fixes
+- compiler fixes
 
 * Thu Jan 24 14:44:00 UTC 2013 - <kevron_m_rees@linux.intel.com>
 - memory usage fixes
