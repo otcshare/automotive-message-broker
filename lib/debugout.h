@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include "timestamp.h"
 
@@ -40,7 +41,7 @@ public:
 		out.precision(15);
 
 		if(mDebugLevel <= debugThreshhold)
-			out<<amb::currentTime()<<" | ";
+			out<<bufferTime(amb::currentTime())<<" | ";
 	}
 
 	DebugOut const& operator << (string message) const
@@ -96,6 +97,20 @@ public:
 	}
 
 private:
+
+	std::string bufferTime(double time)
+	{
+		ostringstream f;
+		f<<time;
+
+		while(f.str().length() < 15)
+		{
+			f<<" ";
+		}
+
+		return f.str();
+	}
+
 	static int debugThreshhold;
 	static std::streambuf *buf;
 	int mDebugLevel;

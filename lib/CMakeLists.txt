@@ -3,7 +3,7 @@ set(amb_headers_install abstractpropertytype.h nullptr.h abstractroutingengine.h
 include_directories( ${include_dirs} )
 add_library(amb SHARED ${amb_sources})
 
-target_link_libraries(amb uuid ${libtool_LIBRARY} ${glib_LIBRARIES} ${gio_LIBRARIES})
+target_link_libraries(amb ${libtool_LIBRARY} ${glib_LIBRARIES} ${gio_LIBRARIES})
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/automotive-message-broker.pc.in ${CMAKE_CURRENT_BINARY_DIR}/automotive-message-broker.pc @ONLY)
 
