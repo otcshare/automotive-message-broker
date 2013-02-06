@@ -86,6 +86,13 @@ enum Mode {
 	OEMCustom1 = 3,
 	OEMCustom2 = 4
 };
+
+enum Type {
+	Unknown = -1,
+	Auto = 0,
+	Manual = 1,
+	CV = 2
+};
 }
 
 namespace Power {
@@ -137,6 +144,8 @@ enum Type
 	Truck
 };
 }
+
+
 
 class VehicleProperty
 {
@@ -359,7 +368,18 @@ public:
 	static const Property VehicleType;
 	typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
 
+	static const Property DoorsPerRow;
+	typedef ListPropertyType DoorsPerRowType;
 
+	static const Property TransmissionGearType;
+	typedef BasicPropertyType<Transmission::Type> TransmissionGearTypeType;
+
+	static const Property FrontWheelRadius;
+	static const Property RearWheelRadius;
+	typedef BasicPropertyType<uint16_t> WheelRadiusType;
+
+	static const Property WheelTrack;
+	typedef BasicPropertyType<uint> WheelTrackType;
 
 	/** END PROPERTIES **/
 

@@ -55,6 +55,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(EngineOilProperty);
 	ConstructProperty(ExteriorBrightnessProperty);
 	ConstructProperty(VehicleId);
+	ConstructProperty(DoorsProperty);
 
 	PropertyList list = VehicleProperty::customProperties();
 
@@ -71,11 +72,13 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 static void
 on_name_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
+
 }
 
 static void
 on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
+
 }
 
 

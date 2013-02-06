@@ -23,6 +23,8 @@
 #include "abstractproperty.h"
 #include "abstractdbusinterface.h"
 #include "basicproperty.h"
+#include "varianttype.h"
+
 #include <map>
 #include <type_traits>
 
@@ -48,6 +50,11 @@ protected:
 	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		propertyDBusMap[property] = new StringDBusProperty(routingEngine, property, propertyName, signature, access, this);
+	}
+
+	void wantPropertyVariant(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
+	{
+		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
 	}
 
 	PropertyDBusMap propertyDBusMap;

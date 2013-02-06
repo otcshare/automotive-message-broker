@@ -27,6 +27,7 @@
 #include <boost/utility.hpp>
 #include <type_traits>
 #include <glib.h>
+#include <list>
 #include "timestamp.h"
 
 class AbstractPropertyType
@@ -359,6 +360,34 @@ public:
 private:
 
 	GVariant* mVariant;
+};
+
+class ListPropertyType: public AbstractPropertyType
+{
+public:
+
+	ListPropertyType();
+	ListPropertyType(int unused);
+	ListPropertyType(ListPropertyType & other);
+	~ListPropertyType();
+
+	void append(AbstractPropertyType* property);
+
+	uint count();
+
+	AbstractPropertyType* copy();
+
+	std::string toString() const;
+	void fromString(std::string );
+
+
+	GVariant* toVariant();
+	void fromVariant(GVariant* v);
+
+	std::list<AbstractPropertyType*> list() { return mList; }
+
+private:
+	std::list<AbstractPropertyType*> mList;
 };
 
 #endif

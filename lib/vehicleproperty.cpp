@@ -103,6 +103,11 @@ const VehicleProperty::Property VehicleProperty::VehicleWidth = "VehicleWidth";
 const VehicleProperty::Property VehicleProperty::VehicleHeight = "VehicleHeight";
 const VehicleProperty::Property VehicleProperty::VehicleLength = "VehicleLength";
 const VehicleProperty::Property VehicleProperty::VehicleType = "VehicleType";
+const VehicleProperty::Property VehicleProperty::DoorsPerRow = "DoorsPerRow";
+const VehicleProperty::Property VehicleProperty::TransmissionGearType = "TransmissionGearType";
+const VehicleProperty::Property VehicleProperty::FrontWheelRadius = "FrontWheelRadius";
+const VehicleProperty::Property VehicleProperty::RearWheelRadius = "RearWheelRadius";
+const VehicleProperty::Property VehicleProperty::WheelTrack = "WheelTrack";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -177,6 +182,12 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Altitude,0);
 	REGISTERPROPERTY(Direction,0);
 	REGISTERPROPERTY(VehicleType,Vehicle::Unknown);
+	REGISTERPROPERTY(DoorsPerRow,0);
+	REGISTERPROPERTY(TransmissionGearType,Transmission::Unknown);
+	REGISTERPROPERTYWITHTYPE(FrontWheelRadius, WheelRadiusType, 0);
+	REGISTERPROPERTYWITHTYPE(RearWheelRadius, WheelRadiusType, 0);
+	REGISTERPROPERTY(WheelTrack,0);
+
 
 
 }

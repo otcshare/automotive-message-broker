@@ -47,4 +47,55 @@ public:
 		}
 };
 
+
+class VehicleTypeProperty: public DBusSink
+{
+public:
+	VehicleTypeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.vehicleType","/org/automotive/vehicleinfo/vehicleType", re, connection, map<string, string>())
+	{
+		wantProperty<Vehicle::Type>(VehicleProperty::VehicleType, "Type", "i", AbstractProperty::Read);
+
+		supportedChanged(re->supported());
+	}
+};
+
+class DoorsProperty: public DBusSink
+{
+public:
+	DoorsProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.doors","/org/automotive/vehicleinfo/doors", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "a(i)", AbstractProperty::Read);
+
+		supportedChanged(re->supported());
+	}
+};
+
+class TransmissionInfoProperty: public DBusSink
+{
+public:
+	TransmissionInfoProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.transmissionGearType","/org/automotive/vehicleinfo/transmissionGearType", re, connection, map<string, string>())
+	{
+		wantProperty<Transmission::Type>(VehicleProperty::TransmissionGearType, "TransmissionGearType", "i", AbstractProperty::Read);
+
+		supportedChanged(re->supported());
+	}
+};
+
+class WheelInformationProperty: public DBusSink
+{
+public:
+	WheelInformationProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("org.automotive.WheelInformationProperty","/org/automotive/vehicleinfo/WheelInformationProperty", re, connection, map<string, string>())
+	{
+		wantProperty<uint16_t>(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::RearWheelRadius, "RearWheelRadius", "i", AbstractProperty::Read);
+		wantProperty<uint>(VehicleProperty::WheelTrack, "WheelTrack", "i", AbstractProperty::Read);
+
+		supportedChanged(re->supported());
+	}
+};
+
 #endif
