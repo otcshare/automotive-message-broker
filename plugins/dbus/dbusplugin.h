@@ -24,6 +24,7 @@
 #include "abstractdbusinterface.h"
 #include "basicproperty.h"
 #include <map>
+#include <type_traits>
 
 typedef std::map<VehicleProperty::Property, AbstractProperty*> PropertyDBusMap;
 
@@ -43,14 +44,11 @@ protected:
 		propertyDBusMap[property] = new BasicProperty<T>(routingEngine, property, propertyName, signature, access, this);
 	}
 
-	/*virtual void setProperty(VehicleProperty::Property name, AbstractPropertyType* value)
+
+	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		AsyncSetPropertyRequest request;
-		request.property = name;
-		request.value = value;
-		request.completed = [](AsyncPropertyReply* reply) { delete reply; };
-		routingEngine->setProperty(request);
-	}*/
+		propertyDBusMap[property] = new StringDBusProperty(routingEngine, property, propertyName, signature, access, this);
+	}
 
 	PropertyDBusMap propertyDBusMap;
 private:
