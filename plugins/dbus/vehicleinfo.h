@@ -66,7 +66,7 @@ public:
 	DoorsProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.doors","/org/automotive/vehicleinfo/doors", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "a(i)", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "ai", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}

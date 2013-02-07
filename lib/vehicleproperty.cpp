@@ -182,7 +182,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Altitude,0);
 	REGISTERPROPERTY(Direction,0);
 	REGISTERPROPERTY(VehicleType,Vehicle::Unknown);
-	REGISTERPROPERTY(DoorsPerRow,0);
+	registerPropertyPriv(DoorsPerRow,[]() { BasicPropertyType<uint16_t> d(0); return new DoorsPerRowType(&d); });
 	REGISTERPROPERTY(TransmissionGearType,Transmission::Unknown);
 	REGISTERPROPERTYWITHTYPE(FrontWheelRadius, WheelRadiusType, 0);
 	REGISTERPROPERTYWITHTYPE(RearWheelRadius, WheelRadiusType, 0);

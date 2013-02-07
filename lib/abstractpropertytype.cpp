@@ -12,9 +12,9 @@ ListPropertyType::ListPropertyType()
 
 }
 
-ListPropertyType::ListPropertyType(int)
+ListPropertyType::ListPropertyType(AbstractPropertyType *property)
 {
-
+	append(property);
 }
 
 ListPropertyType::ListPropertyType(ListPropertyType &other)
@@ -74,15 +74,17 @@ void ListPropertyType::fromString(std::string)
 GVariant *ListPropertyType::toVariant()
 {
 	GVariantBuilder params;
-	g_variant_builder_init(&params,G_VARIANT_TYPE_ARRAY);
+	g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
 
 	for(auto itr = mList.begin(); itr != mList.end(); itr++)
 	{
-		AbstractPropertyType* t;
+		AbstractPropertyType* t = *itr;
 		g_variant_builder_add_value(&params, t->toVariant());
 	}
 
-	return g_variant_builder_end(&params);
+	GVariant* var =  g_variant_builder_end(&params);
+	g_assert(var);
+	return var;
 }
 
 

@@ -367,7 +367,7 @@ class ListPropertyType: public AbstractPropertyType
 public:
 
 	ListPropertyType();
-	ListPropertyType(int unused);
+	ListPropertyType(AbstractPropertyType *property);
 	ListPropertyType(ListPropertyType & other);
 	~ListPropertyType();
 
