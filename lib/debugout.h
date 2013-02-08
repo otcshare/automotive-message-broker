@@ -104,7 +104,7 @@ private:
 		f.precision(15);
 		f<<time;
 
-		while(f.str().length() < 15)
+		while(f.str().length() <= 15)
 		{
 			f<<" ";
 		}

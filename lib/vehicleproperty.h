@@ -204,6 +204,9 @@ public:
 	static const Property WheelBrake;
 	typedef BasicPropertyType<bool> WheelBrakeType;
 
+	static const Property WheelBrakePressure;
+	typedef BasicPropertyType<uint16_t> WheelBrakePressureType;
+
 	/**< Steering wheel angle (0-359) */
 	static const Property SteeringWheelAngle;
 	typedef BasicPropertyType<uint16_t> SteeringWheelAngleType;
@@ -369,7 +372,7 @@ public:
 	typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
 
 	static const Property DoorsPerRow;
-	typedef ListPropertyType DoorsPerRowType;
+	typedef ListPropertyType<BasicPropertyType<uint16_t> > DoorsPerRowType;
 
 	static const Property TransmissionGearType;
 	typedef BasicPropertyType<Transmission::Type> TransmissionGearTypeType;

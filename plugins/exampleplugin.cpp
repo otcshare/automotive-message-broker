@@ -76,54 +76,79 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	{
 		VehicleProperty::VehicleSpeedType temp(velocity);
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::EngineSpeed)
 	{
 		VehicleProperty::EngineSpeedType temp(engineSpeed);
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::AccelerationX)
 	{
 		VehicleProperty::AccelerationType temp(accelerationX);
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::TransmissionShiftPosition)
 	{
 		VehicleProperty::TransmissionShiftPositionType temp(transmissionShiftPostion);
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::SteeringWheelAngle)
 	{
 		VehicleProperty::SteeringWheelAngleType temp(steeringWheelAngle);
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::VIN)
 	{
 		VehicleProperty::VINType temp("ABC00000000000000");
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::WMI)
 	{
 		VehicleProperty::WMIType temp("abc");
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::BatteryVoltage)
 	{
 		VehicleProperty::BatteryVoltageType temp(12.6);
 		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 	else if(reply->property == VehicleProperty::ExteriorBrightness)
 	{
 		VehicleProperty::ExteriorBrightnessType temp(1000);
 		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
+	else if(reply->property == VehicleProperty::DoorsPerRow)
+	{
+		VehicleProperty::DoorsPerRowType temp;
+
+		BasicPropertyType<uint16_t> row1(2);
+		BasicPropertyType<uint16_t> row2(2);
+		BasicPropertyType<uint16_t> row3(1);
+
+		temp.append(&row1);
+		temp.append(&row2);
+		temp.append(&row3);
+
+		reply->value = &temp;
+		reply->success = true;
 		reply->completed(reply);
 	}
 }
@@ -158,6 +183,7 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::BatteryVoltage);
 	props.push_back(VehicleProperty::MachineGunTurretStatus);
 	props.push_back(VehicleProperty::ExteriorBrightness);
+	props.push_back(VehicleProperty::DoorsPerRow);
 	
 	return props;
 }

@@ -22,6 +22,8 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
+#include <iostream>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
@@ -362,31 +364,145 @@ private:
 	GVariant* mVariant;
 };
 
+template <class T>
 class ListPropertyType: public AbstractPropertyType
 {
 public:
 
-	ListPropertyType();
-	ListPropertyType(AbstractPropertyType *property);
-	ListPropertyType(ListPropertyType & other);
-	~ListPropertyType();
+	ListPropertyType():initialized(false){}
+	ListPropertyType(AbstractPropertyType *property):initialized(false)
+	{
+		appendPriv(property->copy());
+	}
 
-	void append(AbstractPropertyType* property);
+	ListPropertyType(ListPropertyType & other)
+		:initialized(false)
+	{
+		std::list<AbstractPropertyType*> l = other.list();
+		for(auto itr = l.begin(); itr != l.end(); itr++)
+		{
+			append(*itr);
+		}
+	}
 
-	uint count();
+	~ListPropertyType()
+	{
+		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		{
+			delete *itr;
+		}
+	}
 
-	AbstractPropertyType* copy();
+	/** append - appends a property to the list
+	 * @arg property - property to be appended.  Will be copied and owned by ListPropertyType.
+	 * You are responsible for freeing property after append is called.
+	 **/
+	void append(AbstractPropertyType* property)
+	{
+		if(!initialized)
+		{
+			for(auto itr = mList.begin(); itr != mList.end(); itr++)
+			{
+				AbstractPropertyType *p = *itr;
+				delete p;
+			}
+			mList.clear();
+			initialized = true;
+		}
 
-	std::string toString() const;
-	void fromString(std::string );
+		appendPriv(property->copy());
+	}
+
+	uint count()
+	{
+		return mList.size();
+	}
+
+	AbstractPropertyType* copy()
+	{
+		return new ListPropertyType(*this);
+	}
+
+	std::string toString() const
+	{
+		std::string str = "[";
+
+		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		{
+			if(str != "[")
+				str += ",";
+
+			AbstractPropertyType* t = *itr;
+
+			str += t->toString();
+		}
+
+		str += "]";
+
+		return str;
+	}
 
 
-	GVariant* toVariant();
-	void fromVariant(GVariant* v);
+	void fromString(std::string str )
+	{
+		if(!str.length())
+			return;
+
+		if(str[0] != '[' && str[str.length()-1] != ']')
+		{
+			return;
+		}
+
+		str = str.substr(1,str.length() - 2);
+
+		std::vector<std::string> elements;
+
+		std::istringstream f(str);
+
+		std::string element;
+		while(std::getline(f,element,','))
+		{
+			T *foo = new T(element);
+			append (foo);
+
+			delete foo;
+		}
+	}
+
+
+	GVariant* toVariant()
+	{
+
+		GVariantBuilder params;
+		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
+
+		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		{
+			AbstractPropertyType* t = *itr;
+			g_variant_builder_add_value(&params, t->toVariant());
+		}
+
+		GVariant* var =  g_variant_builder_end(&params);
+		g_assert(var);
+		return var;
+
+	}
+
+	void fromVariant(GVariant* v)
+	{
+
+	}
 
 	std::list<AbstractPropertyType*> list() { return mList; }
 
 private:
+	void appendPriv(AbstractPropertyType* i)
+	{
+		mList.push_back(i);
+	}
+
+	bool initialized;
+
 	std::list<AbstractPropertyType*> mList;
 };
 

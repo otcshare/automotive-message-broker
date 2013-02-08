@@ -55,7 +55,12 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(EngineOilProperty);
 	ConstructProperty(ExteriorBrightnessProperty);
 	ConstructProperty(VehicleId);
+	ConstructProperty(TransmissionInfoProperty);
+	ConstructProperty(VehicleTypeProperty);
+	ConstructProperty(FuelInfoProperty);
+	ConstructProperty(SizeProperty);
 	ConstructProperty(DoorsProperty);
+	ConstructProperty(WheelInformationProperty);
 
 	PropertyList list = VehicleProperty::customProperties();
 

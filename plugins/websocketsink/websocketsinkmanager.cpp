@@ -120,7 +120,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	}
 	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply)
 	{
-		printf("Got property:%s\n",reply->value->toString().c_str());
+		DebugOut()<<"Got property: "<<reply->value->toString().c_str()<<endl;
 		//uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
 		s.precision(15);

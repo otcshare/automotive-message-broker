@@ -42,6 +42,7 @@ const VehicleProperty::Property VehicleProperty::TransmissionGearPosition = "Tra
 const VehicleProperty::Property VehicleProperty::TransmissionMode = "TransmissionMode";
 const VehicleProperty::Property VehicleProperty::ThrottlePosition = "ThrottlePosition";
 const VehicleProperty::Property VehicleProperty::WheelBrake = "WheelBrake";
+const VehicleProperty::Property VehicleProperty::WheelBrakePressure = "WheelBrakePressure";
 const VehicleProperty::Property VehicleProperty::SteeringWheelAngle = "SteeringWheelAngle";
 const VehicleProperty::Property VehicleProperty::TurnSignal = "TurnSignal";
 const VehicleProperty::Property VehicleProperty::ClutchStatus = "ClutchStatus";
@@ -121,6 +122,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(TransmissionMode,Transmission::Normal);
 	registerPropertyPriv(ThrottlePosition, [](){ return new ThrottlePositionType(0); });
 	registerPropertyPriv(WheelBrake, [](){ return new WheelBrakeType(false); });
+	REGISTERPROPERTY(WheelBrakePressure,0);
 	registerPropertyPriv(SteeringWheelAngle, [](){ return new SteeringWheelAngleType(0); });
 	registerPropertyPriv(TurnSignal, [](){ return new TurnSignalType(TurnSignals::Off); });
 	registerPropertyPriv(ClutchStatus, [](){ return new ClutchStatusType(false); });

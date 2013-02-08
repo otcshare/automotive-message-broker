@@ -77,6 +77,15 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 	routingEngine->getPropertyAsync(batteryVoltageRequest);
 
+	AsyncPropertyRequest doorsPerRowRequest;
+	doorsPerRowRequest.property = VehicleProperty::DoorsPerRow;
+	doorsPerRowRequest.completed = [](AsyncPropertyReply* reply)
+	{
+		DebugOut(1)<<"Doors per row: "<<reply->value->toString()<<endl; delete reply;
+	};
+
+	routingEngine->getPropertyAsync(doorsPerRowRequest);
+
 	auto getRangedCb = [](gpointer data)
 	{
 		AbstractRoutingEngine* routingEngine = (AbstractRoutingEngine*)data;
