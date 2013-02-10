@@ -101,7 +101,9 @@ private:
 	std::string bufferTime(double time)
 	{
 		ostringstream f;
+
 		f.precision(15);
+
 		f<<time;
 
 		while(f.str().length() <= 15)

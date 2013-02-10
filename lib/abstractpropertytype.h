@@ -47,6 +47,13 @@ public:
 
 	virtual AbstractPropertyType* copy() = 0;
 
+	bool operator == (AbstractPropertyType &other)
+	{
+		std::string one = toString();
+		std::string two = other.toString();
+		return one == two;
+	}
+
 	double timestamp;
 
 	int32_t sequence;
