@@ -145,6 +145,14 @@ enum Type
 };
 }
 
+namespace Security {
+enum Status
+{
+	Idle = 0,
+	Armed,
+	AlarmDetected
+};
+}
 
 
 class VehicleProperty
@@ -256,6 +264,9 @@ public:
 	/**< Battery voltage in volts */
 	static const Property BatteryVoltage;
 	typedef BasicPropertyType<double> BatteryVoltageType;
+
+	static const Property BatteryCurrent;
+	typedef BasicPropertyType<double> BatteryCurrentType;
 
 	/**< Interior Air Temperature in degrees celcius */
 	static const Property InteriorTemperature;
@@ -383,6 +394,50 @@ public:
 
 	static const Property WheelTrack;
 	typedef BasicPropertyType<uint> WheelTrackType;
+
+	static const Property Odometer;
+	typedef BasicPropertyType<uint> OdometerType;
+
+	/**< Transmission Fluid Level 0-100%.
+	 **/
+	static const Property TransmissionFluidLevel;
+	typedef BasicPropertyType<uint16_t> TransmissionFluidLevelType;
+
+	/**< Brake Fluid Level 0-100%.
+	 **/
+	static const Property BrakeFluidLevel;
+	typedef BasicPropertyType<uint16_t> BrakeFluidLevelType;
+
+	/**< Washer Fluid Level 0-100%.
+	 **/
+	static const Property WasherFluidLevel;
+	typedef BasicPropertyType<uint16_t> WasherFluidLevelType;
+
+	/**< Securty Alert Status
+	 * status of security alert
+	 * @see Security::Status
+	 */
+	static const Property SecurityAlertStatus;
+	typedef BasicPropertyType<Security::Status> SecurityAlertStatusType;
+
+	/**< Parking Brake Status
+	 * status of parking break active (true) or inactive (false)
+	 */
+	static const Property ParkingBrakeStatus;
+	typedef BasicPropertyType<bool> ParkingBrakeStatusType;
+
+	/**< Parking Light Status
+	 * status of parking lights active (true) or inactive (false)
+	 */
+	static const Property ParkingLightStatus;
+	typedef BasicPropertyType<bool> ParkingLightStatusType;
+
+	/**< Hazard Lights Status
+	 * status of parking lights active (true) or inactive (false)
+	 */
+	static const Property HazardLightStatus;
+	typedef BasicPropertyType<bool> HazardLightStatusType;
+
 
 	/** END PROPERTIES **/
 

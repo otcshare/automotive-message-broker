@@ -56,6 +56,7 @@ const VehicleProperty::Property VehicleProperty::MassAirFlow = "MassAirFlow";
 const VehicleProperty::Property VehicleProperty::ButtonEvent = "ButtonEvent";
 const VehicleProperty::Property VehicleProperty::AirIntakeTemperature = "AirIntakeTemperature";
 const VehicleProperty::Property VehicleProperty::BatteryVoltage = "BatteryVoltage";
+const VehicleProperty::Property VehicleProperty::BatteryCurrent = "BatteryCurrent";
 const VehicleProperty::Property VehicleProperty::InteriorTemperature = "InteriorTemperature";
 const VehicleProperty::Property VehicleProperty::EngineOilTemperature = "EngineOilTemperature";
 const VehicleProperty::Property VehicleProperty::VIN = "VIN";
@@ -109,6 +110,15 @@ const VehicleProperty::Property VehicleProperty::TransmissionGearType = "Transmi
 const VehicleProperty::Property VehicleProperty::FrontWheelRadius = "FrontWheelRadius";
 const VehicleProperty::Property VehicleProperty::RearWheelRadius = "RearWheelRadius";
 const VehicleProperty::Property VehicleProperty::WheelTrack = "WheelTrack";
+const VehicleProperty::Property VehicleProperty::Odometer = "Odometer";
+const VehicleProperty::Property VehicleProperty::TransmissionFluidLevel = "TransmissionFluidLevel";
+const VehicleProperty::Property VehicleProperty::BrakeFluidLevel = "BrakeFluidLevel";
+const VehicleProperty::Property VehicleProperty::WasherFluidLevel = "WasherFluidLevel";
+const VehicleProperty::Property VehicleProperty::SecurityAlertStatus = "SecurityAlertStatus";
+const VehicleProperty::Property VehicleProperty::ParkingBrakeStatus = "ParkingBrakeStatus";
+const VehicleProperty::Property VehicleProperty::ParkingLightStatus = "ParkingLightStatus";
+const VehicleProperty::Property VehicleProperty::HazardLightStatus = "HazardLightStatus";
+
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -138,6 +148,7 @@ VehicleProperty::VehicleProperty()
 	registerPropertyPriv(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
 	REGISTERPROPERTY(AirIntakeTemperature,0)
 	registerPropertyPriv(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
+	REGISTERPROPERTY(BatteryCurrent,0);
 	registerPropertyPriv(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
 	registerPropertyPriv(VIN, [](){ return new VINType(""); });
 	registerPropertyPriv(WMI, [](){ return new WMIType(""); });
@@ -189,7 +200,14 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(FrontWheelRadius, WheelRadiusType, 0);
 	REGISTERPROPERTYWITHTYPE(RearWheelRadius, WheelRadiusType, 0);
 	REGISTERPROPERTY(WheelTrack,0);
-
+	REGISTERPROPERTY(Odometer,0);
+	REGISTERPROPERTY(TransmissionFluidLevel,0);
+	REGISTERPROPERTY(BrakeFluidLevel,0);
+	REGISTERPROPERTY(WasherFluidLevel,0);
+	REGISTERPROPERTY(SecurityAlertStatus,0);
+	REGISTERPROPERTY(ParkingBrakeStatus,false);
+	REGISTERPROPERTY(ParkingLightStatus,false);
+	REGISTERPROPERTY(HazardLightStatus,false);
 
 
 }

@@ -3,4 +3,5 @@
 - websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false (TEST)
 - enable ssl on websocket by default with option to turn it off
 - investigate and enable use of provisioning in ssl websockets
-- support custom vendor properties in dbus sink
+- add API to get number of sources per a given property
+- DBus support for objects with multiple sources (ie battery(n)Voltage where 'n' is a battery source)
