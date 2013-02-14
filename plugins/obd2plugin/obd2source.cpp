@@ -404,7 +404,7 @@ static int updateProperties( gpointer data)
 
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
 {
-	//m_re->updateProperty(property,&value);
+
 	
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
@@ -414,6 +414,20 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 	}
 	else
 	{
+		if(oldValueMap.find(property) != oldValueMap.end())
+		{
+			AbstractPropertyType* old = oldValueMap[property];
+
+			if((*old) == (*value))
+			{
+				return;
+			}
+
+			delete old;
+		}
+
+		oldValueMap[property] = value->copy();
+
 		m_re->updateProperty(property,value,uuid());
 	}
 }

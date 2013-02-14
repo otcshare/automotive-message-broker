@@ -73,7 +73,10 @@ public:
 
 	ObdPid* create()
 	{
-		return new T();
+		T* t = new T();
+		t->value = value;
+		t->isValidVal = isValidVal;
+		return t;
 	}
 };
 
