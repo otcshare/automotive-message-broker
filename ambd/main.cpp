@@ -148,6 +148,8 @@ int main(int argc, char **argv)
 	
 	g_type_init();
 
+	VehicleProperty::factory();
+
 	/* Register signal handler */
 	signal(SIGINT, interrupt);
 	signal(SIGTERM, interrupt);

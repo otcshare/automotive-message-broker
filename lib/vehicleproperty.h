@@ -27,8 +27,8 @@
 #include <sstream>
 #include <map>
 #include <functional>
-
 #include <abstractpropertytype.h>
+#include "mappropertytype.hpp"
 
 namespace ButtonEvents {
 enum ButtonEventType {
@@ -154,6 +154,90 @@ enum Status
 };
 }
 
+namespace Airbag {
+enum Location
+{
+	Driver = 0,
+	Passenger,
+	LeftSide,
+	RightSide
+};
+
+enum Status
+{
+	Inactive = 0,
+	Active,
+	Deployed
+};
+
+}
+
+namespace Door {
+enum Location
+{
+	Driver=0,
+	Passenger,
+	LeftRear,
+	RightRear,
+	Trunk,
+	FuelCap,
+	Hood
+};
+
+enum Status
+{
+	Closed = 0,
+	Open,
+	Ajar
+};
+
+}
+
+namespace Seat
+{
+enum Location
+{
+	Driver = 0,
+	FrontMiddle = 1,
+	Passenger,
+	LeftRear,
+	MiddleRear,
+	RightRear
+};
+
+enum Status
+{
+	Vacant = 0,
+	Child,
+	Adult
+};
+}
+
+namespace Window
+{
+enum Location
+{
+	Driver = 0,
+	Passenger,
+	LeftRear,
+	RightRear,
+	Sunroof
+};
+}
+
+namespace DistanceSensor
+{
+enum Location
+{
+	LeftFront = 0,
+	RightFront = 1,
+	LeftRear = 2,
+	RightRear = 3,
+	LeftBlindSpot = 4,
+	RightBlindSPot = 5
+
+};
+}
 
 class VehicleProperty
 {
@@ -161,7 +245,7 @@ class VehicleProperty
 public:
 	
 
-	VehicleProperty();
+	static void factory();
 
 	typedef std::string Property;
 	typedef std::function<AbstractPropertyType* (void)> PropertyTypeFactoryCallback;
@@ -438,6 +522,33 @@ public:
 	static const Property HazardLightStatus;
 	typedef BasicPropertyType<bool> HazardLightStatusType;
 
+	static const Property AntilockBrakingSystem;
+	typedef BasicPropertyType<bool> AntilockBrakingSystemType;
+
+	static const Property TractionControlSystem;
+	typedef BasicPropertyType<bool> TractionControlSystemType;
+
+	static const Property VehicleTopSpeedLimit;
+	typedef BasicPropertyType<uint16_t> VehicleTopSpeedType;
+
+	static const Property AirbagStatus;
+	typedef MapPropertyType<BasicPropertyType<Airbag::Location>, BasicPropertyType<Airbag::Status> > AirbagStatusType;
+
+	static const Property DoorStatus;
+	typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<Door::Status> > DoorStatusType;
+
+	static const Property DoorLockStatus;
+	typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<bool> > DoorLockStatusType;
+
+	static const Property SeatBeltStatus;
+	typedef MapPropertyType<BasicPropertyType<Seat::Location>, BasicPropertyType<bool> > SeatBeltStatusType;
+
+	static const Property WindowLockStatus;
+	typedef MapPropertyType<BasicPropertyType<Window::Location>, BasicPropertyType<bool> > WindowLockStatusType;
+
+	static const Property ObstacleDistance;
+	typedef MapPropertyType<BasicPropertyType<DistanceSensor::Location>, BasicPropertyType<double> > ObstacleDistanceType;
+
 
 	/** END PROPERTIES **/
 
@@ -474,6 +585,11 @@ public:
 
 
 private:
+
+	VehicleProperty();
+
+	static VehicleProperty* thereCanOnlyBeOne;
+
 	static bool registerPropertyPriv(Property name, PropertyTypeFactoryCallback factory);
 
 	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;

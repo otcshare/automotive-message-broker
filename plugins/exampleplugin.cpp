@@ -151,6 +151,19 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::AirbagStatus)
+	{
+		VehicleProperty::AirbagStatusType temp;
+
+		temp.append(Airbag::Driver, Airbag::Active);
+		temp.append(Airbag::Passenger, Airbag::Active);
+		temp.append(Airbag::LeftSide, Airbag::Active);
+		temp.append(Airbag::RightSide, Airbag::Active);
+
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
 }
 
 void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -184,6 +197,7 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::MachineGunTurretStatus);
 	props.push_back(VehicleProperty::ExteriorBrightness);
 	props.push_back(VehicleProperty::DoorsPerRow);
+	props.push_back(VehicleProperty::AirbagStatus);
 	
 	return props;
 }

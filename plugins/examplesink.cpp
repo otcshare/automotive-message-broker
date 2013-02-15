@@ -86,6 +86,15 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 	routingEngine->getPropertyAsync(doorsPerRowRequest);
 
+	AsyncPropertyRequest airbagStatus;
+	airbagStatus.property = VehicleProperty::AirbagStatus;
+	airbagStatus.completed = [](AsyncPropertyReply* reply)
+	{
+		DebugOut(1)<<"Airbag Status: "<<reply->value->toString()<<endl; delete reply;
+	};
+
+	routingEngine->getPropertyAsync(airbagStatus);
+
 	auto getRangedCb = [](gpointer data)
 	{
 		AbstractRoutingEngine* routingEngine = (AbstractRoutingEngine*)data;

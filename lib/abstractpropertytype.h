@@ -197,16 +197,34 @@ template <typename T>
 class BasicPropertyType: public AbstractPropertyType
 {
 public:
+	BasicPropertyType(): AbstractPropertyType()
+	{
+		mValue = T();
+	}
 	BasicPropertyType(BasicPropertyType const &other)
 		:AbstractPropertyType()
 	{
 		setValue(other.value<T>());
+		timestamp = other.timestamp;
+		sequence = other.sequence;
 	}
 
 	BasicPropertyType & operator = (BasicPropertyType const & other)
 	{
 		setValue(other.value<T>());
+		timestamp = other.timestamp;
+		sequence = other.sequence;
 		return *this;
+	}
+
+	bool operator < (const BasicPropertyType<T>& other) const
+	{
+		return value<T>() < other.value<T>();
+	}
+
+	bool operator > (const BasicPropertyType<T>& other) const
+	{
+		return value<T>() > other.value<T>();
 	}
 
 	BasicPropertyType(T val)
@@ -401,7 +419,7 @@ public:
 	}
 
 	/** append - appends a property to the list
-	 * @arg property - property to be appended.  Will be copied and owned by ListPropertyType.
+	 * @arg property - property to be appended.  Property will be copied and owned by ListPropertyType.
 	 * You are responsible for freeing property after append is called.
 	 **/
 	void append(AbstractPropertyType* property)

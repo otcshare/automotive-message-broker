@@ -34,6 +34,8 @@ using namespace std;
 
 std::map<VehicleProperty::Property, VehicleProperty::PropertyTypeFactoryCallback> VehicleProperty::registeredPropertyFactoryMap;
 
+VehicleProperty* VehicleProperty::thereCanOnlyBeOne = nullptr;
+
 const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
 const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
 const VehicleProperty::Property VehicleProperty::EngineSpeed = "EngineSpeed";
@@ -118,6 +120,15 @@ const VehicleProperty::Property VehicleProperty::SecurityAlertStatus = "Security
 const VehicleProperty::Property VehicleProperty::ParkingBrakeStatus = "ParkingBrakeStatus";
 const VehicleProperty::Property VehicleProperty::ParkingLightStatus = "ParkingLightStatus";
 const VehicleProperty::Property VehicleProperty::HazardLightStatus = "HazardLightStatus";
+const VehicleProperty::Property VehicleProperty::AirbagStatus = "AirbagStatus";
+const VehicleProperty::Property VehicleProperty::AntilockBrakingSystem = "AntilockBrakingSystem";
+const VehicleProperty::Property VehicleProperty::TractionControlSystem = "TractionControlSystem";
+const VehicleProperty::Property VehicleProperty::VehicleTopSpeedLimit = "VehicleTopSpeedLimit";
+const VehicleProperty::Property VehicleProperty::DoorStatus = "DoorStatus";
+const VehicleProperty::Property VehicleProperty::DoorLockStatus = "DoorLockStatus";
+const VehicleProperty::Property VehicleProperty::SeatBeltStatus = "SeatBeltStatus";
+const VehicleProperty::Property VehicleProperty::WindowLockStatus = "WindowLockStatus";
+const VehicleProperty::Property VehicleProperty::ObstacleDistance = "ObstacleDistance";
 
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
@@ -208,8 +219,34 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ParkingBrakeStatus,false);
 	REGISTERPROPERTY(ParkingLightStatus,false);
 	REGISTERPROPERTY(HazardLightStatus,false);
+	registerPropertyPriv(AirbagStatus,[]()
+	{
+		BasicPropertyType<Airbag::Location> a(Airbag::Driver);
+		BasicPropertyType<Airbag::Status> b(Airbag::Inactive);
+		AirbagStatusType* t = new AirbagStatusType();
+		t->append(a,b);
 
+		return t;
+	});
 
+	REGISTERPROPERTY(AntilockBrakingSystem,false);
+	REGISTERPROPERTY(TractionControlSystem,false);
+	REGISTERPROPERTY(VehicleTopSpeedLimit,0);
+
+	registerPropertyPriv(DoorStatus,[]()
+	{
+		DoorStatusType* t = new DoorStatusType();
+		t->append(Door::Driver,Door::Closed);
+
+		return t;
+	});
+
+}
+
+void VehicleProperty::factory()
+{
+	if(!thereCanOnlyBeOne)
+		thereCanOnlyBeOne = new VehicleProperty();
 }
 
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
@@ -266,4 +303,4 @@ bool VehicleProperty::registerPropertyPriv(VehicleProperty::Property name, Vehic
 
 }
 
-VehicleProperty vehiclePropertyConstruct;
+
