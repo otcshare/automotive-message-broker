@@ -55,5 +55,13 @@ ambd -c configwebsocketsink
 (in another terminal)
 ambd -c configwebsocketsource
 
+
+
+Running with other plugins
+
+To learn about running AMB with other plugins, please see the plugins/*/README.  
+
+
+
 TODO: link to website for questions/comments
 
