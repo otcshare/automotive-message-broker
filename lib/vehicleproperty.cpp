@@ -128,6 +128,7 @@ const VehicleProperty::Property VehicleProperty::DoorStatus = "DoorStatus";
 const VehicleProperty::Property VehicleProperty::DoorLockStatus = "DoorLockStatus";
 const VehicleProperty::Property VehicleProperty::SeatBeltStatus = "SeatBeltStatus";
 const VehicleProperty::Property VehicleProperty::WindowLockStatus = "WindowLockStatus";
+const VehicleProperty::Property VehicleProperty::OccupantStatus = "OccupantStatus";
 const VehicleProperty::Property VehicleProperty::ObstacleDistance = "ObstacleDistance";
 
 
@@ -237,6 +238,46 @@ VehicleProperty::VehicleProperty()
 	{
 		DoorStatusType* t = new DoorStatusType();
 		t->append(Door::Driver,Door::Closed);
+
+		return t;
+	});
+
+	registerPropertyPriv(DoorLockStatus,[]()
+	{
+		DoorLockStatusType* t = new DoorLockStatusType();
+		t->append(Door::Driver,false);
+
+		return t;
+	});
+
+	registerPropertyPriv(SeatBeltStatus,[]()
+	{
+		SeatBeltStatusType* t = new SeatBeltStatusType();
+		t->append(Seat::Driver,false);
+
+		return t;
+	});
+
+	registerPropertyPriv(SeatBeltStatus,[]()
+	{
+		SeatBeltStatusType* t = new SeatBeltStatusType();
+		t->append(Seat::Driver,false);
+
+		return t;
+	});
+
+	registerPropertyPriv(OccupantStatus,[]()
+	{
+		OccupantStatusType* t = new OccupantStatusType();
+		t->append(Seat::Driver,false);
+
+		return t;
+	});
+
+	registerPropertyPriv(WindowLockStatus,[]()
+	{
+		WindowLockStatusType* t = new WindowLockStatusType();
+		t->append(Window::Driver,false);
 
 		return t;
 	});

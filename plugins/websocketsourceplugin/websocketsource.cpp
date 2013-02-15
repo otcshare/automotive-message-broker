@@ -34,6 +34,11 @@ libwebsocket_context *context;
 WebSocketSource *source;
 AbstractRoutingEngine *m_re;
 
+double oldTimestamp=0;
+double totalTime=0;
+double numUpdates=0;
+double averageLatency=0;
+
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len);
 static struct libwebsocket_protocols protocols[] = {
 	{
@@ -104,7 +109,9 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	//printf("Polling...%i\n",condition);
-	lws_tokens token;
+
+	oldTimestamp = amb::currentTime();
+
 	struct pollfd pollstruct;
 	int newfd = g_io_channel_unix_get_fd(source);
 	pollstruct.fd = newfd;
@@ -290,7 +297,20 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 
 						double currenttime = amb::currentTime();
 
-						DebugOut(2)<<"websocket source latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
+						/** This is now the latency between when something is available to read on the socket, until
+						 *  a property is about to be updated in AMB.  This includes libwebsockets parsing and the
+						 *  JSON parsing in this section.
+						 */
+
+						DebugOut(2)<<"websocket parse latency: "<<(currenttime - oldTimestamp)*1000<<"ms"<<endl;
+						DebugOut(2)<<"websocket network + parse latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
+
+						totalTime += (currenttime - oldTimestamp)*1000;
+						numUpdates ++;
+
+						averageLatency = totalTime / numUpdates;
+
+						DebugOut(2)<<"Average parse latency: "<<averageLatency<<endl;
 
 						delete type;
 					}

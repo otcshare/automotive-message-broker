@@ -95,7 +95,8 @@ public:
 		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
 		{
 			GVariant **v = g_new(GVariant*,2);
-//			v[0] = (*itr).first.toVariant();
+			auto &foo = (*itr).first;
+			v[0] = const_cast<T&>(foo).toVariant();
 			v[1] = (*itr).second.toVariant();
 			GVariant* tuple = g_variant_new_tuple(v,2);
 

@@ -529,7 +529,7 @@ public:
 	typedef BasicPropertyType<bool> TractionControlSystemType;
 
 	static const Property VehicleTopSpeedLimit;
-	typedef BasicPropertyType<uint16_t> VehicleTopSpeedType;
+	typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
 
 	static const Property AirbagStatus;
 	typedef MapPropertyType<BasicPropertyType<Airbag::Location>, BasicPropertyType<Airbag::Status> > AirbagStatusType;
@@ -545,6 +545,9 @@ public:
 
 	static const Property WindowLockStatus;
 	typedef MapPropertyType<BasicPropertyType<Window::Location>, BasicPropertyType<bool> > WindowLockStatusType;
+
+	static const Property OccupantStatus;
+	typedef MapPropertyType<BasicPropertyType<Seat::Location>, BasicPropertyType<bool> > OccupantStatusType;
 
 	static const Property ObstacleDistance;
 	typedef MapPropertyType<BasicPropertyType<DistanceSensor::Location>, BasicPropertyType<double> > ObstacleDistanceType;

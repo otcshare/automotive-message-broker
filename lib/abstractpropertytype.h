@@ -266,9 +266,7 @@ public:
 
 	GVariant* toVariant()
 	{
-		serializeVariant<T>(value<T>());
-
-		return mVariant;
+		return serializeVariant<T>(value<T>());
 	}
 
 	void fromVariant(GVariant *v)
@@ -278,7 +276,7 @@ public:
 
 private:
 
-	GVariant* mVariant;
+	//GVariant* mVariant;
 
 	template <class N>
 	void serialize(std::string val,  typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
@@ -301,18 +299,19 @@ private:
 	}
 
 	template <class N>
-	void serializeVariant(T val, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	GVariant* serializeVariant(T val, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
 	{
 		//mVariant = Glib::VariantBase(Glib::Variant<gint16>::create((int)val).gobj());
 
-		mVariant = g_variant_ref(g_variant_new("i",(int)val));
+		return (g_variant_new("i",(int)val));
 	}
 
 	template <class N>
-	void serializeVariant(T val, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	GVariant* serializeVariant(T val, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
 	{
 		//mVariant = Glib::Variant<T>::create(val);
-		mVariant = g_variant_ref(g_variant_new(GVS<T>::signature(),val));
+		//mVariant = g_variant_ref(g_variant_new(GVS<T>::signature(),val));
+		return g_variant_new(GVS<T>::signature(),val);
 	}
 
 	template <class N>
