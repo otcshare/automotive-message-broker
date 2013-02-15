@@ -47,7 +47,7 @@ using the ECUSim2000 from scantool.net:
 
 scantool - properties/second = (pids/s) - baud
 
-OBDLink MX - 80 pids/s - N/A
+OBDLink MX - 120 pids/s - N/A (varies with bluetooth radio)
 OBDLink S - 100 pids/s - 115200
 OBDPro USB - 43 pids/s - 9600
 
