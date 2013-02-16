@@ -108,12 +108,18 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 			else
 			{
 				m_sslEnabled = false;
-			} 
+			} 	
 		}
 	}
 	//printf("Connecting to websocket server at %s port %i\n",ip.c_str(),port);
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Connecting to websocket server at" << ip << ":" << port << "\n";
-	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, m_sslEnabled,"/", "localhost", "websocket",protocols[0].name, -1);
+	int sslval = 0;
+	if (m_sslEnabled)
+	{
+		sslval = 2;
+	}
+
+	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, sslval,"/", "localhost", "websocket",protocols[0].name, -1);
 	
 
 }
@@ -139,6 +145,7 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	if (condition == G_IO_IN)
 	{
 	}
+	DebugOut() << "gioPollingFunc" << condition;
 
 	return true;
 }
@@ -189,6 +196,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 {
 	unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + 4096 + LWS_SEND_BUFFER_POST_PADDING];
 	int l;
+	DebugOut() << __SMALLFILE__ << ":" << __LINE__ << reason << "callback_http_only" << endl;
 	switch (reason)
 	{
 		case LWS_CALLBACK_CLOSED:
@@ -197,13 +205,14 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			//printf("Connection closed!\n");
 			break;
 
+		//case LWS_CALLBACK_PROTOCOL_INIT:
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		{
 			//This happens when a client initally connects. We need to request the support event types.
 			source->clientConnected = true;
 			source->checkSubscriptions();
 			//printf("Incoming connection!\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming connection" << "\n";
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming connection" << endl;
 			stringstream s;
 			s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
 
@@ -488,6 +497,10 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
 			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
 			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,0);
+			
+			
 			break;
 		}
 		return 0;
@@ -495,6 +508,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 }
 void WebSocketSource::setSupported(PropertyList list)
 {
+  DebugOut() << "SET SUPPORTED";
 	m_supportedProperties = list;
 	m_re->updateSupported(list,PropertyList());
 }
@@ -505,7 +519,18 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	clientConnected = false;
 	source = this;
 	m_re = re;  
-	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
+	struct lws_context_creation_info info;
+	memset(&info, 0, sizeof info);
+	info.protocols = protocols;
+	info.extensions = libwebsocket_get_internal_extensions();
+	info.gid = -1;
+	info.uid = -1;
+	info.port = CONTEXT_PORT_NO_LISTEN;
+	//std::string ssl_key_path = "/home/michael/.ssh/id_rsa";
+	//info.ssl_ca_filepath = ssl_key_path.c_str();
+		
+	context = libwebsocket_create_context(&info);
+	//context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
 
 	setConfiguration(config);
 	re->setSupported(supported(), this);

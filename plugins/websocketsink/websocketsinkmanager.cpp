@@ -60,6 +60,8 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
 	configuration = config;
+	struct lws_context_creation_info info;
+	memset(&info, 0, sizeof info);
 
 	//Default values
 	int port = 23000;
@@ -101,14 +103,19 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 			}
 		}
 	}
+	info.iface = interface.c_str();
+	info.protocols = protocollist;
+	info.extensions = libwebsocket_get_internal_extensions();
+	info.gid = -1;
+	info.uid = -1;
+	info.options = options;
+	info.port = port;
 	if (ssl)
 	{
-		  context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path.c_str(), ssl_key_path.c_str(), -1, -1, options);
+		info.ssl_cert_filepath = ssl_cert_path.c_str();
+		info.ssl_private_key_filepath = ssl_key_path.c_str();
 	}
-	else
-	{
-		context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,NULL, NULL, -1, -1, options);
-	}
+	context = libwebsocket_create_context(&info);
 	
 }
 
