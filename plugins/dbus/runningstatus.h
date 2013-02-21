@@ -23,12 +23,17 @@
 #include "abstractdbusinterface.h"
 #include "abstractroutingengine.h"
 
+/** @interface: EngineSpeedProperty **/
 class VehicleSpeedProperty: public DBusSink
 {
 public:
 	VehicleSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.vehicleSpeed","/org/automotive/runningstatus/vehicleSpeed", re, connection, map<string, string>())
 	{
+		/** @attributeName EngineSpeed
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
@@ -36,12 +41,17 @@ public:
 
 };
 
+/** @interface: EngineSpeedProperty **/
 class EngineSpeedProperty: public DBusSink
 {
 public:
 	EngineSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.engineSpeed","/org/automotive/runningstatus/engineSpeed", re, connection, map<string, string>())
 	{
+		/** @attributeName EngineSpeed
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
