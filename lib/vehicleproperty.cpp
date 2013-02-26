@@ -20,7 +20,7 @@
 #include "vehicleproperty.h"
 #include "listplusplus.h"
 #include "debugout.h"
-
+#include "mappropertytype.hpp"
 #include <map>
 
 

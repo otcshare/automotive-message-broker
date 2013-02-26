@@ -23,14 +23,14 @@
 #include "abstractdbusinterface.h"
 #include "abstractroutingengine.h"
 
-/** @interface: EngineSpeedProperty **/
+/** @interface VehicleSpeed **/
 class VehicleSpeedProperty: public DBusSink
 {
 public:
 	VehicleSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.vehicleSpeed","/org/automotive/runningstatus/vehicleSpeed", re, connection, map<string, string>())
+		:DBusSink("org.automotive.VehicleSpeed","/org/automotive/runningstatus/VehicleSpeed", re, connection, map<string, string>())
 	{
-		/** @attributeName EngineSpeed
+		/** @attributeName VehicleSpeed
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
@@ -41,12 +41,12 @@ public:
 
 };
 
-/** @interface: EngineSpeedProperty **/
+/** @interface EngineSpeed **/
 class EngineSpeedProperty: public DBusSink
 {
 public:
 	EngineSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.engineSpeed","/org/automotive/runningstatus/engineSpeed", re, connection, map<string, string>())
+		:DBusSink("org.automotive.EngineSpeed","/org/automotive/runningstatus/EngineSpeed", re, connection, map<string, string>())
 	{
 		/** @attributeName EngineSpeed
 		 *  @type unsigned short
@@ -59,53 +59,103 @@ public:
 
 };
 
+/** @interface VehiclePowerMode **/
 class VehiclePowerModeProperty: public DBusSink
 {
 public:
 	VehiclePowerModeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.vehiclePowerMode","/org/automotive/runningstatus/vehiclePowerMode", re, connection, map<string, string>())
+		:DBusSink("org.automotive.VehiclePowerMode","/org/automotive/runningstatus/VehiclePowerMode", re, connection, map<string, string>())
 	{
+		/** @attributeName VehiclePowerMode
+		 *  @type octet
+		 *  @access readonly
+		 **/
 		wantProperty<Power::PowerModes>(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface TripMeter **/
 class TripMeterProperty: public DBusSink
 {
 public:
 	TripMeterProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.tripMeter","/org/automotive/runningstatus/tripMeter", re, connection, map<string, string>())
+	:DBusSink("org.automotive.TripMeter","/org/automotive/runningstatus/TripMeter", re, connection, map<string, string>())
 	{
+		/** @attributeName TripMeterA
+		 *  @type unsigned short
+		 *  setting this will reset the value to '0'.
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::TripMeterA, "A", "q", AbstractProperty::ReadWrite);
+
+		/** @attributeName TripMeterB
+		 *  @type unsigned short
+		 *  setting this will reset the value to '0'.
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::TripMeterB, "B", "q", AbstractProperty::ReadWrite);
+
+		/** @attributeName TripMeterC
+		 *  @type unsigned short
+		 *  setting this will reset the value to '0'.
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::TripMeterC, "C", "q", AbstractProperty::ReadWrite);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface Acceleration **/
 class AccelerationProperty: public DBusSink
 {
 public:
 	AccelerationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.acceleration","/org/automotive/runningstatus/acceleration", re, connection, map<string, string>())
+	:DBusSink("org.automotive.Acceleration","/org/automotive/runningstatus/Acceleration", re, connection, map<string, string>())
 	{
+		/** @attributeName X
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::AccelerationX, "X", "q", AbstractProperty::Read);
+
+		/** @attributeName Y
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::AccelerationY, "Y", "q", AbstractProperty::Read);
+
+		/** @attributeName Z
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::AccelerationZ, "Z", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface Transmission **/
 class TransmissionProperty: public DBusSink
 {
 public:
 	TransmissionProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.transmission","/org/automotive/runningstatus/transmission", re, connection, map<string, string>())
+	:DBusSink("org.automotive.Transmission","/org/automotive/runningstatus/Transmission", re, connection, map<string, string>())
 	{
+		/** @attributeName ShiftPosition
+		 *  @type octet
+		 *  @access readonly
+		 **/
 		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionShiftPosition,
 														  "ShiftPosition", "y", AbstractProperty::Read);
+
+		/** @attributeName GearPosition
+		 *  @type octet
+		 *  @access readonly
+		 **/
 		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionGearPosition,
 														  "GearPosition", "y", AbstractProperty::Read);
+
+		/** @attributeName Mode
+		 *  @type octet
+		 *  @access readonly
+		 **/
 		wantProperty<Transmission::Mode>(VehicleProperty::TransmissionMode,
 														  "Mode", "y", AbstractProperty::Read);
 
@@ -113,109 +163,244 @@ public:
 	}
 };
 
-
+/** @interface CruiseControlStatus **/
 class CruiseControlProperty: public DBusSink
 {
 public:
 	CruiseControlProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.cruiseControlStatus","/org/automotive/runningstatus/cruiseControlStatus", re, connection, map<string, string>())
+	:DBusSink("org.automotive.CruiseControlStatus","/org/automotive/runningstatus/CruiseControlStatus", re, connection, map<string, string>())
 	{
+		/** @attributeName Activated
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::CruiseControlActive, "Activated", "b", AbstractProperty::Read);
+
+		/** @attributeName Speed
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::CruiseControlSpeed, "Speed", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface WheelBrake **/
 class WheelBrakeProperty: public DBusSink
 {
 public:
 	WheelBrakeProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.wheelBrake","/org/automotive/runningstatus/wheelBrake", re, connection, map<string, string>())
+		:DBusSink("org.automotive.WheelBrake","/org/automotive/runningstatus/WheelBrake", re, connection, map<string, string>())
 	{
+		/** @attributeName Engaged
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::WheelBrake, "Engaged", "b", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
+
+/** @interface LightStatus **/
 class LightStatusProperty: public DBusSink
 {
 public:
 	LightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.lightStatus","/org/automotive/runningstatus/lightStatus", re, connection, map<string, string>())
+		:DBusSink("org.automotive.LightStatus","/org/automotive/runningstatus/LightStatus", re, connection, map<string, string>())
 	{
+		/** @attributeName Head
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightHead, "Head", "b", AbstractProperty::Read);
+
+		/** @attributeName RightTurn
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightRightTurn, "RightTurn", "b", AbstractProperty::Read);
+
+		/** @attributeName LeftTurn
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightLeftTurn, "LeftTurn", "b", AbstractProperty::Read);
+
+		/** @attributeName Brake
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightBrake, "Brake", "b", AbstractProperty::Read);
+
+		/** @attributeName Fog
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightFog, "Fog", "b", AbstractProperty::Read);
+
+		/** @attributeName Hazard
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightHazard, "Hazard", "b", AbstractProperty::Read);
+
+		/** @attributeName Parking
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightParking, "Parking", "b", AbstractProperty::Read);
+
+		/** @attributeName HighBeam
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::LightHighBeam, "HighBeam", "b", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface InteriorLightStatus **/
 class InteriorLightStatusProperty: public DBusSink
 {
 public:
 	InteriorLightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.interiorLightStatus","/org/automotive/runningstatus/interiorLightStatus", re, connection, map<string, string>())
+		:DBusSink("org.automotive.InteriorLightStatus","/org/automotive/runningstatus/InteriorLightStatus", re, connection, map<string, string>())
 	{
+		/** @attributeName Passenger
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::InteriorLightPassenger, "Passenger", "b", AbstractProperty::Read);
+
+		/** @attributeName Driver
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::InteriorLightPassenger, "Driver", "b", AbstractProperty::Read);
+
+		/** @attributeName Center
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::InteriorLightCenter, "Center", "b", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface Horn **/
 class HornProperty: public DBusSink
 {
 public:
 	HornProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.horn","/org/automotive/runningstatus/horn", re, connection, map<string, string>())
+		:DBusSink("org.automotive.Horn","/org/automotive/runningstatus/Horn", re, connection, map<string, string>())
 	{
+		/** @attributeName On
+		 *  @type boolean
+		 *  @access readonly
+		 **/
 		wantProperty<bool>(VehicleProperty::Horn,"On","b",AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface Fuel **/
 class FuelProperty: public DBusSink
 {
 public:
 	FuelProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.fuel", "/org/automotive/runningstatus/fuel", re, connection, map<string, string>())
+		:DBusSink("org.automotive.Fuel", "/org/automotive/runningstatus/Fuel", re, connection, map<string, string>())
 	{
+		/** @attributeName Level
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::FuelLevel,"Level", "y", AbstractProperty::Read);
+
+		/** @attributeName Range
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::FuelRange,"Range", "q", AbstractProperty::Read);
+
+		/** @attributeName InstantConsumption
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::FuelConsumption,"InstantConsumption", "q", AbstractProperty::Read);
+
+		/** @attributeName InstantEconomy
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::FuelEconomy,"InstantEconomy", "q", AbstractProperty::Read);
+
+		/** @attributeName AverageEconomy
+		 *  @type unsigned short
+		 *  setting this to any value should reset the counter to '0'
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::FuelAverageEconomy,"AverageEconomy", "q", AbstractProperty::ReadWrite);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface EngineOil **/
 class EngineOilProperty: public DBusSink
 {
 public:
 	EngineOilProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-			:DBusSink("org.automotive.engineOil", "/org/automotive/runningstatus/engineOil", re, connection, map<string, string>())
+			:DBusSink("org.automotive.EngineOil", "/org/automotive/runningstatus/EngineOil", re, connection, map<string, string>())
 	{
+		/** @attributeName Remaining
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::EngineOilRemaining, "Remaining", "y", AbstractProperty::Read);
+
+		/** @attributeName Temperature
+		 *  @type long
+		 *  @access readonly
+		 **/
 		wantProperty<int>(VehicleProperty::EngineOilTemperature, "Temperature", "i", AbstractProperty::Read);
+
+		/** @attributeName Pressure
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
 		wantProperty<uint16_t>(VehicleProperty::EngineOilPressure, "Pressure", "y", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
 
+/** @interface Location **/
 class LocationProperty: public DBusSink
 {
 public:
 	LocationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-			:DBusSink("org.automotive.location", "/org/automotive/runningstatus/location", re, connection, map<string, string>())
+			:DBusSink("org.automotive.Location", "/org/automotive/runningstatus/Location", re, connection, map<string, string>())
 	{
+		/** @attributeName Latitude
+		 *  @type double
+		 *  @access readonly
+		 **/
 		wantProperty<double>(VehicleProperty::Latitude, "Latitude", "d", AbstractProperty::Read);
+
+		/** @attributeName Longitude
+		 *  @type double
+		 *  @access readonly
+		 **/
 		wantProperty<double>(VehicleProperty::Longitude, "Longitude", "d", AbstractProperty::Read);
+
+		/** @attributeName Altitude
+		 *  @type double
+		 *  @access readonly
+		 **/
 		wantProperty<double>(VehicleProperty::Altitude, "Altitude", "d", AbstractProperty::Read);
-		wantProperty<uint>(VehicleProperty::Direction, "Direction", "y", AbstractProperty::Read);
+
+		/** @attributeName Direction
+		 *  @type unsigned short
+		 *  @access readonly
+		 **/
+		wantProperty<uint16_t>(VehicleProperty::Direction, "Direction", "y", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };

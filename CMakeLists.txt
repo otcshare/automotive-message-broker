@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.6.9")
+set(PROJECT_VERSION "0.7.9")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
@@ -21,6 +21,13 @@ option(tpms_plugin "TPMS plugin " OFF)
 option(obd2_plugin "OBD-II plugin" ON)
 option(database_plugin "Database plugins" OFF)
 option(qt_bindings "AMB Qt DBus bindings" OFF)
+option(opencvlux_plugin "OpenCV Lux plugin" OFF)
+
+if(opencvlux_plugin)
+   message(STATUS "OpenCV Lux plugin enabled")
+   set(use_qtcore ON)
+
+endif(opencvlux_plugin)
 
 include (CMakeForceCompiler)
 option(ENABLE_ICECC "Enable icecc checking, for distributed compilation" OFF)
@@ -66,14 +73,22 @@ set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS}
 set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} ${uuid_LIBRARY} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 if(use_qtcore)
+	message(STATUS "using Qt mainloop")
 
 	find_package( Qt4 REQUIRED )
-	set( QT_DONT_USE_QTGUI TRUE )
+
+	if(opencvlux_plugin)
+		message(STATUS "Not setting DONT_USE_QTGUI flag")
+	else(opencvlux_plugin)
+		set( QT_DONT_USE_QTGUI TRUE )
+	endif(opencvlux_plugin)
+
 	include(${QT_USE_FILE})
-	set(include_dirs ${include_dirs} ${qt_INCLUDE_DIRS})
-	set(link_libraries ${link_libraries} ${qt_LIBRARIES})
+	set(include_dirs ${include_dirs} ${QT_INCLUDE_DIRS})
+	set(link_libraries ${link_libraries} ${QT_LIBRARIES})
 
 	add_definitions(-DUSE_QT_CORE)
+	add_definitions(-DQT_NO_KEYWORDS)
 
 endif(use_qtcore)
 
