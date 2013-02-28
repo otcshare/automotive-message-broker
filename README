@@ -62,6 +62,21 @@ Running with other plugins
 To learn about running AMB with other plugins, please see the plugins/*/README.  
 
 
+Running with the Qt mainloop:
 
-TODO: link to website for questions/comments
+Some source and sink plugins may want to use the Qt-based mainloop.  To enable
+the Qt mainloop, run cmake with -Duse_qtcore=On:
+
+cmake .. -Duse_qtcore=On
+
+Alternatively, the Qt-based mainloop will be enabled if you enable an Qt-based
+source or sink plugin at compile time.
+
+You will also need to edit your config to enable the Qt-based mainloop:
+
+{
+	"mainloop" : "/usr/lib/automotive-message-broker/qtmainloopplugin.so",
+	"sources" : [...],
+	"sinks" : [...]
+}
 
