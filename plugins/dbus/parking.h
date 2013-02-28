@@ -18,7 +18,7 @@ public:
 		 *  @type boolean
 		 *  @access readonly
 		 **/
-		wantProperty<bool>(VehicleProperty::SecurityAlertStatus,"SecurityAlert", "b", AbstractProperty::Read);
+		wantProperty<Security::Status>(VehicleProperty::SecurityAlertStatus,"SecurityAlert", "i", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}

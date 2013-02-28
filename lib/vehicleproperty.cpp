@@ -216,7 +216,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(TransmissionFluidLevel,0);
 	REGISTERPROPERTY(BrakeFluidLevel,0);
 	REGISTERPROPERTY(WasherFluidLevel,0);
-	REGISTERPROPERTY(SecurityAlertStatus,0);
+	REGISTERPROPERTY(SecurityAlertStatus,Security::Idle);
 	REGISTERPROPERTY(ParkingBrakeStatus,false);
 	REGISTERPROPERTY(ParkingLightStatus,false);
 	REGISTERPROPERTY(HazardLightStatus,false);
