@@ -16,7 +16,7 @@
 /**
 * @attributeName  vehicle
 * @type Vehicle
-* @access 
+* @access readonly
 **/
 
 /** @raw Tizen implements VehicleObject; **/

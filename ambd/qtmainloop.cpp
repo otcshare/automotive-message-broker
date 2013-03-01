@@ -18,5 +18,5 @@ QtMainLoop::~QtMainLoop()
 
 int QtMainLoop::exec()
 {
-	app->exec();
+	return app->exec();
 }
