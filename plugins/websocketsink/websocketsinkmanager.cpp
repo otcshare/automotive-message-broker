@@ -784,7 +784,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << endl;
 			if (sinkManager != 0)
 			{
-				sinkManager->addPoll((int)(long)user);
+				//sinkManager->addPoll((int)(long)user);
+				sinkManager->addPoll(libwebsocket_get_socket_fd(wsi));
 			}
 			else
 			{
@@ -794,7 +795,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		}
 		case LWS_CALLBACK_DEL_POLL_FD:
 		{
-			sinkManager->removePoll((int)(long)user);
+			sinkManager->removePoll(libwebsocket_get_socket_fd(wsi));
 			break;
 		}
 		case LWS_CALLBACK_SET_MODE_POLL_FD:
