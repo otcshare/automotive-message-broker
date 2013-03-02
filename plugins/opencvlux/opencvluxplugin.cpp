@@ -25,6 +25,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QFutureWatcher>
 #include <QtConcurrentRun>
 
+#ifdef OPENCL
+#include <opencv/ocl/ocl.hpp>
+#endif
+
 using namespace std;
 
 #include "debugout.h"
@@ -36,6 +40,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 	threaded = false;
 	kinect = false;
+	useOpenCl = false;
 	timer = new QTimer(this);
 	fps=30;
 	device="0";
@@ -80,6 +85,21 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 		if(pixelUpperBound > 255)
 			pixelUpperBound = 255;
 	}
+
+	if(config.find("opencl") != config.end())
+	{
+		useOpenCl = config["opencl"] == "true";
+	}
+
+
+#ifdef OPENCL
+	if(useOpenCl)
+	{
+		std::vector<cv::ocl::Info> info;
+		cv::ocl::getDevice(info);
+	}
+#endif
+
 }
 
 
@@ -121,12 +141,12 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 
 void OpenCvLuxPlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
-
+	throw std::runtime_error("OpenCVLuxPlugin does not support this operation.  We should never hit this method.");
 }
 
 AsyncPropertyReply *OpenCvLuxPlugin::setProperty(AsyncSetPropertyRequest request )
 {
-
+	throw std::runtime_error("OpenCVLuxPlugin does not support this operation.  We should never hit this method.");
 }
 
 void OpenCvLuxPlugin::subscribeToPropertyChanges(VehicleProperty::Property property)
@@ -196,7 +216,14 @@ void OpenCvLuxPlugin::grabImage()
 
 uint OpenCvLuxPlugin::evalImage(cv::Mat qImg)
 {
+#ifdef OPENCL
+	cv::Scalar avgPixelIntensity;
+	cv::Scalar stdDev;
+
+	cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
+#else
 	cv::Scalar avgPixelIntensity = cv::mean(qImg);
+#endif
 
 	double val = avgPixelIntensity.val[0];
 

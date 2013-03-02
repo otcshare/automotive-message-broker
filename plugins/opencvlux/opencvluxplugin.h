@@ -65,6 +65,7 @@ private:
 	double fps;
 	bool threaded;
 	bool kinect;
+	bool useOpenCl;
 	int pixelLowerBound;
 	int pixelUpperBound;
 	uint lastLux;

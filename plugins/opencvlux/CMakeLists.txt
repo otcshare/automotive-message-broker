@@ -12,6 +12,16 @@ else(OpenCV_LIBS)
 	 message(FATAL_ERROR "opencv missing.  please install opencv")
 endif(OpenCV_LIBS)
 
+#find opencv ocl headers:
+find_path(ocl ocl.hpp PATH_SUFFIXES opencv/ocl opencv2/ocl DOC "opencv ocl headers")
+
+if(ocl)
+	message(STATUS "found opencv ocl headers. enabling opencl support. ${ocl}")
+	add_definitions(-DOPENCL)
+else(ocl)
+	message(STATUS "no opencv ocl headers found (ocl.hpp). no opencl support")
+endif(ocl)
+
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${OpenCV_INCLUDE_DIRS})
 
 set(opencvluxplugin_headers opencvluxplugin.h)
