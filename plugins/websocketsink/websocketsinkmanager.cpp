@@ -66,8 +66,8 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	//Default values
 	int port = 23000;
 	std::string interface = "lo";
-	std::string ssl_cert_path = "/home/michael/code/Intel/libwebsockets/test-server/libwebsockets-test-server.pem";
-	std::string ssl_key_path = "/home/michael/code/Intel/libwebsockets/test-server/libwebsockets-test-server.key.pem";
+	std::string ssl_cert_path;
+	std::string ssl_key_path;
 	int options = 0;
 	bool ssl = false;
 	//Try to load config
