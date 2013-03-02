@@ -216,14 +216,21 @@ void OpenCvLuxPlugin::grabImage()
 
 uint OpenCvLuxPlugin::evalImage(cv::Mat qImg)
 {
-#ifdef OPENCL
 	cv::Scalar avgPixelIntensity;
-	cv::Scalar stdDev;
 
-	cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
-#else
-	cv::Scalar avgPixelIntensity = cv::mean(qImg);
+
+	if(useOpenCl)
+	{
+#ifdef OPENCL
+		cv::Scalar stdDev;
+		cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
 #endif
+	}
+	else
+	{
+		cv::Scalar avgPixelIntensity = cv::mean(qImg);
+	}
+
 
 	double val = avgPixelIntensity.val[0];
 

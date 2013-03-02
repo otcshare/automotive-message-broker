@@ -1,0 +1,20 @@
+{
+	"sources" : [ 
+		{
+			"name" : "example",
+			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "WebSocketSink",
+			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
+			"cert" : "libwebsockets-test-server.pem",
+			"key" : "libwebsockets-test-server.key.pem",
+			"interface" : "eth0",
+			"port" : "23000",
+			"ssl" : "true"
+		} 
+	]
+}
+

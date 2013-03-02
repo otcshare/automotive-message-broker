@@ -1,0 +1,25 @@
+{
+	"mainloop" : "/usr/lib/automotive-message-broker/qtmainloopplugin.so",
+	"sources" : [ 
+		{
+			"name" : "OpenCV Lux plugin",
+			"path" : "/usr/lib/automotive-message-broker/opencvluxplugin.so",
+			"threaded" : "true",
+			"kinect" : "false",
+			"opencl" : "false",
+			"pixelLowerBound" : "0",
+			"pixelUpperBound" : "255",
+			"fps" : "30",
+			"device" : "0"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "Example sink",
+			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so",
+			"interface" : "lo",
+			"port" : "23000"
+		} 
+	]
+}
+
