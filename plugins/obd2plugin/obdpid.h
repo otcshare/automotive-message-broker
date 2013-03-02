@@ -73,7 +73,10 @@ public:
 
 	ObdPid* create()
 	{
-		return new T();
+		T* t = new T();
+		t->value = value;
+		t->isValidVal = isValidVal;
+		return t;
 	}
 };
 
@@ -224,6 +227,7 @@ public:
 	}
 	bool isValid(ByteArray replyVector)
 	{
+<<<<<<< HEAD
 		if(!MassAirFlowPid::tryParse(replyVector))
 		{
 			isValidVal = false;
@@ -231,6 +235,9 @@ public:
 		}
 		isValidVal = true;
 		return true;
+=======
+		return isValidVal = MassAirFlowPid::isValid(replyVector);
+>>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 	}
 	void parse(ByteArray replyVector)
 	{
@@ -316,9 +323,17 @@ public:
 		property = VehicleProperty::WMI;
 	}
 	bool isValid(ByteArray replyVector)
+<<<<<<< HEAD
+=======
 	{
-		if (!VinPid::tryParse(replyVector))
+		return isValidVal = VinPid::isValid(replyVector);
+	}
+	void parse(ByteArray replyVector)
+>>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
+	{
+		if (!isValidVal)
 		{
+<<<<<<< HEAD
 			isValidVal = false;
 			return false;
 		}
@@ -335,6 +350,14 @@ public:
 		VinPid::parse(replyVector);
 		value = value.substr(0,3);
 	}
+=======
+			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
+			return;
+		}
+		VinPid::parse(replyVector);
+		value = value.substr(0,3);
+	}
+>>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 };
 
 class AirIntakeTemperaturePid: public CopyMe<AirIntakeTemperaturePid>
@@ -373,7 +396,7 @@ class EngineLoadPid: public CopyMe<EngineCoolantPid>
 {
 public:
 	EngineLoadPid()
-		:CopyMe(VehicleProperty::EngineLoad,"01041/r",0x04)
+		:CopyMe(VehicleProperty::EngineLoad,"01041\r",0x04)
 	{
 
 	}
@@ -405,7 +428,7 @@ class ThrottlePositionPid: public CopyMe<ThrottlePositionPid>
 {
 public:
 	ThrottlePositionPid()
-		:CopyMe(VehicleProperty::ThrottlePosition,"01111/r",0x11)
+		:CopyMe(VehicleProperty::ThrottlePosition,"01111\r",0x11)
 	{
 
 	}

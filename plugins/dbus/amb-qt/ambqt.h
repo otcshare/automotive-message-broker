@@ -3,26 +3,57 @@
 
 #include <QObject>
 #include <QDBusInterface>
+#include <QtDebug>
+
+#define AUTOPROPERTY(type, name, Name) \
+	public: \
+	void set ## Name(type s) { m ## Name = s; } \
+	type name() { return m ## Name; } \
+	private: \
+	type m ## Name;
 
 class QDBusInterface;
 
 class AmbProperty: public QObject
 {
 	Q_OBJECT
-public:
-	AmbProperty(QString objectPath, QString interface, QString propertyName);
+	Q_PROPERTY(QString propertyName READ propertyName WRITE setPropertyName)
+	AUTOPROPERTY(QString, propertyName, PropertyName)
+	Q_PROPERTY(QVariant value READ value NOTIFY valueChanged)
+	Q_PROPERTY(QString interfaceName READ interfaceName WRITE setInterfaceName)
+	AUTOPROPERTY(QString, interfaceName, InterfaceName)
+	Q_PROPERTY(QString objectPath READ objectPath WRITE setObjectPath)
+	AUTOPROPERTY(QString, objectPath, ObjectPath)
 
-	QVariant operator()() const
+	public:
+
+		AmbProperty():mDBusInterface(NULL) { }
+
+	AmbProperty(QString op, QString iface, QString propName);
+
+	QVariant value()
 	{
-		return mInterface->property(mPropertyName.toAscii().data());
+		if(!mDBusInterface || !mDBusInterface->isValid())
+		{
+			qDebug()<<"error Interface is not valid";
+			return QVariant::Invalid;
+		}
+
+		QVariant value = mDBusInterface->property(propertyName().toAscii().data());
+
+		return value;
 	}
 
-signals:
-	void propertyChanged(QVariant);
+Q_SIGNALS:
+	void propertyChanged(QVariant, double);
+	void valueChanged(QVariant);
+
+public Q_SLOTS:
+	void propertyChangedSlot(QDBusVariant val, double ts);
+	void connect();
 
 private:
-	QString mPropertyName;
-	QDBusInterface* mInterface;
+	QDBusInterface* mDBusInterface;
 };
 
 #endif // AMBQT_H

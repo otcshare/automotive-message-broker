@@ -24,7 +24,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 ///properties:
 #include "accelerationproperty.h"
-#include "properties.h"
+#include "runningstatus.h"
+#include "custompropertyinterface.h"
+#include "environmentproperties.h"
+#include "vehicleinfo.h"
+#include "maintenance.h"
+#include "parking.h"
 
 #define ConstructProperty(property) \
 	new property(iface->re, connection);
@@ -39,19 +44,54 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	AbstractDBusInterface* acceleration = new AccelerationProperty(iface->re, connection);
 	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
 	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);
+	AbstractDBusInterface* engineSpeed = new EngineSpeedProperty(iface->re, connection);
 	ConstructProperty(VehiclePowerModeProperty);
 	ConstructProperty(TripMeterProperty);
 	ConstructProperty(TransmissionProperty);
+	ConstructProperty(TireTemperatureProperty);
+	ConstructProperty(CruiseControlProperty);
+	ConstructProperty(WheelBrakeProperty);
+	ConstructProperty(LightStatusProperty);
+	ConstructProperty(HornProperty);
+	ConstructProperty(FuelProperty);
+	ConstructProperty(EngineOilProperty);
+	ConstructProperty(ExteriorBrightnessProperty);
+	ConstructProperty(VehicleId);
+	ConstructProperty(TransmissionInfoProperty);
+	ConstructProperty(VehicleTypeProperty);
+	ConstructProperty(FuelInfoProperty);
+	ConstructProperty(SizeProperty);
+	ConstructProperty(DoorsProperty);
+	ConstructProperty(WheelInformationProperty);
+	ConstructProperty(OdometerProperty);
+	ConstructProperty(BatteryProperty);
+	ConstructProperty(SecurityAlertProperty);
+	ConstructProperty(ParkingBrakeProperty);
+	ConstructProperty(ParkingLightProperty);
+	ConstructProperty(HazardLightProperty);
+
+	PropertyList list = VehicleProperty::customProperties();
+
+	for (auto itr = list.begin(); itr != list.end(); itr++)
+	{
+		VehicleProperty::Property prop = *itr;
+
+		new CustomPropertyInterface(prop,iface->re,connection);
+	}
+
+
 }
 
 static void
 on_name_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
+
 }
 
 static void
 on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
+
 }
 
 

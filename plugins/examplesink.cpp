@@ -77,6 +77,36 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 	routingEngine->getPropertyAsync(batteryVoltageRequest);
 
+	AsyncPropertyRequest doorsPerRowRequest;
+	doorsPerRowRequest.property = VehicleProperty::DoorsPerRow;
+	doorsPerRowRequest.completed = [](AsyncPropertyReply* reply)
+	{
+		DebugOut(1)<<"Doors per row: "<<reply->value->toString()<<endl;
+		delete reply;
+	};
+
+	routingEngine->getPropertyAsync(doorsPerRowRequest);
+
+	AsyncPropertyRequest airbagStatus;
+	airbagStatus.property = VehicleProperty::AirbagStatus;
+	airbagStatus.completed = [](AsyncPropertyReply* reply)
+	{
+		DebugOut(1)<<"Airbag Status: "<<reply->value->toString()<<endl;
+		delete reply;
+	};
+
+	routingEngine->getPropertyAsync(airbagStatus);
+
+	AsyncPropertyRequest exteriorBrightness;
+	exteriorBrightness.property = VehicleProperty::ExteriorBrightness;
+	exteriorBrightness.completed = [](AsyncPropertyReply* reply)
+	{
+		DebugOut(1)<<"Exterior Brightness: "<<reply->value->toString()<<endl;
+		delete reply;
+	};
+
+	routingEngine->getPropertyAsync(exteriorBrightness);
+
 	auto getRangedCb = [](gpointer data)
 	{
 		AbstractRoutingEngine* routingEngine = (AbstractRoutingEngine*)data;
@@ -94,6 +124,8 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 				auto val = *itr;
 				DebugOut(1)<<"Velocity value from past: "<<val->toString()<<" time: "<<val->timestamp<<endl;
 			}
+
+			delete reply;
 		};
 
 		routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);

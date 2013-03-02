@@ -267,15 +267,19 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 	}
 		
 	ListPlusPlus<AbstractSink*>(&propertySinkMap[property]).removeOne(self);
-	
-	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+
+	/// Now we check to see if this is the last subscriber
+	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		AbstractSource* src = (*itr);
-		PropertyList properties = src->supported();
-		
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+		for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 		{
-			src->unsubscribeToPropertyChanges(property);
+			AbstractSource* src = (*itr);
+			PropertyList properties = src->supported();
+
+			if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
+			{
+				src->unsubscribeToPropertyChanges(property);
+			}
 		}
 	}
 }

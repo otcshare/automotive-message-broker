@@ -69,23 +69,39 @@ public:
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
-	void setValue(boost::any val)
+	double timestamp()
 	{
-		mValue = val;
+		return mTimestamp;
+	}
+
+	virtual void setValue(AbstractPropertyType* val)
+	{
+		if(mValue) delete mValue;
+
+		mValue = val->copy();
+		mAnyValue = val->anyValue();
+		mTimestamp = val->timestamp;
 		updateValue();
 	}
 
 	template<typename T>
 	void setValue(T val)
 	{
-		mValue = val;
+		mAnyValue = val;
 		updateValue();
 	}
 
+
+
 	template<typename T>
-	T value()
+	T anyValue()
 	{
-		return boost::any_cast<T>(mValue);
+		return boost::any_cast<T>(mAnyValue);
+	}
+
+	AbstractPropertyType* value()
+	{
+		return mValue;
 	}
 	
 protected: ///methods:
@@ -94,12 +110,13 @@ protected: ///methods:
 	
 protected:
 	
-	boost::any mValue;
+	boost::any mAnyValue;
 	string mPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;
 	Access mAccess;
-	
+	double mTimestamp;
+	AbstractPropertyType* mValue;
 	AbstractDBusInterface* mInterface;
 };
 

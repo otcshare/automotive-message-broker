@@ -1,0 +1,36 @@
+/**
+ * Details.
+ *
+ * \def-api-feature http://tizen.org/api/vehicle
+ * \brief Allows access to the vehicle API
+*/
+
+module Vehicle {
+
+	/**
+	 * \brief blah
+	 *
+	 * \def-instantiated
+	 * \api-feature http://tizen.org/api/vehicle
+	 */
+	[NoInterfaceObject] interface VehicleObject {
+		readonly attribute Vehicle vehicle;
+	};
+	Tizen implements VehicleObject;
+
+	[NoInterfaceObject]
+	interface VehiclePropertyType {
+		readonly attribute any value;
+		readonly attribute Date timeStamp;
+	};
+
+	[NoInterfaceObject]
+	interface Vehicle {
+
+		void getSupported(DOMString type, boolean writeable, onSuccessCallback onSuccess);
+		VehiclePropertyType get(DOMString event);
+		void set(DOMString event, any value);
+		sequence<VehiclePropertyTypes> getHistory(DOMString type, Date startTime, Date endTime);
+	};
+
+};

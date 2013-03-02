@@ -60,7 +60,7 @@ void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPrope
 		return;
 
 	AbstractProperty* prop = propertyDBusMap[property];
-	prop->setValue(value->anyValue());
+	prop->setValue(value);
 }
 
 std::string DBusSink::uuid()

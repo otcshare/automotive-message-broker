@@ -50,8 +50,9 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 
 	///see which properties are supported:
 	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
-	"<signal name='" + property->name() + "' >"
-	"	<arg type='"+ property->signature() + "' name='" + nameToLower + "' direction='out' />"
+	"<signal name='" + property->name() + "Changed' >"
+	"	<arg type='v' name='" + nameToLower + "' direction='out' />"
+	"	<arg type='d' name='timestamp' direction='out' />"
 	"</signal>";
 	
 	properties[property->name()] = property;
@@ -77,19 +78,32 @@ void AbstractDBusInterface::registerObject()
 
 	GDBusNodeInfo* introspection = g_dbus_node_info_new_for_xml(introspectionXml.c_str(), &error);
 	
-	if(!introspection)
+	if(!introspection || error)
 	{
-		cerr<<"Error in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<endl;
-		cerr<<error->message<<endl;
-		cerr<<"probably bad xml:"<<endl;
-		cerr<<introspectionXml<<endl;
+
+		DebugOut(0)<<"Error in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<endl;
+		DebugOut(0)<<error->message<<endl;
+		DebugOut(0)<<"probably bad xml:"<<endl;
+		DebugOut(0)<<introspectionXml<<endl;
+
+		g_error_free(error);
+
 		return;
 	}
 
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, mInterfaceName.c_str());
-	
-	const GDBusInterfaceVTable vtable = { NULL, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
-	
+
+	auto fakeMethodCb = [](GDBusConnection *connection,
+			const gchar *sender,
+			const gchar *object_path,
+			const gchar *interface_name,
+			const gchar *method_name,
+			GVariant *parameters,
+			GDBusMethodInvocation *invocation,
+			gpointer user_data) { };
+
+	const GDBusInterfaceVTable vtable = { fakeMethodCb, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
+
 	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
 	
 	if(error) throw -1;
@@ -110,11 +124,23 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	}
 
 	GError *error = NULL;
-	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), property->name().c_str(), g_variant_new("(v)",property->toGVariant()), &error);
+
+	GVariant **params = g_new(GVariant*,2);
+	GVariant *val = g_variant_ref(property->toGVariant());
+	params[0] = g_variant_new("v",val);
+	params[1] = g_variant_new("d",property->timestamp());
+
+	GVariant *tuple_variant = g_variant_new_tuple(params,2);
+
+	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(), tuple_variant, &error);
+
+	g_free(params);
+	g_variant_unref(val);
 
 	if(error)
 	{
-		throw -1;
+		DebugOut(0)<<error->message<<endl;
+		//throw -1;
 	}
 }
 
@@ -127,11 +153,11 @@ void AbstractDBusInterface::startRegistration()
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
-	*error = NULL;
 	if(interfaceMap.count(interfaceName))
 	{
 		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
 		return value;
+
 	}
 	debugOut("No interface for" + string(interfaceName));
 	return nullptr;

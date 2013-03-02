@@ -34,7 +34,7 @@ AbstractRoutingEngine *m_re;
 
 //std::list<ObdPid*> Obd2Amb::supportedPidsList;
 Obd2Amb *obd2AmbInstance = new Obd2Amb;
-
+VehicleProperty::Property Obd2Connected = "Obd2Connected";
 int calledPersecond = 0;
 
 bool sendElmCommand(obdLib *obd,std::string command)
@@ -62,7 +62,7 @@ void connect(obdLib* obd, std::string device, std::string strbaud)
 {
 	//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
 	std::string port = device;
-	DebugOut() << "Obd2Source::Connect()" << device << strbaud << "\n";
+	DebugOut() << "Obd2Source::Connect()" << device << strbaud << endl;
 	int baud = boost::lexical_cast<int>(strbaud);
 	obd->openPort(port.c_str(),baud);
 ObdPid::ByteArray replyVector;
@@ -138,8 +138,9 @@ void threadLoop(gpointer data)
 		if (query != nullptr)
 		{
 			//printf("Got request!\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got single shot request!"<<endl;
+			
 			ObdPid *req = (ObdPid*)query;
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got single shot request: " << req->pid.substr(0,req->pid.length()-1) << ":" << req->property <<endl;
 			repeatReqList.push_back(req);
 		}
 		query = g_async_queue_try_pop(privSubscriptionAddQueue);
@@ -211,7 +212,7 @@ void threadLoop(gpointer data)
 			}
 			else if (req->req == "disconnect")
 			{
-				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Using queued disconnect" << (ulong)req << "\n";
+				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Using queued disconnect" << (ulong)req << endl;
 				obd->closePort();
 				ObdBluetoothDevice bt;
 				bt.disconnect(source->m_btDeviceAddress, source->m_btAdapterAddress);
@@ -225,7 +226,7 @@ void threadLoop(gpointer data)
 		query = g_async_queue_try_pop(privSubscriptionRemoveQueue);
 		if (query != nullptr)
 		{
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got unsubscription request\n";
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got unsubscription request"<<endl;
 			ObdPid *req = (ObdPid*)query;
 			for (std::list<ObdPid*>::iterator i=reqList.begin();i!= reqList.end();i++)
 			{
@@ -234,6 +235,10 @@ void threadLoop(gpointer data)
 					reqList.erase(i);
 					delete (*i);
 					i--;
+					if (reqList.size() == 0)
+					{
+						break;
+					}
 				}
 			}
 			//reqList.push_back(req->req);
@@ -274,6 +279,7 @@ void threadLoop(gpointer data)
 		int badloop = 0;
 		for (std::list<ObdPid*>::iterator i=repeatReqList.begin();i!= repeatReqList.end();i++)
 		{
+			DebugOut(10) << __SMALLFILE__ << ":" << __LINE__ << "Requesting pid: " << (*i)->pid.substr(0,(*i)->pid.length()-1) << (*i)->property << endl;
 			if (source->m_blacklistPidCountMap.find((*i)->pid) != source->m_blacklistPidCountMap.end())
 			{
 				//Don't erase the pid, just skip over it.
@@ -284,13 +290,13 @@ void threadLoop(gpointer data)
 				}
 			}
 			badloop++;
-			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector))
+			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector,5,3))
 			{
 				//This only happens during a error with the com port. Close it and re-open it later.
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid << "!\n";
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid.substr(0,(*i)->pid.length()-1) << endl;
 				if (obd->lastError() == obdLib::NODATA)
 				{
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::NODATA for pid" << (*i)->pid << "\n";
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::NODATA for pid" << (*i)->pid.substr(0,(*i)->pid.length()-1) << " expected property: " << (*i)->property << endl;
 					if (source->m_blacklistPidCountMap.find((*i)->pid) != source->m_blacklistPidCountMap.end())
 					{
 						//pid value i not yet in the list.
@@ -308,6 +314,10 @@ void threadLoop(gpointer data)
 					}
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "error:nodata";
+<<<<<<< HEAD
+=======
+					statusreq->property = (*i)->property;
+>>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 					g_async_queue_push(privStatusQueue,statusreq);
 					continue;
 				}
@@ -316,7 +326,11 @@ void threadLoop(gpointer data)
 					timeoutCount++;
 					if (timeoutCount < 2)
 					{
+<<<<<<< HEAD
 						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::TIMEOUT for pid" << (*i)->pid << "\n";
+=======
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::TIMEOUT for pid" << (*i)->pid << endl;
+>>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "error:timeout";
 						g_async_queue_push(privStatusQueue,statusreq);
@@ -325,10 +339,11 @@ void threadLoop(gpointer data)
 				}
 				else
 				{
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBD Other error:" << obd->lastError() << endl;
 				}
 				
 				CommandRequest *req = new CommandRequest();
-				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Queuing up a disconnect" << (ulong)req << "\n";
+				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Queuing up a disconnect" << (ulong)req << endl;
 				req->req = "disconnect";
 				g_async_queue_push(privCommandQueue,req);
 				i = repeatReqList.end();
@@ -349,72 +364,26 @@ void threadLoop(gpointer data)
 				DebugOut() << "Invalid reply"<<endl;
 				continue;
 			}
+			else
+			{
+				DebugOut(11) << __SMALLFILE__ <<":"<< __LINE__ << "Reply recieved and queued for:" << (*i)->pid.substr(0,(*i)->pid.length()-1) << endl;
+				std::string repstr;
+				for (int i=0;i<replyVector.size();i++)
+				{
+				  if (replyVector[i] != 13)
+				  {
+				  repstr += (char)replyVector[i];
+				  }
+					//DebugOut(11) << replyVector[i];
+				}
+				DebugOut(11) << "Reply:" << repstr << endl;
+			}
 			g_async_queue_push(privResponseQueue,pid);
-			//printf("Req: %s\n",(*i).c_str());
-			/*if ((*i) == "ATRV\r")
-			{
-				//printf("Requesting voltage...\n");
-				if (!obd->sendObdRequestString((*i).c_str(),(*i).length(),&replyVector))
-				{
-					//printf("Unable to request voltage!!!\n");
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to request voltage!\n";
-					continue;
-				}
-				std::string replystring = "";
-				for (int j=0;j<replyVector.size();j++)
-				{
-					replystring += replyVector[j];
-				}
-				//printf("Voltage reply: %s\n",replystring.c_str());
-				replystring.substr(0,replystring.find("V"));*/
-				/*ObdReply *rep = new ObdReply();
-				rep->req = "ATRV\r";
-				rep->reply = replystring;
-				g_async_queue_push(privResponseQueue,rep);*/
-			/*}
-			if (!obd->sendObdRequest((*i).c_str(),(*i).length(),&replyVector))
-			{
-				//printf("Error sending obd2 request\n");
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error sending OBD2 request\n";
-				continue;
-			}*/
-			//printf("Reply: %i %i\n",replyVector[0],replyVector[1]);
-				/*
-			/*
-			else if (replyVector[0] == 0x49)
-			{
-			  /*
-				49 02 01 00 00 00 31 
-				49 02 02 47 31 4A 43 
-				49 02 03 35 34 34 34 
-				49 02 04 52 37 32 35 
-				49 02 05 32 33 36 37 
-				//VIN number reply
-				string vinstring;
-				for (int j=0;j<replyVector.size();j++)
-				{
-					if(replyVector[j] == 0x49 && replyVector[j+1] == 0x02)
-					{
-						//We're at a reply header
-						j+=3;
-					}
-					if (replyVector[j] != 0x00)
-					{
-						vinstring += (char)replyVector[j];
-						//printf("VIN: %i %c\n",replyVector[j],replyVector[j]);
-					}
-				}
-				/*ObdReply *rep = new ObdReply();
-				rep->req = "0902";
-				rep->reply = vinstring;
-				g_async_queue_push(privResponseQueue,rep);*/
-				
-			//DebugOut()<<"Reply: "<<replyVector[2]<<" "<<replyVector[3]<<endl;
 		}
 		if (badloop == 0)
 		{
 			//We had zero non-blacklisted events. Pause for a moment here to keep from burning CPU.
-			usleep(10000);
+			//usleep(10000);
 		}
 		repeatReqList.clear();
 		
@@ -424,11 +393,16 @@ void threadLoop(gpointer data)
 		obd->closePort();
 	}
 }
+<<<<<<< HEAD
 static int updateProperties(/*gpointer retval,*/ gpointer data)
+=======
+static int updateProperties( gpointer data)
+>>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 {
 
 	OBD2Source* src = (OBD2Source*)data;
 	
+<<<<<<< HEAD
 	
 	StatusMessage *statusreq = new StatusMessage();
 				statusreq->statusStr = "connected";
@@ -448,60 +422,45 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 		}
 	}
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
+=======
+	while (gpointer retval = g_async_queue_try_pop(src->statusQueue))
+>>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
+	{
+		StatusMessage *reply = (StatusMessage*)retval;
+		if (reply->statusStr == "disconnected")
+		{
+
+			BasicPropertyType<bool> val(false);
+			src->updateProperty(Obd2Connected,&val);
+		}
+		else if (reply->statusStr == "connected")
+		{
+			BasicPropertyType<bool> val(true);
+			src->updateProperty(Obd2Connected,&val);
+		}
+		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
+		{
+			if (src->propertyReplyMap.find(reply->property) != src->propertyReplyMap.end())
+			{
+				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on property:" << reply->property << endl;
+				src->propertyReplyMap[reply->property]->success = false;
+				src->propertyReplyMap[reply->property]->completed(src->propertyReplyMap[reply->property]);
+				src->propertyReplyMap.erase(reply->property);
+			}
+			else
+			{
+				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on unrequested property:" << reply->property << endl;
+			}
+		}
+	}
+	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{
 		ObdPid *reply = (ObdPid*)retval;
 
 		
 		AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
 		src->updateProperty(reply->property, value);
-
-		/*if (reply->req == "05")
-		{
-			VehicleProperty::EngineCoolantTemperatureType speed(reply->reply);
-			src->updateProperty(VehicleProperty::EngineCoolantTemperature,&speed);
-		}
-		else if (reply->req == "0C")
-		{
-			VehicleProperty::EngineSpeedType speed(reply->reply);
-			src->updateProperty(VehicleProperty::EngineSpeed,&speed); 
-		}
-		else if (reply->req == "0D")
-		{
-			VehicleProperty::VehicleSpeedType speed(reply->reply);
-			src->updateProperty(VehicleProperty::VehicleSpeed,&speed);
-		}
-		else if (reply->req == "10")
-		{
-			VehicleProperty::MassAirFlowType mass(reply->reply);
-			src->updateProperty(VehicleProperty::MassAirFlow,&mass);
-		}
-		else if (reply->req == "ATRV\r")
-		{
-			VehicleProperty::BatteryVoltageType volts(reply->reply);
-			src->updateProperty(VehicleProperty::BatteryVoltage,&volts);
-			
-		}
-		else if (reply->req == "0902")
-		{
-			//VIN number and WMI
-			VehicleProperty::VINType vin(reply->reply);
-			src->updateProperty(VehicleProperty::VIN,&vin);
-			VehicleProperty::WMIType wmi(reply->reply.substr(0,3));
-			src->updateProperty(VehicleProperty::WMI,&wmi);
-		}
-		else if (reply->req == "5C")
-		{
-			VehicleProperty::EngineCoolantTemperatureType ect(reply->reply);
-			src->updateProperty(VehicleProperty::EngineCoolantTemperature,&ect);
-		}
-		else if (reply->req == "46")
-		{
-			VehicleProperty::InteriorTemperatureType temp(reply->reply);
-			src->updateProperty(VehicleProperty::InteriorTemperature,&temp);
-		}
-		//5C -- engine oil temp
-		//46 interior temp*/
-
+		delete value;
 		delete reply;
 	}
 
@@ -510,7 +469,7 @@ static int updateProperties(/*gpointer retval,*/ gpointer data)
 
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
 {
-	//m_re->updateProperty(property,&value);
+
 	
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
@@ -520,6 +479,20 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 	}
 	else
 	{
+		if(oldValueMap.find(property) != oldValueMap.end())
+		{
+			AbstractPropertyType* old = oldValueMap[property];
+
+			if((*old) == (*value))
+			{
+				return;
+			}
+
+			delete old;
+		}
+
+		oldValueMap[property] = value->copy();
+
 		m_re->updateProperty(property,value,uuid());
 	}
 }
@@ -551,7 +524,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
-		DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
+		DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << endl;
 		if ((*i).first == "device")
 		{
 			port = (*i).second;
@@ -602,13 +575,19 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	m_baud = baud;
 	m_gThread = g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
 	//g_idle_add(updateProperties, this);
-	g_timeout_add(10,updateProperties,this);
+	g_timeout_add(5,updateProperties,this);
 }
 
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
-	: AbstractSource(re, config), Obd2Connect("Obd2Connect")
+	: AbstractSource(re, config)
 {
-	VehicleProperty::registerProperty(Obd2Connect,[](){ return new Obd2ConnectType(false); });
+	bool success = VehicleProperty::registerProperty(Obd2Connected,[](){ return new Obd2ConnectType(false); });
+
+	if(!success)
+	{
+		///ERROR!
+	}
+
 	clientConnected = false;
 	m_re = re;  
 
@@ -621,13 +600,14 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
 		m_supportedProperties.push_back((*itr)->property);
 	}
 
-	m_supportedProperties.push_back(Obd2Connect);
+	m_supportedProperties.push_back(Obd2Connected);
 
 	re->setSupported(supported(), this);
 	/*if (openPort(std::string("/dev/pts/7"),115200))
 	{
 	  printf("Error opening OBD2 port\n");
 	}*/
+	statusQueue = g_async_queue_new();
 	commandQueue = g_async_queue_new();
 	subscriptionAddQueue = g_async_queue_new();
 	subscriptionRemoveQueue = g_async_queue_new();
@@ -664,68 +644,6 @@ string OBD2Source::uuid()
 }
 void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	/*//printf("Subscribed to property: %s\n",property.c_str());
-	if (property == VehicleProperty::EngineSpeed)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "010C1\r";
-		g_async_queue_push(subscriptionAddQueue,requ);
-	}
-	else if (property == VehicleProperty::MassAirFlow)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "01101\r";
-		g_async_queue_push(subscriptionAddQueue,requ);
-	}
-	else if (property == VehicleProperty::VehicleSpeed)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "010D1\r";
-		g_async_queue_push(subscriptionAddQueue,requ);
-	}
-	else if (property == VehicleProperty::EngineCoolantTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "01051\r";
-		g_async_queue_push(subscriptionAddQueue,requ);
-	}
-	else if (property == VehicleProperty::VIN)
-	{
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "VIN subscription requested... but there's no point!\n";
-	}
-	else if (property == VehicleProperty::WMI)
-	{
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "WMI subscription requested... but there's no point!\n";
-	}
-	else if (property == VehicleProperty::EngineOilTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "015C1\r";
-		g_async_queue_push(subscriptionAddQueue,requ);
-	}
-	else if (property == VehicleProperty::InteriorTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "01461\r";
-		g_async_queue_push(subscriptionAddQueue,requ);
-	}
-	else if (property == VehicleProperty::BatteryVoltage)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "ATRV\r";
-		g_async_queue_push(subscriptionAddQueue,requ);
-	}
-	/*m_supportedProperties.push_back(VehicleProperty::VIN);
-	m_supportedProperties.push_back(VehicleProperty::WMI);
-	m_supportedProperties.push_back(VehicleProperty::EngineOilTemperature);
-	m_supportedProperties.push_back(VehicleProperty::InteriorTemperature);
-	m_supportedProperties.push_back(VehicleProperty::BatteryVoltage);*/
-	/*else
-	{
-		//printf("Unsupported property: %s\n",property.c_str());
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unsupported property requested:" << property << "\n";
-	}*/
-
 	if (property == VehicleProperty::VIN)
 	{
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "VIN subscription requested... but there's no point!"<<endl;
@@ -768,63 +686,6 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	//
-	/*if (property == VehicleProperty::EngineSpeed)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "010C1\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::MassAirFlow)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "01101\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::VehicleSpeed)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "010D1\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::EngineCoolantTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "01051\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::VIN)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "0902\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::WMI)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "0902\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::EngineOilTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "015C1\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::InteriorTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "01461\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	else if (property == VehicleProperty::BatteryVoltage)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "ATRV\r";
-		g_async_queue_push(subscriptionRemoveQueue,requ);
-	}
-	*/
-
 	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
 	{
 		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
@@ -838,67 +699,10 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 
 void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 {
+	DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "getPropertyAsync requested for " << reply->property << endl;
 	propertyReplyMap[reply->property] = reply;
 	VehicleProperty::Property property = reply->property;
 
-	//TODO: There is a much better way to do this, but for now it's hardcoded.
-	/*if (property == VehicleProperty::EngineSpeed)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "010C\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::MassAirFlow)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "0110\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::VehicleSpeed)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "010D\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::EngineCoolantTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "0105\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::VIN)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "0902\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::WMI)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "0902\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::EngineOilTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "015C\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::InteriorTemperature)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "0146\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	else if (property == VehicleProperty::BatteryVoltage)
-	{
-		ObdRequest *requ = new ObdRequest();
-		requ->req = "ATRV\r";
-		g_async_queue_push(singleShotQueue,requ);
-	}
-	*/
-
-	///Here's a better way:
 
 	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
 	{
@@ -916,7 +720,30 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 {
 	AsyncPropertyReply* reply = new AsyncPropertyReply (request);
-	reply->success = false;
+
+	if(request.property == Obd2Connected)
+	{
+		if(request.value->value<bool>() == true)
+		{
+			CommandRequest *req = new CommandRequest();
+			req->req = "connectifnot";
+			g_async_queue_push(commandQueue,req);
+		}
+		else
+		{
+			CommandRequest *req = new CommandRequest();
+			req->req = "disconnect";
+			g_async_queue_push(commandQueue,req);
+		}
+
+		reply->success = true;
+	}
+
+	else
+	{
+		reply->success = false;
+	}
+
 	try
 	{
 		reply->completed(reply);

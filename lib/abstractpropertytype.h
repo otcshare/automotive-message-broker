@@ -22,10 +22,14 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
+#include <iostream>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
 #include <type_traits>
+#include <glib.h>
+#include <list>
 #include "timestamp.h"
 
 class AbstractPropertyType
@@ -37,7 +41,18 @@ public:
 
 	virtual void fromString(std::string)= 0;
 
+	virtual GVariant* toVariant() = 0;
+
+	virtual void fromVariant(GVariant*) = 0;
+
 	virtual AbstractPropertyType* copy() = 0;
+
+	bool operator == (AbstractPropertyType &other)
+	{
+		std::string one = toString();
+		std::string two = other.toString();
+		return one == two;
+	}
 
 	double timestamp;
 
@@ -67,19 +82,149 @@ protected:
 };
 
 template <typename T>
+class GVS;
+
+template <>
+class GVS<int>
+{
+public:
+	static const char* signature() { return "i"; }
+
+	static char value(GVariant* v)
+	{
+		return g_variant_get_int32(v);
+	}
+};
+
+template <>
+class GVS<double>
+{
+public:
+	static const char* signature() { return "d"; }
+
+	static double value(GVariant* v)
+	{
+		return g_variant_get_double(v);
+	}
+};
+
+template <>
+class GVS<uint16_t>
+{
+public:
+	static const char* signature() { return "q"; }
+
+	static uint16_t value(GVariant* v)
+	{
+		return g_variant_get_uint16(v);
+	}
+};
+
+template <>
+class GVS<int16_t>
+{
+public:
+	static const char* signature() { return "n"; }
+
+	static int16_t value(GVariant* v)
+	{
+		return g_variant_get_int16(v);
+	}
+};
+
+template <>
+class GVS<char>
+{
+public:
+	static const char* signature() { return "y"; }
+
+	static char value(GVariant* v)
+	{
+		return g_variant_get_byte(v);
+	}
+};
+
+template <>
+class GVS<uint32_t>
+{
+public:
+	static const char* signature() { return "u"; }
+
+	static uint32_t value(GVariant* v)
+	{
+		return g_variant_get_uint32(v);
+	}
+};
+
+template <>
+class GVS<int64_t>
+{
+public:
+	static const char* signature() { return "x"; }
+
+	static int64_t value(GVariant* v)
+	{
+		return g_variant_get_int64(v);
+	}
+};
+
+template <>
+class GVS<uint64_t>
+{
+public:
+	static const char* signature() { return "t"; }
+
+	static uint64_t value(GVariant* v)
+	{
+		g_variant_get_uint64(v);
+	}
+};
+
+template <>
+class GVS<bool>
+{
+public:
+	static const char* signature() { return "b"; }
+
+	static bool value(GVariant *v)
+	{
+		return g_variant_get_boolean(v);
+	}
+};
+
+
+template <typename T>
 class BasicPropertyType: public AbstractPropertyType
 {
 public:
+	BasicPropertyType(): AbstractPropertyType()
+	{
+		mValue = T();
+	}
 	BasicPropertyType(BasicPropertyType const &other)
 		:AbstractPropertyType()
 	{
 		setValue(other.value<T>());
+		timestamp = other.timestamp;
+		sequence = other.sequence;
 	}
 
 	BasicPropertyType & operator = (BasicPropertyType const & other)
 	{
 		setValue(other.value<T>());
+		timestamp = other.timestamp;
+		sequence = other.sequence;
 		return *this;
+	}
+
+	bool operator < (const BasicPropertyType<T>& other) const
+	{
+		return value<T>() < other.value<T>();
+	}
+
+	bool operator > (const BasicPropertyType<T>& other) const
+	{
+		return value<T>() > other.value<T>();
 	}
 
 	BasicPropertyType(T val)
@@ -95,7 +240,7 @@ public:
 		{
 			serialize<T>(val);
 		}
-		else throw std::runtime_error("value cannot be empty");
+		else setValue(T());
 	}
 
 	AbstractPropertyType* copy()
@@ -119,7 +264,19 @@ public:
 		return stream.str();
 	}
 
+	GVariant* toVariant()
+	{
+		return serializeVariant<T>(value<T>());
+	}
+
+	void fromVariant(GVariant *v)
+	{
+		setValue(deserializeVariant<T>(v));
+	}
+
 private:
+
+	//GVariant* mVariant;
 
 	template <class N>
 	void serialize(std::string val,  typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
@@ -140,13 +297,44 @@ private:
 		stream>>someTemp;
 		setValue(someTemp);
 	}
+
+	template <class N>
+	GVariant* serializeVariant(T val, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	{
+		//mVariant = Glib::VariantBase(Glib::Variant<gint16>::create((int)val).gobj());
+
+		return (g_variant_new("i",(int)val));
+	}
+
+	template <class N>
+	GVariant* serializeVariant(T val, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	{
+		//mVariant = Glib::Variant<T>::create(val);
+		//mVariant = g_variant_ref(g_variant_new(GVS<T>::signature(),val));
+		return g_variant_new(GVS<T>::signature(),val);
+	}
+
+	template <class N>
+	T deserializeVariant(GVariant* v, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	{
+//		return (T)((Glib::Variant<int>::cast_dynamic<Glib::Variant<int> >(*v)).get());
+
+		return (T)GVS<int>::value(v);
+	}
+
+	template <class N>
+	T deserializeVariant(GVariant* v, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	{
+		//	return Glib::VariantBase::cast_dynamic<Glib::Variant<T> >(*v).get();
+		return GVS<T>::value(v);
+	}
 };
 
 class StringPropertyType: public AbstractPropertyType
 {
 public:
 	StringPropertyType(std::string val)
-		:AbstractPropertyType()
+		:AbstractPropertyType(),mVariant(NULL)
 	{
 		setValue(val);
 	}
@@ -178,6 +366,168 @@ public:
 		return value<std::string>();
 	}
 
+	GVariant* toVariant()
+	{
+		//mVariant = Glib::Variant<std::string>::create(toString());
+
+		if(mVariant)
+			g_variant_unref(mVariant);
+
+		mVariant = g_variant_ref(g_variant_new_string(toString().c_str()));
+
+		return mVariant;
+	}
+
+	void fromVariant(GVariant *v)
+	{
+		setValue(std::string(g_variant_get_string(v,NULL)));
+	}
+
+private:
+
+	GVariant* mVariant;
+};
+
+template <class T>
+class ListPropertyType: public AbstractPropertyType
+{
+public:
+
+	ListPropertyType():initialized(false){}
+	ListPropertyType(AbstractPropertyType *property):initialized(false)
+	{
+		appendPriv(property->copy());
+	}
+
+	ListPropertyType(ListPropertyType & other)
+		:initialized(false)
+	{
+		std::list<AbstractPropertyType*> l = other.list();
+		for(auto itr = l.begin(); itr != l.end(); itr++)
+		{
+			append(*itr);
+		}
+	}
+
+	~ListPropertyType()
+	{
+		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		{
+			delete *itr;
+		}
+	}
+
+	/** append - appends a property to the list
+	 * @arg property - property to be appended.  Property will be copied and owned by ListPropertyType.
+	 * You are responsible for freeing property after append is called.
+	 **/
+	void append(AbstractPropertyType* property)
+	{
+		if(!initialized)
+		{
+			for(auto itr = mList.begin(); itr != mList.end(); itr++)
+			{
+				AbstractPropertyType *p = *itr;
+				delete p;
+			}
+			mList.clear();
+			initialized = true;
+		}
+
+		appendPriv(property->copy());
+	}
+
+	uint count()
+	{
+		return mList.size();
+	}
+
+	AbstractPropertyType* copy()
+	{
+		return new ListPropertyType(*this);
+	}
+
+	std::string toString() const
+	{
+		std::string str = "[";
+
+		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		{
+			if(str != "[")
+				str += ",";
+
+			AbstractPropertyType* t = *itr;
+
+			str += t->toString();
+		}
+
+		str += "]";
+
+		return str;
+	}
+
+
+	void fromString(std::string str )
+	{
+		if(!str.length())
+			return;
+
+		if(str[0] != '[' && str[str.length()-1] != ']')
+		{
+			return;
+		}
+
+		str = str.substr(1,str.length() - 2);
+
+		std::vector<std::string> elements;
+
+		std::istringstream f(str);
+
+		std::string element;
+		while(std::getline(f,element,','))
+		{
+			T *foo = new T(element);
+			append (foo);
+
+			delete foo;
+		}
+	}
+
+
+	GVariant* toVariant()
+	{
+
+		GVariantBuilder params;
+		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
+
+		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		{
+			AbstractPropertyType* t = *itr;
+			g_variant_builder_add_value(&params, t->toVariant());
+		}
+
+		GVariant* var =  g_variant_builder_end(&params);
+		g_assert(var);
+		return var;
+
+	}
+
+	void fromVariant(GVariant* v)
+	{
+
+	}
+
+	std::list<AbstractPropertyType*> list() { return mList; }
+
+private:
+	void appendPriv(AbstractPropertyType* i)
+	{
+		mList.push_back(i);
+	}
+
+	bool initialized;
+
+	std::list<AbstractPropertyType*> mList;
 };
 
 #endif

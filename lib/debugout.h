@@ -22,6 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
+
+#include "timestamp.h"
 
 using namespace std;
 
@@ -30,8 +33,17 @@ void debugOut(string message);
 class DebugOut 
 {
 public: 
-	DebugOut(int debugLevel = 4) { mDebugLevel = debugLevel; }
-				
+	DebugOut(int debugLevel = 4)
+	{
+		mDebugLevel = debugLevel;
+		ostream out(buf);
+
+		out.precision(15);
+
+		if(mDebugLevel <= debugThreshhold)
+			out<<bufferTime(amb::currentTime())<<" | ";
+	}
+
 	DebugOut const& operator << (string message) const
 	{
 		ostream out(buf);
@@ -67,7 +79,7 @@ public:
 	{
 		ostream out(buf);
 
-		out.precision(5);
+		out.precision(15);
 
 		if(mDebugLevel <= debugThreshhold)
 			 out<<val<<" ";
@@ -85,6 +97,23 @@ public:
 	}
 
 private:
+
+	std::string bufferTime(double time)
+	{
+		ostringstream f;
+
+		f.precision(15);
+
+		f<<time;
+
+		while(f.str().length() <= 15)
+		{
+			f<<" ";
+		}
+
+		return f.str();
+	}
+
 	static int debugThreshhold;
 	static std::streambuf *buf;
 	int mDebugLevel;

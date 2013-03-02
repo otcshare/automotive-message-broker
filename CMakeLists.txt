@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.6.1")
+set(PROJECT_VERSION "0.7.9")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
@@ -21,9 +21,46 @@ option(tpms_plugin "TPMS plugin " OFF)
 option(obd2_plugin "OBD-II plugin" ON)
 option(database_plugin "Database plugins" OFF)
 option(qt_bindings "AMB Qt DBus bindings" OFF)
+option(opencvlux_plugin "OpenCV Lux plugin" OFF)
+
+if(opencvlux_plugin)
+   message(STATUS "OpenCV Lux plugin enabled")
+   set(use_qtcore ON)
+
+endif(opencvlux_plugin)
+
+include (CMakeForceCompiler)
+option(ENABLE_ICECC "Enable icecc checking, for distributed compilation" OFF)
+
+if (ENABLE_ICECC)
+   find_program(ICECC icecc)
+    if (ICECC)
+        message(STATUS "icecc will be used for distributed compiling")
+        cmake_force_cxx_compiler(${ICECC} icecc)
+    else(ICECC)
+        message(STATUS "Not using icecc")
+    endif(ICECC)
+endif(ENABLE_ICECC)
 
 find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
+
+if(libtool_LIBRARY)
+     message(STATUS "libtool found")
+else(libtool_LIBRARY)
+     message(FATAL_ERROR "libtool missing.  please install libtool")
+endif(libtool_LIBRARY)
+
+find_library(uuid_LIBRARY uuid DOC "Uuid libraries")
+find_path(uuid_INCLUDE_DIR uuid/uuid.h DOC "Libtool headers")
+
+if(uuid_LIBRARY)
+     message(STATUS "uuid found")
+else(uuid_LIBRARY)
+     message(FATAL_ERROR "uuid missing.  please install uuid-dev")
+endif(uuid_LIBRARY)
+
+
 find_package(Boost REQUIRED)
 
 pkg_check_modules(glib REQUIRED glib-2.0)
@@ -32,25 +69,34 @@ pkg_check_modules(json REQUIRED json-glib-1.0)
 add_definitions(-std=c++0x)
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
-set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${uuid_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} ${uuid_LIBRARY} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 if(use_qtcore)
+	message(STATUS "using Qt mainloop")
 
 	find_package( Qt4 REQUIRED )
-	set( QT_DONT_USE_QTGUI TRUE )
+
+	if(opencvlux_plugin)
+		message(STATUS "Not setting DONT_USE_QTGUI flag")
+	else(opencvlux_plugin)
+		set( QT_DONT_USE_QTGUI TRUE )
+	endif(opencvlux_plugin)
+
 	include(${QT_USE_FILE})
-	set(include_dirs ${include_dirs} ${qt_INCLUDE_DIRS})
-	set(link_libraries ${link_libraries} ${qt_LIBRARIES})
+	set(include_dirs ${include_dirs} ${QT_INCLUDE_DIRS})
+	set(link_libraries ${link_libraries} ${QT_LIBRARIES})
 
 	add_definitions(-DUSE_QT_CORE)
+	add_definitions(-DQT_NO_KEYWORDS)
 
 endif(use_qtcore)
 
-add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
-
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
 add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
+add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
 add_subdirectory(lib)
 add_subdirectory(ambd)

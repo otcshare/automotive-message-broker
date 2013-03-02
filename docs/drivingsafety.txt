@@ -2,127 +2,136 @@ Driving Safety hierarchy
 =================
 
 Service         org.automotive
-Interface       org.automotive.drivingsafety
-Object path     /
+Object path     /org/automotive/drivingSafety
 
  
-Properties		byte AntilockBrakingSystem [readonly]
+Interface:	org.automotive.antilockBrakingSystem
+Object path:	/org/automotive/vehicleInfo/vehicleId
+Properties:
+		bool AntilockBrakingSystem [readonly]
 
-				Idle = 0,
-				Engaged = 1
+			Idle = false,
+			Engaged = true
 				
-			byte TractionControlSystem [readonly]
+		bool TractionControlSystem [readonly]
 			
-				Off = 0,
-				On = 1
+			Off = false,
+			On = true
 				
-			uint16 VehicleTopSpeedLimit [readonly]
+		uint16 VehicleTopSpeedLimit [readonly]
 			
-				top rated speed in km/h. 0 = no limit
+			top rated speed in km/h. 0 = no limit
 				
-			dict{ byte, byte } AirbagStatus [readonly]
+		dict{ byte, byte } AirbagStatus [readonly]
 			
-				Dictionary of Airbag (byte) and Status (byte)
+			Dictionary of Airbag (byte) and Status (byte)
 				
-				Airbag:
+			Airbag:
 				
-				Driver = 0,
-				Passenger = 1,
-				LeftSide = 2,
-				RightSide = 3
+			Driver = 0,
+			Passenger = 1,
+			LeftSide = 2,
+			RightSide = 3
 				
-				Status:
+			Status:
 				
-				Active = 0,
-				Inactive = 1,
-				Deployed = 2
+			Inactive = 0,
+			Active = 1,
+			Deployed = 2
 				
-			dict{ byte, byte } DoorStatus [readonly]
+		dict{ byte, byte } DoorStatus [readonly]
 			
-				Dictionary of Door (byte) and Status (byte)
+			Dictionary of Door (byte) and Status (byte)
 				
-				Door:
+			Door:
 				
-				Driver = 0,
-				Passenger = 1,
-				LeftRear = 2,
-				RightRear = 3,
-				Trunk = 4,
-				FuelCap = 5,
-				Hood = 6
+			Driver = 0,
+			Passenger = 1,
+			LeftRear = 2,
+			RightRear = 3,
+			Trunk = 4,
+			FuelCap = 5,
+			Hood = 6
 				
-				Status:
+			Status:
 				
-				Closed = 0,
-				Open = 1,
-				Ajar = 2
+			Closed = 0,
+			Open = 1,
+			Ajar = 2
 			
-			dict{ byte, bool } DoorLockStatus [readonly]
+		dict{ byte, bool } DoorLockStatus [readonly]
 			
-				Dictionary of Door (byte) and Status (bool locked = true)
+			Dictionary of Door (byte) and Status (bool locked = true, unlocked = false)
 				
-				Door:
+			Door:
 				
-				Driver = 0,
-				Passenger = 1,
-				LeftRear = 2,
-				RightRear = 3,
+			Driver = 0,
+			Passenger = 1,
+			LeftRear = 2,
+			RightRear = 3,
+
+		bool ChildLockStatus  [readwrite]
+
+			Child lock status of rear doors.  active = true, inactive = false.
+			Setting this to 'true' will prevent the rear doors from being opened
+			from the inside.
 			
-			dict{ byte, bool } SeatBeltStatus [readonly]
+		dict{ byte, bool } SeatBeltStatus [readonly]
 			
-				Dictionary of Seat Belt (byte) and Status (bool: Fasten = true)
+			Dictionary of Seat Belt (byte) and Status (bool: Fasten = true, Unfastened = false)
 				
-				Seat Belt:
+			Seat Belt:
 				
-				Driver = 0,
-				Passenger = 1,
-				LeftRear = 2,
-				RightRear = 3
+			Driver = 0,
+			MiddleFront = 1,
+			Passenger = 2,
+			LeftRear = 3,
+			MiddleRear = 4,
+			RightRear = 5
 				
-			dict{ byte, bool } WindowLockStatus [readonly]
+		dict{ byte, bool } WindowLockStatus [readonly]
 			
-				Dictionary of Windows (byte) and Status (bool: Locked = true)
+			Dictionary of Windows (byte) and Status (bool: Locked = true)
 				
-				Window:
+			Window:
 				
-				Driver = 0,
-				Passenger = 1,
-				LeftRear = 2,
-				RightRear = 3
+			Driver = 0,
+			Passenger = 1,
+			LeftRear = 2,
+			RightRear = 3,
+			Sunroof = 4
 			
-			dict{ byte, byte } OccupantStatus [readonly]
+		dict{ byte, byte } OccupantStatus [readonly]
 			
-				Dictionary of Occupant (byte) and Status
-				
-				Occupant:
-				
-				Driver = 0,
-				Passenger = 1,
-				LeftRear = 2,
-				RightRear = 3
-				
-				Status:
-				
-				Vacant = 0,
-				Child = 1, 
-				Adult = 2
-				
-			dict{ byte, double } ObstacleDistance [readonly]
+			Dictionary of Occupant (byte) and Status
 			
-				Dictionary of Distance Sensor and distance (double) in m
-			
-				Distance Sensors:
+			Occupant:
 				
-				LeftFront = 0,
-				RightFront = 1,
-				LeftRear = 2,
-				RightRear = 3,
-				LeftBlindSpot = 4,
-				RightBlindSPot = 5
+			Driver = 0,
+			Passenger = 1,
+			LeftRear = 2,
+			RightRear = 3
 				
-			string CameraFrame [readonly]
+			Status:
+				
+			Vacant = 0,
+			Child = 1, 
+			Adult = 2
+
+			/// TODO: document the weight threshold standard for child vs adult
+				
+		dict{ byte, double } ObstacleDistance [readonly]
 			
-				string representing a shared memory key where the camera frame is stored.  
-				The frame is stored as a PNG encoded byte array.
+			Dictionary of Distance Sensor and distance (double) in m
+			
+			Distance Sensors:
+				
+			LeftFront = 0,
+			RightFront = 1,
+			LeftRear = 2,
+			RightRear = 3,
+			LeftBlindSpot = 4,
+			RightBlindSPot = 5
+				
 
 				

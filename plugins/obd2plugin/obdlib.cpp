@@ -222,6 +222,7 @@ void obdLib::setPortHandle(HANDLE hdnl)
 
 int obdLib::closePort()
 {
+	debug(obdLib::DEBUG_VERBOSE,"Closing port...");
 	#ifdef WINVER
 	CloseHandle(portHandle);
 	#else
@@ -238,6 +239,7 @@ bool obdLib::connected()
 
 int obdLib::initPort()
 {
+	debug(obdLib::DEBUG_VERY_VERBOSE,"Init OBD2 port...");
 	sendObdRequest("atz\r",4);
 	sendObdRequest("ati\r",4);
 	sendObdRequest("ate0\r",5);

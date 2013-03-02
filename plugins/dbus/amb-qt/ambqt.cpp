@@ -3,19 +3,44 @@
 #include <QDBusInterface>
 #include <QtDebug>
 
-AmbProperty::AmbProperty(QString objectPath, QString interface, QString propertyName)
-	:QObject(),mPropertyName(propertyName)
+AmbProperty::AmbProperty(QString op, QString iface, QString propName)
+	:QObject(), mPropertyName(propName),mInterfaceName(iface), mObjectPath(op),mDBusInterface(NULL)
 {
+	connect();
+}
 
-	mInterface = new QDBusInterface("org.automotive.message.broker",objectPath, interface,QDBusConnection::systemBus(),this);
 
-	if(!QDBusConnection::systemBus().connect("org.automotive.message.broker", objectPath, interface, propertyName, this, SIGNAL(propertyChanged(QVariant))))
+void AmbProperty::propertyChangedSlot(QDBusVariant val, double ts)
+{
+	valueChanged(val.variant());
+	propertyChanged(val.variant(), ts);
+}
+
+void AmbProperty::connect()
+{
+	if(mDBusInterface)
 	{
-		qDebug()<<"Failed to connect to signal";
-		qDebug()<<"path: "<<objectPath;
-		qDebug()<<"interface: "<<interface;
-		qDebug()<<"signal: "<<propertyName;
+		delete mDBusInterface;
+	}
+	mDBusInterface = new QDBusInterface("org.automotive.message.broker",objectPath(), interfaceName(), QDBusConnection::systemBus(),this);
+
+	if(!mDBusInterface->isValid())
+	{
+		qDebug()<<"Failed to create dbus interface for property "<<propertyName();
+		qDebug()<<"Path: "<<objectPath();
+		qDebug()<<"Interface: "<<interfaceName();
 		qDebug()<<"Error: "<<QDBusConnection::systemBus().lastError().message();
 	}
 
+	QString signalName = propertyName() + "Changed";
+
+
+	if(!QDBusConnection::systemBus().connect("org.automotive.message.broker", objectPath(), interfaceName(), signalName, this, SLOT(propertyChangedSlot(QDBusVariant,double))))
+	{
+		qDebug()<<"Failed to connect to signal";
+		qDebug()<<"path: "<<objectPath();
+		qDebug()<<"interface: "<<interfaceName();
+		qDebug()<<"signal: "<<propertyName();
+		qDebug()<<"Error: "<<QDBusConnection::systemBus().lastError().message();
+	}
 }
