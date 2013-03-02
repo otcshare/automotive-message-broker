@@ -45,10 +45,12 @@ static struct libwebsocket_protocols protocols[] = {
 		"http-only",
 		callback_http_only,
 		0,
+		128,
 	},
 	{  /* end of list */
 		NULL,
 		NULL,
+		0,
 		0
 	}
 };
@@ -116,6 +118,7 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	int sslval = 0;
 	if (m_sslEnabled)
 	{
+		DebugOut(5) << "SSL ENABLED" << endl;
 		sslval = 2;
 	}
 
@@ -493,6 +496,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
+		  DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "Adding poll for websocket IO channel" << endl;
 			//Add a FD to the poll list.
 			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
 			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);

@@ -402,6 +402,8 @@ void WebSocketSinkManager::addPoll(int fd)
 {
 	GIOChannel *chan = g_io_channel_unix_new(fd);
 	guint sourceid = g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,chan);
+	g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,chan);
+	g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,chan);
 	g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 	m_ioChannelMap[fd] = chan;
 	m_ioSourceMap[fd] = sourceid;
@@ -447,6 +449,7 @@ void WebSocketSinkManager::removePoll(int fd)
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len)
 {
 	//printf("Switch: %i\n",reason);
+	DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "websocket_callback:" << reason << endl;
 
 
 	switch (reason)
@@ -778,10 +781,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//printf("Adding poll %i\n",sinkManager);
-			//DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << (int)sinkManager << "\n";
+			DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << endl;
 			if (sinkManager != 0)
 			{
 				sinkManager->addPoll((int)(long)user);
+			}
+			else
+			{
+				DebugOut(5) << "Error, invalid sink manager!!" << endl;
 			}
 			break;
 		}
@@ -812,6 +819,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
+  DebugOut(5) << "Polling..." << condition << endl;
 	if (condition != G_IO_IN)
 	{
 		//Don't need to do anything
@@ -825,6 +833,7 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	}
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	//printf("Polling...%i\n",condition);
+	
 	lws_tokens token;
 	struct pollfd pollstruct;
 	int newfd = g_io_channel_unix_get_fd(source);
