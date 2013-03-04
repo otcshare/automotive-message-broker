@@ -4,6 +4,8 @@ This plugin simulates the ExteriorBrigtness property using a traditional webcame
 by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
 can be calibrated using the "pixelUpperBound" and "pixelLowerBound" variables.
 
+Currently, this plugin has been tested with OpenCV 2.4.4.
+
 To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/config:
 
 {
