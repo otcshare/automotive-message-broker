@@ -77,12 +77,6 @@ if(use_qtcore)
 
 	find_package( Qt4 REQUIRED )
 
-	if(opencvlux_plugin)
-		message(STATUS "Not setting DONT_USE_QTGUI flag")
-	else(opencvlux_plugin)
-		set( QT_DONT_USE_QTGUI TRUE )
-	endif(opencvlux_plugin)
-
 	include(${QT_USE_FILE})
 	set(include_dirs ${include_dirs} ${QT_INCLUDE_DIRS})
 	set(link_libraries ${link_libraries} ${QT_LIBRARIES})

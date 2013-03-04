@@ -4,6 +4,10 @@ This plugin simulates the ExteriorBrigtness property using a traditional webcame
 by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
 can be calibrated using the "pixelUpperBound" and "pixelLowerBound" variables.
 
+To enable the OpenCV "lux" plugin, run cmake and enable the opencvlux_plugin option:
+
+cmake -Dopencvlux_plugin=On ..
+
 Currently, this plugin has been tested with OpenCV 2.4.4.
 
 To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/config:
