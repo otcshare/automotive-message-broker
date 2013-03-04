@@ -1,0 +1,69 @@
+OpenCV "lux" plugin
+
+This plugin simulates the ExteriorBrigtness property using a traditional webcamera.  It works 
+by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
+can be calibrated using the "pixelUpperBound" and "pixelLowerBound" variables.
+
+To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/config:
+
+{
+	"name" : "OpenCV LUX",
+	"path" : "/usr/lib/automotive-message-broker/opencvluxplugin.so",
+	"threaded" : "true",
+	"pixelLowerBound" : "0",
+	"pixelUpperBound" : "255",
+	"fps" : "30",
+	"kinect" : "false",
+	"opencl" : "false",
+	"device" : "0"
+}
+
+Configuration Key Definitions:
+
+"name"
+name of plugin.  This key is not used by the plugin at this moment.
+
+"path"
+path to plugin on the filesystem.
+
+"device"
+Camera to use.  The string "0" corrisponds to /dev/video0, "1" to /dev/video1, etc.
+
+Default: "0"
+
+"threaded"
+Compute pixel intensity in another thread.  Set to "true" or "false"
+
+Default: "false"
+
+"fps"
+How many times per second to poll image data from the camera.
+
+Default: "30"
+
+"kinect"
+Set to "true" if you are using a kinect camera.
+
+Default: "false"
+
+"pixelLowerBound"
+Lowest calibration value for a camera.  This is the average pixel intensity value the camera reports when 
+it is completely covered.
+
+Default: "0"
+
+"pixelUpperBound"
+The highest calibration value for camera.  This is the average pixel intensity value when a very bright 
+light (like the sun) is being projected at the camera.
+
+Default: "255"
+
+"opencl" (experimental)
+Use a specialized CPU/GPU device to calculate the mean pixel intensity.  This will only work if OpenCV
+was compiled with OpenCL support.  This plugin looks for the OpenCV ocl headers and adds support at 
+compile time.
+
+NOTE: This option has not been tested because at implementation, OpenCL 1.2 was not available from devices
+on-hand.
+
+Default: "false"

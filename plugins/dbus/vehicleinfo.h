@@ -69,7 +69,7 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<Fuel::Type>(VehicleProperty::FuelType, "Type", "i", AbstractProperty::Read);
+		wantProperty<Fuel::Type>(VehicleProperty::FuelType, "Type", "y", AbstractProperty::Read);
 
 		/** @attributeName RefuelPosition
 		 *  @type unsigned short
@@ -109,7 +109,7 @@ public:
 		 *  @type sequence<unsigned short>
 		 *  @access readonly
 		 **/
-		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "ai", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "ay", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
@@ -144,13 +144,13 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "u", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "q", AbstractProperty::Read);
 
 		/** @attributeName RearWheelRadius
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::RearWheelRadius, "RearWheelRadius", "u", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::RearWheelRadius, "RearWheelRadius", "q", AbstractProperty::Read);
 
 		/** @attributeName WheelTrack
 		 *  @type unsigned long

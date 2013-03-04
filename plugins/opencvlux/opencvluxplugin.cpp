@@ -74,7 +74,9 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 		pixelLowerBound = boost::lexical_cast<int>(config["pixelLowerBound"]);
 
 		if(pixelLowerBound < 0)
+		{
 			pixelLowerBound = 0;
+		}
 	}
 
 
