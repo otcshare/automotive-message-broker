@@ -12,7 +12,7 @@ public:
 	ExteriorBrightnessProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.ExteriorBrightness","/org/automotive/environment/ExteriorBrightness", re, connection, map<string, string>())
 	{
-		wantProperty<uint16_t>(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "y", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };

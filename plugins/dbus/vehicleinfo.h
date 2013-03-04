@@ -40,19 +40,19 @@ public:
 		 *  @type unsigned long
 		 *  @access readonly
 		 **/
-		wantProperty<uint>(VehicleProperty::VehicleWidth, "Width", "i", AbstractProperty::Read);
+		wantProperty<uint>(VehicleProperty::VehicleWidth, "Width", "u", AbstractProperty::Read);
 
 		/** @attributeName Height
 		 *  @type unsigned long
 		 *  @access readonly
 		 **/
-		wantProperty<uint>(VehicleProperty::VehicleHeight, "Height", "i", AbstractProperty::Read);
+		wantProperty<uint>(VehicleProperty::VehicleHeight, "Height", "u", AbstractProperty::Read);
 
 		/** @attributeName Length
 		 *  @type unsigned long
 		 *  @access readonly
 		 **/
-		wantProperty<uint>(VehicleProperty::VehicleLength, "Length", "i", AbstractProperty::Read);
+		wantProperty<uint>(VehicleProperty::VehicleLength, "Length", "u", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
@@ -75,7 +75,7 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<Fuel::RefuelPosition>(VehicleProperty::FuelPositionSide, "RefuelPosition", "i", AbstractProperty::Read);
+		wantProperty<Fuel::RefuelPosition>(VehicleProperty::FuelPositionSide, "RefuelPosition", "y", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
@@ -92,7 +92,7 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<Vehicle::Type>(VehicleProperty::VehicleType, "Type", "i", AbstractProperty::Read);
+		wantProperty<Vehicle::Type>(VehicleProperty::VehicleType, "Type", "y", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
@@ -126,7 +126,7 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<Transmission::Type>(VehicleProperty::TransmissionGearType, "TransmissionGearType", "i", AbstractProperty::Read);
+		wantProperty<Transmission::Type>(VehicleProperty::TransmissionGearType, "TransmissionGearType", "y", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
@@ -144,19 +144,19 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "u", AbstractProperty::Read);
 
 		/** @attributeName RearWheelRadius
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::RearWheelRadius, "RearWheelRadius", "i", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::RearWheelRadius, "RearWheelRadius", "u", AbstractProperty::Read);
 
 		/** @attributeName WheelTrack
 		 *  @type unsigned long
 		 *  @access readonly
 		 **/
-		wantProperty<uint>(VehicleProperty::WheelTrack, "WheelTrack", "i", AbstractProperty::Read);
+		wantProperty<uint>(VehicleProperty::WheelTrack, "WheelTrack", "u", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
