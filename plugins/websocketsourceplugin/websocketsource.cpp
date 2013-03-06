@@ -231,6 +231,13 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
+			double prejsonparsetime = (amb::currentTime() - oldTimestamp)*1000;
+
+			DebugOut(2)<<"websocket source pre-json parse time: "<<prejsonparsetime<<endl;
+
+			for(int i=0;i<1000;i++)
+			{
+
 			//Incoming JSON reqest.
 			GError* error = nullptr;
 			JsonParser* parser = json_parser_new();
@@ -308,7 +315,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					std::string sequence= json_reader_get_string_value(reader);
 					json_reader_end_member(reader);
 					//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << "\n";
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << endl;
 					//Name should be a valid property
 					//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
 					//data.front()
@@ -487,6 +494,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			g_object_unref(parser);
 
 			break;
+			}
 		}
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
 		{
