@@ -7,5 +7,5 @@ Name: automotive-message-broker
 Description: 
 Version: @PROJECT_VERSION@
 Requires: gio-2.0 glib-2.0
-Libs: -L${libdir} -lamb
+Libs: -L${libdir} -lamb -luuid
 Cflags: -I${includedir}

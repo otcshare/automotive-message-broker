@@ -354,7 +354,7 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::EngineOilRemaining, "Remaining", "y", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::EngineOilRemaining, "Remaining", "q", AbstractProperty::Read);
 
 		/** @attributeName Temperature
 		 *  @type long
@@ -366,7 +366,7 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::EngineOilPressure, "Pressure", "y", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::EngineOilPressure, "Pressure", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -400,7 +400,7 @@ public:
 		 *  @type unsigned short
 		 *  @access readonly
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::Direction, "Direction", "y", AbstractProperty::Read);
+		wantProperty<uint16_t>(VehicleProperty::Direction, "Direction", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };

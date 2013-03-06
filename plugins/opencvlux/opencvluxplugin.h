@@ -22,19 +22,29 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <abstractsource.h>
 #include <string>
 
-#include <QTimer>
-#include <QImage>
-#include <QList>
 #include <opencv/cv.h>
 #include <opencv/highgui.h>
 
 using namespace std;
 
-class OpenCvLuxPlugin: public QObject, public AbstractSource
+class OpenCvLuxPlugin: public AbstractSource
 {
-	Q_OBJECT
 
 public:
+
+	struct Shared
+	{
+		cv::VideoCapture *m_capture;
+		PropertyList mRequests;
+		OpenCvLuxPlugin* parent;
+
+		double fps;
+		bool threaded;
+		bool kinect;
+		bool useOpenCl;
+		int pixelLowerBound;
+		int pixelUpperBound;
+	};
 
 	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
 	
@@ -51,31 +61,24 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
-private Q_SLOTS:
-	void grabImage();
-	uint evalImage(cv::Mat qImg);
-	void imageGrabCompleted();
+	void updateProperty(uint lux);
+
+
+
 	
 private: /// method s:
 	void init();
-	void updateProperty(uint lux);
 
-private:
-	bool started;
-	double fps;
-	bool threaded;
-	bool kinect;
-	bool useOpenCl;
-	int pixelLowerBound;
-	int pixelUpperBound;
+private:	
 	uint lastLux;
-	QString device;
-	PropertyList mRequests;
-	QTimer *timer;
-	QList<AsyncPropertyReply*> replyQueue;
+	std::string device;
+	std::list<AsyncPropertyReply*> replyQueue;
 
-	cv::VideoCapture *m_capture;
-	cv::Mat m_image;
+	Shared* shared;
 };
+
+static int grabImage(void *data);
+static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared);
+
 
 #endif // EXAMPLEPLUGIN_H
