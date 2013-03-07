@@ -38,7 +38,8 @@ Camera to use.  The string "0" corrisponds to /dev/video0, "1" to /dev/video1, e
 Default: "0"
 
 "threaded"
-Compute pixel intensity in another thread.  Set to "true" or "false"
+Compute pixel intensity in another thread.  Set to "true" or "false".  This feature has been disabled
+for now.
 
 Default: "false"
 
