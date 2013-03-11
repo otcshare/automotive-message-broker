@@ -105,16 +105,20 @@ public:
 		//set default value:
 		AbstractProperty::setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(ambPropertyName));
 
+		using namespace std::placeholders;
+
 		AsyncPropertyRequest request;
 		request.property = ambPropertyName;
-		request.completed = [this](AsyncPropertyReply* reply)
-		{
-			AbstractProperty::setValue(reply->value);
-
-			delete reply;
-		};
+		request.completed = std::bind(&StringDBusProperty::asyncReply, this, _1);
 
 		routingEngine->getPropertyAsync(request);
+	}
+
+	void asyncReply(AsyncPropertyReply* reply)
+	{
+		AbstractProperty::setValue(reply->value);
+
+		delete reply;
 	}
 
 	void setValue(std::string val)

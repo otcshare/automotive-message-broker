@@ -49,23 +49,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
-#ifndef USE_QT_CORE
-
-GMainLoop* mainLoop = nullptr;
-
-#endif
+IMainLoop* mainloop = nullptr;
 
 void interrupt(int sign)
 {
 	signal(sign, SIG_IGN);
 	cout<<"Signal caught. Exiting gracefully.\n"<<endl;
 	
-#ifdef USE_QT_CORE
-	QCoreApplication::exit(0);
-#else
-	g_main_loop_quit(mainLoop);
-	exit(0);
-#endif
+	/// this will cause the application to terminate and clean up:
+	delete mainloop;
 }
 
 void daemonize();
@@ -135,41 +127,24 @@ int main(int argc, char **argv)
 		DebugOut::setOutput(logfile);
 	}
 
-	
-#ifdef USE_QT_CORE
-
-	QCoreApplication app(argc,argv);
-
-#else
-
-	mainLoop = g_main_loop_new(NULL, false);
-	
-#endif
-	
 	g_type_init();
 
-	/* Register signal handler */
-	signal(SIGINT, interrupt);
-	signal(SIGTERM, interrupt);
+	VehicleProperty::factory();
 	
-	PluginLoader loader(config, new Core());
+	PluginLoader loader(config, new Core(), argc, argv);
 	
 	if(!loader.sources().size())
 	{
 		throw std::runtime_error("No sources present. aborting");
 	}
-	
-	
-	
-#ifdef USE_QT_CORE
-	
-	app.exec();
-	
-#else
-	
-	g_main_loop_run(mainLoop);
-	
-#endif
+		
+	mainloop = loader.mainloop();
+
+	/* Register signal handler */
+	signal(SIGINT, interrupt);
+	signal(SIGTERM, interrupt);
+
+	mainloop->exec();
 	
 	if(logfile.is_open())
 		logfile.close();

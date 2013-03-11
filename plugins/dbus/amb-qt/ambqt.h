@@ -44,11 +44,11 @@ class AmbProperty: public QObject
 		return value;
 	}
 
-signals:
+Q_SIGNALS:
 	void propertyChanged(QVariant, double);
 	void valueChanged(QVariant);
 
-public slots:
+public Q_SLOTS:
 	void propertyChangedSlot(QDBusVariant val, double ts);
 	void connect();
 

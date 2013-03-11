@@ -4,6 +4,7 @@
 			"name" : "WebsocketSource",
 			"path" : "/usr/lib/automotive-message-broker/websocketsourceplugin.so",
 			"port" : "23000",
+			"ssl" : "false",
 			"ip" : "127.0.0.1"
 		}
 	],

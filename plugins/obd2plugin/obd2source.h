@@ -54,6 +54,7 @@ class StatusMessage
 {
 public:
   std::string statusStr;
+  VehicleProperty::Property property;
 };
 class ObdReply
 {
@@ -104,7 +105,7 @@ public:
 			}
 			
 			ObdPid* pid = (*itr)->create();
-			pid->tryParse(replyVector);
+			//pid->tryParse(replyVector);
 			return pid;
 		}
 		return 0;
@@ -177,6 +178,7 @@ public:
 
 private:
 	PropertyList m_supportedProperties;
+	std::map<VehicleProperty::Property, AbstractPropertyType*> oldValueMap;
 	GMutex *threadQueueMutex;
 	typedef BasicPropertyType<bool> Obd2ConnectType;
 

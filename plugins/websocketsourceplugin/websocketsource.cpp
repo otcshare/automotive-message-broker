@@ -34,16 +34,23 @@ libwebsocket_context *context;
 WebSocketSource *source;
 AbstractRoutingEngine *m_re;
 
+double oldTimestamp=0;
+double totalTime=0;
+double numUpdates=0;
+double averageLatency=0;
+
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len);
 static struct libwebsocket_protocols protocols[] = {
 	{
 		"http-only",
 		callback_http_only,
 		0,
+		128,
 	},
 	{  /* end of list */
 		NULL,
 		NULL,
+		0,
 		0
 	}
 };
@@ -94,17 +101,38 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 		{
 			port = boost::lexical_cast<int>((*i).second);
 		}
+		if ((*i).first == "ssl")
+		{
+			if ((*i).second == "true")
+			{
+				m_sslEnabled = true;
+			}
+			else
+			{
+				m_sslEnabled = false;
+			} 	
+		}
 	}
 	//printf("Connecting to websocket server at %s port %i\n",ip.c_str(),port);
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Connecting to websocket server at" << ip << ":" << port << "\n";
-	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, 0,"/", "localhost", "websocket",protocols[0].name, -1);
+	int sslval = 0;
+	if (m_sslEnabled)
+	{
+		DebugOut(5) << "SSL ENABLED" << endl;
+		sslval = 2;
+	}
+
+	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, sslval,"/", "localhost", "websocket",protocols[0].name, -1);
+	
 
 }
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	//printf("Polling...%i\n",condition);
-	lws_tokens token;
+
+	oldTimestamp = amb::currentTime();
+
 	struct pollfd pollstruct;
 	int newfd = g_io_channel_unix_get_fd(source);
 	pollstruct.fd = newfd;
@@ -120,6 +148,7 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	if (condition == G_IO_IN)
 	{
 	}
+	DebugOut() << "gioPollingFunc" << condition;
 
 	return true;
 }
@@ -170,6 +199,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 {
 	unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + 4096 + LWS_SEND_BUFFER_POST_PADDING];
 	int l;
+	DebugOut() << __SMALLFILE__ << ":" << __LINE__ << reason << "callback_http_only" << endl;
 	switch (reason)
 	{
 		case LWS_CALLBACK_CLOSED:
@@ -178,13 +208,14 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			//printf("Connection closed!\n");
 			break;
 
+		//case LWS_CALLBACK_PROTOCOL_INIT:
 		case LWS_CALLBACK_CLIENT_ESTABLISHED:
 		{
 			//This happens when a client initally connects. We need to request the support event types.
 			source->clientConnected = true;
 			source->checkSubscriptions();
 			//printf("Incoming connection!\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming connection" << "\n";
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming connection" << endl;
 			stringstream s;
 			s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
 
@@ -200,6 +231,13 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
+			double prejsonparsetime = (amb::currentTime() - oldTimestamp)*1000;
+
+			DebugOut(2)<<"websocket source pre-json parse time: "<<prejsonparsetime<<endl;
+
+			for(int i=0;i<1000;i++)
+			{
+
 			//Incoming JSON reqest.
 			GError* error = nullptr;
 			JsonParser* parser = json_parser_new();
@@ -277,7 +315,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					std::string sequence= json_reader_get_string_value(reader);
 					json_reader_end_member(reader);
 					//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << "\n";
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << endl;
 					//Name should be a valid property
 					//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
 					//data.front()
@@ -290,7 +328,20 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 
 						double currenttime = amb::currentTime();
 
-						DebugOut(2)<<"websocket source latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
+						/** This is now the latency between when something is available to read on the socket, until
+						 *  a property is about to be updated in AMB.  This includes libwebsockets parsing and the
+						 *  JSON parsing in this section.
+						 */
+
+						DebugOut(2)<<"websocket parse latency: "<<(currenttime - oldTimestamp)*1000<<"ms"<<endl;
+						DebugOut(2)<<"websocket network + parse latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
+
+						totalTime += (currenttime - oldTimestamp)*1000;
+						numUpdates ++;
+
+						averageLatency = totalTime / numUpdates;
+
+						DebugOut(2)<<"Average parse latency: "<<averageLatency<<endl;
 
 						delete type;
 					}
@@ -443,6 +494,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			g_object_unref(parser);
 
 			break;
+			}
 		}
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
 		{
@@ -452,10 +504,15 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
+		  DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "Adding poll for websocket IO channel" << endl;
 			//Add a FD to the poll list.
-			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
+			GIOChannel *chan = g_io_channel_unix_new(libwebsocket_get_socket_fd(wsi));
 			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
 			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,0);
+			g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,0);
+			
+			
 			break;
 		}
 		return 0;
@@ -463,16 +520,29 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 }
 void WebSocketSource::setSupported(PropertyList list)
 {
+  DebugOut() << "SET SUPPORTED";
 	m_supportedProperties = list;
 	m_re->updateSupported(list,PropertyList());
 }
 
 WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {
+	m_sslEnabled = false;
 	clientConnected = false;
 	source = this;
 	m_re = re;  
-	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
+	struct lws_context_creation_info info;
+	memset(&info, 0, sizeof info);
+	info.protocols = protocols;
+	info.extensions = libwebsocket_get_internal_extensions();
+	info.gid = -1;
+	info.uid = -1;
+	info.port = CONTEXT_PORT_NO_LISTEN;
+	//std::string ssl_key_path = "/home/michael/.ssh/id_rsa";
+	//info.ssl_ca_filepath = ssl_key_path.c_str();
+		
+	context = libwebsocket_create_context(&info);
+	//context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
 
 	setConfiguration(config);
 	re->setSupported(supported(), this);

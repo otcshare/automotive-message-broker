@@ -1,5 +1,6 @@
 #include "varianttype.h"
 #include "abstractroutingengine.h"
+#include "debugout.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
 	:AbstractProperty(propertyName, signature, access, interface),routingEngine(re)
@@ -10,10 +11,8 @@ VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::
 	AsyncPropertyRequest request;
 	request.property = mPropertyName;
 
-	request.completed = [this](AsyncPropertyReply* reply)
-	{
-		setValue(reply->value);
-	};
+	using namespace std::placeholders;
+	request.completed = std::bind(&VariantType::asyncReply, this, _1);
 
 	re->getPropertyAsync(request);
 
@@ -23,7 +22,6 @@ GVariant *VariantType::toGVariant()
 {
 	if(!value())
 	{
-
 		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
 
 		setValue(v);
@@ -31,7 +29,9 @@ GVariant *VariantType::toGVariant()
 		delete v;
 	}
 
-	return value()->toVariant();
+	auto v = value();
+
+	return v->toVariant();
 }
 
 void VariantType::fromGVariant(GVariant *val)
@@ -44,8 +44,20 @@ void VariantType::fromGVariant(GVariant *val)
 	request.value = v;
 	request.completed = [](AsyncPropertyReply* reply)
 	{
+		/// TODO: throw dbus exception
+		if(!reply->success)
+		{
+			DebugOut(0)<<"Success fail";
+		}
 		delete reply;
 	};
 
 	routingEngine->setProperty(request);
+}
+
+void VariantType::asyncReply(AsyncPropertyReply * reply)
+{
+	setValue(reply->value);
+
+	delete reply;
 }

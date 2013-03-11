@@ -138,8 +138,9 @@ void threadLoop(gpointer data)
 		if (query != nullptr)
 		{
 			//printf("Got request!\n");
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got single shot request!"<<endl;
+			
 			ObdPid *req = (ObdPid*)query;
+			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got single shot request: " << req->pid.substr(0,req->pid.length()-1) << ":" << req->property <<endl;
 			repeatReqList.push_back(req);
 		}
 		query = g_async_queue_try_pop(privSubscriptionAddQueue);
@@ -278,6 +279,7 @@ void threadLoop(gpointer data)
 		int badloop = 0;
 		for (std::list<ObdPid*>::iterator i=repeatReqList.begin();i!= repeatReqList.end();i++)
 		{
+			DebugOut(10) << __SMALLFILE__ << ":" << __LINE__ << "Requesting pid: " << (*i)->pid.substr(0,(*i)->pid.length()-1) << (*i)->property << endl;
 			if (source->m_blacklistPidCountMap.find((*i)->pid) != source->m_blacklistPidCountMap.end())
 			{
 				//Don't erase the pid, just skip over it.
@@ -291,10 +293,10 @@ void threadLoop(gpointer data)
 			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector,5,3))
 			{
 				//This only happens during a error with the com port. Close it and re-open it later.
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid << endl;
+				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid.substr(0,(*i)->pid.length()-1) << endl;
 				if (obd->lastError() == obdLib::NODATA)
 				{
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::NODATA for pid" << (*i)->pid <<endl;
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::NODATA for pid" << (*i)->pid.substr(0,(*i)->pid.length()-1) << " expected property: " << (*i)->property << endl;
 					if (source->m_blacklistPidCountMap.find((*i)->pid) != source->m_blacklistPidCountMap.end())
 					{
 						//pid value i not yet in the list.
@@ -312,6 +314,7 @@ void threadLoop(gpointer data)
 					}
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "error:nodata";
+					statusreq->property = (*i)->property;
 					g_async_queue_push(privStatusQueue,statusreq);
 					continue;
 				}
@@ -329,10 +332,11 @@ void threadLoop(gpointer data)
 				}
 				else
 				{
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBD Other error:" << obd->lastError() << endl;
 				}
 				
 				CommandRequest *req = new CommandRequest();
-				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Queuing up a disconnect" << (ulong)req << "\n";
+				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Queuing up a disconnect" << (ulong)req << endl;
 				req->req = "disconnect";
 				g_async_queue_push(privCommandQueue,req);
 				i = repeatReqList.end();
@@ -352,6 +356,20 @@ void threadLoop(gpointer data)
 				//Invalid reply
 				DebugOut() << "Invalid reply"<<endl;
 				continue;
+			}
+			else
+			{
+				DebugOut(11) << __SMALLFILE__ <<":"<< __LINE__ << "Reply recieved and queued for:" << (*i)->pid.substr(0,(*i)->pid.length()-1) << endl;
+				std::string repstr;
+				for (int i=0;i<replyVector.size();i++)
+				{
+				  if (replyVector[i] != 13)
+				  {
+				  repstr += (char)replyVector[i];
+				  }
+					//DebugOut(11) << replyVector[i];
+				}
+				DebugOut(11) << "Reply:" << repstr << endl;
 			}
 			g_async_queue_push(privResponseQueue,pid);
 		}
@@ -387,6 +405,20 @@ static int updateProperties( gpointer data)
 			BasicPropertyType<bool> val(true);
 			src->updateProperty(Obd2Connected,&val);
 		}
+		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
+		{
+			if (src->propertyReplyMap.find(reply->property) != src->propertyReplyMap.end())
+			{
+				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on property:" << reply->property << endl;
+				src->propertyReplyMap[reply->property]->success = false;
+				src->propertyReplyMap[reply->property]->completed(src->propertyReplyMap[reply->property]);
+				src->propertyReplyMap.erase(reply->property);
+			}
+			else
+			{
+				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on unrequested property:" << reply->property << endl;
+			}
+		}
 	}
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{
@@ -404,7 +436,7 @@ static int updateProperties( gpointer data)
 
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
 {
-	//m_re->updateProperty(property,&value);
+
 	
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
@@ -414,6 +446,20 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 	}
 	else
 	{
+		if(oldValueMap.find(property) != oldValueMap.end())
+		{
+			AbstractPropertyType* old = oldValueMap[property];
+
+			if((*old) == (*value))
+			{
+				return;
+			}
+
+			delete old;
+		}
+
+		oldValueMap[property] = value->copy();
+
 		m_re->updateProperty(property,value,uuid());
 	}
 }
@@ -445,7 +491,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		//printf("Incoming setting: %s:%s\n",(*i).first.c_str(),(*i).second.c_str());
-		DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << "\n";
+		DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting:" << (*i).first << ":" << (*i).second << endl;
 		if ((*i).first == "device")
 		{
 			port = (*i).second;
@@ -620,6 +666,7 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 
 void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 {
+	DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "getPropertyAsync requested for " << reply->property << endl;
 	propertyReplyMap[reply->property] = reply;
 	VehicleProperty::Property property = reply->property;
 
