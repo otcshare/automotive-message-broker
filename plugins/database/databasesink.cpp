@@ -1,5 +1,6 @@
 #include "databasesink.h"
 #include "abstractroutingengine.h"
+#include "listplusplus.h"
 
 #include <json-glib/json-glib.h>
 
@@ -8,52 +9,99 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DatabaseSinkManager(routingengine, config);
 }
 
+void * cbFunc(gpointer data)
+{
+	Shared *shared = static_cast<Shared*>(data);
+
+	if(!shared)
+	{
+		throw std::runtime_error("Could not cast shared object.");
+	}
+
+	while(1)
+	{
+		DBObject* obj = shared->queue.pop();
+
+		if( obj->quit )
+		{
+			delete obj;
+			break;
+		}
+
+		DictionaryList<string> dict;
+
+		NameValuePair<string> one("key", obj->key);
+		NameValuePair<string> two("value", obj->value);
+		NameValuePair<string> three("source", obj->source);
+		NameValuePair<string> four("time", boost::lexical_cast<string>(obj->time));
+		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj->sequence));
+
+		dict.push_back(one);
+		dict.push_back(two);
+		dict.push_back(three);
+		dict.push_back(four);
+		dict.push_back(five);
+
+		shared->db->insert(dict);
+		delete obj;
+	}
+
+	return NULL;
+}
+
+int getNextEvent(gpointer data)
+{
+	PlaybackShared* pbshared = static_cast<PlaybackShared*>(data);
+
+	if(!pbshared)
+		throw std::runtime_error("failed to cast PlaybackShared object");
+
+	auto itr = pbshared->playbackQueue.begin();
+
+	if(itr == pbshared->playbackQueue.end())
+	{
+		return 0;
+	}
+
+	DBObject* obj = *itr;
+
+	AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(obj->key,obj->value);
+
+	if(value)
+	{
+		pbshared->routingEngine->updateProperty(obj->key, value, pbshared->uuid);
+	}
+
+	if(++itr != pbshared->playbackQueue.end())
+	{
+		DBObject *o2 = *itr;
+		double t = o2->time - obj->time;
+
+		if(t > 0)
+			g_timeout_add(t*1000, getNextEvent, pbshared);
+		else
+			g_timeout_add(t, getNextEvent, pbshared);
+	}
+
+	pbshared->playbackQueue.remove(obj);
+	delete obj;
+
+	return 0;
+}
+
 DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::string> config)
-	:AbstractSource(engine,config)
+	:AbstractSource(engine,config),thread(NULL),shared(NULL),playback(false),playbackShared(NULL)
 {
 	databaseName = "storage";
 	tablename = "data";
 	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, time REAL, sequence REAL)";
-	shared = new Shared;
-	shared->db->init(databaseName, tablename, tablecreate);
 
-	auto cb = [](gpointer data)
+	//startDb();
+
+	if(config.find("startOnLoad")!= config.end())
 	{
-		Shared *shared = (Shared*)data;
-
-		while(1)
-		{
-			DBObject* obj = shared->queue.pop();
-
-			if( obj->quit )
-			{
-				delete obj;
-				break;
-			}
-
-			DictionaryList<string> dict;
-
-			NameValuePair<string> one("key", obj->key);
-			NameValuePair<string> two("value", obj->value);
-			NameValuePair<string> three("source", obj->source);
-			NameValuePair<string> four("time", boost::lexical_cast<string>(obj->time));
-			NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj->sequence));
-
-			dict.push_back(one);
-			dict.push_back(two);
-			dict.push_back(three);
-			dict.push_back(four);
-			dict.push_back(five);
-
-			shared->db->insert(dict);
-			delete obj;
-		}
-
-		void* ret = NULL;
-		return ret;
-	};
-
-	thread = g_thread_new("dbthread", cb, shared);
+		startDb();
+	}
 
 	parseConfig();
 
@@ -62,18 +110,27 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		engine->subscribeToProperty(*itr,this);
 	}
 
+	mSupported.push_back(DatabaseFileProperty);
+	mSupported.push_back(DatabaseLoggingProperty);
+	mSupported.push_back(DatabasePlaybackProperty);
+
+	routingEngine->setSupported(mSupported,this);
+
 }
 
 DatabaseSink::~DatabaseSink()
 {
-	DBObject* obj = new DBObject();
-	obj->quit = true;
+	if(shared)
+	{
+		DBObject* obj = new DBObject();
+		obj->quit = true;
 
-	shared->queue.append(obj);
+		shared->queue.append(obj);
 
-	g_thread_join(thread);
-
-	delete shared;
+		g_thread_join(thread);
+		g_thread_unref(thread);
+		delete shared;
+	}
 }
 
 
@@ -84,13 +141,7 @@ void DatabaseSink::supportedChanged(PropertyList supportedProperties)
 
 PropertyList DatabaseSink::supported()
 {
-	PropertyList props;
-
-	props.push_back(VehicleProperty::EngineSpeed);
-	props.push_back(VehicleProperty::VehicleSpeed);
-	props.push_back(DatabaseLoggingProperty);
-
-	return props;
+	return mSupported;
 }
 
 void DatabaseSink::parseConfig()
@@ -133,8 +184,105 @@ void DatabaseSink::parseConfig()
 	g_object_unref(parser);
 }
 
+void DatabaseSink::stopDb()
+{
+	if(!shared)
+		return;
+
+	DBObject *obj = new DBObject();
+	obj->quit = true;
+	shared->queue.append(obj);
+
+	g_thread_join(thread);
+	g_thread_unref(thread);
+
+	delete shared;
+	shared = NULL;
+}
+
+void DatabaseSink::startDb()
+{
+	if(playback)
+	{
+		DebugOut(0)<<"ERROR: tried to start logging during playback.  Only logging or playback can be used at one time"<<endl;
+		return;
+	}
+
+	if(shared)
+	{
+		DebugOut(0)<<"WARNING: logging already started.  doing nothing."<<endl;
+		return;
+	}
+
+	initDb();
+
+//	thread = g_thread_new("dbthread", cbFunc, shared);
+}
+
+void DatabaseSink::startPlayback()
+{
+	if(playback)
+		return;
+
+	playback = true;
+
+	initDb();
+
+	/// get supported:
+
+	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
+
+	for(int i=0; i < supportedStr.size(); i++)
+	{
+		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
+			mSupported.push_back(supportedStr[i][0]);
+	}
+
+	routingEngine->setSupported(supported(), this);
+
+	/// populate playback queue:
+
+	vector<vector<string> > results = shared->db->select("SELECT * FROM "+tablename);
+
+	if(playbackShared)
+	{
+		delete playbackShared;
+	}
+
+	playbackShared = new PlaybackShared(routingEngine,uuid());
+
+	for(int i=0;i<results.size();i++)
+	{
+		if(results[i].size() < 5)
+		{
+			throw std::runtime_error("column mismatch in query");
+		}
+
+		DBObject* obj = new DBObject();
+
+		obj->key = results[i][0];
+		obj->value = results[i][1];
+		obj->source = results[i][2];
+		obj->time = boost::lexical_cast<double>(results[i][3]);
+		obj->sequence = boost::lexical_cast<uint16_t>(results[i][4]);
+
+		playbackShared->playbackQueue.push_back(obj);
+	}
+}
+
+void DatabaseSink::initDb()
+{
+	if(shared) delete shared;
+
+	shared = new Shared;
+	shared->db->init(databaseName, tablename, tablecreate);
+}
+
 void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
 {
+	if(!shared)
+		return;
+
 	DBObject* obj = new DBObject;
 	obj->key = property;
 	obj->value = value->toString();
@@ -153,7 +301,40 @@ std::string DatabaseSink::uuid()
 
 void DatabaseSink::getPropertyAsync(AsyncPropertyReply *reply)
 {
+	reply->success = false;
 
+	if(reply->property == DatabaseFileProperty)
+	{
+		StringPropertyType temp(databaseName);
+		reply->value = &temp;
+
+		reply->success = true;
+		reply->completed(reply);
+
+		return;
+	}
+	else if(reply->property == DatabaseLoggingProperty)
+	{
+		BasicPropertyType<bool> temp = shared;
+
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+
+		return;
+	}
+
+	else if(reply->property == DatabasePlaybackProperty)
+	{
+		BasicPropertyType<bool> temp = playback;
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+
+		return;
+	}
+
+	reply->completed(reply);
 }
 
 void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -225,7 +406,40 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 		if(request.value->value<bool>())
 		{
 			///TODO: start or stop logging thread
+			startDb();
+			reply->success = true;
 		}
+		else
+		{
+			stopDb();
+			reply->success = true;
+		}
+	}
+
+	else if(request.property == DatabaseFileProperty)
+	{
+		std::string fname = request.value->toString();
+
+		databaseName = fname;
+
+		StringPropertyType temp(databaseName);
+
+		routingEngine->updateProperty(DatabaseFileProperty,&temp,uuid());
+
+		reply->success = true;
+	}
+	else if( request.property == DatabasePlaybackProperty)
+	{
+		if(request.value->value<bool>())
+		{
+			startPlayback();
+		}
+		else
+		{
+			/// TODO: stop playback
+		}
+
+		reply->success = true;
 	}
 
 	return reply;
