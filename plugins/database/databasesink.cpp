@@ -70,6 +70,8 @@ int getNextEvent(gpointer data)
 	if(value)
 	{
 		pbshared->routingEngine->updateProperty(obj->key, value, pbshared->uuid);
+		value->timestamp = obj->time;
+		value->sequence = obj->sequence;
 	}
 
 	if(++itr != pbshared->playbackQueue.end())
@@ -157,7 +159,10 @@ void DatabaseSink::parseConfig()
 	JsonNode* node = json_parser_get_root(parser);
 
 	if(node == nullptr)
-		throw std::runtime_error("Unable to get JSON root object");
+	{
+		/// no options
+		return;
+	}
 
 	JsonReader* reader = json_reader_new(node);
 
@@ -194,7 +199,6 @@ void DatabaseSink::stopDb()
 	shared->queue.append(obj);
 
 	g_thread_join(thread);
-	g_thread_unref(thread);
 
 	delete shared;
 	shared = NULL;
@@ -264,10 +268,12 @@ void DatabaseSink::startPlayback()
 		obj->value = results[i][1];
 		obj->source = results[i][2];
 		obj->time = boost::lexical_cast<double>(results[i][3]);
-		obj->sequence = boost::lexical_cast<uint16_t>(results[i][4]);
+//		obj->sequence = boost::lexical_cast<int>(results[i][4]);
 
 		playbackShared->playbackQueue.push_back(obj);
 	}
+
+	g_timeout_add(0,getNextEvent,playbackShared);
 }
 
 void DatabaseSink::initDb()
@@ -408,11 +414,15 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 			///TODO: start or stop logging thread
 			startDb();
 			reply->success = true;
+			BasicPropertyType<bool> temp(true);
+			routingEngine->updateProperty(DatabaseLoggingProperty,&temp,uuid());
 		}
 		else
 		{
 			stopDb();
 			reply->success = true;
+			BasicPropertyType<bool> temp(false);
+			routingEngine->updateProperty(DatabaseLoggingProperty,&temp,uuid());
 		}
 	}
 

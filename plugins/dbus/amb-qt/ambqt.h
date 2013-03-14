@@ -35,7 +35,7 @@ class AmbProperty: public QObject
 	{
 		if(!mDBusInterface || !mDBusInterface->isValid())
 		{
-			qDebug()<<"error Interface is not valid";
+			qDebug()<<"error Interface is not valid: "<<interfaceName();
 			return QVariant::Invalid;
 		}
 
@@ -48,7 +48,7 @@ class AmbProperty: public QObject
 	{
 		if(!mDBusInterface || !mDBusInterface->isValid())
 		{
-			qDebug()<<"error Interface is not valid";
+			qDebug()<<"error Interface is not valid "<<interfaceName();
 		}
 
 		mDBusInterface->setProperty(propertyName().toAscii(), v);
