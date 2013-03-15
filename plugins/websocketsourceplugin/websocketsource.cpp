@@ -235,9 +235,6 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 
 			DebugOut(2)<<"websocket source pre-json parse time: "<<prejsonparsetime<<endl;
 
-			for(int i=0;i<1000;i++)
-			{
-
 			//Incoming JSON reqest.
 			GError* error = nullptr;
 			JsonParser* parser = json_parser_new();
@@ -494,7 +491,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			g_object_unref(parser);
 
 			break;
-			}
+
 		}
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
 		{
