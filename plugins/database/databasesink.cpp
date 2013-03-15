@@ -443,10 +443,18 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 		if(request.value->value<bool>())
 		{
 			startPlayback();
+
+			BasicPropertyType<bool> temp(true);
+
+			routingEngine->updateProperty(DatabasePlaybackProperty,&temp,uuid());
 		}
 		else
 		{
 			/// TODO: stop playback
+
+			BasicPropertyType<bool> temp(true);
+
+			routingEngine->updateProperty(DatabasePlaybackProperty,&temp,uuid());
 		}
 
 		reply->success = true;
