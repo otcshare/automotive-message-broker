@@ -26,7 +26,11 @@
 
 #include <glib.h>
 
+#include <functional>
+
 #define DatabaseLoggingProperty "DatabaseLogging"
+#define DatabasePlaybackProperty "DatabasePlayback"
+#define DatabaseFileProperty "DatabaseFile"
 
 template <typename T>
 class Queue
@@ -34,25 +38,26 @@ class Queue
 public:
 	Queue()
 	{
-		mutex = g_mutex_new();
+		g_mutex_init(&mutex);
+		g_cond_init(&cond);
 	}
 
 	int count()
 	{
-		g_mutex_lock(mutex);
+		g_mutex_lock(&mutex);
 		int ret = mQueue.count();
-		g_mutex_unlock(mutex);
+		g_mutex_unlock(&mutex);
 
 		return ret;
 	}
 
 	T pop()
 	{
-		g_mutex_lock(mutex);
+		g_mutex_lock(&mutex);
 
 		while(!mQueue.size())
 		{
-			g_cond_wait(&cond, mutex);
+			g_cond_wait(&cond, &mutex);
 		}
 
 		auto itr = mQueue.begin();
@@ -61,24 +66,24 @@ public:
 
 		mQueue.erase(itr);
 
-		g_mutex_unlock(mutex);
+		g_mutex_unlock(&mutex);
 
 		return item;
 	}
 
 	void append(T item)
 	{
-		g_mutex_lock(mutex);
+		g_mutex_lock(&mutex);
 
 		g_cond_signal(&cond);
 
 		mQueue.push_back(item);
 
-		g_mutex_unlock(mutex);
+		g_mutex_unlock(&mutex);
 	}
 
 private:
-	GMutex * mutex;
+	GMutex mutex;
 	GCond cond;
 	std::vector<T> mQueue;
 };
@@ -110,6 +115,28 @@ public:
 	Queue<DBObject*> queue;
 };
 
+class PlaybackShared
+{
+public:
+	PlaybackShared(AbstractRoutingEngine* re, std::string u)
+		:routingEngine(re),uuid(u) {}
+	~PlaybackShared()
+	{
+		for(auto itr = playbackQueue.begin(); itr != playbackQueue.end(); itr++)
+		{
+			DBObject* obj = *itr;
+
+			delete obj;
+		}
+
+		playbackQueue.clear();
+	}
+
+	AbstractRoutingEngine* routingEngine;
+	std::list<DBObject*> playbackQueue;
+	std::string uuid;
+};
+
 class DatabaseSink : public AbstractSource
 {
 
@@ -127,11 +154,15 @@ public:
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	virtual PropertyList supported();
-	int supportedOperations() { return GetRanged; }
+	int supportedOperations() { return GetRanged | Get | Set;}
 
 private: //methods:
 
 	void parseConfig();
+	void stopDb();
+	void startDb();
+	void startPlayback();
+	void initDb();
 
 private:
 	PropertyList mSubscriptions;
@@ -141,6 +172,9 @@ private:
 	std::string tablename;
 	std::string tablecreate;
 	std::list<VehicleProperty::Property> propertiesToSubscribeTo;
+	PropertyList mSupported;
+	bool playback;
+	PlaybackShared* playbackShared;
 };
 
 class DatabaseSinkManager: public AbstractSinkManager
@@ -151,6 +185,8 @@ public:
 	{
 		new DatabaseSink(routingEngine, config);
 		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new BasicPropertyType<bool>(false);});
+		VehicleProperty::registerProperty(DatabasePlaybackProperty, [](){return new BasicPropertyType<bool>(false);});
+VehicleProperty::registerProperty(DatabaseFileProperty, [](){return new StringPropertyType("out.ogg");});
 	}
 };
 

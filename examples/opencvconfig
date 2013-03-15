@@ -1,0 +1,15 @@
+{
+	"sources" : [ 
+		{
+			"name" : "OpenCV Lux Plugin",
+			"path" : "/usr/lib/automotive-message-broker/opencvluxplugin.so"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "DBusSink",
+			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
+		} 
+	]
+}
+
