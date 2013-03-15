@@ -49,6 +49,8 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	printf("Support changed!\n");
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
+	routingEngine->subscribeToProperty(VehicleProperty::Latitude, this);
+	routingEngine->subscribeToProperty(VehicleProperty::Longitude, this);
 
 	AsyncPropertyRequest velocityRequest;
 	velocityRequest.property = VehicleProperty::VehicleSpeed;

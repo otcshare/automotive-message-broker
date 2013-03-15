@@ -76,7 +76,7 @@ std::string reply;
 	{
 		//No reply found
 		//printf("Error!\n");
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM\n";
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM"<<endl;
 	}
 	else
 	{

@@ -334,7 +334,7 @@ class StringPropertyType: public AbstractPropertyType
 {
 public:
 	StringPropertyType(std::string val)
-		:AbstractPropertyType(),mVariant(NULL)
+		:AbstractPropertyType()
 	{
 		setValue(val);
 	}
@@ -370,22 +370,14 @@ public:
 	{
 		//mVariant = Glib::Variant<std::string>::create(toString());
 
-		if(mVariant)
-			g_variant_unref(mVariant);
+		return g_variant_new_string(toString().c_str());
 
-		mVariant = g_variant_ref(g_variant_new_string(toString().c_str()));
-
-		return mVariant;
 	}
 
 	void fromVariant(GVariant *v)
 	{
 		setValue(std::string(g_variant_get_string(v,NULL)));
 	}
-
-private:
-
-	GVariant* mVariant;
 };
 
 template <class T>
