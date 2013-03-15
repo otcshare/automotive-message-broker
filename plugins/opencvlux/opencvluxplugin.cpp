@@ -186,15 +186,15 @@ static int grabImage(void *data)
 {
 	OpenCvLuxPlugin::Shared* shared = static_cast<OpenCvLuxPlugin::Shared*>(data);
 
-/*	if(kinect)
-	{
-		m_capture->grab();
-		m_capture->retrieve( m_image, CV_CAP_OPENNI_GRAY_IMAGE );
-	}
-	else*/
-	{
-		cv::Mat m_image;
+	cv::Mat m_image;
 
+	if(shared->kinect)
+	{
+		shared->m_capture->grab();
+		shared->m_capture->retrieve( m_image, CV_CAP_OPENNI_GRAY_IMAGE );
+	}
+	else
+	{
 		*(shared->m_capture) >> m_image;
 
 		uint lux = evalImage(m_image,shared);
@@ -218,7 +218,7 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 	cv::Scalar avgPixelIntensity;
 
 
-	if(useOpenCl)
+	if(shared->useOpenCl)
 	{
 #ifdef OPENCL
 		cv::Scalar stdDev;
@@ -227,7 +227,7 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 	}
 	else
 	{
-		cv::Scalar avgPixelIntensity = cv::mean(qImg);
+		avgPixelIntensity = cv::mean(qImg);
 	}
 
 

@@ -54,7 +54,8 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
 	velocityRequest.completed = [](AsyncPropertyReply* reply)
 	{
-		DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; delete reply;
+		DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
+		delete reply;
 	};
 
 	routingEngine->getPropertyAsync(velocityRequest);
