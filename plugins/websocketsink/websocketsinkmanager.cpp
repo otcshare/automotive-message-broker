@@ -20,7 +20,10 @@
 #include "websocketsinkmanager.h"
 #include "websocketsink.h"
 #include <sstream>
-#include <json-glib/json-glib.h>
+//#include <json-glib/json-glib.h>
+#include <json/json.h>
+#include <json/json_object.h>
+#include <json/json_tokener.h>
 #include <listplusplus.h>
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 
@@ -497,96 +500,64 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			GError* error = nullptr;
 
 
-			JsonParser* parser = json_parser_new();
-			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
+			json_object *rootobject;
+			json_tokener *tokener = json_tokener_new();
+			enum json_tokener_error err;
+			do
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON\n";
-				return 0;
-			}
-
-			JsonNode* node = json_parser_get_root(parser);
-			if(node == nullptr)
+				rootobject = json_tokener_parse_ex(tokener, (char*)in,len);
+			} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
+			if (err != json_tokener_success)
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json\n";
-				//throw std::runtime_error("Unable to get JSON root object");
-				return 0;
+				fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
+				// Handle errors, as appropriate for your application.
 			}
-
-			JsonReader* reader = json_reader_new(node);
-			if(reader == nullptr)
+			if (tokener->char_offset < len) // XXX shouldn't access internal fields
 			{
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!\n";
-				//throw std::runtime_error("Unable to create JSON reader");
-				return 0;
+				// Handle extra characters after parsed object as desired.
+				// e.g. issue an error, parse another object from that point, etc...
 			}
-
-
-
-
-
-			string type;
-			json_reader_read_member(reader,"type");
-			type = json_reader_get_string_value(reader);
-			json_reader_end_member(reader);
-
-			string  name;
-			json_reader_read_member(reader,"name");
-			name = json_reader_get_string_value(reader);
-			json_reader_end_member(reader);
+			// Success, use jobj here.
+			json_object *typeobject = json_object_object_get(rootobject,"type");
+			json_object *nameobject = json_object_object_get(rootobject,"name");
+			json_object *transidobject = json_object_object_get(rootobject,"transactionid");
 			
+			string type = string(json_object_get_string(typeobject));
+			string name = string(json_object_get_string(nameobject));
 			string id;
-			json_reader_read_member(reader,"transactionid");
-			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
+			if (json_object_get_type(transidobject) == json_type_string)
 			{
-				//Type is a string
-				id = json_reader_get_string_value(reader);
+				id = string(json_object_get_string(transidobject));
 			}
 			else
 			{
-				//Type is an integer
 				stringstream strstr;
-				strstr << json_reader_get_int_value(reader);
+				strstr << json_object_get_int(transidobject);
 				id = strstr.str();
 			}
-			json_reader_end_member(reader);
-
-			
+			json_object_put(typeobject);
+			json_object_put(nameobject);
+			json_object_put(transidobject);
 			if (type == "method" && name == "getRanged")
 			{
-				json_reader_read_member(reader,"data");
-				if (json_reader_is_object(reader))
+				json_object *dataobject = json_object_object_get(rootobject,"data");
+				if (json_object_get_type(dataobject) == json_type_object)
 				{
-					double timeBegin;
-					double timeEnd;
-					double sequenceBegin;
-					double sequenceEnd;
-					string property;
-					if (json_reader_read_member(reader,"timeBegin"))
-					{
-						timeBegin = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
-						json_reader_end_member(reader);
-					}
-					
-					if (json_reader_read_member(reader,"timeEnd"))
-					{
-						timeEnd = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
-						json_reader_end_member(reader);
-					}
-					if (json_reader_read_member(reader,"sequenceBegin"))
-					{
-						sequenceBegin = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
-						json_reader_end_member(reader);
-					}
-					if (json_reader_read_member(reader,"sequenceEnd"))
-					{
-						sequenceEnd = boost::lexical_cast<double,std::string>(json_reader_get_string_value(reader));
-						json_reader_end_member(reader);
-					}
-					if (json_reader_read_member(reader,"property"))
-					{
-						property = json_reader_get_string_value(reader);
-						json_reader_end_member(reader);
-					}
+					json_object *timeBeginObject = json_object_object_get(dataobject,"timeBegin");
+					json_object *timeEndObject = json_object_object_get(dataobject,"timeEnd");
+					json_object *sequenceBeginObject = json_object_object_get(dataobject,"sequenceBegin");
+					json_object *sequenceEndObject = json_object_object_get(dataobject,"sequenceEnd");
+					json_object *propertyObject = json_object_object_get(dataobject,"property");
+					double timeBegin = boost::lexical_cast<double,std::string>(json_object_get_string(timeBeginObject));
+					double timeEnd = boost::lexical_cast<double,std::string>(json_object_get_string(timeEndObject));
+					double sequenceBegin = boost::lexical_cast<double,std::string>(json_object_get_string(sequenceBeginObject));
+					double sequenceEnd = boost::lexical_cast<double,std::string>(json_object_get_string(sequenceEndObject));
+					string property = string(json_object_get_string(propertyObject));
+					json_object_put(timeBeginObject);
+					json_object_put(timeEndObject);
+					json_object_put(sequenceBeginObject);
+					json_object_put(sequenceEndObject);
+					json_object_put(propertyObject);
 					if ((timeBegin < 0 && timeEnd > 0) || (timeBegin > 0 && timeEnd < 0))
 					{
 						//Invalid time begin/end pair
@@ -597,7 +568,6 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					}
 					sinkManager->addSingleShotRangedSink(wsi,property,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
 				}
-				json_reader_end_member(reader);
 			}
 			else
 			{
@@ -605,43 +575,41 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				vector<string> data;
 				list<string> key;
 				list<string> value;
-				json_reader_read_member(reader,"data");
-				if (json_reader_is_array(reader))
+				json_object *dataobject = json_object_object_get(rootobject,"data");
+				if (json_object_get_type(dataobject) == json_type_array)
 				{
-					for(int i=0; i < json_reader_count_elements(reader); i++)
+					array_list *arraylist = json_object_get_array(dataobject);
+					for (int i=0;i<array_list_length(arraylist);i++)
 					{
-						json_reader_read_element(reader,i);
-						if (json_reader_is_value(reader))
+						json_object *arrayobject = (json_object*)array_list_get_idx(arraylist,i);
+						if (json_object_get_type(arrayobject) == json_type_object)
 						{
-							//Raw string value
-							string path = json_reader_get_string_value(reader);
-							data.push_back(path);
-
-						}
-						else
-						{
-							//Not a raw string value, then it's "property/value" kvp, for "set" requests
-							json_reader_read_member(reader,"property");
-							string keystr = json_reader_get_string_value(reader);
+							json_object *propobject = json_object_object_get(arrayobject,"property");
+							json_object *valueobject = json_object_object_get(arrayobject,"value");
+							string keystr = string(json_object_get_string(propobject));
+							string valuestr = string(json_object_get_string(valueobject));
 							key.push_back(keystr);
-							json_reader_end_member(reader);
-							json_reader_read_member(reader,"value");
-							string valuestr = json_reader_get_string_value(reader);
 							value.push_back(valuestr);
-							json_reader_end_member(reader);
+							json_object_put(propobject);
+							json_object_put(valueobject);
 						}
-						json_reader_end_element(reader);
+						else if (json_object_get_type(arrayobject) == json_type_string)
+						{
+							string path = string(json_object_get_string(arrayobject));
+							data.push_back(path);
+						}
 					}
+					array_list_free(arraylist);
 				}
 				else
 				{
-					string path = json_reader_get_string_value(reader);
+					string path = json_object_get_string(dataobject);
 					if (path != "")
 					{
 						data.push_back(path);
 					}
 				}
-				json_reader_end_member(reader);
+				json_object_put(dataobject);
 				if (type == "method")
 				{
 					if (name == "get")
@@ -767,13 +735,6 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			}
 
 			
-			///TODO: this will probably explode:
-			//mlc: I agree with Kevron here, it does explode.
-			//if(error) g_error_free(error);
-
-			g_object_unref(reader);
-			g_object_unref(parser);
-
 
 			
 			break;

@@ -5,8 +5,8 @@
 #include "abstractpropertytype.h"
 #include <map>
 #include <debugout.h>
-#include <json-glib/json-glib.h>
-
+//#include <json-glib/json-glib.h>
+#include <json/json.h>
 template <class T, class N>
 class MapPropertyType: public AbstractPropertyType
 {
@@ -50,24 +50,34 @@ public:
 
 	void fromString(std::string str)
 	{
-		JsonParser* parser = json_parser_new();
-		GError* error = nullptr;
-		if(!json_parser_load_from_data(parser, str.c_str(), str.length(), &error))
+		json_object *rootobject;
+		json_tokener *tokener = json_tokener_new();
+		enum json_tokener_error err;
+		do
 		{
-			DebugOut()<<"Failed to load config: "<<error->message;
-			throw std::runtime_error("Failed to load config");
+			rootobject = json_tokener_parse_ex(tokener, str.c_str(),str.length());
+		} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
+		if (err != json_tokener_success)
+		{
+			fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
+			// Handle errors, as appropriate for your application.
 		}
+		if (tokener->char_offset < str.length()) // XXX shouldn't access internal fields
+		{
+			// Handle extra characters after parsed object as desired.
+			// e.g. issue an error, parse another object from that point, etc...
+		}
+		//Good!
+		
+		json_object_object_foreach(rootobject, key, val)
+		{
+			T one(key);
+			N two(json_object_get_string(val));
+			append(one,two);
 
-		JsonNode* node = json_parser_get_root(parser);
-
-		if(node == nullptr)
-			throw std::runtime_error("Unable to get JSON root object");
-
-		JsonReader* reader = json_reader_new(node);
-
-		if(reader == nullptr)
-			throw std::runtime_error("Unable to create JSON reader");
-
+		}
+		json_object_put(rootobject);
+		/*
 		DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
 
 		gchar** srcMembers = json_reader_list_members(reader);
@@ -84,7 +94,7 @@ public:
 
 		g_free(srcMembers);
 		g_object_unref(reader);
-		g_object_unref(parser);
+		g_object_unref(parser);*/
 	}
 
 	GVariant* toVariant()
