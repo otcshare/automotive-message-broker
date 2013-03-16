@@ -118,7 +118,10 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		databaseName = config["databaseFile"];
 	}
 
-	parseConfig();
+	if(config.find("properties") != config.end())
+	{
+		parseConfig();
+	}
 
 	for(auto itr=propertiesToSubscribeTo.begin();itr!=propertiesToSubscribeTo.end();itr++)
 	{
