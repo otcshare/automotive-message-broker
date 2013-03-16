@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 #include <stdexcept>
+#include <boost/concept_check.hpp>
 //#include <json-glib/json-glib.h>
 
 
@@ -36,16 +37,31 @@ using namespace std;
  * 
 **********************************************/
 
+std::string get_file_contents(const char *filename)
+{
+  //FILE *in = fopen(filename,"r");
+  
+  std::ifstream in(filename, std::ios::in);
+  std::string output;
+  std::string line;
+  while(in.good())
+  {
+    getline(in,line);
+    output.append(line);
+  }
+  return output;
+}
 PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int argc, char** argv): f_create(NULL), routingEngine(re), mMainLoop(nullptr)
 {
   
 	DebugOut()<<"Loading config file: "<<configFile<<endl;
 	json_object *rootobject;
 	json_tokener *tokener = json_tokener_new();
+	std::string configBuffer = get_file_contents(configFile.c_str());
 	enum json_tokener_error err;
 	do
 	{
-		rootobject = json_tokener_parse_ex(tokener, configFile.c_str(),configFile.length());
+		rootobject = json_tokener_parse_ex(tokener, configBuffer.c_str(),configBuffer.length());
 	} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
 	if (err != json_tokener_success)
 	{
@@ -93,6 +109,11 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 	
 	
 	array_list *sourceslist = json_object_get_array(sourcesobject);
+	if (!sourceslist)
+	{
+	  DebugOut() << "Error getting source list" << endl;
+	  throw std::runtime_error("Error getting sources list");
+	}
 	
 	for(int i=0; i < array_list_length(sourceslist); i++)
 	{
@@ -116,13 +137,32 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		}
 		json_object_put(pathobject);
 	}
+	DebugOut() << "Trying to free list" << endl;
 	array_list_free(sourceslist);
-	json_object_put(sourcesobject);
-
+	DebugOut() << "Trying to free obj" << endl;
+	//json_object_put(sourcesobject);
+	DebugOut() << "Done first" << endl;
 	///read the sinks:
 	
 	json_object *sinksobject = json_object_object_get(rootobject,"sinks");
+	
+	if (!sinksobject)
+	{
+	  DebugOut() << "Error getting sink object" << endl;
+	  throw std::runtime_error("Error getting sink object");
+	}
+	
+	
+	
 	array_list *sinkslist = json_object_get_array(sinksobject);
+	
+	
+	if (!sinkslist)
+	{
+	  DebugOut() << "Error getting sink list" << endl;
+	  throw std::runtime_error("Error getting sink list");
+	}
+	
 	
 	for(int i=0; i < array_list_length(sinkslist); i++)
 	{
@@ -148,10 +188,14 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 			throw std::runtime_error("plugin is not a SinkManager");
 		}
 		json_object_put(pathobject);
+		//json_object_put(obj);
 
 	}
+	DebugOut() << "Trying to free list" << endl;
 	array_list_free(sinkslist);
-	json_object_put(sinksobject);
+	DebugOut() << "Trying to free obj" << endl;
+	//json_object_put(sinksobject);
+	DebugOut() << "Done" << endl;
 		
 	
 	///TODO: this will probably explode:

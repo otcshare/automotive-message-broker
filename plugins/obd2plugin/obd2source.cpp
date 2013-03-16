@@ -23,7 +23,7 @@
 #include <boost/lexical_cast.hpp>
 #include <glib.h>
 #include <sstream>
-#include <json-glib/json-glib.h>
+//#include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include "debugout.h"
 #include "bluetooth.hpp"
