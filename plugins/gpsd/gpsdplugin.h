@@ -16,38 +16,41 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef OPENCVLUXPLUGIN_H
-#define OPENCVLUXPLUGIN_H
+#ifndef GPSDPLUGIN_H
+#define GPSDPLUGIN_H
 
 #include <abstractsource.h>
 #include <string>
 
-#include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include <gps.h>
 
 using namespace std;
 
-class OpenCvLuxPlugin: public AbstractSource
+class GpsdPlugin: public AbstractSource
 {
 
 public:
 
-	struct Shared
+	class Shared
 	{
-		cv::VideoCapture *m_capture;
-		PropertyList mRequests;
-		OpenCvLuxPlugin* parent;
+	public:
+		Shared(GpsdPlugin* p)
+			:oldspeed(0), oldalt(0), oldlat(0), oldlon(0), oldheading(0), parent(p)
+		{
 
-		double fps;
-		bool threaded;
-		bool kinect;
-		bool useOpenCl;
-		int pixelLowerBound;
-		int pixelUpperBound;
+		}
+
+		struct gps_data_t gps;
+		double oldspeed;
+		double oldalt;
+		double oldlat;
+		double oldlon;
+		double oldheading;
+		GpsdPlugin* parent;
 	};
 
-	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
-	
+	GpsdPlugin(AbstractRoutingEngine* re, map<string, string> config);
+	~GpsdPlugin();
 	string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
@@ -61,24 +64,19 @@ public:
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
-	void updateProperty(uint lux);
+	void updateProperty();
 
-
-
-	
-private: /// method s:
-	void init();
 
 private:	
 	uint lastLux;
 	std::string device;
 	std::list<AsyncPropertyReply*> replyQueue;
-
 	Shared* shared;
+
+	bool updateVelocity;
 };
 
-static int grabImage(void *data);
-static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared);
+
 
 
 #endif // EXAMPLEPLUGIN_H

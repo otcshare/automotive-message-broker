@@ -455,7 +455,7 @@ public:
 	typedef BasicPropertyType<double> AltitudeType;
 
 	static const Property Direction;
-	typedef BasicPropertyType<uint> DirectionType;
+	typedef BasicPropertyType<uint16_t> DirectionType;
 
 	static const Property VehicleWidth;
 	static const Property VehicleHeight;

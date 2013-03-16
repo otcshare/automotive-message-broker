@@ -33,8 +33,8 @@
 
 /** @interface Vehicle **/
 /** @method sequence<DOMString> getSupported();
- *  @method VehiclePropertyType get(DOMString event);
- *  @method void set(DOMString event, object value);
+ *  @method object get(DOMString property);
+ *  @method void set(DOMString property, object value);
  *  @method sequence<VehiclePropertyTypes> getHistory(DOMString type, Date startTime, Date endTime);
  **/
 

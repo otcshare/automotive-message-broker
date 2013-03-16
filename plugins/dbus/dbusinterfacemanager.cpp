@@ -69,6 +69,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(ParkingBrakeProperty);
 	ConstructProperty(ParkingLightProperty);
 	ConstructProperty(HazardLightProperty);
+	ConstructProperty(LocationProperty);
 
 	PropertyList list = VehicleProperty::customProperties();
 
