@@ -58,12 +58,12 @@ public:
 	}
 };
 
-/** @interface ParkingLight **/
+/** @interface HazardLight **/
 class HazardLightProperty: public DBusSink
 {
 public:
 	HazardLightProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.ParkingLight","/org/automotive/parking/ParkingLight", re, connection, map<string, string>())
+		:DBusSink("org.automotive.HazardLight","/org/automotive/parking/HazardLight", re, connection, map<string, string>())
 	{
 		/** @attributeName HazardLight
 		 *  @type boolean
