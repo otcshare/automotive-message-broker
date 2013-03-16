@@ -2,7 +2,7 @@
 #include "abstractroutingengine.h"
 #include "listplusplus.h"
 
-#include <json-glib/json-glib.h>
+//#include <json-glib/json-glib.h>
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -148,45 +148,39 @@ PropertyList DatabaseSink::supported()
 
 void DatabaseSink::parseConfig()
 {
-	JsonParser* parser = json_parser_new();
-	GError* error = nullptr;
-	if(!json_parser_load_from_data(parser, configuration["properties"].c_str(),configuration["properties"].size(), &error))
+	json_object *rootobject;
+	json_tokener *tokener = json_tokener_new();
+	enum json_tokener_error err;
+	do
 	{
-		DebugOut()<<"Failed to load config: "<<error->message;
-		throw std::runtime_error("Failed to load config");
+		rootobject = json_tokener_parse_ex(tokener, configuration["properties"].c_str(),configuration["properties"].size());
+	} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
+	if (err != json_tokener_success)
+	{
+		fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
 	}
-
-	JsonNode* node = json_parser_get_root(parser);
-
-	if(node == nullptr)
+	if (tokener->char_offset < configuration["properties"].size()) // XXX shouldn't access internal fields
 	{
-		/// no options
-		return;
+		//Should handle the extra data here sometime...
 	}
+	
+	json_object *propobject = json_object_object_get(rootobject,"properties");
+	
+	g_assert(json_object_get_type(propobject) == json_type_array);
 
-	JsonReader* reader = json_reader_new(node);
-
-	if(reader == nullptr)
-		throw std::runtime_error("Unable to create JSON reader");
-
-	json_reader_read_member(reader,"properties");
-
-	g_assert(json_reader_is_array(reader));
-
-	for(int i=0; i < json_reader_count_elements(reader); i++)
+	array_list *proplist = json_object_get_array(propobject);
+	
+ 	for(int i=0; i < array_list_length(proplist); i++)
 	{
-		json_reader_read_element(reader, i);
-		std::string prop = json_reader_get_string_value(reader);
+		json_object *idxobj = (json_object*)array_list_get_idx(proplist,i);
+		std::string prop = json_object_get_string(idxobj);
 		propertiesToSubscribeTo.push_back(prop);
-		json_reader_end_element(reader);
 
 		DebugOut()<<"DatabaseSink logging: "<<prop<<endl;
 	}
 
-	if(error) g_error_free(error);
-
-	g_object_unref(reader);
-	g_object_unref(parser);
+	json_object_put(propobject);
+	json_object_put(rootobject);
 }
 
 void DatabaseSink::stopDb()
