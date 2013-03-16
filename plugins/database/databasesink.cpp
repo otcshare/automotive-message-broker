@@ -108,6 +108,16 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		playbackMultiplier = boost::lexical_cast<uint>(config["playbackMultiplier"]);
 	}
 
+	if(config.find("playbackOnLoad")!= config.end())
+	{
+		startPlayback();
+	}
+
+	if(config.find("databaseFile") != config.end())
+	{
+		databaseName = config["databaseFile"];
+	}
+
 	parseConfig();
 
 	for(auto itr=propertiesToSubscribeTo.begin();itr!=propertiesToSubscribeTo.end();itr++)
