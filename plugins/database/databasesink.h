@@ -118,8 +118,8 @@ public:
 class PlaybackShared
 {
 public:
-	PlaybackShared(AbstractRoutingEngine* re, std::string u)
-		:routingEngine(re),uuid(u) {}
+	PlaybackShared(AbstractRoutingEngine* re, std::string u, uint playbackMult)
+		:routingEngine(re),uuid(u),playBackMultiplier(playbackMult) {}
 	~PlaybackShared()
 	{
 		for(auto itr = playbackQueue.begin(); itr != playbackQueue.end(); itr++)
@@ -134,6 +134,7 @@ public:
 
 	AbstractRoutingEngine* routingEngine;
 	std::list<DBObject*> playbackQueue;
+	uint playBackMultiplier;
 	std::string uuid;
 };
 
@@ -175,6 +176,7 @@ private:
 	PropertyList mSupported;
 	bool playback;
 	PlaybackShared* playbackShared;
+	uint playbackMultiplier;
 };
 
 class DatabaseSinkManager: public AbstractSinkManager

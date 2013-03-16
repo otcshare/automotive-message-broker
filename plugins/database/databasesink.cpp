@@ -2,8 +2,6 @@
 #include "abstractroutingengine.h"
 #include "listplusplus.h"
 
-//#include <json-glib/json-glib.h>
-
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new DatabaseSinkManager(routingengine, config);
@@ -80,7 +78,7 @@ int getNextEvent(gpointer data)
 		double t = o2->time - obj->time;
 
 		if(t > 0)
-			g_timeout_add(t*1000, getNextEvent, pbshared);
+			g_timeout_add((t*1000) / pbshared->playBackMultiplier, getNextEvent, pbshared);
 		else
 			g_timeout_add(t, getNextEvent, pbshared);
 	}
@@ -92,7 +90,7 @@ int getNextEvent(gpointer data)
 }
 
 DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::string> config)
-	:AbstractSource(engine,config),thread(NULL),shared(NULL),playback(false),playbackShared(NULL)
+	:AbstractSource(engine,config),thread(NULL),shared(NULL),playback(false),playbackShared(NULL), playbackMultiplier(1)
 {
 	databaseName = "storage";
 	tablename = "data";
@@ -103,6 +101,11 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	if(config.find("startOnLoad")!= config.end())
 	{
 		startDb();
+	}
+
+	if(config.find("playbackMultiplier")!= config.end())
+	{
+		playbackMultiplier = boost::lexical_cast<uint>(config["playbackMultiplier"]);
 	}
 
 	parseConfig();
@@ -132,6 +135,11 @@ DatabaseSink::~DatabaseSink()
 		g_thread_join(thread);
 		g_thread_unref(thread);
 		delete shared;
+	}
+
+	if(playbackShared)
+	{
+		delete playbackShared;
 	}
 }
 
@@ -247,7 +255,7 @@ void DatabaseSink::startPlayback()
 		delete playbackShared;
 	}
 
-	playbackShared = new PlaybackShared(routingEngine,uuid());
+	playbackShared = new PlaybackShared(routingEngine, uuid(), playbackMultiplier);
 
 	for(int i=0;i<results.size();i++)
 	{
