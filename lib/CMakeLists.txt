@@ -14,7 +14,7 @@ endif(uuid_LIBRARY)
 
 include_directories( ${include_dirs} ${uuid_INCLUDE_DIR})
 
-target_link_libraries(amb ${libtool_LIBRARY} ${glib_LIBRARIES} ${gio_LIBRARIES} ${uuid_LIBRARY})
+target_link_libraries(amb ${libtool_LIBRARY} ${glib_LIBRARIES} ${gio_LIBRARIES} ${uuid_LIBRARY} ${json_LIBRARY})
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/automotive-message-broker.pc.in ${CMAKE_CURRENT_BINARY_DIR}/automotive-message-broker.pc @ONLY)
 

@@ -283,9 +283,9 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			{
 				json_object *dataobject = json_object_object_get(rootobject,"data");
 				
-				json_object *valueobject = json_object_object_get(rootobject,"value");
-				json_object *timestampobject = json_object_object_get(rootobject,"timestamp");
-				json_object *sequenceobject= json_object_object_get(rootobject,"sequence");
+				json_object *valueobject = json_object_object_get(dataobject,"value");
+				json_object *timestampobject = json_object_object_get(dataobject,"timestamp");
+				json_object *sequenceobject= json_object_object_get(dataobject,"sequence");
 				
 				string value = string(json_object_get_string(valueobject));
 				string timestamp = string(json_object_get_string(timestampobject));
@@ -351,7 +351,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 							json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
 							props.push_back(string(json_object_get_string(arrayobj)));
 						}
-						array_list_free(dataarray);
+						//array_list_free(dataarray);
 					}
 					else
 					{
@@ -381,7 +381,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						propertylist.push_back(type);
 						//props.push_back(string(json_object_get_string(arrayobj)));
 					}
-					array_list_free(dataarray);
+					//array_list_free(dataarray);
 					if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
 					{
 						source->uuidRangedReplyMap[id]->values = propertylist;

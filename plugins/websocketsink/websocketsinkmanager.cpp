@@ -599,7 +599,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 							data.push_back(path);
 						}
 					}
-					array_list_free(arraylist);
+					//array_list_free(arraylist);
 				}
 				else
 				{
