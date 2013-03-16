@@ -235,6 +235,9 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 
 			DebugOut(2)<<"websocket source pre-json parse time: "<<prejsonparsetime<<endl;
 
+			json_object *rootobject;
+			json_tokener *tokener = json_tokener_new();
+			enum json_tokener_error err;
 			do
 			{
 				rootobject = json_tokener_parse_ex(tokener, (char*)in,len);
