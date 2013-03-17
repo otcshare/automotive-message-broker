@@ -299,6 +299,11 @@ public:
 
 	}
 
+	void exec(string query)
+	{
+		q->execute(query);
+	}
+
 protected:
 	
 	void

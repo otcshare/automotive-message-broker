@@ -16,6 +16,8 @@ void * cbFunc(gpointer data)
 		throw std::runtime_error("Could not cast shared object.");
 	}
 
+	vector<DictionaryList<string> > insertList;
+
 	while(1)
 	{
 		DBObject* obj = shared->queue.pop();
@@ -40,7 +42,19 @@ void * cbFunc(gpointer data)
 		dict.push_back(four);
 		dict.push_back(five);
 
-		shared->db->insert(dict);
+		insertList.push_back(dict);
+
+		if(insertList.size() > 100)
+		{
+			shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
+			for(int i=0; i< insertList.size(); i++)
+			{
+				DictionaryList<string> d = insertList[i];
+				shared->db->insert(d);
+			}
+			shared->db->exec("END TRANSACTION");
+			insertList.clear();
+		}
 		delete obj;
 	}
 
@@ -69,7 +83,7 @@ int getNextEvent(gpointer data)
 	{
 		pbshared->routingEngine->updateProperty(obj->key, value, pbshared->uuid);
 		value->timestamp = obj->time;
-		value->sequence = obj->sequence;
+		//value->sequence = obj->sequence;
 	}
 
 	if(++itr != pbshared->playbackQueue.end())
@@ -235,7 +249,7 @@ void DatabaseSink::startDb()
 
 	initDb();
 
-//	thread = g_thread_new("dbthread", cbFunc, shared);
+	thread = g_thread_new("dbthread", cbFunc, shared);
 }
 
 void DatabaseSink::startPlayback()
