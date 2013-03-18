@@ -195,7 +195,7 @@ interface ParkingLight {
 };
 
 [NoInterfaceObject]
-interface ParkingLight { 
+interface HazardLight { 
 	readonly attribute boolean HazardLight;
 };
 
@@ -213,8 +213,8 @@ interface VehiclePropertyType {
 [NoInterfaceObject]
 interface Vehicle { 
 	sequence<DOMString> getSupported();  
-	VehiclePropertyType get(DOMString event);  
-	void set(DOMString event, object value);  
+	object get(DOMString property);  
+	void set(DOMString property, object value);  
 	sequence<VehiclePropertyTypes> getHistory(DOMString type, Date startTime, Date endTime);  
 };
 
