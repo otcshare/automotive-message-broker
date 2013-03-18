@@ -23,6 +23,7 @@ option(database_plugin "Database plugins" OFF)
 option(qt_bindings "AMB Qt DBus bindings" OFF)
 option(opencvlux_plugin "OpenCV Lux plugin" OFF)
 option(gpsd_plugin "gpsd location plugin" OFF)
+option(murphy_plugin "murphy policy framework plugin" OFF)
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")

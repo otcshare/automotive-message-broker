@@ -353,6 +353,7 @@ void MurphySource::getPropertyAsync(AsyncPropertyReply *reply)
     if (murphyProperties.find(reply->property) != murphyProperties.end()) {
         AbstractPropertyType *prop = murphyProperties[reply->property];
         reply->value = prop;
+		reply->success = true;
         reply->completed(reply);
     }
 }
