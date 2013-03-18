@@ -1,3 +1,5 @@
+if(murphy_plugin)
+
 include(CheckIncludeFiles)
 include(FindPkgConfig)
 
@@ -28,3 +30,5 @@ set_target_properties(murphysourceplugin PROPERTIES PREFIX "")
 target_link_libraries(murphysourceplugin amb ${MURPHY_COMMON_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
 install(TARGETS murphysourceplugin LIBRARY DESTINATION lib/automotive-message-broker)
+
+endif(murphy_plugin)
