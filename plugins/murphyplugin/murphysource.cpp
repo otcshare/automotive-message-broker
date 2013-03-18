@@ -214,9 +214,21 @@ static void recv_msg(mrp_transport_t *transp, mrp_msg_t *msg, void *user_data)
 static void closed_evt(mrp_transport_t *t, int error, void *user_data)
 {
    /* TODO: should process the error somehow */
+
+    MurphySource *s = (MurphySource *) user_data;
+
+    s->setState(MRP_PROCESS_STATE_NOT_READY);
+    s->setConnected(FALSE);
 }
 
-int MurphySource::connectToMurphy(mrp_mainloop_t *ml, const char *address)
+
+void MurphySource::setConnected(bool connected)
+{
+    m_connected = connected;
+}
+
+
+int MurphySource::connectToMurphy()
 {
     mrp_sockaddr_t addr;
     socklen_t alen;
@@ -228,14 +240,20 @@ int MurphySource::connectToMurphy(mrp_mainloop_t *ml, const char *address)
     evt.recvmsgfrom = recvfrom_msg;
     evt.closed = closed_evt;
 
-    alen = mrp_transport_resolve(NULL, address, &addr, sizeof(addr), &atype);
+    if (m_ml == NULL || m_address.empty())
+        return -1;
+
+    if (m_connected == TRUE)
+        return -1;
+
+    alen = mrp_transport_resolve(NULL, m_address.c_str(), &addr, sizeof(addr), &atype);
 
     if (alen <= 0) {
         debugOut("Failed to resolve address");
         return -1;
     }
 
-    m_tport = mrp_transport_create(ml, atype, &evt, this, flags);
+    m_tport = mrp_transport_create(m_ml, atype, &evt, this, flags);
 
     if (!m_tport) {
         debugOut("Can't create a Murphy transport");
@@ -249,17 +267,17 @@ int MurphySource::connectToMurphy(mrp_mainloop_t *ml, const char *address)
         return -1;
     }
 
+    setConnected(true);
+
     return 0;
 }
 
 
 MurphySource::MurphySource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {
-    m_clientConnected = false;
     m_source = this;
     m_re = re;
-
-    setConfiguration(config);
+    m_connected = false;
 
     // main loop integration
 
@@ -272,10 +290,12 @@ MurphySource::MurphySource(AbstractRoutingEngine *re, map<string, string> config
     debugOut("Murphy plugin initialized using glib mainloop!");
 #endif
 
+    setConfiguration(config);
 }
 
 MurphySource::~MurphySource()
 {
+    mrp_process_set_state("ambd", MRP_PROCESS_STATE_NOT_READY);
     mrp_transport_destroy(m_tport);
     mrp_mainloop_unregister(m_ml);
 
@@ -286,6 +306,59 @@ MurphySource::~MurphySource()
 
         delete (*i).second;
     }
+}
+
+void MurphySource::setState(mrp_process_state_t state)
+{
+    m_state = state;
+}
+
+mrp_process_state_t MurphySource::getState()
+{
+    return m_state;
+}
+
+static void murphy_watch(const char *id, mrp_process_state_t state, void *user_data)
+{
+    MurphySource *s = (MurphySource *) user_data;
+
+    debugOut("murphy process watch event");
+
+    if (strcmp(id, "murphy-amb") != 0)
+        return;
+
+    printf("murphyd state changed to %s\n",
+            state == MRP_PROCESS_STATE_READY ? "ready" : "not ready");
+
+    if (state == MRP_PROCESS_STATE_NOT_READY &&
+            s->getState() == MRP_PROCESS_STATE_READY) {
+        debugOut("lost connection to murphyd");
+    }
+
+    else if (state == MRP_PROCESS_STATE_READY) {
+        /* start connecting if needed */
+        s->connectToMurphy();
+    }
+
+    s->setState(state);
+}
+
+void MurphySource::readyToConnect(mrp_mainloop_t *ml)
+{
+    /* set a watch to follow Murphy status */
+
+    if (mrp_process_set_watch("murphy-amb", ml, murphy_watch, this) < 0) {
+        debugOut("failed to set a murphy process watch");
+        return;
+    }
+
+    mrp_process_set_state("ambd", MRP_PROCESS_STATE_READY);
+
+    /* check if Murphy is running */
+    m_state = mrp_process_query_state("murphy-amb");
+
+    if (m_state == MRP_PROCESS_STATE_READY)
+        connectToMurphy();
 }
 
 
@@ -308,7 +381,7 @@ void MurphySource::setConfiguration(map<string, string> config)
 
     // set up the connection with Murphy
     if (!m_address.empty())
-        connectToMurphy(m_ml, m_address.c_str());
+        readyToConnect(m_ml);
 }
 
 
