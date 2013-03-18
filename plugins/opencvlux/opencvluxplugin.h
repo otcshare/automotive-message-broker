@@ -66,8 +66,8 @@ public:
 
 
 	
-private: /// method s:
-	void init();
+private: /// methods:
+	bool init();
 
 private:	
 	uint lastLux;
