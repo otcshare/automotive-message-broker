@@ -49,6 +49,32 @@ Requires:   %{name} = %{version}-%{release}
 %description plugins
 Collection of plugins for automotive-message-broker
 
+%package plugins-obd2
+Summary:    OBD-II plugin
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}-%{release}
+
+%description plugins-obd2
+OBD-II plugin that uses ELM 327-compatible scantools to access vehicle data
+
+%package plugins-websocket
+Summary:    websocket source and sink plugins
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}-%{release}
+Requires:   libwebsockets
+
+%description plugins-websocket
+websocket source and sink plugins
+
+%package plugins-wheel
+Summary:    source plugin for using the Logitech G27 racing wheel                                        
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}-%{release}
+Requires:   libwebsockets
+
+%description plugins-wheel
+source plugin for using the Logitech G27 racing wheel
+
 %package plugins-database
 Summary:    Database logging plugin for automotive-message-broker
 Group:      System Environment/Daemons  
@@ -115,8 +141,24 @@ ln -s ../init.d/ambd %{buildroot}/etc/rc.d/rc5.d/S62ambd
 
 %files plugins
 %defattr(-,root,root,-)
-%{_libdir}/%{name}/*.so
+%{_libdir}/%{name}/examplesourceplugin.so
+%{_libdir}/%{name}/examplesinkplugin.so
+%{_libdir}/%{name}/dbussinkplugin.so
+%{_libdir}/%{name}/demosinkplugin.so
 /etc/dbus-1/system.d/amb.conf
+
+%files plugins-wheel
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/wheelsourceplugin.so
+
+%files plugins-websocket
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/websocketsourceplugin.so
+%{_libdir}/%{name}/websocketsinkplugin.so
+
+%files plugins-obd2
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/obd2sourceplugin.so
 
 %files plugins-database
 %defattr(-,root,root,-)
