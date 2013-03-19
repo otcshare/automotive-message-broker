@@ -187,6 +187,10 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet)
 		{
 			src->getPropertyAsync(reply);
+
+			/** right now the owner of the reply becomes the requestor that called this method.
+			 *  reply will become invalid after the first reply. */
+			return reply;
 		}
 	}
 
