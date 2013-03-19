@@ -47,7 +47,7 @@ Group:      System Environment/Daemons
 Requires:   %{name} = %{version}-%{release}
 
 %description plugins
-Collection of plugins for automotive-message-broker
+Collection of plugins for automotive-message-broker.  Contains example, demo and dbus plugins.
 
 %package plugins-obd2
 Summary:    OBD-II plugin
