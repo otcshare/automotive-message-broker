@@ -233,6 +233,12 @@ AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
+
+	/** TODO: Change behavior of subscribe to subscribe even if no sources provide a
+	 *  given property.  When subscribers come online with support, core should tell
+	 *  the sources what properties have already been subscribed to.
+	 */
+
 	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
 		DebugOut(1)<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
