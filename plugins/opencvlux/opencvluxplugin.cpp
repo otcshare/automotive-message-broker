@@ -126,7 +126,7 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		/// we want to turn on the camera for one shot to get an image and determine the intensity
 
 		if(init())
-			g_timeout_add(1,grabImage,shared);
+			grabImage(shared);
 	}
 
 	if(reply->property == VehicleProperty::ExteriorBrightness)
@@ -196,11 +196,11 @@ static int grabImage(void *data)
 		cv::Mat m_image;
 
 		*(shared->m_capture) >> m_image;
-
-		uint lux = evalImage(m_image,shared);
-
-		shared->parent->updateProperty(lux);
 	}
+
+	uint lux = evalImage(m_image,shared);
+
+	shared->parent->updateProperty(lux);
 
 	if(shared->mRequests.size())
 	{
