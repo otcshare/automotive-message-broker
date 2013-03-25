@@ -9,7 +9,6 @@ Source0:    %{name}-%{version}.tar.bz2
 Source100: ambd
 Requires: automotive-message-broker-plugins
 Requires: automotive-message-broker-plugins-websocket
-Requires: automotive-message-broker-plugins-dbus
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:	json-glib
