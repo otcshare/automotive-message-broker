@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define MURPHYSOURCE_H
 
 #include <murphy/common.h>
+#include <murphy/common/process.h>
 
 #include <abstractsource.h>
 #include <string>
@@ -55,13 +56,20 @@ public:
 
     bool hasProperty(string propertyName);
 
+    void setState(mrp_process_state_t state);
+    mrp_process_state_t getState();
+
+    void setConnected(bool connected);
+
+    int connectToMurphy();
+
+
 private:
     void checkSubscriptions();
     void setConfiguration(map<string, string> config);
-    int connectToMurphy(mrp_mainloop_t *ml, const char *address);
+    void readyToConnect(mrp_mainloop_t *ml);
 
     PropertyList m_supportedProperties;
-    bool m_clientConnected;
 
     MurphySource *m_source;
     AbstractRoutingEngine *m_re;
@@ -75,6 +83,8 @@ private:
     mrp_mainloop_t *m_ml;
     mrp_transport_t *m_tport;
     string m_address; // transport address
+    mrp_process_state_t m_state;
+    bool m_connected;
 };
 
 #endif // MURPHYSOURCE_H
