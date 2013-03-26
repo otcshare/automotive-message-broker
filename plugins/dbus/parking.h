@@ -6,7 +6,7 @@
 #include "abstractdbusinterface.h"
 #include "abstractroutingengine.h"
 
-/** @interface SecurityAlert **/
+/** @interface SecurityAlert : VehiclePropertyType **/
 class SecurityAlertProperty: public DBusSink
 {
 public:
@@ -24,7 +24,7 @@ public:
 	}
 };
 
-/** @interface ParkingBrake **/
+/** @interface ParkingBrake : VehiclePropertyType **/
 class ParkingBrakeProperty: public DBusSink
 {
 public:
@@ -41,7 +41,7 @@ public:
 	}
 };
 
-/** @interface ParkingLight **/
+/** @interface ParkingLight : VehiclePropertyType **/
 class ParkingLightProperty: public DBusSink
 {
 public:
@@ -58,7 +58,7 @@ public:
 	}
 };
 
-/** @interface HazardLight **/
+/** @interface HazardLight : VehiclePropertyType **/
 class HazardLightProperty: public DBusSink
 {
 public:

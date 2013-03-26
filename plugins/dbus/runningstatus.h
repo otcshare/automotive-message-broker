@@ -23,7 +23,7 @@
 #include "abstractdbusinterface.h"
 #include "abstractroutingengine.h"
 
-/** @interface VehicleSpeed **/
+/** @interface VehicleSpeed : VehiclePropertyType **/
 class VehicleSpeedProperty: public DBusSink
 {
 public:
@@ -41,7 +41,7 @@ public:
 
 };
 
-/** @interface EngineSpeed **/
+/** @interface EngineSpeed : VehiclePropertyType **/
 class EngineSpeedProperty: public DBusSink
 {
 public:
@@ -59,7 +59,7 @@ public:
 
 };
 
-/** @interface VehiclePowerMode **/
+/** @interface VehiclePowerMode : VehiclePropertyType **/
 class VehiclePowerModeProperty: public DBusSink
 {
 public:
@@ -75,7 +75,7 @@ public:
 	}
 };
 
-/** @interface TripMeter **/
+/** @interface TripMeter : VehiclePropertyType **/
 class TripMeterProperty: public DBusSink
 {
 public:
@@ -103,7 +103,7 @@ public:
 	}
 };
 
-/** @interface Acceleration **/
+/** @interface Acceleration : VehiclePropertyType **/
 class AccelerationProperty: public DBusSink
 {
 public:
@@ -131,7 +131,7 @@ public:
 	}
 };
 
-/** @interface Transmission **/
+/** @interface Transmission : VehiclePropertyType **/
 class TransmissionProperty: public DBusSink
 {
 public:
@@ -163,7 +163,7 @@ public:
 	}
 };
 
-/** @interface CruiseControlStatus **/
+/** @interface CruiseControlStatus : VehiclePropertyType **/
 class CruiseControlProperty: public DBusSink
 {
 public:
@@ -185,7 +185,7 @@ public:
 	}
 };
 
-/** @interface WheelBrake **/
+/** @interface WheelBrake : VehiclePropertyType **/
 class WheelBrakeProperty: public DBusSink
 {
 public:
@@ -201,7 +201,7 @@ public:
 	}
 };
 
-/** @interface LightStatus **/
+/** @interface LightStatus : VehiclePropertyType **/
 class LightStatusProperty: public DBusSink
 {
 public:
@@ -259,7 +259,7 @@ public:
 	}
 };
 
-/** @interface InteriorLightStatus **/
+/** @interface InteriorLightStatus : VehiclePropertyType **/
 class InteriorLightStatusProperty: public DBusSink
 {
 public:
@@ -287,7 +287,7 @@ public:
 	}
 };
 
-/** @interface Horn **/
+/** @interface Horn : VehiclePropertyType **/
 class HornProperty: public DBusSink
 {
 public:
@@ -303,7 +303,7 @@ public:
 	}
 };
 
-/** @interface Fuel **/
+/** @interface Fuel : VehiclePropertyType **/
 class FuelProperty: public DBusSink
 {
 public:
@@ -343,7 +343,7 @@ public:
 	}
 };
 
-/** @interface EngineOil **/
+/** @interface EngineOil : VehiclePropertyType **/
 class EngineOilProperty: public DBusSink
 {
 public:
@@ -371,7 +371,7 @@ public:
 	}
 };
 
-/** @interface Location **/
+/** @interface Location : VehiclePropertyType **/
 class LocationProperty: public DBusSink
 {
 public:

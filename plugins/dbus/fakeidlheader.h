@@ -22,20 +22,39 @@
 /** @raw Tizen implements VehicleObject; **/
 
 /** @interface VehiclePropertyType **/
-/** @attributeName value
- *  @type object
- *  @access readonly
- *
- *  @attributeName timeStamp
+/** @attributeName timeStamp
  *  @type Date
  *  @access readonly
 **/
 
+/** @raw callback VehiclePropertyCallback = void (VehiclePropertyType value); **/
+
+/** @raw callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); **/
+
+/** @raw callback VehiclePropertyListCallback = void (sequence<VehiclePropertyType> values); **/
+
+/** @interface VehiclePropertyError 
+*
+*    @enum const unsigned short PERMISSION_DENIED = 1;
+*    @enum const unsigned short PROPERTY_UNAVAILABLE = 2;
+*    @enum const unsigned short TIMEOUT = 3;
+*
+*    @attributeName code
+*    @type unsigned short
+*    @access readonly
+*    @attributeComment MUST return error code.
+*
+*    @attributeName message
+*    @type DOMString
+*    @access readonly
+*    @attributeComment MUST return error message
+**/
+
 /** @interface Vehicle **/
 /** @method sequence<DOMString> getSupported();
- *  @method object get(DOMString property);
- *  @method void set(DOMString property, object value);
- *  @method sequence<VehiclePropertyTypes> getHistory(DOMString type, Date startTime, Date endTime);
+ *  @method get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
+ *  @method set(DOMString property, VehiclePropertyType value, optional SuccessCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
+ *  @method getHistory(DOMString property, Date startTime, Date endTime, VehicleHistoryListCallback successCallback, VehiclePropertyErrorCallback errorCallback);
  **/
 
 

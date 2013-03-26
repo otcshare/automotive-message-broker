@@ -6,7 +6,7 @@
 #include "abstractdbusinterface.h"
 #include "abstractroutingengine.h"
 
-/** @interface Odometer **/
+/** @interface Odometer : VehiclePropertyType **/
 class OdometerProperty: public DBusSink
 {
 public:
@@ -23,7 +23,7 @@ public:
 	}
 };
 
-/** @interface Battery **/
+/** @interface Battery : VehiclePropertyType **/
 class BatteryProperty: public DBusSink
 {
 public:
@@ -45,7 +45,7 @@ public:
 	}
 };
 
-/** @interface TirePressure **/
+/** @interface TirePressure : VehiclePropertyType **/
 class TirePressureProperty: public DBusSink
 {
 public:
@@ -79,7 +79,7 @@ public:
 	}
 };
 
-/** @interface TireTemperature **/
+/** @interface TireTemperature : VehiclePropertyType **/
 class TireTemperatureProperty: public DBusSink
 {
 public:

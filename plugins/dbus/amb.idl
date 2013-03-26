@@ -1,4 +1,10 @@
-TizenimplementsVehicleObject;**/
+Tizen implements VehicleObject; 
+
+callback VehiclePropertyCallback = void (VehiclePropertyType value); 
+
+callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); 
+
+callback VehiclePropertyListCallback = void (sequence<VehiclePropertyType> values); 
 
 /**
 
@@ -13,54 +19,54 @@ Details.
 
 module Vehicle {
 [NoInterfaceObject]
-interface VehicleSpeed { 
+interface VehicleSpeed : VehiclePropertyType  { 
 	readonly attribute unsigned short VehicleSpeed;
 };
 
 [NoInterfaceObject]
-interface EngineSpeed { 
+interface EngineSpeed : VehiclePropertyType  { 
 	readonly attribute unsigned short EngineSpeed;
 };
 
 [NoInterfaceObject]
-interface VehiclePowerMode { 
+interface VehiclePowerMode : VehiclePropertyType  { 
 	readonly attribute octet VehiclePowerMode;
 };
 
 [NoInterfaceObject]
-interface TripMeter { 
+interface TripMeter : VehiclePropertyType  { 
 	 attribute unsigned short TripMeterA;
 	 attribute unsigned short TripMeterB;
 	 attribute unsigned short TripMeterC;
 };
 
 [NoInterfaceObject]
-interface Acceleration { 
+interface Acceleration : VehiclePropertyType  { 
 	readonly attribute unsigned short X;
 	readonly attribute unsigned short Y;
 	readonly attribute unsigned short Z;
 };
 
 [NoInterfaceObject]
-interface Transmission { 
+interface Transmission : VehiclePropertyType  { 
 	readonly attribute octet ShiftPosition;
 	readonly attribute octet GearPosition;
 	readonly attribute octet Mode;
 };
 
 [NoInterfaceObject]
-interface CruiseControlStatus { 
+interface CruiseControlStatus : VehiclePropertyType  { 
 	readonly attribute boolean Activated;
 	readonly attribute unsigned short Speed;
 };
 
 [NoInterfaceObject]
-interface WheelBrake { 
+interface WheelBrake : VehiclePropertyType  { 
 	readonly attribute boolean Engaged;
 };
 
 [NoInterfaceObject]
-interface LightStatus { 
+interface LightStatus : VehiclePropertyType  { 
 	readonly attribute boolean Head;
 	readonly attribute boolean RightTurn;
 	readonly attribute boolean LeftTurn;
@@ -72,19 +78,19 @@ interface LightStatus {
 };
 
 [NoInterfaceObject]
-interface InteriorLightStatus { 
+interface InteriorLightStatus : VehiclePropertyType  { 
 	readonly attribute boolean Passenger;
 	readonly attribute boolean Driver;
 	readonly attribute boolean Center;
 };
 
 [NoInterfaceObject]
-interface Horn { 
+interface Horn : VehiclePropertyType  { 
 	readonly attribute boolean On;
 };
 
 [NoInterfaceObject]
-interface Fuel { 
+interface Fuel : VehiclePropertyType  { 
 	readonly attribute unsigned short Level;
 	readonly attribute unsigned short Range;
 	readonly attribute unsigned short InstantConsumption;
@@ -93,14 +99,14 @@ interface Fuel {
 };
 
 [NoInterfaceObject]
-interface EngineOil { 
+interface EngineOil : VehiclePropertyType  { 
 	readonly attribute unsigned short Remaining;
 	readonly attribute long Temperature;
 	readonly attribute unsigned short Pressure;
 };
 
 [NoInterfaceObject]
-interface Location { 
+interface Location : VehiclePropertyType  { 
 	readonly attribute double Latitude;
 	readonly attribute double Longitude;
 	readonly attribute double Altitude;
@@ -108,63 +114,142 @@ interface Location {
 };
 
 [NoInterfaceObject]
-interface ExteriorBrightness { 
+interface ExteriorBrightness : VehiclePropertyType  { 
+
+	/**  ExteriorBrightness
+	 *   Must return Exterior Brightness in lux.    
+	 **/
+	readonly attribute unsigned long ExteriorBrightness;
 };
 
 [NoInterfaceObject]
-interface VehicleId { 
+interface VehicleId : VehiclePropertyType  { 
+
+	/**  WMI
+	 *   \brief MUST return World Manufacturer Identifier (WMI)    
+	 *   WMI is defined by SAE ISO 3780:2009.  3 characters.    
+	 **/
 	readonly attribute DOMString WMI;
+
+	/**  VIN
+	 *   \brief MUST return Vehicle Identification Number (VIN) as defined by ISO 3779. 17 characters.    
+	 **/
 	readonly attribute DOMString VIN;
 };
 
 [NoInterfaceObject]
-interface Size { 
+interface Size : VehiclePropertyType  { 
+
+	/**  Width
+	 *   \brief MUST return width of vehicle in mm    
+	 **/
 	readonly attribute unsigned long Width;
+
+	/**  Height
+	 *   \brief MUST return height of vehicle in mm    
+	 **/
 	readonly attribute unsigned long Height;
+
+	/**  Length
+	 *   \brief MUST return length of vehicle in mm    
+	 **/
 	readonly attribute unsigned long Length;
 };
 
 [NoInterfaceObject]
-interface FuelInfo { 
+interface FuelInfo : VehiclePropertyType  { 
+	const unsigned short FUELTYPE_GASOLINE = 0;    
+	const unsigned short FUELTYPE_HIGH_OCTANE= 1;    
+	const unsigned short FUELTYPE_DIESEL = 2;    
+	const unsigned short FUELTYPE_ELECTRIC = 3;    
+	const unsigned short FUELTYPE_HYDROGEN = 4;    
+	const unsigned short REFUELPOSITION_LEFT = 0;    
+	const unsigned short REFUELPOSITION_RIGHT= 1;    
+	const unsigned short REFUELPOSITION_FRONT = 2;    
+	const unsigned short REFUELPOSITION_REAR = 3;    
+
+	/**  Type
+	 *   \brief MUST return type of fuel.  integer 0-4 (see 
+	 **/
 	readonly attribute unsigned short Type;
+
+	/**  RefuelPosition
+	 *   \brief MUST return position of refuling (see 
+	 **/
 	readonly attribute unsigned short RefuelPosition;
 };
 
 [NoInterfaceObject]
-interface VehicleType { 
+interface VehicleType : VehiclePropertyType  { 
+	const unsigned short VEHICLETYPE_SEDAN = 0;    
+	const unsigned short VEHICLETYPE_COUPE= 1;    
+	const unsigned short VEHICLETYPE_CABRIOLE = 2;    
+	const unsigned short VEHICLETYPE_ROADSTER = 3;    
+	const unsigned short VEHICLETYPE_SUV = 4;    
+	const unsigned short VEHICLETYPE_TRUCK = 5;    
+
+	/**  Type
+	 *   \brief MUST return type of Vehicle.  Integer 0-5 (see 
+	 **/
 	readonly attribute unsigned short Type;
 };
 
 [NoInterfaceObject]
-interface Doors { 
+interface Doors : VehiclePropertyType  { 
+
+	/**  DoorsPerRow
+	 *   \brief MUST return Number of doors in each row.  The index represents the row.  Position '0'    
+	 *   represents the first row, '1' the second row etc.    
+	 *   Example a common mini-van may have Doors[0] = 2 doors,    
+	 *   Doors[1] = 1 (side door), Doors[2] = 1 (trunk).    
+	 **/
 	readonly attribute sequence<unsigned short> DoorsPerRow;
 };
 
 [NoInterfaceObject]
-interface TransmissionGearType { 
+interface TransmissionGearType : VehiclePropertyType  { 
+	const unsigned short TRANSMISSIONGEARTYPE_AUTO=0;    
+	const unsigned short TRANSMISSIONGEARTYPE_MANUAL=1;    
+	const unsigned short TRANSMISSIONGEARTYPE_CV=2;    
+
+	/**  TransmissionGearType
+	 *   \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV).  See 
+	 **/
 	readonly attribute unsigned short TransmissionGearType;
 };
 
 [NoInterfaceObject]
-interface WheelInformation { 
+interface WheelInformation : VehiclePropertyType  { 
+
+	/**  FrontWheelRadius
+	 *   \brief MUST return Radius of Front Wheel(s) in mm.    
+	 **/
 	readonly attribute unsigned short FrontWheelRadius;
+
+	/**  RearWheelRadius
+	 *   \brief MUST return Radius of Rear Wheel(s) in mm.    
+	 **/
 	readonly attribute unsigned short RearWheelRadius;
+
+	/**  WheelTrack
+	 *   \brief MUST return Wheel Track in mm.    
+	 **/
 	readonly attribute unsigned long WheelTrack;
 };
 
 [NoInterfaceObject]
-interface Odometer { 
+interface Odometer : VehiclePropertyType  { 
 	readonly attribute unsigned long Odometer;
 };
 
 [NoInterfaceObject]
-interface Battery { 
+interface Battery : VehiclePropertyType  { 
 	readonly attribute double Voltage;
 	readonly attribute double Current;
 };
 
 [NoInterfaceObject]
-interface TirePressure { 
+interface TirePressure : VehiclePropertyType  { 
 	readonly attribute double LeftFront;
 	readonly attribute double RightFront;
 	readonly attribute double LeftRear;
@@ -172,7 +257,7 @@ interface TirePressure {
 };
 
 [NoInterfaceObject]
-interface TireTemperature { 
+interface TireTemperature : VehiclePropertyType  { 
 	readonly attribute double LeftFront;
 	readonly attribute double RightFront;
 	readonly attribute double LeftRear;
@@ -180,42 +265,58 @@ interface TireTemperature {
 };
 
 [NoInterfaceObject]
-interface SecurityAlert { 
+interface SecurityAlert : VehiclePropertyType  { 
 	readonly attribute boolean SecurityAlert;
 };
 
 [NoInterfaceObject]
-interface ParkingBrake { 
+interface ParkingBrake : VehiclePropertyType  { 
 	readonly attribute boolean ParkingBrake;
 };
 
 [NoInterfaceObject]
-interface ParkingLight { 
+interface ParkingLight : VehiclePropertyType  { 
 	readonly attribute boolean ParkingLight;
 };
 
 [NoInterfaceObject]
-interface HazardLight { 
+interface HazardLight : VehiclePropertyType  { 
 	readonly attribute boolean HazardLight;
 };
 
 [NoInterfaceObject]
-interface VehicleObject { 
+interface VehicleObject  { 
 	readonly attribute Vehicle ;
 };
 
 [NoInterfaceObject]
-interface VehiclePropertyType { 
-	readonly attribute object value;
+interface VehiclePropertyType  { 
 	readonly attribute Date timeStamp;
 };
 
 [NoInterfaceObject]
-interface Vehicle { 
+interface VehiclePropertyError   { 
+	const unsigned short PERMISSION_DENIED = 1; 
+	const unsigned short PROPERTY_UNAVAILABLE = 2; 
+	const unsigned short TIMEOUT = 3; 
+
+	/**  code
+	 *   MUST return error code. 
+	 **/
+	readonly attribute unsigned short code;
+
+	/**  message
+	 *   MUST return error message 
+	 **/
+	readonly attribute DOMString message;
+};
+
+[NoInterfaceObject]
+interface Vehicle  { 
 	sequence<DOMString> getSupported();  
-	object get(DOMString property);  
-	void set(DOMString property, object value);  
-	sequence<VehiclePropertyTypes> getHistory(DOMString type, Date startTime, Date endTime);  
+	get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+	set(DOMString property, VehiclePropertyType value, optional SuccessCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+	getHistory(DOMString property, Date startTime, Date endTime, VehicleHistoryListCallback successCallback, VehiclePropertyErrorCallback errorCallback);  
 };
 
 };
