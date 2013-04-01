@@ -31,7 +31,7 @@ public:
 		:DBusSink("org.automotive.VehicleSpeed","/org/automotive/runningstatus/VehicleSpeed", re, connection, map<string, string>())
 	{
 		/** @attributeName VehicleSpeed
-		 *  @type unsigned short
+		 *  @type unsigned long
 		 *  @access readonly
 		 **/
 		wantProperty<uint16_t>(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
@@ -49,7 +49,7 @@ public:
 		:DBusSink("org.automotive.EngineSpeed","/org/automotive/runningstatus/EngineSpeed", re, connection, map<string, string>())
 	{
 		/** @attributeName EngineSpeed
-		 *  @type unsigned short
+		 *  @type unsigned long
 		 *  @access readonly
 		 **/
 		wantProperty<uint16_t>(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
