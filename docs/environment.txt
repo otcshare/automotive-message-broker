@@ -1,4 +1,4 @@
-Environment hierarchy
+	Environment hierarchy
 =================
 
 Service         org.automotive
@@ -47,19 +47,16 @@ Properties
 			Fastest = 5,
 			Auto = 10
 
-Interface       org.automotive.HVACFan
-Object path     /org/automotive/environment/HVACFan
+Interface       org.automotive.HVAC
+Object path     /org/automotive/environment/HVAC
 Properties
-				
-		struct{ byte, byte, byte } HVACFan [readwrite]
-			
+						
 		byte AirflowDirection [readwrite]
 
 			Front Panel = 0,
 			Floor Duct = 1,
-			Front + Floor = 2,
-			Front = 3,
-			Defroster + Floor = 4
+			Front = 0x02,
+			Defroster = 0x04
 
 		byte FanSpeed [readwrite]
 			
@@ -102,6 +99,11 @@ Properties
 		bool SeatCooler [readwrite]
 			
 			Seat cooler on (true) / off (false)
+
+
+Interface       org.automotive.WindowStatus
+Object path     /org/automotive/environment/WindowStatus
+Properties
 				
 		dict{ byte, byte } WindowStatus [readwrite]
 			
@@ -112,12 +114,25 @@ Properties
 			Driver = 0,
 			Passenger = 1,
 			LeftRear = 2,
-			RightRear = 3
+			RightRear = 3,
+			Rear = 4
+
+Interface       org.automotive.Sunroof
+Object path     /org/automotive/environment/Sunroof
+Properties
 				
-		struct{ byte, byte } Sunroof [readwrite]
+		byte Openness [readwrite]
 			
-			Percent of sunroof openness (0: Closed - 100: Fully Opened) (byte) and percent of tilt (0: Closed - 100: Maximum Tilt) (byte)
+			Percent of sunroof openness (0: Closed - 100: Fully Opened).
+
+		byte Tilt [readwrite]
+		
+			Percent of tilt (0: Closed - 100: Maximum Tilt).
 				
+Interface       org.automotive.ConvertibleRoof
+Object path     /org/automotive/environment/ConvertibleRoof
+Properties
+
 		bool ConvertibleRoof [readwrite]
 			
 			Convertible roof on (true) / off (false)

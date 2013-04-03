@@ -60,6 +60,7 @@ const VehicleProperty::Property VehicleProperty::AirIntakeTemperature = "AirInta
 const VehicleProperty::Property VehicleProperty::BatteryVoltage = "BatteryVoltage";
 const VehicleProperty::Property VehicleProperty::BatteryCurrent = "BatteryCurrent";
 const VehicleProperty::Property VehicleProperty::InteriorTemperature = "InteriorTemperature";
+const VehicleProperty::Property VehicleProperty::ExteriorTemperature = "ExteriorTemperature";
 const VehicleProperty::Property VehicleProperty::EngineOilTemperature = "EngineOilTemperature";
 const VehicleProperty::Property VehicleProperty::VIN = "VIN";
 const VehicleProperty::Property VehicleProperty::WMI = "WMI";
@@ -130,6 +131,22 @@ const VehicleProperty::Property VehicleProperty::SeatBeltStatus = "SeatBeltStatu
 const VehicleProperty::Property VehicleProperty::WindowLockStatus = "WindowLockStatus";
 const VehicleProperty::Property VehicleProperty::OccupantStatus = "OccupantStatus";
 const VehicleProperty::Property VehicleProperty::ObstacleDistance = "ObstacleDistance";
+const VehicleProperty::Property VehicleProperty::RainSensor = "RainSensor";
+const VehicleProperty::Property VehicleProperty::WindshieldWiper = "WindshieldWiper";
+const VehicleProperty::Property VehicleProperty::AirflowDirection = "AirflowDirection";
+const VehicleProperty::Property VehicleProperty::FanSpeed = "FanSpeed";
+const VehicleProperty::Property VehicleProperty::TargetTemperature = "TargetTemperature";
+const VehicleProperty::Property VehicleProperty::AirConditioning = "AirConditioning";
+const VehicleProperty::Property VehicleProperty::AirRecirculation = "AirRecirculation";
+const VehicleProperty::Property VehicleProperty::Heater = "Heater";
+const VehicleProperty::Property VehicleProperty::Defrost = "Defrost";
+const VehicleProperty::Property VehicleProperty::SteeringWheelHeater = "SteeringWheelHeater";
+const VehicleProperty::Property VehicleProperty::SeatHeater = "SeatHeater";
+const VehicleProperty::Property VehicleProperty::SeatCooler = "SeatCooler";
+const VehicleProperty::Property VehicleProperty::WindowStatus = "WindowStatus";
+const VehicleProperty::Property VehicleProperty::Sunroof = "Sunroof";
+const VehicleProperty::Property VehicleProperty::SunroofTilt = "SunroofTilt";
+const VehicleProperty::Property VehicleProperty::ConvertibleRoof = "ConvertibleRoof";
 
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
@@ -162,6 +179,7 @@ VehicleProperty::VehicleProperty()
 	registerPropertyPriv(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
 	REGISTERPROPERTY(BatteryCurrent,0);
 	registerPropertyPriv(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
+	REGISTERPROPERTY(ExteriorTemperature,0);
 	registerPropertyPriv(VIN, [](){ return new VINType(""); });
 	registerPropertyPriv(WMI, [](){ return new WMIType(""); });
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftFront, TirePressureType, 0);
@@ -281,6 +299,37 @@ VehicleProperty::VehicleProperty()
 
 		return t;
 	});
+
+	REGISTERPROPERTY(RainSensor,0);
+	REGISTERPROPERTY(WindshieldWiper,Window::Off);
+	REGISTERPROPERTY(AirflowDirection,HVAC::Front);
+	REGISTERPROPERTY(FanSpeed,0);
+	REGISTERPROPERTY(TargetTemperature,0);
+	REGISTERPROPERTY(AirConditioning,false);
+	REGISTERPROPERTY(AirRecirculation,false);
+	REGISTERPROPERTY(Heater,false);
+
+	registerPropertyPriv(Defrost, []()
+	{
+		DefrostType *d = new DefrostType();
+		d->append(Window::Windshield,false);
+
+		return d;
+	});
+
+	REGISTERPROPERTY(SteeringWheelHeater,false);
+	REGISTERPROPERTY(SeatHeater, false);
+	REGISTERPROPERTY(SeatCooler, false);
+	registerPropertyPriv(WindowStatus, []()
+	{
+		WindowStatusType* d = new WindowStatusType();
+		d->append(Window::Driver,100);
+
+		return d;
+	});
+	REGISTERPROPERTY(Sunroof,0);
+	REGISTERPROPERTY(SunroofTilt,0);
+	REGISTERPROPERTY(ConvertibleRoof,false);
 
 }
 

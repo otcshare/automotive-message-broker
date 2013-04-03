@@ -221,8 +221,20 @@ enum Location
 	Passenger,
 	LeftRear,
 	RightRear,
-	Sunroof
+	Sunroof,
+	Windshield,
+	SideMirrorLeft,
+	SideMirrorRight
 };
+
+enum WiperSpeed
+{
+	Off = 0,
+	Slowest = 1,
+	Fastest = 5,
+	Auto = 10
+};
+
 }
 
 namespace DistanceSensor
@@ -235,6 +247,18 @@ enum Location
 	RightRear = 3,
 	LeftBlindSpot = 4,
 	RightBlindSPot = 5
+
+};
+}
+
+namespace HVAC
+{
+enum AirflowDirection
+{
+	FrontPanel=0,
+	FloorDuct = 1,
+	Front = 1 << 1,
+	Defroster = 1 << 2
 
 };
 }
@@ -355,6 +379,9 @@ public:
 	/**< Interior Air Temperature in degrees celcius */
 	static const Property InteriorTemperature;
 	typedef BasicPropertyType<int> InteriorTemperatureType;
+
+	static const Property ExteriorTemperature;
+	typedef BasicPropertyType<int> ExteriorTemperatureType;
 
 	/**< Engine Oil Temperature in degrees celcius */
 	static const Property EngineOilTemperature;
@@ -552,6 +579,53 @@ public:
 	static const Property ObstacleDistance;
 	typedef MapPropertyType<BasicPropertyType<DistanceSensor::Location>, BasicPropertyType<double> > ObstacleDistanceType;
 
+	static const Property RainSensor;
+	typedef BasicPropertyType<uint16_t> RainSensorType;
+
+	static const Property WindshieldWiper;
+	typedef BasicPropertyType<Window::WiperSpeed> WindshieldWiperType;
+
+	static const Property AirflowDirection;
+	typedef BasicPropertyType<HVAC::AirflowDirection> AirflowDirectionType;
+
+	static const Property FanSpeed;
+	typedef BasicPropertyType<uint16_t> FanSpeedType;
+
+	static const Property TargetTemperature;
+	typedef BasicPropertyType<int> TargetTemperatureType;
+
+	static const Property AirConditioning;
+	typedef BasicPropertyType<bool> AirConditioningType;
+
+	static const Property AirRecirculation;
+	typedef BasicPropertyType<bool> AirRecirculationType;
+
+	static const Property Heater;
+	typedef BasicPropertyType<bool> HeaterType;
+
+	static const Property Defrost;
+	typedef MapPropertyType<BasicPropertyType<Window::Location>, BasicPropertyType<bool> > DefrostType;
+
+	static const Property SteeringWheelHeater;
+	typedef BasicPropertyType<bool> SteeringWheelHeaterType;
+
+	static const Property SeatHeater;
+	typedef BasicPropertyType<bool> SeatHeaterType;
+
+	static const Property SeatCooler;
+	typedef BasicPropertyType<bool> SeatCoolerType;
+
+	static const Property WindowStatus;
+	typedef MapPropertyType<BasicPropertyType<Window::Location>, BasicPropertyType<uint16_t> > WindowStatusType;
+
+	static const Property Sunroof;
+	typedef BasicPropertyType<uint16_t> SunroofType;
+
+	static const Property SunroofTilt;
+	typedef BasicPropertyType<uint16_t> SunroofTiltType;
+
+	static const Property ConvertibleRoof;
+	typedef BasicPropertyType<bool> ConvertibleRoofType;
 
 	/** END PROPERTIES **/
 

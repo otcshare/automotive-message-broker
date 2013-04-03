@@ -17,6 +17,7 @@ public:
 		/** @attributeName SecurityAlert
 		 *  @type boolean
 		 *  @access readonly
+		 *  @attributeComment \brief MUST return
 		 **/
 		wantProperty<Security::Status>(VehicleProperty::SecurityAlertStatus,"SecurityAlert", "i", AbstractProperty::Read);
 
