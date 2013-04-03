@@ -110,23 +110,6 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	tablename = "data";
 	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, time REAL, sequence REAL)";
 
-	//startDb();
-
-	if(config.find("startOnLoad")!= config.end())
-	{
-		startDb();
-	}
-
-	if(config.find("playbackMultiplier")!= config.end())
-	{
-		playbackMultiplier = boost::lexical_cast<uint>(config["playbackMultiplier"]);
-	}
-
-	if(config.find("playbackOnLoad")!= config.end())
-	{
-		startPlayback();
-	}
-
 	if(config.find("databaseFile") != config.end())
 	{
 		databaseName = config["databaseFile"];
@@ -146,7 +129,36 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	mSupported.push_back(DatabaseLoggingProperty);
 	mSupported.push_back(DatabasePlaybackProperty);
 
-	routingEngine->setSupported(mSupported,this);
+
+	initDb();
+
+	/// get supported:
+
+	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
+
+	for(int i=0; i < supportedStr.size(); i++)
+	{
+		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
+			mSupported.push_back(supportedStr[i][0]);
+	}
+
+	routingEngine->setSupported(supported(), this);
+
+	if(config.find("startOnLoad")!= config.end())
+	{
+		startDb();
+	}
+
+	if(config.find("playbackMultiplier")!= config.end())
+	{
+		playbackMultiplier = boost::lexical_cast<uint>(config["playbackMultiplier"]);
+	}
+
+	if(config.find("playbackOnLoad")!= config.end())
+	{
+		startPlayback();
+	}
+
 
 }
 
@@ -260,18 +272,6 @@ void DatabaseSink::startPlayback()
 	playback = true;
 
 	initDb();
-
-	/// get supported:
-
-	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
-
-	for(int i=0; i < supportedStr.size(); i++)
-	{
-		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
-			mSupported.push_back(supportedStr[i][0]);
-	}
-
-	routingEngine->setSupported(supported(), this);
 
 	/// populate playback queue:
 
@@ -421,12 +421,6 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	reply->success = true;
 	reply->completed(reply);
-
-	/// reply is owned by the requester of this call.  we own the data:
-	for(auto itr = cleanup.begin(); itr != cleanup.end(); itr++)
-	{
-		delete *itr;
-	}
 
 	delete db;
 }
