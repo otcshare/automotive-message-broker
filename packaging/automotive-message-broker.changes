@@ -1,3 +1,6 @@
+* Wed Apr 03 14:12:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fix for TIVI-559 - database sink not working with get history
+
 * Thu Mar 21 16:02:00 PST 2013 - <kevron.m.rees@intel.com>
 - Fix for performance issues in opencvlux plugin
 - Murphy code added but not built by default yet
