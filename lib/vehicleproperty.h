@@ -506,6 +506,9 @@ public:
 	static const Property WheelTrack;
 	typedef BasicPropertyType<uint> WheelTrackType;
 
+	static const Property BrakePressure;
+	typedef BasicPropertyType<uint16_t> BrakePressureType;
+
 	static const Property Odometer;
 	typedef BasicPropertyType<uint> OdometerType;
 

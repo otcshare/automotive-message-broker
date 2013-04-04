@@ -205,6 +205,13 @@ public:
 		 **/
 		wantProperty<uint>(VehicleProperty::WheelTrack, "WheelTrack", "u", AbstractProperty::Read);
 
+		/** @attributeName ABS
+		 *  @type boolean
+		 *  @access readonly
+		 *  @attributeComment \brief MUST return Antilock Brake System status: on = true, off = false.
+		 **/
+		wantPropertyVariant(VehicleProperty::WheelTrack, "ABS", "b", AbstractProperty::Read);
+
 		supportedChanged(re->supported());
 	}
 };

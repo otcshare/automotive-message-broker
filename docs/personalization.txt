@@ -2,63 +2,65 @@ Running Status hierarchy
 =================
 
 Service         org.automotive
-Interface       org.automotive.runningstatus
-Object path     /
+Object path     /org/automotive/personalization/*
 
 
-Properties		string KeyId [readonly]
+Interface	org.automotive.KeyId
+Object path	/org/automotive/personalization/KeyId
+Properties
+		string KeyId [readonly]
 
-				UUID of key in the ignition.  Unique to each key of the vehicle
+			UUID of key in the ignition.  Unique to each key of the vehicle
 				
-			string Language [readwrite]
+		string Language [readwrite]
 			
-				ISO 639-1 Language Code (ie en)
+			ISO 639-1 Language Code (ie en)
 			
-			byte MeasurementSystem [readwrite]
+		byte MeasurementSystem [readwrite]
 			
-				Metric = 0,
-				Imperial(US) = 1,
-				Imperial(UK) = 2
+			Metric = 0,
+			Imperial(US) = 1,
+			Imperial(UK) = 2
 				
-			dict{ byte, struct { byte, byte} }  MirrorSettings [readwrite]
+		dict{ byte, struct { byte, byte} }  MirrorSettings [readwrite]
 			
-				Dictionary of Mirrors (byte) and the Mirrors' Tilt (byte) and Pan (byte) settings
+			Dictionary of Mirrors (byte) and the Mirrors' Tilt (byte) and Pan (byte) settings
 				
-				Mirror:
+			Mirror:
 				
-				DriverSide = 0,
-				PassengerSide = 1,
-				Inside = 2
+			DriverSide = 0,
+			PassengerSide = 1,
+			Inside = 2
 				
 			
-			struct { uint16, uint16 } SteeringWheelPostion [readwrite]
+		struct { uint16, uint16 } SteeringWheelPostion [readwrite]
 			
-				Dictionary of steering wheel parts and its Slide (uint16) and Tilt (uint16)
+			Dictionary of steering wheel parts and its Slide (uint16) and Tilt (uint16)
 				
-			byte DrivingMode [readwrite]
+		byte DrivingMode [readwrite]
 			
-				Mode:
+			Mode:
 				
-				Auto = 0,
-				Comfort = 1,
-				Sport = 2,
-				Eco = 3,
-				Manual = 4
+			Auto = 0,
+			Comfort = 1,
+			Sport = 2,
+			Eco = 3,
+			Manual = 4
 				
-			struct{ uint16, uint16, uint16, uint16, uint16, uint16 } DriverSeatPosition [readwrite]
+		struct{ uint16, uint16, uint16, uint16, uint16, uint16 } DriverSeatPosition [readwrite]
 			
-				Driver seat positon per part: (recline seatback, slide, cushion height, headrest, back cushion, side cushion)
+			Driver seat positon per part: (recline seatback, slide, cushion height, headrest, back cushion, side cushion)
 				
-			struct{ uint16, uint16, uint16, uint16, uint16, uint16 } PassengerSeatPosition [readwrite]
+		struct{ uint16, uint16, uint16, uint16, uint16, uint16 } PassengerSeatPosition [readwrite]
 			
-				Passenger seat positon per part: (recline seatback, slide, cushion height, headrest, back cushion, side cushion)
+			Passenger seat positon per part: (recline seatback, slide, cushion height, headrest, back cushion, side cushion)
 				
-			byte DashboardIllumination [readwrite]
+		byte DashboardIllumination [readwrite]
 			
-				Percentage of illumination, 0: Darkest, 100: Brightest
+			Percentage of illumination, 0: Darkest, 100: Brightest
 				
-			byte GeneratedVehicleSoundMode [readwrite]
+		byte GeneratedVehicleSoundMode [readwrite]
 			
-				Normal = 0,
-				Quiet = 1,
-				Sportive = 2
+			Normal = 0,
+			Quiet = 1,
+			Sportive = 2
