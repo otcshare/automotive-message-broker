@@ -113,7 +113,6 @@ const VehicleProperty::Property VehicleProperty::TransmissionGearType = "Transmi
 const VehicleProperty::Property VehicleProperty::FrontWheelRadius = "FrontWheelRadius";
 const VehicleProperty::Property VehicleProperty::RearWheelRadius = "RearWheelRadius";
 const VehicleProperty::Property VehicleProperty::WheelTrack = "WheelTrack";
-const VehicleProperty::Property VehicleProperty::ABS = "ABS";
 const VehicleProperty::Property VehicleProperty::BrakePressure = "BrakePressure";
 const VehicleProperty::Property VehicleProperty::Odometer = "Odometer";
 const VehicleProperty::Property VehicleProperty::TransmissionFluidLevel = "TransmissionFluidLevel";
@@ -232,7 +231,6 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(FrontWheelRadius, WheelRadiusType, 0);
 	REGISTERPROPERTYWITHTYPE(RearWheelRadius, WheelRadiusType, 0);
 	REGISTERPROPERTY(WheelTrack,0);
-	REGISTERPROPERTY(ABS,false);
 	REGISTERPROPERTY(BrakePressure,0);
 	REGISTERPROPERTY(Odometer,0);
 	REGISTERPROPERTY(TransmissionFluidLevel,0);
