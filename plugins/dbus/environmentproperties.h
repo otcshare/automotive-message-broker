@@ -88,7 +88,7 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return Level of windshield whiper speed (see WIPERSPEED_*)
 		 */
-		wantProperty<Window::WiperSpeed>(VehicleProperty::RainSensor, "WindshieldWiper", "y", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::RainSensor, "WindshieldWiper", "y", AbstractProperty::ReadWrite);
 		supportedChanged(re->supported());
 	}
 };
@@ -113,7 +113,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return airflow direction.  See AIRFLOWDIRECTION_*.
 		 */
-		wantProperty<HVAC::AirflowDirection>(VehicleProperty::AirflowDirection, "AirflowDirection", "y", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirflowDirection, "AirflowDirection", "y", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName FanSpeed
@@ -121,7 +121,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return speed of the fan (0-7)
 		 */
-		wantProperty<uint16_t>(VehicleProperty::FanSpeed, "FanSpeed", "y", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeed", "y", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName TargetTemperature
@@ -129,7 +129,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return target desired temperature in celcius.
 		 */
-		wantProperty<uint16_t>(VehicleProperty::TargetTemperature, "TargetTemperature", "y", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::TargetTemperature, "TargetTemperature", "y", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName AirConditioning
@@ -137,7 +137,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return air conditioning on (true) / off (false).
 		 */
-		wantProperty<bool>(VehicleProperty::AirConditioning, "AirConditioning", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirConditioning, "AirConditioning", "b", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName AirRecirculation
@@ -145,7 +145,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return air recirculation on (true) / off (false).
 		 */
-		wantProperty<bool>(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName Heater
@@ -153,7 +153,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return heater on (true) / off (false).
 		 */
-		wantProperty<bool>(VehicleProperty::Heater, "Heater", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::Heater, "Heater", "b", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName Defrost
@@ -161,7 +161,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return air recirculation on (true) / off (false).
 		 */
-		wantProperty<bool>(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName Defrost
@@ -170,7 +170,7 @@ public:
 		 * @attributeComment \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of { unsigned short, boolean } that represents
 		 * @attributeComment \brief each window and its defrost status.
 		 */
-		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", "a(y,b)", AbstractProperty::ReadWrite);
+		//wantPropertyVariant(VehicleProperty::Defrost, "Defrost", "a(yb)", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName SteeringWheelHeater
@@ -178,7 +178,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return air recirculation on (true) / off (false).
 		 */
-		wantProperty<bool>(VehicleProperty::SteeringWheelHeater, "SteeringWheelHeater", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SteeringWheelHeater, "SteeringWheelHeater", "b", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName SeatHeater
@@ -186,7 +186,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return seat heater status: on (true) / off (false).
 		 */
-		wantProperty<bool>(VehicleProperty::SeatHeater, "SeatHeater", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatHeater, "SeatHeater", "b", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName SeatCooler
@@ -194,17 +194,17 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return seat heater status: on (true) / off (false).
 		 */
-		wantProperty<bool>(VehicleProperty::SeatCooler, "SeatCooler", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatCooler, "SeatCooler", "b", AbstractProperty::ReadWrite);
 
 		supportedChanged(re->supported());
 	}
 };
 
 /** @interface WindowStatus : VehiclePropertyType **/
-class WindowStatus: public DBusSink
+class WindowStatusProperty: public DBusSink
 {
 public:
-	WindowStatus(AbstractRoutingEngine* re, GDBusConnection* connection)
+	WindowStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("org.automotive.WindowStatus","/org/automotive/environment/WindowStatus", re, connection, map<string, string>())
 	{
 		/**
@@ -221,7 +221,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return window status for each window location.  object returned is a dictionary { unsigned short windowlocation, unsigned short percentage opened }
 		 */
-		wantPropertyVariant(VehicleProperty::WindowStatus,"WindowStatus","a(b,b)", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowStatus,"WindowStatus","a(bb)", AbstractProperty::ReadWrite);
 	}
 };
 

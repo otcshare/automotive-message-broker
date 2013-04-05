@@ -104,15 +104,9 @@ public:
 
 		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
 		{
-			GVariant **v = g_new(GVariant*,2);
 			auto &foo = (*itr).first;
-			v[0] = const_cast<T&>(foo).toVariant();
-			v[1] = (*itr).second.toVariant();
-			GVariant* tuple = g_variant_new_tuple(v,2);
+			g_variant_builder_add(&params,"{?*}",const_cast<T&>(foo).toVariant(),(*itr).second.toVariant());
 
-			g_variant_builder_add_value(&params,tuple);
-
-			g_free(v);
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);

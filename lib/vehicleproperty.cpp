@@ -302,6 +302,14 @@ VehicleProperty::VehicleProperty()
 		return t;
 	});
 
+	registerPropertyPriv(ObstacleDistance,[]()
+	{
+		ObstacleDistanceType* t = new ObstacleDistanceType();
+		t->append(DistanceSensor::LeftFront,0);
+
+		return t;
+	});
+
 	REGISTERPROPERTY(RainSensor,0);
 	REGISTERPROPERTY(WindshieldWiper,Window::Off);
 	REGISTERPROPERTY(AirflowDirection,HVAC::Front);
@@ -314,7 +322,7 @@ VehicleProperty::VehicleProperty()
 	registerPropertyPriv(Defrost, []()
 	{
 		DefrostType *d = new DefrostType();
-		d->append(Window::Windshield,false);
+		d->append(Window::Windshield, false);
 
 		return d;
 	});
