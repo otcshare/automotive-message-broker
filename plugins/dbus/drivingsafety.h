@@ -183,9 +183,11 @@ public:
 
 		/**
 		 * @enum const unsigned short OCCUPANTLOCATION_DRIVER = 0;
-		 * @enum const unsigned short OCCUPANTLOCATION_PASSENGER= 1;
-		 * @enum const unsigned short OCCUPANTLOCATION_LEFTSIDE = 2;
-		 * @enum const unsigned short OCCUPANTLOCATION_RIGHTSIDE = 3;
+		 * @enum const unsigned short OCCUPANTLOCATION_FRONTMIDDLE = 1;
+		 * @enum const unsigned short OCCUPANTLOCATION_PASSENGER= 2;
+		 * @enum const unsigned short OCCUPANTLOCATION_LEFTREAR = 3;
+		 * @enum const unsigned short OCCUPANTLOCATION_MIDDLEREAR = 4;
+		 * @enum const unsigned short OCCUPANTLOCATION_RIGHTREAR = 5;
 		 * @enum const unsigned short OCCUPANTSTATUS_VACANT = 0;
 		 * @enum const unsigned short OCCUPANTSTATUS_CHILD = 1;
 		 * @enum const unsigned short OCCUPANTSTATUS_ADULT = 2;

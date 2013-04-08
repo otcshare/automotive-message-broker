@@ -20,12 +20,12 @@ Details.
 module Vehicle {
 [NoInterfaceObject]
 interface VehicleSpeed : VehiclePropertyType  { 
-	readonly attribute unsigned short VehicleSpeed;
+	readonly attribute unsigned long VehicleSpeed;
 };
 
 [NoInterfaceObject]
 interface EngineSpeed : VehiclePropertyType  { 
-	readonly attribute unsigned short EngineSpeed;
+	readonly attribute unsigned long EngineSpeed;
 };
 
 [NoInterfaceObject]
@@ -117,9 +117,146 @@ interface Location : VehiclePropertyType  {
 interface ExteriorBrightness : VehiclePropertyType  { 
 
 	/**  ExteriorBrightness
-	 *   Must return Exterior Brightness in lux.    
+	 *   \brief Must return the brightness outside the vehicle in lux.    
 	 **/
 	readonly attribute unsigned long ExteriorBrightness;
+};
+
+[NoInterfaceObject]
+interface Temperature : VehiclePropertyType  { 
+
+	/**  Interior
+	 *   \brief Must return the temperature of the interior of the vehicle in celcius.    
+	 **/
+	readonly attribute signed long Interior;
+
+	/**  Exterior
+	 *   \brief Must return the temperature of the exterior of the vehicle in celcius.    
+	 **/
+	readonly attribute signed long Exterior;
+};
+
+[NoInterfaceObject]
+interface RainSensor : VehiclePropertyType  { 
+
+	/**  RainSensor
+	 *   \brief Must return level of rain intensity 0: No Rain - 10: Heaviest Rain.    
+	 **/
+	readonly attribute unsigned short RainSensor;
+};
+
+[NoInterfaceObject]
+interface WindshieldWiper : VehiclePropertyType  { 
+	const unsigned short WIPERSPEED_OFF = 0;    
+	const unsigned short WIPERSPEED_SLOWEST= 1;    
+	const unsigned short WIPERSPEED_FASTEST = 5;    
+	const unsigned short WIPERSPEED_AUTO = 10;    
+
+	/**  WindshieldWiper
+	 *   \brief Must return Level of windshield whiper speed (see 
+	 **/
+	readonly attribute unsigned short WindshieldWiper;
+};
+
+[NoInterfaceObject]
+interface HVAC : VehiclePropertyType  { 
+	const unsigned short AIRFLOWDIRECTION_FRONTPANEL = 0;    
+	const unsigned short AIRFLOWDIRECTION_FLOORDUCT= 1;    
+	const unsigned short AIRFLOWDIRECTION_FRONT = 0x02;    
+	const unsigned short AIRFLOWDIRECTION_DEFROSTER = 0x04;    
+
+	/**  AirflowDirection
+	 *   \brief Must return airflow direction.  See 
+	 **/
+	readwrite attribute unsigned short AirflowDirection;
+
+	/**  FanSpeed
+	 *   \brief Must return speed of the fan (0-7)    
+	 **/
+	readwrite attribute unsigned short FanSpeed;
+
+	/**  TargetTemperature
+	 *   \brief Must return target desired temperature in celcius.    
+	 **/
+	readwrite attribute unsigned short TargetTemperature;
+
+	/**  AirConditioning
+	 *   \brief Must return air conditioning on (true) / off (false).    
+	 **/
+	readwrite attribute boolean AirConditioning;
+
+	/**  AirRecirculation
+	 *   \brief Must return air recirculation on (true) / off (false).    
+	 **/
+	readwrite attribute boolean AirRecirculation;
+
+	/**  Heater
+	 *   \brief Must return heater on (true) / off (false).    
+	 **/
+	readwrite attribute boolean Heater;
+
+	/**  Defrost
+	 *   \brief Must return air recirculation on (true) / off (false).    
+	 **/
+	readwrite attribute boolean Defrost;
+
+	/**  Defrost
+	 *   \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of { unsigned short, boolean } that represents    
+	 *   \brief each window and its defrost status.    
+	 **/
+	readwrite attribute object Defrost;
+
+	/**  SteeringWheelHeater
+	 *   \brief Must return air recirculation on (true) / off (false).    
+	 **/
+	readwrite attribute boolean SteeringWheelHeater;
+
+	/**  SeatHeater
+	 *   \brief Must return seat heater status: on (true) / off (false).    
+	 **/
+	readwrite attribute boolean SeatHeater;
+
+	/**  SeatCooler
+	 *   \brief Must return seat heater status: on (true) / off (false).    
+	 **/
+	readwrite attribute boolean SeatCooler;
+};
+
+[NoInterfaceObject]
+interface WindowStatus : VehiclePropertyType  { 
+	const unsigned short WINDOWLOCATION_DRIVER= 0;    
+	const unsigned short WINDOWLOCATION_PASSENGER = 1;    
+	const unsigned short WINDOWLOCATION_LEFTREAR = 2;    
+	const unsigned short WINDOWLOCATION_RIGHTREAR = 3;    
+	const unsigned short WINDOWLOCATION_REAR = 4;    
+
+	/**  WindowStatus
+	 *   \brief Must return window status for each window location.  object returned is a dictionary { unsigned short windowlocation, unsigned short percentage opened }    
+	 **/
+	readwrite attribute object WindowStatus;
+};
+
+[NoInterfaceObject]
+interface Sunroof : VehiclePropertyType  { 
+
+	/**  Openness
+	 *   \brief Must return window status for sunroof openness percentage.    
+	 **/
+	readwrite attribute unsigned short Openness;
+
+	/**  Tilt
+	 *   \brief Must return tilt status for sunroof percentage.    
+	 **/
+	readwrite attribute unsigned short Tilt;
+};
+
+[NoInterfaceObject]
+interface ConvertibleRoof : VehiclePropertyType  { 
+
+	/**  Openness
+	 *   \brief Must return window status for sunroof openness percentage.    
+	 **/
+	readwrite attribute unsigned short Openness;
 };
 
 [NoInterfaceObject]
@@ -235,37 +372,109 @@ interface WheelInformation : VehiclePropertyType  {
 	 *   \brief MUST return Wheel Track in mm.    
 	 **/
 	readonly attribute unsigned long WheelTrack;
+
+	/**  ABS
+	 *   \brief MUST return Antilock Brake System status: on = true, off = false.    
+	 **/
+	readonly attribute boolean ABS;
 };
 
 [NoInterfaceObject]
 interface Odometer : VehiclePropertyType  { 
+
+	/**  Odometer
+	 *   \brief MUST return Distance traveled in km    
+	 **/
 	readonly attribute unsigned long Odometer;
 };
 
 [NoInterfaceObject]
+interface Fluid : VehiclePropertyType  { 
+
+	/**  Transmission
+	 *   \brief MUST return Transmission fluid level percentage. 0-100.    
+	 **/
+	readonly attribute unsigned short Transmission;
+
+	/**  Brake
+	 *   \brief MUST return Brake fluid level percentage. 0-100.    
+	 **/
+	readonly attribute unsigned short Brake;
+
+	/**  Washer
+	 *   \brief MUST return Washer fluid level percentage. 0-100.    
+	 **/
+	readonly attribute unsigned short Washer;
+};
+
+[NoInterfaceObject]
 interface Battery : VehiclePropertyType  { 
+
+	/**  Voltage
+	 *   \brief MUST return battery voltage.    
+	 **/
 	readonly attribute double Voltage;
+
+	/**  Current
+	 *   \brief MUST return battery current in Amperes    
+	 **/
 	readonly attribute double Current;
 };
 
 [NoInterfaceObject]
 interface TirePressure : VehiclePropertyType  { 
+
+	/**  LeftFront
+	 *   \brief MUST return left front tire pressure in kPa.    
+	 **/
 	readonly attribute double LeftFront;
+
+	/**  RightFront
+	 *   \brief MUST return right front tire pressure in kPa.    
+	 **/
 	readonly attribute double RightFront;
+
+	/**  LeftRear
+	 *   \brief MUST return left rear tire pressure in kPa.    
+	 **/
 	readonly attribute double LeftRear;
+
+	/**  RightRear
+	 *   \brief MUST return right rear tire pressure in kPa.    
+	 **/
 	readonly attribute double RightRear;
 };
 
 [NoInterfaceObject]
 interface TireTemperature : VehiclePropertyType  { 
+
+	/**  LeftFront
+	 *   \brief MUST return left front tire temperature in Celcius.    
+	 **/
 	readonly attribute double LeftFront;
+
+	/**  RightFront
+	 *   \brief MUST return right front tire temperature in Celcius.    
+	 **/
 	readonly attribute double RightFront;
+
+	/**  LeftRear
+	 *   \brief MUST return left rear tire temperature in Celcius.    
+	 **/
 	readonly attribute double LeftRear;
+
+	/**  RightRear
+	 *   \brief MUST return right rear tire temperature in Celcius.    
+	 **/
 	readonly attribute double RightRear;
 };
 
 [NoInterfaceObject]
 interface SecurityAlert : VehiclePropertyType  { 
+
+	/**  SecurityAlert
+	 *   \brief MUST return    
+	 **/
 	readonly attribute boolean SecurityAlert;
 };
 
@@ -317,6 +526,128 @@ interface Vehicle  {
 	get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
 	set(DOMString property, VehiclePropertyType value, optional SuccessCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
 	getHistory(DOMString property, Date startTime, Date endTime, VehicleHistoryListCallback successCallback, VehiclePropertyErrorCallback errorCallback);  
+};
+
+[NoInterfaceObject]
+interface AntilockBrakingSystem : VehiclePropertyType  { 
+
+	/**  AntilockBrakingSystem
+	 *   \brief MUST return whether Antilock Braking System is Idle (false) or Engaged (true)    
+	 **/
+	readonly attribute boolean AntilockBrakingSystem;
+};
+
+[NoInterfaceObject]
+interface TractionControlSystem : VehiclePropertyType  { 
+
+	/**  TractionControlSystem
+	 *   \brief MUST return whether Traction Control System is Off (false) or On (true)    
+	 **/
+	readonly attribute boolean TractionControlSystem;
+};
+
+[NoInterfaceObject]
+interface VehicleTopSpeedLimit : VehiclePropertyType  { 
+
+	/**  VehicleTopSpeedLimit
+	 *   \brief MUST returns top rated speed in km/h. 0 = no limit    
+	 **/
+	readonly attribute unsigned short VehicleTopSpeedLimit;
+};
+
+[NoInterfaceObject]
+interface AirbagStatus : VehiclePropertyType  { 
+	const unsigned short AIRBAGLOCATION_DRIVER = 0;    
+	const unsigned short AIRBAGLOCATION_PASSENGER= 1;    
+	const unsigned short AIRBAGLOCATION_LEFTSIDE = 2;    
+	const unsigned short AIRBAGLOCATION_RIGHTSIDE = 3;    
+	const unsigned short AIRBAGSTATUS_INACTIVE = 0;    
+	const unsigned short AIRBAGSTATUS_ACTIVE = 1;    
+	const unsigned short AIRBAGSTATUS_DEPLOYED = 2;    
+
+	/**  AirbagStatus
+	 *   \brief MUST returns a dictionary of Airbag (byte) and Status (byte) (see 
+	 **/
+	readonly attribute object AirbagStatus;
+};
+
+[NoInterfaceObject]
+interface DoorStatus : VehiclePropertyType  { 
+	const unsigned short DOORLOCATION_DRIVER= 0;    
+	const unsigned short DOORLOCATION_PASSENGER = 1;    
+	const unsigned short DOORLOCATION_LEFTREAR = 2;    
+	const unsigned short DOORLOCATION_RIGHTREAR = 3;    
+	const unsigned short DOORLOCATION_TRUNK = 4;    
+	const unsigned short DOORLOCATION_FUELCAP = 5;    
+	const unsigned short DOORLOCATION_HOOD = 6;    
+	const unsigned short DOORSTATUS_CLOSED = 0;    
+	const unsigned short DOORSTATUS_OPEN = 1;    
+	const unsigned short DOORSTATUS_AJAR = 2;    
+
+	/**  DoorStatus
+	 *   \brief MUST returns dictionary of Door (byte) and Status (byte).  See 
+	 **/
+	readonly attribute object DoorStatus;
+
+	/**  DoorLockStatus
+	 *   \brief MUST returns dictionary of Door (byte) and Status (bool locked = true, unlocked = false).  See 
+	 **/
+	readonly attribute object DoorLockStatus;
+
+	/**  ChildLockStatus
+	 *   \brief MUST returns Child lock status of rear doors.  active = true, inactive = false.    
+	 *   Setting this to 'true' will prevent the rear doors from being opened    
+	 *   from the inside.    
+	 **/
+	readonly attribute boolean ChildLockStatus;
+};
+
+[NoInterfaceObject]
+interface SeatBeltStatus : VehiclePropertyType  { 
+	const unsigned short SEATBELTLOCATION_DRIVER= 0;    
+	const unsigned short SEATBELTLOCATION_MIDDLEFRONT = 1;    
+	const unsigned short SEATBELTLOCATION_PASSENGER = 2;    
+	const unsigned short SEATBELTLOCATION_LEFTREAR = 3;    
+	const unsigned short SEATBELTLOCATION_MIDDLEREAR = 4;    
+	const unsigned short SEATBELTLOCATION_RIGHTREAR = 5;    
+
+	/**  SeatBeltStatus
+	 *   \brief MUST returns dictionary of Seat Belt (byte, see 
+	 **/
+	readonly attribute object SeatBeltStatus;
+};
+
+[NoInterfaceObject]
+interface OccupantStatus : VehiclePropertyType  { 
+	const unsigned short OCCUPANTLOCATION_DRIVER = 0;    
+	const unsigned short OCCUPANTLOCATION_FRONTMIDDLE = 1;    
+	const unsigned short OCCUPANTLOCATION_PASSENGER= 2;    
+	const unsigned short OCCUPANTLOCATION_LEFTREAR = 3;    
+	const unsigned short OCCUPANTLOCATION_MIDDLEREAR = 4;    
+	const unsigned short OCCUPANTLOCATION_RIGHTREAR = 5;    
+	const unsigned short OCCUPANTSTATUS_VACANT = 0;    
+	const unsigned short OCCUPANTSTATUS_CHILD = 1;    
+	const unsigned short OCCUPANTSTATUS_ADULT = 2;    
+
+	/**  OccupantStatus
+	 *   \brief MUST returns dictionary of Occupant (byte see 
+	 **/
+	readonly attribute object OccupantStatus;
+};
+
+[NoInterfaceObject]
+interface ObstacleDistance : VehiclePropertyType  { 
+	const unsigned short DISTANCESENSORLOCATION_LEFTFRONT = 0;    
+	const unsigned short DISTANCESENSORLOCATION_RIGHTFRONT = 1;    
+	const unsigned short DISTANCESENSORLOCATION_LEFTREAR = 2;    
+	const unsigned short DISTANCESENSORLOCATION_RIGHTREAR = 3;    
+	const unsigned short DISTANCESENSORLOCATION_LEFTBLINDSPOT = 4;    
+	const unsigned short DISTANCESENSORLOCATION_RIGHTBLINDSPOT = 5;    
+
+	/**  ObstacleDistance
+	 *   \brief MUST returns dictionary of Distance Sensor (byte, see 
+	 **/
+	readonly attribute object ObstacleDistance;
 };
 
 };
