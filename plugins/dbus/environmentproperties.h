@@ -86,7 +86,7 @@ public:
 		 * @attributeName WindshieldWiper
 		 * @type unsigned short
 		 * @access readonly
-		 * @attributeComment \brief Must return Level of windshield whiper speed (see WIPERSPEED_*)
+		 * @attributeComment \brief Must return Level of windshield whiper speed (see WIPERSPEED_)
 		 */
 		wantPropertyVariant(VehicleProperty::RainSensor, "WindshieldWiper", "y", AbstractProperty::ReadWrite);
 		supportedChanged(re->supported());
@@ -219,7 +219,8 @@ public:
 		 * @attributeName WindowStatus
 		 * @type object
 		 * @access readwrite
-		 * @attributeComment \brief Must return window status for each window location.  object returned is a dictionary { unsigned short windowlocation, unsigned short percentage opened }
+		 * @attributeComment \brief Must return window status for each window location.  object returned is a
+		 * @attributeComment dictionary { unsigned short windowlocation, unsigned short percentage opened }
 		 */
 		wantPropertyVariant(VehicleProperty::WindowStatus,"WindowStatus","a(bb)", AbstractProperty::ReadWrite);
 	}

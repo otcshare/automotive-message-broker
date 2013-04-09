@@ -35,6 +35,7 @@ public:
 		/** @attributeName ParkingBrake
 		 *  @type boolean
 		 *  @access readonly
+		 *  @attributeComment must return status of parking brake:  Engaged = true, Disengaged = false.
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingBrakeStatus,"ParkingBrake", "b", AbstractProperty::Read);
 
@@ -52,6 +53,7 @@ public:
 		/** @attributeName ParkingLight
 		 *  @type boolean
 		 *  @access readonly
+		 *  @attributeComment must return status of parking light:  Engaged = true, Disengaged = false.
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingLightStatus,"ParkingLight", "b", AbstractProperty::Read);
 
@@ -69,6 +71,7 @@ public:
 		/** @attributeName HazardLight
 		 *  @type boolean
 		 *  @access readonly
+		 *  @attributeComment must return status of hazard light:  Engaged = true, Disengaged = false.
 		 **/
 		wantProperty<bool>(VehicleProperty::HazardLightStatus,"HazardLight", "b", AbstractProperty::Read);
 

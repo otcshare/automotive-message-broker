@@ -163,7 +163,7 @@ public:
 		/** @attributeName SeatBeltStatus
 		 *  @type object
 		 *  @access readonly
-		 *  @attributeComment \brief MUST returns dictionary of Seat Belt (byte, see SEATBELTLOCATION_*) and Status (bool: Fasten = true, Unfastened = false)
+		 *  @attributeComment \brief MUST returns dictionary of Seat Belt (byte, see SEATBELTLOCATION) and Status (bool: Fasten = true, Unfastened = false)
 		 **/
 		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "SeatBeltStatus", "a(yb)", AbstractProperty::Read);
 
@@ -196,7 +196,7 @@ public:
 		/** @attributeName OccupantStatus
 		 *  @type object
 		 *  @access readonly
-		 *  @attributeComment \brief MUST returns dictionary of Occupant (byte see OCCUPANTLOCATION_*) and Status (byte, see OCCUPANTSTATUS_*)
+		 *  @attributeComment \brief MUST returns dictionary of Occupant (byte see OCCUPANTLOCATION) and Status (byte, see OCCUPANTSTATUS_*)
 		 **/
 		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", "a(yy)", AbstractProperty::Read);
 
@@ -224,7 +224,7 @@ public:
 		/** @attributeName ObstacleDistance
 		 *  @type object
 		 *  @access readonly
-		 *  @attributeComment \brief MUST returns dictionary of Distance Sensor (byte, see DISTANCESENSORLOCATION_*) and distance (double) in m.
+		 *  @attributeComment \brief MUST returns dictionary of Distance Sensor (byte, see DISTANCESENSORLOCATION) and distance (double) in m.
 		 **/
 		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", "a{yd}", AbstractProperty::Read);
 

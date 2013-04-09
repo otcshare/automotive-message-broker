@@ -1,5 +1,3 @@
-Tizen implements VehicleObject; 
-
 callback VehiclePropertyCallback = void (VehiclePropertyType value); 
 
 callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); 
@@ -20,96 +18,270 @@ Details.
 module Vehicle {
 [NoInterfaceObject]
 interface VehicleSpeed : VehiclePropertyType  { 
+
+	/**  VehicleSpeed
+	 *   \brief  Must return Vehicle Speed in kilometers per hour.    
+	 **/
 	readonly attribute unsigned long VehicleSpeed;
 };
 
 [NoInterfaceObject]
 interface EngineSpeed : VehiclePropertyType  { 
+
+	/**  EngineSpeed
+	 *   \brief  Must return Engine Speed in rotations per minute.    
+	 **/
 	readonly attribute unsigned long EngineSpeed;
 };
 
 [NoInterfaceObject]
 interface VehiclePowerMode : VehiclePropertyType  { 
+	const unsigned short VEHICLEPOWERMODE_OFF = 0,    
+	const unsigned short VEHICLEPOWERMODE_ACCESSORY1 = 1,    
+	const unsigned short VEHICLEPOWERMODE_ACCESSORY2 = 2,    
+	const unsigned short VEHICLEPOWERMODE_RUN = 3;    
+
+	/**  VehiclePowerMode
+	 *   \brief  Must return Vehicle Power mode (see VEHICLEPOWERMODE)    
+	 **/
 	readonly attribute octet VehiclePowerMode;
 };
 
 [NoInterfaceObject]
 interface TripMeter : VehiclePropertyType  { 
+
+	/**  TripMeterA
+	 *   \brief  Must return trip meter A.  Setting this will reset the value to '0'.    
+	 **/
 	 attribute unsigned short TripMeterA;
+
+	/**  TripMeterB
+	 *   \brief  Must return trip meter B.  Setting this will reset the value to '0'.    
+	 **/
 	 attribute unsigned short TripMeterB;
+
+	/**  TripMeterC
+	 *   \brief  Must return trip meter C.  Setting this will reset the value to '0'.    
+	 **/
 	 attribute unsigned short TripMeterC;
 };
 
 [NoInterfaceObject]
 interface Acceleration : VehiclePropertyType  { 
+
+	/**  X
+	 *   \brief  Must return acceleration on the "X" axis as 1/1000 G (gravitational force).    
+	 **/
 	readonly attribute unsigned short X;
+
+	/**  Y
+	 *   \brief  Must return acceleration on the "Y" axis as 1/1000 G (gravitational force).    
+	 **/
 	readonly attribute unsigned short Y;
+
+	/**  Z
+	 *   \brief  Must return acceleration on the "Z" axis as 1/1000 G (gravitational force).    
+	 **/
 	readonly attribute unsigned short Z;
 };
 
 [NoInterfaceObject]
 interface Transmission : VehiclePropertyType  { 
-	readonly attribute octet ShiftPosition;
+	const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0;    
+	const unsigned short TRANSMISSIONPOSITION_FIRST = 1;    
+	const unsigned short TRANSMISSIONPOSITION_SECOND = 2;    
+	const unsigned short TRANSMISSIONPOSITION_THIRD = 3;    
+	const unsigned short TRANSMISSIONPOSITION_FORTH = 4;    
+	const unsigned short TRANSMISSIONPOSITION_FIFTH = 5;    
+	const unsigned short TRANSMISSIONPOSITION_SIXTH = 6;    
+	const unsigned short TRANSMISSIONPOSITION_SEVENTH = 7;    
+	const unsigned short TRANSMISSIONPOSITION_EIGHTH = 8;    
+	const unsigned short TRANSMISSIONPOSITION_NINTH = 9;    
+	const unsigned short TRANSMISSIONPOSITION_TENTH = 10;    
+	const unsigned short TRANSMISSIONPOSITION_CVT = 64;    
+	const unsigned short TRANSMISSIONPOSITION_REVERSE = 128;    
+	const unsigned short TRANSMISSIONPOSITION_PARK = 255;    
+	const unsigned short TRANSMISSIONMODE_NORMAL = 0;    
+	const unsigned short TRANSMISSIONMODE_SPORT = 1;    
+	const unsigned short TRANSMISSIONMODE_ECONOMY = 2;    
+	const unsigned short TRANSMISSIONMODE_OEMCUSTOM1 = 3;    
+	const unsigned short TRANSMISSIONMODE_OEMCUSTOM2 = 4;    
+
+	/**  GearPosition
+	 *   \brief  Must return transmission gear position (see TRANSMISSIONPOSITION)    
+	 **/
 	readonly attribute octet GearPosition;
+
+	/**  Mode
+	 *   \brief  Must return transmission Mode (see 
+	 **/
 	readonly attribute octet Mode;
 };
 
 [NoInterfaceObject]
 interface CruiseControlStatus : VehiclePropertyType  { 
+
+	/**  Activated
+	 *   \brief  Must return whether or not the Cruise Control system is active (true) or inactive (false)    
+	 **/
 	readonly attribute boolean Activated;
+
+	/**  Speed
+	 *   \brief  Must return target Cruise Control speed in kilometers per hour (kph).    
+	 **/
 	readonly attribute unsigned short Speed;
 };
 
 [NoInterfaceObject]
 interface WheelBrake : VehiclePropertyType  { 
+
+	/**  Engaged
+	 *   \brief  Must return Wheel Brake status: Engaged = true, disengaged = false    
+	 **/
 	readonly attribute boolean Engaged;
 };
 
 [NoInterfaceObject]
 interface LightStatus : VehiclePropertyType  { 
+
+	/**  Head
+	 *   \brief  Must return headlight status: on = true, off = false.    
+	 **/
 	readonly attribute boolean Head;
+
+	/**  RightTurn
+	 *   \brief  Must return right turn signal status: on = true, off = false.    
+	 **/
 	readonly attribute boolean RightTurn;
+
+	/**  LeftTurn
+	 *   \brief  Must return left turn signal status: on = true, off = false.    
+	 **/
 	readonly attribute boolean LeftTurn;
+
+	/**  Brake
+	 *   \brief  Must return  brake signal light status: on = true, off = false.    
+	 **/
 	readonly attribute boolean Brake;
+
+	/**  Fog
+	 *   \brief  Must return fog light status: on = true, off = false.    
+	 **/
 	readonly attribute boolean Fog;
+
+	/**  Hazard
+	 *   \brief  Must return hazard light status: on = true, off = false.    
+	 **/
 	readonly attribute boolean Hazard;
+
+	/**  Parking
+	 *   \brief  Must return parking light status: on = true, off = false.    
+	 **/
 	readonly attribute boolean Parking;
+
+	/**  HighBeam
+	 *   \brief  Must return high beam status: on = true, off = false.    
+	 **/
 	readonly attribute boolean HighBeam;
 };
 
 [NoInterfaceObject]
 interface InteriorLightStatus : VehiclePropertyType  { 
+
+	/**  Passenger
+	 *   \brief  Must return passenger interior light status: on = true, off = false    
+	 **/
 	readonly attribute boolean Passenger;
+
+	/**  Driver
+	 *   \brief  Must return driver interior light status: on = true, off = false    
+	 **/
 	readonly attribute boolean Driver;
+
+	/**  Center
+	 *   \brief  Must return center interior light status: on = true, off = false    
+	 **/
 	readonly attribute boolean Center;
 };
 
 [NoInterfaceObject]
 interface Horn : VehiclePropertyType  { 
+
+	/**  On
+	 *   \brief  Must return horn status: on = true, off = false    
+	 **/
 	readonly attribute boolean On;
 };
 
 [NoInterfaceObject]
 interface Fuel : VehiclePropertyType  { 
+
+	/**  Level
+	 *   \brief  Must return fuel level as a percentage of fullness.    
+	 **/
 	readonly attribute unsigned short Level;
+
+	/**  Range
+	 *   \brief  Must return estimated fuel range in kilometers.    
+	 **/
 	readonly attribute unsigned short Range;
+
+	/**  InstantConsumption
+	 *   \brief  Must return instant fuel consumption in milliliters of fuel per second.    
+	 **/
 	readonly attribute unsigned short InstantConsumption;
+
+	/**  InstantEconomy
+	 *   \brief  Must return instant fuel 'economy' in kilometers per liter of fuel.    
+	 **/
 	readonly attribute unsigned short InstantEconomy;
+
+	/**  AverageEconomy
+	 *   \brief  Must return average fuel 'economy' in kilometers per liter of fuel since last reset.  Setting this to any value should reset the counter to '0'    
+	 **/
 	 attribute unsigned short AverageEconomy;
 };
 
 [NoInterfaceObject]
 interface EngineOil : VehiclePropertyType  { 
+
+	/**  Remaining
+	 *   \brief  Must return remaining engine oil as percentage of fullness.    
+	 **/
 	readonly attribute unsigned short Remaining;
+
+	/**  Temperature
+	 *   \brief  Must return Engine Oil Temperature in Celcius.    
+	 **/
 	readonly attribute long Temperature;
+
+	/**  Pressure
+	 *   \brief  Must return Engine Oil Pressure in kPa.    
+	 **/
 	readonly attribute unsigned short Pressure;
 };
 
 [NoInterfaceObject]
 interface Location : VehiclePropertyType  { 
+
+	/**  Latitude
+	 *   \brief  Must return latitude in Deg.Min (-180, +180)    
+	 **/
 	readonly attribute double Latitude;
+
+	/**  Longitude
+	 *   \brief  Must return longitude in Deg.Min (-90, +90)    
+	 **/
 	readonly attribute double Longitude;
+
+	/**  Altitude
+	 *   \brief  Must return altitude in meters above sea-level (0).    
+	 **/
 	readonly attribute double Altitude;
+
+	/**  Direction
+	 *   \brief  Must return direction in Degrees  (0-360)    
+	 **/
 	readonly attribute unsigned short Direction;
 };
 
@@ -153,7 +325,7 @@ interface WindshieldWiper : VehiclePropertyType  {
 	const unsigned short WIPERSPEED_AUTO = 10;    
 
 	/**  WindshieldWiper
-	 *   \brief Must return Level of windshield whiper speed (see 
+	 *   \brief Must return Level of windshield whiper speed (see WIPERSPEED_)    
 	 **/
 	readonly attribute unsigned short WindshieldWiper;
 };
@@ -231,7 +403,8 @@ interface WindowStatus : VehiclePropertyType  {
 	const unsigned short WINDOWLOCATION_REAR = 4;    
 
 	/**  WindowStatus
-	 *   \brief Must return window status for each window location.  object returned is a dictionary { unsigned short windowlocation, unsigned short percentage opened }    
+	 *   \brief Must return window status for each window location.  object returned is a    
+	 *   dictionary { unsigned short windowlocation, unsigned short percentage opened }    
 	 **/
 	readwrite attribute object WindowStatus;
 };
@@ -480,22 +653,34 @@ interface SecurityAlert : VehiclePropertyType  {
 
 [NoInterfaceObject]
 interface ParkingBrake : VehiclePropertyType  { 
+
+	/**  ParkingBrake
+	 *   must return status of parking brake:  Engaged = true, Disengaged = false.    
+	 **/
 	readonly attribute boolean ParkingBrake;
 };
 
 [NoInterfaceObject]
 interface ParkingLight : VehiclePropertyType  { 
+
+	/**  ParkingLight
+	 *   must return status of parking light:  Engaged = true, Disengaged = false.    
+	 **/
 	readonly attribute boolean ParkingLight;
 };
 
 [NoInterfaceObject]
 interface HazardLight : VehiclePropertyType  { 
+
+	/**  HazardLight
+	 *   must return status of hazard light:  Engaged = true, Disengaged = false.    
+	 **/
 	readonly attribute boolean HazardLight;
 };
 
-[NoInterfaceObject]
-interface VehicleObject  { 
-	readonly attribute Vehicle ;
+partial 
+interface Navigator   { 
+	readonly attribute Vehicle vehicle;
 };
 
 [NoInterfaceObject]
@@ -522,10 +707,34 @@ interface VehiclePropertyError   {
 
 [NoInterfaceObject]
 interface Vehicle  { 
+	/**  
+	 *  \brief returns supported properties  
+	**/
 	sequence<DOMString> getSupported();  
+	/**  
+	 *  \brief fetch the current value for 'property'.  
+	 *  \arg DOMString property is the property  
+	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
+	 *  \arg VehiclePropertyErrorCallback this function is called when an error has occured.  
+	**/
 	get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+	/**  
+	 *  \brief set the given property to value  
+	 *  \arg DOMString property property to set  
+	 *  \arg VehiclePropertyType value value to set  
+	 *  \arg SuccessCallback successCallback callback if operation is successfull  
+	 *  \arg VehiclePropertyErrorCallback errorCallback callback if error has been called.  
+	**/
 	set(DOMString property, VehiclePropertyType value, optional SuccessCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
-	getHistory(DOMString property, Date startTime, Date endTime, VehicleHistoryListCallback successCallback, VehiclePropertyErrorCallback errorCallback);  
+	/**  
+	 *  \brief get values for a given property within a certain past time period between 'startTime' and 'endTime'  
+	 *  \arg DOMString property property to request  
+	 *  \arg Date startTime, starting period of time.  
+	 *  \arg Date endTime, ending period of time.  
+	 *  \arg VehiclePropertyListCallback successCallback. Callback with the result of the method call  
+	 *  \arg VehiclePropertyErrorCallback errorCallback. Callback if an error has occurred.  
+	**/
+	getHistory(DOMString property, Date startTime, Date endTime, VehiclePropertyListCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
 };
 
 [NoInterfaceObject]
@@ -612,7 +821,7 @@ interface SeatBeltStatus : VehiclePropertyType  {
 	const unsigned short SEATBELTLOCATION_RIGHTREAR = 5;    
 
 	/**  SeatBeltStatus
-	 *   \brief MUST returns dictionary of Seat Belt (byte, see 
+	 *   \brief MUST returns dictionary of Seat Belt (byte, see SEATBELTLOCATION) and Status (bool: Fasten = true, Unfastened = false)    
 	 **/
 	readonly attribute object SeatBeltStatus;
 };
@@ -630,7 +839,7 @@ interface OccupantStatus : VehiclePropertyType  {
 	const unsigned short OCCUPANTSTATUS_ADULT = 2;    
 
 	/**  OccupantStatus
-	 *   \brief MUST returns dictionary of Occupant (byte see 
+	 *   \brief MUST returns dictionary of Occupant (byte see OCCUPANTLOCATION) and Status (byte, see 
 	 **/
 	readonly attribute object OccupantStatus;
 };
@@ -645,7 +854,7 @@ interface ObstacleDistance : VehiclePropertyType  {
 	const unsigned short DISTANCESENSORLOCATION_RIGHTBLINDSPOT = 5;    
 
 	/**  ObstacleDistance
-	 *   \brief MUST returns dictionary of Distance Sensor (byte, see 
+	 *   \brief MUST returns dictionary of Distance Sensor (byte, see DISTANCESENSORLOCATION) and distance (double) in m.    
 	 **/
 	readonly attribute object ObstacleDistance;
 };
