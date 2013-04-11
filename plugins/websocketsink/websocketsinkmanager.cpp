@@ -20,7 +20,6 @@
 #include "websocketsinkmanager.h"
 #include "websocketsink.h"
 #include <sstream>
-//#include <json-glib/json-glib.h>
 #include <json/json.h>
 #include <json/json_object.h>
 #include <json/json_tokener.h>

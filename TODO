@@ -12,3 +12,5 @@ Other:
 - DBus support for objects with multiple sources (ie battery(n)Voltage where 'n' is a battery source)
 - Clean up sink subscription process so that subscription only happens once regardless of whether the 
 property is supported or not at the time
+- enable ambd/config.d/
+

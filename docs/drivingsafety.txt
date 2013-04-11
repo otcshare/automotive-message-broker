@@ -43,7 +43,6 @@ Properties:
 			Driver = 0,
 			Passenger = 1,
 			LeftSide = 2,
-
 			RightSide = 3
 				
 			Status:
@@ -164,7 +163,7 @@ Properties:
 			LeftRear = 2,
 			RightRear = 3,
 			LeftBlindSpot = 4,
-			RightBlindSPot = 5
+			RightBlindSpot = 5
 				
 
 				

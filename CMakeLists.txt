@@ -17,8 +17,9 @@ set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The direc
 set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE PATH "The directory the docs will be installed to")
 
 option(use_qtcore "Use QCoreApplication mainloop " OFF)
+option(websocket_plugin "websocket source and sink plugins" OFF)
 option(tpms_plugin "TPMS plugin " OFF)
-option(obd2_plugin "OBD-II plugin" ON)
+option(obd2_plugin "OBD-II plugin" OFF)
 option(database_plugin "Database plugins" OFF)
 option(qt_bindings "AMB Qt DBus bindings" OFF)
 option(opencvlux_plugin "OpenCV Lux plugin" OFF)
@@ -84,6 +85,26 @@ add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
 add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+
+# packaging stuff:
+# Common things to every type of package
+SET(CPACK_PACKAGE_DESCRIPTION "daemon to access vehicle data")
+SET(CPACK_PACKAGE_NAME "automotive-message-broker")
+SET(CPACK_PACKAGE_EXECUTABLES "ambd")
+SET(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+SET(CPACK_STRIP_FILES true)
+SET(CPACK_PACKAGE_CONTACT "tripzero.kev@gmail.com")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
+
+
+# Always build .tar.gz and .sh files
+SET(CPACK_GENERATOR "STGZ;TGZ")
+
+SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "gpsd (>=2.0), libopencv, libjson0, libltdl7")
+SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION})
+
+INCLUDE(CPack)
 
 add_subdirectory(lib)
 add_subdirectory(ambd)
