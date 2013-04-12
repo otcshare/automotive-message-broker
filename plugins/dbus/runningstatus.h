@@ -93,23 +93,12 @@ public:
 	TripMeterProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("org.automotive.TripMeter","/org/automotive/runningstatus/TripMeter", re, connection, map<string, string>())
 	{
-		/** @attributeName TripMeterA
-		 *  @type unsigned short
-		 *  @attributeComment \brief  Must return trip meter A.  Setting this will reset the value to '0'.
+		/** @attributeName TripMeters
+		 *  @type sequence<unsigned long>
+		 *  @attributeComment \brief  Must return trip metes. Changing any items in the array will reset the item's value to '0''.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::TripMeterA, "A", "q", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::TripMeters, "TripMeters", "aq", AbstractProperty::ReadWrite);
 
-		/** @attributeName TripMeterB
-		 *  @type unsigned short
-		 *  @attributeComment \brief  Must return trip meter B.  Setting this will reset the value to '0'.
-		 **/
-		wantProperty<uint16_t>(VehicleProperty::TripMeterB, "B", "q", AbstractProperty::ReadWrite);
-
-		/** @attributeName TripMeterC
-		 *  @type unsigned short
-		 *  @attributeComment \brief  Must return trip meter C.  Setting this will reset the value to '0'.
-		 **/
-		wantProperty<uint16_t>(VehicleProperty::TripMeterC, "C", "q", AbstractProperty::ReadWrite);
 		supportedChanged(re->supported());
 	}
 };

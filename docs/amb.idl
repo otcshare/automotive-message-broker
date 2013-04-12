@@ -7,9 +7,84 @@ Details.
 \brief Allows access to the vehicle API 
 
 
+
 */
 
 module Vehicle {
+
+partial interface Navigator   { 
+	readonly attribute Vehicle vehicle;
+};
+
+[NoInterfaceObject]
+interface VehiclePropertyType  { 
+	readonly attribute Date timeStamp;
+};
+
+[NoInterfaceObject]
+interface VehiclePropertyError   { 
+	const unsigned short PERMISSION_DENIED = 1; 
+	const unsigned short PROPERTY_UNAVAILABLE = 2; 
+	const unsigned short TIMEOUT = 3; 
+	const unsigned short UNKNOWN = 10;
+	
+	/**  code
+	 *   MUST return error code. 
+	 **/
+	readonly attribute unsigned short code;
+
+	/**  message
+	 *   MUST return error message 
+	 **/
+	readonly attribute DOMString message;
+};
+
+callback VehiclePropertyCallback = void (VehiclePropertyType value); 
+
+callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); 
+
+callback VehiclePropertyListCallback = void (sequence<VehiclePropertyType> values); 
+
+callback SupportedPropertiesCallback = void (sequence<DOMString> properties);
+
+
+[NoInterfaceObject]
+interface Vehicle  { 
+
+	/**  
+	 *  \brief returns supported properties  
+	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
+     *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
+	**/
+    getSupported(SupportedPropertiesCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
+	/**  
+	 *  \brief fetch the current value for 'property'.  
+     *  \arg DOMString property is the requested property to be retrieved.
+	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
+     *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
+	**/
+	get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+	
+	/**  
+	 *  \brief set the given property to value  
+	 *  \arg DOMString property property to set  
+	 *  \arg VehiclePropertyType value value to set  
+     *  \arg VehiclePropertyCallback successCallback callback if operation is successfull
+	 *  \arg VehiclePropertyErrorCallback errorCallback callback if error has been called.  
+	**/
+    set(DOMString property, VehiclePropertyType value, optional VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
+        
+	/**  
+	 *  \brief get values for a given property within a certain past time period between 'startTime' and 'endTime'  
+	 *  \arg DOMString property property to request  
+	 *  \arg Date startTime, starting period of time.  
+	 *  \arg Date endTime, ending period of time.  
+	 *  \arg VehiclePropertyListCallback successCallback. Callback with the result of the method call  
+	 *  \arg VehiclePropertyErrorCallback errorCallback. Callback if an error has occurred.  
+	**/
+	getHistory(DOMString property, Date startTime, Date endTime, VehiclePropertyListCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+};
+
 [NoInterfaceObject]
 interface VehicleSpeed : VehiclePropertyType  { 
 
@@ -44,20 +119,10 @@ interface VehiclePowerMode : VehiclePropertyType  {
 [NoInterfaceObject]
 interface TripMeter : VehiclePropertyType  { 
 
-	/**  TripMeterA
-	 *   \brief  Must return trip meter A.  Setting this will reset the value to '0'.    
+	/**  TripMeters
+	 *   \brief  Must return trip meters.  Changing any items in the array will reset the item's value to '0'.
 	 **/
-	 attribute unsigned short TripMeterA;
-
-	/**  TripMeterB
-	 *   \brief  Must return trip meter B.  Setting this will reset the value to '0'.    
-	 **/
-	 attribute unsigned short TripMeterB;
-
-	/**  TripMeterC
-	 *   \brief  Must return trip meter C.  Setting this will reset the value to '0'.    
-	 **/
-	 attribute unsigned short TripMeterC;
+	 attribute sequence<unsigned long> TripMeters;
 };
 
 [NoInterfaceObject]
@@ -323,6 +388,11 @@ interface WindshieldWiper : VehiclePropertyType  {
 	 **/
 	readonly attribute unsigned short WindshieldWiper;
 };
+
+dictionary DefrostDictionary {
+	unsigned short window;
+	boolean defrost;
+}
 
 [NoInterfaceObject]
 interface HVAC : VehiclePropertyType  { 
@@ -670,78 +740,6 @@ interface HazardLight : VehiclePropertyType  {
 	 *   must return status of hazard light:  Engaged = true, Disengaged = false.    
 	 **/
 	readonly attribute boolean HazardLight;
-};
-
-partial interface Navigator   { 
-	readonly attribute Vehicle vehicle;
-};
-
-[NoInterfaceObject]
-interface VehiclePropertyType  { 
-	readonly attribute Date timeStamp;
-};
-
-[NoInterfaceObject]
-interface VehiclePropertyError   { 
-	const unsigned short PERMISSION_DENIED = 1; 
-	const unsigned short PROPERTY_UNAVAILABLE = 2; 
-	const unsigned short TIMEOUT = 3; 
-
-	/**  code
-	 *   MUST return error code. 
-	 **/
-	readonly attribute unsigned short code;
-
-	/**  message
-	 *   MUST return error message 
-	 **/
-	readonly attribute DOMString message;
-};
-
-callback VehiclePropertyCallback = void (VehiclePropertyType value); 
-
-callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); 
-
-callback VehiclePropertyListCallback = void (sequence<VehiclePropertyType> values); 
-
-callback SupportedPropertiesCallback = void (sequence<DOMString> properties);
-
-
-[NoInterfaceObject]
-interface Vehicle  { 
-
-	/**  
-	 *  \brief returns supported properties  
-	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
-         *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
-	**/
-        getSupported(SupportedPropertiesCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
-	/**  
-	 *  \brief fetch the current value for 'property'.  
-         *  \arg DOMString property is the requested property to be retrieved.
-	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
-         *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
-	**/
-	get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
-	
-	/**  
-	 *  \brief set the given property to value  
-	 *  \arg DOMString property property to set  
-	 *  \arg VehiclePropertyType value value to set  
-         *  \arg VehiclePropertyCallback successCallback callback if operation is successfull
-	 *  \arg VehiclePropertyErrorCallback errorCallback callback if error has been called.  
-	**/
-        set(DOMString property, VehiclePropertyType value, optional VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
-        
-	/**  
-	 *  \brief get values for a given property within a certain past time period between 'startTime' and 'endTime'  
-	 *  \arg DOMString property property to request  
-	 *  \arg Date startTime, starting period of time.  
-	 *  \arg Date endTime, ending period of time.  
-	 *  \arg VehiclePropertyListCallback successCallback. Callback with the result of the method call  
-	 *  \arg VehiclePropertyErrorCallback errorCallback. Callback if an error has occurred.  
-	**/
-	getHistory(DOMString property, Date startTime, Date endTime, VehiclePropertyListCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
 };
 
 [NoInterfaceObject]

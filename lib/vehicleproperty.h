@@ -418,10 +418,8 @@ public:
 	static const Property VehiclePowerMode;
 	typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
-	static const Property TripMeterA;
-	static const Property TripMeterB;
-	static const Property TripMeterC;
-	typedef BasicPropertyType<uint16_t> TripMeterType;
+	static const Property TripMeters;
+	typedef ListPropertyType<BasicPropertyType<uint16_t> > TripMetersType;
 
 	static const Property CruiseControlActive;
 	typedef BasicPropertyType<bool> CruiseControlActiveType;

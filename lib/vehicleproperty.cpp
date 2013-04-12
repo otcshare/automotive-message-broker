@@ -73,9 +73,7 @@ const VehicleProperty::Property VehicleProperty::TireTemperatureRightFront = "Ti
 const VehicleProperty::Property VehicleProperty::TireTemperatureLeftRear = "TireTemperatureLeftRear";
 const VehicleProperty::Property VehicleProperty::TireTemperatureRightRear = "TireTemperatureRightRear";
 const VehicleProperty::Property VehicleProperty::VehiclePowerMode = "VehiclePowerMode";
-const VehicleProperty::Property VehicleProperty::TripMeterA = "TripMeterA";
-const VehicleProperty::Property VehicleProperty::TripMeterB = "TripMeterB";
-const VehicleProperty::Property VehicleProperty::TripMeterC = "TripMeterC";
+const VehicleProperty::Property VehicleProperty::TripMeters = "TripMeters";
 const VehicleProperty::Property VehicleProperty::CruiseControlActive = "CruiseControlActive";
 const VehicleProperty::Property VehicleProperty::CruiseControlSpeed = "CruiseControlSpeed";
 const VehicleProperty::Property VehicleProperty::LightHead = "LightHead";
@@ -192,9 +190,12 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftRear,TireTemperatureType,0);
 	REGISTERPROPERTYWITHTYPE(TireTemperatureRightRear,TireTemperatureType,0);
 	registerPropertyPriv( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
-	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
-	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
-	REGISTERPROPERTYWITHTYPE(TripMeterC,TripMeterType,0);
+	registerPropertyPriv(TripMeters,[](){
+		TripMetersType* t = new TripMetersType();
+		t->append(0);
+		return t;
+	});
+
 	REGISTERPROPERTY(CruiseControlActive, false);
 	REGISTERPROPERTY(CruiseControlSpeed,0);
 	REGISTERPROPERTYWITHTYPE(LightHead, LightStatusType, false);
