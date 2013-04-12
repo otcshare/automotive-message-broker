@@ -1,9 +1,3 @@
-callback VehiclePropertyCallback = void (VehiclePropertyType value); 
-
-callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); 
-
-callback VehiclePropertyListCallback = void (sequence<VehiclePropertyType> values); 
-
 /**
 
 
@@ -678,8 +672,7 @@ interface HazardLight : VehiclePropertyType  {
 	readonly attribute boolean HazardLight;
 };
 
-partial 
-interface Navigator   { 
+partial interface Navigator   { 
 	readonly attribute Vehicle vehicle;
 };
 
@@ -705,27 +698,41 @@ interface VehiclePropertyError   {
 	readonly attribute DOMString message;
 };
 
+callback VehiclePropertyCallback = void (VehiclePropertyType value); 
+
+callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); 
+
+callback VehiclePropertyListCallback = void (sequence<VehiclePropertyType> values); 
+
+callback SupportedPropertiesCallback = void (sequence<DOMString> properties);
+
+
 [NoInterfaceObject]
 interface Vehicle  { 
+
 	/**  
 	 *  \brief returns supported properties  
+	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
+         *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
 	**/
-	sequence<DOMString> getSupported();  
+        getSupported(SupportedPropertiesCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
 	/**  
 	 *  \brief fetch the current value for 'property'.  
-	 *  \arg DOMString property is the property  
+         *  \arg DOMString property is the requested property to be retrieved.
 	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
-	 *  \arg VehiclePropertyErrorCallback this function is called when an error has occured.  
+         *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
 	**/
 	get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+	
 	/**  
 	 *  \brief set the given property to value  
 	 *  \arg DOMString property property to set  
 	 *  \arg VehiclePropertyType value value to set  
-	 *  \arg SuccessCallback successCallback callback if operation is successfull  
+         *  \arg VehiclePropertyCallback successCallback callback if operation is successfull
 	 *  \arg VehiclePropertyErrorCallback errorCallback callback if error has been called.  
 	**/
-	set(DOMString property, VehiclePropertyType value, optional SuccessCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+        set(DOMString property, VehiclePropertyType value, optional VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
+        
 	/**  
 	 *  \brief get values for a given property within a certain past time period between 'startTime' and 'endTime'  
 	 *  \arg DOMString property property to request  
