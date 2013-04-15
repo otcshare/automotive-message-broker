@@ -131,17 +131,17 @@ interface Acceleration : VehiclePropertyType  {
 	/**  X
 	 *   \brief  Must return acceleration on the "X" axis as 1/1000 G (gravitational force).    
 	 **/
-	readonly attribute unsigned short X;
+	readonly attribute unsigned long X;
 
 	/**  Y
 	 *   \brief  Must return acceleration on the "Y" axis as 1/1000 G (gravitational force).    
 	 **/
-	readonly attribute unsigned short Y;
+	readonly attribute unsigned long Y;
 
 	/**  Z
 	 *   \brief  Must return acceleration on the "Z" axis as 1/1000 G (gravitational force).    
 	 **/
-	readonly attribute unsigned short Z;
+	readonly attribute unsigned long Z;
 };
 
 [NoInterfaceObject]
