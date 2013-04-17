@@ -44,13 +44,11 @@ static struct libwebsocket_protocols protocols[] = {
 	{
 		"http-only",
 		callback_http_only,
-		0,
-		128,
+		0
 	},
 	{  /* end of list */
 		NULL,
 		NULL,
-		0,
 		0
 	}
 };
@@ -528,7 +526,7 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	clientConnected = false;
 	source = this;
 	m_re = re;  
-	struct lws_context_creation_info info;
+	/*struct lws_context_creation_info info;
 	memset(&info, 0, sizeof info);
 	info.protocols = protocols;
 	info.extensions = libwebsocket_get_internal_extensions();
@@ -539,7 +537,8 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	//info.ssl_ca_filepath = ssl_key_path.c_str();
 		
 	context = libwebsocket_create_context(&info);
-	//context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
+	*/
+	context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
 
 	setConfiguration(config);
 	re->setSupported(supported(), this);

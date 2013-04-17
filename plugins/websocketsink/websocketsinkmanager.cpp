@@ -60,8 +60,8 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
 	configuration = config;
-	struct lws_context_creation_info info;
-	memset(&info, 0, sizeof info);
+//	struct lws_context_creation_info info;
+//	memset(&info, 0, sizeof info);
 
 	//Default values
 	int port = 23000;
@@ -103,7 +103,7 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 			}
 		}
 	}
-	info.iface = interface.c_str();
+	/*info.iface = interface.c_str();
 	info.protocols = protocollist;
 	info.extensions = libwebsocket_get_internal_extensions();
 	info.gid = -1;
@@ -116,7 +116,9 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 		info.ssl_private_key_filepath = ssl_key_path.c_str();
 	}
 	context = libwebsocket_create_context(&info);
-	
+	*/
+
+	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions, NULL, NULL, -1, -1, options);
 }
 
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
