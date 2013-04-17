@@ -1,6 +1,6 @@
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system.
-Version:    0.6.9
+Version:    0.8.0
 Release:    1
 Group:      System Environment/Daemons
 License:    LGPL v2.1
@@ -8,6 +8,7 @@ URL:        https://github.com/otcshare/automotive-message-broker
 Source0:    %{name}-%{version}.tar.bz2
 Source100: ambd
 Requires: automotive-message-broker-plugins
+Requires: automotive-message-broker-plugins-websocket
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:	json-glib
@@ -19,6 +20,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  libwebsockets-devel
 BuildRequires:  libuuid-devel
 BuildRequires:  sqlite-devel
+BuildRequires:  opencv-devel
 
 %description
 Automotive Message Broker is a vehicle network abstraction system.
@@ -46,7 +48,33 @@ Group:      System Environment/Daemons
 Requires:   %{name} = %{version}-%{release}
 
 %description plugins
-Collection of plugins for automotive-message-broker
+Collection of plugins for automotive-message-broker.  Contains example, demo and dbus plugins.
+
+%package plugins-obd2
+Summary:    OBD-II plugin
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}-%{release}
+
+%description plugins-obd2
+OBD-II plugin that uses ELM 327-compatible scantools to access vehicle data
+
+%package plugins-websocket
+Summary:    websocket source and sink plugins
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}-%{release}
+Requires:   libwebsockets
+
+%description plugins-websocket
+websocket source and sink plugins
+
+%package plugins-wheel
+Summary:    source plugin for using the Logitech G27 racing wheel                                        
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}-%{release}
+Requires:   libwebsockets
+
+%description plugins-wheel
+source plugin for using the Logitech G27 racing wheel
 
 %package plugins-database
 Summary:    Database logging plugin for automotive-message-broker
@@ -57,11 +85,20 @@ Requires:  sqlite
 %description plugins-database
 Database logging plugin for automotive-message-broker
 
+%package plugins-opencvlux
+Summary:    Plugin for simulating ExteriorBrightness using a common webcam
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}-%{release}
+Requires:   opencv
+
+%description plugins-opencvlux
+Plugin for simulating ExteriorBrightness using a common webcam
+
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Ddatabase_plugin=ON
+%cmake -Ddatabase_plugin=ON -Dopencvlux_plugin=ON
 
 make %{?jobs:-j%jobs}
 
@@ -105,12 +142,32 @@ ln -s ../init.d/ambd %{buildroot}/etc/rc.d/rc5.d/S62ambd
 
 %files plugins
 %defattr(-,root,root,-)
-%{_libdir}/%{name}/*.so
+%{_libdir}/%{name}/examplesourceplugin.so
+%{_libdir}/%{name}/examplesinkplugin.so
+%{_libdir}/%{name}/dbussinkplugin.so
+%{_libdir}/%{name}/demosinkplugin.so
 /etc/dbus-1/system.d/amb.conf
+
+%files plugins-wheel
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/wheelsourceplugin.so
+
+%files plugins-websocket
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/websocketsourceplugin.so
+%{_libdir}/%{name}/websocketsinkplugin.so
+
+%files plugins-obd2
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/obd2sourceplugin.so
 
 %files plugins-database
 %defattr(-,root,root,-)
 %{_libdir}/%{name}/databasesinkplugin.so
+
+%files plugins-opencvlux
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/opencvluxplugin.so
 
 %files doc
 %defattr(-,root,root,-)
