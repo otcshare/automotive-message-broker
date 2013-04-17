@@ -28,23 +28,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "abstractsink.h"
 #include "abstractroutingengine.h"
 #include "debugout.h"
-
+#include "imainloop.h"
 
 
 using namespace std;
 
 typedef void* create_t(AbstractRoutingEngine*, map<string, string> );
-
+typedef void* create_mainloop_t(int argc, char** argv);
 
 class PluginLoader
 {
 
 public:
-	PluginLoader(string configFile, AbstractRoutingEngine* routingEngine);
+	PluginLoader(string configFile, AbstractRoutingEngine* routingEngine, int argc, char** argv);
 	~PluginLoader();
 
 	SourceList sources();
 	SinkList sinks();
+
+	IMainLoop* mainloop();
 
 	std::string errorString();
         
@@ -86,6 +88,39 @@ private: ///methods:
 		
 		return nullptr;
 	}
+
+	IMainLoop* loadMainLoop(string pluginName, int argc, char** argv)
+		{
+			DebugOut()<<"Loading plugin: "<<pluginName<<endl;
+
+			if(lt_dlinit())
+			{
+				mErrorString = lt_dlerror();
+				cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+				return nullptr;
+			}
+
+			lt_dlerror();
+
+			lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
+
+			if(!handle)
+			{
+				mErrorString = lt_dlerror();
+				cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+				return nullptr;
+			}
+
+			m_create = (create_mainloop_t *)lt_dlsym(handle, "create");
+
+			if(m_create)
+			{
+				void* obj = m_create(argc, argv);
+				return static_cast<IMainLoop*>( obj );
+			}
+
+			return nullptr;
+		}
 	
 private:
 	
@@ -98,6 +133,10 @@ private:
 	SinkList mSinks;
 	
 	create_t * f_create;
+	create_mainloop_t * m_create;
+
+
+	IMainLoop* mMainLoop;
 };
 
 #endif // PLUGINLOADER_H

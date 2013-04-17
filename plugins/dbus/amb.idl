@@ -1,0 +1,222 @@
+TizenimplementsVehicleObject;**/
+
+/**
+
+
+Details. 
+
+\def-api-feature http://tizen.org/api/vehicle 
+\brief Allows access to the vehicle API 
+
+
+*/
+
+module Vehicle {
+[NoInterfaceObject]
+interface VehicleSpeed { 
+	readonly attribute unsigned short VehicleSpeed;
+};
+
+[NoInterfaceObject]
+interface EngineSpeed { 
+	readonly attribute unsigned short EngineSpeed;
+};
+
+[NoInterfaceObject]
+interface VehiclePowerMode { 
+	readonly attribute octet VehiclePowerMode;
+};
+
+[NoInterfaceObject]
+interface TripMeter { 
+	 attribute unsigned short TripMeterA;
+	 attribute unsigned short TripMeterB;
+	 attribute unsigned short TripMeterC;
+};
+
+[NoInterfaceObject]
+interface Acceleration { 
+	readonly attribute unsigned short X;
+	readonly attribute unsigned short Y;
+	readonly attribute unsigned short Z;
+};
+
+[NoInterfaceObject]
+interface Transmission { 
+	readonly attribute octet ShiftPosition;
+	readonly attribute octet GearPosition;
+	readonly attribute octet Mode;
+};
+
+[NoInterfaceObject]
+interface CruiseControlStatus { 
+	readonly attribute boolean Activated;
+	readonly attribute unsigned short Speed;
+};
+
+[NoInterfaceObject]
+interface WheelBrake { 
+	readonly attribute boolean Engaged;
+};
+
+[NoInterfaceObject]
+interface LightStatus { 
+	readonly attribute boolean Head;
+	readonly attribute boolean RightTurn;
+	readonly attribute boolean LeftTurn;
+	readonly attribute boolean Brake;
+	readonly attribute boolean Fog;
+	readonly attribute boolean Hazard;
+	readonly attribute boolean Parking;
+	readonly attribute boolean HighBeam;
+};
+
+[NoInterfaceObject]
+interface InteriorLightStatus { 
+	readonly attribute boolean Passenger;
+	readonly attribute boolean Driver;
+	readonly attribute boolean Center;
+};
+
+[NoInterfaceObject]
+interface Horn { 
+	readonly attribute boolean On;
+};
+
+[NoInterfaceObject]
+interface Fuel { 
+	readonly attribute unsigned short Level;
+	readonly attribute unsigned short Range;
+	readonly attribute unsigned short InstantConsumption;
+	readonly attribute unsigned short InstantEconomy;
+	 attribute unsigned short AverageEconomy;
+};
+
+[NoInterfaceObject]
+interface EngineOil { 
+	readonly attribute unsigned short Remaining;
+	readonly attribute long Temperature;
+	readonly attribute unsigned short Pressure;
+};
+
+[NoInterfaceObject]
+interface Location { 
+	readonly attribute double Latitude;
+	readonly attribute double Longitude;
+	readonly attribute double Altitude;
+	readonly attribute unsigned short Direction;
+};
+
+[NoInterfaceObject]
+interface ExteriorBrightness { 
+};
+
+[NoInterfaceObject]
+interface VehicleId { 
+	readonly attribute DOMString WMI;
+	readonly attribute DOMString VIN;
+};
+
+[NoInterfaceObject]
+interface Size { 
+	readonly attribute unsigned long Width;
+	readonly attribute unsigned long Height;
+	readonly attribute unsigned long Length;
+};
+
+[NoInterfaceObject]
+interface FuelInfo { 
+	readonly attribute unsigned short Type;
+	readonly attribute unsigned short RefuelPosition;
+};
+
+[NoInterfaceObject]
+interface VehicleType { 
+	readonly attribute unsigned short Type;
+};
+
+[NoInterfaceObject]
+interface Doors { 
+	readonly attribute sequence<unsigned short> DoorsPerRow;
+};
+
+[NoInterfaceObject]
+interface TransmissionGearType { 
+	readonly attribute unsigned short TransmissionGearType;
+};
+
+[NoInterfaceObject]
+interface WheelInformation { 
+	readonly attribute unsigned short FrontWheelRadius;
+	readonly attribute unsigned short RearWheelRadius;
+	readonly attribute unsigned long WheelTrack;
+};
+
+[NoInterfaceObject]
+interface Odometer { 
+	readonly attribute unsigned long Odometer;
+};
+
+[NoInterfaceObject]
+interface Battery { 
+	readonly attribute double Voltage;
+	readonly attribute double Current;
+};
+
+[NoInterfaceObject]
+interface TirePressure { 
+	readonly attribute double LeftFront;
+	readonly attribute double RightFront;
+	readonly attribute double LeftRear;
+	readonly attribute double RightRear;
+};
+
+[NoInterfaceObject]
+interface TireTemperature { 
+	readonly attribute double LeftFront;
+	readonly attribute double RightFront;
+	readonly attribute double LeftRear;
+	readonly attribute double RightRear;
+};
+
+[NoInterfaceObject]
+interface SecurityAlert { 
+	readonly attribute boolean SecurityAlert;
+};
+
+[NoInterfaceObject]
+interface ParkingBrake { 
+	readonly attribute boolean ParkingBrake;
+};
+
+[NoInterfaceObject]
+interface ParkingLight { 
+	readonly attribute boolean ParkingLight;
+};
+
+[NoInterfaceObject]
+interface HazardLight { 
+	readonly attribute boolean HazardLight;
+};
+
+[NoInterfaceObject]
+interface VehicleObject { 
+	readonly attribute Vehicle ;
+};
+
+[NoInterfaceObject]
+interface VehiclePropertyType { 
+	readonly attribute object value;
+	readonly attribute Date timeStamp;
+};
+
+[NoInterfaceObject]
+interface Vehicle { 
+	sequence<DOMString> getSupported();  
+	object get(DOMString property);  
+	void set(DOMString property, object value);  
+	sequence<VehiclePropertyTypes> getHistory(DOMString type, Date startTime, Date endTime);  
+};
+
+};
+

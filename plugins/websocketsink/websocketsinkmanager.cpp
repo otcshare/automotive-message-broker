@@ -60,14 +60,16 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
 	configuration = config;
+//	struct lws_context_creation_info info;
+//	memset(&info, 0, sizeof info);
 
 	//Default values
 	int port = 23000;
 	std::string interface = "lo";
-	const char *ssl_cert_path = NULL;
-	const char *ssl_key_path = NULL;
+	std::string ssl_cert_path;
+	std::string ssl_key_path;
 	int options = 0;
-
+	bool ssl = false;
 	//Try to load config
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
@@ -81,8 +83,42 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 		{
 			port = boost::lexical_cast<int>((*i).second);
 		}
+		if ((*i).first == "cert")
+		{
+			ssl_cert_path = (*i).second;
+		}
+		if ((*i).first == "key")
+		{
+			ssl_key_path = (*i).second;
+		}
+		if ((*i).first == "ssl")
+		{
+			if ((*i).second == "true")
+			{
+				ssl = true;
+			}
+			else
+			{
+				ssl = false;
+			}
+		}
 	}
-	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions,ssl_cert_path, ssl_key_path, -1, -1, options);
+	/*info.iface = interface.c_str();
+	info.protocols = protocollist;
+	info.extensions = libwebsocket_get_internal_extensions();
+	info.gid = -1;
+	info.uid = -1;
+	info.options = options;
+	info.port = port;
+	if (ssl)
+	{
+		info.ssl_cert_filepath = ssl_cert_path.c_str();
+		info.ssl_private_key_filepath = ssl_key_path.c_str();
+	}
+	context = libwebsocket_create_context(&info);
+	*/
+
+	context = libwebsocket_create_context(port, interface.c_str(), protocollist,libwebsocket_internal_extensions, NULL, NULL, -1, -1, options);
 }
 
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property,string id)
@@ -120,7 +156,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	}
 	velocityRequest.completed = [socket,id,property](AsyncPropertyReply* reply)
 	{
-		printf("Got property:%s\n",reply->value->toString().c_str());
+		DebugOut()<<"Got property: "<<reply->value->toString().c_str()<<endl;
 		//uint16_t velocity = boost::any_cast<uint16_t>(reply->value);
 		stringstream s;
 		s.precision(15);
@@ -368,6 +404,8 @@ void WebSocketSinkManager::addPoll(int fd)
 {
 	GIOChannel *chan = g_io_channel_unix_new(fd);
 	guint sourceid = g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,chan);
+	g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,chan);
+	g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,chan);
 	g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 	m_ioChannelMap[fd] = chan;
 	m_ioSourceMap[fd] = sourceid;
@@ -413,6 +451,7 @@ void WebSocketSinkManager::removePoll(int fd)
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len)
 {
 	//printf("Switch: %i\n",reason);
+	DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "websocket_callback:" << reason << endl;
 
 
 	switch (reason)
@@ -744,16 +783,21 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
 			//printf("Adding poll %i\n",sinkManager);
-			//DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << (int)sinkManager << "\n";
+			DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "Adding poll" << endl;
 			if (sinkManager != 0)
 			{
-				sinkManager->addPoll((int)(long)user);
+				//sinkManager->addPoll((int)(long)user);
+				sinkManager->addPoll(libwebsocket_get_socket_fd(wsi));
+			}
+			else
+			{
+				DebugOut(5) << "Error, invalid sink manager!!" << endl;
 			}
 			break;
 		}
 		case LWS_CALLBACK_DEL_POLL_FD:
 		{
-			sinkManager->removePoll((int)(long)user);
+			sinkManager->removePoll(libwebsocket_get_socket_fd(wsi));
 			break;
 		}
 		case LWS_CALLBACK_SET_MODE_POLL_FD:
@@ -778,6 +822,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
+  DebugOut(5) << "Polling..." << condition << endl;
 	if (condition != G_IO_IN)
 	{
 		//Don't need to do anything
@@ -791,6 +836,7 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	}
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	//printf("Polling...%i\n",condition);
+	
 	lws_tokens token;
 	struct pollfd pollstruct;
 	int newfd = g_io_channel_unix_get_fd(source);

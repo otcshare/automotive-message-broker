@@ -2,45 +2,68 @@ Maintenance hierarchy
 =================
 
 Service         org.automotive
-Interface       org.automotive.maintenance
-Object path     /
 
-Properties	uint32 Odometer [readonly]
+
+Interface       org.automotive.odometer
+Object path     /org/automotive/maintenance/odometer
+Properties:
+
+		uint32 Odometer [readonly]
 
 			Distance in km
-			
-		byte TransmissionFluid [readonly]
-		
-			Remaining percentage
-		
-		byte BrakeFluid [readonly]
-		
-			Remaining percentage
-			
-		byte WasherFluid [readonly]
-		
-			Remaining percentage
-			
-		struct{ double, double } BatteryStatus [readonly]
-		
-			Voltage (double)
-			Current (double)
-			
-		dict{ byte, double } TirePressure [readonly]
-		
-			Tire (byte), Pressure (kPa)
-			Tire:
-			LeftFront = 0,
-			RightFront = 1,
-			LeftRear = 2,
-			RightRear = 3
 
-        dict( byte, double } TireTemperature [readonly]
+Interface       org.automotive.fluid
+Object path     /org/automotive/maintenance/fluid
+Properties:
 
-            Tire (byte), Temperature (C)
-            Tire:
-            LeftFront = 0,
-            RightFront = 1,
-            LeftRear = 2,
-            RightRear = 3				
+		
+		byte Transmission [readonly]
+		
+			Remaining percentage
+		
+		byte Brake [readonly]
+		
+			Remaining percentage
+			
+		byte Washer [readonly]
+		
+			Remaining percentage
+
+Interface       org.automotive.batteryStatus
+Object path     /org/automotive/maintenance/batteryStatus
+Properties:
+			
+		double Voltage [readonly]
+		
+		double Current [readonly]
+
+
+Interface       org.automotive.tirePressure
+Object path     /org/automotive/maintenance/tirePressure
+Properties:
+			
+		double LeftFront [readonly]
+		
+			Pressure (kPa)
+			
+		double RightFront [readonly]
+
+		double LeftRear [readonly]
+
+		double RightRear [readonly]
+
+
+Interface       org.automotive.tireTemperature
+Object path     /org/automotive/maintenance/tireTemperature
+Properties:
+
+		double LeftFront [readonly]
+
+                        Temperature of tire in Celsius (C)
+
+                double RightFront [readonly]
+
+                double LeftRear [readonly]
+
+                double RightRear [readonly]
 			

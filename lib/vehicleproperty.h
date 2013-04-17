@@ -27,8 +27,8 @@
 #include <sstream>
 #include <map>
 #include <functional>
-
 #include <abstractpropertytype.h>
+#include "mappropertytype.hpp"
 
 namespace ButtonEvents {
 enum ButtonEventType {
@@ -86,6 +86,13 @@ enum Mode {
 	OEMCustom1 = 3,
 	OEMCustom2 = 4
 };
+
+enum Type {
+	Unknown = -1,
+	Auto = 0,
+	Manual = 1,
+	CV = 2
+};
 }
 
 namespace Power {
@@ -104,13 +111,141 @@ enum PowerModes
 };
 }
 
+namespace Fuel{
+enum Type
+{
+	Unknown = -1,
+	Gasoline = 0,
+	High_Octane,
+	Diesel,
+	Electric,
+	Hydrogen
+};
+
+enum RefuelPosition
+{
+	UnknownPosition = -1,
+	Left = 0,
+	Right,
+	Front,
+	Rear
+};
+}
+
+namespace Vehicle {
+enum Type
+{
+	Unknown = -1,
+	Sedan = 0,
+	Coupe,
+	Cabriole,
+	Roadster,
+	SUV,
+	Truck
+};
+}
+
+namespace Security {
+enum Status
+{
+	Idle = 0,
+	Armed,
+	AlarmDetected
+};
+}
+
+namespace Airbag {
+enum Location
+{
+	Driver = 0,
+	Passenger,
+	LeftSide,
+	RightSide
+};
+
+enum Status
+{
+	Inactive = 0,
+	Active,
+	Deployed
+};
+
+}
+
+namespace Door {
+enum Location
+{
+	Driver=0,
+	Passenger,
+	LeftRear,
+	RightRear,
+	Trunk,
+	FuelCap,
+	Hood
+};
+
+enum Status
+{
+	Closed = 0,
+	Open,
+	Ajar
+};
+
+}
+
+namespace Seat
+{
+enum Location
+{
+	Driver = 0,
+	FrontMiddle = 1,
+	Passenger,
+	LeftRear,
+	MiddleRear,
+	RightRear
+};
+
+enum Status
+{
+	Vacant = 0,
+	Child,
+	Adult
+};
+}
+
+namespace Window
+{
+enum Location
+{
+	Driver = 0,
+	Passenger,
+	LeftRear,
+	RightRear,
+	Sunroof
+};
+}
+
+namespace DistanceSensor
+{
+enum Location
+{
+	LeftFront = 0,
+	RightFront = 1,
+	LeftRear = 2,
+	RightRear = 3,
+	LeftBlindSpot = 4,
+	RightBlindSPot = 5
+
+};
+}
+
 class VehicleProperty
 {
 
 public:
 	
 
-	VehicleProperty();
+	static void factory();
 
 	typedef std::string Property;
 	typedef std::function<AbstractPropertyType* (void)> PropertyTypeFactoryCallback;
@@ -161,6 +296,9 @@ public:
 	static const Property WheelBrake;
 	typedef BasicPropertyType<bool> WheelBrakeType;
 
+	static const Property WheelBrakePressure;
+	typedef BasicPropertyType<uint16_t> WheelBrakePressureType;
+
 	/**< Steering wheel angle (0-359) */
 	static const Property SteeringWheelAngle;
 	typedef BasicPropertyType<uint16_t> SteeringWheelAngleType;
@@ -210,6 +348,9 @@ public:
 	/**< Battery voltage in volts */
 	static const Property BatteryVoltage;
 	typedef BasicPropertyType<double> BatteryVoltageType;
+
+	static const Property BatteryCurrent;
+	typedef BasicPropertyType<double> BatteryCurrentType;
 
 	/**< Interior Air Temperature in degrees celcius */
 	static const Property InteriorTemperature;
@@ -295,6 +436,12 @@ public:
 	static const Property FuelAverageEconomy;
 	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
+	static const Property FuelType;
+	typedef BasicPropertyType<Fuel::Type> FuelTypeType;
+
+	static const Property FuelPositionSide;
+	typedef BasicPropertyType<Fuel::RefuelPosition> FuelPositionSideType;
+
 	static const Property ExteriorBrightness;
 	typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
 	
@@ -309,6 +456,105 @@ public:
 
 	static const Property Direction;
 	typedef BasicPropertyType<uint> DirectionType;
+
+	static const Property VehicleWidth;
+	static const Property VehicleHeight;
+	static const Property VehicleLength;
+	typedef BasicPropertyType<uint> VehicleSizeType;
+
+
+	static const Property VehicleType;
+	typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
+
+	static const Property DoorsPerRow;
+	typedef ListPropertyType<BasicPropertyType<uint16_t> > DoorsPerRowType;
+
+	static const Property TransmissionGearType;
+	typedef BasicPropertyType<Transmission::Type> TransmissionGearTypeType;
+
+	static const Property FrontWheelRadius;
+	static const Property RearWheelRadius;
+	typedef BasicPropertyType<uint16_t> WheelRadiusType;
+
+	static const Property WheelTrack;
+	typedef BasicPropertyType<uint> WheelTrackType;
+
+	static const Property Odometer;
+	typedef BasicPropertyType<uint> OdometerType;
+
+	/**< Transmission Fluid Level 0-100%.
+	 **/
+	static const Property TransmissionFluidLevel;
+	typedef BasicPropertyType<uint16_t> TransmissionFluidLevelType;
+
+	/**< Brake Fluid Level 0-100%.
+	 **/
+	static const Property BrakeFluidLevel;
+	typedef BasicPropertyType<uint16_t> BrakeFluidLevelType;
+
+	/**< Washer Fluid Level 0-100%.
+	 **/
+	static const Property WasherFluidLevel;
+	typedef BasicPropertyType<uint16_t> WasherFluidLevelType;
+
+	/**< Securty Alert Status
+	 * status of security alert
+	 * @see Security::Status
+	 */
+	static const Property SecurityAlertStatus;
+	typedef BasicPropertyType<Security::Status> SecurityAlertStatusType;
+
+	/**< Parking Brake Status
+	 * status of parking break active (true) or inactive (false)
+	 */
+	static const Property ParkingBrakeStatus;
+	typedef BasicPropertyType<bool> ParkingBrakeStatusType;
+
+	/**< Parking Light Status
+	 * status of parking lights active (true) or inactive (false)
+	 */
+	static const Property ParkingLightStatus;
+	typedef BasicPropertyType<bool> ParkingLightStatusType;
+
+	/**< Hazard Lights Status
+	 * status of parking lights active (true) or inactive (false)
+	 */
+	static const Property HazardLightStatus;
+	typedef BasicPropertyType<bool> HazardLightStatusType;
+
+	static const Property AntilockBrakingSystem;
+	typedef BasicPropertyType<bool> AntilockBrakingSystemType;
+
+	static const Property TractionControlSystem;
+	typedef BasicPropertyType<bool> TractionControlSystemType;
+
+	static const Property VehicleTopSpeedLimit;
+	typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
+
+	static const Property AirbagStatus;
+	typedef MapPropertyType<BasicPropertyType<Airbag::Location>, BasicPropertyType<Airbag::Status> > AirbagStatusType;
+
+	static const Property DoorStatus;
+	typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<Door::Status> > DoorStatusType;
+
+	static const Property DoorLockStatus;
+	typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<bool> > DoorLockStatusType;
+
+	static const Property SeatBeltStatus;
+	typedef MapPropertyType<BasicPropertyType<Seat::Location>, BasicPropertyType<bool> > SeatBeltStatusType;
+
+	static const Property WindowLockStatus;
+	typedef MapPropertyType<BasicPropertyType<Window::Location>, BasicPropertyType<bool> > WindowLockStatusType;
+
+	static const Property OccupantStatus;
+	typedef MapPropertyType<BasicPropertyType<Seat::Location>, BasicPropertyType<bool> > OccupantStatusType;
+
+	static const Property ObstacleDistance;
+	typedef MapPropertyType<BasicPropertyType<DistanceSensor::Location>, BasicPropertyType<double> > ObstacleDistanceType;
+
+
+	/** END PROPERTIES **/
+
 
 	static std::list<VehicleProperty::Property> capabilities();
 	static std::list<VehicleProperty::Property> customProperties();
@@ -330,7 +576,7 @@ public:
 	 *  #include <vehicleproperty.h>
 	 *  #include <abstractpropertytype.h>
 	 *
-	 *  //In the constructor of a source plugin:
+	 *  //Somewhere in a source plugin:
 	 *  ...
 	 *  Property VehicleJetEngineStatus = "VehicleJetEngineStatus";
 	 *  VehicleProperty::registerProperty(VehicleJetEngineStatus, [](){return new BasicPropertyType<bool>(false);});
@@ -342,6 +588,11 @@ public:
 
 
 private:
+
+	VehicleProperty();
+
+	static VehicleProperty* thereCanOnlyBeOne;
+
 	static bool registerPropertyPriv(Property name, PropertyTypeFactoryCallback factory);
 
 	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;

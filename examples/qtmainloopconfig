@@ -1,0 +1,18 @@
+{
+	"mainloop" : "/usr/lib/automotive-message-broker/qtmainloopplugin.so",
+	"sources" : [ 
+		{
+			"name" : "ExampleSouce",
+			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "Example sink",
+			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so",
+			"interface" : "lo",
+			"port" : "23000"
+		} 
+	]
+}
+

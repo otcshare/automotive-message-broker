@@ -55,5 +55,40 @@ ambd -c configwebsocketsink
 (in another terminal)
 ambd -c configwebsocketsource
 
-TODO: link to website for questions/comments
 
+
+Running with other plugins
+
+To learn about running AMB with other plugins, please see the plugins/*/README.  
+
+
+
+Running with the Qt mainloop:
+
+Some source and sink plugins may want to use the Qt-based mainloop.  To enable the Qt mainloop, run cmake
+with -Duse_qtcore=On:
+
+cmake .. -Duse_qtcore=On
+
+Alternatively, the Qt-based mainloop will be enabled if you enable an Qt-based
+source or sink plugin at compile time.
+
+You will also need to edit your config to enable the Qt-based mainloop:
+
+{
+	"mainloop" : "/usr/lib/automotive-message-broker/qtmainloopplugin.so",
+	"sources" : [...],
+	"sinks" : [...]
+}
+
+NOTE: by default the glib mainloop will be used.
+
+
+
+Questions/Issues/Comments:
+
+Questions or Comments can be emailed to:
+tripzero.kev@gmail.com
+
+Issues can be submitted on our github page:
+https://github.com/otcshare/automotive-message-broker/issues

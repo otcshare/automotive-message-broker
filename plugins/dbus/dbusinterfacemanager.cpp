@@ -24,10 +24,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 ///properties:
 #include "accelerationproperty.h"
-#include "properties.h"
+#include "runningstatus.h"
 #include "custompropertyinterface.h"
 #include "environmentproperties.h"
 #include "vehicleinfo.h"
+#include "maintenance.h"
+#include "parking.h"
 
 #define ConstructProperty(property) \
 	new property(iface->re, connection);
@@ -55,6 +57,18 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(EngineOilProperty);
 	ConstructProperty(ExteriorBrightnessProperty);
 	ConstructProperty(VehicleId);
+	ConstructProperty(TransmissionInfoProperty);
+	ConstructProperty(VehicleTypeProperty);
+	ConstructProperty(FuelInfoProperty);
+	ConstructProperty(SizeProperty);
+	ConstructProperty(DoorsProperty);
+	ConstructProperty(WheelInformationProperty);
+	ConstructProperty(OdometerProperty);
+	ConstructProperty(BatteryProperty);
+	ConstructProperty(SecurityAlertProperty);
+	ConstructProperty(ParkingBrakeProperty);
+	ConstructProperty(ParkingLightProperty);
+	ConstructProperty(HazardLightProperty);
 
 	PropertyList list = VehicleProperty::customProperties();
 
@@ -71,11 +85,13 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 static void
 on_name_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
+
 }
 
 static void
 on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
+
 }
 
 

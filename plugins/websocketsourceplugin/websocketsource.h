@@ -37,6 +37,7 @@ public:
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
+	bool m_sslEnabled;
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();

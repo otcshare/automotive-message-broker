@@ -19,7 +19,7 @@ class AmbProperty: public QObject
 	Q_OBJECT
 	Q_PROPERTY(QString propertyName READ propertyName WRITE setPropertyName)
 	AUTOPROPERTY(QString, propertyName, PropertyName)
-	Q_PROPERTY(QVariant value READ value NOTIFY valueChanged)
+	Q_PROPERTY(QVariant value READ value WRITE setValue NOTIFY valueChanged)
 	Q_PROPERTY(QString interfaceName READ interfaceName WRITE setInterfaceName)
 	AUTOPROPERTY(QString, interfaceName, InterfaceName)
 	Q_PROPERTY(QString objectPath READ objectPath WRITE setObjectPath)
@@ -44,11 +44,21 @@ class AmbProperty: public QObject
 		return value;
 	}
 
-signals:
+	void setValue(QVariant v)
+	{
+		if(!mDBusInterface || !mDBusInterface->isValid())
+		{
+			qDebug()<<"error Interface is not valid";
+		}
+
+		mDBusInterface->setProperty(propertyName().toAscii(), v);
+	}
+
+Q_SIGNALS:
 	void propertyChanged(QVariant, double);
 	void valueChanged(QVariant);
 
-public slots:
+public Q_SLOTS:
 	void propertyChangedSlot(QDBusVariant val, double ts);
 	void connect();
 

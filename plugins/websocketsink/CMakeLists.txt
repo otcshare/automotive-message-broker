@@ -9,6 +9,9 @@ else(websockets_LIBRARY)
     message(FATAL_ERROR "libwebsockets not found.  please install libwebsockets")
 endif(websockets_LIBRARY)
 
+endif(websockets_LIBRARY)
+
+
 set(websocketsinkplugin_headers websocketsink.h websocketmanager.h)
 set(websocketsinkplugin_sources websocketsinkmanager.cpp websocketsink.cpp)
 add_library(websocketsinkplugin MODULE ${websocketsinkplugin_sources})
