@@ -588,7 +588,7 @@
         function onsuccess(value) {
             var hvacsettings = value;
 			
-			value.AirflowDirection = value.AIRFLOWDIRECTION_FRONT & value.AIRFLOWDIRECTION_DEFROSTER;
+			value.AirflowDirection = value.AIRFLOWDIRECTION_FRONT | value.AIRFLOWDIRECTION_DEFROSTER;
 			
 			navigator.vehicle.set(navicator.vehicle.HVAC, value, onsetsuccess, onerror);
         }
@@ -614,14 +614,10 @@
      <dt>readwrite attribute DefrostDictionary Defrost</dt>
      <dd>Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of 
          DefrostDictionary that represents each window and its defrost status</dd>
-     <dt>readwrite attribute boolean Heater;</dt>
-     <dd>Must return heater on (true) / off (false)</dd>
-     <dt>readwrite attribute boolean Heater;</dt>
-     <dd>Must return heater on (true) / off (false)</dd>
-     
-     
-     
-     
+     <dt>readwrite attribute boolean SteeringWheelHeater</dt>
+     <dd>ust return air recirculation on (true) / off (false).</dd>
+     <dt>readwrite attribute boolean SeatHeater</dt>
+     <dd>Must return seat heater status: on (true) / off (false)</dd>
      
   </dl>
 </section>
