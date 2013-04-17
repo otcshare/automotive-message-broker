@@ -1,3 +1,6 @@
+* Wed Apr 17 14:51:00 PST 2013 - <kevron.m.rees@intel.com>
+- Patched to use the old libwebsockets
+
 * Wed Apr 10 18:04:00 PST 2013 - <kevron.m.rees@intel.com>
 - Submission to 2.0alpha
 
