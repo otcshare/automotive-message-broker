@@ -359,12 +359,12 @@ interface Temperature : VehiclePropertyType  {
 	/**  Interior
 	 *   \brief Must return the temperature of the interior of the vehicle in celcius.    
 	 **/
-	readonly attribute signed long Interior;
+	readonly attribute signed short Interior;
 
 	/**  Exterior
 	 *   \brief Must return the temperature of the exterior of the vehicle in celcius.    
 	 **/
-	readonly attribute signed long Exterior;
+	readonly attribute signed short Exterior;
 };
 
 [NoInterfaceObject]
@@ -384,7 +384,7 @@ interface WindshieldWiper : VehiclePropertyType  {
 	const unsigned short WIPERSPEED_AUTO = 10;    
 
 	/**  WindshieldWiper
-	 *   \brief Must return Level of windshield whiper speed (see WIPERSPEED_)    
+	 *   \brief Must return Level of windshield whiper speed (see WIPERSPEED)    
 	 **/
 	readonly attribute unsigned short WindshieldWiper;
 };
@@ -404,22 +404,22 @@ interface HVAC : VehiclePropertyType  {
 	/**  AirflowDirection
 	 *   \brief Must return airflow direction.  See 
 	 **/
-	readwrite attribute unsigned short AirflowDirection;
+	attribute unsigned short AirflowDirection;
 
 	/**  FanSpeed
 	 *   \brief Must return speed of the fan (0-7)    
 	 **/
-	readwrite attribute unsigned short FanSpeed;
+	attribute unsigned short FanSpeed;
 
 	/**  TargetTemperature
 	 *   \brief Must return target desired temperature in celcius.    
 	 **/
-	readwrite attribute unsigned short TargetTemperature;
+	attribute unsigned short TargetTemperature;
 
 	/**  AirConditioning
 	 *   \brief Must return air conditioning on (true) / off (false).    
 	 **/
-	readwrite attribute boolean AirConditioning;
+	attribute boolean AirConditioning;
 
 	/**  AirRecirculation
 	 *   \brief Must return air recirculation on (true) / off (false).    
@@ -429,33 +429,28 @@ interface HVAC : VehiclePropertyType  {
 	/**  Heater
 	 *   \brief Must return heater on (true) / off (false).    
 	 **/
-	readwrite attribute boolean Heater;
+	attribute boolean Heater;
 
 	/**  Defrost
-	 *   \brief Must return air recirculation on (true) / off (false).    
-	 **/
-	readwrite attribute boolean Defrost;
-
-	/**  Defrost
-	 *   \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of { unsigned short, boolean } that represents    
+	 *   \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of DefrostDictionary that represents    
 	 *   \brief each window and its defrost status.    
 	 **/
-	readwrite attribute object Defrost;
+	attribute DefrostDictionary Defrost;
 
 	/**  SteeringWheelHeater
 	 *   \brief Must return air recirculation on (true) / off (false).    
 	 **/
-	readwrite attribute boolean SteeringWheelHeater;
+	attribute boolean SteeringWheelHeater;
 
 	/**  SeatHeater
 	 *   \brief Must return seat heater status: on (true) / off (false).    
 	 **/
-	readwrite attribute boolean SeatHeater;
+	attribute boolean SeatHeater;
 
 	/**  SeatCooler
 	 *   \brief Must return seat heater status: on (true) / off (false).    
 	 **/
-	readwrite attribute boolean SeatCooler;
+	attribute boolean SeatCooler;
 };
 
 [NoInterfaceObject]
