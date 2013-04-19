@@ -579,8 +579,8 @@
      <dt class="no-docs">const unsigned short AIRFLOWDIRECTION_FLOORDUCT= 1</dt>
      <dt class="no-docs">const unsigned short AIRFLOWDIRECTION_FRONT = 0x02</dt>
      <dt class="no-docs">const unsigned short AIRFLOWDIRECTION_DEFROSTER = 0x04</dt>
-     <dt>readwrite attribute unsigned short AirflowDirection</dt>
-     <dd>Must return airflow direction.  The value represents a bitmask of HVAC.AIRFLOWDIRECTION(s).  For example:
+     <dt>attribute unsigned short AirflowDirection</dt>
+    <dd>Must return airflow direction.  The value represents a bitmask of HVAC.AIRFLOWDIRECTION(s).  For example:
      <pre class="example highlight">
         navigator.vehicle.get("HVAC", onsuccess, onerror);
           
@@ -598,22 +598,22 @@
         
      </pre>
      </dd>
-     <dt>readwrite attribute unsigned short FanSpeed</dt>
+     <dt>attribute unsigned short FanSpeed</dt>
      <dd>Must return speed of the fan (0-7)</dd>
-     <dt>readwrite attribute unsigned short TargetTemperature</dt>
+     <dt>attribute unsigned short TargetTemperature</dt>
      <dd>Must return target desired temperature in celcius</dd>
-     <dt>readwrite attribute boolean AirConditioning</dt>
+     <dt>attribute boolean AirConditioning</dt>
      <dd>Must return air conditioning on (true) / off (false)</dd>
-     <dt>readwrite attribute boolean AirRecirculation</dt>
+     <dt>attribute boolean AirRecirculation</dt>
      <dd>Must return air recirculation on (true) / off (false)</dd>
-     <dt>readwrite attribute boolean Heater</dt>
+     <dt>attribute boolean Heater</dt>
      <dd>Must return heater on (true) / off (false)</dd>
-     <dt>readwrite attribute DefrostDictionary Defrost</dt>
+     <dt>attribute DefrostDictionary Defrost</dt>
      <dd>Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of 
          DefrostDictionary that represents each window and its defrost status</dd>
-     <dt>readwrite attribute boolean SteeringWheelHeater</dt>
+     <dt>attribute boolean SteeringWheelHeater</dt>
      <dd>ust return air recirculation on (true) / off (false).</dd>
-     <dt>readwrite attribute boolean SeatHeater</dt>
+     <dt>attribute boolean SeatHeater</dt>
      <dd>Must return seat heater status: on (true) / off (false)</dd>
      
   </dl>
