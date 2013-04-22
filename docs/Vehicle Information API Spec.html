@@ -367,25 +367,25 @@
   <h2><a>Trasnmission</a> Interface</h2>
   <p>The <a>Trasnmission</a> interface represents the current transmssion gear and mode.
   <dl title="[NoInterfaceObject] interface Trasnmission : VehiclePropertyType" class="idl">
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIRST = 1;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SECOND = 2;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_THIRD = 3;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FORTH = 4;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIFTH = 5;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SIXTH = 6;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SEVENTH = 7;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_EIGHTH = 8;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NINTH = 9;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_TENTH = 10;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_CVT = 64;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_REVERSE = 128;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_PARK = 255;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_NORMAL = 0;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_SPORT = 1;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_ECONOMY = 2;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM1 = 3;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM2 = 4;</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIRST = 1</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SECOND = 2</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_THIRD = 3</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FORTH = 4</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIFTH = 5</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SIXTH = 6</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SEVENTH = 7</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_EIGHTH = 8</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NINTH = 9</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_TENTH = 10</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_CVT = 64</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_REVERSE = 128</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_PARK = 255</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_NORMAL = 0</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_SPORT = 1</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_ECONOMY = 2</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM1 = 3</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM2 = 4</dt>
      
      <dt>readonly attribute octet GearPosition</dt><dd>Must return transmission gear position (see <a>TRANSMISSIONPOSITION</a>)</dd>
      <dt>readonly attribute octet Mode</dt><dd>Must return transmission Mode (see <a>TRANSMISSIONMODE</a>)</dd>
@@ -506,7 +506,7 @@
      <dd>Must return longitude in Deg.Min (-90, +90)</dd>
      <dt>readonly attribute double Altitude</dt>
      <dd>Must return altitude in meters above sea-level (0)</dd>
-     <dt>readonly attribute unsigned short Direction;</dt>
+     <dt>readonly attribute unsigned short Direction</dt>
      <dd>Must return direction in Degrees  (0-360)</dd>
   </dl>
 </section>
@@ -587,7 +587,7 @@
         function onsuccess(value) {
             var hvacsettings = value;
             value.AirflowDirection = value.AIRFLOWDIRECTION_FRONT | value.AIRFLOWDIRECTION_DEFROSTER;
-            navigator.vehicle.set(navicator.vehicle.HVAC, value, onsetsuccess, onerror);
+            navigator.vehicle.set("HVAC", value, onsetsuccess, onerror);
         }
         function onerror(e) {
             window.console.error(e.message);
