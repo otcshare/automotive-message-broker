@@ -1,0 +1,44 @@
+Parking hierarchy
+=================
+
+Service         org.automotive
+Object path:    /org/automotive/parking/*
+
+
+
+Interface       org.automotive.securityAlert
+Object path     /org/automotive/parking/securityAlert
+Properties:
+		byte SecurityAlert [readonly]
+				
+			returns status of security alert:
+
+			Idle = 0,
+			Armed = 1,
+			Alarm Detected = 2
+
+Interface       org.automotive.parkingBrake
+Object path     /org/automotive/parking/parkingBrake
+Properties:
+				
+		bool ParkingBrake
+			
+			returns whether the parking break is active (true)/inactive (false)
+				
+
+Interface       org.automotive.parkingLights
+Object path     /org/automotive/parking/parkingLights
+Properties:
+
+		bool ParkingLights
+			
+			returns whether the parking lights are active (true) or inactive (false)
+
+Interface       org.automotive.hazardLightsiiiiiiiiiiiiiooooooooo]Object path     /org/automotive/parking/hazardLights
+Properties:
+
+		bool HazardLights
+			
+			returns whether the hazard lights are active (true) or inactive (false)
+				
+				

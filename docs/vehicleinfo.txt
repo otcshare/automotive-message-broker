@@ -1,0 +1,112 @@
+Vehicle Information hierarchy
+=================
+
+Service         org.automotive.message.broker
+Object path     /org/automotive/vehicleInfo/*
+
+
+
+Interface:	org.automotive.vehicleId
+Object path:	/org/automotive/vehicleInfo/vehicleId
+Properties:
+
+		string WMI [readonly]
+
+			World Manufacturer Identifier as defined by SAE. 3 characters.
+
+		string VIN [readonly]
+
+			Vehicle Identification Number as defined by ISO 3779. 17 characters.
+
+Interface:	org.automotive.size
+Object path:	/org/automotive/vehicleInfo/size
+Properties:
+
+		int Width [readonly]
+			width in mm
+
+		Height [readonly]
+			height in mm
+
+		Length [readonly]
+			length in mm
+
+Interface:	org.automotive.fuelInfo
+Object path:	/org/automotive/vehicleInfo/fuelInfo
+Properties:
+
+		byte Type [readonly]
+
+			type of fuel:
+			Gasoline = 0,
+			High-Octane = 1,
+			Diesel = 2,
+			Electric = 3,
+			Hydrogen = 4
+
+		byte RefuelPosition [readonly]
+
+			Position of refueling:
+			Left = 0,
+			Right = 1,
+			Front = 2,
+			Rear = 3
+
+Interface:	org.automotive.vehicleType
+Object path:	/org/automotive/vehicleInfo/vehicleType
+Properties:
+
+		byte VehicleType [readonly]
+			
+			Vehicle Type: Sedan = 0,
+			Coupe = 1,
+			Cabriole = 2,
+			Roadster = 3,
+			SUV = 4,
+			Truck = 5
+
+Interface:	org.automotive.doors
+Object path:	/org/automotive/vehicleInfo/doors
+Properties:
+
+		array{ byte } DoorsPerRow [readonly]
+			
+			Number of doors in each row.  The index represents the row.  Position '0'
+			represents the first row, '1' the second row etc.
+
+			Example a common mini-van may have Doors[0] = 2 doors,
+			Doors[1] = 1 (side door), Doors[2] = 1 (trunk).
+
+Interface:	org.automotive.transmissionGearType
+Object path:	/org/automotive/vehicleInfo/transmissionGearType
+Properties:
+
+		byte TransmissionGearType [readonly]
+		
+			Auto = 0,
+			Manual = 1,
+			CV = 2 (Constant Variable Transmission)
+
+
+			
+Interface:	org.automotive.wheelInformation
+Object path:	/org/automotive/vehicleInfo/wheelInformation
+Properties:
+
+		uint16 FrontRadius [readonly]
+
+			Radius of Front Wheel(s) in mm.
+
+		uint16 RearRadius [readonly]
+	
+			Radius of Rear Wheel(s) in mm.
+
+		uint32 Track [readonly]
+
+			Wheel Track in mm.
+
+		bool ABS [readonly]
+
+			Status of Antilock Brake System (ABS) on=true, off=false
+				
+			
