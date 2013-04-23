@@ -3,15 +3,16 @@
 
 
 #include "abstractpropertytype.h"
+//#include "vehicleproperty.h"
 #include <map>
 #include <debugout.h>
-//#include <json-glib/json-glib.h>
 #include <json/json.h>
+
 template <class T, class N>
 class MapPropertyType: public AbstractPropertyType
 {
 public:
-	MapPropertyType(){}
+	MapPropertyType(VehicleProperty::Property propertyName):AbstractPropertyType(propertyName){}
 
 	void append(T  key, N  value)
 	{
@@ -20,7 +21,7 @@ public:
 
 	AbstractPropertyType* copy()
 	{
-		MapPropertyType<T,N> *t = new MapPropertyType<T,N>();
+		MapPropertyType<T,N> *t = new MapPropertyType<T,N>(name);
 
 		t->setMap(mMap);
 
@@ -77,24 +78,7 @@ public:
 
 		}
 		json_object_put(rootobject);
-		/*
-		DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
 
-		gchar** srcMembers = json_reader_list_members(reader);
-
-		for(int i=0; i< json_reader_count_members(reader); i++)
-		{
-			json_reader_read_member(reader,srcMembers[i]);
-			T one(srcMembers[i]);
-			N two(json_reader_get_string_value(reader));
-
-			append(one,two);
-			json_reader_end_member(reader);
-		}
-
-		g_free(srcMembers);
-		g_object_unref(reader);
-		g_object_unref(parser);*/
 	}
 
 	GVariant* toVariant()
@@ -116,7 +100,7 @@ public:
 
 	void fromVariant(GVariant*)
 	{
-
+		/// TODO: fill this in
 	}
 
 	void setMap(std::map<T, N> m)

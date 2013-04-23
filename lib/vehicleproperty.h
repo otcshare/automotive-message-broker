@@ -27,8 +27,19 @@
 #include <sstream>
 #include <map>
 #include <functional>
-#include <abstractpropertytype.h>
-#include "mappropertytype.hpp"
+
+class AbstractPropertyType;
+
+template<class T>
+class BasicPropertyType;
+
+class StringPropertyType;
+
+template<class T>
+class ListPropertyType;
+
+template<class T, class N>
+class MapPropertyType;
 
 namespace ButtonEvents {
 enum ButtonEventType {

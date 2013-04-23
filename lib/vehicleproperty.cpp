@@ -25,10 +25,10 @@
 
 
 #define REGISTERPROPERTY(property, defaultValue) \
-	registerPropertyPriv(property, []() { return new property ## Type(defaultValue); });
+	registerPropertyPriv(property, []() { return new property ## Type(property, defaultValue); });
 
 #define REGISTERPROPERTYWITHTYPE(property, type, defaultValue) \
-	registerPropertyPriv(property, []() { return new type(defaultValue); });
+	registerPropertyPriv(property, []() { return new type(property, defaultValue); });
 
 using namespace std;
 
@@ -153,34 +153,34 @@ std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
 
 VehicleProperty::VehicleProperty()
 {
-	registerPropertyPriv( VehicleSpeed, [](){ return new VehicleSpeedType(0); });
-	registerPropertyPriv(EngineSpeed, [](){ return new EngineSpeedType(0); });
-	registerPropertyPriv(TransmissionShiftPosition, [](){ return new TransmissionShiftPositionType(Transmission::Neutral); });
-	registerPropertyPriv(TransmissionGearPosition, [](){ return new TransmissionGearPositionType(Transmission::Neutral); });
+	REGISTERPROPERTY( VehicleSpeed, 0);
+	REGISTERPROPERTY(EngineSpeed, 0);
+	REGISTERPROPERTY(TransmissionShiftPosition,Transmission::Neutral);
+	REGISTERPROPERTY(TransmissionGearPosition,Transmission::Neutral);
 	REGISTERPROPERTY(TransmissionMode,Transmission::Normal);
-	registerPropertyPriv(ThrottlePosition, [](){ return new ThrottlePositionType(0); });
-	registerPropertyPriv(WheelBrake, [](){ return new WheelBrakeType(false); });
+	REGISTERPROPERTY(ThrottlePosition, 0);
+	REGISTERPROPERTY(WheelBrake, false);
 	REGISTERPROPERTY(WheelBrakePressure,0);
-	registerPropertyPriv(SteeringWheelAngle, [](){ return new SteeringWheelAngleType(0); });
-	registerPropertyPriv(TurnSignal, [](){ return new TurnSignalType(TurnSignals::Off); });
-	registerPropertyPriv(ClutchStatus, [](){ return new ClutchStatusType(false); });
-	registerPropertyPriv(EngineOilPressure, [](){ return new EngineOilPressureType(0); });
-	registerPropertyPriv(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
+	REGISTERPROPERTY(SteeringWheelAngle,0);
+	REGISTERPROPERTY(TurnSignal, TurnSignals::Off);
+	REGISTERPROPERTY(ClutchStatus, false);
+	REGISTERPROPERTY(EngineOilPressure, 0);
+	REGISTERPROPERTY(EngineOilTemperature, 0);
 	REGISTERPROPERTY(EngineOilRemaining,0);
-	registerPropertyPriv(EngineCoolantTemperature, [](){ return new EngineCoolantTemperatureType(0); });
-	registerPropertyPriv(MachineGunTurretStatus, [](){ return new MachineGunTurretStatusType(false); });
-	registerPropertyPriv(AccelerationX, [](){ return new AccelerationType(0); });
-	registerPropertyPriv(AccelerationY, [](){ return new AccelerationType(0); });
-	registerPropertyPriv(AccelerationZ, [](){ return new AccelerationType(0); });
-	registerPropertyPriv(MassAirFlow, [](){ return new MassAirFlowType(0); });
-	registerPropertyPriv(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
+	REGISTERPROPERTY(EngineCoolantTemperature, 0);
+	REGISTERPROPERTY(MachineGunTurretStatus, false);
+	REGISTERPROPERTYWITHTYPE(AccelerationX, AccelerationType,0);
+	REGISTERPROPERTYWITHTYPE(AccelerationY, AccelerationType,0);
+	REGISTERPROPERTYWITHTYPE(AccelerationZ, AccelerationType,0);
+	REGISTERPROPERTY(MassAirFlow,0);
+	REGISTERPROPERTY(ButtonEvent, ButtonEvents::NoButton);
 	REGISTERPROPERTY(AirIntakeTemperature,0)
-	registerPropertyPriv(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
+	REGISTERPROPERTY(BatteryVoltage, 0);
 	REGISTERPROPERTY(BatteryCurrent,0);
-	registerPropertyPriv(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
+	REGISTERPROPERTY(InteriorTemperature, 0);
 	REGISTERPROPERTY(ExteriorTemperature,0);
-	registerPropertyPriv(VIN, [](){ return new VINType(""); });
-	registerPropertyPriv(WMI, [](){ return new WMIType(""); });
+	REGISTERPROPERTY(VIN, "");
+	REGISTERPROPERTY(WMI, "");
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftFront, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureRightFront, TirePressureType, 0);
 	REGISTERPROPERTYWITHTYPE(TirePressureLeftRear, TirePressureType, 0);
@@ -189,9 +189,9 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTYWITHTYPE(TireTemperatureRightFront,TireTemperatureType,0);
 	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftRear,TireTemperatureType,0);
 	REGISTERPROPERTYWITHTYPE(TireTemperatureRightRear,TireTemperatureType,0);
-	registerPropertyPriv( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
+	REGISTERPROPERTY( VehiclePowerMode,Power::Off);
 	registerPropertyPriv(TripMeters,[](){
-		TripMetersType* t = new TripMetersType();
+		TripMetersType* t = new TripMetersType(TripMeters);
 		t->append(0);
 		return t;
 	});
@@ -227,7 +227,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Altitude,0);
 	REGISTERPROPERTY(Direction,0);
 	REGISTERPROPERTY(VehicleType,Vehicle::Unknown);
-	registerPropertyPriv(DoorsPerRow,[]() { BasicPropertyType<uint16_t> d(0); return new DoorsPerRowType(&d); });
+	registerPropertyPriv(DoorsPerRow,[]() { BasicPropertyType<uint16_t> d(0); return new DoorsPerRowType(DoorsPerRow,&d); });
 	REGISTERPROPERTY(TransmissionGearType,Transmission::Unknown);
 	REGISTERPROPERTYWITHTYPE(FrontWheelRadius, WheelRadiusType, 0);
 	REGISTERPROPERTYWITHTYPE(RearWheelRadius, WheelRadiusType, 0);
@@ -243,9 +243,9 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(HazardLightStatus,false);
 	registerPropertyPriv(AirbagStatus,[]()
 	{
-		BasicPropertyType<Airbag::Location> a(Airbag::Driver);
-		BasicPropertyType<Airbag::Status> b(Airbag::Inactive);
-		AirbagStatusType* t = new AirbagStatusType();
+		BasicPropertyType<Airbag::Location> a(AirbagStatus,Airbag::Driver);
+		BasicPropertyType<Airbag::Status> b(AirbagStatus, Airbag::Inactive);
+		AirbagStatusType* t = new AirbagStatusType(AirbagStatus);
 		t->append(a,b);
 
 		return t;
@@ -257,7 +257,7 @@ VehicleProperty::VehicleProperty()
 
 	registerPropertyPriv(DoorStatus,[]()
 	{
-		DoorStatusType* t = new DoorStatusType();
+		DoorStatusType* t = new DoorStatusType(DoorStatus);
 		t->append(Door::Driver,Door::Closed);
 
 		return t;
@@ -265,7 +265,7 @@ VehicleProperty::VehicleProperty()
 
 	registerPropertyPriv(DoorLockStatus,[]()
 	{
-		DoorLockStatusType* t = new DoorLockStatusType();
+		DoorLockStatusType* t = new DoorLockStatusType(DoorLockStatus);
 		t->append(Door::Driver,false);
 
 		return t;
@@ -273,15 +273,7 @@ VehicleProperty::VehicleProperty()
 
 	registerPropertyPriv(SeatBeltStatus,[]()
 	{
-		SeatBeltStatusType* t = new SeatBeltStatusType();
-		t->append(Seat::Driver,false);
-
-		return t;
-	});
-
-	registerPropertyPriv(SeatBeltStatus,[]()
-	{
-		SeatBeltStatusType* t = new SeatBeltStatusType();
+		SeatBeltStatusType* t = new SeatBeltStatusType(SeatBeltStatus);
 		t->append(Seat::Driver,false);
 
 		return t;
@@ -289,7 +281,7 @@ VehicleProperty::VehicleProperty()
 
 	registerPropertyPriv(OccupantStatus,[]()
 	{
-		OccupantStatusType* t = new OccupantStatusType();
+		OccupantStatusType* t = new OccupantStatusType(OccupantStatus);
 		t->append(Seat::Driver,false);
 
 		return t;
@@ -297,7 +289,7 @@ VehicleProperty::VehicleProperty()
 
 	registerPropertyPriv(WindowLockStatus,[]()
 	{
-		WindowLockStatusType* t = new WindowLockStatusType();
+		WindowLockStatusType* t = new WindowLockStatusType(WindowLockStatus);
 		t->append(Window::Driver,false);
 
 		return t;
@@ -305,7 +297,7 @@ VehicleProperty::VehicleProperty()
 
 	registerPropertyPriv(ObstacleDistance,[]()
 	{
-		ObstacleDistanceType* t = new ObstacleDistanceType();
+		ObstacleDistanceType* t = new ObstacleDistanceType(ObstacleDistance);
 		t->append(DistanceSensor::LeftFront,0);
 
 		return t;
@@ -322,7 +314,7 @@ VehicleProperty::VehicleProperty()
 
 	registerPropertyPriv(Defrost, []()
 	{
-		DefrostType *d = new DefrostType();
+		DefrostType *d = new DefrostType(Defrost);
 		d->append(Window::Windshield, false);
 
 		return d;
@@ -333,7 +325,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(SeatCooler, false);
 	registerPropertyPriv(WindowStatus, []()
 	{
-		WindowStatusType* d = new WindowStatusType();
+		WindowStatusType* d = new WindowStatusType(WindowStatus);
 		d->append(Window::Driver,100);
 
 		return d;
