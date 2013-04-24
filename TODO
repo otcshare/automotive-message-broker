@@ -4,7 +4,8 @@ For 0.9.0:
 - websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false (TEST)
 
 Other:
-
+- fill in the fromGVariant() methods in list and map abstract property types.
+- grep all the TODOs in the code and do them
 - per-source property filtering in routing engine
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
 - investigate and enable use of provisioning in ssl websockets
