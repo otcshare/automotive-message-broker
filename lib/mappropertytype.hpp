@@ -12,7 +12,7 @@ template <class T, class N>
 class MapPropertyType: public AbstractPropertyType
 {
 public:
-	MapPropertyType(VehicleProperty::Property propertyName):AbstractPropertyType(propertyName){}
+	MapPropertyType(std::string propertyName):AbstractPropertyType(propertyName){}
 
 	void append(T  key, N  value)
 	{

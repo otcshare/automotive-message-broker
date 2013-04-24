@@ -31,7 +31,6 @@
 #include <glib.h>
 #include <list>
 #include "timestamp.h"
-#include "vehicleproperty.h"
 
 namespace Zone {
 enum Type {
@@ -50,7 +49,7 @@ class AbstractPropertyType
 public:
 	//AbstractPropertyType(): timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
 
-	AbstractPropertyType(VehicleProperty::Property property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
+	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
 
 	virtual std::string toString() const = 0;
 
@@ -69,7 +68,7 @@ public:
 		return one == two;
 	}
 
-	VehicleProperty::Property name;
+	std::string name;
 
 	double timestamp;
 
@@ -263,13 +262,13 @@ public:
 		setValue(val);
 	}
 
-	BasicPropertyType( VehicleProperty::Property propertyName, T val)
+	BasicPropertyType( std::string propertyName, T val)
 		:AbstractPropertyType(propertyName)
 	{
 		setValue(val);
 	}
 
-	BasicPropertyType( VehicleProperty::Property propertyName, std::string val)
+	BasicPropertyType( std::string propertyName, std::string val)
 		:AbstractPropertyType(propertyName)
 	{
 		if(!val.empty() && val != "")
@@ -379,7 +378,13 @@ private:
 class StringPropertyType: public AbstractPropertyType
 {
 public:
-	StringPropertyType(VehicleProperty::Property propertyName, std::string val)
+	StringPropertyType(std::string propertyName)
+		:AbstractPropertyType(propertyName)
+	{
+
+	}
+
+	StringPropertyType(std::string propertyName, std::string val)
 		:AbstractPropertyType(propertyName)
 	{
 		setValue(val);
@@ -442,13 +447,13 @@ class ListPropertyType: public AbstractPropertyType
 {
 public:
 
-	ListPropertyType(VehicleProperty::Property propertyName)
+	ListPropertyType(std::string propertyName)
 		: AbstractPropertyType(propertyName), initialized(false)
 	{
 
 	}
 
-	ListPropertyType(VehicleProperty::Property propertyName, AbstractPropertyType *value)
+	ListPropertyType(std::string propertyName, AbstractPropertyType *value)
 		: AbstractPropertyType(propertyName), initialized(false)
 	{
 		appendPriv(value->copy());
