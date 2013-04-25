@@ -37,7 +37,7 @@ static gboolean timeoutCallback(gpointer data)
 }
 
 OpenXCPlugin::OpenXCPlugin(AbstractRoutingEngine* re, map<string, string> config)
-:AbstractSource(re, config), velocity(0), engineSpeed(0)
+:AbstractSource(re, config)
 {
 	re->setSupported(supported(), this);	
 
@@ -129,26 +129,170 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 	json_object *rootobject;
 	json_tokener *tokener = json_tokener_new();
 
-	std::string configBuffer = get_file_contents(configFile.c_str());
+
 	enum json_tokener_error err;
 	do
 	{
-		rootobject = json_tokener_parse_ex(tokener, configBuffer.c_str(),configBuffer.length());
+		rootobject = json_tokener_parse_ex(tokener, json.c_str(),json.length());
 	} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
 	if (err != json_tokener_success)
 	{
 		fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
 		// Handle errors, as appropriate for your application.
 	}
-	if (tokener->char_offset < configFile.length()) // XXX shouldn't access internal fields
+	if (tokener->char_offset < json.length()) // XXX shouldn't access internal fields
 	{
 		// Handle extra characters after parsed object as desired.
 		// e.g. issue an error, parse another object from that point, etc...
 	}
 
+	VehicleProperty::Property property;
+
 	json_object *name = json_object_object_get(rootobject,"name");
 	if (name)
 	{
+		string namestr = string(json_object_get_string(name));
 
+		property = openXC2AmbMap[namestr];
 	}
+
+	json_object *value = json_object_object_get(rootobject, "value");
+	if(value)
+	{
+		if (property == VehicleProperty::SteeringWheelAngle)
+		{
+			int val = json_object_get_int(value);
+			VehicleProperty::SteeringWheelAngleType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::EngineSpeed)
+		{
+			int val = json_object_get_int(value);
+			VehicleProperty::EngineSpeedType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::VehicleSpeed)
+		{
+			int val = json_object_get_int(value);
+			VehicleProperty::VehicleSpeedType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::ThrottlePosition)
+		{
+			int val = json_object_get_int(value);
+			VehicleProperty::ThrottlePositionType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::LightBrake)
+		{
+			bool val = json_object_get_boolean(value);
+			VehicleProperty::LightBrakeType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::TransmissionGearPosition)
+		{
+
+		}
+
+		else if (property == VehicleProperty::Odometer)
+		{
+			int val = json_object_get_int(value);
+			VehicleProperty::OdometerType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::VehiclePowerMode)
+		{
+
+		}
+
+		else if (property == VehicleProperty::FuelLevel)
+		{
+			int val = json_object_get_int(value);
+			VehicleProperty::FuelLevelType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::FuelConsumption)
+		{
+			/// This is a different concept than our 'instant' fuel consumption.
+			/// TODO: we should probably do a CumulativeFuelConsuption
+		}
+
+		else if (property == VehicleProperty::DoorStatus)
+		{
+
+		}
+
+		else if (property == VehicleProperty::LightHead)
+		{
+			bool val = json_object_get_boolean(value);
+			VehicleProperty::LightHeadType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+		}
+
+		else if (property == VehicleProperty::LightHighBeam)
+		{
+			bool val = json_object_get_boolean(value);
+			VehicleProperty::LightHighBeamType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal, uuid());
+		}
+
+		else if (property == VehicleProperty::WindshieldWiper)
+		{
+			bool val = json_object_get_boolean(value);
+			if(val)
+			{
+				Window::WiperSpeed speed = Window::Auto;
+
+				VehicleProperty::WindshieldWiperType ambVal(speed);
+				routingEngine->updateProperty(property, &ambVal, uuid());
+			}
+			else
+			{
+				Window::WiperSpeed speed = Window::Off;
+
+				VehicleProperty::WindshieldWiperType ambVal(speed);
+				routingEngine->updateProperty(property, &ambVal, uuid());
+			}
+
+		}
+
+		else if (property == VehicleProperty::Latitude)
+		{
+			double val = json_object_get_double(value);
+			VehicleProperty::LatitudeType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal, uuid());
+		}
+
+		else if (property == VehicleProperty::Longitude)
+		{
+			double val = json_object_get_double(value);
+			VehicleProperty::LongitudeType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal, uuid());
+		}
+
+		else if (property == VehicleProperty::ButtonEvent)
+		{
+
+		}
+	}
+
+
 }
