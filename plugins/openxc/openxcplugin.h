@@ -46,6 +46,8 @@ public:
 	
 private:
 	PropertyList mRequests;
+	void translateOpenXCEvent(std::string json);
+	std::map<std::string, std::string> openXC2AmbMap;
 
 };
 
