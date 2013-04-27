@@ -2,6 +2,7 @@ For 0.9.0:
 
 - Test database plugin. specifically get ranged support with example sink
 - websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false (TEST)
+- sometimes ambd goes to 100% on tizen when using the websocket sink.  investigate
 
 Other:
 - fill in the fromGVariant() methods in list and map abstract property types.
