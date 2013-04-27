@@ -1,6 +1,6 @@
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system.
-Version:    0.8.0
+Version:    0.7.0
 Release:    1
 Group:      System Environment/Daemons
 License:    LGPL v2.1
@@ -20,7 +20,6 @@ BuildRequires:  libuuid-devel
 BuildRequires:  libwebsockets-devel
 BuildRequires:  libuuid-devel
 BuildRequires:  sqlite-devel
-BuildRequires:  opencv-devel
 
 %description
 Automotive Message Broker is a vehicle network abstraction system.
@@ -85,20 +84,12 @@ Requires:  sqlite
 %description plugins-database
 Database logging plugin for automotive-message-broker
 
-%package plugins-opencvlux
-Summary:    Plugin for simulating ExteriorBrightness using a common webcam
-Group:      System Environment/Daemons
-Requires:   %{name} = %{version}-%{release}
-Requires:   opencv
-
-%description plugins-opencvlux
-Plugin for simulating ExteriorBrightness using a common webcam
 
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Ddatabase_plugin=ON -Dopencvlux_plugin=ON
+%cmake -Ddatabase_plugin=ON 
 
 make %{?jobs:-j%jobs}
 
@@ -165,9 +156,9 @@ ln -s ../init.d/ambd %{buildroot}/etc/rc.d/rc5.d/S62ambd
 %defattr(-,root,root,-)
 %{_libdir}/%{name}/databasesinkplugin.so
 
-%files plugins-opencvlux
-%defattr(-,root,root,-)
-%{_libdir}/%{name}/opencvluxplugin.so
+#%files plugins-opencvlux
+#%defattr(-,root,root,-)
+#%{_libdir}/%{name}/opencvluxplugin.so
 
 %files doc
 %defattr(-,root,root,-)
