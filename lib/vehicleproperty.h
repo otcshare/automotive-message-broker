@@ -567,7 +567,7 @@ public:
 	//typedef BasicPropertyType<double> AltitudeType;
 
 	static const Property Direction;
-	PROPERTYTYPE(Direction, DirectionType, BasicPropertyType<double>, double)
+	PROPERTYTYPE(Direction, DirectionType, BasicPropertyType<uint16_t>, uint16_t)
 	//typedef BasicPropertyType<uint16_t> DirectionType;
 
 	static const Property VehicleWidth;
@@ -597,7 +597,7 @@ public:
 //	/typedef BasicPropertyType<uint16_t> WheelRadiusType;
 
 	static const Property WheelTrack;
-	PROPERTYTYPE(WheelTrack, WheelTrackType, BasicPropertyType<uint16_t>, uint16_t)
+	PROPERTYTYPE(WheelTrack, WheelTrackType, BasicPropertyType<uint>, uint)
 //	typedef BasicPropertyType<uint> WheelTrackType;
 
 	static const Property BrakePressure;
