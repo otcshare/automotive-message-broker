@@ -203,14 +203,14 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Wheel Track in mm.
 		 **/
-		wantProperty<uint>(VehicleProperty::WheelTrack, "WheelTrack", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WheelTrack, "WheelTrack", "u", AbstractProperty::Read);
 
 		/** @attributeName ABS
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Antilock Brake System status: on = true, off = false.
 		 **/
-		wantPropertyVariant(VehicleProperty::WheelTrack, "ABS", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
