@@ -23,6 +23,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/assert.hpp>
 #include <glib.h>
 
+#include "bluetooth.hpp"
+
 using namespace std;
 
 #include "debugout.h"
@@ -62,6 +64,27 @@ OpenXCPlugin::OpenXCPlugin(AbstractRoutingEngine* re, map<string, string> config
 	openXC2AmbMap["longitude"] = VehicleProperty::Longitude;
 	openXC2AmbMap["button_event"] = VehicleProperty::ButtonEvent;
 
+	std::string bluetoothAddy = config["device"];
+	std::string serialDevice;
+
+	if(bluetoothAddy != "")
+	{
+		ObdBluetoothDevice btDevice;
+
+		serialDevice = btDevice.getDeviceForAddress(bluetoothAddy);
+	}
+
+
+	bool test = false;
+	if(config.find("testMode") != config.end())
+	{
+		test = config["testMode"] == "true";
+	}
+
+	if(test)
+	{
+		testParseEngine();
+	}
 
 }
 
@@ -118,7 +141,7 @@ void OpenXCPlugin::unsubscribeToPropertyChanges(VehicleProperty::Property proper
 
 
 
-void OpenXCPlugin::translateOpenXCEvent(string json)
+bool OpenXCPlugin::translateOpenXCEvent(string json)
 {
 	/// signal:
 	/// {"name": "steering_wheel_angle", "value": 45}
@@ -165,6 +188,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::SteeringWheelAngleType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::EngineSpeed)
@@ -173,6 +198,7 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::EngineSpeedType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+			return true;
 		}
 
 		else if (property == VehicleProperty::VehicleSpeed)
@@ -181,6 +207,7 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::VehicleSpeedType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+			return true;
 		}
 
 		else if (property == VehicleProperty::ThrottlePosition)
@@ -189,6 +216,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::ThrottlePositionType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::LightBrake)
@@ -197,11 +226,24 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::LightBrakeType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+
+			return true;
+		}
+
+		else if (property == VehicleProperty::ParkingBrakeStatus)
+		{
+			bool val = json_object_get_boolean(value);
+			VehicleProperty::ParkingBrakeStatusType ambVal(val);
+
+			routingEngine->updateProperty(property, &ambVal,uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::TransmissionGearPosition)
 		{
-
+			/// TODO: implement
+			return false;
 		}
 
 		else if (property == VehicleProperty::Odometer)
@@ -210,11 +252,14 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::OdometerType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::VehiclePowerMode)
 		{
-
+			/// TODO: implement
+			return false;
 		}
 
 		else if (property == VehicleProperty::FuelLevel)
@@ -223,6 +268,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::FuelLevelType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::FuelConsumption)
@@ -242,6 +289,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::LightHeadType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal,uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::LightHighBeam)
@@ -250,6 +299,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::LightHighBeamType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal, uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::WindshieldWiper)
@@ -261,6 +312,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 
 				VehicleProperty::WindshieldWiperType ambVal(speed);
 				routingEngine->updateProperty(property, &ambVal, uuid());
+
+				return true;
 			}
 			else
 			{
@@ -268,6 +321,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 
 				VehicleProperty::WindshieldWiperType ambVal(speed);
 				routingEngine->updateProperty(property, &ambVal, uuid());
+
+				return true;
 			}
 
 		}
@@ -278,6 +333,8 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::LatitudeType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal, uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::Longitude)
@@ -286,13 +343,120 @@ void OpenXCPlugin::translateOpenXCEvent(string json)
 			VehicleProperty::LongitudeType ambVal(val);
 
 			routingEngine->updateProperty(property, &ambVal, uuid());
+
+			return true;
 		}
 
 		else if (property == VehicleProperty::ButtonEvent)
 		{
-
+			/// TODO: implement
+			return false;
 		}
 	}
 
+	return false;
 
+}
+
+void OpenXCPlugin::testParseEngine()
+{
+	bool passed = true;
+
+	if(!translateOpenXCEvent("{\"name\": \"steering_wheel_angle\", \"value\": 45}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (steering_wheel_angle): \tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (steering_wheel_angle): \tPassed"<<endl;
+
+	if(!translateOpenXCEvent("{\"name\": \"engine_speed\", \"value\": 5000}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (engine_speed): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (engine_speed): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"vehicle_speed\", \"value\": 100}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (vehicle_speed): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (vehicle_speed): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"accelerator_pedal_position\", \"value\": 90}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (accelerator_pedal_position): \tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (accelerator_pedal_position): \tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"parking_brake_status\", \"value\": \"false\" }"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (parking_brake_status): \tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (parking_brake_status): \tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"brake_pedal_status\", \"value\": \"false\" }"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (brake_pedal_status): \tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (brake_pedal_status): \tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"transmission_gear_position\", \"value\": \"fourth\"}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (transmission_gear_position): \tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (transmission_gear_position): \tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"odometer\", \"value\": 1000}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (odometer): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (odometer): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"ignition_status\", \"value\": \"run\"}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (ignition_status): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (ignition_status): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"fuel_level\", \"value\": 30}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (fuel_level): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (fuel_level): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"fuel_consumed_since_restart\", \"value\": 45}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (fuel_consumed_since_restart): \tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (fuel_consumed_since_restart): \tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"headlamp_status\", \"value\": \"true\"}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (headlamp_status): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (headlamp_status): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"latitude\", \"value\": 88.12125}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (latitude): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (latitude): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"longitude\", \"value\": 108.12125}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (longitude): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (longitude): \t\tPassed"<<endl;
+	if(!translateOpenXCEvent("{\"name\": \"button_event\", \"value\": \"up\", \"event\": \"pressed\"}"))
+	{
+		DebugOut(0)<<"OpenXC Parse Test (button_event): \t\tFailed"<<endl;
+		passed = false;
+	}
+	else DebugOut(0)<<"OpenXC Parse Test (button_event): \t\tPassed"<<endl;
+
+	if(!passed)
+	{
+		DebugOut(0)<<"Some OpenXC Parse Tests failed.  Aborting";
+		throw std::runtime_error("OpenXC Parse tests failed.");
+	}
 }

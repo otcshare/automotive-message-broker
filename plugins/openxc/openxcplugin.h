@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <abstractsource.h>
 #include <string>
 
+
 using namespace std;
 
 class OpenXCPlugin: public AbstractSource
@@ -46,7 +47,8 @@ public:
 	
 private:
 	PropertyList mRequests;
-	void translateOpenXCEvent(std::string json);
+	bool translateOpenXCEvent(std::string json);
+	void testParseEngine();
 	std::map<std::string, std::string> openXC2AmbMap;
 
 };

@@ -7,8 +7,8 @@ pkg_check_modules(json REQUIRED json)
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${json_INCLUDE_DIRS})
 
-set(openxcplugin_headers openxcplugin.h)
-set(openxcplugin_sources openxcplugin.cpp)
+set(openxcplugin_headers openxcplugin.h abastractio.hpp)
+set(openxcplugin_sources openxcplugin.cpp bluetooth.hpp abstractio.hpp serialport.hpp)
 
 add_library(openxcplugin MODULE ${openxcplugin_sources})
 set_target_properties(openxcplugin PROPERTIES PREFIX "")
