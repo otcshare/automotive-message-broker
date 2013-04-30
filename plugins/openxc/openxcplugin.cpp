@@ -29,12 +29,24 @@ using namespace std;
 
 #include "debugout.h"
 
-static gboolean timeoutCallback(gpointer data)
+bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 {
-	OpenXCPlugin* src = (OpenXCPlugin*)data;
-	
-	src->randomizeProperties();
-	
+	if (condition == G_IO_HUP)
+	{
+		//Hang up. Returning false closes out the GIOChannel.
+		//printf("Callback on G_IO_HUP\n");
+		return false;
+	}
+
+	OpenXCPlugin* plugin = static_cast<OpenXCPlugin*>(data);
+
+	if(!plugin)
+	{
+		throw std::runtime_error("Bad cast to OpenXCPlugin*");
+	}
+
+	plugin->processData();
+
 	return true;
 }
 
@@ -74,6 +86,17 @@ OpenXCPlugin::OpenXCPlugin(AbstractRoutingEngine* re, map<string, string> config
 		serialDevice = btDevice.getDeviceForAddress(bluetoothAddy);
 	}
 
+	device = new SerialPort(serialDevice);
+	if(!device->open())
+	{
+		throw std::runtime_error("unable to open serial device " + serialDevice);
+	}
+
+	GIOChannel *chan = g_io_channel_unix_new(device->fileDescriptor());
+	g_io_add_watch(chan, G_IO_IN,(GIOFunc)gioPollingFunc, this);
+	g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,this);
+	g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,this);
+	g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 
 	bool test = false;
 	if(config.find("testMode") != config.end())
@@ -383,28 +406,28 @@ void OpenXCPlugin::testParseEngine()
 	else DebugOut(0)<<"OpenXC Parse Test (vehicle_speed): \t\tPassed"<<endl;
 	if(!translateOpenXCEvent("{\"name\": \"accelerator_pedal_position\", \"value\": 90}"))
 	{
-		DebugOut(0)<<"OpenXC Parse Test (accelerator_pedal_position): \tFailed"<<endl;
+		DebugOut(0)<<"OpenXC Parse Test (accelerator_pedal_position): tFailed"<<endl;
 		passed = false;
 	}
-	else DebugOut(0)<<"OpenXC Parse Test (accelerator_pedal_position): \tPassed"<<endl;
+	else DebugOut(0)<<"OpenXC Parse Test (accelerator_pedal_position):\tPassed"<<endl;
 	if(!translateOpenXCEvent("{\"name\": \"parking_brake_status\", \"value\": \"false\" }"))
 	{
-		DebugOut(0)<<"OpenXC Parse Test (parking_brake_status): \tFailed"<<endl;
+		DebugOut(0)<<"OpenXC Parse Test (parking_brake_status):\tFailed"<<endl;
 		passed = false;
 	}
-	else DebugOut(0)<<"OpenXC Parse Test (parking_brake_status): \tPassed"<<endl;
+	else DebugOut(0)<<"OpenXC Parse Test (parking_brake_status):\tPassed"<<endl;
 	if(!translateOpenXCEvent("{\"name\": \"brake_pedal_status\", \"value\": \"false\" }"))
 	{
-		DebugOut(0)<<"OpenXC Parse Test (brake_pedal_status): \tFailed"<<endl;
+		DebugOut(0)<<"OpenXC Parse Test (brake_pedal_status):\tFailed"<<endl;
 		passed = false;
 	}
-	else DebugOut(0)<<"OpenXC Parse Test (brake_pedal_status): \tPassed"<<endl;
+	else DebugOut(0)<<"OpenXC Parse Test (brake_pedal_status):\tPassed"<<endl;
 	if(!translateOpenXCEvent("{\"name\": \"transmission_gear_position\", \"value\": \"fourth\"}"))
 	{
-		DebugOut(0)<<"OpenXC Parse Test (transmission_gear_position): \tFailed"<<endl;
+		DebugOut(0)<<"OpenXC Parse Test (transmission_gear_position):\tFailed"<<endl;
 		passed = false;
 	}
-	else DebugOut(0)<<"OpenXC Parse Test (transmission_gear_position): \tPassed"<<endl;
+	else DebugOut(0)<<"OpenXC Parse Test (transmission_gear_position):\tPassed"<<endl;
 	if(!translateOpenXCEvent("{\"name\": \"odometer\", \"value\": 1000}"))
 	{
 		DebugOut(0)<<"OpenXC Parse Test (odometer): \t\tFailed"<<endl;
@@ -425,10 +448,10 @@ void OpenXCPlugin::testParseEngine()
 	else DebugOut(0)<<"OpenXC Parse Test (fuel_level): \t\tPassed"<<endl;
 	if(!translateOpenXCEvent("{\"name\": \"fuel_consumed_since_restart\", \"value\": 45}"))
 	{
-		DebugOut(0)<<"OpenXC Parse Test (fuel_consumed_since_restart): \tFailed"<<endl;
+		DebugOut(0)<<"OpenXC Parse Test (fuel_consumed_since_restart):\tFailed"<<endl;
 		passed = false;
 	}
-	else DebugOut(0)<<"OpenXC Parse Test (fuel_consumed_since_restart): \tPassed"<<endl;
+	else DebugOut(0)<<"OpenXC Parse Test (fuel_consumed_since_restart):\tPassed"<<endl;
 	if(!translateOpenXCEvent("{\"name\": \"headlamp_status\", \"value\": \"true\"}"))
 	{
 		DebugOut(0)<<"OpenXC Parse Test (headlamp_status): \t\tFailed"<<endl;
@@ -459,4 +482,12 @@ void OpenXCPlugin::testParseEngine()
 		DebugOut(0)<<"Some OpenXC Parse Tests failed.  Aborting";
 		throw std::runtime_error("OpenXC Parse tests failed.");
 	}
+}
+
+
+void OpenXCPlugin::processData()
+{
+	std::string data = device->read();
+
+	translateOpenXCEvent(data);
 }

@@ -24,7 +24,7 @@ public:
 
 	bool open()
 	{
-		fd = open(tty, O_RDWR, O_NOCITY);
+		fd = ::open(tty.c_str(), O_RDWR, O_NOCTTY);
 
 		if(fd == -1)
 		{
@@ -56,9 +56,11 @@ public:
 		fcntl(fd,F_SETFL,O_NONBLOCK);
 	}
 
+	int fileDescriptor() { return fd; }
+
 	bool close()
 	{
-		close(fd);
+		::close(fd);
 	}
 
 	std::string read()

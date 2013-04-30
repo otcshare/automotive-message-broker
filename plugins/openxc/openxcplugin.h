@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <abstractsource.h>
 #include <string>
 
+#include "serialport.hpp"
 
 using namespace std;
 
@@ -42,14 +43,18 @@ public:
 	
 	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
-	
-	void randomizeProperties();
-	
+
+	void processData();
+
 private:
 	PropertyList mRequests;
+
 	bool translateOpenXCEvent(std::string json);
+
 	void testParseEngine();
 	std::map<std::string, std::string> openXC2AmbMap;
+
+	SerialPort* device;
 
 };
 
