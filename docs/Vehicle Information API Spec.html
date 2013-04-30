@@ -3,11 +3,11 @@
   <head>
     <title>Vehicle Information API</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <!--<script src='https://www.w3.org/Tools/respec/respec-w3c-common'
+    <script src='https://www.w3.org/Tools/respec/respec-w3c-common'
             class='remove'></script>
     <script class="remove">
       var respecConfig = {
-          specStatus:           "",
+          specStatus:           "unofficial",
           shortName:            "vehicle-information-api",
           publishDate:          "",
           previousPublishDate:  "",
@@ -21,13 +21,13 @@
          ],
           inlineCSS:    true,
           noIDLIn:      true,
-          extraCSS:     ["../ReSpec.js/css/respec.css"],
+          extraCSS:     ["http://dev.w3.org/2009/dap/ReSpec.js/css/respec.css"],
           wg:           "",
           wgURI:        "http://",
           wgPublicList: "",
           wgPatentURI:  "",
       };
-    </script> -->
+    </script> 
   </head>
 
   <body>
@@ -55,7 +55,7 @@
     An example of use is provided below:
   
   <pre class="example highlight">
-        navigator.vehicle.get(navigator.vehicle.EngineSpeed, onsuccess, onerror);
+        navigator.vehicle.get("EngineSpeed", onsuccess, onerror);
           
         function onsuccess(value) {
                 window.console.log(value.EngineSpeed);
@@ -122,29 +122,28 @@
   represents the initial entry point for getting access to the vehicle information
   services, i.e. Engine Speed and Tire Pressure.
   
-  <dl title="[NoInterfaceObject] interface Vehicle" class="idl">
-
-    <dt>getSupported ()</dt> <dd>Preturns supported properties.
+  <dl title="[NoInterfaceObject] interface Vehicle" class="idl">  
+    <dt>void getSupported ()</dt> <dd>Preturns supported properties.
        <dl class='parameters'>  
           <dt>SupportedPropertiesCallback successCallback</dt><dd>function to be called when method
           has completed successfully</dd>
           <dt>VehiclePropertyErrorCallback errorCallback</dt><dd>this function is called
           when an error has occured</dd>
-       </dl></dd>
+       </dl>
     </dd>
   
-    <dt>get ()</dt> <dd>fetch the current value for <code>property</code>.  Upon
+    <dt>void get ()</dt> <dd>fetch the current value for <code>property</code>.  Upon
     success, the <code>successCallback</code> will be called with the value.
        <dl class='parameters'>
           <dt>DOMString property</dt><dd>requested property to be retrieved</dd>
           <dt>VehiclePropertyCallback success</dt><dd>function to be called when method
           has completed successfully</dd>
           <dt>VehiclePropertyErrorCallback errorCallback</dt><dd>this function is called
-          when an error has occured</dd></dd>
+          when an error has occured</dd>
        </dl>
     </dd>
   
-    <dt>set ()</dt> <dd>set the <code>property</code> to <code>value</code>.  Upon
+    <dt>void set ()</dt> <dd>set the <code>property</code> to <code>value</code>.  Upon
     success, the <code>successCallback</code> will be called with the result.
        <dl class='parameters'>
           <dt>DOMString property</dt><dd>requested property to be retrieved</dd>
@@ -152,11 +151,11 @@
           <dt>VehiclePropertyCallback success</dt><dd>function to be called when method
           has completed successfully</dd>
           <dt>VehiclePropertyErrorCallback errorCallback</dt><dd>this function is called
-          when an error has occured</dd></dd>
+          when an error has occured</dd>
        </dl>
     </dd>
 
-    <dt>getHistory ()</dt> <dd>get the <code>property</code> in series from <code>startTime</code>
+    <dt>void getHistory ()</dt> <dd>get the <code>property</code> in series from <code>startTime</code>
     to <code>endTime</code>.  Upon success, the <code>successCallback</code> will be called 
     with the result.
        <dl class='parameters'>
@@ -166,7 +165,7 @@
           <dt>VehiclePropertyListCallback success</dt><dd>function to be called when method
           has completed successfully</dd>
           <dt>VehiclePropertyErrorCallback errorCallback</dt><dd>this function is called
-          when an error has occured</dd></dd>
+          when an error has occured</dd>
        </dl>
     </dd>
 
@@ -249,7 +248,7 @@
   <h2><a>VehiclePropertyType</a> Interface</h2> <p>The <a>VehiclePropertyType</a>
   interface represents the base interface for all vehicle properties.
   
-  <dl title="[NoInterfaceObject] interface VehiclePropertyType"
+  <dl title="[NoInterfaceObject] interface VehiclePropertyType : Event"
   class="idl">
 
     <dt>readonly attribute Date timeStamp;</dt> <dd>MUST return the type time at which this property was
@@ -263,15 +262,15 @@
   <h2><a>VehiclePropertyError</a> Interface</h2>
   <p>The <a>VehiclePropertyError</a> interface represents the an error returned by the vehicle information system.
   manager.
-  <dl title="[NoInterfaceObject] interface VehiclePropertyError">
+  <dl title="[NoInterfaceObject] interface VehiclePropertyError" class="idl">
      <dt class="no-docs">const unsigned short PERMISSION_DENIED = 1 </dt>
      <dt class="no-docs">const unsigned short PROPERTY_UNAVAILABLE = 2</dt> 
-	 <dt class="no-docs">const unsigned short TIMEOUT = 3</dt>
-	 <dt class="no-docs">const unsigned short UNKNOWN = 10</dt>
+     <dt class="no-docs">const unsigned short TIMEOUT = 3</dt>
+     <dt class="no-docs">const unsigned short UNKNOWN = 10</dt>
 	
      <dt>readonly attribute unsigned short code</dt>
      <dd> MUST return error code. </dd>
-     <dt>readonly attribute DOMString message<dt>
+     <dt>readonly attribute DOMString message</dt>
      <dd>MUST return error message</dd>
 
   </dl>
@@ -309,7 +308,7 @@
 <section>
   <h2><a>VehicleSpeed</a> Interface</h2>
   <p>The <a>VehicleSpeed</a> interface represents vehicle speed.
-  <dl title="[NoInterfaceObject] interface VehicleSpeed : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface VehicleSpeed : VehiclePropertyType" class="idl">
      <dt>readonly attribute unsigned long VehicleSpeed</dt>
      <dd>Must return Vehicle Speed in kilometers per hour.</dd>
   </dl>
@@ -319,7 +318,7 @@
 <section>
   <h2><a>EngineSpeed</a> Interface</h2>
   <p>The <a>EngineSpeed</a> interface represents engine speed.
-  <dl title="[NoInterfaceObject] interface EngineSpeed : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface EngineSpeed : VehiclePropertyType" class="idl">
      <dt>readonly attribute unsigned long EngineSpeed</dt>
      <dd>Must return Engine Speed in rotations per minute.</dd>
   </dl>
@@ -329,7 +328,7 @@
 <section>
   <h2><a>VehiclePowerMode</a> Interface</h2>
   <p>The <a>VehiclePowerMode</a> interface represents the current vehidle power mode.
-  <dl title="[NoInterfaceObject] interface VehiclePowerMode : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface VehiclePowerMode : VehiclePropertyType" class="idl">
      <dt class="no-docs">const unsigned short VEHICLEPOWERMODE_OFF = 0</dt>
      <dt class="no-docs">const unsigned short VEHICLEPOWERMODE_ACCESSORY1 = 1</dt>
      <dt class="no-docs">const unsigned short VEHICLEPOWERMODE_ACCESSORY2 = 2</dt>
@@ -343,7 +342,7 @@
 <section>
   <h2><a>TripMeters</a> Interface</h2>
   <p>The <a>TripMeters</a> interface represents the current trip meters.
-  <dl title="[NoInterfaceObject] interface TripMeters : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface TripMeters : VehiclePropertyType" class="idl">
      <dt>attribute sequence unsigned long TripMeters</dt>
      <dd>Must return trip meters.  Changing any items in the array will reset the item's value to '0'.</dd>
   </dl>
@@ -353,7 +352,7 @@
 <section>
   <h2><a>Acceleration</a> Interface</h2>
   <p>The <a>Acceleration</a> interface represents vehicle acceleration.
-  <dl title="[NoInterfaceObject] interface Acceleration : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface Acceleration : VehiclePropertyType" class="idl">
      <dt>readonly attribute unsigned long X</dt>
      <dd>Must return acceleration on the "X" axis as 1/1000 G (gravitational force). </dd>
      <dt>readonly attribute unsigned long Y</dt>
@@ -367,26 +366,26 @@
 <section>
   <h2><a>Trasnmission</a> Interface</h2>
   <p>The <a>Trasnmission</a> interface represents the current transmssion gear and mode.
-  <dl title="[NoInterfaceObject] interface Trasnmission : VehiclePropertyType">
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIRST = 1;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SECOND = 2;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_THIRD = 3;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FORTH = 4;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIFTH = 5;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SIXTH = 6;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SEVENTH = 7;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_EIGHTH = 8;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NINTH = 9;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_TENTH = 10;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_CVT = 64;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_REVERSE = 128;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_PARK = 255;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_NORMAL = 0;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_SPORT = 1;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_ECONOMY = 2;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM1 = 3;</dt>
-     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM2 = 4;</dt>
+  <dl title="[NoInterfaceObject] interface Trasnmission : VehiclePropertyType" class="idl">
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIRST = 1</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SECOND = 2</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_THIRD = 3</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FORTH = 4</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_FIFTH = 5</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SIXTH = 6</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_SEVENTH = 7</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_EIGHTH = 8</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_NINTH = 9</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_TENTH = 10</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_CVT = 64</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_REVERSE = 128</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONPOSITION_PARK = 255</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_NORMAL = 0</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_SPORT = 1</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_ECONOMY = 2</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM1 = 3</dt>
+     <dt class="no-docs">const unsigned short TRANSMISSIONMODE_OEMCUSTOM2 = 4</dt>
      
      <dt>readonly attribute octet GearPosition</dt><dd>Must return transmission gear position (see <a>TRANSMISSIONPOSITION</a>)</dd>
      <dt>readonly attribute octet Mode</dt><dd>Must return transmission Mode (see <a>TRANSMISSIONMODE</a>)</dd>
@@ -398,7 +397,7 @@
 <section>
   <h2><a>CruiseControlStatus</a> Interface</h2>
   <p>The <a>CruiseControlStatus</a> interface represents cruise control settings.
-  <dl title="[NoInterfaceObject] interface CruiseControlStatus : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface CruiseControlStatus : VehiclePropertyType" class="idl">
      <dt>readonly attribute boolean Activated</dt>
      <dd>Must return whether or not the Cruise Control system is active (true) or inactive (false)</dd>
      <dt>readonly attribute unsigned short Speed</dt>
@@ -410,7 +409,7 @@
 <section>
   <h2><a>WheelBrake</a> Interface</h2>
   <p>The <a>WheelBrake</a> interface represents wheel brake status.
-  <dl title="[NoInterfaceObject] interface WheelBrake : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface WheelBrake : VehiclePropertyType" class="idl">
      <dt>readonly attribute boolean Engaged</dt>
      <dd>Must return Wheel Brake status: Engaged (true) or Disengaged (false)</dd>
   </dl>
@@ -420,7 +419,7 @@
 <section>
   <h2><a>LightStatus</a> Interface</h2>
   <p>The <a>LightStatus</a> interface represents exterior light statuses.
-  <dl title="[NoInterfaceObject] interface LightStatus : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface LightStatus : VehiclePropertyType" class="idl">
      <dt>readonly attribute boolean Head</dt>
      <dd>Must return headlight status: on (true), off (false)</dd>
      <dt>readonly attribute boolean RightTurn</dt>
@@ -444,7 +443,7 @@
 <section>
   <h2><a>InteriorLightStatus</a> Interface</h2>
   <p>The <a>InteriorLightStatus</a> interface represents interior light status.
-  <dl title="[NoInterfaceObject] interface InteriorLightStatus : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface InteriorLightStatus : VehiclePropertyType" class="idl">
      <dt>readonly attribute boolean Passenger</dt>
      <dd> Must return passenger interior light status: on (true), off (false)</dd>
      <dt>readonly attribute boolean Driver</dt>
@@ -458,7 +457,7 @@
 <section>
   <h2><a>Horn</a> Interface</h2>
   <p>The <a>Horn</a> interface represents horn status.
-  <dl title="[NoInterfaceObject] interface Horn : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface Horn : VehiclePropertyType" class="idl">
      <dt>readonly attribute boolean On</dt>
      <dd>Must return Horn status: On (true) or off (false)</dd>
   </dl>
@@ -468,7 +467,7 @@
 <section>
   <h2><a>Fuel</a> Interface</h2>
   <p>The <a>Fuel</a> interface represents vehicle fuel status.
-  <dl title="[NoInterfaceObject] interface Fuel : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface Fuel : VehiclePropertyType" class="idl">
      <dt>readonly attribute unsigned short Level</dt>
      <dd>Must return fuel level as a percentage of fullness</dd>
      <dt>readonly attribute unsigned short Range</dt>
@@ -486,7 +485,7 @@
 <section>
   <h2><a>EngineOil</a> Interface</h2>
   <p>The <a>EngineOil</a> interface represents engine oil status.
-  <dl title="[NoInterfaceObject] interface Horn : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface Horn : VehiclePropertyType" class="idl">
      <dt>readonly attribute unsigned short Remaining</dt>
      <dd>Must return remaining engine oil as percentage of fullness</dd>
      <dt>readonly attribute long Temperature</dt>
@@ -500,14 +499,14 @@
 <section>
   <h2><a>Location</a> Interface</h2>
   <p>The <a>Location</a> interface represents vehicle location status.  This is usually from gps, but could use a number of technologies.
-  <dl title="[NoInterfaceObject] interface Location : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface Location : VehiclePropertyType" class="idl">
      <dt>readonly attribute double Latitude</dt>
      <dd>Must return latitude in Deg.Min (-180, +180)</dd>
      <dt>readonly attribute double Longitude</dt>
      <dd>Must return longitude in Deg.Min (-90, +90)</dd>
      <dt>readonly attribute double Altitude</dt>
      <dd>Must return altitude in meters above sea-level (0)</dd>
-     <dt>readonly attribute unsigned short Direction;</dt>
+     <dt>readonly attribute unsigned short Direction</dt>
      <dd>Must return direction in Degrees  (0-360)</dd>
   </dl>
 </section>
@@ -516,7 +515,7 @@
 <section>
   <h2><a>ExteriorBrightness</a> Interface</h2>
   <p>The <a>ExteriorBrightness</a> interface represents brightness outside the vehicle.
-  <dl title="[NoInterfaceObject] interface ExteriorBrightness : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface ExteriorBrightness : VehiclePropertyType" class="idl">
      <dt>readonly attribute unsigned long ExteriorBrightness</dt>
      <dd>Must return the brightness outside the vehicle in lux</dd>
   </dl>
@@ -526,7 +525,7 @@
 <section>
   <h2><a>Temperature</a> Interface</h2>
   <p>The <a>Temperature</a> interface represents temperature inside and outside the vehicle.
-  <dl title="[NoInterfaceObject] interface Temperature : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface Temperature : VehiclePropertyType" class="idl">
      <dt>readonly attribute signed short Interior</dt>
      <dd>Must return the temperature of the interior of the vehicle in celcius</dd>
      <dt>readonly attribute signed short Exterior</dt>
@@ -538,7 +537,7 @@
 <section>
   <h2><a>RainSensor</a> Interface</h2>
   <p>The <a>RainSensor</a> interface represents intensity of rain.
-  <dl title="[NoInterfaceObject] interface RainSensor : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface RainSensor : VehiclePropertyType" class="idl">
      <dt>readonly attribute unsigned short RainSensor</dt>
      <dd>Must return level of rain intensity 0: No Rain - 10: Heaviest Rain</dd>
   </dl>
@@ -548,7 +547,7 @@
 <section>
   <h2><a>WindshieldWiper</a> Interface</h2>
   <p>The <a>WindshieldWiper</a> interface represents the status of the windshield wiper.
-  <dl title="[NoInterfaceObject] interface WindshieldWiper : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface WindshieldWiper : VehiclePropertyType" class="idl">
      <dt class="no-docs">const unsigned short WIPERSPEED_OFF = 0</dt>
 	 <dt class="no-docs">const unsigned short WIPERSPEED_SLOWEST= 1</dt>    
 	 <dt class="no-docs">const unsigned short WIPERSPEED_FASTEST = 5</dt>  
@@ -575,68 +574,49 @@
 <section>
   <h2><a>HVAC</a> Interface</h2>
   <p>The <a>HVAC</a> interface to get status and control the vehicle HVAC system.
-  <dl title="[NoInterfaceObject] interface HVAC : VehiclePropertyType">
+  <dl title="[NoInterfaceObject] interface HVAC : VehiclePropertyType" class="idl">
      <dt class="no-docs">const unsigned short AIRFLOWDIRECTION_FRONTPANEL = 0</dt>
      <dt class="no-docs">const unsigned short AIRFLOWDIRECTION_FLOORDUCT= 1</dt>
      <dt class="no-docs">const unsigned short AIRFLOWDIRECTION_FRONT = 0x02</dt>
      <dt class="no-docs">const unsigned short AIRFLOWDIRECTION_DEFROSTER = 0x04</dt>
-     <dt>readwrite attribute unsigned short AirflowDirection</dt>
-     <dd>Must return airflow direction.  The value represents a bitmask of HVAC.AIRFLOWDIRECTION(s).  For example:
+     <dt>attribute unsigned short AirflowDirection</dt>
+    <dd>Must return airflow direction.  The value represents a bitmask of HVAC.AIRFLOWDIRECTION(s).  For example:
      <pre class="example highlight">
-        navigator.vehicle.get(navigator.vehicle.HVAC, onsuccess, onerror);
+        navigator.vehicle.get("HVAC", onsuccess, onerror);
           
         function onsuccess(value) {
             var hvacsettings = value;
-			
-			value.AirflowDirection = value.AIRFLOWDIRECTION_FRONT | value.AIRFLOWDIRECTION_DEFROSTER;
-			
-			navigator.vehicle.set(navicator.vehicle.HVAC, value, onsetsuccess, onerror);
+            value.AirflowDirection = value.AIRFLOWDIRECTION_FRONT | value.AIRFLOWDIRECTION_DEFROSTER;
+            navigator.vehicle.set("HVAC", value, onsetsuccess, onerror);
         }
         function onerror(e) {
             window.console.error(e.message);
         }
         function onsetsuccess() {
-			window.console.log("success!");
-		}
+            window.console.log("success!");
+        }
         
      </pre>
      </dd>
-     <dt>readwrite attribute unsigned short FanSpeed</dt>
+     <dt>attribute unsigned short FanSpeed</dt>
      <dd>Must return speed of the fan (0-7)</dd>
-     <dt>readwrite attribute unsigned short TargetTemperature</dt>
+     <dt>attribute unsigned short TargetTemperature</dt>
      <dd>Must return target desired temperature in celcius</dd>
-     <dt>readwrite attribute boolean AirConditioning</dt>
+     <dt>attribute boolean AirConditioning</dt>
      <dd>Must return air conditioning on (true) / off (false)</dd>
-     <dt>readwrite attribute boolean AirRecirculation</dt>
+     <dt>attribute boolean AirRecirculation</dt>
      <dd>Must return air recirculation on (true) / off (false)</dd>
-     <dt>readwrite attribute boolean Heater</dt>
+     <dt>attribute boolean Heater</dt>
      <dd>Must return heater on (true) / off (false)</dd>
-     <dt>readwrite attribute DefrostDictionary Defrost</dt>
+     <dt>attribute DefrostDictionary Defrost</dt>
      <dd>Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of 
          DefrostDictionary that represents each window and its defrost status</dd>
-     <dt>readwrite attribute boolean SteeringWheelHeater</dt>
+     <dt>attribute boolean SteeringWheelHeater</dt>
      <dd>ust return air recirculation on (true) / off (false).</dd>
-     <dt>readwrite attribute boolean SeatHeater</dt>
+     <dt>attribute boolean SeatHeater</dt>
      <dd>Must return seat heater status: on (true) / off (false)</dd>
      
   </dl>
-</section>
-
-
-  <p class="issue">
-  It needs to be discussed whether to just allow using the above
-  messaging-specific MessagingFilter or otherwise to allow defining filters with
-  a generic syntax (as defined in the following sections) and reflect in this
-  specification on which attributes the implementation is required to filter in
-  an efficient manner (e.g. creating the corresponding indexes).
-  </p>
-
-<!------------------------ Acknowledgements ---------------------------------->
-<section>
-  <h2>Acknowledgements</h2>
-  <p>The editors would like to express their gratitude to the Mozilla B2G Team
-  and specially to Jonas Sicking, Mounir Lamouri and Vicamo Yang for their
-  technical guidance, implementation work and support.</p>
 </section>
 
   </body>

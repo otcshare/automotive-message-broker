@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "pluginloader.h"
 #include "glibmainloop.h"
-
+#include <json.h>
 #include <iostream>
 #include <stdexcept>
 #include <boost/concept_check.hpp>

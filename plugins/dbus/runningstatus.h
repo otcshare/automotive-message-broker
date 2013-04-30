@@ -459,7 +459,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return direction in Degrees  (0-360)
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::Direction, "Direction", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Direction, "Direction", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
