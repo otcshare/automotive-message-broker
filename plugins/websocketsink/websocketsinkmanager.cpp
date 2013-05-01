@@ -367,7 +367,8 @@ void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 void WebSocketSinkManager::addPoll(int fd)
 {
 	GIOChannel *chan = g_io_channel_unix_new(fd);
-	guint sourceid = g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,chan);
+	guint sourceid = g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)gioPollingFunc,chan);
+	g_io_channel_set_close_on_unref(chan,true);
 	g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 	m_ioChannelMap[fd] = chan;
 	m_ioSourceMap[fd] = sourceid;
@@ -378,6 +379,7 @@ void WebSocketSinkManager::removePoll(int fd)
 	//printf("Shutting down IO Channel\n");
 	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Shutting down IO Channel\n";
 	g_source_remove(m_ioSourceMap[fd]); //Since the watch owns the GIOChannel, this should unref it enough to dissapear.
+
 	//for (map<int,guint>::const_iterator i=m_ioSourceMap.cbegin();i!=m_ioSourceMap.cend();i++)
 	for (map<int,guint>::iterator i=m_ioSourceMap.begin();i!=m_ioSourceMap.end();i++)
 	{
