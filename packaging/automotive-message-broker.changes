@@ -1,3 +1,8 @@
+* Fri May 03 15:48:00 PST 2013 - <kevron.m.rees@intel.com>
+- 0.7.1 release
+- bug fixes for TIVI 821
+- fixed ambd cpu at 100% when close websocket connection
+
 * Tue Apr 23 11:03:00 CET 2013 - <kevron.m.rees@intel.com>
 - reverted back to 0.7.0
 
