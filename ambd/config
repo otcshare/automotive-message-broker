@@ -7,10 +7,6 @@
 		}
 	],
 	"sinks": [
-		{ 
-			"name" : "ExampleSink",
-			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so" 
-		},
 		{
 			"name" : "WebSocketSink",
 			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
