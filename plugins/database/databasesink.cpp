@@ -62,6 +62,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		engine->subscribeToProperty(*itr,this);
 	}
 
+	engine->setSupported(supported(),this);
 }
 
 DatabaseSink::~DatabaseSink()
@@ -206,11 +207,7 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	reply->success = true;
 	reply->completed(reply);
 
-	/// reply is owned by the requester of this call.  we own the data:
-	for(auto itr = cleanup.begin(); itr != cleanup.end(); itr++)
-	{
-		delete *itr;
-	}
+	/// reply owns the data
 
 	delete db;
 }
