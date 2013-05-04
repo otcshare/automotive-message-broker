@@ -119,7 +119,7 @@ class PlaybackShared
 {
 public:
 	PlaybackShared(AbstractRoutingEngine* re, std::string u, uint playbackMult)
-		:routingEngine(re),uuid(u),playBackMultiplier(playbackMult) {}
+		:routingEngine(re),uuid(u),playBackMultiplier(playbackMult),stop(false) {}
 	~PlaybackShared()
 	{
 		for(auto itr = playbackQueue.begin(); itr != playbackQueue.end(); itr++)
@@ -136,6 +136,7 @@ public:
 	std::list<DBObject*> playbackQueue;
 	uint playBackMultiplier;
 	std::string uuid;
+	bool stop;
 };
 
 class DatabaseSink : public AbstractSource
@@ -164,6 +165,8 @@ private: //methods:
 	void startDb();
 	void startPlayback();
 	void initDb();
+	void setPlayback(bool v);
+	void setLogging(bool b);
 
 private:
 	PropertyList mSubscriptions;
