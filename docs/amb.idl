@@ -17,8 +17,10 @@ partial interface Navigator   {
 };
 
 [NoInterfaceObject]
-interface VehiclePropertyType  { 
-	readonly attribute Date timeStamp;
+interface VehiclePropertyType: Event { 
+	/** /brief time at which the vehicle generated the property
+	 **/
+	readonly attribute DOMTimeStamp time;
 };
 
 [NoInterfaceObject]

@@ -192,7 +192,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY( VehiclePowerMode,Power::Off);
 	registerPropertyPriv(TripMeters,[](){
 		TripMetersType* t = new TripMetersType();
-		t->append(0);
+		BasicPropertyType<uint16_t> v(0);
+		t->append(&v);
 		return t;
 	});
 
