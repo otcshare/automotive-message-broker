@@ -78,6 +78,9 @@ int getNextEvent(gpointer data)
 	if(!pbshared)
 		throw std::runtime_error("failed to cast PlaybackShared object");
 
+	if(pbshared->stop)
+		return 0;
+
 	auto itr = pbshared->playbackQueue.begin();
 
 	if(itr == pbshared->playbackQueue.end())
@@ -104,10 +107,11 @@ int getNextEvent(gpointer data)
 		if(t > 0)
 			g_timeout_add((t*1000) / pbshared->playBackMultiplier, getNextEvent, pbshared);
 		else
-			g_timeout_add(t, getNextEvent, pbshared);
+			g_timeout_add(1, getNextEvent, pbshared);
 	}
 
 	pbshared->playbackQueue.remove(obj);
+	DebugOut()<<"playback Queue size: "<<pbshared->playbackQueue.size()<<endl;
 	delete obj;
 
 	return 0;
@@ -164,7 +168,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	{
 		AsyncSetPropertyRequest request;
 		request.property = DatabaseLoggingProperty;
-		request.value = new BasicPropertyType<bool>(true);
+		request.value = new DatabaseLoggingType(true);
 
 		setProperty(request);
 	}
@@ -176,7 +180,11 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("playbackOnLoad")!= config.end())
 	{
-		startPlayback();
+		AsyncSetPropertyRequest request;
+		request.property = DatabasePlaybackProperty;
+		request.value = new DatabasePlaybackType(true);
+
+		setProperty(request);
 	}
 
 
@@ -297,6 +305,10 @@ void DatabaseSink::startPlayback()
 
 	vector<vector<string> > results = shared->db->select("SELECT * FROM "+tablename);
 
+	/// we are done with shared.  clean up:
+	delete shared;
+	shared = NULL;
+
 	if(playbackShared)
 	{
 		delete playbackShared;
@@ -317,6 +329,9 @@ void DatabaseSink::startPlayback()
 		obj->value = results[i][1];
 		obj->source = results[i][2];
 		obj->time = boost::lexical_cast<double>(results[i][3]);
+
+		/// TODO: figure out why sequence is broken:
+
 //		obj->sequence = boost::lexical_cast<int>(results[i][4]);
 
 		playbackShared->playbackQueue.push_back(obj);
@@ -331,6 +346,24 @@ void DatabaseSink::initDb()
 
 	shared = new Shared;
 	shared->db->init(databaseName, tablename, tablecreate);
+}
+
+void DatabaseSink::setPlayback(bool v)
+{
+	AsyncSetPropertyRequest request;
+	request.property = DatabasePlaybackProperty;
+	request.value = new DatabasePlaybackType(v);
+
+	setProperty(request);
+}
+
+void DatabaseSink::setLogging(bool b)
+{
+	AsyncSetPropertyRequest request;
+	request.property = DatabaseLoggingProperty;
+	request.value = new DatabaseLoggingType(b);
+
+	setProperty(request);
 }
 
 void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
@@ -454,7 +487,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 	{
 		if(request.value->value<bool>())
 		{
-			///TODO: start or stop logging thread
+			setPlayback(false);
 			startDb();
 			reply->success = true;
 			BasicPropertyType<bool> temp(true);
@@ -485,19 +518,23 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 	{
 		if(request.value->value<bool>())
 		{
+			setLogging(false);
 			startPlayback();
 
-			BasicPropertyType<bool> temp(true);
+			BasicPropertyType<bool> temp(playback);
 
 			routingEngine->updateProperty(DatabasePlaybackProperty,&temp,uuid());
 		}
 		else
 		{
-			/// TODO: stop playback
+			if(playbackShared)
+				playbackShared->stop = true;
 
-			BasicPropertyType<bool> temp(true);
+			playback = false;
 
-			routingEngine->updateProperty(DatabasePlaybackProperty,&temp,uuid());
+			BasicPropertyType<bool> temp(playback);
+
+			routingEngine->updateProperty(DatabasePlaybackProperty, &temp, uuid());
 		}
 
 		reply->success = true;
