@@ -1,0 +1,17 @@
+{
+	"sources" : [ 
+		{
+			"name" : "obd2source",
+			"path" : "/usr/lib/automotive-message-broker/obd2sourceplugin.so",
+			"device" : "00:04:3E:1F:16:A3"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "Database",
+			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
+			"properties" : "{ 'properties' : ['VehicleSpeed'] }"
+		},
+	]
+}
+
