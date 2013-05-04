@@ -126,7 +126,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("databaseFile") != config.end())
 	{
-		databaseName = config["databaseFile"];
+		setDatabaseFileName(config["databaseFile"]);
 	}
 
 	if(config.find("properties") != config.end())
@@ -143,26 +143,10 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	mSupported.push_back(DatabaseLoggingProperty);
 	mSupported.push_back(DatabasePlaybackProperty);
 
-
-	initDb();
-
 	/// get supported:
-
-	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
-
-	for(int i=0; i < supportedStr.size(); i++)
-	{
-		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
-			mSupported.push_back(supportedStr[i][0]);
-	}
 
 	routingEngine->setSupported(supported(), this);
 
-	if(shared)
-	{
-		delete shared;
-		shared = NULL;
-	}
 
 	if(config.find("startOnLoad")!= config.end())
 	{
@@ -356,6 +340,26 @@ void DatabaseSink::setLogging(bool b)
 	request.value = new BasicPropertyType<bool>(b);
 
 	setProperty(request);
+}
+
+void DatabaseSink::setDatabaseFileName(string filename)
+{
+	databaseName = filename;
+
+	initDb();
+
+	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
+
+	for(int i=0; i < supportedStr.size(); i++)
+	{
+		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
+			mSupported.push_back(supportedStr[i][0]);
+	}
+
+	delete shared;
+	shared = NULL;
+
+	routingEngine->setSupported(mSupported, this);
 }
 
 void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)

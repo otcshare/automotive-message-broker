@@ -50,7 +50,11 @@ Core::Core()
 
 Core::~Core()
 {
-
+	for(auto itr = mSinks.begin(); itr != mSinks.end(); itr++)
+	{
+		AbstractSink* sink = *itr;
+		delete sink;
+	}
 }
 
 
