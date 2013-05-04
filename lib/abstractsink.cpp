@@ -28,7 +28,7 @@ AbstractSink::AbstractSink(AbstractRoutingEngine* engine, map<string, string> co
 
 AbstractSink::~AbstractSink()
 {
-	routingEngine->unregisterSink(this);
+	//routingEngine->unregisterSink(this);
 }
 
 void AbstractSink::setConfiguration(map<string, string> config)

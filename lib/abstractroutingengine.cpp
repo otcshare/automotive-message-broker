@@ -19,3 +19,8 @@
 
 #include "abstractroutingengine.h"
 
+
+
+AbstractRoutingEngine::~AbstractRoutingEngine()
+{
+}

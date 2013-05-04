@@ -131,7 +131,9 @@ int main(int argc, char **argv)
 
 	VehicleProperty::factory();
 	
-	PluginLoader loader(config, new Core(), argc, argv);
+	Core routingEngine;
+
+	PluginLoader loader(config, &routingEngine , argc, argv);
 	
 	if(!loader.sources().size())
 	{

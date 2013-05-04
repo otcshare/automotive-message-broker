@@ -126,7 +126,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("databaseFile") != config.end())
 	{
-		databaseName = config["databaseFile"];
+		setDatabaseFileName(config["databaseFile"]);
 	}
 
 	if(config.find("properties") != config.end())
@@ -143,30 +143,11 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	mSupported.push_back(DatabaseLoggingProperty);
 	mSupported.push_back(DatabasePlaybackProperty);
 
-	/// get supported:
-
-	initDb();
-
-	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
-
-	for(int i=0; i < supportedStr.size(); i++)
-	{
-		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
-			mSupported.push_back(supportedStr[i][0]);
-	}
-
-	delete shared;
-	shared = NULL;
-
 	routingEngine->setSupported(supported(), this);
 
 	if(config.find("startOnLoad")!= config.end())
 	{
-		AsyncSetPropertyRequest request;
-		request.property = DatabaseLoggingProperty;
-		request.value = new DatabaseLoggingType(true);
-
-		setProperty(request);
+		setLogging(true);
 	}
 
 	if(config.find("playbackMultiplier")!= config.end())
@@ -176,11 +157,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("playbackOnLoad")!= config.end())
 	{
-		AsyncSetPropertyRequest request;
-		request.property = DatabasePlaybackProperty;
-		request.value = new DatabasePlaybackType(true);
-
-		setProperty(request);
+		setPlayback(true);
 	}
 
 
@@ -360,6 +337,26 @@ void DatabaseSink::setLogging(bool b)
 	request.value = new DatabaseLoggingType(b);
 
 	setProperty(request);
+}
+
+void DatabaseSink::setDatabaseFileName(string filename)
+{
+	databaseName = filename;
+
+	initDb();
+
+	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
+
+	for(int i=0; i < supportedStr.size(); i++)
+	{
+		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
+			mSupported.push_back(supportedStr[i][0]);
+	}
+
+	delete shared;
+	shared = NULL;
+
+	routingEngine->setSupported(mSupported, this);
 }
 
 void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)

@@ -167,6 +167,7 @@ private: //methods:
 	void initDb();
 	void setPlayback(bool v);
 	void setLogging(bool b);
+	void setDatabaseFileName(std::string filename);
 
 private:
 	PropertyList mSubscriptions;
