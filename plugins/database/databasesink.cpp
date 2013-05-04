@@ -146,7 +146,11 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("startOnLoad")!= config.end())
 	{
-		startDb();
+		AsyncSetPropertyRequest request;
+		request.property = DatabaseLoggingProperty;
+		request.value = new BasicPropertyType<bool>(true);
+
+		setProperty(request);
 	}
 
 	if(config.find("playbackMultiplier")!= config.end())
