@@ -185,7 +185,7 @@ class MassAirFlowPid: public CopyMe<MassAirFlowPid>
 public:
 
 	MassAirFlowPid()
-		:CopyMe(VehicleProperty::MassAirFlow,"01101\r",0x01)
+		:CopyMe(VehicleProperty::MassAirFlow,"01101\r", 0x10)
 	{
 
 	}
