@@ -50,10 +50,16 @@ Core::Core()
 
 Core::~Core()
 {
+	std::vector<AbstractSink*> toDelete;
 	for(auto itr = mSinks.begin(); itr != mSinks.end(); itr++)
 	{
 		AbstractSink* sink = *itr;
-		delete sink;
+		toDelete.push_back(sink);
+	}
+
+	for(int i=0; i<toDelete.size(); i++)
+	{
+		delete toDelete[i];
 	}
 }
 
