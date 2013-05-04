@@ -166,11 +166,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("startOnLoad")!= config.end())
 	{
-		AsyncSetPropertyRequest request;
-		request.property = DatabaseLoggingProperty;
-		request.value = new DatabaseLoggingType(true);
-
-		setProperty(request);
+		setLogging(true);
 	}
 
 	if(config.find("playbackMultiplier")!= config.end())
@@ -180,11 +176,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("playbackOnLoad")!= config.end())
 	{
-		AsyncSetPropertyRequest request;
-		request.property = DatabasePlaybackProperty;
-		request.value = new DatabasePlaybackType(true);
-
-		setProperty(request);
+		setPlayback(true);
 	}
 
 
@@ -352,7 +344,7 @@ void DatabaseSink::setPlayback(bool v)
 {
 	AsyncSetPropertyRequest request;
 	request.property = DatabasePlaybackProperty;
-	request.value = new DatabasePlaybackType(v);
+	request.value = new BasicPropertyType<bool>(v);
 
 	setProperty(request);
 }
@@ -361,7 +353,7 @@ void DatabaseSink::setLogging(bool b)
 {
 	AsyncSetPropertyRequest request;
 	request.property = DatabaseLoggingProperty;
-	request.value = new DatabaseLoggingType(b);
+	request.value = new BasicPropertyType<bool>(b);
 
 	setProperty(request);
 }
