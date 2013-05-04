@@ -58,6 +58,16 @@ void * cbFunc(gpointer data)
 		delete obj;
 	}
 
+	/// final flush of whatever is still in the queue:
+
+	shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
+	for(int i=0; i< insertList.size(); i++)
+	{
+		DictionaryList<string> d = insertList[i];
+		shared->db->insert(d);
+	}
+	shared->db->exec("END TRANSACTION");
+
 	return NULL;
 }
 
@@ -143,6 +153,12 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	}
 
 	routingEngine->setSupported(supported(), this);
+
+	if(shared)
+	{
+		delete shared;
+		shared = NULL;
+	}
 
 	if(config.find("startOnLoad")!= config.end())
 	{
