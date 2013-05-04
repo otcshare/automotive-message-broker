@@ -548,7 +548,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
 	: AbstractSource(re, config)
 {
-	bool success = VehicleProperty::registerProperty(Obd2Connected,[](){ return new Obd2ConnectType(false); });
+	bool success = VehicleProperty::registerProperty(Obd2Connected,[](){ return new Obd2ConnectType(Obd2Connected,false); });
 
 	if(!success)
 	{

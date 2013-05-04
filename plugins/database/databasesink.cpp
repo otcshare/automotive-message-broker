@@ -129,10 +129,9 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	mSupported.push_back(DatabaseLoggingProperty);
 	mSupported.push_back(DatabasePlaybackProperty);
 
+	/// get supported:
 
 	initDb();
-
-	/// get supported:
 
 	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
 
@@ -141,6 +140,9 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
 			mSupported.push_back(supportedStr[i][0]);
 	}
+
+	delete shared;
+	shared = NULL;
 
 	routingEngine->setSupported(supported(), this);
 
@@ -344,7 +346,7 @@ void DatabaseSink::getPropertyAsync(AsyncPropertyReply *reply)
 
 	if(reply->property == DatabaseFileProperty)
 	{
-		StringPropertyType temp(databaseName);
+		DatabaseFilePropertyType temp(databaseName);
 		reply->value = &temp;
 
 		reply->success = true;

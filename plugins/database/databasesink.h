@@ -179,6 +179,11 @@ private:
 	uint playbackMultiplier;
 };
 
+PROPERTYTYPEBASIC1(DatabaseLogging, bool)
+PROPERTYTYPEBASIC1(DatabasePlayback, bool)
+PROPERTYTYPE1(DatabaseFile, DatabaseFilePropertyType, StringPropertyType, std::string)
+
+
 class DatabaseSinkManager: public AbstractSinkManager
 {
 public:
@@ -186,9 +191,9 @@ public:
 	:AbstractSinkManager(engine, config)
 	{
 		new DatabaseSink(routingEngine, config);
-		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new BasicPropertyType<bool>(false);});
-		VehicleProperty::registerProperty(DatabasePlaybackProperty, [](){return new BasicPropertyType<bool>(false);});
-VehicleProperty::registerProperty(DatabaseFileProperty, [](){return new StringPropertyType("out.ogg");});
+		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new DatabaseLoggingType(false);});
+		VehicleProperty::registerProperty(DatabasePlaybackProperty, [](){return new DatabasePlaybackType(false);});
+		VehicleProperty::registerProperty(DatabaseFileProperty, [](){return new DatabaseFilePropertyType("storage");});
 	}
 };
 
