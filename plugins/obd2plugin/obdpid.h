@@ -267,14 +267,14 @@ public:
 	}
 	bool isValid(ByteArray replyVector)
 	{
+		isValidVal = true;
 		ByteArray tmp = compress(cleanup(replyVector));
 		if (tmp[0] != 0x49 || tmp[1] != 0x02)
 		{
 			isValidVal = false;
-			return false;
+
 		}
-		isValidVal = true;
-		return true;
+		return isValidVal;
 	}
 	void parse(ByteArray replyVector)
 	{
