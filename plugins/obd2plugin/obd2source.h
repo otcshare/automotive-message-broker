@@ -99,7 +99,7 @@ public:
 	{
 		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
 		{
-			if (!(*itr)->isValid(replyVector))
+			if (!(*itr)->tryParse(replyVector))
 			{
 				continue;
 			}
