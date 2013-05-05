@@ -57,7 +57,8 @@ void VariantType::fromGVariant(GVariant *val)
 
 void VariantType::asyncReply(AsyncPropertyReply * reply)
 {
-	setValue(reply->value);
+	if(reply->success)
+		setValue(reply->value);
 
 	delete reply;
 }
