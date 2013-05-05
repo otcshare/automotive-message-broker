@@ -50,22 +50,38 @@ static int updateGpsposition(gpointer data)
 
 	double time = amb::currentTime();
 
+	bool changed = false;
+
 	if(shared->gps.fix.mode > 2)
 	{
 		if(shared->gps.fix.latitude != shared->oldlat)
+		{
 			shared->oldlat = shared->gps.fix.latitude;
+			changed |= true;
+		}
 		if(shared->gps.fix.longitude != shared->oldlon)
+		{
 			shared->oldlon = shared->gps.fix.longitude;
+			changed |= true;
+		}
 		if(shared->gps.fix.altitude != shared->oldalt)
+		{
 			shared->oldalt = shared->gps.fix.altitude;
+			changed |= true;
+		}
 		if(shared->gps.fix.track != shared->oldheading)
+		{
 			shared->oldheading = shared->gps.fix.track;
+			changed |= true;
+		}
 		if(shared->gps.fix.speed * MPS_TO_KPH != shared->oldspeed)
 		{
 			shared->oldspeed = shared->gps.fix.speed * MPS_TO_KPH;
+			changed |= true;
 		}
 
-		shared->parent->updateProperty();
+		if(changed)
+			shared->parent->updateProperty();
 	}
 
 	return 1;
