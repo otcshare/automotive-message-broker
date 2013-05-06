@@ -78,8 +78,6 @@ public:
 	{
 		if(mValue) delete mValue;
 
-		//if(!val) return;
-
 		mValue = val->copy();
 		mAnyValue = val->anyValue();
 		mTimestamp = val->timestamp;

@@ -259,6 +259,7 @@ public:
 	std::string toString() const
 	{
 		std::stringstream stream;
+		stream.precision(10);
 		stream<<value<T>();
 
 		return stream.str();

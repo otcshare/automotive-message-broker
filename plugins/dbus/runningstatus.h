@@ -449,21 +449,21 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return latitude in Deg.Min (-180, +180)
 		 **/
-		wantProperty<double>(VehicleProperty::Latitude, "Latitude", "d", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Latitude, "Latitude", "d", AbstractProperty::Read);
 
 		/** @attributeName Longitude
 		 *  @type double
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return longitude in Deg.Min (-90, +90)
 		 **/
-		wantProperty<double>(VehicleProperty::Longitude, "Longitude", "d", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Longitude, "Longitude", "d", AbstractProperty::Read);
 
 		/** @attributeName Altitude
 		 *  @type double
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return altitude in meters above sea-level (0).
 		 **/
-		wantProperty<double>(VehicleProperty::Altitude, "Altitude", "d", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Altitude, "Altitude", "d", AbstractProperty::Read);
 
 		/** @attributeName Direction
 		 *  @type unsigned short
