@@ -2,6 +2,7 @@ For 0.9.0:
 
 - Test database plugin. specifically get ranged support with example sink
 - websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false (TEST)
+- We may have a resource leak when closing a websocket connection.  make sure stuff is getting unreff'd enough.
 
 Other:
 
@@ -9,7 +10,7 @@ Other:
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
 - investigate and enable use of provisioning in ssl websockets
 - add API to get number of sources per a given property
-- DBus support for objects with multiple sources (ie battery(n)Voltage where 'n' is a battery source)
+- Implement all the DBus properties in the docs/ directory.
 - Clean up sink subscription process so that subscription only happens once regardless of whether the 
 property is supported or not at the time
 - enable ambd/config.d/
