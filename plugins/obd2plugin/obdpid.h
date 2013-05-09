@@ -435,7 +435,7 @@ public:
 
 	bool isValid(ByteArray replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
+		ByteArray tmp = cleanup(replyVector);
 		if(tmp[tmp.size() - 1] == 'V')
 		{
 			return isValidVal = true;
@@ -444,11 +444,11 @@ public:
 	}
 	void parse(ByteArray replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
+		ByteArray tmp = cleanup(replyVector);
 		value = "";
 		for(int i=0; i<tmp.size() - 1; i++)
 		{
-			value+= tmp[i];
+			value += tmp[i];
 		}
 	}
 
