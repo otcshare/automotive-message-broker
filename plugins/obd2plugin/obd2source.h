@@ -85,6 +85,7 @@ public:
 		supportedPidsList.push_back(new AirIntakeTemperaturePid());
 		supportedPidsList.push_back(new EngineLoadPid());
 		supportedPidsList.push_back(new ThrottlePositionPid());
+		supportedPidsList.push_back(new BatteryVoltagePid());
 	}
 
 	~Obd2Amb()
