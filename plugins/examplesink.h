@@ -22,6 +22,7 @@
 
 #include "abstractsink.h"
 
+class Battery;
 
 class ExampleSink : public AbstractSink
 {
@@ -32,6 +33,8 @@ public:
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
 	virtual std::string uuid();
+private:
+	Battery *battery;
 };
 
 class ExampleSinkManager: public AbstractSinkManager
