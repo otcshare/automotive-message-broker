@@ -29,6 +29,6 @@ add_library(murphysourceplugin MODULE ${murphysourceplugin_sources})
 set_target_properties(murphysourceplugin PROPERTIES PREFIX "")
 target_link_libraries(murphysourceplugin amb ${MURPHY_COMMON_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
-install(TARGETS murphysourceplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS murphysourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
 endif(murphy_plugin)

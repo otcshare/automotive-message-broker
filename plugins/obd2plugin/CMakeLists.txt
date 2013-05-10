@@ -15,6 +15,6 @@ add_library(obd2sourceplugin MODULE ${obd2sourceplugin_sources})
 set_target_properties(obd2sourceplugin PROPERTIES PREFIX "")
 target_link_libraries(obd2sourceplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES} ${gio-unix_LIBRARIES} )
 
-install(TARGETS obd2sourceplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS obd2sourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
 #endif(obd2_plugin)
