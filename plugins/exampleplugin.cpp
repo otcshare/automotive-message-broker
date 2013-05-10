@@ -34,14 +34,6 @@ uint16_t throttlePos = 0;
 uint16_t engineCoolant = 40;
 bool machineGun = false;
 
-class Battery
-{
-public:
-	Battery():oldVoltage(0),currentVoltage(0) { }
-	double oldVoltage;
-	double currentVoltage;
-};
-
 static gboolean timeoutCallback(gpointer data)
 {
 	ExampleSourcePlugin* src = (ExampleSourcePlugin*)data;
@@ -51,27 +43,13 @@ static gboolean timeoutCallback(gpointer data)
 	return true;
 }
 
-static gboolean checkBattery(gpointer data)
-{
-	Battery *battery = (Battery*)data;
-
-	if(battery->currentVoltage > 12.9 && battery->oldVoltage < 12.9)
-	{
-		/// halt!
-		g_spawn_command_line_async("/sbin/shutdown -t now",NULL);
-		exit(0);
-	}
-}
 
 ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSource(re, config), velocity(0), engineSpeed(0)
 {
-	Battery *battery = new Battery;
 	re->setSupported(supported(), this);
 	debugOut("setting timeout");
-	g_timeout_add(1000, timeoutCallback, this );
-	g_timeout_add(60000,checkBattery,battery);
-	
+	g_timeout_add(1000, timeoutCallback, this );	
 }
 
 

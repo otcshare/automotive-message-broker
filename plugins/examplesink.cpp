@@ -59,7 +59,7 @@ static gboolean checkBattery(gpointer data)
 
 ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> config): AbstractSink(engine, config)
 {
-	Battery *battery = new Battery;
+	battery = new Battery;
 
 	routingEngine->subscribeToProperty(VehicleProperty::BatteryVoltage, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
