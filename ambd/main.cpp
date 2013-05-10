@@ -190,6 +190,7 @@ void printhelp(const char *argv0)
 		   "   [-v|--version]\n"
 		   "   [-c|--config </path/to/config> \t]\n"
 		   "   [-d|--debug <level (0-5)>\t]\n"
+		   "   [-l]--log </path/to/logfile>\t]\n"
 		   "   [-h|--help]\n"
 		   , argv0);
 }
