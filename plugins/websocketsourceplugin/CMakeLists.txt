@@ -11,6 +11,6 @@ add_library(websocketsourceplugin MODULE ${websocketsourceplugin_sources})
 set_target_properties(websocketsourceplugin PROPERTIES PREFIX "")
 target_link_libraries(websocketsourceplugin amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
-install(TARGETS websocketsourceplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS websocketsourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
 endif(websocket_plugin)
