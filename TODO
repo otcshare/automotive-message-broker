@@ -3,6 +3,7 @@ For 0.9.0:
 - Test database plugin. specifically get ranged support with example sink
 - websocket source may want to implement a timeout on Get/Set/GetRanged calls and reply with success=false (TEST)
 - We may have a resource leak when closing a websocket connection.  make sure stuff is getting unreff'd enough.
+- investigate why websocketsink plugin constantly gets disconnected when using eth0
 
 Other:
 
