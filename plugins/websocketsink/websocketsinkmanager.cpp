@@ -778,20 +778,30 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 	return 0; 
 }
 
-bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
+bool gioPollingFunc(GIOChannel *source, GIOCondition condition,gpointer data)
 {
 	DebugOut(5) << "Polling..." << condition << endl;
-	if (condition != G_IO_IN)
+
+	if(condition & G_IO_ERR)
+	{
+		DebugOut(0)<<"websocketsink polling error."<<endl;
+	}
+
+	if (! condition & G_IO_IN)
 	{
 		//Don't need to do anything
-		if (condition == G_IO_HUP)
-		{
-			//Hang up. Returning false closes out the GIOChannel.
-			//printf("Callback on G_IO_HUP\n");
-			return false;
-		}
+
 		return true;
 	}
+
+	if (condition & G_IO_HUP)
+	{
+		//Hang up. Returning false closes out the GIOChannel.
+		//printf("Callback on G_IO_HUP\n");
+		DebugOut(0)<<"socket hangup event..."<<endl;
+		return false;
+	}
+
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	//printf("Polling...%i\n",condition);
 	

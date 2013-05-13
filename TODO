@@ -9,6 +9,7 @@ For 0.10.0
 - DBus support for objects with multiple sources and multiple 'zones' (ie /org/automotive/${sourceID}/${zone}/batteryVoltage/${index})
 - Document changes to the DBus API
 
+- investigate why websocketsink plugin constantly gets disconnected when using eth0
 
 
 Other:

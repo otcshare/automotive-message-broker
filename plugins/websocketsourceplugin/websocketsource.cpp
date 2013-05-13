@@ -465,10 +465,15 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		  DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "Adding poll for websocket IO channel" << endl;
 			//Add a FD to the poll list.
 			GIOChannel *chan = g_io_channel_unix_new(libwebsocket_get_socket_fd(wsi));
-			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,0);
+			/// TODO: I changed this to be more consistent with the websocket sink end. it may not be correct. TEST
+
+			g_io_add_watch(chan,GIOCondition(G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_HUP),(GIOFunc)gioPollingFunc,0);
+			g_io_channel_set_close_on_unref(chan,true);
+			g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
+
+			//g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
+			//g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,0);
+			//g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,0);
 			
 			
 			break;
