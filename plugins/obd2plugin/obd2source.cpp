@@ -58,6 +58,11 @@ bool sendElmCommand(obdLib *obd,std::string command)
 
 }
 
+bool beginsWith(std::string a, std::string b)
+{
+	return (a.compare(0, b.length(), b) == 0);
+}
+
 void connect(obdLib* obd, std::string device, std::string strbaud)
 {
 	//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
@@ -290,7 +295,16 @@ void threadLoop(gpointer data)
 				}
 			}
 			badloop++;
-			if (!obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector,5,3))
+
+			bool result = false;
+
+			if(beginsWith((*i)->pid,"AT") || beginsWith((*i)->pid, "ST"))
+			{
+				result = obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector);
+			}
+			else result = obd->sendObdRequestString((*i)->pid.c_str(),(*i)->pid.length(),&replyVector,5,3);
+
+			if (!result)
 			{
 				//This only happens during a error with the com port. Close it and re-open it later.
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Unable to send request:" << (*i)->pid.substr(0,(*i)->pid.length()-1) << endl;

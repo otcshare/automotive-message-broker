@@ -424,4 +424,34 @@ public:
 	}
 };
 
+class BatteryVoltagePid: public CopyMe<BatteryVoltagePid>
+{
+public:
+	BatteryVoltagePid()
+		:CopyMe(VehicleProperty::BatteryVoltage,"ATRV\r",0)
+	{
+
+	}
+
+	bool isValid(ByteArray replyVector)
+	{
+		ByteArray tmp = cleanup(replyVector);
+		if(tmp[tmp.size() - 1] == 'V')
+		{
+			return isValidVal = true;
+		}
+		return false;
+	}
+	void parse(ByteArray replyVector)
+	{
+		ByteArray tmp = cleanup(replyVector);
+		value = "";
+		for(int i=0; i<tmp.size() - 1; i++)
+		{
+			value += tmp[i];
+		}
+	}
+
+};
+
 #endif
