@@ -282,7 +282,7 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property;
+		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property<<endl;
 		return; 
 	}
 		

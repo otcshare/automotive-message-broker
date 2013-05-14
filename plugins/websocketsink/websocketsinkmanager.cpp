@@ -787,13 +787,6 @@ bool gioPollingFunc(GIOChannel *source, GIOCondition condition,gpointer data)
 		DebugOut(0)<<"websocketsink polling error."<<endl;
 	}
 
-	if (! condition & G_IO_IN)
-	{
-		//Don't need to do anything
-
-		return true;
-	}
-
 	if (condition & G_IO_HUP)
 	{
 		//Hang up. Returning false closes out the GIOChannel.
@@ -812,5 +805,6 @@ bool gioPollingFunc(GIOChannel *source, GIOCondition condition,gpointer data)
 	pollstruct.events = condition;
 	pollstruct.revents = condition;
 	libwebsocket_service_fd(context,&pollstruct);
+
 	return true;
 }
