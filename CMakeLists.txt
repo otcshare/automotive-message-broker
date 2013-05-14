@@ -19,7 +19,7 @@ set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/${PROJECT_NAME}" CACHE P
 option(use_qtcore "Use QCoreApplication mainloop " OFF)
 option(websocket_plugin "websocket source and sink plugins" OFF)
 option(tpms_plugin "TPMS plugin " OFF)
-option(obd2_plugin "OBD-II plugin" OFF)
+option(obd_plugin "OBD-II plugin" OFF)
 option(database_plugin "Database plugins" OFF)
 option(qt_bindings "AMB Qt DBus bindings" OFF)
 option(opencvlux_plugin "OpenCV Lux plugin" OFF)
