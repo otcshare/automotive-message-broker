@@ -249,11 +249,11 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 	 *  the sources what properties have already been subscribed to.
 	 */
 
-	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
+	/*if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
 		DebugOut(1)<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
 		return; 
-	}
+	}*/
 	
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
