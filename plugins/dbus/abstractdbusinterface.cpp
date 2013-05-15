@@ -21,9 +21,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/algorithm/string.hpp>
 #include <gio/gio.h>
 
+#include "listplusplus.h"
 #include "abstractproperty.h"
 
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMap;
+list<string> AbstractDBusInterface::mimplementedProperties;
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectPath,
 											 GDBusConnection* connection)
@@ -56,6 +58,11 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	"</signal>";
 	
 	properties[property->name()] = property;
+
+	if(!ListPlusPlus<string>(&mimplementedProperties).contains(property->name()))
+	{
+		mimplementedProperties.push_back(property->name());
+	}
 }
 
 void AbstractDBusInterface::registerObject()

@@ -22,10 +22,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <gio/gio.h>
 #include <string>
 
+#include "listplusplus.h"
+
 ///properties:
 #include "accelerationproperty.h"
 #include "runningstatus.h"
 #include "custompropertyinterface.h"
+#include "uncategorizedproperty.h"
 #include "environmentproperties.h"
 #include "vehicleinfo.h"
 #include "maintenance.h"
@@ -98,6 +101,22 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	}
 
 
+	/// Create objects for unimplemented properties:
+
+	PropertyList capabilitiesList = VehicleProperty::capabilities();
+
+	for (auto itr = capabilitiesList.begin(); itr != capabilitiesList.end(); itr++)
+	{
+		VehicleProperty::Property prop = *itr;
+
+		PropertyList implemented = AbstractDBusInterface::implementedProperties();
+
+		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
+		{
+			new UncategorizedPropertyInterface(prop, iface->re, connection);
+		}
+	}
+
 }
 
 static void
@@ -110,6 +129,12 @@ static void
 on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
 
+	DebugOut(0)<<"DBus: Lost bus name"<<endl;
+
+	if(!connection){
+		DebugOut(0)<<"DBus: Connection could not be established."<<endl;
+		throw std::runtime_error("Could not establish DBus connection.");
+	}
 }
 
 

@@ -4,9 +4,9 @@ include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
 pkg_check_modules(gio REQUIRED gio-2.0)
 
 set(dbussinkplugin_headers dbusplugin.h abstractproperty.h abstractdbusinterface.h dbusinterfacemanager.h basicproperty.h runningstatus.h varianttype.h
-custompropertyinterface.h environmentproperties.h vehicleinfo.h maintenance.h parking.h fakeidlheader.h drivingsafety.h)
+custompropertyinterface.h uncategorizedproperty.h environmentproperties.h vehicleinfo.h maintenance.h parking.h fakeidlheader.h drivingsafety.h)
 set(dbussinkplugin_sources dbusplugin.cpp abstractproperty.cpp abstractdbusinterface.cpp dbusinterfacemanager.cpp basicproperty.cpp runningstatus.cpp
-varianttype.cpp custompropertyinterface.cpp environmentproperties.cpp vehicleinfo.cpp maintenance.cpp parking.cpp drivingsafety.cpp)
+varianttype.cpp custompropertyinterface.cpp uncategorizedproperty.cpp environmentproperties.cpp vehicleinfo.cpp maintenance.cpp parking.cpp drivingsafety.cpp)
 
 add_library(dbussinkplugin MODULE ${dbussinkplugin_sources})
 set_target_properties(dbussinkplugin PROPERTIES PREFIX "")
