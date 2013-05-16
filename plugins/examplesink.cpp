@@ -158,7 +158,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 			for(auto itr = values.begin(); itr != values.end(); itr++)
 			{
 				auto val = *itr;
-				DebugOut(1)<<"Value from past: ("<<val->name<<"): "<<val->toString()<<" time: "<<val->timestamp<<endl;
+				DebugOut(1)<<"Value from past: (VehicleSpeed): "<<val->toString()<<" time: "<<val->timestamp<<endl;
 			}
 
 			delete reply;
