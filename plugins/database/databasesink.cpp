@@ -2,6 +2,8 @@
 #include "abstractroutingengine.h"
 #include "listplusplus.h"
 
+int bufferLength = 100;
+
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new DatabaseSinkManager(routingengine, config);
@@ -44,7 +46,7 @@ void * cbFunc(gpointer data)
 
 		insertList.push_back(dict);
 
-		if(insertList.size() > 100)
+		if(insertList.size() > bufferLength)
 		{
 			shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
 			for(int i=0; i< insertList.size(); i++)
@@ -127,6 +129,11 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	if(config.find("databaseFile") != config.end())
 	{
 		setDatabaseFileName(config["databaseFile"]);
+	}
+
+	if(config.find("bufferLength") != config.end())
+	{
+		bufferLength = atoi(config["bufferLength"].c_str());
 	}
 
 	if(config.find("properties") != config.end())
@@ -364,6 +371,12 @@ void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractP
 	if(!shared)
 		return;
 
+	if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(property))
+	{
+		mSupported.push_back(property);
+		routingEngine->setSupported(mSupported, this);
+	}
+
 	DBObject* obj = new DBObject;
 	obj->key = property;
 	obj->value = value->toString();
@@ -426,7 +439,7 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	ostringstream query;
 	query.precision(15);
 
-	query<<"SELECT * from "<<tablename<<" WHERE ";
+	query<<"SELECT * from "<<tablename<<" WHERE key='"<<reply->property<<"' AND";
 
 	if(reply->timeBegin && reply->timeEnd)
 	{
