@@ -41,11 +41,11 @@ public:
 		}
 
 		struct gps_data_t gps;
-		double oldspeed;
-		double oldalt;
-		double oldlat;
-		double oldlon;
-		double oldheading;
+		std::string oldspeed;
+		std::string oldalt;
+		std::string oldlat;
+		std::string oldlon;
+		std::string oldheading;
 		GpsdPlugin* parent;
 	};
 
