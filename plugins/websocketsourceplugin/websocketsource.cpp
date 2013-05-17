@@ -126,7 +126,7 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	
 
 }
-bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
+bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
 {
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	//printf("Polling...%i\n",condition);
@@ -139,14 +139,15 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	pollstruct.events = condition;
 	pollstruct.revents = condition;
 	libwebsocket_service_fd(context,&pollstruct);
-	if (condition == G_IO_HUP)
+	if (condition & G_IO_HUP)
 	{
 		//Hang up. Returning false closes out the GIOChannel.
 		//printf("Callback on G_IO_HUP\n");
 		return false;
 	}
-	if (condition == G_IO_IN)
+	if (condition & G_IO_IN)
 	{
+
 	}
 	DebugOut() << "gioPollingFunc" << condition;
 
@@ -522,7 +523,7 @@ PropertyList WebSocketSource::supported()
 int WebSocketSource::supportedOperations()
 {
 	/// TODO: need to do this correctly based on what the host supports.
-	return Get | Set;
+	return Get | Set | GetRanged;
 }
 
 string WebSocketSource::uuid()
@@ -586,6 +587,7 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	uuidRangedReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 60; ///TODO: 60 second timeout, make this configurable?
 	stringstream s;  
+	s.precision(15);
 	s << "{\"type\":\"method\",\"name\":\"getRange\",\"data\": {";
 	s << "\"timeBegin\":\"" << reply->timeBegin << "\",";
 	s << "\"timeEnd\":\"" << reply->timeEnd << "\",";
