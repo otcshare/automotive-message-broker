@@ -234,8 +234,9 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 		stringstream s;
 
 		//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-		stringstream data ("[");
-		//data << "{ \"property
+		stringstream data;
+		data.precision(15);
+		data<< "[";
 		std::list<AbstractPropertyType*> values = reply->values;
 		for(auto itr = values.begin(); itr != values.end(); itr++)
 		{
@@ -249,7 +250,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 
 		data<<"]";
 
-		s << "{\"type\":\"methodReply\",\"name\":\"getRanged\",\"data\":"<<data<<",\"transactionid\":\"" << id << "\"}";
+		s << "{\"type\":\"methodReply\",\"name\":\"getRanged\",\"data\":"<<data.str()<<",\"transactionid\":\"" << id << "\"}";
 
 		string replystr = s.str();
 		//printf("Reply: %s\n",replystr.c_str());
