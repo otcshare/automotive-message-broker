@@ -199,36 +199,17 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 	rangedRequest.sequenceBegin = seqstart;
 	rangedRequest.sequenceEnd = seqend;
 
-	if (property == "running_status_speedometer")
+	PropertyList foo = VehicleProperty::capabilities();
+	if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
 	{
-		rangedRequest.property = VehicleProperty::VehicleSpeed;
-	}
-	else if (property == "running_status_engine_speed")
-	{
-		rangedRequest.property = VehicleProperty::EngineSpeed;
-	}
-	else if (property == "running_status_steering_wheel_angle")
-	{
-		rangedRequest.property = VehicleProperty::SteeringWheelAngle;
-	}
-	else if (property == "running_status_transmission_gear_status")
-	{
-		rangedRequest.property = VehicleProperty::TransmissionShiftPosition;
+		rangedRequest.property = property;
 	}
 	else
 	{
-		PropertyList foo = VehicleProperty::capabilities();
-		if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
-		{
-			rangedRequest.property = property;
-		}
-		else
-		{
-			DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
-			return;
-		}
-
+		DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
+		return;
 	}
+
 	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
 	{
 		stringstream s;
