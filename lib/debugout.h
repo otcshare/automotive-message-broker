@@ -32,7 +32,11 @@ void debugOut(string message);
 
 class DebugOut 
 {
-public: 
+public:
+
+	static const int Error;
+	static const int Warning;
+
 	DebugOut(int debugLevel = 4)
 	{
 		mDebugLevel = debugLevel;
@@ -40,8 +44,15 @@ public:
 
 		out.precision(15);
 
-		if(mDebugLevel <= debugThreshhold)
+		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
+		{
 			out<<bufferTime(amb::currentTime())<<" | ";
+
+			if(mDebugLevel == Error)
+				out<<" ERROR ";
+			if(mDebugLevel == Warning)
+				out<<" WARNING ";
+		}
 	}
 
 	DebugOut const& operator << (string message) const
@@ -66,15 +77,6 @@ public:
 		return *this;
 	}
 	
-	/*DebugOut const & operator << (uint16_t val) const
-	{
-		ostream out(buf);
-
-		if(mDebugLevel <= debugThreshhold)
-			 out<<val<<" ";
-		return *this;
-	}*/
-
 	DebugOut const & operator << (double val) const
 	{
 		ostream out(buf);
