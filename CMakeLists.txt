@@ -7,9 +7,11 @@ include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_VERSION "0.8.9")
+set(PROJECT_CODENAME "stingray")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
+add_definitions(-DPROJECT_CODENAME="${PROJECT_CODENAME}")
 
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" CACHE STRING "Directory where lib will install")

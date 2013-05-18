@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 				
 			case 'v':
 				cout<<PROJECT_NAME<<endl;
-				cout<<"Version: "<<PROJECT_VERSION<<endl;
+				cout<<"Version: "<<PROJECT_VERSION<<" ("<<PROJECT_CODENAME<<")"<<endl;
 				return (0);
 				break;
 			case 'c':
