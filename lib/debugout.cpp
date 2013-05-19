@@ -23,8 +23,8 @@ using namespace std;
 int DebugOut::debugThreshhold = 0;
 std::streambuf * DebugOut::buf = cout.rdbuf();
 
-const int DebugOut::Error = 9999999999;
-const int DebugOut::Warning = 9999999998;
+const int DebugOut::Error = 999999;
+const int DebugOut::Warning = 999998;
 
 void debugOut(string message)
 {
