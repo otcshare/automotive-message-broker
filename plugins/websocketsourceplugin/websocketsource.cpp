@@ -393,13 +393,6 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					{
 						DebugOut() << "getRanged methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
 					}
-					while (propertylist.size() > 0)
-					{
-						
-						AbstractPropertyType *type = propertylist.front();
-						delete type;
-						propertylist.pop_front();
-					}
 				}
 				else if (name == "get")
 				{
@@ -446,11 +439,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				json_object_put(dataobject);
 			}
 			json_object_put(rootobject);
-			///TODO: this will probably explode:
-			//mlc: I agree with Kevron here, it does explode.
-			//if(error) g_error_free(error);
 
-			
 			break;
 
 		}
@@ -465,16 +454,12 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		  DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "Adding poll for websocket IO channel" << endl;
 			//Add a FD to the poll list.
 			GIOChannel *chan = g_io_channel_unix_new(libwebsocket_get_socket_fd(wsi));
+
 			/// TODO: I changed this to be more consistent with the websocket sink end. it may not be correct. TEST
 
 			g_io_add_watch(chan,GIOCondition(G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_HUP),(GIOFunc)gioPollingFunc,0);
 			g_io_channel_set_close_on_unref(chan,true);
 			g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
-
-			//g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
-			//g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,0);
-			//g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,0);
-			
 			
 			break;
 		}
@@ -570,7 +555,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	
 	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << uuid << "\"}";
 	string replystr = s.str();
-	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr <<endl;
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sending:" << replystr <<endl;
 	//printf("Reply: %s\n",replystr.c_str());
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
