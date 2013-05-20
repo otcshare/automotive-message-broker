@@ -478,25 +478,32 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			//TODO: Verify that ALL requests get sent via LWS_CALLBACK_HTTP, so we can use that instead of LWS_CALLBACK_RECIEVE
 			//TODO: Do we want exceptions, or just to return an invalid json reply? Probably an invalid json reply.
 			DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Requested: " << (char*)in << "\n";
-			GError* error = nullptr;
 
+			std::string tempInput((char*)in);
 
 			json_object *rootobject;
 			json_tokener *tokener = json_tokener_new();
 			enum json_tokener_error err;
 			do
 			{
-				rootobject = json_tokener_parse_ex(tokener, (char*)in,len);
+				rootobject = json_tokener_parse_ex(tokener, tempInput.c_str(),len);
 			} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
 			if (err != json_tokener_success)
 			{
 				fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
+				throw std::runtime_error("JSON Parsing error");
 				// Handle errors, as appropriate for your application.
 			}
+			if(!rootobject)
+			{
+				DebugOut(0)<<"failed to parse json: "<<tempInput<<endl;
+			}
+
 			if (tokener->char_offset < len) // XXX shouldn't access internal fields
 			{
 				// Handle extra characters after parsed object as desired.
 				// e.g. issue an error, parse another object from that point, etc...
+
 			}
 			// Success, use jobj here.
 			json_object *typeobject = json_object_object_get(rootobject,"type");
@@ -766,7 +773,7 @@ bool gioPollingFunc(GIOChannel *source, GIOCondition condition,gpointer data)
 
 	if(condition & G_IO_ERR)
 	{
-		DebugOut(0)<<"websocketsink polling error."<<endl;
+		DebugOut(0)<< __SMALLFILE__ <<":"<< __LINE__ <<" websocketsink polling error."<<endl;
 	}
 
 	if (condition & G_IO_HUP)
