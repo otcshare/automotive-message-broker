@@ -3,11 +3,11 @@
 #include <IrcCommand>
 #include <IrcMessage>
 #include <QSslSocket>
-#include <QScriptEngine>
 #include <QFile>
 #include <QNetworkProxy>
 #include <QTimer>
 
+#define foreach Q_FOREACH
 
 IrcCommunication::IrcCommunication(QObject* parent)
 	:QObject(parent)
@@ -114,7 +114,7 @@ void IrcCommunication::reconnect()
 	QTimer::singleShot(5000,session,SLOT(open()));
 }
 
-void IrcCommunication::sslError(QList<QSslError>)
+/*void IrcCommunication::sslError(QList<QSslError>)
 {
 	qDebug()<<"some ssl errors!! trying to ignore them";
 	QSslSocket* socket = qobject_cast<QSslSocket*>(session->socket());
@@ -122,7 +122,7 @@ void IrcCommunication::sslError(QList<QSslError>)
 	{
 		socket->ignoreSslErrors();
 	}
-}
+}*/
 
 void IrcCommunication::socketError(QAbstractSocket::SocketError error)
 {
@@ -133,5 +133,5 @@ void IrcCommunication::socketError(QAbstractSocket::SocketError error)
 void IrcCommunication::setIgnoreInvalidCert(bool ignore)
 {
 	if(ignore)
-		QObject::connect(session->socket(),SIGNAL(sslErrors(QList<QSslError>)),this,SLOT(sslError(QList<QSslError>)));
+		QObject::connect(session->socket(),SIGNAL(),this,SLOT(sslError(QList<QSslError>)));
 }

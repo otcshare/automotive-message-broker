@@ -4,8 +4,6 @@
 #include <QVariant>
 #include <QStringList>
 
-#include <QSslError>
-
 #include <IrcSession>
 #include <IrcMessage>
 
@@ -19,7 +17,7 @@ public:
 	QStringList channels() { return mChannels; }
 	void setChannels(QStringList c) { mChannels = c; }
 
-public slots:
+public Q_SLOTS:
 	void respond(QString target, QString msg);
 	void announce(QString);
 	void connect(QString host,int port, QString proxy, QString user, QString nick, QString pass);
@@ -29,12 +27,12 @@ public slots:
 
 	void reconnect();
 
-private slots:
+private Q_SLOTS:
 	void messageReceived(IrcMessage*);
-	void sslError(QList<QSslError>);
+//	void sslError(QList<QSslError>);
 	void socketError(QAbstractSocket::SocketError);
 
-signals:
+Q_SIGNALS:
 	void message(QString sender, QString prefix, QString codes);
 	void connecting();
 	void connected();

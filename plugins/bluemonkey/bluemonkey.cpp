@@ -20,8 +20,9 @@
 #include "bluemonkey.h"
 #include "abstractroutingengine.h"
 #include "debugout.h"
+#include "irccoms.h"
 
-#include <glib.h>
+#include <QJsonDocument>
 
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
@@ -29,8 +30,13 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new BluemonkeySinkManager(routingengine, config);
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* engine, map<string, string> config): AbstractSink(engine, config)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* engine, map<string, string> config): QObject(0),AbstractSink(engine, config)
 {
+	irc = new IrcCommunication(this);
+	irc->connect("chat.freenode.com",8001,"","tripzero","bluemoney","");
+	connect(irc,&IrcCommunication::connected, [&]() {
+		irc->join("#linuxice");
+	});
 
 }
 
@@ -53,4 +59,57 @@ void BluemonkeySink::propertyChanged(VehicleProperty::Property property, Abstrac
 std::string BluemonkeySink::uuid()
 {
 	return "bluemonkey";
+}
+
+QObject *BluemonkeySink::subscribeTo(QString str)
+{
+	return new Property(str.toStdString(), routingEngine, this);
+}
+
+
+QVariant Property::value()
+{
+	QJsonDocument doc;
+
+	doc.fromJson(mValue->toString().c_str());
+
+	return doc.toVariant();
+}
+
+void Property::setValue(QVariant v)
+{
+	QJsonDocument doc;
+	doc.fromVariant(v);
+
+	mValue->fromString(doc.toJson().data());
+
+	AsyncSetPropertyRequest request;
+	request.property = mValue->name;
+	request.value = mValue;
+	request.completed = [](AsyncPropertyReply* reply) { delete reply; };
+	routingEngine->setProperty(request);
+}
+
+Property::Property(VehicleProperty::Property prop, AbstractRoutingEngine* re, QObject *parent)
+	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>())
+{
+	setType(prop.c_str());
+}
+
+QString Property::type()
+{
+	return mValue->name.c_str();
+}
+
+void Property::setType(QString t)
+{
+	mValue = VehicleProperty::getPropertyTypeForPropertyNameValue(t.toStdString());
+
+	AsyncPropertyRequest request;
+	request.property = mValue->name;
+	request.completed = [this](AsyncPropertyReply* reply)
+	{
+		propertyChanged(reply->property, reply->value,uuid());
+		delete reply;
+	};
 }
