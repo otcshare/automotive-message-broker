@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 
 #include "listplusplus.h"
+#include "automotivemanager.h"
 
 ///properties:
 #include "accelerationproperty.h"
@@ -45,6 +46,9 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 {
 	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
 
+	new AutomotiveManager(connection);
+
+	/// properties:
 	AbstractDBusInterface* acceleration = new AccelerationProperty(iface->re, connection);
 	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
 	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);

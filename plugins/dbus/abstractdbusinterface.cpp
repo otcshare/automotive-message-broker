@@ -27,9 +27,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMap;
 list<string> AbstractDBusInterface::mimplementedProperties;
 
-AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectPath,
+AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string op,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mObjectPath(objectPath), mConnection(connection)
+	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection)
 {
 	interfaceMap[interfaceName] = this;
 	startRegistration();
@@ -149,6 +149,31 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 		DebugOut(0)<<error->message<<endl;
 		//throw -1;
 	}
+}
+
+AbstractDBusInterface *AbstractDBusInterface::getInterfaceForProperty(string property)
+{
+	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
+	{
+		auto interface = (*itr).second;
+		if(interface->implementsProperty(property))
+			return interface;
+	}
+
+	return NULL;
+}
+
+bool AbstractDBusInterface::implementsProperty(string property)
+{
+	for(auto itr = properties.begin(); itr != properties.end(); itr++)
+	{
+		if((*itr).first == property)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void AbstractDBusInterface::startRegistration()

@@ -51,6 +51,12 @@ public:
 	
 	static list<string> implementedProperties() { return mimplementedProperties; }
 
+	static AbstractDBusInterface* getInterfaceForProperty(std::string property);
+
+	bool implementsProperty(std::string property);
+
+	std::string objectPath() { return mObjectPath; }
+
 protected:
 
 	void startRegistration();
