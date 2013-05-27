@@ -98,9 +98,27 @@ public:
 		return var;
 	}
 
-	void fromVariant(GVariant*)
+	void fromVariant(GVariant* variant)
 	{
 		/// TODO: fill this in
+		gsize dictsize = g_variant_n_children(variant);
+		for (int i=0;i<dictsize;i++)
+		{
+			GVariant *childvariant = g_variant_get_child_value(variant,i);
+			gsize dictvalsize = g_variant_n_children(childvariant);
+			if (dictvalsize == 2)
+			{
+				//It is a dictionary entry
+				GVariant *keyvariant = g_variant_get_child_value(childvariant,0);
+				GVariant *valvariant = g_variant_get_child_value(childvariant,1);
+				T t = T();
+				t.fromVariant(keyvariant);
+				N n = N();
+				n.fromVariant(valvariant);
+				appendPriv(t,n);
+			}
+		}
+		
 	}
 
 	void setMap(std::map<T, N> m)
