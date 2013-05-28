@@ -1,0 +1,10 @@
+Release notes for release 0.10.0
+
+New features:
+
+- Added org.automotive.Manager DBus interface.
+- Added org.automotive.Manager.findProperty method for finding a specific object path for a given property
+
+Changes:
+- AbstractPropertyType class now contains information for zone and the property name
+
