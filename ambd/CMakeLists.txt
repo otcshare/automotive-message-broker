@@ -1,7 +1,7 @@
 set(ambd_headers core.h imainloop.h pluginloader.h glibmainloop.h)
 set(ambd_sources core.cpp main.cpp pluginloader.cpp glibmainloop.cpp)
 
-if(use_qtcore)
+if(qtmainloop)
     set(qtmainloopplugin_headers qtmainloop.h)
     set(qtmainloopplugin_sources qtmainloop.cpp)
 
@@ -10,7 +10,7 @@ if(use_qtcore)
     target_link_libraries(qtmainloopplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
     install(TARGETS qtmainloopplugin LIBRARY DESTINATION lib/automotive-message-broker)
-endif(use_qtcore)
+endif(qtmainloop)
 
 add_executable(ambd ${ambd_sources})
 
