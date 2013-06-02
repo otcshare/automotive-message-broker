@@ -85,12 +85,10 @@ public:
 	{
 		GVariantBuilder params;
 		g_variant_builder_init(&params, G_VARIANT_TYPE_DICTIONARY);
-
 		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
 		{
 			auto &foo = (*itr).first;
 			g_variant_builder_add(&params,"{?*}",const_cast<T&>(foo).toVariant(),(*itr).second.toVariant());
-
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);

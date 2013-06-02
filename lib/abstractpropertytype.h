@@ -31,7 +31,7 @@
 #include <glib.h>
 #include <list>
 #include "timestamp.h"
-
+#include <debugout.h>
 namespace Zone {
 enum Type {
 	None = 0,
@@ -565,12 +565,16 @@ public:
 	{
 
 		GVariantBuilder params;
-		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
+		g_variant_builder_init(&params, ((const GVariantType *) "av"));
 
 		for(auto itr = mList.begin(); itr != mList.end(); itr++)
 		{
 			AbstractPropertyType* t = *itr;
-			g_variant_builder_add_value(&params, t->toVariant());
+			GVariant *var = t->toVariant();
+			GVariant *newvar = g_variant_new("v",var);
+			DebugOut() << "Ceated toVariant var" << endl;
+			g_variant_builder_add_value(&params, newvar);
+			
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -582,6 +586,18 @@ public:
 	void fromVariant(GVariant* v)
 	{
 		/// TODO: fill this in
+		gsize dictsize = g_variant_n_children(v);
+		for (int i=0;i<dictsize;i++)
+		{
+			GVariant *childvariant = g_variant_get_child_value(v,i);
+			DebugOut() << "Got outer child" << endl;
+			GVariant *innervariant = g_variant_get_variant(childvariant);
+			DebugOut() << "Got inner child" << endl;
+			T *t = new T();
+			t->fromVariant(innervariant);
+			DebugOut() << "Parsed child" << endl;
+			appendPriv(t);
+		}
 	}
 
 	std::list<AbstractPropertyType*> list() { return mList; }
