@@ -35,7 +35,7 @@ public:
 	{
 	public:
 		Shared(GpsdPlugin* p)
-			:oldspeed(0), oldalt(0), oldlat(0), oldlon(0), oldheading(0), parent(p)
+			: parent(p)
 		{
 
 		}
