@@ -572,7 +572,6 @@ public:
 			AbstractPropertyType* t = *itr;
 			GVariant *var = t->toVariant();
 			GVariant *newvar = g_variant_new("v",var);
-			DebugOut() << "Ceated toVariant var" << endl;
 			g_variant_builder_add_value(&params, newvar);
 			
 		}
@@ -590,12 +589,9 @@ public:
 		for (int i=0;i<dictsize;i++)
 		{
 			GVariant *childvariant = g_variant_get_child_value(v,i);
-			DebugOut() << "Got outer child" << endl;
 			GVariant *innervariant = g_variant_get_variant(childvariant);
-			DebugOut() << "Got inner child" << endl;
 			T *t = new T();
 			t->fromVariant(innervariant);
-			DebugOut() << "Parsed child" << endl;
 			appendPriv(t);
 		}
 	}

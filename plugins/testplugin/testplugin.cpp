@@ -24,6 +24,7 @@
 #include <sstream>
 //#include <json-glib/json-glib.h>
 #include <listplusplus.h>
+#include <vehicleproperty.h>
 #include "debugout.h"
 #include "timestamp.h"
 #include "testplugin.h"
@@ -53,7 +54,7 @@ void TestPlugin::setConfiguration(map<string, string> config)
 TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	: AbstractSource(re, config)
 {
-  DebugOut() << "Testing MapPropertyType" << endl;
+  DebugOut() << "Testing MapPropertyType... " << endl;
   MapPropertyType<BasicPropertyType<Door::Location>,BasicPropertyType<Door::Status>> propmap("something");
   MapPropertyType<BasicPropertyType<Door::Location>,BasicPropertyType<Door::Status>> propmaptwo("something");
   propmap.append(Door::LeftRear,Door::Ajar);
@@ -61,14 +62,13 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
   gsize dictsize = g_variant_n_children(var);
   //DebugOut() << var << endl;
   propmaptwo.fromVariant(var);
-  DebugOut() << propmap.toString() << propmaptwo.toString() << endl;
   if (propmap.toString() == propmap.toString())
   {
       DebugOut() << "Success!" << endl;
   }
   else
   {
-      DebugOut() << "Failure" << endl;
+      DebugOut() << "Failure!" << endl;
       exit(-1);
   }
   /*
@@ -91,6 +91,26 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
       DebugOut() << "Failure" << endl;
       exit(-1);
   }*/
+  DebugOut() << "Testing ListPropertyType... " << endl;
+  VehicleProperty::TripMetersType* tfirst = new VehicleProperty::TripMetersType();
+  VehicleProperty::TripMetersType* tsecond = new VehicleProperty::TripMetersType();
+  BasicPropertyType<uint16_t> v1(0);
+  BasicPropertyType<uint16_t> v2(5);
+  BasicPropertyType<uint16_t> v3(10);
+  tfirst->append(&v1);
+  tfirst->append(&v2);
+  tfirst->append(&v3);
+  tsecond->fromVariant(tfirst->toVariant());
+  if (tfirst->toString() == tsecond->toString())
+  {
+    DebugOut() << "Success!" << endl;
+  }
+  else
+  {
+    DebugOut() << "Failure!" << endl;
+  }
+  
+  
     
   DebugOut() << "Exiting..." << endl;
   exit(-1);
