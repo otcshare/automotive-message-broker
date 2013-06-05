@@ -88,7 +88,7 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	}
 	else if(reply->property == VehicleProperty::AccelerationX)
 	{
-		VehicleProperty::AccelerationType temp(accelerationX);
+		VehicleProperty::AccelerationXType temp(accelerationX);
 		reply->value = &temp;
 		reply->success = true;
 		reply->completed(reply);
@@ -164,6 +164,13 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::MachineGunTurretStatus)
+	{
+		VehicleProperty::MachineGunTurretStatusType temp(true);
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
 }
 
 void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -198,6 +205,7 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::ExteriorBrightness);
 	props.push_back(VehicleProperty::DoorsPerRow);
 	props.push_back(VehicleProperty::AirbagStatus);
+	props.push_back(VehicleProperty::MachineGunTurretStatus);
 	
 	return props;
 }
@@ -227,7 +235,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	
 	VehicleProperty::VehicleSpeedType vel(velocity);
 	VehicleProperty::EngineSpeedType es(engineSpeed);
-	VehicleProperty::AccelerationType ac(accelerationX);
+	VehicleProperty::AccelerationXType ac(accelerationX);
 	VehicleProperty::SteeringWheelAngleType swa(steeringWheelAngle);
 	VehicleProperty::TransmissionShiftPositionType tsp(transmissionShiftPostion);
 	VehicleProperty::ThrottlePositionType tp(throttlePos);

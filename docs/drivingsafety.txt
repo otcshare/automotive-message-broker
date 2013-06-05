@@ -5,23 +5,35 @@ Service         org.automotive
 Object path     /org/automotive/drivingSafety
 
  
-Interface:	org.automotive.antilockBrakingSystem
-Object path:	/org/automotive/vehicleInfo/vehicleId
+Interface:	org.automotive.AntilockBrakingSystem
+Object path:	/org/automotive/drivingSafety/AntilockBrackingSystem
 Properties:
 		bool AntilockBrakingSystem [readonly]
 
 			Idle = false,
 			Engaged = true
+
+Interface:      org.automotive.TractionControlSystem
+Object path:    /org/automotive/drivingSafety/TractionControlSystem
+Properties:
 				
 		bool TractionControlSystem [readonly]
 			
 			Off = false,
 			On = true
-				
+
+Interface:      org.automotive.VehicleTopSpeedLimit
+Object path:    /org/automotive/drivingSafety/VehicleTopSpeedLimit
+Properties:	
+			
 		uint16 VehicleTopSpeedLimit [readonly]
 			
 			top rated speed in km/h. 0 = no limit
-				
+	
+Interface:      org.automotive.AirbagStatus
+Object path:    /org/automotive/drivingSafety/AirbagStatus
+Properties:
+			
 		dict{ byte, byte } AirbagStatus [readonly]
 			
 			Dictionary of Airbag (byte) and Status (byte)
@@ -38,7 +50,11 @@ Properties:
 			Inactive = 0,
 			Active = 1,
 			Deployed = 2
-				
+	
+Interface:      org.automotive.DoorStatus
+Object path:    /org/automotive/drivingSafety/DoorStatus
+Properties:
+			
 		dict{ byte, byte } DoorStatus [readonly]
 			
 			Dictionary of Door (byte) and Status (byte)
@@ -58,7 +74,7 @@ Properties:
 			Closed = 0,
 			Open = 1,
 			Ajar = 2
-			
+
 		dict{ byte, bool } DoorLockStatus [readonly]
 			
 			Dictionary of Door (byte) and Status (bool locked = true, unlocked = false)
@@ -75,7 +91,11 @@ Properties:
 			Child lock status of rear doors.  active = true, inactive = false.
 			Setting this to 'true' will prevent the rear doors from being opened
 			from the inside.
-			
+	
+Interface:      org.automotive.SeatBeltStatus
+Object path:    /org/automotive/drivingSafety/SeatBeltStatus
+Properties:
+		
 		dict{ byte, bool } SeatBeltStatus [readonly]
 			
 			Dictionary of Seat Belt (byte) and Status (bool: Fasten = true, Unfastened = false)
@@ -88,7 +108,11 @@ Properties:
 			LeftRear = 3,
 			MiddleRear = 4,
 			RightRear = 5
-				
+	
+Interface:      org.automotive.WindowLockStatus
+Object path:    /org/automotive/drivingSafety/WindowLockStatus
+Properties:
+			
 		dict{ byte, bool } WindowLockStatus [readonly]
 			
 			Dictionary of Windows (byte) and Status (bool: Locked = true)
@@ -100,7 +124,11 @@ Properties:
 			LeftRear = 2,
 			RightRear = 3,
 			Sunroof = 4
-			
+	
+Interface:      org.automotive.OccupantStatus
+Object path:    /org/automotive/drivingSafety/OccupantStatus
+Properties:
+		
 		dict{ byte, byte } OccupantStatus [readonly]
 			
 			Dictionary of Occupant (byte) and Status
@@ -119,7 +147,11 @@ Properties:
 			Adult = 2
 
 			/// TODO: document the weight threshold standard for child vs adult
-				
+	
+Interface:      org.automotive.ObstacleDistance
+Object path:    /org/automotive/drivingSafety/ObstacleDistance
+Properties:
+			
 		dict{ byte, double } ObstacleDistance [readonly]
 			
 			Dictionary of Distance Sensor and distance (double) in m
@@ -131,7 +163,7 @@ Properties:
 			LeftRear = 2,
 			RightRear = 3,
 			LeftBlindSpot = 4,
-			RightBlindSPot = 5
+			RightBlindSpot = 5
 				
 
 				

@@ -3,15 +3,16 @@
 
 
 #include "abstractpropertytype.h"
+//#include "vehicleproperty.h"
 #include <map>
 #include <debugout.h>
-//#include <json-glib/json-glib.h>
 #include <json/json.h>
+
 template <class T, class N>
 class MapPropertyType: public AbstractPropertyType
 {
 public:
-	MapPropertyType(){}
+	MapPropertyType(std::string propertyName):AbstractPropertyType(propertyName){}
 
 	void append(T  key, N  value)
 	{
@@ -20,7 +21,7 @@ public:
 
 	AbstractPropertyType* copy()
 	{
-		MapPropertyType<T,N> *t = new MapPropertyType<T,N>();
+		MapPropertyType<T,N> *t = new MapPropertyType<T,N>(name);
 
 		t->setMap(mMap);
 
@@ -77,42 +78,17 @@ public:
 
 		}
 		json_object_put(rootobject);
-		/*
-		DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
 
-		gchar** srcMembers = json_reader_list_members(reader);
-
-		for(int i=0; i< json_reader_count_members(reader); i++)
-		{
-			json_reader_read_member(reader,srcMembers[i]);
-			T one(srcMembers[i]);
-			N two(json_reader_get_string_value(reader));
-
-			append(one,two);
-			json_reader_end_member(reader);
-		}
-
-		g_free(srcMembers);
-		g_object_unref(reader);
-		g_object_unref(parser);*/
 	}
 
 	GVariant* toVariant()
 	{
 		GVariantBuilder params;
 		g_variant_builder_init(&params, G_VARIANT_TYPE_DICTIONARY);
-
 		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
 		{
-			GVariant **v = g_new(GVariant*,2);
 			auto &foo = (*itr).first;
-			v[0] = const_cast<T&>(foo).toVariant();
-			v[1] = (*itr).second.toVariant();
-			GVariant* tuple = g_variant_new_tuple(v,2);
-
-			g_variant_builder_add_value(&params,tuple);
-
-			g_free(v);
+			g_variant_builder_add(&params,"{?*}",const_cast<T&>(foo).toVariant(),(*itr).second.toVariant());
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -120,9 +96,27 @@ public:
 		return var;
 	}
 
-	void fromVariant(GVariant*)
+	void fromVariant(GVariant* variant)
 	{
-
+		/// TODO: fill this in
+		gsize dictsize = g_variant_n_children(variant);
+		for (int i=0;i<dictsize;i++)
+		{
+			GVariant *childvariant = g_variant_get_child_value(variant,i);
+			gsize dictvalsize = g_variant_n_children(childvariant);
+			if (dictvalsize == 2)
+			{
+				//It is a dictionary entry
+				GVariant *keyvariant = g_variant_get_child_value(childvariant,0);
+				GVariant *valvariant = g_variant_get_child_value(childvariant,1);
+				T t = T();
+				t.fromVariant(keyvariant);
+				N n = N();
+				n.fromVariant(valvariant);
+				appendPriv(t,n);
+			}
+		}
+		
 	}
 
 	void setMap(std::map<T, N> m)

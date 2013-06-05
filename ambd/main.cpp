@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 				
 			case 'v':
 				cout<<PROJECT_NAME<<endl;
-				cout<<"Version: "<<PROJECT_VERSION<<endl;
+				cout<<"Version: "<<PROJECT_VERSION<<" ("<<PROJECT_CODENAME<<")"<<endl;
 				return (0);
 				break;
 			case 'c':
@@ -131,7 +131,9 @@ int main(int argc, char **argv)
 
 	VehicleProperty::factory();
 	
-	PluginLoader loader(config, new Core(), argc, argv);
+	Core routingEngine;
+
+	PluginLoader loader(config, &routingEngine , argc, argv);
 	
 	if(!loader.sources().size())
 	{
@@ -188,6 +190,7 @@ void printhelp(const char *argv0)
 		   "   [-v|--version]\n"
 		   "   [-c|--config </path/to/config> \t]\n"
 		   "   [-d|--debug <level (0-5)>\t]\n"
+		   "   [-l]--log </path/to/logfile>\t]\n"
 		   "   [-h|--help]\n"
 		   , argv0);
 }

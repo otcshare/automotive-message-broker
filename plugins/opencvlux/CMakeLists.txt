@@ -27,6 +27,6 @@ add_library(opencvluxplugin MODULE ${opencvluxplugin_sources} ${opencvluxplugin_
 set_target_properties(opencvluxplugin PROPERTIES PREFIX "")
 target_link_libraries(opencvluxplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${OpenCV_LIBS})
 
-install(TARGETS opencvluxplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS opencvluxplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
 endif(opencvlux_plugin)

@@ -34,8 +34,7 @@ Properties:
 			
 			returns whether the parking lights are active (true) or inactive (false)
 
-Interface       org.automotive.hazardLights
-Object path     /org/automotive/parking/hazardLights
+Interface       org.automotive.hazardLightsiiiiiiiiiiiiiooooooooo]Object path     /org/automotive/parking/hazardLights
 Properties:
 
 		bool HazardLights

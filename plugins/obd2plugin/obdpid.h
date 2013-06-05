@@ -185,7 +185,7 @@ class MassAirFlowPid: public CopyMe<MassAirFlowPid>
 public:
 
 	MassAirFlowPid()
-		:CopyMe(VehicleProperty::MassAirFlow,"01101\r",0x01)
+		:CopyMe(VehicleProperty::MassAirFlow,"01101\r", 0x10)
 	{
 
 	}
@@ -277,14 +277,14 @@ public:
 	}
 	bool isValid(ByteArray replyVector)
 	{
+		isValidVal = true;
 		ByteArray tmp = compress(cleanup(replyVector));
 		if (tmp[0] != 0x49 || tmp[1] != 0x02)
 		{
 			isValidVal = false;
-			return false;
+
 		}
-		isValidVal = true;
-		return true;
+		return isValidVal;
 	}
 	void parse(ByteArray replyVector)
 	{
@@ -454,6 +454,36 @@ public:
 		int temp = tmp[2]*100.0/255.0;
 		value = boost::lexical_cast<std::string>(temp);
 	}
+};
+
+class BatteryVoltagePid: public CopyMe<BatteryVoltagePid>
+{
+public:
+	BatteryVoltagePid()
+		:CopyMe(VehicleProperty::BatteryVoltage,"ATRV\r",0)
+	{
+
+	}
+
+	bool isValid(ByteArray replyVector)
+	{
+		ByteArray tmp = cleanup(replyVector);
+		if(tmp[tmp.size() - 1] == 'V')
+		{
+			return isValidVal = true;
+		}
+		return false;
+	}
+	void parse(ByteArray replyVector)
+	{
+		ByteArray tmp = cleanup(replyVector);
+		value = "";
+		for(int i=0; i<tmp.size() - 1; i++)
+		{
+			value += tmp[i];
+		}
+	}
+
 };
 
 #endif

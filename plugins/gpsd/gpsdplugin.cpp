@@ -50,21 +50,10 @@ static int updateGpsposition(gpointer data)
 
 	double time = amb::currentTime();
 
+	bool changed = false;
+
 	if(shared->gps.fix.mode > 2)
 	{
-		if(shared->gps.fix.latitude != shared->oldlat)
-			shared->oldlat = shared->gps.fix.latitude;
-		if(shared->gps.fix.longitude != shared->oldlon)
-			shared->oldlon = shared->gps.fix.longitude;
-		if(shared->gps.fix.altitude != shared->oldalt)
-			shared->oldalt = shared->gps.fix.altitude;
-		if(shared->gps.fix.track != shared->oldheading)
-			shared->oldheading = shared->gps.fix.track;
-		if(shared->gps.fix.speed * MPS_TO_KPH != shared->oldspeed)
-		{
-			shared->oldspeed = shared->gps.fix.speed * MPS_TO_KPH;
-		}
-
 		shared->parent->updateProperty();
 	}
 
@@ -190,22 +179,46 @@ int GpsdPlugin::supportedOperations()
 
 void GpsdPlugin::updateProperty()
 {
-	VehicleProperty::LatitudeType lat(shared->oldlat);
-	routingEngine->updateProperty(VehicleProperty::Latitude,&lat, uuid());
+	VehicleProperty::LatitudeType lat(shared->gps.fix.latitude);
 
-	VehicleProperty::LongitudeType lon(shared->oldlon);
-	routingEngine->updateProperty(VehicleProperty::Longitude, &lon, uuid());
+	if(lat.toString() != shared->oldlat)
+	{
+		shared->oldlat = lat.toString();
+		routingEngine->updateProperty(VehicleProperty::Latitude,&lat, uuid());
+	}
 
-	VehicleProperty::AltitudeType alt(shared->oldalt);
-	routingEngine->updateProperty(VehicleProperty::Altitude, &alt, uuid());
+	VehicleProperty::LongitudeType lon(shared->gps.fix.longitude);
+	if(lon.toString() != shared->oldlon)
+	{
+		shared->oldlon = lon.toString();
+		routingEngine->updateProperty(VehicleProperty::Longitude, &lon, uuid());
+	}
 
-	VehicleProperty::DirectionType heading(shared->oldheading);
-	routingEngine->updateProperty(VehicleProperty::Direction, &heading, uuid());
+	VehicleProperty::AltitudeType alt(shared->gps.fix.altitude);
+
+	if(alt.toString() != shared->oldalt)
+	{
+		shared->oldalt = alt.toString();
+		routingEngine->updateProperty(VehicleProperty::Altitude, &alt, uuid());
+	}
+
+	VehicleProperty::DirectionType heading(shared->gps.fix.track);
+
+	if(heading.toString() != shared->oldheading)
+	{
+		shared->oldalt = heading.toString();
+		routingEngine->updateProperty(VehicleProperty::Direction, &heading, uuid());
+	}
 
 	if(updateVelocity)
 	{
-		VehicleProperty::VehicleSpeedType speed(shared->oldspeed);
-		routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &speed, uuid());
+		VehicleProperty::VehicleSpeedType speed(shared->gps.fix.speed);
+
+		if(speed.toString() != shared->oldspeed)
+		{
+			shared->oldspeed = speed.toString();
+			routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &speed, uuid());
+		}
 	}
 }
 

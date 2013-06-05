@@ -125,8 +125,8 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	{
 		/// we want to turn on the camera for one shot to get an image and determine the intensity
 
-		init();
-		g_timeout_add(1,grabImage,shared);
+		if(init())
+			grabImage(shared);
 	}
 
 	if(reply->property == VehicleProperty::ExteriorBrightness)
@@ -156,8 +156,8 @@ void OpenCvLuxPlugin::subscribeToPropertyChanges(VehicleProperty::Property prope
 {
 	if(!shared->mRequests.size())
 	{
-		init();
-		g_timeout_add(1000 / shared->fps, grabImage, shared);
+		if(init())
+			g_timeout_add(1000 / shared->fps, grabImage, shared);
 	}
 
 	shared->mRequests.push_back(property);
@@ -186,21 +186,21 @@ static int grabImage(void *data)
 {
 	OpenCvLuxPlugin::Shared* shared = static_cast<OpenCvLuxPlugin::Shared*>(data);
 
-/*	if(kinect)
-	{
-		m_capture->grab();
-		m_capture->retrieve( m_image, CV_CAP_OPENNI_GRAY_IMAGE );
-	}
-	else*/
-	{
-		cv::Mat m_image;
+	cv::Mat m_image;
 
+	if(shared->kinect)
+	{
+		shared->m_capture->grab();
+		shared->m_capture->retrieve( m_image, CV_CAP_OPENNI_GRAY_IMAGE );
+	}
+	else
+	{
 		*(shared->m_capture) >> m_image;
-
-		uint lux = evalImage(m_image,shared);
-
-		shared->parent->updateProperty(lux);
 	}
+
+	uint lux = evalImage(m_image,shared);
+
+	shared->parent->updateProperty(lux);
 
 	if(shared->mRequests.size())
 	{
@@ -215,14 +215,21 @@ static int grabImage(void *data)
 
 static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 {
-#ifdef OPENCL
 	cv::Scalar avgPixelIntensity;
-	cv::Scalar stdDev;
 
-	cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
-#else
-	cv::Scalar avgPixelIntensity = cv::mean(qImg);
+
+	if(shared->useOpenCl)
+	{
+#ifdef OPENCL
+		cv::Scalar stdDev;
+		cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
 #endif
+	}
+	else
+	{
+		avgPixelIntensity = cv::mean(qImg);
+	}
+
 
 	double val = avgPixelIntensity.val[0];
 
@@ -238,7 +245,7 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 }
 
 
-void OpenCvLuxPlugin::init()
+bool OpenCvLuxPlugin::init()
 {
 	if(shared->m_capture) delete shared->m_capture;
 
@@ -253,7 +260,7 @@ void OpenCvLuxPlugin::init()
 	if(!shared->m_capture->isOpened())
 	{
 		DebugOut()<<"we failed to open camera device ("<<device<<") or no camera found"<<endl;
-		return;
+		return false;
 	}
 
 
@@ -261,6 +268,8 @@ void OpenCvLuxPlugin::init()
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
 	DebugOut()<<"camera frame height: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT)<<endl;
 	DebugOut()<<"camera frame fps: "<<shared->m_capture->get(CV_CAP_PROP_FPS)<<endl;
+
+	return true;
 }
 
 void OpenCvLuxPlugin::updateProperty(uint lux)

@@ -50,7 +50,17 @@ Core::Core()
 
 Core::~Core()
 {
+	std::vector<AbstractSink*> toDelete;
+	for(auto itr = mSinks.begin(); itr != mSinks.end(); itr++)
+	{
+		AbstractSink* sink = *itr;
+		toDelete.push_back(sink);
+	}
 
+	for(int i=0; i<toDelete.size(); i++)
+	{
+		delete toDelete[i];
+	}
 }
 
 
@@ -187,6 +197,10 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet)
 		{
 			src->getPropertyAsync(reply);
+
+			/** right now the owner of the reply becomes the requestor that called this method.
+			 *  reply will become invalid after the first reply. */
+			return reply;
 		}
 	}
 
@@ -229,11 +243,17 @@ AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
-	if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
+
+	/** TODO: Change behavior of subscribe to subscribe even if no sources provide a
+	 *  given property.  When subscribers come online with support, core should tell
+	 *  the sources what properties have already been subscribed to.
+	 */
+
+	/*if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
 	{
 		DebugOut(1)<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
 		return; 
-	}
+	}*/
 	
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
@@ -262,7 +282,7 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property;
+		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property<<endl;
 		return; 
 	}
 		

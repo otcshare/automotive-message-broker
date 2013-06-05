@@ -19,7 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "pluginloader.h"
 #include "glibmainloop.h"
-
+#include <json.h>
 #include <iostream>
 #include <stdexcept>
 #include <boost/concept_check.hpp>
@@ -209,15 +209,6 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 
 PluginLoader::~PluginLoader()
 {
-	for(auto itr = mSinks.begin(); itr != mSinks.end(); itr++)
-	{
-		delete *itr;
-	}
-
-	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
-	{
-		delete *itr;
-	}
 }
 
 SinkList PluginLoader::sinks()

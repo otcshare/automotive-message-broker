@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 #include <functional>
 #include <unordered_map>
+#include <list>
 #include <gio/gio.h>
 #include <boost/any.hpp>
 #include <nullptr.h>
@@ -48,6 +49,14 @@ public:
 	void addProperty(AbstractProperty* property);
 	virtual void updateValue(AbstractProperty* property);
 	
+	static list<string> implementedProperties() { return mimplementedProperties; }
+
+	static AbstractDBusInterface* getInterfaceForProperty(std::string property);
+
+	bool implementsProperty(std::string property);
+
+	std::string objectPath() { return mObjectPath; }
+
 protected:
 
 	void startRegistration();
@@ -70,6 +79,7 @@ private:
 	string introspectionXml;
 	GDBusConnection * mConnection;
 	static unordered_map<string, AbstractDBusInterface*> interfaceMap;
+	static list<string> mimplementedProperties;
 	guint regId;
 };
 

@@ -13,4 +13,4 @@ add_library(demosinkplugin MODULE ${demosinkplugin_sources})
 set_target_properties(demosinkplugin PROPERTIES PREFIX "")
 target_link_libraries(demosinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
-install(TARGETS demosinkplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS demosinkplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)

@@ -49,7 +49,6 @@ public:
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	PropertyList supported() { return mMasterPropertyList; }
     
-protected: 
 	~Core();
 	
 private:

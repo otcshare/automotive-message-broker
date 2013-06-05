@@ -41,6 +41,8 @@ class AmbProperty: public QObject
 
 		QVariant value = mDBusInterface->property(propertyName().toAscii().data());
 
+		qDebug()<<"property "<<propertyName()<<" value: "<<value<<" isvalid? "<<(QVariant::Invalid == value);
+
 		return value;
 	}
 
@@ -55,8 +57,8 @@ class AmbProperty: public QObject
 	}
 
 Q_SIGNALS:
-	void propertyChanged(QVariant, double);
-	void valueChanged(QVariant);
+	void propertyChanged(QVariant val, double time);
+	void valueChanged(QVariant val);
 
 public Q_SLOTS:
 	void propertyChangedSlot(QDBusVariant val, double ts);

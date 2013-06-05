@@ -56,26 +56,51 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	velocityRequest.property = VehicleProperty::VehicleSpeed;
 	velocityRequest.completed = [](AsyncPropertyReply* reply)
 	{
-		DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl; delete reply;
+		if(!reply->success)
+			DebugOut(0)<<"Velocity Async request failed";
+		else
+			DebugOut(0)<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
+		delete reply;
 	};
 
 	routingEngine->getPropertyAsync(velocityRequest);
 
 	AsyncPropertyRequest vinRequest;
 	vinRequest.property = VehicleProperty::VIN;
-	vinRequest.completed = [](AsyncPropertyReply* reply) { DebugOut(1)<<"VIN Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+	vinRequest.completed = [](AsyncPropertyReply* reply)
+	{
+		if(!reply->success)
+			DebugOut(0)<<"VIN Async request failed";
+		else
+			DebugOut(0)<<"VIN Async request completed: "<<reply->value->toString()<<endl;
+		delete reply;
+	};
 
 	routingEngine->getPropertyAsync(vinRequest);
 
 	AsyncPropertyRequest wmiRequest;
 	wmiRequest.property = VehicleProperty::WMI;
-	wmiRequest.completed = [](AsyncPropertyReply* reply) { DebugOut(1)<<"WMI Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+	wmiRequest.completed = [](AsyncPropertyReply* reply)
+	{
+		if(!reply->success)
+			DebugOut(0)<<"WMI Async request failed";
+		else
+		DebugOut(1)<<"WMI Async request completed: "<<reply->value->toString()<<endl;
+		delete reply;
+	};
 
 	routingEngine->getPropertyAsync(wmiRequest);
 
 	AsyncPropertyRequest batteryVoltageRequest;
 	batteryVoltageRequest.property = VehicleProperty::BatteryVoltage;
-	batteryVoltageRequest.completed = [](AsyncPropertyReply* reply) { DebugOut(1)<<"BatteryVoltage Async request completed: "<<reply->value->toString()<<endl; delete reply; };
+	batteryVoltageRequest.completed = [](AsyncPropertyReply* reply)
+	{
+		if(!reply->success)
+			DebugOut(0)<<"BatteryVoltage Async request failed";
+		else
+			DebugOut(1)<<"BatteryVoltage Async request completed: "<<reply->value->toString()<<endl;
+		delete reply;
+	};
 
 	routingEngine->getPropertyAsync(batteryVoltageRequest);
 
@@ -83,7 +108,10 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	doorsPerRowRequest.property = VehicleProperty::DoorsPerRow;
 	doorsPerRowRequest.completed = [](AsyncPropertyReply* reply)
 	{
-		DebugOut(1)<<"Doors per row: "<<reply->value->toString()<<endl;
+		if(!reply->success)
+			DebugOut(0)<<"Doors per row Async request failed";
+		else
+			DebugOut(1)<<"Doors per row: "<<reply->value->toString()<<endl;
 		delete reply;
 	};
 
@@ -93,7 +121,10 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	airbagStatus.property = VehicleProperty::AirbagStatus;
 	airbagStatus.completed = [](AsyncPropertyReply* reply)
 	{
-		DebugOut(1)<<"Airbag Status: "<<reply->value->toString()<<endl;
+		if(!reply->success)
+			DebugOut(0)<<"Airbag Async request failed";
+		else
+			DebugOut(1)<<"Airbag Status: "<<reply->value->toString()<<endl;
 		delete reply;
 	};
 
@@ -103,7 +134,10 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	exteriorBrightness.property = VehicleProperty::ExteriorBrightness;
 	exteriorBrightness.completed = [](AsyncPropertyReply* reply)
 	{
-		DebugOut(1)<<"Exterior Brightness: "<<reply->value->toString()<<endl;
+		if(!reply->success)
+			DebugOut(0)<<"Exterior Brightness Async request failed";
+		else
+			DebugOut(1)<<"Exterior Brightness: "<<reply->value->toString()<<endl;
 		delete reply;
 	};
 
@@ -124,7 +158,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 			for(auto itr = values.begin(); itr != values.end(); itr++)
 			{
 				auto val = *itr;
-				DebugOut(1)<<"Velocity value from past: "<<val->toString()<<" time: "<<val->timestamp<<endl;
+				DebugOut(1)<<"Value from past: ("<<val->name<<"): "<<val->toString()<<" time: "<<val->timestamp<<endl;
 			}
 
 			delete reply;

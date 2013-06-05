@@ -31,11 +31,25 @@
 #include <glib.h>
 #include <list>
 #include "timestamp.h"
+#include <debugout.h>
+namespace Zone {
+enum Type {
+	None = 0,
+	Driver = 1,
+	FrontMiddle = 1 << 1,
+	Passenger = 1 << 2,
+	LeftRear = 1 << 3,
+	MiddleRear = 1 << 4,
+	RightRear = 1 << 5
+};
+}
 
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(): timestamp(-1), sequence(-1) {}
+	//AbstractPropertyType(): timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
+
+	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
 
 	virtual std::string toString() const = 0;
 
@@ -54,9 +68,17 @@ public:
 		return one == two;
 	}
 
+	std::string name;
+
 	double timestamp;
 
 	int32_t sequence;
+
+	std::string sourceUuid;
+
+	Zone::Type zone;
+
+	int index;
 
 	void setValue(boost::any val)
 	{
@@ -197,16 +219,19 @@ template <typename T>
 class BasicPropertyType: public AbstractPropertyType
 {
 public:
-	BasicPropertyType(): AbstractPropertyType()
+	BasicPropertyType(): AbstractPropertyType("")
 	{
 		mValue = T();
 	}
 	BasicPropertyType(BasicPropertyType const &other)
-		:AbstractPropertyType()
+		:AbstractPropertyType(other.name)
 	{
 		setValue(other.value<T>());
 		timestamp = other.timestamp;
 		sequence = other.sequence;
+		sourceUuid = other.sourceUuid;
+		index = other.index;
+		name = other.name;
 	}
 
 	BasicPropertyType & operator = (BasicPropertyType const & other)
@@ -214,6 +239,10 @@ public:
 		setValue(other.value<T>());
 		timestamp = other.timestamp;
 		sequence = other.sequence;
+		sourceUuid = other.sourceUuid;
+		index = other.index;
+		name = other.name;
+
 		return *this;
 	}
 
@@ -227,14 +256,30 @@ public:
 		return value<T>() > other.value<T>();
 	}
 
-	BasicPropertyType(T val)
-		:AbstractPropertyType()
+	BasicPropertyType( T val)
+		:AbstractPropertyType("")
 	{
 		setValue(val);
 	}
 
+	BasicPropertyType( std::string propertyName, T val)
+		:AbstractPropertyType(propertyName)
+	{
+		setValue(val);
+	}
+
+	BasicPropertyType( std::string propertyName, std::string val)
+		:AbstractPropertyType(propertyName)
+	{
+		if(!val.empty() && val != "")
+		{
+			serialize<T>(val);
+		}
+		else setValue(T());
+	}
+
 	BasicPropertyType(std::string val)
-		:AbstractPropertyType()
+		:AbstractPropertyType("")
 	{
 		if(!val.empty() && val != "")
 		{
@@ -259,6 +304,7 @@ public:
 	std::string toString() const
 	{
 		std::stringstream stream;
+		stream.precision(10);
 		stream<<value<T>();
 
 		return stream.str();
@@ -333,21 +379,38 @@ private:
 class StringPropertyType: public AbstractPropertyType
 {
 public:
-	StringPropertyType(std::string val)
-		:AbstractPropertyType()
+	StringPropertyType(std::string propertyName)
+		:AbstractPropertyType(propertyName)
+	{
+
+	}
+
+	StringPropertyType(std::string propertyName, std::string val)
+		:AbstractPropertyType(propertyName)
 	{
 		setValue(val);
 	}
 
 	StringPropertyType(StringPropertyType const & other)
-	:AbstractPropertyType()
+	:AbstractPropertyType(other.name)
 	{
 		setValue(other.value<std::string>());
+		timestamp = other.timestamp;
+		sequence = other.sequence;
+		sourceUuid = other.sourceUuid;
+		index = other.index;
+		name = other.name;
 	}
 
 	StringPropertyType & operator = (StringPropertyType const & other)
 	{
 		setValue(other.value<std::string>());
+		timestamp = other.timestamp;
+		sequence = other.sequence;
+		sourceUuid = other.sourceUuid;
+		index = other.index;
+		name = other.name;
+
 		return *this;
 	}
 
@@ -385,20 +448,32 @@ class ListPropertyType: public AbstractPropertyType
 {
 public:
 
-	ListPropertyType():initialized(false){}
-	ListPropertyType(AbstractPropertyType *property):initialized(false)
+	ListPropertyType(std::string propertyName)
+		: AbstractPropertyType(propertyName), initialized(false)
 	{
-		appendPriv(property->copy());
+
+	}
+
+	ListPropertyType(std::string propertyName, AbstractPropertyType *value)
+		: AbstractPropertyType(propertyName), initialized(false)
+	{
+		appendPriv(value->copy());
 	}
 
 	ListPropertyType(ListPropertyType & other)
-		:initialized(false)
+		:AbstractPropertyType(other.name),initialized(false)
 	{
 		std::list<AbstractPropertyType*> l = other.list();
 		for(auto itr = l.begin(); itr != l.end(); itr++)
 		{
 			append(*itr);
 		}
+
+		timestamp = other.timestamp;
+		sequence = other.sequence;
+		sourceUuid = other.sourceUuid;
+		index = other.index;
+		name = other.name;
 	}
 
 	~ListPropertyType()
@@ -490,12 +565,15 @@ public:
 	{
 
 		GVariantBuilder params;
-		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
+		g_variant_builder_init(&params, ((const GVariantType *) "av"));
 
 		for(auto itr = mList.begin(); itr != mList.end(); itr++)
 		{
 			AbstractPropertyType* t = *itr;
-			g_variant_builder_add_value(&params, t->toVariant());
+			GVariant *var = t->toVariant();
+			GVariant *newvar = g_variant_new("v",var);
+			g_variant_builder_add_value(&params, newvar);
+			
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -506,7 +584,16 @@ public:
 
 	void fromVariant(GVariant* v)
 	{
-
+		/// TODO: fill this in
+		gsize dictsize = g_variant_n_children(v);
+		for (int i=0;i<dictsize;i++)
+		{
+			GVariant *childvariant = g_variant_get_child_value(v,i);
+			GVariant *innervariant = g_variant_get_variant(childvariant);
+			T *t = new T();
+			t->fromVariant(innervariant);
+			appendPriv(t);
+		}
 	}
 
 	std::list<AbstractPropertyType*> list() { return mList; }

@@ -118,8 +118,8 @@ public:
 class PlaybackShared
 {
 public:
-	PlaybackShared(AbstractRoutingEngine* re, std::string u)
-		:routingEngine(re),uuid(u) {}
+	PlaybackShared(AbstractRoutingEngine* re, std::string u, uint playbackMult)
+		:routingEngine(re),uuid(u),playBackMultiplier(playbackMult),stop(false) {}
 	~PlaybackShared()
 	{
 		for(auto itr = playbackQueue.begin(); itr != playbackQueue.end(); itr++)
@@ -134,7 +134,9 @@ public:
 
 	AbstractRoutingEngine* routingEngine;
 	std::list<DBObject*> playbackQueue;
+	uint playBackMultiplier;
 	std::string uuid;
+	bool stop;
 };
 
 class DatabaseSink : public AbstractSource
@@ -163,6 +165,9 @@ private: //methods:
 	void startDb();
 	void startPlayback();
 	void initDb();
+	void setPlayback(bool v);
+	void setLogging(bool b);
+	void setDatabaseFileName(std::string filename);
 
 private:
 	PropertyList mSubscriptions;
@@ -175,7 +180,13 @@ private:
 	PropertyList mSupported;
 	bool playback;
 	PlaybackShared* playbackShared;
+	uint playbackMultiplier;
 };
+
+PROPERTYTYPEBASIC1(DatabaseLogging, bool)
+PROPERTYTYPEBASIC1(DatabasePlayback, bool)
+PROPERTYTYPE1(DatabaseFile, DatabaseFilePropertyType, StringPropertyType, std::string)
+
 
 class DatabaseSinkManager: public AbstractSinkManager
 {
@@ -184,9 +195,9 @@ public:
 	:AbstractSinkManager(engine, config)
 	{
 		new DatabaseSink(routingEngine, config);
-		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new BasicPropertyType<bool>(false);});
-		VehicleProperty::registerProperty(DatabasePlaybackProperty, [](){return new BasicPropertyType<bool>(false);});
-VehicleProperty::registerProperty(DatabaseFileProperty, [](){return new StringPropertyType("out.ogg");});
+		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new DatabaseLoggingType(false);});
+		VehicleProperty::registerProperty(DatabasePlaybackProperty, [](){return new DatabasePlaybackType(false);});
+		VehicleProperty::registerProperty(DatabaseFileProperty, [](){return new DatabaseFilePropertyType("storage");});
 	}
 };
 

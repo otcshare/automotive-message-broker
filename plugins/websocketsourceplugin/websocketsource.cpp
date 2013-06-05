@@ -126,10 +126,9 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	
 
 }
-bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
+bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
 {
 	//This is the polling function. If it return false, glib will stop polling this FD.
-	//printf("Polling...%i\n",condition);
 
 	oldTimestamp = amb::currentTime();
 
@@ -139,16 +138,17 @@ bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data)
 	pollstruct.events = condition;
 	pollstruct.revents = condition;
 	libwebsocket_service_fd(context,&pollstruct);
-	if (condition == G_IO_HUP)
+	if (condition & G_IO_HUP)
 	{
 		//Hang up. Returning false closes out the GIOChannel.
 		//printf("Callback on G_IO_HUP\n");
 		return false;
 	}
-	if (condition == G_IO_IN)
+	if (condition & G_IO_IN)
 	{
+
 	}
-	DebugOut() << "gioPollingFunc" << condition;
+	DebugOut() << "gioPollingFunc" << condition << endl;
 
 	return true;
 }
@@ -292,9 +292,9 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			{
 				json_object *dataobject = json_object_object_get(rootobject,"data");
 				
-				json_object *valueobject = json_object_object_get(rootobject,"value");
-				json_object *timestampobject = json_object_object_get(rootobject,"timestamp");
-				json_object *sequenceobject= json_object_object_get(rootobject,"sequence");
+				json_object *valueobject = json_object_object_get(dataobject,"value");
+				json_object *timestampobject = json_object_object_get(dataobject,"timestamp");
+				json_object *sequenceobject= json_object_object_get(dataobject,"sequence");
 				
 				string value = string(json_object_get_string(valueobject));
 				string timestamp = string(json_object_get_string(timestampobject));
@@ -360,7 +360,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 							json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
 							props.push_back(string(json_object_get_string(arrayobj)));
 						}
-						array_list_free(dataarray);
+						//array_list_free(dataarray);
 					}
 					else
 					{
@@ -390,7 +390,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						propertylist.push_back(type);
 						//props.push_back(string(json_object_get_string(arrayobj)));
 					}
-					array_list_free(dataarray);
+					//array_list_free(dataarray);
 					if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
 					{
 						source->uuidRangedReplyMap[id]->values = propertylist;
@@ -401,13 +401,6 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					else
 					{
 						DebugOut() << "getRanged methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
-					}
-					while (propertylist.size() > 0)
-					{
-						
-						AbstractPropertyType *type = propertylist.front();
-						delete type;
-						propertylist.pop_front();
 					}
 				}
 				else if (name == "get")
@@ -462,12 +455,9 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 				json_object_put(dataobject);
 			}
 			json_object_put(rootobject);
-			///TODO: this will probably explode:
-			//mlc: I agree with Kevron here, it does explode.
-			//if(error) g_error_free(error);
 
-			
 			break;
+
 		}
 		case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED:
 		{
@@ -480,11 +470,12 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		  DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "Adding poll for websocket IO channel" << endl;
 			//Add a FD to the poll list.
 			GIOChannel *chan = g_io_channel_unix_new(libwebsocket_get_socket_fd(wsi));
-			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_HUP,(GIOFunc)gioPollingFunc,0);
-			
+
+			/// TODO: I changed this to be more consistent with the websocket sink end. it may not be correct. TEST
+
+			g_io_add_watch(chan,GIOCondition(G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_HUP),(GIOFunc)gioPollingFunc,0);
+			g_io_channel_set_close_on_unref(chan,true);
+			g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 			
 			break;
 		}
@@ -532,7 +523,7 @@ PropertyList WebSocketSource::supported()
 int WebSocketSource::supportedOperations()
 {
 	/// TODO: need to do this correctly based on what the host supports.
-	return Get | Set;
+	return Get | Set | GetRanged;
 }
 
 string WebSocketSource::uuid()
@@ -580,7 +571,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	
 	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << uuid << "\"}";
 	string replystr = s.str();
-	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr <<endl;
+	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sending:" << replystr <<endl;
 	//printf("Reply: %s\n",replystr.c_str());
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
@@ -596,7 +587,9 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	uuidRangedReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 60; ///TODO: 60 second timeout, make this configurable?
 	stringstream s;  
-	s << "{\"type\":\"method\",\"name\":\"getRange\",\"data\": {";
+	s.precision(15);
+	s << "{\"type\":\"method\",\"name\":\"getRanged\",\"data\": {";
+	s << "\"property\":\""<< reply->property << "\",";
 	s << "\"timeBegin\":\"" << reply->timeBegin << "\",";
 	s << "\"timeEnd\":\"" << reply->timeEnd << "\",";
 	s << "\"sequenceBegin\":\"" << reply->sequenceBegin<< "\",";

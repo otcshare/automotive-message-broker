@@ -22,14 +22,19 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <gio/gio.h>
 #include <string>
 
+#include "listplusplus.h"
+#include "automotivemanager.h"
+
 ///properties:
 #include "accelerationproperty.h"
 #include "runningstatus.h"
 #include "custompropertyinterface.h"
+#include "uncategorizedproperty.h"
 #include "environmentproperties.h"
 #include "vehicleinfo.h"
 #include "maintenance.h"
 #include "parking.h"
+#include "drivingsafety.h"
 
 #define ConstructProperty(property) \
 	new property(iface->re, connection);
@@ -41,6 +46,9 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 {
 	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
 
+	new AutomotiveManager(connection);
+
+	/// properties:
 	AbstractDBusInterface* acceleration = new AccelerationProperty(iface->re, connection);
 	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
 	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);
@@ -56,6 +64,13 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(FuelProperty);
 	ConstructProperty(EngineOilProperty);
 	ConstructProperty(ExteriorBrightnessProperty);
+	ConstructProperty(Temperature);
+	ConstructProperty(RainSensor);
+	ConstructProperty(WindshieldWiper);
+	ConstructProperty(HVACProperty);
+	ConstructProperty(WindowStatusProperty);
+	ConstructProperty(Sunroof);
+	ConstructProperty(ConvertibleRoof);
 	ConstructProperty(VehicleId);
 	ConstructProperty(TransmissionInfoProperty);
 	ConstructProperty(VehicleTypeProperty);
@@ -64,12 +79,21 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(DoorsProperty);
 	ConstructProperty(WheelInformationProperty);
 	ConstructProperty(OdometerProperty);
+	ConstructProperty(FluidProperty);
 	ConstructProperty(BatteryProperty);
 	ConstructProperty(SecurityAlertProperty);
 	ConstructProperty(ParkingBrakeProperty);
 	ConstructProperty(ParkingLightProperty);
 	ConstructProperty(HazardLightProperty);
 	ConstructProperty(LocationProperty);
+	ConstructProperty(AntilockBrakingSystemProperty);
+	ConstructProperty(TractionControlSystemProperty);
+	ConstructProperty(VehicleTopSpeedLimitProperty);
+	ConstructProperty(AirbagStatusProperty);
+	ConstructProperty(DoorStatusProperty);
+	ConstructProperty(SeatBeltStatusProperty);
+	ConstructProperty(OccupantStatusProperty);
+	ConstructProperty(ObstacleDistanceProperty);
 
 	PropertyList list = VehicleProperty::customProperties();
 
@@ -80,6 +104,22 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 		new CustomPropertyInterface(prop,iface->re,connection);
 	}
 
+
+	/// Create objects for unimplemented properties:
+
+	PropertyList capabilitiesList = VehicleProperty::capabilities();
+
+	for (auto itr = capabilitiesList.begin(); itr != capabilitiesList.end(); itr++)
+	{
+		VehicleProperty::Property prop = *itr;
+
+		PropertyList implemented = AbstractDBusInterface::implementedProperties();
+
+		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
+		{
+			new UncategorizedPropertyInterface(prop, iface->re, connection);
+		}
+	}
 
 }
 
@@ -93,6 +133,12 @@ static void
 on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
 
+	DebugOut(0)<<"DBus: Lost bus name"<<endl;
+
+	if(!connection){
+		DebugOut(0)<<"DBus: Connection could not be established."<<endl;
+		throw std::runtime_error("Could not establish DBus connection.");
+	}
 }
 
 

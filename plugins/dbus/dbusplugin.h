@@ -58,6 +58,7 @@ protected:
 	}
 
 	PropertyDBusMap propertyDBusMap;
+
 private:
 
 	bool supported;
