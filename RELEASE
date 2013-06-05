@@ -4,7 +4,12 @@ New features:
 
 - Added org.automotive.Manager DBus interface.
 - Added org.automotive.Manager.findProperty method for finding a specific object path for a given property
+- OBD2 add support for AT/ST calls (ie, atrv for battery voltage) 
 
 Changes:
 - AbstractPropertyType class now contains information for zone and the property name
+- Clean up sink subscription process so that subscription only happens once regardless of whether the property is supported or not at the time
 
+Fixes:
+
+- Fill in the fromGVariant() methods in list and map abstract property types

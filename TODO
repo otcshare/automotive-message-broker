@@ -5,13 +5,6 @@ For 0.10.0
 - Document changes to the DBus API in the IDL
 - autoreconnect on a timeout when Obd2 disconnects if 'autoreconnect' is 'true' in the config
 
-- OBD2 add support for AT/ST calls (ie, atrv for battery voltage) - DONE
-- fill in the fromGVariant() methods in list and map abstract property types. - DONE
-- Clean up sink subscription process so that subscription only happens once regardless of whether the 
-  property is supported or not at the time - DONE
-- investigate why websocketsink plugin constantly gets disconnected when using eth0 - DONE
-
-
 Other:
 - grep all the TODOs in the code and do them
 - per-source property filtering in routing engine
