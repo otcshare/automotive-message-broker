@@ -227,17 +227,7 @@ public:
 	}
 	bool isValid(ByteArray replyVector)
 	{
-<<<<<<< HEAD
-		if(!MassAirFlowPid::tryParse(replyVector))
-		{
-			isValidVal = false;
-			return false;
-		}
-		isValidVal = true;
-		return true;
-=======
 		return isValidVal = MassAirFlowPid::isValid(replyVector);
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 	}
 	void parse(ByteArray replyVector)
 	{
