@@ -313,24 +313,10 @@ public:
 		property = VehicleProperty::WMI;
 	}
 	bool isValid(ByteArray replyVector)
-<<<<<<< HEAD
-=======
 	{
 		return isValidVal = VinPid::isValid(replyVector);
 	}
 	void parse(ByteArray replyVector)
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
-	{
-		if (!isValidVal)
-		{
-<<<<<<< HEAD
-			isValidVal = false;
-			return false;
-		}
-		isValidVal = true;
-		return true;
-	}
-	void parse(ByteArray replyVector)
 	{
 		if (!isValidVal)
 		{
@@ -340,14 +326,6 @@ public:
 		VinPid::parse(replyVector);
 		value = value.substr(0,3);
 	}
-=======
-			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
-			return;
-		}
-		VinPid::parse(replyVector);
-		value = value.substr(0,3);
-	}
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 };
 
 class AirIntakeTemperaturePid: public CopyMe<AirIntakeTemperaturePid>

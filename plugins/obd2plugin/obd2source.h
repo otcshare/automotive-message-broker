@@ -54,10 +54,7 @@ class StatusMessage
 {
 public:
   std::string statusStr;
-<<<<<<< HEAD
-=======
   VehicleProperty::Property property;
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 };
 class ObdReply
 {

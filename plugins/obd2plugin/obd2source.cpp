@@ -328,10 +328,7 @@ void threadLoop(gpointer data)
 					}
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "error:nodata";
-<<<<<<< HEAD
-=======
 					statusreq->property = (*i)->property;
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 					g_async_queue_push(privStatusQueue,statusreq);
 					continue;
 				}
@@ -340,11 +337,7 @@ void threadLoop(gpointer data)
 					timeoutCount++;
 					if (timeoutCount < 2)
 					{
-<<<<<<< HEAD
-						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::TIMEOUT for pid" << (*i)->pid << "\n";
-=======
 						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBDLib::TIMEOUT for pid" << (*i)->pid << endl;
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "error:timeout";
 						g_async_queue_push(privStatusQueue,statusreq);
@@ -407,38 +400,12 @@ void threadLoop(gpointer data)
 		obd->closePort();
 	}
 }
-<<<<<<< HEAD
-static int updateProperties(/*gpointer retval,*/ gpointer data)
-=======
 static int updateProperties( gpointer data)
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 {
 
 	OBD2Source* src = (OBD2Source*)data;
 	
-<<<<<<< HEAD
-	
-	StatusMessage *statusreq = new StatusMessage();
-				statusreq->statusStr = "connected";
-				g_async_queue_push(src->statusQueue,statusreq);
-				
 	while (gpointer retval = g_async_queue_try_pop(src->statusQueue))
-	{
-		StatusMessage *reply = (StatusMessage*)retval;
-		if (reply->statusStr == "disconnected")
-		{
-			//TODO: This is where we update Obd2Connected property
-			//src->updateProperty("Obd2Connected",true);
-		}
-		else if (reply->statusStr == "connected")
-		{
-			//TODO: This is where we update Obd2Connected property
-		}
-	}
-	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
-=======
-	while (gpointer retval = g_async_queue_try_pop(src->statusQueue))
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 	{
 		StatusMessage *reply = (StatusMessage*)retval;
 		if (reply->statusStr == "disconnected")
