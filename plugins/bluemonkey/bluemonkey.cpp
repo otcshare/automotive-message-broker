@@ -23,20 +23,94 @@
 #include "irccoms.h"
 
 #include <QJsonDocument>
-
+#include <QScriptEngine>
+#include <QString>
+#include <QFile>
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new BluemonkeySinkManager(routingengine, config);
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* engine, map<string, string> config): QObject(0),AbstractSink(engine, config)
+QVariant gvariantToQVariant(GVariant *value)
+{
+	switch (g_variant_classify(value)) {
+		case G_VARIANT_CLASS_BOOLEAN:
+			return QVariant((bool) g_variant_get_boolean(value));
+
+		case G_VARIANT_CLASS_BYTE:
+			return QVariant((char) g_variant_get_byte(value));
+
+		case G_VARIANT_CLASS_INT16:
+			return QVariant((int) g_variant_get_int16(value));
+
+		case G_VARIANT_CLASS_UINT16:
+			return QVariant((unsigned int) g_variant_get_uint16(value));
+
+		case G_VARIANT_CLASS_INT32:
+			return QVariant((int) g_variant_get_int32(value));
+
+		case G_VARIANT_CLASS_UINT32:
+			return QVariant((unsigned int) g_variant_get_uint32(value));
+
+		case G_VARIANT_CLASS_INT64:
+			return QVariant((long long) g_variant_get_int64(value));
+
+		case G_VARIANT_CLASS_UINT64:
+			return QVariant((unsigned long long) g_variant_get_uint64(value));
+
+		case G_VARIANT_CLASS_DOUBLE:
+			return QVariant(g_variant_get_double(value));
+
+		case G_VARIANT_CLASS_STRING:
+			return QVariant(g_variant_get_string(value, NULL));
+
+		default:
+			return QVariant::Invalid;
+	}
+}
+
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config)
 {
 	irc = new IrcCommunication(this);
-	irc->connect("chat.freenode.com",8001,"","tripzero","bluemoney","");
+	irc->connect("chat.freenode.com",8001,"","tripzero","bluemonkey","");
 	connect(irc,&IrcCommunication::connected, [&]() {
 		irc->join("#linuxice");
 	});
+
+	engine = new QScriptEngine(this);
+
+	auth = new Authenticate(this);
+
+	QScriptValue value = engine->newQObject(this);
+	engine->globalObject().setProperty("bluemonkey", value);
+
+	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
+
+		if(codes.contains("authenticate"))
+		{
+
+			int i = codes.indexOf("authenticate");
+			QString pin = codes.mid(i+10);
+			pin = pin.trimmed();
+
+
+			if(!auth->authorize(prefix, pin))
+				irc->respond(sender,"failed");
+
+		}
+		else if(codes.startsWith("bluemonkey"))
+		{
+			if(!auth->isAuthorized(prefix))
+			{
+				irc->respond(sender, "denied");
+				return;
+			}
+			irc->respond(sender, engine->evaluate(codes).toString());
+		}
+	});
+
+	loadConfig("config.js");
 
 }
 
@@ -66,14 +140,31 @@ QObject *BluemonkeySink::subscribeTo(QString str)
 	return new Property(str.toStdString(), routingEngine, this);
 }
 
+bool BluemonkeySink::authenticate(QString pass)
+{
+
+}
+
+void BluemonkeySink::loadConfig(QString str)
+{
+	QFile file(str);
+	if(!file.open(QIODevice::ReadOnly))
+	{
+		qDebug()<<"failed to open config file: "<<str;
+		return;
+	}
+
+	QString script = file.readAll();
+
+	file.close();
+
+	engine->evaluate(script);
+}
+
 
 QVariant Property::value()
 {
-	QJsonDocument doc;
-
-	doc.fromJson(mValue->toString().c_str());
-
-	return doc.toVariant();
+	return gvariantToQVariant(mValue->toVariant());
 }
 
 void Property::setValue(QVariant v)
@@ -91,7 +182,7 @@ void Property::setValue(QVariant v)
 }
 
 Property::Property(VehicleProperty::Property prop, AbstractRoutingEngine* re, QObject *parent)
-	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>())
+	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr)
 {
 	setType(prop.c_str());
 }
@@ -103,6 +194,11 @@ QString Property::type()
 
 void Property::setType(QString t)
 {
+	if(mValue && type() != "")
+		routingEngine->unsubscribeToProperty(type().toStdString(),this);
+
+	routingEngine->subscribeToProperty(t.toStdString(),this);
+
 	mValue = VehicleProperty::getPropertyTypeForPropertyNameValue(t.toStdString());
 
 	AsyncPropertyRequest request;
@@ -112,4 +208,6 @@ void Property::setType(QString t)
 		propertyChanged(reply->property, reply->value,uuid());
 		delete reply;
 	};
+
+	routingEngine->getPropertyAsync(request);
 }

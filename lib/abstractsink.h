@@ -54,7 +54,8 @@ public:
 	  * @see AbstractRoutingEngine::subscribeToPropertyChanges()
 	  * @param property name that changed
 	  * @param value value of the property that changed. this is a temporary pointer that will be destroyed.
-	  * Do not destroy it.  If you need to store the value use value.anyValue() or value.value<T>() to copy.
+	  * Do not destroy it.  If you need to store the value use value.anyValue(), value.value<T>() or
+	  * value->copy() to copy.
 	  * @param uuid Unique identifier representing the source
 	  */
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) = 0;
@@ -68,6 +69,8 @@ protected:
 	map<string, string> configuration;
 };
 
+
+/// TODO:  this class actually serves no purpose.
 class AbstractSinkManager
 {
 public:

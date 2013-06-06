@@ -23,8 +23,13 @@
 #include "abstractsink.h"
 #include <QObject>
 #include <QVariant>
+#include <QJsonDocument>
+#include "uuidhelper.h"
+
+#include "authenticate.h"
 
 class IrcCommunication;
+class QScriptEngine;
 
 class Property: public QObject, public AbstractSink
 {
@@ -38,20 +43,27 @@ public:
 	QString type();
 	void setType(QString t);
 
-	virtual PropertyList subscriptions();
-	virtual void supportedChanged(PropertyList supportedProperties);
+	virtual PropertyList subscriptions() { PropertyList list; list.push_back(type().toStdString()); return list; }
+	virtual void supportedChanged(PropertyList ){	}
 
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
 	{
 		mValue = value->copy();
+
+		QJsonDocument doc;
+
+		doc.fromJson(mValue->toString().c_str());
+
+		changed(doc.toVariant());
 	}
 
-	virtual std::string uuid();
+	virtual std::string uuid() { return amb::createUuid(); }
 
 	QVariant value();
 	void setValue(QVariant v);
 
 Q_SIGNALS:
+
 	void changed(QVariant val);
 
 private:
@@ -63,7 +75,7 @@ class BluemonkeySink : public QObject, public AbstractSink
 {
 Q_OBJECT
 public:
-	BluemonkeySink(AbstractRoutingEngine* engine, map<string, string> config);
+	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config);
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
@@ -73,11 +85,17 @@ public Q_SLOTS:
 
 	QObject* subscribeTo(QString str);
 
+	bool authenticate(QString pass);
+
+	void loadConfig(QString str);
+
 Q_SIGNALS:
 
 
 private:
 	IrcCommunication* irc;
+	QScriptEngine* engine;
+	Authenticate* auth;
 };
 
 class BluemonkeySinkManager: public AbstractSinkManager
