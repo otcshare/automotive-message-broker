@@ -18,7 +18,7 @@ set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_A
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
 set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}" CACHE PATH "The directory the docs will be installed to")
 
-option(use_qtcore "Use QCoreApplication mainloop " OFF)
+option(qtmainloop "Use QCoreApplication mainloop " OFF)
 option(websocket_plugin "websocket source and sink plugins" OFF)
 option(tpms_plugin "TPMS plugin " OFF)
 option(obd_plugin "OBD-II plugin" OFF)
@@ -28,6 +28,7 @@ option(opencvlux_plugin "OpenCV Lux plugin" OFF)
 option(gpsd_plugin "gpsd location plugin" OFF)
 option(murphy_plugin "murphy policy framework plugin" OFF)
 option(test_plugin "Test Plugin" ON)
+option(bluemonkey_plugin "bluemonkey irc plugin" OFF)
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")
@@ -69,19 +70,29 @@ add_definitions(-DDBusServiceName="org.automotive.message.broker")
 set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-if(use_qtcore)
+if(qtmainloop)
 	message(STATUS "using Qt mainloop")
 
-	find_package( Qt4 REQUIRED )
+	find_package(Qt5Core)
+	if(Qt5Core_FOUND)
+		message(STATUS "using Qt5")
+		set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS})
+		set(QT_LIBRARIES ${Qt5Core_LIBRARIES})
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS} -mcmodel=large")
+		add_definitions(${Qt5Core_DEFINITIONS})
+	else(Qt5Core_FOUND)
+		message(STATUS "using Qt4")
+		find_package( Qt4 REQUIRED )
+		include(${QT_USE_FILE})
 
-	include(${QT_USE_FILE})
+	endif(Qt5Core_FOUND)
+
 	set(include_dirs ${include_dirs} ${QT_INCLUDE_DIRS})
 	set(link_libraries ${link_libraries} ${QT_LIBRARIES})
 
-	add_definitions(-DUSE_QT_CORE)
 	add_definitions(-DQT_NO_KEYWORDS)
-
-endif(use_qtcore)
+	add_definitions(-DUSE_QT_CORE)
+endif(qtmainloop)
 
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
 add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
