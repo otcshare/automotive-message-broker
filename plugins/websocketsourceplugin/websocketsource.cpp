@@ -170,13 +170,12 @@ static int checkTimeouts(gpointer data)
 				src->uuidRangedReplyMap.erase((*i).first);
 				src->uuidTimeoutMap.erase((*i).first);
 				i--;
-<<<<<<< HEAD
-=======
+
 				if (src->uuidTimeoutMap.size() == 0)
 				{
 					return 0;
 				}
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
+
 			}
 			else
 			{
@@ -188,11 +187,7 @@ static int checkTimeouts(gpointer data)
 			//Reply has already come back, ignore and erase from list.
 			src->uuidTimeoutMap.erase((*i).first);
 			i--;
-<<<<<<< HEAD
-		}
 
-	}
-=======
 			if (src->uuidTimeoutMap.size() == 0)
 			{
 				return 0;
@@ -201,7 +196,6 @@ static int checkTimeouts(gpointer data)
 
 	}
 	return 0;
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 }
 
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len)
@@ -431,19 +425,12 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 							source->uuidReplyMap[id]->success = true;
 							source->uuidReplyMap[id]->completed(source->uuidReplyMap[id]);
 							source->uuidReplyMap.erase(id);
-<<<<<<< HEAD
-								delete v;
-=======
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
+
 						}
 						else
 						{
 							DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
 						}
-<<<<<<< HEAD
-=======
-							delete v;
->>>>>>> 46f67f8d33d8eccc26d9326ce1c6b9745dc6bb97
 					}
 					else
 					{
@@ -484,7 +471,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 }
 void WebSocketSource::setSupported(PropertyList list)
 {
-  DebugOut() << "SET SUPPORTED";
+	DebugOut() <<__SMALLFILE__ << ":" << __LINE__ <<"SET SUPPORTED"<<endl;
 	m_supportedProperties = list;
 	m_re->updateSupported(list,PropertyList());
 }
