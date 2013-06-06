@@ -58,6 +58,10 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 	json_object *rootobject;
 	json_tokener *tokener = json_tokener_new();
 	std::string configBuffer = get_file_contents(configFile.c_str());
+	if(configBuffer == "")
+	{
+		throw std::runtime_error("No config or config empty");
+	}
 	enum json_tokener_error err;
 	do
 	{
