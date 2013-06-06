@@ -39,10 +39,11 @@ void IrcCommunication::announce(QString s)
 
 void IrcCommunication::respond(QString target, QString s)
 {
-	IrcCommand command;
-	command.setType(IrcCommand::Message);
-	command.setParameters(QStringList()<<target<<s);
-	session->sendCommand(&command);
+	IrcCommand *command = IrcCommand::createMessage(target,s);
+	session->sendCommand(command);
+
+	delete command;
+
 }
 
 void IrcCommunication::messageReceived(IrcMessage *msg)
@@ -56,7 +57,7 @@ void IrcCommunication::messageReceived(IrcMessage *msg)
 			QString sender = msg->parameters().at(0);
 			QString m = msg->parameters().at(1);
 
-			message(sender,msg->sender().prefix(),m);
+			message(sender, msg->sender().prefix(), m);
 		}
 
 	}

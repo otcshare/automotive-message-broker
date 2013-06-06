@@ -91,12 +91,13 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 		{
 
 			int i = codes.indexOf("authenticate");
-			QString pin = codes.mid(i+10);
+			QString pin = codes.mid(i+13);
 			pin = pin.trimmed();
 
 
 			if(!auth->authorize(prefix, pin))
 				irc->respond(sender,"failed");
+			qDebug()<<sender;
 
 		}
 		else if(codes.startsWith("bluemonkey"))
@@ -106,6 +107,11 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 				irc->respond(sender, "denied");
 				return;
 			}
+
+			QString bm("bluemonkey");
+
+			codes = codes.mid(bm.length()+1);
+
 			irc->respond(sender, engine->evaluate(codes).toString());
 		}
 	});
@@ -210,4 +216,11 @@ void Property::setType(QString t)
 	};
 
 	routingEngine->getPropertyAsync(request);
+}
+
+void Property::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
+{
+	mValue = value->copy();
+
+	changed(gvariantToQVariant(mValue->toVariant()));
 }

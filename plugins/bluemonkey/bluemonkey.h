@@ -46,16 +46,7 @@ public:
 	virtual PropertyList subscriptions() { PropertyList list; list.push_back(type().toStdString()); return list; }
 	virtual void supportedChanged(PropertyList ){	}
 
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
-	{
-		mValue = value->copy();
-
-		QJsonDocument doc;
-
-		doc.fromJson(mValue->toString().c_str());
-
-		changed(doc.toVariant());
-	}
+	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
 
 	virtual std::string uuid() { return amb::createUuid(); }
 
