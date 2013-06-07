@@ -80,10 +80,16 @@ public Q_SLOTS:
 
 	void loadConfig(QString str);
 
-Q_SIGNALS:
+	void reloadEngine();
 
+	void writeProgram(QString program);
+
+private Q_SLOTS: /// methods:
+
+	void loadConfigPriv();
 
 private:
+	QStringList configsToLoad;
 	IrcCommunication* irc;
 	QScriptEngine* engine;
 	Authenticate* auth;

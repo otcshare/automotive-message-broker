@@ -112,7 +112,10 @@ void IrcCommunication::join(QString channel)
 
 void IrcCommunication::reconnect()
 {
-	QTimer::singleShot(5000,session,SLOT(open()));
+	if(session->socket()->state() == QAbstractSocket::ConnectingState)
+		QTimer::singleShot(5000,this,SLOT(reconnect()));
+	else
+		QTimer::singleShot(5000,session,SLOT(open()));
 }
 
 /*void IrcCommunication::sslError(QList<QSslError>)

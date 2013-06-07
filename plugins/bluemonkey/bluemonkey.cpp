@@ -26,6 +26,7 @@
 #include <QScriptEngine>
 #include <QString>
 #include <QFile>
+#include <QTimer>
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -70,20 +71,18 @@ QVariant gvariantToQVariant(GVariant *value)
 	}
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), engine(nullptr)
 {
 	irc = new IrcCommunication(this);
 	irc->connect("chat.freenode.com",8001,"","tripzero","bluemonkey","");
 	connect(irc,&IrcCommunication::connected, [&]() {
 		irc->join("#linuxice");
+		irc->join("#bluemonkey");
 	});
 
-	engine = new QScriptEngine(this);
+	reloadEngine();
 
 	auth = new Authenticate(this);
-
-	QScriptValue value = engine->newQObject(this);
-	engine->globalObject().setProperty("bluemonkey", value);
 
 	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
 
@@ -116,7 +115,7 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 		}
 	});
 
-	loadConfig("config.js");
+
 
 }
 
@@ -153,6 +152,17 @@ bool BluemonkeySink::authenticate(QString pass)
 
 void BluemonkeySink::loadConfig(QString str)
 {
+	configsToLoad.append(str);
+	QTimer::singleShot(1,this,SLOT(loadConfigPriv()));
+}
+
+void BluemonkeySink::loadConfigPriv()
+{
+	if(!configsToLoad.count()) return;
+
+	QString str = configsToLoad.first();
+	configsToLoad.pop_front();
+
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
@@ -164,7 +174,34 @@ void BluemonkeySink::loadConfig(QString str)
 
 	file.close();
 
-	engine->evaluate(script);
+	QScriptValue val = engine->evaluate(script);
+
+	qDebug()<<val.toString();
+}
+
+void BluemonkeySink::reloadEngine()
+{
+	if(engine)
+		engine->deleteLater();
+
+	engine = new QScriptEngine(this);
+
+	QScriptValue value = engine->newQObject(this);
+	engine->globalObject().setProperty("bluemonkey", value);
+
+	loadConfig("config.js");
+}
+
+void BluemonkeySink::writeProgram(QString program)
+{
+	QFile file("customPrograms.js");
+
+	file.open(QIODevice::ReadWrite | QIODevice::Append);
+
+	file.write(program.toUtf8());
+	file.write("\n");
+
+	file.close();
 }
 
 
