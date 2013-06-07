@@ -194,7 +194,7 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 
 		bool supportsGet = supportedOps & AbstractSource::Get;
 
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet)
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet && (request.sourceUuid == "" || request.sourceUuid == src->uuid()))
 		{
 			src->getPropertyAsync(reply);
 
@@ -215,7 +215,9 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 	{
 		AbstractSource* src = (*itr);
 		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::GetRanged)
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property)
+				&& (src->supportedOperations() & AbstractSource::GetRanged)
+				&& (request.sourceUuid == "" || request.sourceUuid == src->uuid()))
 		{
 			src->getRangePropertyAsync(reply);
 		}

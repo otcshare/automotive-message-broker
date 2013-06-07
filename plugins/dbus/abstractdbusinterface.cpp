@@ -27,6 +27,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMap;
 list<string> AbstractDBusInterface::mimplementedProperties;
 
+
+static void handleMethodCall(GDBusConnection       *connection,
+							 const gchar           *sender,
+							 const gchar           *object_path,
+							 const gchar           *interface_name,
+							 const gchar           *method_name,
+							 GVariant              *parameters,
+							 GDBusMethodInvocation *invocation,
+							 gpointer               user_data)
+{
+
+	std::string method = method_name;
+
+
+
+}
+
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string op,
 											 GDBusConnection* connection)
 	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection)
@@ -52,10 +69,15 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 
 	///see which properties are supported:
 	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
-	"<signal name='" + property->name() + "Changed' >"
-	"	<arg type='v' name='" + nameToLower + "' direction='out' />"
-	"	<arg type='d' name='timestamp' direction='out' />"
-	"</signal>";
+			"<method name='get" + property->name() + "Extended'>"
+			"	<arg type='v' direction='out' name='value' />"
+			"	<arg type='d' direction='out' name='timestamp' />"
+			"	<arg type='d' direction='out' name='sequence' />"
+			"</method>"
+			"<signal name='" + property->name() + "Changed' >"
+			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
+			"	<arg type='d' name='timestamp' direction='out' />"
+			"</signal>";
 	
 	properties[property->name()] = property;
 
@@ -100,18 +122,10 @@ void AbstractDBusInterface::registerObject()
 
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, mInterfaceName.c_str());
 
-	auto fakeMethodCb = [](GDBusConnection *connection,
-			const gchar *sender,
-			const gchar *object_path,
-			const gchar *interface_name,
-			const gchar *method_name,
-			GVariant *parameters,
-			GDBusMethodInvocation *invocation,
-			gpointer user_data) { };
 
-	const GDBusInterfaceVTable vtable = { fakeMethodCb, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
+	const GDBusInterfaceVTable vtable = { handleMethodCall, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 
-	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, NULL, NULL, &error);
+	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error);
 	
 	if(error) throw -1;
 	

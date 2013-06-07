@@ -20,12 +20,13 @@
 #ifndef ABSTRACTROUTINGENGINE_H
 #define ABSTRACTROUTINGENGINE_H
 
-#include "sys/types.h"
+#include <sys/types.h>
 #include <stdlib.h>
-
 #include <boost/any.hpp>
 #include <functional>
+#include <string>
 #include <time.h>
+
 #include "vehicleproperty.h"
 #include "abstractpropertytype.h"
 
@@ -51,17 +52,20 @@ public:
 	{
 		this->property = request.property;
 		this->completed = request.completed;
+		this->sourceUuid = request.sourceUuid;
 	}
 
 	AsyncPropertyRequest & operator = (const AsyncPropertyRequest & other)
 	{
 		this->property = other.property;
 		this->completed = other.completed;
+		this->sourceUuid = other.sourceUuid;
 
 		return *this;
 	}
 
 	VehicleProperty::Property property;
+	std::string sourceUuid;
 	GetPropertyCompletedSignal completed;
 };
 
@@ -115,9 +119,11 @@ public:
 		this->timeEnd = request.timeEnd;
 		this->sequenceBegin = request.sequenceBegin;
 		this->sequenceEnd = request.sequenceEnd;
+		this->sourceUuid = request.sourceUuid;
 	}
 
 	VehicleProperty::Property property;
+	std::string sourceUuid;
 	GetRangedPropertyCompletedSignal completed;
 	double timeBegin;
 	double timeEnd;
