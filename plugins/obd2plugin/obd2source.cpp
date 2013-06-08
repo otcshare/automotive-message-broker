@@ -188,6 +188,12 @@ void threadLoop(gpointer data)
 					statusreq->statusStr = "connected";
 					g_async_queue_push(privStatusQueue,statusreq);
 				}
+				else
+				{
+					StatusMessage *statusreq = new StatusMessage();
+					statusreq->statusStr = "disconnected";
+					g_async_queue_push(privStatusQueue,statusreq);
+				}
 				
 			}
 			else if (req->req == "connectifnot")
@@ -210,6 +216,12 @@ void threadLoop(gpointer data)
 					{
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "connected";
+						g_async_queue_push(privStatusQueue,statusreq);
+					}
+					else
+					{
+						StatusMessage *statusreq = new StatusMessage();
+						statusreq->statusStr = "disconnected";
 						g_async_queue_push(privStatusQueue,statusreq);
 					}
 				}
@@ -450,6 +462,7 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
 		propertyReplyMap[property]->value = value;
+		propertyReplyMap[property]->success = true;
 		propertyReplyMap[property]->completed(propertyReplyMap[property]);
 		propertyReplyMap.erase(property);
 	}
@@ -676,7 +689,7 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "getPropertyAsync requested for " << reply->property << endl;
-	propertyReplyMap[reply->property] = reply;
+
 	VehicleProperty::Property property = reply->property;
 
 
@@ -685,6 +698,8 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
 		return;
 	}
+
+	propertyReplyMap[reply->property] = reply;
 
 	ObdPid* requ = obd2AmbInstance->createPidforProperty(property);
 	g_async_queue_push(singleShotQueue,requ);
@@ -697,8 +712,13 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 {
 	AsyncPropertyReply* reply = new AsyncPropertyReply (request);
 
+
+
 	if(request.property == Obd2Connected)
 	{
+		propertyReplyMap[reply->property] = reply;
+		reply->success = true;
+
 		if(request.value->value<bool>() == true)
 		{
 			CommandRequest *req = new CommandRequest();
@@ -712,23 +732,21 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 			g_async_queue_push(commandQueue,req);
 		}
 
-		reply->success = true;
 	}
 
 	else
 	{
 		reply->success = false;
+		try
+		{
+			reply->completed(reply);
+		}
+		catch (...)
+		{
+
+		}
 	}
 
-	try
-	{
-		/// TODO: this doesn't seem right:
-		reply->value = request.value;
-		reply->completed(reply);
-	}
-	catch (...)
-	{
 
-	}
 	return reply;
 }
