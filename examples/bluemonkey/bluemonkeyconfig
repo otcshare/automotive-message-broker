@@ -3,16 +3,12 @@
 
 	"sources" : [ 
 		{
-			"name" : "ExampleSouce",
-			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so"
+			"name" : "Database",
+                        "path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
+                        "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }"		
 		}
 	],
 	"sinks": [
-		{
-			"name" : "Database",
-			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
-			"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }"
-		},
 		{
 			"name" : "Bluemonkey Sink",
 			"path" : "/usr/lib/automotive-message-broker/bluemonkeyplugin.so"

@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QNetworkProxy>
 #include <QTimer>
+#include <QScriptEngine>
 
 #define foreach Q_FOREACH
 
@@ -21,6 +22,26 @@ IrcCommunication::IrcCommunication(QObject* parent)
 	QObject::connect(session,SIGNAL(socketError(QAbstractSocket::SocketError)),this,SLOT(socketError(QAbstractSocket::SocketError)));
 	QObject::connect(session,SIGNAL(connecting()),this,SIGNAL(connecting()));
 	QObject::connect(session,SIGNAL(messageReceived(IrcMessage*)),this,SLOT(messageReceived(IrcMessage*)));
+
+	QScriptEngine *engine = new QScriptEngine(this);
+
+	QScriptValue eventEngineValue = engine->newQObject(this);
+	engine->globalObject().setProperty("irc", eventEngineValue);
+
+	QString str = "ircSettings.js";
+
+	QFile file(str);
+	if(!file.open(QIODevice::ReadOnly))
+	{
+		qDebug()<<"failed to open config file: "<<str;
+		return;
+	}
+
+	QString script = file.readAll();
+
+	file.close();
+
+	engine->evaluate(script);
 
 }
 

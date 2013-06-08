@@ -74,11 +74,6 @@ QVariant gvariantToQVariant(GVariant *value)
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), engine(nullptr)
 {
 	irc = new IrcCommunication(this);
-	irc->connect("chat.freenode.com",8001,"","tripzero","bluemonkey","");
-	connect(irc,&IrcCommunication::connected, [&]() {
-		irc->join("#linuxice");
-		irc->join("#bluemonkey");
-	});
 
 	reloadEngine();
 
