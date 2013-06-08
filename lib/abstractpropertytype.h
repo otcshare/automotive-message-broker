@@ -70,6 +70,13 @@ public:
 		return one == two;
 	}
 
+	bool operator != (AbstractPropertyType &other)
+	{
+		std::string one = toString();
+		std::string two = other.toString();
+		return one != two;
+	}
+
 	std::string name;
 
 	double timestamp;

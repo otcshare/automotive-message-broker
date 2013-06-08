@@ -5,6 +5,8 @@ New features:
 - Added org.automotive.Manager DBus interface.
 - Added org.automotive.Manager.findProperty method for finding a specific object path for a given property
 - OBD2 add support for AT/ST calls (ie, atrv for battery voltage) 
+- Added automatic and configurable timeout for get() calls
+- Added error type for get() calls
 
 Changes:
 - AbstractPropertyType class now contains information for zone and the property name

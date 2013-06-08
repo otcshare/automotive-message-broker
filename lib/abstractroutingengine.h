@@ -43,7 +43,7 @@ class AsyncPropertyRequest
 {
 public:
 	AsyncPropertyRequest()
-		:property(VehicleProperty::NoValue)
+		:property(VehicleProperty::NoValue),timeout(10000)
 	{
 
 	}
@@ -53,6 +53,7 @@ public:
 		this->property = request.property;
 		this->completed = request.completed;
 		this->sourceUuid = request.sourceUuid;
+		this->timeout = request.timeout;
 	}
 
 	AsyncPropertyRequest & operator = (const AsyncPropertyRequest & other)
@@ -60,6 +61,7 @@ public:
 		this->property = other.property;
 		this->completed = other.completed;
 		this->sourceUuid = other.sourceUuid;
+		this->timeout = other.timeout;
 
 		return *this;
 	}
@@ -67,20 +69,58 @@ public:
 	VehicleProperty::Property property;
 	std::string sourceUuid;
 	GetPropertyCompletedSignal completed;
+	uint timeout;
 };
 
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
 	AsyncPropertyReply(const AsyncPropertyRequest &request)
-		:AsyncPropertyRequest(request), value(NULL), success(false)
+		:AsyncPropertyRequest(request), value(NULL), success(false), timeoutSource(nullptr)
 	{
+		auto timeoutfunc = [](gpointer userData) {
+			AsyncPropertyReply* thisReply = static_cast<AsyncPropertyReply*>(userData);
+			if(thisReply->success == false)
+			{
+				thisReply->error = Timeout;
+				thisReply->completed(thisReply);
+			}
+			return 0;
+		};
 
+		if(timeout)
+		{
+			timeoutSource = g_timeout_source_new(timeout);
+			g_source_set_callback(timeoutSource,(GSourceFunc) timeoutfunc, this, nullptr);
+			g_source_attach(timeoutSource, nullptr);
+		}
 	}
 
+	~AsyncPropertyReply()
+	{
+		if(timeoutSource)
+		{
+			g_source_destroy(timeoutSource);
+			g_source_unref(timeoutSource);
+		}
+	}
 
+	enum Error {
+		NoError,
+		Timeout,
+		InvalidOperation,
+		PermissionDenied
+	};
+
+	/**
+	 * @brief value of the reply.  This may be null if success = false.  This is owned by the source.
+	 */
 	AbstractPropertyType* value;
 	bool success;
+	Error error;
+
+private:
+	GSource* timeoutSource;
 };
 
 class AsyncSetPropertyRequest: public AsyncPropertyRequest
