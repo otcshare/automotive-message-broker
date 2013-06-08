@@ -235,6 +235,10 @@ void Property::setValue(QVariant v)
 	request.value = mValue;
 	request.completed = [&](AsyncPropertyReply* reply)
 	{
+		if(reply->success)
+		{
+			propertyChanged(reply->property,reply->value,reply->value->sourceUuid);
+		}
 		delete reply;
 	};
 	routingEngine->setProperty(request);
