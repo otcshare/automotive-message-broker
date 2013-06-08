@@ -233,7 +233,10 @@ void Property::setValue(QVariant v)
 	AsyncSetPropertyRequest request;
 	request.property = mValue->name;
 	request.value = mValue;
-	request.completed = [](AsyncPropertyReply* reply) { delete reply; };
+	request.completed = [&](AsyncPropertyReply* reply)
+	{
+		delete reply;
+	};
 	routingEngine->setProperty(request);
 }
 

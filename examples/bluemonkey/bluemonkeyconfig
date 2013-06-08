@@ -3,6 +3,13 @@
 
 	"sources" : [ 
 		{
+                        "name" : "OBD2Source",
+                        "path" : "/usr/lib/automotive-message-broker/obd2sourceplugin.so",
+                        "baud" : "115200",
+                        "device" : "00:04:3E:1F:16:A3",
+                        "bluetoothAdapter" : "00:02:72:24:68:35"
+                },
+		{
 			"name" : "Database",
                         "path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
                         "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",

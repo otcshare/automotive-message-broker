@@ -1,11 +1,11 @@
-#if(obd2_plugin)
+if(obd2_plugin)
 
 include(CheckIncludeFiles)
 
 
 pkg_check_modules(gio REQUIRED gio-2.0)
 pkg_check_modules(gio-unix REQUIRED gio-unix-2.0)
-#pkg_check_modules(glibmm REQUIRED glibmm-2.4)
+
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} )
 
@@ -17,4 +17,4 @@ target_link_libraries(obd2sourceplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${l
 
 install(TARGETS obd2sourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
-#endif(obd2_plugin)
+endif(obd2_plugin)
