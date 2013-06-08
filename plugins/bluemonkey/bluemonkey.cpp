@@ -283,7 +283,9 @@ void Property::setType(QString t)
 	request.property = mValue->name;
 	request.completed = [this](AsyncPropertyReply* reply)
 	{
-		propertyChanged(reply->property, reply->value,uuid());
+		if(reply->success)
+			propertyChanged(reply->property, reply->value,uuid());
+
 		delete reply;
 	};
 

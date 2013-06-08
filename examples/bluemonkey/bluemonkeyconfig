@@ -14,6 +14,9 @@
                         "path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
                         "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
 			"startOnLoad" : "true"		
+		},
+		{
+			"path" : "/usr/lib/automotive-message-broker/gpsdplugin.so"
 		}
 	],
 	"sinks": [
