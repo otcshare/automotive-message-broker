@@ -1,1 +1,1 @@
-auth.pin = "000"
+auth.pin = "1234"
