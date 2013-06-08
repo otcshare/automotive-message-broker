@@ -63,15 +63,18 @@ bool beginsWith(std::string a, std::string b)
 	return (a.compare(0, b.length(), b) == 0);
 }
 
-void connect(obdLib* obd, std::string device, std::string strbaud)
+bool connect(obdLib* obd, std::string device, std::string strbaud)
 {
 	//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
 	std::string port = device;
 	DebugOut() << "Obd2Source::Connect()" << device << strbaud << endl;
 	int baud = boost::lexical_cast<int>(strbaud);
-	obd->openPort(port.c_str(),baud);
-ObdPid::ByteArray replyVector;
-std::string reply;
+
+	if(obd->openPort(port.c_str(),baud) == -1)
+		return false;
+
+	ObdPid::ByteArray replyVector;
+	std::string reply;
 	obd->sendObdRequestString("ATZ\r",4,&replyVector,500,3);
 	for (unsigned int i=0;i<replyVector.size();i++)
 	{
@@ -182,11 +185,14 @@ void threadLoop(gpointer data)
 					port = req->arglist[0];
 					baud = req->arglist[1];
 				}
-				connect(obd,port,baud);
-				connected = true;
-				StatusMessage *statusreq = new StatusMessage();
-				statusreq->statusStr = "connected";
-				g_async_queue_push(privStatusQueue,statusreq);
+				connected = connect(obd,port,baud);
+
+				if(connected)
+				{
+					StatusMessage *statusreq = new StatusMessage();
+					statusreq->statusStr = "connected";
+					g_async_queue_push(privStatusQueue,statusreq);
+				}
 				
 			}
 			else if (req->req == "connectifnot")
@@ -203,11 +209,14 @@ void threadLoop(gpointer data)
 							port = tempPort;
 						}
 					}
-					connect(obd,port,baud);
-					connected = true;
-					StatusMessage *statusreq = new StatusMessage();
-					statusreq->statusStr = "connected";
-					g_async_queue_push(privStatusQueue,statusreq);
+					connected = connect(obd,port,baud);
+
+					if(connected)
+					{
+						StatusMessage *statusreq = new StatusMessage();
+						statusreq->statusStr = "connected";
+						g_async_queue_push(privStatusQueue,statusreq);
+					}
 				}
 			}
 			else if (req->req == "setportandbaud")
@@ -411,12 +420,12 @@ static int updateProperties( gpointer data)
 		if (reply->statusStr == "disconnected")
 		{
 
-			BasicPropertyType<bool> val(false);
+			BasicPropertyType<bool> val(Obd2Connected,false);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "connected")
 		{
-			BasicPropertyType<bool> val(true);
+			BasicPropertyType<bool> val(Obd2Connected, true);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
@@ -727,6 +736,8 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 
 	try
 	{
+		/// TODO: this doesn't seem right:
+		reply->value = request.value;
 		reply->completed(reply);
 	}
 	catch (...)
