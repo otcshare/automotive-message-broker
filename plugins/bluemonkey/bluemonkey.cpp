@@ -184,6 +184,9 @@ void BluemonkeySink::reloadEngine()
 	QScriptValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
 
+	QScriptValue qtimerClass = engine->scriptValueFromQMetaObject<QTimer>();
+	engine->globalObject().setProperty("QTimer", qtimerClass);
+
 
 
 	loadConfig(configuration["config"].c_str());
