@@ -28,6 +28,8 @@
 #include <QFile>
 #include <QTimer>
 
+Q_SCRIPT_DECLARE_QMETAOBJECT(QTimer, QObject*)
+
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new BluemonkeySinkManager(routingengine, config);
@@ -35,40 +37,53 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 
 QVariant gvariantToQVariant(GVariant *value)
 {
-	switch (g_variant_classify(value)) {
-		case G_VARIANT_CLASS_BOOLEAN:
-			return QVariant((bool) g_variant_get_boolean(value));
+	GVariantClass c = g_variant_classify(value);
+	if(c == G_VARIANT_CLASS_BOOLEAN)
+		return QVariant((bool) g_variant_get_boolean(value));
 
-		case G_VARIANT_CLASS_BYTE:
-			return QVariant((char) g_variant_get_byte(value));
+	else if(c == G_VARIANT_CLASS_BYTE)
+		return QVariant((char) g_variant_get_byte(value));
 
-		case G_VARIANT_CLASS_INT16:
-			return QVariant((int) g_variant_get_int16(value));
+	else if(c == G_VARIANT_CLASS_INT16)
+		return QVariant((int) g_variant_get_int16(value));
 
-		case G_VARIANT_CLASS_UINT16:
-			return QVariant((unsigned int) g_variant_get_uint16(value));
+	else if(c == G_VARIANT_CLASS_UINT16)
+		return QVariant((unsigned int) g_variant_get_uint16(value));
 
-		case G_VARIANT_CLASS_INT32:
-			return QVariant((int) g_variant_get_int32(value));
+	else if(c == G_VARIANT_CLASS_INT32)
+		return QVariant((int) g_variant_get_int32(value));
 
-		case G_VARIANT_CLASS_UINT32:
-			return QVariant((unsigned int) g_variant_get_uint32(value));
+	else if(c ==  G_VARIANT_CLASS_UINT32)
+		return QVariant((unsigned int) g_variant_get_uint32(value));
 
-		case G_VARIANT_CLASS_INT64:
-			return QVariant((long long) g_variant_get_int64(value));
+	else if(c == G_VARIANT_CLASS_INT64)
+		return QVariant((long long) g_variant_get_int64(value));
 
-		case G_VARIANT_CLASS_UINT64:
-			return QVariant((unsigned long long) g_variant_get_uint64(value));
+	else if(c == G_VARIANT_CLASS_UINT64)
+		return QVariant((unsigned long long) g_variant_get_uint64(value));
 
-		case G_VARIANT_CLASS_DOUBLE:
-			return QVariant(g_variant_get_double(value));
+	else if(c == G_VARIANT_CLASS_DOUBLE)
+		return QVariant(g_variant_get_double(value));
 
-		case G_VARIANT_CLASS_STRING:
-			return QVariant(g_variant_get_string(value, NULL));
+	else if(c == G_VARIANT_CLASS_STRING)
+		return QVariant(g_variant_get_string(value, NULL));
 
-		default:
-			return QVariant::Invalid;
+	else if(c == G_VARIANT_CLASS_ARRAY)
+	{
+		gsize dictsize = g_variant_n_children(value);
+		QVariantList list;
+		for (int i=0;i<dictsize;i++)
+		{
+			GVariant *childvariant = g_variant_get_child_value(value,i);
+			GVariant *innervariant = g_variant_get_variant(childvariant);
+			list.append(gvariantToQVariant(innervariant));
+		}
+		return list;
 	}
+
+	else
+		return QVariant::Invalid;
+
 }
 
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), engine(nullptr)
