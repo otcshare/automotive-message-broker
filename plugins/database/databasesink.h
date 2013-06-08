@@ -28,9 +28,9 @@
 
 #include <functional>
 
-#define DatabaseLoggingProperty "DatabaseLogging"
-#define DatabasePlaybackProperty "DatabasePlayback"
-#define DatabaseFileProperty "DatabaseFile"
+const std::string DatabaseLogging = "DatabaseLogging";
+const std::string DatabasePlayback = "DatabasePlayback";
+const std::string DatabaseFile = "DatabaseFile";
 
 template <typename T>
 class Queue
@@ -183,9 +183,9 @@ private:
 	uint playbackMultiplier;
 };
 
-PROPERTYTYPEBASIC1(DatabaseLogging, bool)
-PROPERTYTYPEBASIC1(DatabasePlayback, bool)
-PROPERTYTYPE1(DatabaseFile, DatabaseFilePropertyType, StringPropertyType, std::string)
+PROPERTYTYPEBASIC(DatabaseLogging, bool)
+PROPERTYTYPEBASIC(DatabasePlayback, bool)
+PROPERTYTYPE(DatabaseFile, DatabaseFileType, StringPropertyType, std::string)
 
 
 class DatabaseSinkManager: public AbstractSinkManager
@@ -195,9 +195,9 @@ public:
 	:AbstractSinkManager(engine, config)
 	{
 		new DatabaseSink(routingEngine, config);
-		VehicleProperty::registerProperty(DatabaseLoggingProperty, [](){return new DatabaseLoggingType(false);});
-		VehicleProperty::registerProperty(DatabasePlaybackProperty, [](){return new DatabasePlaybackType(false);});
-		VehicleProperty::registerProperty(DatabaseFileProperty, [](){return new DatabaseFilePropertyType("storage");});
+		VehicleProperty::registerProperty(DatabaseLogging, [](){return new DatabaseLoggingType(false);});
+		VehicleProperty::registerProperty(DatabasePlayback, [](){return new DatabasePlaybackType(false);});
+		VehicleProperty::registerProperty(DatabaseFile, [](){return new DatabaseFileType("storage");});
 	}
 };
 

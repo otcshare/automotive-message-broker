@@ -285,8 +285,8 @@ enum AirflowDirection
 
 #define PROPERTYTYPEBASIC1(property, valueType) \
 	class property ## Type : public BasicPropertyType<valueType> { \
-	public: property ## Type(): BasicPropertyType("property") {} \
-	property ## Type(valueType val) : BasicPropertyType("property", val) {} \
+	public: property ## Type(): BasicPropertyType( #property) {} \
+	property ## Type(valueType val) : BasicPropertyType(#property, val) {} \
 	};
 
 #define PROPERTYTYPENOVAL(property, propertyType, baseClass) \

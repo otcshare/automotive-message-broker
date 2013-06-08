@@ -219,8 +219,13 @@ void Property::setValue(QVariant v)
 		mValue->fromString(json.toStdString());
 	}
 
+
+
 	else
-		mValue->fromString(v.toString().toStdString());
+	{
+		QString tempVal = v.toString();
+		mValue->fromString(tempVal.toStdString());
+	}
 
 	AsyncSetPropertyRequest request;
 	request.property = mValue->name;

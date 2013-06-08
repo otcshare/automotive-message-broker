@@ -5,7 +5,8 @@
 		{
 			"name" : "Database",
                         "path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
-                        "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }"		
+                        "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
+			"startOnLoad" : "true"		
 		}
 	],
 	"sinks": [

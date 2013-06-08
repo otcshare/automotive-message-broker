@@ -32,6 +32,8 @@
 #include <list>
 #include "timestamp.h"
 #include <debugout.h>
+#include <boost/algorithm/string.hpp>
+
 namespace Zone {
 enum Type {
 	None = 0,
@@ -116,6 +118,11 @@ public:
 	{
 		return g_variant_get_int32(v);
 	}
+
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -127,6 +134,10 @@ public:
 	static double value(GVariant* v)
 	{
 		return g_variant_get_double(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
 	}
 };
 
@@ -140,6 +151,10 @@ public:
 	{
 		return g_variant_get_uint16(v);
 	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -151,6 +166,10 @@ public:
 	static int16_t value(GVariant* v)
 	{
 		return g_variant_get_int16(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
 	}
 };
 
@@ -164,6 +183,10 @@ public:
 	{
 		return g_variant_get_byte(v);
 	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -175,6 +198,10 @@ public:
 	static uint32_t value(GVariant* v)
 	{
 		return g_variant_get_uint32(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
 	}
 };
 
@@ -188,6 +215,10 @@ public:
 	{
 		return g_variant_get_int64(v);
 	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -200,6 +231,10 @@ public:
 	{
 		g_variant_get_uint64(v);
 	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -211,6 +246,11 @@ public:
 	static bool value(GVariant *v)
 	{
 		return g_variant_get_boolean(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		boost::algorithm::to_lower(v);
+		return v == "true" ? "1":"0";
 	}
 };
 
@@ -338,7 +378,7 @@ private:
 	template <class N>
 	void serialize(std::string  val,  typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
 	{
-		std::stringstream stream(val);
+		std::stringstream stream(GVS<T>::stringize(val));
 		N someTemp;
 		stream>>someTemp;
 		setValue(someTemp);
