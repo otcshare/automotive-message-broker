@@ -62,35 +62,9 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
   gsize dictsize = g_variant_n_children(var);
   //DebugOut() << var << endl;
   propmaptwo.fromVariant(var);
-  if (propmap.toString() == propmap.toString())
-  {
-      DebugOut() << "Success!" << endl;
-  }
-  else
-  {
-      DebugOut() << "Failure!" << endl;
-      exit(-1);
-  }
-  /*
-  DebugOut() << "Testing ListPropertyType" << endl;
-  ListPropertyType<BasicPropertyType<uint16_t> > listpropmap("something");
-  ListPropertyType<BasicPropertyType<uint16_t> > listpropmaptwo("something");
-  //listpropmap.append(new VehicleProperty::AccelerationXType());
-  //listpropmap.append(new VehicleProperty::MachineGunTurretStatusType());
-  listpropmap.append(new AbstractPropertyType<VehicleProperty::TripMeters>());
-  GVariant *newvar = listpropmap.toVariant();
-  DebugOut() << "Newvar created" << endl;
-  listpropmaptwo.fromVariant(newvar);
-  DebugOut() << listpropmap.toString() << listpropmaptwo.toString() << endl;
-  if (listpropmap.toString() == listpropmaptwo.toString())
-  {
-      DebugOut() << "Success!" << endl;
-  }
-  else
-  {
-      DebugOut() << "Failure" << endl;
-      exit(-1);
-  }*/
+
+  g_assert(propmap.toString() == propmap.toString());
+
   DebugOut() << "Testing ListPropertyType... " << endl;
   VehicleProperty::TripMetersType* tfirst = new VehicleProperty::TripMetersType();
   VehicleProperty::TripMetersType* tsecond = new VehicleProperty::TripMetersType();
@@ -101,17 +75,9 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
   tfirst->append(&v2);
   tfirst->append(&v3);
   tsecond->fromVariant(tfirst->toVariant());
-  if (tfirst->toString() == tsecond->toString())
-  {
-    DebugOut() << "Success!" << endl;
-  }
-  else
-  {
-    DebugOut() << "Failure!" << endl;
-  }
-  
-  
-    
+
+  g_assert (tfirst->toString() == tsecond->toString());
+
   DebugOut() << "Exiting..." << endl;
   exit(-1);
 }
