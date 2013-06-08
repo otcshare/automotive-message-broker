@@ -73,11 +73,11 @@ QVariant gvariantToQVariant(GVariant *value)
 
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), engine(nullptr)
 {
-	irc = new IrcCommunication(this);
+	irc = new IrcCommunication(config, this);
 
 	reloadEngine();
 
-	auth = new Authenticate(this);
+	auth = new Authenticate(config, this);
 
 	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
 
@@ -184,12 +184,14 @@ void BluemonkeySink::reloadEngine()
 	QScriptValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
 
-	loadConfig("config.js");
+
+
+	loadConfig(configuration["config"].c_str());
 }
 
 void BluemonkeySink::writeProgram(QString program)
 {
-	QFile file("customPrograms.js");
+	QFile file(configuration["customPrograms"].c_str());
 
 	file.open(QIODevice::ReadWrite | QIODevice::Append);
 

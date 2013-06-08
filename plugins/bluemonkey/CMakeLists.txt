@@ -28,6 +28,10 @@ add_library(bluemonkeyplugin MODULE ${bluemonkeyplugin_sources})
 set_target_properties(bluemonkeyplugin PROPERTIES PREFIX "")
 target_link_libraries(bluemonkeyplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES} ${communi_LIBRARIES})
 
-install(TARGETS bluemonkeyplugin LIBRARY DESTINATION lib/automotive-message-broker)
+set(config_files ${CMAKE_CURRENT_SOURCE_DIR}/ircSettings.js
+    ${CMAKE_CURRENT_SOURCE_DIR}/authSettings.js
+    ${CMAKE_CURRENT_SOURCE_DIR}/config.js)
 
+install(TARGETS bluemonkeyplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install (FILES ${config_files} DESTINATION /etc/ambd)
 endif(bluemonkey_plugin)

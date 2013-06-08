@@ -11,7 +11,12 @@
 	"sinks": [
 		{
 			"name" : "Bluemonkey Sink",
-			"path" : "/usr/lib/automotive-message-broker/bluemonkeyplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/bluemonkeyplugin.so",
+			"authSettings" : "/etc/ambd/authSettings.js",
+			"ircSettings" : "/etc/ambd/ircSettings.js",
+			"config" : "/etc/ambd/config.js",
+			"customPrograms" : "/etc/ambd/customPrograms.js"
+
 		}
 	]
 }

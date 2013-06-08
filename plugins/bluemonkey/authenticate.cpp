@@ -2,7 +2,7 @@
 #include <QSettings>
 #include <QtScript>
 
-Authenticate::Authenticate(QObject *parent) :
+Authenticate::Authenticate(std::map<std::string, std::string> config, QObject *parent) :
     QObject(parent)
 {
 	QSettings settings;
@@ -13,7 +13,7 @@ Authenticate::Authenticate(QObject *parent) :
 	QScriptValue eventEngineValue = engine.newQObject(this);
 	engine.globalObject().setProperty("auth", eventEngineValue);
 
-	QString str = "authSettings.js";
+	QString str = config["authSettings"].c_str();
 
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))

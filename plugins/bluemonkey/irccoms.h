@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QVariant>
 #include <QStringList>
+#include <map>
 
 #include <IrcSession>
 #include <IrcMessage>
@@ -13,7 +14,7 @@ class IrcCommunication: public QObject
 	Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
 	Q_PROPERTY(bool ssl WRITE setSsl)
 public:
-	IrcCommunication(QObject* parent=0);
+	IrcCommunication(std::map<std::string, std::string> config, QObject* parent=0);
 	QStringList channels() { return mChannels; }
 	void setChannels(QStringList c) { mChannels = c; }
 

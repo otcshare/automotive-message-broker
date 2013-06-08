@@ -10,9 +10,10 @@
 
 #define foreach Q_FOREACH
 
-IrcCommunication::IrcCommunication(QObject* parent)
+IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QObject* parent)
 	:QObject(parent)
 {
+
 	session = new IrcSession(this);
 	mSsl=false;
 
@@ -28,12 +29,12 @@ IrcCommunication::IrcCommunication(QObject* parent)
 	QScriptValue eventEngineValue = engine->newQObject(this);
 	engine->globalObject().setProperty("irc", eventEngineValue);
 
-	QString str = "ircSettings.js";
+	QString str = config["ircSettings"].c_str();
 
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		qDebug()<<"failed to open config file: "<<str;
+		qDebug()<<"failed to open irc config file: "<<str;
 		return;
 	}
 
