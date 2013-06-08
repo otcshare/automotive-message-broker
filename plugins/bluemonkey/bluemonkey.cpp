@@ -209,10 +209,18 @@ QVariant Property::value()
 
 void Property::setValue(QVariant v)
 {
-	QJsonDocument doc;
-	doc.fromVariant(v);
+	if(v.type() == QVariant::List || v.type() == QVariant::Map)
+	{
 
-	mValue->fromString(doc.toJson().data());
+		QJsonDocument doc = QJsonDocument::fromVariant(v);
+
+		QString json = doc.toJson();
+
+		mValue->fromString(json.toStdString());
+	}
+
+	else
+		mValue->fromString(v.toString().toStdString());
 
 	AsyncSetPropertyRequest request;
 	request.property = mValue->name;
