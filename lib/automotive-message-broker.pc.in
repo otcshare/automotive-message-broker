@@ -6,6 +6,6 @@ includedir=@INCLUDE_INSTALL_DIR@/amb
 Name: automotive-message-broker
 Description: 
 Version: @PROJECT_VERSION@
-Requires: gio-2.0 glib-2.0
+Requires: gio-2.0 glib-2.0 json
 Libs: -L${libdir} -lamb -luuid
 Cflags: -I${includedir}
