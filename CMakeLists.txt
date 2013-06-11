@@ -7,7 +7,7 @@ include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_VERSION "0.10.9")
-set(PROJECT_CODENAME "nonameyet")
+set(PROJECT_CODENAME "challenger")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
