@@ -236,7 +236,7 @@ public:
 
 	static uint64_t value(GVariant* v)
 	{
-		g_variant_get_uint64(v);
+		return g_variant_get_uint64(v);
 	}
 	static std::string stringize(std::string v)
 	{

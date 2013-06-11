@@ -7,17 +7,17 @@ include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${MURPHY_COMMON_INCL
 
 pkg_check_modules(MURPHY_COMMON REQUIRED murphy-common)
 
-if(use_qtcore)
+if(qtmainloop)
     pkg_check_modules(MURPHY_QT REQUIRED murphy-qt)
 
     set(include_dirs ${include_dirs} ${MURPHY_QT_INCLUDE_DIRS})
     set(link_libraries ${link_libraries} ${MURPHY_QT_LIBRARIES})
-else(user_qtcore)
+else(qtmainloop)
     pkg_check_modules(MURPHY_GLIB REQUIRED murphy-glib)
 
     set(include_dirs ${include_dirs} ${MURPHY_GLIB_INCLUDE_DIRS})
     set(link_libraries ${link_libraries} ${MURPHY_GLIB_LIBRARIES})
-endif(use_qtcore)
+endif(qtmainloop)
 
 
 set(murphysourceplugin_headers murphysource.h)
