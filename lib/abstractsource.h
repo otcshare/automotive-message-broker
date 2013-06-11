@@ -28,17 +28,19 @@
 #include "vehicleproperty.h"
 #include "abstractroutingengine.h"
 #include "abstractpropertytype.h"
+#include "propertyinfo.hpp"
 
-using namespace std;
+
 
 class AbstractSource;
 
-typedef list<AbstractSource*> SourceList;
+typedef std::list<AbstractSource*> SourceList;
 
 
 
 class AbstractSource: public AbstractSink
 {
+using namespace std;
 
 public:
 	enum Operations {
@@ -60,6 +62,8 @@ public:
 	virtual PropertyList supported() = 0;
 
 	virtual int supportedOperations() = 0;
+
+	PropertyInfo getPropertyInfo(VehicleProperty::Property) = 0;
 	
 
 protected:
