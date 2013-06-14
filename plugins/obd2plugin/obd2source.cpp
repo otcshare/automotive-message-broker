@@ -192,22 +192,20 @@ void threadLoop(gpointer data)
 					port = req->arglist[0];
 					baud = req->arglist[1];
 				}
-				bool isconnected = connect(obd,port,baud);
+				connected = connect(obd,port,baud);
 
-				if(isconnected)
+				if(connected)
 				{
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "connected";
 					g_async_queue_push(privStatusQueue,statusreq);
 				}
-				else if(!isconnected && connected)
+				else
 				{
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "disconnected";
 					g_async_queue_push(privStatusQueue,statusreq);
 				}
-
-				connected = isconnected;
 				
 			}
 			else if (req->req == "connectifnot")
@@ -228,22 +226,20 @@ void threadLoop(gpointer data)
 							DebugOut(DebugOut::Error)<<"Error creating bluetooth device"<<endl;
 						}
 					}
-					bool isconnected = connect(obd,port,baud);
+					connected = connect(obd,port,baud);
 
-					if(isconnected)
+					if(connected)
 					{
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "connected";
 						g_async_queue_push(privStatusQueue,statusreq);
 					}
-					else if(!isconnected && connected)
+					else
 					{
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "disconnected";
 						g_async_queue_push(privStatusQueue,statusreq);
 					}
-
-					connected = isconnected;
 				}
 			}
 			else if (req->req == "setportandbaud")
