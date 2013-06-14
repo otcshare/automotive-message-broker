@@ -206,6 +206,25 @@ public:
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;
 	virtual void  unregisterSink(AbstractSink* self) = 0;
+
+	/**
+	 * @brief sourcesForProperty
+	 * @param property
+	 * @return list of source uuid's that support the "property"
+	 */
+	virtual std::list<std::string> sourcesForProperty(VehicleProperty::Property property) = 0;
+
+	/**
+	 * @brief getPropertyAsync requests a property value from a source.  This call has a timeout and will always return.
+	 * @see AsyncPropertyRequest
+	 * @see AsyncPropertyReply.
+	 * @param request requested property.
+	 * @return AsyncPropertyReply. The returned AsyncPropertyReply is owned by the caller of getPropertyAsync.
+	 * @example AsyncPropertyRequest request;
+	 * request.property = VehicleProperty::VehicleSpeed
+	 * request.completed = [](AsyncPropertyReply* reply) { delete reply; };
+	 * routingEngine->getPropertyAsync(request);
+	 */
 	virtual AsyncPropertyReply * getPropertyAsync(AsyncPropertyRequest request) = 0;
 	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;

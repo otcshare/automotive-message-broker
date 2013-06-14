@@ -39,6 +39,8 @@ public:
 	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, string uuid);
 	
 	/// sinks:
+
+	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
 	
 	void registerSink(AbstractSink *self);
 	void unregisterSink(AbstractSink *self);

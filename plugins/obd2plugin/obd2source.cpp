@@ -85,6 +85,7 @@ bool connect(obdLib* obd, std::string device, std::string strbaud)
 		//No reply found
 		//printf("Error!\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM"<<endl;
+		return false;
 	}
 	else
 	{
@@ -94,23 +95,29 @@ bool connect(obdLib* obd, std::string device, std::string strbaud)
 	{
 		//printf("Error sending echo\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error setting auto protocol"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATE0"))
 	{
 		//printf("Error sending echo\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off echo"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATH0"))
 	{
 		//printf("Error sending headers off\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off headers"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATL0"))
 	{
 		//printf("Error turning linefeeds off\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off linefeeds"<<endl;
+		return false;
 	}
 	obd->sendObdRequestString("010C1\r",6,&replyVector,500,5);
+
+	return true;
 }
 
 void threadLoop(gpointer data)
@@ -167,9 +174,9 @@ void threadLoop(gpointer data)
 			//commandMap[req->req] = req->arg;
 			//printf("Command: %s\n",req->req.c_str());
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << endl;
-			if (req->req == "connect")
+			if (req->req == "connect" )
 			{
-				
+
 				if (source->m_isBluetooth)
 				{
 					ObdBluetoothDevice bt;
@@ -185,20 +192,22 @@ void threadLoop(gpointer data)
 					port = req->arglist[0];
 					baud = req->arglist[1];
 				}
-				connected = connect(obd,port,baud);
+				bool isconnected = connect(obd,port,baud);
 
-				if(connected)
+				if(isconnected)
 				{
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "connected";
 					g_async_queue_push(privStatusQueue,statusreq);
 				}
-				else
+				else if(!isconnected && connected)
 				{
 					StatusMessage *statusreq = new StatusMessage();
 					statusreq->statusStr = "disconnected";
 					g_async_queue_push(privStatusQueue,statusreq);
 				}
+
+				connected = isconnected;
 				
 			}
 			else if (req->req == "connectifnot")
@@ -214,21 +223,27 @@ void threadLoop(gpointer data)
 							DebugOut(3)<<"Using bluetooth device \""<<source->m_btDeviceAddress<<"\" bound to: "<<tempPort<<endl;
 							port = tempPort;
 						}
+						else
+						{
+							DebugOut(DebugOut::Error)<<"Error creating bluetooth device"<<endl;
+						}
 					}
-					connected = connect(obd,port,baud);
+					bool isconnected = connect(obd,port,baud);
 
-					if(connected)
+					if(isconnected)
 					{
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "connected";
 						g_async_queue_push(privStatusQueue,statusreq);
 					}
-					else
+					else if(!isconnected && connected)
 					{
 						StatusMessage *statusreq = new StatusMessage();
 						statusreq->statusStr = "disconnected";
 						g_async_queue_push(privStatusQueue,statusreq);
 					}
+
+					connected = isconnected;
 				}
 			}
 			else if (req->req == "setportandbaud")
