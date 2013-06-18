@@ -23,8 +23,8 @@ BuildRequires:  libuuid-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  glib2-devel
 BuildRequires:  opencv-devel
-#BuildRequires:  murphy-devel
-#BuildRequires:  pkgconfig(murphy-glib)
+BuildRequires:  murphy-devel
+BuildRequires:  pkgconfig(murphy-glib)
 BuildRequires:  dbus-devel
 
 %description
@@ -99,11 +99,11 @@ Requires:   opencv
 %description plugins-opencvlux
 Plugin for simulating ExteriorBrightness using a common webcam
 
-#%package plugins-murphy
-#Summary:   Plugin for integration with the murphy policy system
-#Group:     System Environment/Daemons
-#Requires:  %{name} = %{version}-%{release}
-#Requires:  murphy
+%package plugins-murphy
+Summary:   Plugin for integration with the murphy policy system
+Group:     System Environment/Daemons
+Requires:  %{name} = %{version}-%{release}
+Requires:  murphy
 
 #%description plugins-murphy
 #Plugin for integration with the murphy policy system
@@ -121,7 +121,7 @@ Plugin for simulating ExteriorBrightness using a common webcam
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=OFF -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=OFF
+%cmake -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=OFF
 
 make %{?jobs:-j%jobs}
 
@@ -181,9 +181,9 @@ ln -s ../ambd.service %{buildroot}%{_prefix}/lib/systemd/system/network.target.w
 %defattr(-,root,root,-)
 %{_libdir}/%{name}/opencvluxplugin.so
 
-#%files plugins-murphy
-#%defattr(-,root,root,-)
-#%{_libdir}/%{name}/murphysourceplugin.so
+%files plugins-murphy
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/murphysourceplugin.so
 
 #%files plugins-gpsd
 #%defattr(-,root,root,-)
