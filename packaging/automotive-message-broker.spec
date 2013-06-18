@@ -12,6 +12,7 @@ Requires: automotive-message-broker-plugins-websocket
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:	libjson
+Requires:       libuuid
 BuildRequires:  cmake
 BuildRequires:  boost-devel
 BuildRequires:  libjson-devel
