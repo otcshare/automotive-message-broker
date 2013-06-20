@@ -23,7 +23,8 @@ BuildRequires:  libuuid-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  glib2-devel
 BuildRequires:  opencv-devel
-BuildRequires:  murphy-devel
+BuildRequires:  murphy
+BuildRequires:  murphy-glib
 BuildRequires:  pkgconfig(murphy-glib)
 BuildRequires:  dbus-devel
 
@@ -105,8 +106,8 @@ Group:     System Environment/Daemons
 Requires:  %{name} = %{version}-%{release}
 Requires:  murphy
 
-#%description plugins-murphy
-#Plugin for integration with the murphy policy system
+%description plugins-murphy
+Plugin for integration with the murphy policy system
 
 #%package plugins-gpsd
 #Summary:   Plugin for integration with the gpsd policy system
