@@ -53,6 +53,8 @@ public:
 
 	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
 
+	virtual ~AbstractPropertyType() { }
+
 	virtual std::string toString() const = 0;
 
 	virtual void fromString(std::string)= 0;

@@ -30,6 +30,7 @@
 #include "abstractpropertytype.h"
 #include "mappropertytype.hpp"
 
+
 namespace ButtonEvents {
 enum ButtonEventType {
 	NoButton = 0,
