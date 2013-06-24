@@ -200,24 +200,10 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 	DebugOut() << "Trying to free obj" << endl;
 	//json_object_put(sinksobject);
 	DebugOut() << "Done" << endl;
-		
-	
-	///TODO: this will probably explode:
-	
-	//if(error) g_error_free(error);
-	
-	//g_object_unref(reader);
-	//g_object_unref(parser);
-	//*/
 }
 
 PluginLoader::~PluginLoader()
 {
-}
-
-SinkList PluginLoader::sinks()
-{
-	return mSinks;
 }
 
 IMainLoop *PluginLoader::mainloop()

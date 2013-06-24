@@ -40,7 +40,6 @@ typedef std::list<AbstractSource*> SourceList;
 
 class AbstractSource: public AbstractSink
 {
-using namespace std;
 
 public:
 	enum Operations {
@@ -63,14 +62,14 @@ public:
 
 	virtual int supportedOperations() = 0;
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property) = 0;
+	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property) = 0;
 	
 
 protected:
 	AbstractRoutingEngine* routingEngine;
 	
 private:
-	AbstractSource():AbstractSink(nullptr, map<string,string>()) { }
+	AbstractSource():AbstractSink(nullptr, std::map<std::string,std::string>()) { }
 };
 
 #endif // ABSTRACTSOURCE_H

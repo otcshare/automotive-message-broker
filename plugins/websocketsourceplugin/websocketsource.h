@@ -32,8 +32,8 @@ class WebSocketSource : public AbstractSource
 {
 
 public:
-	WebSocketSource(AbstractRoutingEngine* re, map<string, string> config);
-    string uuid();
+	WebSocketSource(AbstractRoutingEngine* re, std::map<std::string, std::string> config);
+	std::string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
@@ -51,15 +51,16 @@ public:
 	PropertyList activeRequests;
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
+	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid) {}
 	void supportedChanged(PropertyList) {}
-	void setConfiguration(map<string, string> config);
+	void setConfiguration(std::map<std::string, std::string> config);
 	//map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 	//map<VehicleProperty::Property,AsyncRangePropertyReply*> rangedPropertyReplyMap;
-	map<std::string,AsyncPropertyReply*> uuidReplyMap;
-	map<std::string,double> uuidTimeoutMap;
-	map<std::string,AsyncRangePropertyReply*> uuidRangedReplyMap;
+	std::map<std::string,AsyncPropertyReply*> uuidReplyMap;
+	std::map<std::string,double> uuidTimeoutMap;
+	std::map<std::string,AsyncRangePropertyReply*> uuidRangedReplyMap;
 	
+	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 
 private:
   	PropertyList m_supportedProperties;

@@ -161,7 +161,12 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{
-		(*itr)->propertyChanged(property, value, uuid);
+		AbstractSink* sink = *itr;
+
+		auto isFiltered = filteredSourceSinkMap.find(sink);
+
+		if( (isFiltered != filteredSourceSinkMap.end() && filteredSourceSinkMap[sink] == uuid) || isFiltered == filteredSourceSinkMap.end())
+			sink->propertyChanged(property, value, uuid);
 	}
 }
 
@@ -265,29 +270,18 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 {
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 
-	/** TODO: Change behavior of subscribe to subscribe even if no sources provide a
-	 *  given property.  When subscribers come online with support, core should tell
-	 *  the sources what properties have already been subscribed to.
-	 */
-
-	/*if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
-	{
-		DebugOut(1)<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
-		return; 
-	}*/
-	
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
 		propertySinkMap[property] = SinkList();
 	}
-	
+
 	SinkList list = propertySinkMap[property];
-	
+
 	if(!ListPlusPlus<AbstractSink*>(&list).contains(self))
 	{
 		propertySinkMap[property].push_back(self);
 	}
-	
+
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
 		AbstractSource* src = (*itr);
@@ -297,17 +291,33 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 			src->subscribeToPropertyChanges(property);
 		}
 	}
+
+}
+
+void Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
+{
+	if(filteredSourceSinkMap.find(sink) == filteredSourceSinkMap.end())
+	{
+		filteredSourceSinkMap[sink] = sourceUuidFilter;
+	}
+
+	subscribeToProperty(property,sink);
 }
 
 void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property<<endl;
+		DebugOut(1)<<__FUNCTION__<<" property not subscribed to: "<<property<<endl;
 		return; 
 	}
 		
 	ListPlusPlus<AbstractSink*>(&propertySinkMap[property]).removeOne(self);
+
+	if( filteredSourceSinkMap.find(self) != filteredSourceSinkMap.end())
+	{
+		filteredSourceSinkMap.erase(self);
+	}
 
 	/// Now we check to see if this is the last subscriber
 	if(propertySinkMap.find(property) == propertySinkMap.end())
@@ -323,5 +333,39 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 			}
 		}
 	}
+}
+
+PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
+{
+	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = *itr;
+
+		if(src->uuid() == sourceUuid)
+		{
+			return src->getPropertyInfo(property);
+		}
+	}
+
+	return PropertyInfo();
+}
+
+std::list<string> Core::getSourcesForProperty(VehicleProperty::Property property)
+{
+	std::list<std::string> list;
+
+	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = *itr;
+
+		PropertyList supportedProperties = src->supported();
+
+		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(property))
+		{
+			list.push_back(src->uuid());
+		}
+	}
+
+	return list;
 }
 
