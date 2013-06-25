@@ -442,13 +442,12 @@ static int updateProperties( gpointer data)
 		StatusMessage *reply = (StatusMessage*)retval;
 		if (reply->statusStr == "disconnected")
 		{
-
-			BasicPropertyType<bool> val(Obd2Connected,false);
+			OBD2Source::Obd2ConnectType val(Obd2Connected,false);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "connected")
 		{
-			BasicPropertyType<bool> val(Obd2Connected, true);
+			OBD2Source::Obd2ConnectType val(Obd2Connected, true);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
@@ -465,6 +464,7 @@ static int updateProperties( gpointer data)
 				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on unrequested property:" << reply->property << endl;
 			}
 		}
+		delete reply;
 	}
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{
