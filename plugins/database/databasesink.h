@@ -158,6 +158,8 @@ public:
 	virtual PropertyList supported();
 	int supportedOperations() { return GetRanged | Get | Set;}
 
+	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
+
 private: //methods:
 
 	void parseConfig();

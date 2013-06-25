@@ -37,9 +37,9 @@
 namespace Zone {
 enum Type {
 	None = 0,
-	Driver = 1,
+	FrontRight = 1,
 	FrontMiddle = 1 << 1,
-	Passenger = 1 << 2,
+	FrontLeft = 1 << 2,
 	LeftRear = 1 << 3,
 	MiddleRear = 1 << 4,
 	RightRear = 1 << 5
@@ -52,6 +52,8 @@ public:
 	//AbstractPropertyType(): timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
 
 	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
+
+	virtual ~AbstractPropertyType() { }
 
 	virtual std::string toString() const = 0;
 

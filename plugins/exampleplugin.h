@@ -44,6 +44,8 @@ public:
 	void supportedChanged(PropertyList) {}
 	
 	void randomizeProperties();
+
+	PropertyInfo getPropertyInfo(VehicleProperty::Property ) { return PropertyInfo(); }
 	
 private:
 	PropertyList mRequests;

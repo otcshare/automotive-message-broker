@@ -29,6 +29,7 @@
 
 #include "vehicleproperty.h"
 #include "abstractpropertytype.h"
+#include "propertyinfo.hpp"
 
 class AbstractSink;
 class AbstractSource;
@@ -202,6 +203,7 @@ public:
 	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
 	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
 	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid) = 0;
+	virtual PropertyList supported() = 0;
 
 	/// sinks:
 	virtual void registerSink(AbstractSink* self) = 0;
@@ -229,8 +231,11 @@ public:
 	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
+	virtual void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
-	virtual PropertyList supported() = 0;
+
+	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid) = 0;
+	virtual std::list<std::string> getSourcesForProperty(VehicleProperty::Property) = 0;
 };
 
 #endif // ABSTRACTROUTINGENGINE_H

@@ -201,6 +201,12 @@ PropertyList DatabaseSink::supported()
 	return mSupported;
 }
 
+PropertyInfo DatabaseSink::getPropertyInfo(VehicleProperty::Property property)
+{
+	/// TODO: Compute update frequency for properties in the database
+	return PropertyInfo();
+}
+
 void DatabaseSink::parseConfig()
 {
 	json_object *rootobject;

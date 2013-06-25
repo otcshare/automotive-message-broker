@@ -1,9 +1,15 @@
-For 0.10.0
+
+
+For 0.11
+
 - Implement all the DBus properties in the docs/ directory.
-- DBus support for time and sequece being included in dbus properties.
-- DBus support for objects with multiple sources and multiple 'zones' (ie /org/automotive/${sourceID}/${zone}/batteryVoltage/${index})
+- DBus support for time and sequece being an additional api call (ie, getExtendedVehicleSpeedInfo()).
+- DBus support for objects with multiple sources and multiple 'zones' (ie /org/automotive/${sourceID}/[${zone}/]batteryVoltage)
 - Document changes to the DBus API in the IDL
 - autoreconnect on a timeout when Obd2 disconnects if 'autoreconnect' is 'true' in the config
+- update json protocol to include getPropertyInfo calls
+- update database to support zone column 
+- no reason for pluginloader to track sources.  core already does it.
 
 Other:
 - grep all the TODOs in the code and do them
@@ -11,5 +17,5 @@ Other:
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
 - investigate and enable use of provisioning in ssl websockets
 - add API to get number of sources per a given property (ie uint AbstractRoutingEngine::sources(VehicleProperty::Property))
-- enable ambd/config.d/
+- enable ambd/plugins.d/
 - finish implementing openxc plugin
