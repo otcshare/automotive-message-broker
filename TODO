@@ -10,6 +10,7 @@ For 0.11
 - update json protocol to include getPropertyInfo calls
 - update database to support zone column 
 - no reason for pluginloader to track sources.  core already does it.
+- create docs for all plugins (README)
 
 Other:
 - grep all the TODOs in the code and do them
