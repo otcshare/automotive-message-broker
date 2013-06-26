@@ -105,8 +105,8 @@ Group:     System Environment/Daemons
 Requires:  %{name} = %{version}-%{release}
 Requires:  murphy
 
-#%description plugins-murphy
-#Plugin for integration with the murphy policy system
+%description plugins-murphy
+Plugin for integration with the murphy policy system
 
 #%package plugins-gpsd
 #Summary:   Plugin for integration with the gpsd policy system
@@ -131,6 +131,8 @@ rm -rf %{buildroot}
 
 mkdir -p %{buildroot}%{_prefix}/lib/systemd/system/network.target.wants
 ln -s ../ambd.service %{buildroot}%{_prefix}/lib/systemd/system/network.target.wants/ambd.service
+
+%install_service multi-user.target.wants ambd.service
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
