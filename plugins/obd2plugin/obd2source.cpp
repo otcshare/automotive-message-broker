@@ -85,6 +85,7 @@ bool connect(obdLib* obd, std::string device, std::string strbaud)
 		//No reply found
 		//printf("Error!\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM"<<endl;
+		return false;
 	}
 	else
 	{
@@ -94,23 +95,29 @@ bool connect(obdLib* obd, std::string device, std::string strbaud)
 	{
 		//printf("Error sending echo\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error setting auto protocol"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATE0"))
 	{
 		//printf("Error sending echo\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off echo"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATH0"))
 	{
 		//printf("Error sending headers off\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off headers"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATL0"))
 	{
 		//printf("Error turning linefeeds off\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off linefeeds"<<endl;
+		return false;
 	}
 	obd->sendObdRequestString("010C1\r",6,&replyVector,500,5);
+
+	return true;
 }
 
 void threadLoop(gpointer data)
@@ -167,9 +174,9 @@ void threadLoop(gpointer data)
 			//commandMap[req->req] = req->arg;
 			//printf("Command: %s\n",req->req.c_str());
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << endl;
-			if (req->req == "connect")
+			if (req->req == "connect" )
 			{
-				
+
 				if (source->m_isBluetooth)
 				{
 					ObdBluetoothDevice bt;
@@ -213,6 +220,10 @@ void threadLoop(gpointer data)
 						{
 							DebugOut(3)<<"Using bluetooth device \""<<source->m_btDeviceAddress<<"\" bound to: "<<tempPort<<endl;
 							port = tempPort;
+						}
+						else
+						{
+							DebugOut(DebugOut::Error)<<"Error creating bluetooth device"<<endl;
 						}
 					}
 					connected = connect(obd,port,baud);
@@ -431,13 +442,12 @@ static int updateProperties( gpointer data)
 		StatusMessage *reply = (StatusMessage*)retval;
 		if (reply->statusStr == "disconnected")
 		{
-
-			BasicPropertyType<bool> val(Obd2Connected,false);
+			OBD2Source::Obd2ConnectType val(Obd2Connected,false);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "connected")
 		{
-			BasicPropertyType<bool> val(Obd2Connected, true);
+			OBD2Source::Obd2ConnectType val(Obd2Connected, true);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
@@ -454,6 +464,7 @@ static int updateProperties( gpointer data)
 				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on unrequested property:" << reply->property << endl;
 			}
 		}
+		delete reply;
 	}
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{

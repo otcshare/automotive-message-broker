@@ -1,4 +1,3 @@
-
 /*
 Copyright (C) 2012 Intel Corporation
 
@@ -177,11 +176,13 @@ public:
 	bool m_threadLive;
 	GThread *m_gThread;
 
+	typedef BasicPropertyType<bool> Obd2ConnectType;
+
 private:
 	PropertyList m_supportedProperties;
 	std::map<VehicleProperty::Property, AbstractPropertyType*> oldValueMap;
 	GMutex *threadQueueMutex;
-	typedef BasicPropertyType<bool> Obd2ConnectType;
+
 
 };
 

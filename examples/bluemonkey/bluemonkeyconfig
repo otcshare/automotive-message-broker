@@ -16,7 +16,7 @@
 			"startOnLoad" : "true"		
 		},
 		{
-			"path" : "/usr/lib/automotive-message-broker/gpsdplugin.so"
+                        "path" : "/usr/lib/automotive-message-broker/gpsdplugin.so",
 		}
 	],
 	"sinks": [
