@@ -24,7 +24,8 @@ BuildRequires:  sqlite-devel
 BuildRequires:  glib2-devel
 BuildRequires:  opencv-devel
 BuildRequires:  murphy-devel
-BuildRequires:  pkgconfig(murphy-glib)
+BuildRequires:  murphy-glib-devel
+BuildRequires:  murphy-glib
 BuildRequires:  dbus-devel
 
 %description
