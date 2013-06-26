@@ -23,7 +23,7 @@ BuildRequires:  libuuid-devel
 BuildRequires:  sqlite-devel
 BuildRequires:  glib2-devel
 BuildRequires:  opencv-devel
-BuildRequires:  murphy-devel
+BuildRequires:  murphy
 BuildRequires:  murphy-glib-devel
 BuildRequires:  murphy-glib
 BuildRequires:  dbus-devel
