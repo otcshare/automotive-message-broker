@@ -133,6 +133,8 @@ rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_prefix}/lib/systemd/system/network.target.wants
 ln -s ../ambd.service %{buildroot}%{_prefix}/lib/systemd/system/network.target.wants/ambd.service
 
+%install_service multi-user.target.wants ambd.service
+
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
 
