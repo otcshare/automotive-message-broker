@@ -62,7 +62,7 @@ public:
 
 	virtual int supportedOperations() = 0;
 
-	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property) = 0;
+	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 	
 
 protected:
