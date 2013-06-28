@@ -1,3 +1,6 @@
+* Fri Jun 28 11:06:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fixed segfault on timeout reply
+
 * Wed Jun 26 13:40:00 UTC 2013 - <kevron.m.rees@intel.com>
 - Fixed systemd startup issue
 - Merged in latest upstream fixes from the 0.10 branch
