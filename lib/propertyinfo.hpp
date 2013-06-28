@@ -7,10 +7,16 @@
 class PropertyInfo
 {
 public:
+
 	/** PropertyInfo
-	 *
-	 **/
-	PropertyInfo(): mUpdateFrequency(0) {}
+	 * @arg updateFrequency
+	 * @arg zonesList
+	 */
+	PropertyInfo(uint updateFreq, std::list<Zone::Type> zonesList)
+		:mUpdateFrequency(updateFreq), mZones(zonesList), mIsValid(true)
+	{
+
+	}
 
 
 	/** updateFrequency
@@ -31,10 +37,36 @@ public:
 		return mZones;
 	}
 
+	/** isValid
+	 * returns whether this PropertyInfo is valid
+	 *
+	 * default when you construct a PropertyInfo is false
+	 **/
+	bool isValid()
+	{
+		return mIsValid;
+	}
+
+
+	/** invalid()
+	 * returns instance of PropertyInfo that isn't valid
+	 **/
+	static PropertyInfo invalid()
+	{
+		return PropertyInfo();
+	}
+
+protected:
+	/** PropertyInfo
+	 *
+	 **/
+	PropertyInfo(): mUpdateFrequency(0), mIsValid(false) {}
+
 private:
 
 	uint mUpdateFrequency;
 	std::list<Zone::Type> mZones;
+	bool mIsValid;
 };
 
 

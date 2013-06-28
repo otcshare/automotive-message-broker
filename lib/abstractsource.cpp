@@ -32,7 +32,7 @@ AbstractSource::~AbstractSource()
 
 PropertyInfo AbstractSource::getPropertyInfo(VehicleProperty::Property property)
 {
-	return PropertyInfo();
+	return PropertyInfo::invalid();
 }
 
 

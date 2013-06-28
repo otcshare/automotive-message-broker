@@ -347,7 +347,7 @@ PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string so
 		}
 	}
 
-	return PropertyInfo();
+	return PropertyInfo::invalid();
 }
 
 std::list<string> Core::getSourcesForProperty(VehicleProperty::Property property)

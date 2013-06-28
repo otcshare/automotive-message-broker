@@ -204,7 +204,7 @@ PropertyList DatabaseSink::supported()
 PropertyInfo DatabaseSink::getPropertyInfo(VehicleProperty::Property property)
 {
 	/// TODO: Compute update frequency for properties in the database
-	return PropertyInfo();
+	return PropertyInfo::invalid();
 }
 
 void DatabaseSink::parseConfig()

@@ -45,7 +45,10 @@ public:
 	
 	void randomizeProperties();
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property ) { return PropertyInfo(); }
+	PropertyInfo getPropertyInfo(VehicleProperty::Property ) {
+		/// TODO FIXME don't just return an invalid property info
+		return PropertyInfo::invalid();
+	}
 	
 private:
 	PropertyList mRequests;
