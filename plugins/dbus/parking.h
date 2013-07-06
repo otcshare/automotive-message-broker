@@ -11,7 +11,7 @@ class SecurityAlertProperty: public DBusSink
 {
 public:
 	SecurityAlertProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.SecurityAlert","/org/automotive/parking/SecurityAlert", re, connection, map<string, string>())
+		:DBusSink("SecurityAlert", re, connection, map<string, string>())
 	{
 
 		/** @attributeName SecurityAlert
@@ -30,7 +30,7 @@ class ParkingBrakeProperty: public DBusSink
 {
 public:
 	ParkingBrakeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.ParkingBrake","/org/automotive/parking/ParkingBrake", re, connection, map<string, string>())
+		:DBusSink("ParkingBrake", re, connection, map<string, string>())
 	{
 		/** @attributeName ParkingBrake
 		 *  @type boolean
@@ -48,7 +48,7 @@ class ParkingLightProperty: public DBusSink
 {
 public:
 	ParkingLightProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.ParkingLight","/org/automotive/parking/ParkingLight", re, connection, map<string, string>())
+		:DBusSink("ParkingLight", re, connection, map<string, string>())
 	{
 		/** @attributeName ParkingLight
 		 *  @type boolean
@@ -66,7 +66,7 @@ class HazardLightProperty: public DBusSink
 {
 public:
 	HazardLightProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.HazardLight","/org/automotive/parking/HazardLight", re, connection, map<string, string>())
+		:DBusSink("HazardLight", re, connection, map<string, string>())
 	{
 		/** @attributeName HazardLight
 		 *  @type boolean

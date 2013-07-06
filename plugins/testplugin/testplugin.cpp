@@ -81,6 +81,7 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
   DebugOut() << "Exiting..." << endl;
   exit(-1);
 }
+
 TestPlugin::~TestPlugin()
 {
 	DebugOut() << "TestPlugin Destructor called!!!"<<endl;

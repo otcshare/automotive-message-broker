@@ -67,7 +67,7 @@ private:
 	
 	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
 
-	std::map<AbstractSink*, std::string> filteredSourceSinkMap;
+	std::map<AbstractSink*, std::map<VehicleProperty::Property, std::string> > filteredSourceSinkMap;
 
 	std::map<VehicleProperty::Property, std::string> previousValueMap;
     

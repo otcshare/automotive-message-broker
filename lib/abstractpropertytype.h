@@ -35,6 +35,7 @@
 #include <boost/algorithm/string.hpp>
 
 namespace Zone {
+
 enum Type {
 	None = 0,
 	FrontRight = 1,
@@ -44,13 +45,12 @@ enum Type {
 	MiddleRear = 1 << 4,
 	RightRear = 1 << 5
 };
+
 }
 
 class AbstractPropertyType
 {
 public:
-	//AbstractPropertyType(): timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
-
 	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
 
 	virtual ~AbstractPropertyType() { }

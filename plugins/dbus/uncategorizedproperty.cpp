@@ -4,7 +4,7 @@
 #include "listplusplus.h"
 
 UncategorizedPropertyInterface::UncategorizedPropertyInterface(VehicleProperty::Property prop, AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive."+prop,"/org/automotive/uncategorized/"+prop, re, connection, map<string, string>())
+	:DBusSink(prop, re, connection, map<string, string>())
 {
 	AbstractPropertyType* temp = VehicleProperty::getPropertyTypeForPropertyNameValue(prop);
 

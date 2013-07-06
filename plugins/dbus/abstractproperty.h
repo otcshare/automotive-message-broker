@@ -65,6 +65,9 @@ public:
 	{
 		return mAccess;
 	}
+
+	void setSourceFilter(std::string filter) { mSourceFilter = filter; }
+	void setZoneFilter(Zone::Type zone) { mZoneFilter = zone; }
 	
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
@@ -107,6 +110,9 @@ public:
 protected: ///methods:
 
 	void updateValue();
+
+	std::string mSourceFilter;
+	Zone::Type mZoneFilter;
 	
 protected:
 	

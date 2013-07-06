@@ -36,10 +36,148 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "parking.h"
 #include "drivingsafety.h"
 
-#define ConstructProperty(property) \
-	new property(iface->re, connection);
-
 using namespace std;
+
+
+std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(AbstractRoutingEngine *re, std::list<VehicleProperty::Property> implementedProperties)
+{
+	std::map<std::string, std::map<Zone::Type, bool>> uniqueSourcesList;
+
+	for(auto itr = implementedProperties.begin(); itr != implementedProperties.end(); itr++)
+	{
+		VehicleProperty::Property property = *itr;
+		std::list<std::string> sources = re->getSourcesForProperty(property);
+
+		for(auto itr2 = sources.begin(); itr2 != sources.end(); itr2++)
+		{
+			std::string source = *itr2;
+
+			PropertyInfo info = re->getPropertyInfo(property,source);
+
+			std::map<Zone::Type, bool> uniqueZoneList;
+
+			if(uniqueSourcesList.find(source) != uniqueSourcesList.end())
+			{
+				uniqueZoneList = uniqueSourcesList[source];
+			}
+
+			std::list<Zone::Type> zoneList = info.zones();
+
+			for(auto zoneItr = zoneList.begin(); zoneItr != zoneList.end(); zoneItr++)
+			{
+				uniqueZoneList[*zoneItr] = true;
+			}
+
+			uniqueSourcesList[source] = uniqueZoneList;
+		}
+	}
+
+	return uniqueSourcesList;
+}
+
+template <typename T>
+void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+{
+	T* t = new T(re, connection);
+
+	/// check if we need more than one instance:
+
+	std::list<VehicleProperty::Property> implementedProperties = t->wantsProperties();
+
+
+	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
+
+	delete t;
+
+	for(auto itr = uniqueSourcesList.begin(); itr != uniqueSourcesList.end(); itr++)
+	{
+		std::map<Zone::Type, bool> zones = (*itr).second;
+
+		std::string source = (*itr).first;
+
+		std::string objectPath = "/" + source;
+
+		boost::algorithm::erase_all(objectPath, "-");
+
+		if(!zones.size())
+		{
+
+			T* t = new T(re, connection);
+
+			objectPath += "/" + t->propertyName();
+			t->setObjectPath(objectPath);
+			t->setSourceFilter(source);
+			t->unregisterObject();
+			t->supportedChanged(re->supported());
+		}
+
+		for(auto zoneItr = zones.begin(); zoneItr != zones.end(); zoneItr++)
+		{
+			Zone::Type zone = (*zoneItr).first;
+			T* t = new T(re, connection);
+			std::stringstream fullobjectPath;
+			fullobjectPath<< objectPath << "/" << zone << "/" <<t->propertyName();
+			t->setObjectPath(fullobjectPath.str());
+			t->setSourceFilter(source);
+			t->setZoneFilter(zone);
+			t->unregisterObject();
+			t->supportedChanged(re->supported());
+		}
+
+	}
+}
+
+template <typename T>
+void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, GDBusConnection *connection)
+{
+	T* t = new T(prop, re, connection);
+
+	/// check if we need more than one instance:
+
+	std::list<VehicleProperty::Property> implementedProperties = t->wantsProperties();
+
+
+	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
+
+	delete t;
+
+	for(auto itr = uniqueSourcesList.begin(); itr != uniqueSourcesList.end(); itr++)
+	{
+		std::map<Zone::Type, bool> zones = (*itr).second;
+
+		std::string source = (*itr).first;
+
+		std::string objectPath = "/" + source;
+
+		boost::algorithm::erase_all(objectPath, "-");
+
+		if(!zones.size())
+		{
+
+			T* t = new T(prop, re, connection);
+
+			objectPath += "/" + t->propertyName();
+			t->setObjectPath(objectPath);
+			t->setSourceFilter(source);
+			t->unregisterObject();
+			t->supportedChanged(re->supported());
+		}
+
+		for(auto zoneItr = zones.begin(); zoneItr != zones.end(); zoneItr++)
+		{
+			Zone::Type zone = (*zoneItr).first;
+			T* t = new T(prop, re, connection);
+			std::stringstream fullobjectPath;
+			fullobjectPath<< objectPath << "/" << zone << "/" <<t->propertyName();
+			t->setObjectPath(fullobjectPath.str());
+			t->setSourceFilter(source);
+			t->setZoneFilter(zone);
+			t->unregisterObject();
+			t->supportedChanged(re->supported());
+		}
+
+	}
+}
 
 static void
 on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
@@ -49,51 +187,51 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	new AutomotiveManager(connection);
 
 	/// properties:
-	AbstractDBusInterface* acceleration = new AccelerationProperty(iface->re, connection);
-	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
-	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);
-	AbstractDBusInterface* engineSpeed = new EngineSpeedProperty(iface->re, connection);
-	ConstructProperty(VehiclePowerModeProperty);
-	ConstructProperty(TripMeterProperty);
-	ConstructProperty(TransmissionProperty);
-	ConstructProperty(TireTemperatureProperty);
-	ConstructProperty(CruiseControlProperty);
-	ConstructProperty(WheelBrakeProperty);
-	ConstructProperty(LightStatusProperty);
-	ConstructProperty(HornProperty);
-	ConstructProperty(FuelProperty);
-	ConstructProperty(EngineOilProperty);
-	ConstructProperty(ExteriorBrightnessProperty);
-	ConstructProperty(Temperature);
-	ConstructProperty(RainSensor);
-	ConstructProperty(WindshieldWiper);
-	ConstructProperty(HVACProperty);
-	ConstructProperty(WindowStatusProperty);
-	ConstructProperty(Sunroof);
-	ConstructProperty(ConvertibleRoof);
-	ConstructProperty(VehicleId);
-	ConstructProperty(TransmissionInfoProperty);
-	ConstructProperty(VehicleTypeProperty);
-	ConstructProperty(FuelInfoProperty);
-	ConstructProperty(SizeProperty);
-	ConstructProperty(DoorsProperty);
-	ConstructProperty(WheelInformationProperty);
-	ConstructProperty(OdometerProperty);
-	ConstructProperty(FluidProperty);
-	ConstructProperty(BatteryProperty);
-	ConstructProperty(SecurityAlertProperty);
-	ConstructProperty(ParkingBrakeProperty);
-	ConstructProperty(ParkingLightProperty);
-	ConstructProperty(HazardLightProperty);
-	ConstructProperty(LocationProperty);
-	ConstructProperty(AntilockBrakingSystemProperty);
-	ConstructProperty(TractionControlSystemProperty);
-	ConstructProperty(VehicleTopSpeedLimitProperty);
-	ConstructProperty(AirbagStatusProperty);
-	ConstructProperty(DoorStatusProperty);
-	ConstructProperty(SeatBeltStatusProperty);
-	ConstructProperty(OccupantStatusProperty);
-	ConstructProperty(ObstacleDistanceProperty);
+	exportProperty<AccelerationProperty>(iface->re,connection);
+	exportProperty<VehicleSpeedProperty>(iface->re, connection);
+	exportProperty<TirePressureProperty>(iface->re, connection);
+	exportProperty<EngineSpeedProperty>(iface->re, connection);
+	exportProperty<VehiclePowerModeProperty>(iface->re, connection);
+	exportProperty<TripMeterProperty>(iface->re, connection);
+	exportProperty<TransmissionProperty>(iface->re, connection);
+	exportProperty<TireTemperatureProperty>(iface->re, connection);
+	exportProperty<CruiseControlProperty>(iface->re, connection);
+	exportProperty<WheelBrakeProperty>(iface->re, connection);
+	exportProperty<LightStatusProperty>(iface->re, connection);
+	exportProperty<HornProperty>(iface->re, connection);
+	exportProperty<FuelProperty>(iface->re, connection);
+	exportProperty<EngineOilProperty>(iface->re, connection);
+	exportProperty<ExteriorBrightnessProperty>(iface->re, connection);
+	exportProperty<Temperature>(iface->re, connection);
+	exportProperty<RainSensor>(iface->re, connection);
+	exportProperty<WindshieldWiper>(iface->re, connection);
+	exportProperty<HVACProperty>(iface->re, connection);
+	exportProperty<WindowStatusProperty>(iface->re, connection);
+	exportProperty<Sunroof>(iface->re, connection);
+	exportProperty<ConvertibleRoof>(iface->re, connection);
+	exportProperty<VehicleId>(iface->re, connection);
+	exportProperty<TransmissionInfoProperty>(iface->re, connection);
+	exportProperty<VehicleTypeProperty>(iface->re, connection);
+	exportProperty<FuelInfoProperty>(iface->re, connection);
+	exportProperty<SizeProperty>(iface->re, connection);
+	exportProperty<DoorsProperty>(iface->re, connection);
+	exportProperty<WheelInformationProperty>(iface->re, connection);
+	exportProperty<OdometerProperty>(iface->re, connection);
+	exportProperty<FluidProperty>(iface->re, connection);
+	exportProperty<BatteryProperty>(iface->re, connection);
+	exportProperty<SecurityAlertProperty>(iface->re, connection);
+	exportProperty<ParkingBrakeProperty>(iface->re, connection);
+	exportProperty<ParkingLightProperty>(iface->re, connection);
+	exportProperty<HazardLightProperty>(iface->re, connection);
+	exportProperty<LocationProperty>(iface->re, connection);
+	exportProperty<AntilockBrakingSystemProperty>(iface->re, connection);
+	exportProperty<TractionControlSystemProperty>(iface->re, connection);
+	exportProperty<VehicleTopSpeedLimitProperty>(iface->re, connection);
+	exportProperty<AirbagStatusProperty>(iface->re, connection);
+	exportProperty<DoorStatusProperty>(iface->re, connection);
+	exportProperty<SeatBeltStatusProperty>(iface->re, connection);
+	exportProperty<OccupantStatusProperty>(iface->re, connection);
+	exportProperty<ObstacleDistanceProperty>(iface->re, connection);
 
 	PropertyList list = VehicleProperty::customProperties();
 
@@ -101,7 +239,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	{
 		VehicleProperty::Property prop = *itr;
 
-		new CustomPropertyInterface(prop,iface->re,connection);
+		exportProperty<CustomPropertyInterface>(prop, iface->re, connection);
 	}
 
 
@@ -117,7 +255,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 
 		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
 		{
-			new UncategorizedPropertyInterface(prop, iface->re, connection);
+			exportProperty<UncategorizedPropertyInterface>(prop, iface->re, connection);
 		}
 	}
 
@@ -146,8 +284,6 @@ on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data
 DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine)
 	:re(engine)
 {
-	g_type_init();
-
 	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
 					DBusServiceName,
 					G_BUS_NAME_OWNER_FLAGS_NONE,

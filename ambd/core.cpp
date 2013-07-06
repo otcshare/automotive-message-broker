@@ -165,8 +165,20 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 
 		auto isFiltered = filteredSourceSinkMap.find(sink);
 
-		if( (isFiltered != filteredSourceSinkMap.end() && filteredSourceSinkMap[sink] == uuid) || isFiltered == filteredSourceSinkMap.end())
+		if(isFiltered != filteredSourceSinkMap.end() )
+		{
+
+			std::string u = filteredSourceSinkMap[sink][property];
+			DebugOut()<<"Property ("<<property<<") for sink is filtered for source: "<<u<<endl;
+		}
+
+		if( (isFiltered != filteredSourceSinkMap.end() && filteredSourceSinkMap[sink][property] == uuid) || isFiltered == filteredSourceSinkMap.end())
+		{
+			/// FIXME: Set this here just in case a source neglects to:
+			value->sourceUuid = uuid;
+
 			sink->propertyChanged(property, value, uuid);
+		}
 	}
 }
 
@@ -218,8 +230,9 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 
 		bool supportsGet = supportedOps & AbstractSource::Get;
 
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet && (request.sourceUuid == "" || request.sourceUuid == src->uuid()))
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet && (request.sourceUuidFilter == "" || request.sourceUuidFilter == src->uuid()))
 		{
+
 			src->getPropertyAsync(reply);
 
 			/** right now the owner of the reply becomes the requestor that called this method.
@@ -296,9 +309,11 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 
 void Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
 {
-	if(filteredSourceSinkMap.find(sink) == filteredSourceSinkMap.end())
+	if(filteredSourceSinkMap.find(sink) == filteredSourceSinkMap.end() && sourceUuidFilter != "")
 	{
-		filteredSourceSinkMap[sink] = sourceUuidFilter;
+		std::map<VehicleProperty::Property, std::string> propertyFilter;
+		propertyFilter[property] = sourceUuidFilter;
+		filteredSourceSinkMap[sink] = propertyFilter;
 	}
 
 	subscribeToProperty(property,sink);

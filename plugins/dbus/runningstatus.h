@@ -28,14 +28,14 @@ class VehicleSpeedProperty: public DBusSink
 {
 public:
 	VehicleSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.VehicleSpeed","/org/automotive/runningstatus/VehicleSpeed", re, connection, map<string, string>())
+		:DBusSink("VehicleSpeed", re, connection, map<string, string>())
 	{
 		/** @attributeName VehicleSpeed
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Vehicle Speed in kilometers per hour.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 
@@ -47,14 +47,14 @@ class EngineSpeedProperty: public DBusSink
 {
 public:
 	EngineSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.EngineSpeed","/org/automotive/runningstatus/EngineSpeed", re, connection, map<string, string>())
+		:DBusSink("EngineSpeed", re, connection, map<string, string>())
 	{
 		/** @attributeName EngineSpeed
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Engine Speed in rotations per minute.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 
@@ -66,7 +66,7 @@ class VehiclePowerModeProperty: public DBusSink
 {
 public:
 	VehiclePowerModeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.VehiclePowerMode","/org/automotive/runningstatus/VehiclePowerMode", re, connection, map<string, string>())
+		:DBusSink("VehiclePowerMode", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short VEHICLEPOWERMODE_OFF = 0,
@@ -81,7 +81,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Vehicle Power mode (see VEHICLEPOWERMODE)
 		 **/
-		wantProperty<Power::PowerModes>(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -91,7 +91,7 @@ class TripMeterProperty: public DBusSink
 {
 public:
 	TripMeterProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.TripMeter","/org/automotive/runningstatus/TripMeter", re, connection, map<string, string>())
+	:DBusSink("TripMeter", re, connection, map<string, string>())
 	{
 		/** @attributeName TripMeters
 		 *  @type sequence<unsigned long>
@@ -108,28 +108,28 @@ class AccelerationProperty: public DBusSink
 {
 public:
 	AccelerationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.Acceleration","/org/automotive/runningstatus/Acceleration", re, connection, map<string, string>())
+	:DBusSink("Acceleration", re, connection, map<string, string>())
 	{
 		/** @attributeName X
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return acceleration on the "X" axis as 1/1000 G (gravitational force).
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::AccelerationX, "X", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AccelerationX, "X", "q", AbstractProperty::Read);
 
 		/** @attributeName Y
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return acceleration on the "Y" axis as 1/1000 G (gravitational force).
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::AccelerationY, "Y", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AccelerationY, "Y", "q", AbstractProperty::Read);
 
 		/** @attributeName Z
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return acceleration on the "Z" axis as 1/1000 G (gravitational force).
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::AccelerationZ, "Z", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AccelerationZ, "Z", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -139,7 +139,7 @@ class TransmissionProperty: public DBusSink
 {
 public:
 	TransmissionProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.Transmission","/org/automotive/runningstatus/Transmission", re, connection, map<string, string>())
+	:DBusSink("Transmission", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0;
@@ -165,7 +165,7 @@ public:
 		 *  @ access readonly
 		 *  @ attributeComment \brief  Must return transmission shift position
 		 **/
-		//wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionShiftPosition,
+		//wantPropertyVariant(VehicleProperty::TransmissionShiftPosition,
 			//											  "ShiftPosition", "y", AbstractProperty::Read);
 
 		/** @attributeName GearPosition
@@ -173,7 +173,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return transmission gear position (see TRANSMISSIONPOSITION)
 		 **/
-		wantProperty<Transmission::TransmissionPositions>(VehicleProperty::TransmissionGearPosition,
+		wantPropertyVariant(VehicleProperty::TransmissionGearPosition,
 														  "GearPosition", "y", AbstractProperty::Read);
 
 		/**
@@ -189,7 +189,7 @@ public:
 		 *  @attributeComment \brief  Must return transmission Mode (see TRANSMISSIONMODE_*)
 		 *  @access readonly
 		 **/
-		wantProperty<Transmission::Mode>(VehicleProperty::TransmissionMode,
+		wantPropertyVariant(VehicleProperty::TransmissionMode,
 														  "Mode", "y", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
@@ -201,21 +201,21 @@ class CruiseControlProperty: public DBusSink
 {
 public:
 	CruiseControlProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive.CruiseControlStatus","/org/automotive/runningstatus/CruiseControlStatus", re, connection, map<string, string>())
+	:DBusSink("CruiseControlStatus", re, connection, map<string, string>())
 	{
 		/** @attributeName Activated
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return whether or not the Cruise Control system is active (true) or inactive (false)
 		 **/
-		wantProperty<bool>(VehicleProperty::CruiseControlActive, "Activated", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::CruiseControlActive, "Activated", "b", AbstractProperty::Read);
 
 		/** @attributeName Speed
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return target Cruise Control speed in kilometers per hour (kph).
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::CruiseControlSpeed, "Speed", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::CruiseControlSpeed, "Speed", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -225,14 +225,14 @@ class WheelBrakeProperty: public DBusSink
 {
 public:
 	WheelBrakeProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.WheelBrake","/org/automotive/runningstatus/WheelBrake", re, connection, map<string, string>())
+		:DBusSink("WheelBrake", re, connection, map<string, string>())
 	{
 		/** @attributeName Engaged
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Wheel Brake status: Engaged = true, disengaged = false
 		 **/
-		wantProperty<bool>(VehicleProperty::WheelBrake, "Engaged", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WheelBrake, "Engaged", "b", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -242,63 +242,63 @@ class LightStatusProperty: public DBusSink
 {
 public:
 	LightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.LightStatus","/org/automotive/runningstatus/LightStatus", re, connection, map<string, string>())
+		:DBusSink("LightStatus", re, connection, map<string, string>())
 	{
 		/** @attributeName Head
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return headlight status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightHead, "Head", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightHead, "Head", "b", AbstractProperty::Read);
 
 		/** @attributeName RightTurn
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return right turn signal status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightRightTurn, "RightTurn", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightRightTurn, "RightTurn", "b", AbstractProperty::Read);
 
 		/** @attributeName LeftTurn
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return left turn signal status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightLeftTurn, "LeftTurn", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightLeftTurn, "LeftTurn", "b", AbstractProperty::Read);
 
 		/** @attributeName Brake
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return  brake signal light status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightBrake, "Brake", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightBrake, "Brake", "b", AbstractProperty::Read);
 
 		/** @attributeName Fog
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return fog light status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightFog, "Fog", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightFog, "Fog", "b", AbstractProperty::Read);
 
 		/** @attributeName Hazard
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return hazard light status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightHazard, "Hazard", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightHazard, "Hazard", "b", AbstractProperty::Read);
 
 		/** @attributeName Parking
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return parking light status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightParking, "Parking", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightParking, "Parking", "b", AbstractProperty::Read);
 
 		/** @attributeName HighBeam
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return high beam status: on = true, off = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::LightHighBeam, "HighBeam", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LightHighBeam, "HighBeam", "b", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -308,28 +308,28 @@ class InteriorLightStatusProperty: public DBusSink
 {
 public:
 	InteriorLightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.InteriorLightStatus","/org/automotive/runningstatus/InteriorLightStatus", re, connection, map<string, string>())
+		:DBusSink("InteriorLightStatus", re, connection, map<string, string>())
 	{
 		/** @attributeName Passenger
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return passenger interior light status: on = true, off = false
 		 **/
-		wantProperty<bool>(VehicleProperty::InteriorLightPassenger, "Passenger", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::InteriorLightPassenger, "Passenger", "b", AbstractProperty::Read);
 
 		/** @attributeName Driver
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return driver interior light status: on = true, off = false
 		 **/
-		wantProperty<bool>(VehicleProperty::InteriorLightPassenger, "Driver", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::InteriorLightPassenger, "Driver", "b", AbstractProperty::Read);
 
 		/** @attributeName Center
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return center interior light status: on = true, off = false
 		 **/
-		wantProperty<bool>(VehicleProperty::InteriorLightCenter, "Center", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::InteriorLightCenter, "Center", "b", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -339,14 +339,14 @@ class HornProperty: public DBusSink
 {
 public:
 	HornProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.Horn","/org/automotive/runningstatus/Horn", re, connection, map<string, string>())
+		:DBusSink("Horn", re, connection, map<string, string>())
 	{
 		/** @attributeName On
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return horn status: on = true, off = false
 		 **/
-		wantProperty<bool>(VehicleProperty::Horn,"On","b",AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Horn,"On","b",AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -356,41 +356,41 @@ class FuelProperty: public DBusSink
 {
 public:
 	FuelProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("org.automotive.Fuel", "/org/automotive/runningstatus/Fuel", re, connection, map<string, string>())
+		:DBusSink("Fuel", re, connection, map<string, string>())
 	{
 		/** @attributeName Level
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return fuel level as a percentage of fullness.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FuelLevel,"Level", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelLevel,"Level", "y", AbstractProperty::Read);
 
 		/** @attributeName Range
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return estimated fuel range in kilometers.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FuelRange,"Range", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelRange,"Range", "q", AbstractProperty::Read);
 
 		/** @attributeName InstantConsumption
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return instant fuel consumption in milliliters of fuel per second.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FuelConsumption,"InstantConsumption", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelConsumption,"InstantConsumption", "q", AbstractProperty::Read);
 
 		/** @attributeName InstantEconomy
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return instant fuel 'economy' in kilometers per liter of fuel.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FuelEconomy,"InstantEconomy", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelEconomy,"InstantEconomy", "q", AbstractProperty::Read);
 
 		/** @attributeName AverageEconomy
 		 *  @type unsigned short
 		 *  @attributeComment \brief  Must return average fuel 'economy' in kilometers per liter of fuel since last reset.  Setting this to any value should reset the counter to '0'
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FuelAverageEconomy,"AverageEconomy", "q", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FuelAverageEconomy,"AverageEconomy", "q", AbstractProperty::ReadWrite);
 		supportedChanged(re->supported());
 	}
 };
@@ -400,28 +400,28 @@ class EngineOilProperty: public DBusSink
 {
 public:
 	EngineOilProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-			:DBusSink("org.automotive.EngineOil", "/org/automotive/runningstatus/EngineOil", re, connection, map<string, string>())
+			:DBusSink("EngineOil", re, connection, map<string, string>())
 	{
 		/** @attributeName Remaining
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return remaining engine oil as percentage of fullness.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::EngineOilRemaining, "Remaining", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineOilRemaining, "Remaining", "q", AbstractProperty::Read);
 
 		/** @attributeName Temperature
 		 *  @type long
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Engine Oil Temperature in Celcius.
 		 **/
-		wantProperty<int>(VehicleProperty::EngineOilTemperature, "Temperature", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineOilTemperature, "Temperature", "i", AbstractProperty::Read);
 
 		/** @attributeName Pressure
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Engine Oil Pressure in kPa.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::EngineOilPressure, "Pressure", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineOilPressure, "Pressure", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -431,7 +431,7 @@ class LocationProperty: public DBusSink
 {
 public:
 	LocationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-			:DBusSink("org.automotive.Location", "/org/automotive/runningstatus/Location", re, connection, map<string, string>())
+			:DBusSink("Location", re, connection, map<string, string>())
 	{
 		/** @attributeName Latitude
 		 *  @type double

@@ -8,6 +8,12 @@ class PropertyInfo
 {
 public:
 
+
+	/** PropertyInfo
+	 *
+	 **/
+	PropertyInfo(): mUpdateFrequency(0), mIsValid(false) {}
+
 	/** PropertyInfo
 	 * @arg updateFrequency
 	 * @arg zonesList
@@ -55,12 +61,6 @@ public:
 	{
 		return PropertyInfo();
 	}
-
-protected:
-	/** PropertyInfo
-	 *
-	 **/
-	PropertyInfo(): mUpdateFrequency(0), mIsValid(false) {}
 
 private:
 

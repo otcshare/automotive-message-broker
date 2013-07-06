@@ -37,6 +37,7 @@ class AbstractDBusInterface
 public:
 	AbstractDBusInterface(string interfaceName, string objectPath, GDBusConnection* connection);
 
+	virtual ~AbstractDBusInterface();
 	
 	void setDBusConnection(GDBusConnection* connection)
 	{
@@ -57,6 +58,13 @@ public:
 
 	std::string objectPath() { return mObjectPath; }
 
+	void setObjectPath(std::string op)
+	{
+		mObjectPath = op;
+	}
+
+	std::string propertyName() { return mPropertyName; }
+
 protected:
 
 	void startRegistration();
@@ -76,6 +84,7 @@ protected:
 private:
 	string mInterfaceName;
 	string mObjectPath;
+	string mPropertyName;
 	string introspectionXml;
 	GDBusConnection * mConnection;
 	static unordered_map<string, AbstractDBusInterface*> interfaceMap;

@@ -3,19 +3,23 @@
 #include "debugout.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, signature, access, interface),routingEngine(re)
+	:AbstractProperty(propertyName, signature, access, interface), routingEngine(re)
 {
 	//set default value:
 	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName));
+}
 
+void VariantType::initialize()
+{
 	AsyncPropertyRequest request;
 	request.property = mPropertyName;
+	request.sourceUuidFilter = mSourceFilter;
+	request.zoneFilter = mZoneFilter;
 
 	using namespace std::placeholders;
 	request.completed = std::bind(&VariantType::asyncReply, this, _1);
 
-	re->getPropertyAsync(request);
-
+	routingEngine->getPropertyAsync(request);
 }
 
 GVariant *VariantType::toGVariant()

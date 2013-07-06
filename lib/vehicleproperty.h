@@ -156,13 +156,6 @@ enum Status
 }
 
 namespace Airbag {
-enum Location
-{
-	Driver = 0,
-	Passenger,
-	LeftSide,
-	RightSide
-};
 
 enum Status
 {
@@ -681,8 +674,7 @@ public:
 	//typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
 
 	static const Property AirbagStatus;
-	PROPERTYTYPENOVAL(AirbagStatus, AirbagStatusType, MapPropertyType<BasicPropertyType<Airbag::Location> BOOST_PP_COMMA() BasicPropertyType<Airbag::Status> >)
-	//typedef MapPropertyType<BasicPropertyType<Airbag::Location>, BasicPropertyType<Airbag::Status> > AirbagStatusType;
+	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
 
 	static const Property DoorStatus;
 	PROPERTYTYPENOVAL(DoorStatus, DoorStatusType,

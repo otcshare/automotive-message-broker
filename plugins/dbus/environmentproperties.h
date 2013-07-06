@@ -10,7 +10,7 @@ class ExteriorBrightnessProperty: public DBusSink
 {
 public:
 	ExteriorBrightnessProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.ExteriorBrightness","/org/automotive/environment/ExteriorBrightness", re, connection, map<string, string>())
+		:DBusSink("ExteriorBrightness", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName ExteriorBrightness
@@ -18,7 +18,7 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return the brightness outside the vehicle in lux.
 		 */
-		wantProperty<uint16_t>(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -28,7 +28,7 @@ class Temperature: public DBusSink
 {
 public:
 	Temperature(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.InteriorTemperature","/org/automotive/environment/InteriorTemperature", re, connection, map<string, string>())
+		:DBusSink("InteriorTemperature", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName Interior
@@ -36,7 +36,7 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return the temperature of the interior of the vehicle in celcius.
 		 */
-		wantProperty<int>(VehicleProperty::InteriorTemperature, "Interior", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::InteriorTemperature, "Interior", "i", AbstractProperty::Read);
 
 		/**
 		 * @attributeName Exterior
@@ -44,7 +44,7 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return the temperature of the exterior of the vehicle in celcius.
 		 */
-		wantProperty<int>(VehicleProperty::ExteriorTemperature, "Exterior", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "Exterior", "i", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}
@@ -55,7 +55,7 @@ class RainSensor: public DBusSink
 {
 public:
 	RainSensor(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.InteriorTemperature","/org/automotive/environment/InteriorTemperature", re, connection, map<string, string>())
+		:DBusSink("InteriorTemperature", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName RainSensor
@@ -63,7 +63,7 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return level of rain intensity 0: No Rain - 10: Heaviest Rain.
 		 */
-		wantProperty<uint16_t>(VehicleProperty::RainSensor, "RainSensor", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::RainSensor, "RainSensor", "q", AbstractProperty::Read);
 		supportedChanged(re->supported());
 	}
 };
@@ -73,7 +73,7 @@ class WindshieldWiper: public DBusSink
 {
 public:
 	WindshieldWiper(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.WindshieldWiper","/org/automotive/environment/WindshieldWiper", re, connection, map<string, string>())
+		:DBusSink("WindshieldWiper", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short WIPERSPEED_OFF = 0;
@@ -98,7 +98,7 @@ class HVACProperty: public DBusSink
 {
 public:
 	HVACProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.HVAC","/org/automotive/environment/HVAC", re, connection, map<string, string>())
+		:DBusSink("HVAC", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short AIRFLOWDIRECTION_FRONTPANEL = 0;
@@ -205,7 +205,7 @@ class WindowStatusProperty: public DBusSink
 {
 public:
 	WindowStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.WindowStatus","/org/automotive/environment/WindowStatus", re, connection, map<string, string>())
+		:DBusSink("WindowStatus", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short WINDOWLOCATION_DRIVER= 0;
@@ -231,7 +231,7 @@ class Sunroof: public DBusSink
 {
 public:
 	Sunroof(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.Sunroof","/org/automotive/environment/Sunroof", re, connection, map<string, string>())
+		:DBusSink("Sunroof", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName Openness
@@ -257,7 +257,7 @@ class ConvertibleRoof: public DBusSink
 {
 public:
 	ConvertibleRoof(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.ConvertibleRoof","/org/automotive/environment/ConvertibleRoof", re, connection, map<string, string>())
+		:DBusSink("ConvertibleRoof", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName Openness

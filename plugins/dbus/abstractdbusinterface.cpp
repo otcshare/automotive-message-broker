@@ -44,12 +44,33 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 }
 
-AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string op,
+AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string propertyName,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection)
+	: mInterfaceName(interfaceName), mPropertyName(propertyName), mConnection(connection)
 {
 	interfaceMap[interfaceName] = this;
 	startRegistration();
+
+	mObjectPath = "/" + propertyName;
+}
+
+AbstractDBusInterface::~AbstractDBusInterface()
+{
+	unregisterObject();
+
+	list<std::string> impl = implementedProperties();
+
+	for(auto itr = impl.begin(); itr != impl.end(); itr++)
+	{
+		if(properties.find(*itr) != properties.end())
+		{
+			delete properties[*itr];
+			properties.erase(*itr);
+		}
+	}
+
+	interfaceMap.erase(mInterfaceName);
+
 }
 
 void AbstractDBusInterface::addProperty(AbstractProperty* property)
@@ -125,9 +146,11 @@ void AbstractDBusInterface::registerObject()
 
 	const GDBusInterfaceVTable vtable = { handleMethodCall, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 
-	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error);
+	GError* error2=NULL;
+
+	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error2);
 	
-	if(error) throw -1;
+	if(error2) throw -1;
 	
 	g_assert(regId > 0);
 }

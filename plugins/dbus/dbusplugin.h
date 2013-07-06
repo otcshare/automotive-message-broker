@@ -28,28 +28,50 @@
 #include <map>
 #include <type_traits>
 
-typedef std::map<VehicleProperty::Property, AbstractProperty*> PropertyDBusMap;
+typedef std::map<VehicleProperty::Property, VariantType*> PropertyDBusMap;
 
 class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
 
 public:
-	DBusSink(std::string interface, std::string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
+	DBusSink(std::string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
+	virtual ~DBusSink() { }
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid);
 	virtual std::string uuid();
+
+	std::list<VehicleProperty::Property> wantsProperties()
+	{
+		std::list<VehicleProperty::Property> l;
+		for(auto itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
+		{
+			l.push_back((*itr).first);
+		}
+
+		return l;
+	}
+
+	void setSourceFilter(std::string sourceFilter)
+	{
+		mSourceFilter = sourceFilter;
+	}
+
+	void setZoneFilter(Zone::Type zone)
+	{
+		zoneFilter = zone;
+	}
 
 protected:
 	template <typename T>
 	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new BasicProperty<T>(routingEngine, property, propertyName, signature, access, this);
+		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
 	}
 
 
 	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new StringDBusProperty(routingEngine, property, propertyName, signature, access, this);
+		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
 	}
 
 	void wantPropertyVariant(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
@@ -62,6 +84,8 @@ protected:
 private:
 
 	bool supported;
+	std::string mSourceFilter;
+	Zone::Type zoneFilter;
 };
 
 class DBusSinkManager: public AbstractSinkManager

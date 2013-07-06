@@ -127,8 +127,6 @@ int main(int argc, char **argv)
 		DebugOut::setOutput(logfile);
 	}
 
-	g_type_init();
-
 	VehicleProperty::factory();
 	
 	Core routingEngine;

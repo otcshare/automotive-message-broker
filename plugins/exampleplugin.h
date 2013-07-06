@@ -45,13 +45,21 @@ public:
 	
 	void randomizeProperties();
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property ) {
-		/// TODO FIXME don't just return an invalid property info
+	PropertyInfo getPropertyInfo(VehicleProperty::Property property)
+	{
+		if(propertyInfoMap.find(property) != propertyInfoMap.end())
+			return propertyInfoMap[property];
+
 		return PropertyInfo::invalid();
 	}
 	
 private:
+
+	void addPropertySupport(VehicleProperty::Property property, Zone::Type zone);
+
+	std::map<VehicleProperty::Property, PropertyInfo> propertyInfoMap;
 	PropertyList mRequests;
+	PropertyList mSupported;
 	uint16_t velocity;
 	uint16_t engineSpeed;
 };

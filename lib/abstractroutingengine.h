@@ -53,7 +53,8 @@ public:
 	{
 		this->property = request.property;
 		this->completed = request.completed;
-		this->sourceUuid = request.sourceUuid;
+		this->sourceUuidFilter = request.sourceUuidFilter;
+		this->zoneFilter = request.zoneFilter;
 		this->timeout = request.timeout;
 	}
 
@@ -61,14 +62,16 @@ public:
 	{
 		this->property = other.property;
 		this->completed = other.completed;
-		this->sourceUuid = other.sourceUuid;
+		this->sourceUuidFilter = other.sourceUuidFilter;
+		this->zoneFilter = other.zoneFilter;
 		this->timeout = other.timeout;
 
 		return *this;
 	}
 
 	VehicleProperty::Property property;
-	std::string sourceUuid;
+	std::string sourceUuidFilter;
+	Zone::Type zoneFilter;
 	GetPropertyCompletedSignal completed;
 	uint timeout;
 };
@@ -107,10 +110,11 @@ public:
 	}
 
 	enum Error {
-		NoError,
+		NoError = 0,
 		Timeout,
 		InvalidOperation,
-		PermissionDenied
+		PermissionDenied,
+		ZoneNotSupported
 	};
 
 	/**

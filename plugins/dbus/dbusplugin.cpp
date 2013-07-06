@@ -28,9 +28,9 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DBusSinkManager(routingengine, config);
 }
 
-DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
-	:AbstractDBusInterface(interface, path, connection),
-	  AbstractSink(engine, config), supported(false)
+DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
+	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
+	  AbstractSink(engine, config), supported(false), zoneFilter(Zone::None)
 {
 
 }
@@ -43,8 +43,12 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 	{
 		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr).first))
 		{
-			routingEngine->subscribeToProperty((*itr).first, this);
-			addProperty((*itr).second);
+			VariantType* prop = (*itr).second;
+			prop->setSourceFilter(mSourceFilter);
+			prop->setZoneFilter(zoneFilter);
+			prop->initialize();
+			routingEngine->subscribeToProperty((*itr).first, mSourceFilter, this);
+			addProperty(prop);
 			supported = true;
 		}
 	}
@@ -52,11 +56,13 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 
 	if(supported)
 		registerObject();
+	else
+		unregisterObject();
 }
 
 void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
 {
-	if(!propertyDBusMap.count(property))
+	if(!propertyDBusMap.count(property) || value->zone != zoneFilter)
 		return;
 
 	AbstractProperty* prop = propertyDBusMap[property];
