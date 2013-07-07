@@ -75,10 +75,6 @@ public:
 	{
 
 		/**
-		 * @enum const unsigned short AIRBAGLOCATION_DRIVER = 0;
-		 * @enum const unsigned short AIRBAGLOCATION_PASSENGER= 1;
-		 * @enum const unsigned short AIRBAGLOCATION_LEFTSIDE = 2;
-		 * @enum const unsigned short AIRBAGLOCATION_RIGHTSIDE = 3;
 		 * @enum const unsigned short AIRBAGSTATUS_INACTIVE = 0;
 		 * @enum const unsigned short AIRBAGSTATUS_ACTIVE = 1;
 		 * @enum const unsigned short AIRBAGSTATUS_DEPLOYED = 2;
@@ -87,12 +83,12 @@ public:
 		/** @attributeName AirbagStatus
 		 *  @type object
 		 *  @access readonly
-		 *  @attributeComment \brief MUST returns a dictionary of Airbag (byte) and Status (byte) (see AIRBAGLOCATION_* and AIRBAGSTATUS_*)
+		 *  @attributeComment \brief MUST returns airbag status (byte) (see AIRBAGSTATUS_*)
 		 **/
-		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", "a{yy}", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", "y", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		//supportedChanged(re->supported());
 	}
 };
 

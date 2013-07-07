@@ -3,7 +3,7 @@
 #include "debugout.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, signature, access, interface), routingEngine(re)
+	:AbstractProperty(propertyName, signature, access, interface), routingEngine(re), mInitialized(false)
 {
 	//set default value:
 	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName));
@@ -11,13 +11,25 @@ VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::
 
 void VariantType::initialize()
 {
+	if(mInitialized) return;
+
 	AsyncPropertyRequest request;
 	request.property = mPropertyName;
 	request.sourceUuidFilter = mSourceFilter;
 	request.zoneFilter = mZoneFilter;
 
 	using namespace std::placeholders;
-	request.completed = std::bind(&VariantType::asyncReply, this, _1);
+	request.completed = [this](AsyncPropertyReply* reply)
+	{
+		if(reply->success)
+			setValue(reply->value);
+		else
+			DebugOut(DebugOut::Error)<<"get request unsuccessful for "<<reply->property<<" : "<<reply->error<<endl;
+
+		mInitialized = true;
+
+		delete reply;
+	};
 
 	routingEngine->getPropertyAsync(request);
 }
@@ -51,7 +63,7 @@ void VariantType::fromGVariant(GVariant *val)
 		/// TODO: throw dbus exception
 		if(!reply->success)
 		{
-			DebugOut(0)<<"Success fail";
+			DebugOut(DebugOut::Error)<<"setProperty fail: "<<reply->error<<endl;
 		}
 		delete reply;
 	};
@@ -59,10 +71,3 @@ void VariantType::fromGVariant(GVariant *val)
 	routingEngine->setProperty(request);
 }
 
-void VariantType::asyncReply(AsyncPropertyReply * reply)
-{
-	if(reply->success)
-		setValue(reply->value);
-
-	delete reply;
-}

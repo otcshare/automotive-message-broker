@@ -60,7 +60,11 @@ public:
 
 	void setObjectPath(std::string op)
 	{
+		if(interfaceMap.find(op) != interfaceMap.end())
+			interfaceMap.erase(op);
+
 		mObjectPath = op;
+		interfaceMap[mObjectPath] = this;
 	}
 
 	std::string propertyName() { return mPropertyName; }

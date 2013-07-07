@@ -64,6 +64,21 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 	addPropertySupport(VehicleProperty::DoorsPerRow, Zone::None);
 	addPropertySupport(VehicleProperty::AirbagStatus, Zone::FrontLeft);
 
+	Zone::ZoneList airbagZones;
+	airbagZones.push_back(Zone::FrontLeft);
+	airbagZones.push_back(Zone::FrontRight);
+	airbagZones.push_back(Zone::RearLeft);
+	airbagZones.push_back(Zone::RearRight);
+
+	airbagStatus[Zone::FrontLeft] = Airbag::Active;
+	airbagStatus[Zone::FrontRight] = Airbag::Inactive;
+	airbagStatus[Zone::RearLeft] = Airbag::Deployed;
+	airbagStatus[Zone::RearRight] = Airbag::Deployed;
+
+	PropertyInfo airbagInfo(0,airbagZones);
+
+	propertyInfoMap[VehicleProperty::AirbagStatus] = airbagInfo;
+
 	re->setSupported(supported(), this);
 }
 
@@ -168,20 +183,24 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	}
 	else if(reply->property == VehicleProperty::AirbagStatus)
 	{
-
-		if(reply->zoneFilter != Zone::None && reply->zoneFilter != Zone::FrontLeft)
+		if(airbagStatus.find(reply->zoneFilter) == airbagStatus.end())
 		{
 			reply->success = false;
 			reply->error = AsyncPropertyReply::ZoneNotSupported;
 			reply->completed(reply);
 		}
 
-		VehicleProperty::AirbagStatusType temp(Airbag::Active);
-		temp.zone = Zone::FrontLeft;
+		else
+		{
 
-		reply->value = &temp;
-		reply->success = true;
-		reply->completed(reply);
+			VehicleProperty::AirbagStatusType temp;
+			temp.setValue(airbagStatus[reply->zoneFilter]);
+			temp.zone = reply->zoneFilter;
+
+			reply->value = &temp;
+			reply->success = true;
+			reply->completed(reply);
+		}
 	}
 	else if(reply->property == VehicleProperty::MachineGunTurretStatus)
 	{

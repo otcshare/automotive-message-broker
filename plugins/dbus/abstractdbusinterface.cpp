@@ -48,7 +48,6 @@ AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string proper
 											 GDBusConnection* connection)
 	: mInterfaceName(interfaceName), mPropertyName(propertyName), mConnection(connection)
 {
-	interfaceMap[interfaceName] = this;
 	startRegistration();
 
 	mObjectPath = "/" + propertyName;
@@ -222,9 +221,9 @@ void AbstractDBusInterface::startRegistration()
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
-	if(interfaceMap.count(interfaceName))
+	if(interfaceMap.count(objectPath))
 	{
-		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
+		GVariant* value = interfaceMap[objectPath]->getProperty(propertyName);
 		return value;
 
 	}
@@ -234,9 +233,9 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 
 gboolean AbstractDBusInterface::setProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GVariant* value, GError** error, gpointer userData)
 {
-	if(interfaceMap.count(interfaceName))
+	if(interfaceMap.count(objectPath))
 	{
-		interfaceMap[interfaceName]->setProperty(propertyName, value);
+		interfaceMap[objectPath]->setProperty(propertyName, value);
 		return true;
 	}
 

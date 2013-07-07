@@ -84,7 +84,6 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 
 	std::list<VehicleProperty::Property> implementedProperties = t->wantsProperties();
 
-
 	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
 
 	delete t;

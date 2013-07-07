@@ -62,7 +62,7 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 
 void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
 {
-	if(!propertyDBusMap.count(property) || value->zone != zoneFilter)
+	if(propertyDBusMap.find(property) == propertyDBusMap.end() || value->zone != zoneFilter)
 		return;
 
 	AbstractProperty* prop = propertyDBusMap[property];

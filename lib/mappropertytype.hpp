@@ -24,6 +24,11 @@ public:
 		MapPropertyType<T,N> *t = new MapPropertyType<T,N>(name);
 
 		t->setMap(mMap);
+		t->timestamp = timestamp;
+		t->sequence = sequence;
+		t->sourceUuid = sourceUuid;
+		t->name = name;
+		t->zone = zone;
 
 		return t;
 	}

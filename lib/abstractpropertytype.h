@@ -38,20 +38,22 @@ namespace Zone {
 
 enum Type {
 	None = 0,
-	FrontRight = 1,
+	FrontLeft = 1,
 	FrontMiddle = 1 << 1,
-	FrontLeft = 1 << 2,
-	LeftRear = 1 << 3,
-	MiddleRear = 1 << 4,
-	RightRear = 1 << 5
+	FrontRight = 1 << 2,
+	RearLeft = 1 << 3,
+	RearMiddle = 1 << 4,
+	RearRight = 1 << 5
 };
+
+typedef std::list<Zone::Type> ZoneList;
 
 }
 
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
+	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None) {}
 
 	virtual ~AbstractPropertyType() { }
 
@@ -88,8 +90,6 @@ public:
 	std::string sourceUuid;
 
 	Zone::Type zone;
-
-	int index;
 
 	void setValue(boost::any val)
 	{
@@ -279,8 +279,9 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
+
 	}
 
 	BasicPropertyType & operator = (BasicPropertyType const & other)
@@ -289,8 +290,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 
 		return *this;
 	}
@@ -447,8 +448,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 	}
 
 	StringPropertyType & operator = (StringPropertyType const & other)
@@ -457,8 +458,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 
 		return *this;
 	}
@@ -521,8 +522,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 	}
 
 	~ListPropertyType()

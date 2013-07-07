@@ -58,6 +58,7 @@ private:
 	void addPropertySupport(VehicleProperty::Property property, Zone::Type zone);
 
 	std::map<VehicleProperty::Property, PropertyInfo> propertyInfoMap;
+	std::map<Zone::Type, Airbag::Status> airbagStatus;
 	PropertyList mRequests;
 	PropertyList mSupported;
 	uint16_t velocity;
