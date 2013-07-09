@@ -1,12 +1,17 @@
 #include "automotivemanager.h"
 #include "abstractdbusinterface.h"
 
+#include "dbusplugin.h"
+
 static const gchar introspection_xml[] =
   "<node>"
   "  <interface name='org.automotive.Manager'>"
   "    <method name='findProperty'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='o' name='response' direction='out'/>"
+  "    </method>"
+  "    <method name='getAMBPropertyNameMap'>"
+  "      <arg type='a{ss}' name='ambPropertyName' direction='out'/>"
   "    </method>"
   "  </interface>"
   "</node>";
@@ -46,6 +51,37 @@ static void handleMethodCall(GDBusConnection       *connection,
 		}
 
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)",interface->objectPath().c_str()));
+	}
+
+	else if(method == "getAMBPropertyNameMap")
+	{
+		std::unordered_map<std::string,std::string> mMap = DBusSink::DBusPropertyToAMBPropertyMap;
+
+		GVariantBuilder params;
+		g_variant_builder_init(&params, G_VARIANT_TYPE_DICTIONARY);
+		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
+		{
+			std::string key = (*itr).first;
+			std::string value = (*itr).second;
+
+			g_variant_builder_add(&params,"{ss}", key.c_str(), value.c_str());
+		}
+
+		GVariant* var =  g_variant_builder_end(&params);
+
+		if(!var)
+		{
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.UnknownError", "Error building dict");
+		}
+
+		GVariantBuilder tuplebuilder;
+		g_variant_builder_init(&tuplebuilder, G_VARIANT_TYPE_TUPLE);
+
+		g_variant_builder_add_value(&tuplebuilder, var);
+
+		GVariant * retval = g_variant_builder_end(&tuplebuilder);
+
+		g_dbus_method_invocation_return_value(invocation, retval);
 	}
 
 }

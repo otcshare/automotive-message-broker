@@ -28,6 +28,8 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DBusSinkManager(routingengine, config);
 }
 
+std::unordered_map<std::string, std::string> DBusSink::DBusPropertyToAMBPropertyMap;
+
 DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
 	:AbstractDBusInterface(interface, path, connection),
 	  AbstractSink(engine, config), supported(false)
