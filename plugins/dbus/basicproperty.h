@@ -116,8 +116,7 @@ public:
 
 	void asyncReply(AsyncPropertyReply* reply)
 	{
-		if(reply->success)
-			AbstractProperty::setValue(reply->value);
+		AbstractProperty::setValue(reply->value);
 
 		delete reply;
 	}
