@@ -39,27 +39,22 @@ public:
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid);
 	virtual std::string uuid();
 
-	static std::unordered_map<std::string, std::string> DBusPropertyToAMBPropertyMap;
-
 protected:
 	template <typename T>
 	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		propertyDBusMap[property] = new BasicProperty<T>(routingEngine, property, propertyName, signature, access, this);
-		DBusSink::DBusPropertyToAMBPropertyMap[propertyName] = property;
 	}
 
 
 	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		propertyDBusMap[property] = new StringDBusProperty(routingEngine, property, propertyName, signature, access, this);
-		DBusSink::DBusPropertyToAMBPropertyMap[propertyName] = property;
 	}
 
 	void wantPropertyVariant(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
-		DBusSink::DBusPropertyToAMBPropertyMap[propertyName] = property;
 	}
 
 	PropertyDBusMap propertyDBusMap;
@@ -67,7 +62,6 @@ protected:
 private:
 
 	bool supported;
-
 };
 
 class DBusSinkManager: public AbstractSinkManager
