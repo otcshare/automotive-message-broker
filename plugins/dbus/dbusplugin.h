@@ -61,27 +61,22 @@ public:
 		zoneFilter = zone;
 	}
 
-	static std::unordered_map<std::string, std::string> DBusPropertyToAMBPropertyMap;
-
 protected:
 	template <typename T>
 	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
-		DBusSink::DBusPropertyToAMBPropertyMap[propertyName] = property;
 	}
 
 
 	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
-		DBusSink::DBusPropertyToAMBPropertyMap[propertyName] = property;
 	}
 
 	void wantPropertyVariant(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
-		DBusSink::DBusPropertyToAMBPropertyMap[propertyName] = property;
 	}
 
 	PropertyDBusMap propertyDBusMap;
@@ -91,7 +86,6 @@ private:
 	bool supported;
 	std::string mSourceFilter;
 	Zone::Type zoneFilter;
-
 };
 
 class DBusSinkManager: public AbstractSinkManager

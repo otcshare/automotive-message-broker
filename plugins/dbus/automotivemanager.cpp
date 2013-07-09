@@ -1,18 +1,12 @@
 #include "automotivemanager.h"
 #include "abstractdbusinterface.h"
 
-#include "dbusplugin.h"
-
 static const gchar introspection_xml[] =
   "<node>"
   "  <interface name='org.automotive.Manager'>"
   "    <method name='findProperty'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='o' name='response' direction='out'/>"
-  "    </method>"
-  "    <method name='getAMBPropertyNameforDBusPropertyName'>"
-  "      <arg type='s' name='dBusPropertyName' direction='in'/>"
-  "      <arg type='s' name='ambPropertyName' direction='out'/>"
   "    </method>"
   "  </interface>"
   "</node>";
@@ -52,31 +46,6 @@ static void handleMethodCall(GDBusConnection       *connection,
 		}
 
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)",interface->objectPath().c_str()));
-	}
-
-	else if(method == "getAMBPropertyNameforDBusPropertyName")
-	{
-		gchar* arg;
-
-		g_variant_get(parameters,"(s)",&arg);
-
-		std::string propertyToFind = arg;
-
-		if(propertyToFind == "")
-		{
-			g_dbus_method_invocation_return_error(invocation, G_DBUS_ERROR,G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
-			return;
-		}
-
-		if(DBusSink::DBusPropertyToAMBPropertyMap.find(propertyToFind) == DBusSink::DBusPropertyToAMBPropertyMap.end())
-		{
-			g_dbus_method_invocation_return_dbus_error(invocation, "org.automotive.Manager.PropertyNotFound", "Property not found");
-			return;
-		}
-
-		std::string ambProperty = DBusSink::DBusPropertyToAMBPropertyMap[propertyToFind];
-
-		g_dbus_method_invocation_return_value(invocation, g_variant_new("(s)", ambProperty.c_str()));
 	}
 
 }
