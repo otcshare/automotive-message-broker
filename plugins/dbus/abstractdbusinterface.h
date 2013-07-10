@@ -26,16 +26,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <gio/gio.h>
 #include <boost/any.hpp>
 #include <nullptr.h>
+#include "abstractpropertytype.h"
 
 class AbstractProperty;
-
-using namespace std;
 
 class AbstractDBusInterface
 {
 
 public:
-	AbstractDBusInterface(string interfaceName, string objectPath, GDBusConnection* connection);
+	AbstractDBusInterface(std::string interfaceName, std::string objectPath, GDBusConnection* connection);
 
 	virtual ~AbstractDBusInterface();
 	
@@ -50,9 +49,9 @@ public:
 	void addProperty(AbstractProperty* property);
 	virtual void updateValue(AbstractProperty* property);
 	
-	static list<string> implementedProperties() { return mimplementedProperties; }
+	static std::list<std::string> implementedProperties() { return mimplementedProperties; }
 
-	static AbstractDBusInterface* getInterfaceForProperty(std::string property);
+	static std::list<AbstractDBusInterface *> getObjectsForProperty(std::string property, Zone::Type zone = Zone::None);
 
 	bool implementsProperty(std::string property);
 
@@ -69,6 +68,8 @@ public:
 
 	std::string propertyName() { return mPropertyName; }
 
+	Zone::Type zone() { return zoneFilter; }
+
 protected:
 
 	void startRegistration();
@@ -80,19 +81,21 @@ protected:
 								const gchar *interfaceName, const gchar * propertyName, GVariant *value,
 								GError** error, gpointer userData);
     
-	virtual void setProperty(string propertyName, GVariant * value);
-	virtual GVariant * getProperty(string propertyName);
+	virtual void setProperty(std::string propertyName, GVariant * value);
+	virtual GVariant * getProperty(std::string propertyName);
 	
-	unordered_map<string, AbstractProperty*> properties;
+	std::unordered_map<std::string, AbstractProperty*> properties;
+
+	Zone::Type zoneFilter;
 
 private:
-	string mInterfaceName;
-	string mObjectPath;
-	string mPropertyName;
-	string introspectionXml;
+	std::string mInterfaceName;
+	std::string mObjectPath;
+	std::string mPropertyName;
+	std::string introspectionXml;
 	GDBusConnection * mConnection;
-	static unordered_map<string, AbstractDBusInterface*> interfaceMap;
-	static list<string> mimplementedProperties;
+	static std::unordered_map<std::string, AbstractDBusInterface*> interfaceMap;
+	static std::list<std::string> mimplementedProperties;
 	guint regId;
 };
 

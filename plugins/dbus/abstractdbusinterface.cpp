@@ -46,7 +46,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string propertyName,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mPropertyName(propertyName), mConnection(connection)
+	: mInterfaceName(interfaceName), mPropertyName(propertyName), mConnection(connection), zoneFilter(Zone::None)
 {
 	startRegistration();
 
@@ -88,11 +88,13 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	else throw -1; //FIXME: don't throw
 
 	///see which properties are supported:
-	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
-			"<method name='get" + property->name() + "Extended'>"
+	introspectionXml +=
+			"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
+			"<method name='get" + property->name() + "'>"
 			"	<arg type='v' direction='out' name='value' />"
 			"	<arg type='d' direction='out' name='timestamp' />"
 			"	<arg type='d' direction='out' name='sequence' />"
+			"   <arg type='i' direction='out' name='updateFrequency' />"
 			"</method>"
 			"<signal name='" + property->name() + "Changed' >"
 			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
@@ -182,21 +184,25 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 	if(error)
 	{
-		DebugOut(0)<<error->message<<endl;
-		//throw -1;
+		DebugOut(DebugOut::Error)<<error->message<<endl;
+		g_error_free(error);
 	}
+
+
 }
 
-AbstractDBusInterface *AbstractDBusInterface::getInterfaceForProperty(string property)
+std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string property, Zone::Type zone)
 {
+
+	std::list<AbstractDBusInterface *> l;
 	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
 	{
 		auto interface = (*itr).second;
-		if(interface->implementsProperty(property))
-			return interface;
+		if(interface->zone() == zone && interface->implementsProperty(property))
+			l.push_back(interface);
 	}
 
-	return NULL;
+	return l;
 }
 
 bool AbstractDBusInterface::implementsProperty(string property)
@@ -216,7 +222,9 @@ void AbstractDBusInterface::startRegistration()
 {
 	unregisterObject();
 	introspectionXml ="<node>" ;
-	introspectionXml += "<interface name='"+ mInterfaceName + "' >";
+	introspectionXml +=
+			"<interface name='"+ mInterfaceName + "' >"
+			"<property type='i' name='Zone' access='r' />";
 }
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
@@ -227,6 +235,14 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 		return value;
 
 	}
+	else if(propertyName == "Zone")
+	{
+		Zone::Type zone = interfaceMap[objectPath]->zone();
+
+		GVariant* value = g_variant_new("(i)",(int)zone);
+		return value;
+	}
+
 	debugOut("No interface for" + string(interfaceName));
 	return nullptr;
 }

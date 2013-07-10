@@ -85,7 +85,7 @@ private:
 
 	bool supported;
 	std::string mSourceFilter;
-	Zone::Type zoneFilter;
+
 };
 
 class DBusSinkManager: public AbstractSinkManager

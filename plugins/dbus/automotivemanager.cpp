@@ -6,7 +6,7 @@ static const gchar introspection_xml[] =
   "  <interface name='org.automotive.Manager'>"
   "    <method name='findProperty'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
-  "      <arg type='o' name='response' direction='out'/>"
+  "      <arg type='ao' name='response' direction='out'/>"
   "    </method>"
   "  </interface>"
   "</node>";
@@ -37,15 +37,29 @@ static void handleMethodCall(GDBusConnection       *connection,
 			return;
 		}
 
-		AbstractDBusInterface* interface = AbstractDBusInterface::getInterfaceForProperty(propertyToFind);
+		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(propertyToFind);
 
-		if(!interface)
+		if(!interfaces.size())
 		{
 			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Property not found");
 			return;
 		}
 
-		g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)",interface->objectPath().c_str()));
+		GVariantBuilder params;
+		g_variant_builder_init(&params, ((const GVariantType *) "ao"));
+
+		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
+		{
+			AbstractDBusInterface* t = *itr;
+			GVariant *newvar = g_variant_new("o",t->objectPath().c_str());
+			g_variant_builder_add_value(&params, newvar);
+
+		}
+
+		GVariant* var =  g_variant_builder_end(&params);
+
+		g_dbus_method_invocation_return_value(invocation,g_variant_new("ao", var));
+		///TODO: we might need to clean up stuff there (like var)
 	}
 
 }
