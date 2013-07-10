@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "abstractdbusinterface.h"
 #include "debugout.h"
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 #include <gio/gio.h>
 
 #include "listplusplus.h"
@@ -28,7 +29,7 @@ unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMa
 list<string> AbstractDBusInterface::mimplementedProperties;
 
 
-static void handleMethodCall(GDBusConnection       *connection,
+static void handleMyMethodCall(GDBusConnection       *connection,
 							 const gchar           *sender,
 							 const gchar           *object_path,
 							 const gchar           *interface_name,
@@ -39,14 +40,52 @@ static void handleMethodCall(GDBusConnection       *connection,
 {
 
 	std::string method = method_name;
+	AbstractDBusInterface* iface = static_cast<AbstractDBusInterface*>(user_data);
 
+	g_assert(iface);
 
+	if(boost::algorithm::starts_with(method,"get"))
+	{
+		std::string propertyName = method.substr(3);
+		auto propertyMap = iface->getProperties();
+		if(propertyMap.find(propertyName) == propertyMap.end())
+		{
+			g_dbus_method_invocation_return_error(invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
+			return;
+		}
 
+		AbstractProperty* property = propertyMap[propertyName];
+
+		GError *error = NULL;
+
+		GVariant **params = g_new(GVariant*,4);
+		GVariant *val = g_variant_ref(property->value()->toVariant());
+		params[0] = g_variant_new("v",val);
+		params[1] = g_variant_new("d",property->timestamp());
+		params[2] = g_variant_new("i",property->value()->sequence);
+		params[3] = g_variant_new("i",property->updateFrequency());
+
+		GVariant *tuple_variant = g_variant_new_tuple(params,4);
+
+		g_dbus_method_invocation_return_value(invocation, tuple_variant);
+
+		g_free(params);
+		g_variant_unref(val);
+
+		if(error)
+		{
+			DebugOut(DebugOut::Error)<<error->message<<endl;
+			g_error_free(error);
+		}
+		return;
+	}
+
+	g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
 }
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string propertyName,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mPropertyName(propertyName), mConnection(connection)
+	: mInterfaceName(interfaceName), mPropertyName(propertyName), mConnection(connection), zoneFilter(Zone::None)
 {
 	startRegistration();
 
@@ -88,11 +127,13 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	else throw -1; //FIXME: don't throw
 
 	///see which properties are supported:
-	introspectionXml += 	"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
-			"<method name='get" + property->name() + "Extended'>"
+	introspectionXml +=
+			"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
+			"<method name='get" + property->name() + "'>"
 			"	<arg type='v' direction='out' name='value' />"
 			"	<arg type='d' direction='out' name='timestamp' />"
-			"	<arg type='d' direction='out' name='sequence' />"
+			"	<arg type='i' direction='out' name='sequence' />"
+			"   <arg type='i' direction='out' name='updateFrequency' />"
 			"</method>"
 			"<signal name='" + property->name() + "Changed' >"
 			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
@@ -143,7 +184,7 @@ void AbstractDBusInterface::registerObject()
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, mInterfaceName.c_str());
 
 
-	const GDBusInterfaceVTable vtable = { handleMethodCall, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
+	const GDBusInterfaceVTable vtable = { handleMyMethodCall, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 
 	GError* error2=NULL;
 
@@ -182,21 +223,25 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 	if(error)
 	{
-		DebugOut(0)<<error->message<<endl;
-		//throw -1;
+		DebugOut(DebugOut::Error)<<error->message<<endl;
+		g_error_free(error);
 	}
+
+
 }
 
-AbstractDBusInterface *AbstractDBusInterface::getInterfaceForProperty(string property)
+std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string property, Zone::Type zone)
 {
+
+	std::list<AbstractDBusInterface *> l;
 	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
 	{
 		auto interface = (*itr).second;
-		if(interface->implementsProperty(property))
-			return interface;
+		if(interface->zone() == zone && interface->implementsProperty(property))
+			l.push_back(interface);
 	}
 
-	return NULL;
+	return l;
 }
 
 bool AbstractDBusInterface::implementsProperty(string property)
@@ -216,18 +261,30 @@ void AbstractDBusInterface::startRegistration()
 {
 	unregisterObject();
 	introspectionXml ="<node>" ;
-	introspectionXml += "<interface name='"+ mInterfaceName + "' >";
+	introspectionXml +=
+			"<interface name='"+ mInterfaceName + "' >"
+			"<property type='i' name='Zone' access='read' />";
 }
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
-	if(interfaceMap.count(objectPath))
+	std::string pn = propertyName;
+	if(pn == "Zone")
+	{
+		Zone::Type zone = interfaceMap[objectPath]->zone();
+
+		GVariant* value = g_variant_new("(i)",(int)zone);
+		return value;
+	}
+
+	else if(interfaceMap.count(objectPath))
 	{
 		GVariant* value = interfaceMap[objectPath]->getProperty(propertyName);
 		return value;
-
 	}
-	debugOut("No interface for" + string(interfaceName));
+
+
+	DebugOut(DebugOut::Error)<<"No interface for" << interfaceName <<endl;
 	return nullptr;
 }
 

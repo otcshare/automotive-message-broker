@@ -30,7 +30,7 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 
 DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
 	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
-	  AbstractSink(engine, config), supported(false), zoneFilter(Zone::None)
+	  AbstractSink(engine, config), supported(false)
 {
 
 }

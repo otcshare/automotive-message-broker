@@ -17,7 +17,6 @@ public:
 
 private:
 	void asyncReply(AsyncPropertyReply*);
-	AbstractRoutingEngine* routingEngine;
 	bool mInitialized;
 
 

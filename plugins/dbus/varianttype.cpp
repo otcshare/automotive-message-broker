@@ -3,8 +3,9 @@
 #include "debugout.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, signature, access, interface), routingEngine(re), mInitialized(false)
+	:AbstractProperty(propertyName, signature, access, interface), mInitialized(false)
 {
+	routingEngine = re;
 	//set default value:
 	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName));
 }

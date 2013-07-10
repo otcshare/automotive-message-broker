@@ -22,7 +22,6 @@
 #include "abstractsink.h"
 #include "abstractproperty.h"
 #include "abstractdbusinterface.h"
-#include "basicproperty.h"
 #include "varianttype.h"
 
 #include <map>
@@ -85,7 +84,7 @@ private:
 
 	bool supported;
 	std::string mSourceFilter;
-	Zone::Type zoneFilter;
+
 };
 
 class DBusSinkManager: public AbstractSinkManager
