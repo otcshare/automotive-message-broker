@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "debugout.h"
 #include "abstractpropertytype.h"
+#include "abstractroutingengine.h"
 
 class AbstractDBusInterface;
 
@@ -81,18 +82,27 @@ public:
 	{
 		if(mValue) delete mValue;
 
+		PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);
+
 		mValue = val->copy();
 		mAnyValue = val->anyValue();
 		mTimestamp = val->timestamp;
+		if(info.isValid())
+			mUpdateFrequency = info.updateFrequency();
 		updateValue();
 	}
 
-	template<typename T>
+	int updateFrequency()
+	{
+		return mUpdateFrequency;
+	}
+
+	/*template<typename T>
 	void setValue(T val)
 	{
 		mAnyValue = val;
 		updateValue();
-	}
+	}*/
 
 
 
@@ -113,6 +123,8 @@ protected: ///methods:
 
 	std::string mSourceFilter;
 	Zone::Type mZoneFilter;
+	int mUpdateFrequency;
+	AbstractRoutingEngine* routingEngine;
 	
 protected:
 	

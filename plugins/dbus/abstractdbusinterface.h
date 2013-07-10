@@ -70,6 +70,8 @@ public:
 
 	Zone::Type zone() { return zoneFilter; }
 
+	std::unordered_map<std::string, AbstractProperty*> getProperties() { return properties; }
+
 protected:
 
 	void startRegistration();
@@ -87,6 +89,7 @@ protected:
 	std::unordered_map<std::string, AbstractProperty*> properties;
 
 	Zone::Type zoneFilter;
+
 
 private:
 	std::string mInterfaceName;

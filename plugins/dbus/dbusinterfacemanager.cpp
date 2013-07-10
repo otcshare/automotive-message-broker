@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "automotivemanager.h"
 
 ///properties:
-#include "accelerationproperty.h"
 #include "runningstatus.h"
 #include "custompropertyinterface.h"
 #include "uncategorizedproperty.h"

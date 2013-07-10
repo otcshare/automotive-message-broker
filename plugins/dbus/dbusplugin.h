@@ -22,7 +22,6 @@
 #include "abstractsink.h"
 #include "abstractproperty.h"
 #include "abstractdbusinterface.h"
-#include "basicproperty.h"
 #include "varianttype.h"
 
 #include <map>
