@@ -1,0 +1,8 @@
+Service: org.automotive.message.broker
+Interface: org.automotive.Manager
+Object Path: /
+
+Methods:
+
+	ObjectPath	findProperty(string property)
+		returns object path representing the property.
