@@ -48,6 +48,8 @@ public:
 	{
 		if(reply->success)
 			AbstractProperty::setValue(reply->value);
+		else
+			DebugOut(DebugOut::Warning)<<"get property request failed for "<<mAmbPropertyName<<endl;
 
 		delete reply;
 	}
@@ -116,7 +118,8 @@ public:
 
 	void asyncReply(AsyncPropertyReply* reply)
 	{
-		AbstractProperty::setValue(reply->value);
+		if(reply->success)
+			AbstractProperty::setValue(reply->value);
 
 		delete reply;
 	}
