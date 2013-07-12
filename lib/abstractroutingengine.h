@@ -236,6 +236,7 @@ public:
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 	virtual void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self) = 0;
+	virtual void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 
 	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid) = 0;

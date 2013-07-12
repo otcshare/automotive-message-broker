@@ -38,12 +38,12 @@ class Property: public QObject, public AbstractSink
 	Q_PROPERTY(QVariant value READ value WRITE setValue)
 
 public:
-	Property(VehicleProperty::Property, AbstractRoutingEngine* re, QObject *parent = 0);
+	Property(VehicleProperty::Property, QString srcFilter, AbstractRoutingEngine* re, QObject *parent = 0);
 
 	QString type();
 	void setType(QString t);
 
-	virtual PropertyList subscriptions() { PropertyList list; list.push_back(type().toStdString()); return list; }
+	virtual PropertyList subscriptions() { return PropertyList(); }
 	virtual void supportedChanged(PropertyList ){	}
 
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
@@ -75,6 +75,9 @@ public:
 public Q_SLOTS:
 
 	QObject* subscribeTo(QString str);
+	QObject* subscribeTo(QString str, QString srcFilter);
+
+	QStringList sourcesForProperty(QString property);
 
 	bool authenticate(QString pass);
 
@@ -83,6 +86,8 @@ public Q_SLOTS:
 	void reloadEngine();
 
 	void writeProgram(QString program);
+
+	void log(QString str);
 
 private Q_SLOTS: /// methods:
 

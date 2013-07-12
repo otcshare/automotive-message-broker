@@ -49,6 +49,7 @@ public:
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self);
+	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	PropertyList supported() { return mMasterPropertyList; }
 

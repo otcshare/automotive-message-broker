@@ -38,13 +38,20 @@ namespace Zone {
 
 enum Type {
 	None = 0,
-	FrontLeft = 1,
-	FrontMiddle = 1 << 1,
-	FrontRight = 1 << 2,
-	RearLeft = 1 << 3,
-	RearMiddle = 1 << 4,
-	RearRight = 1 << 5
+	Front = 1,
+	Middle = 1 << 1,
+	Right = 1 << 2,
+	Left = 1 << 3,
+	Rear = 1 << 4,
+	Center = 1 << 5
 };
+
+const Zone::Type FrontRight = Zone::Type(Front | Right);
+const Zone::Type FrontLeft = Zone::Type(Front | Left);
+const Zone::Type MiddleRight = Zone::Type(Middle | Right);
+const Zone::Type MiddleLeft = Zone::Type(Middle | Left);
+const Zone::Type RearRight = Zone::Type(Rear | Right);
+const Zone::Type RearLeft = Zone::Type(Rear| Left);
 
 typedef std::list<Zone::Type> ZoneList;
 

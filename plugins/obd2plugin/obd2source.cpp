@@ -488,7 +488,13 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 	{
 		propertyReplyMap[property]->value = value;
 		propertyReplyMap[property]->success = true;
-		propertyReplyMap[property]->completed(propertyReplyMap[property]);
+		try {
+			propertyReplyMap[property]->completed(propertyReplyMap[property]);
+		}catch(...)
+		{
+			DebugOut(DebugOut::Error)<<"failed to call reply completed callback"<<endl;
+		}
+
 		propertyReplyMap.erase(property);
 	}
 	else
