@@ -6,7 +6,7 @@ Automotive Message Broker is built using CMake and requires libltdl (libtool), j
 
 About the Git Tree:
 master is expected to be unstable and may not even compile.  If you want something more stable, checkout one of the 
-release branches (ie, 0.9.0, 0.10.0, etc)
+release branches (ie, 0.9.0, 0.10, etc)
 
 
 To build:
