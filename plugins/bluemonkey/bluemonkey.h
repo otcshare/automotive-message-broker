@@ -84,6 +84,8 @@ public Q_SLOTS:
 
 	void writeProgram(QString program);
 
+	void log(QString str);
+
 private Q_SLOTS: /// methods:
 
 	void loadConfigPriv();

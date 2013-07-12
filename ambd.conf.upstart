@@ -19,8 +19,6 @@ expect fork
 
 # Run before process
 pre-start script
-    exec hciconfig hci0 up
-    exec /etc/init.d/gpsd start
 end script
 
 # Start the process

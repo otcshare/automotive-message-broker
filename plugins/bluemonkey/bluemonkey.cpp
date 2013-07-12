@@ -202,7 +202,8 @@ void BluemonkeySink::reloadEngine()
 	QScriptValue qtimerClass = engine->scriptValueFromQMetaObject<QTimer>();
 	engine->globalObject().setProperty("QTimer", qtimerClass);
 
-
+	QScriptValue ircValue = engine->newQObject(irc);
+	engine->globalObject().setProperty("irc", ircValue);
 
 	loadConfig(configuration["config"].c_str());
 }
@@ -211,12 +212,21 @@ void BluemonkeySink::writeProgram(QString program)
 {
 	QFile file(configuration["customPrograms"].c_str());
 
-	file.open(QIODevice::ReadWrite | QIODevice::Append);
+	if(!file.open(QIODevice::ReadWrite | QIODevice::Append))
+	{
+		DebugOut(DebugOut::Error)<<"failed to open file: "<<file.fileName().toStdString()<<endl;
+		return;
+	}
 
 	file.write(program.toUtf8());
 	file.write("\n");
 
 	file.close();
+}
+
+void BluemonkeySink::log(QString str)
+{
+	DebugOut()<<str.toStdString()<<endl;
 }
 
 
