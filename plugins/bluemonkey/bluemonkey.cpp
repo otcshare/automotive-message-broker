@@ -152,8 +152,26 @@ std::string BluemonkeySink::uuid()
 
 QObject *BluemonkeySink::subscribeTo(QString str)
 {
-	return new Property(str.toStdString(), routingEngine, this);
+	return new Property(str.toStdString(), "", routingEngine, this);
 }
+
+QObject *BluemonkeySink::subscribeTo(QString str, QString srcFilter)
+{
+	return new Property(str.toStdString(), srcFilter, routingEngine, this);
+}
+
+QStringList BluemonkeySink::sourcesForProperty(QString property)
+{
+	std::list<std::string> list = routingEngine->sourcesForProperty(property.toStdString());
+	QStringList strList;
+	for(auto itr = list.begin(); itr != list.end(); itr++)
+	{
+		strList<<(*itr).c_str();
+	}
+
+	return strList;
+}
+
 
 bool BluemonkeySink::authenticate(QString pass)
 {
@@ -269,7 +287,7 @@ void Property::setValue(QVariant v)
 	routingEngine->setProperty(request);
 }
 
-Property::Property(VehicleProperty::Property prop, AbstractRoutingEngine* re, QObject *parent)
+Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, QObject *parent)
 	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr)
 {
 	setType(prop.c_str());
@@ -304,6 +322,10 @@ void Property::setType(QString t)
 
 void Property::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
 {
+	if(mValue)
+	{
+		delete mValue;
+	}
 	mValue = value->copy();
 
 	changed(gvariantToQVariant(mValue->toVariant()));

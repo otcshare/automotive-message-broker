@@ -319,6 +319,11 @@ void Core::subscribeToProperty(VehicleProperty::Property property, string source
 	subscribeToProperty(property,sink);
 }
 
+void Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self)
+{
+
+}
+
 void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
