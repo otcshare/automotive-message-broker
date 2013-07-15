@@ -281,7 +281,13 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 		AsyncPropertyReply* reply = *itr;
 		reply->value = &l;
 		reply->success = true;
-		reply->completed(reply);
+		try{
+			reply->completed(reply);
+		}
+		catch(...)
+		{
+			DebugOut(DebugOut::Warning)<<"reply failed"<<endl;
+		}
 	}
 
 	replyQueue.clear();
