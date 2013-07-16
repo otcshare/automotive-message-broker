@@ -34,7 +34,7 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 	routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 
-	supportedChanged(routingEngine->supported());
+//	supportedChanged(routingEngine->supported());
 
 }
 
@@ -57,7 +57,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	velocityRequest.completed = [](AsyncPropertyReply* reply)
 	{
 		if(!reply->success)
-			DebugOut(0)<<"Velocity Async request failed";
+			DebugOut(DebugOut::Error)<<"Velocity Async request failed ("<<reply->error<<")"<<endl;
 		else
 			DebugOut(0)<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
 		delete reply;
@@ -70,7 +70,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	vinRequest.completed = [](AsyncPropertyReply* reply)
 	{
 		if(!reply->success)
-			DebugOut(0)<<"VIN Async request failed";
+			DebugOut(DebugOut::Error)<<"VIN Async request failed ("<<reply->error<<")"<<endl;
 		else
 			DebugOut(0)<<"VIN Async request completed: "<<reply->value->toString()<<endl;
 		delete reply;
@@ -83,7 +83,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	wmiRequest.completed = [](AsyncPropertyReply* reply)
 	{
 		if(!reply->success)
-			DebugOut(0)<<"WMI Async request failed";
+			DebugOut(DebugOut::Error)<<"WMI Async request failed ("<<reply->error<<")"<<endl;
 		else
 		DebugOut(1)<<"WMI Async request completed: "<<reply->value->toString()<<endl;
 		delete reply;
@@ -96,7 +96,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	batteryVoltageRequest.completed = [](AsyncPropertyReply* reply)
 	{
 		if(!reply->success)
-			DebugOut(0)<<"BatteryVoltage Async request failed";
+			DebugOut(DebugOut::Error)<<"BatteryVoltage Async request failed ("<<reply->error<<")"<<endl;
 		else
 			DebugOut(1)<<"BatteryVoltage Async request completed: "<<reply->value->toString()<<endl;
 		delete reply;
@@ -109,7 +109,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	doorsPerRowRequest.completed = [](AsyncPropertyReply* reply)
 	{
 		if(!reply->success)
-			DebugOut(0)<<"Doors per row Async request failed";
+			DebugOut(DebugOut::Error)<<"Doors per row Async request failed ("<<reply->error<<")"<<endl;
 		else
 			DebugOut(1)<<"Doors per row: "<<reply->value->toString()<<endl;
 		delete reply;
@@ -122,7 +122,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	airbagStatus.completed = [](AsyncPropertyReply* reply)
 	{
 		if(!reply->success)
-			DebugOut(0)<<"Airbag Async request failed";
+			DebugOut(DebugOut::Error)<<"Airbag Async request failed ("<<reply->error<<")"<<endl;
 		else
 			DebugOut(1)<<"Airbag Status: "<<reply->value->toString()<<endl;
 		delete reply;
@@ -135,7 +135,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	exteriorBrightness.completed = [](AsyncPropertyReply* reply)
 	{
 		if(!reply->success)
-			DebugOut(0)<<"Exterior Brightness Async request failed";
+			DebugOut(DebugOut::Error)<<"Exterior Brightness Async request failed ("<<reply->error<<")"<<endl;
 		else
 			DebugOut(1)<<"Exterior Brightness: "<<reply->value->toString()<<endl;
 		delete reply;

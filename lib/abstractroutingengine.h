@@ -66,6 +66,8 @@ public:
 		return *this;
 	}
 
+	virtual ~AsyncPropertyRequest() { }
+
 	VehicleProperty::Property property;
 	std::string sourceUuid;
 	GetPropertyCompletedSignal completed;
@@ -96,7 +98,7 @@ public:
 		}
 	}
 
-	~AsyncPropertyReply()
+	virtual ~AsyncPropertyReply()
 	{
 		if(timeoutSource)
 		{
@@ -106,7 +108,7 @@ public:
 	}
 
 	enum Error {
-		NoError,
+		NoError=0,
 		Timeout,
 		InvalidOperation,
 		PermissionDenied
@@ -138,6 +140,8 @@ public:
 
 	}
 
+	virtual ~AsyncSetPropertyRequest() { }
+
 	AbstractPropertyType* value;
 };
 
@@ -161,6 +165,8 @@ public:
 		this->sequenceEnd = request.sequenceEnd;
 		this->sourceUuid = request.sourceUuid;
 	}
+
+	virtual ~AsyncRangePropertyRequest() {}
 
 	VehicleProperty::Property property;
 	std::string sourceUuid;
