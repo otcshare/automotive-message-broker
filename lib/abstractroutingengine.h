@@ -69,6 +69,8 @@ public:
 		return *this;
 	}
 
+	virtual ~AsyncPropertyRequest() { }
+
 	VehicleProperty::Property property;
 	std::string sourceUuidFilter;
 	Zone::Type zoneFilter;
@@ -100,7 +102,7 @@ public:
 		}
 	}
 
-	~AsyncPropertyReply()
+	virtual ~AsyncPropertyReply()
 	{
 		if(timeoutSource)
 		{
@@ -143,6 +145,8 @@ public:
 
 	}
 
+	virtual ~AsyncSetPropertyRequest() { }
+
 	AbstractPropertyType* value;
 };
 
@@ -166,6 +170,8 @@ public:
 		this->sequenceEnd = request.sequenceEnd;
 		this->sourceUuid = request.sourceUuid;
 	}
+
+	virtual ~AsyncRangePropertyRequest() {}
 
 	VehicleProperty::Property property;
 	std::string sourceUuid;
