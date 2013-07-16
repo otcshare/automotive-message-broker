@@ -150,14 +150,27 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(), tuple_variant, &error);
 
-	g_free(params);
-	g_variant_unref(val);
-
 	if(error)
 	{
-		DebugOut(0)<<error->message<<endl;
-		//throw -1;
+		DebugOut(DebugOut::Error)<<error->message<<endl;
 	}
+
+	g_free(params);
+
+	/// Send PropertiesChanged signal
+
+	GVariantBuilder builder;
+	g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
+
+	g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val);
+
+	GError *error2 = NULL;
+
+	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), "org.freedesktop.DBus.Properties", "PropertiesChanged", g_variant_new("(sa{sv}as)",
+																																				mInterfaceName.c_str(),
+																																				&builder, NULL), &error2);
+	g_variant_unref(val);
+
 }
 
 AbstractDBusInterface *AbstractDBusInterface::getInterfaceForProperty(string property)
