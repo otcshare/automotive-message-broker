@@ -1,6 +1,6 @@
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system.
-Version:    0.9.8
+Version:    0.9.9
 Release:    1
 Group:      System/Base
 License:    LGPL-2.1
@@ -144,6 +144,7 @@ ln -s ../ambd.service %{buildroot}%{_prefix}/lib/systemd/system/network.target.w
 %files
 %defattr(-,root,root,-)
 %config %{_sysconfdir}/ambd/config
+%{_sysconfdir}/ambd/examples/*
 %{_bindir}/*
 %{_libdir}/libamb.so*
 %{_prefix}/lib/systemd/system/*
