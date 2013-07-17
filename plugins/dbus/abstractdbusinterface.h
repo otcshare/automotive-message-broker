@@ -51,7 +51,7 @@ public:
 	
 	static std::list<std::string> implementedProperties() { return mimplementedProperties; }
 
-	static std::list<AbstractDBusInterface *> getObjectsForProperty(std::string property, Zone::Type zone = Zone::None);
+	static std::list<AbstractDBusInterface *> getObjectsForProperty(std::string property);
 
 	bool implementsProperty(std::string property);
 
