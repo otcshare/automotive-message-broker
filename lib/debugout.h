@@ -61,7 +61,7 @@ public:
 
 		out.precision(15);
 
-		if(mDebugLevel <= debugThreshhold)
+		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 			 out<<message<<" ";
 		return *this;
 	}
@@ -72,7 +72,7 @@ public:
 
 		out.precision(15);
 
-		if(mDebugLevel <= debugThreshhold)
+		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 			 out<<endl;
 		return *this;
 	}
@@ -83,7 +83,7 @@ public:
 
 		out.precision(15);
 
-		if(mDebugLevel <= debugThreshhold)
+		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 			 out<<val<<" ";
 		return *this;
 	}
