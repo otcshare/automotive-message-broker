@@ -184,31 +184,12 @@ std::list<std::string> Core::sourcesForProperty(VehicleProperty::Property proper
 	return l;
 }
 
-struct UserData{
-	AbstractSink* sink;
-	PropertyList list;
-};
-
 void Core::registerSink(AbstractSink *self)
 {
 	if(!ListPlusPlus<AbstractSink*>(&mSinks).contains(self))
 	{
 		mSinks.push_back(self);
 	}
-
-	auto cb = [](gpointer userdata) {
-		UserData* foo = (UserData*)userdata;
-		foo->sink->supportedChanged(foo->list);
-
-		delete foo;
-		return (int)0;
-	};
-
-	UserData* foo = new UserData;
-	foo->sink = self;
-	foo->list = mMasterPropertyList;
-
-	g_timeout_add(0, (GSourceFunc) cb, foo);
 }
 
 void Core::unregisterSink(AbstractSink *self)
