@@ -57,7 +57,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		}
 
 		GVariantBuilder params;
-		g_variant_builder_init(&params, ((const GVariantType *) "ao"));
+		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
 
 		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
 		{
@@ -69,7 +69,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		//GVariant* var =  g_variant_builder_end(&params);
 
-		g_dbus_method_invocation_return_value(invocation, g_variant_new("ao",&params));
+		g_dbus_method_invocation_return_value(invocation, g_variant_new("(ao)",&params));
 		///TODO: we might need to clean up stuff there (like var)
 	}
 
@@ -103,7 +103,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 			AbstractDBusInterface* t = *itr;
 			if(t->zone() == (Zone::Type)zone)
 			{
-				g_dbus_method_invocation_return_value(invocation,g_variant_new("o", t->objectPath().c_str()));
+				g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)", t->objectPath().c_str()));
 				return;
 			}
 		}
@@ -134,7 +134,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		}
 
 		GVariantBuilder params;
-		g_variant_builder_init(&params, ((const GVariantType *) "ai"));
+		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
 
 		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
 		{
@@ -144,8 +144,10 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		}
 
-		g_dbus_method_invocation_return_value(invocation,g_variant_new("ai",&params));
+		g_dbus_method_invocation_return_value(invocation,g_variant_new("(ai)",&params));
 	}
+
+	g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
 
 }
 
