@@ -154,6 +154,8 @@ PropertyList WheelSourcePlugin::supported()
 	props.push_back(VehicleProperty::EngineSpeed);
 	props.push_back(VehicleProperty::VehicleSpeed);
 	props.push_back(VehicleProperty::TransmissionShiftPosition);
+	props.push_back(VehicleProperty::TransmissionGearPosition);
+	props.push_back(VehicleProperty::TransmissionMode);
 	props.push_back(VehicleProperty::ThrottlePosition);
 	props.push_back(VehicleProperty::WheelBrake);
 	props.push_back(VehicleProperty::SteeringWheelAngle);
@@ -278,6 +280,10 @@ AbstractPropertyType *WheelPrivate::getProperty(VehicleProperty::Property propTy
 		return new VehicleProperty::EngineSpeedType(this->calcRPM());
 	else if (propType == VehicleProperty::TransmissionShiftPosition)
 		return new VehicleProperty::TransmissionShiftPositionType(this->currentGear);
+	else if (propType == VehicleProperty::TransmissionGearPosition)
+		return new VehicleProperty::TransmissionGearPositionType(this->currentGear);
+	else if (propType == VehicleProperty::TransmissionMode)
+		return new VehicleProperty::TransmissionModeType(Transmission::Sports);
 	else if (propType == VehicleProperty::ThrottlePosition)
 		return new VehicleProperty::ThrottlePositionType(this->throttle);
 	else if (propType == VehicleProperty::WheelBrake)
@@ -477,10 +483,11 @@ void WheelPrivate::changeGear(int gear)
 {
 	this->currentGear = (Transmission::TransmissionPositions)gear;
 	VehicleProperty::TransmissionShiftPositionType tempTrans(this->currentGear);
+	VehicleProperty::TransmissionGearPositionType tempTransGear(this->currentGear);
 	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
-	tempTrans.timestamp = amb::currentTime();
-	tempSpeed.timestamp = amb::currentTime();
+
 	this->re->updateProperty(VehicleProperty::TransmissionShiftPosition, &tempTrans, mParent->uuid());
+	this->re->updateProperty(VehicleProperty::TransmissionGearPosition, &tempTransGear, mParent->uuid());
 	this->re->updateProperty(VehicleProperty::VehicleSpeed, &tempSpeed, mParent->uuid());
 }
 
