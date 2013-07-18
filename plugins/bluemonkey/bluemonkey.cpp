@@ -275,7 +275,7 @@ void Property::setValue(QVariant v)
 
 	AsyncSetPropertyRequest request;
 	request.property = mValue->name;
-	request.value = mValue;
+	request.value = mValue->copy();
 	request.completed = [&](AsyncPropertyReply* reply)
 	{
 		if(reply->success)

@@ -209,6 +209,12 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else
+	{
+		reply->success=false;
+		reply->error = AsyncPropertyReply::InvalidOperation;
+		reply->completed(reply);
+	}
 }
 
 void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)

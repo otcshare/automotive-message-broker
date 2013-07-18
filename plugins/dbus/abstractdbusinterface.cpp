@@ -242,14 +242,14 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 }
 
-std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string property, Zone::Type zone)
+std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string property)
 {
 
 	std::list<AbstractDBusInterface *> l;
 	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
 	{
-		auto interface = (*itr).second;
-		if(interface->zone() == zone && interface->implementsProperty(property))
+		AbstractDBusInterface * interface = (*itr).second;
+		if(interface->propertyName() == property)
 			l.push_back(interface);
 	}
 

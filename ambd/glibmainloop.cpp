@@ -17,5 +17,6 @@ GlibMainLoop::~GlibMainLoop()
 int GlibMainLoop::exec()
 {
 	g_main_loop_run(mainLoop);
+	return 1;
 }
 
