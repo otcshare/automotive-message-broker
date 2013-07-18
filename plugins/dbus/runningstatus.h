@@ -165,8 +165,8 @@ public:
 		 *  @ access readonly
 		 *  @ attributeComment \brief  Must return transmission shift position
 		 **/
-		//wantPropertyVariant(VehicleProperty::TransmissionShiftPosition,
-			//											  "ShiftPosition", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionShiftPosition,
+														  "ShiftPosition", "y", AbstractProperty::Read);
 
 		/** @attributeName GearPosition
 		 *  @type octet
