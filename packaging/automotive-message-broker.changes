@@ -1,5 +1,5 @@
 * Fri Jul 19 15:09:00 PST 2013 - <kevron.m.rees@intel.com>
-- added .gbs.conf file to point to upstream branch
+- readded .gbs.conf file to point to upstream branch
 - set upstream branch to track upstream so gbs will stop complaining
 - recreated tizen branch from upstream
 
