@@ -2,6 +2,7 @@
 - readded .gbs.conf file to point to upstream branch
 - set upstream branch to track upstream so gbs will stop complaining
 - recreated tizen branch from upstream
+- submitting to tizen build
 
 * Thu Jul 18 10:39:00 PST 2013 - <kevron.m.rees@intel.com>
 - version 0.9.9 ("chevelle" beta)
