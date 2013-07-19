@@ -1,5 +1,5 @@
 * Fri Jul 19 15:09:00 PST 2013 - <kevron.m.rees@intel.com>
-- added .gbs.conf file
+- added .gbs.conf file to point to upstream branch
 
 * Thu Jul 18 10:39:00 PST 2013 - <kevron.m.rees@intel.com>
 - version 0.9.9 ("chevelle" beta)
