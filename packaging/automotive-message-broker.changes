@@ -3,6 +3,7 @@
 - set upstream branch to track upstream so gbs will stop complaining
 - recreated tizen branch from upstream
 - submitting to tizen build
+- added fix for compiling with gcc 4.7.0
 
 * Thu Jul 18 10:39:00 PST 2013 - <kevron.m.rees@intel.com>
 - version 0.9.9 ("chevelle" beta)
