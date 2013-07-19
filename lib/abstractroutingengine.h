@@ -77,26 +77,34 @@ public:
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
-	AsyncPropertyReply(const AsyncPropertyRequest &request)
-		:AsyncPropertyRequest(request), value(NULL), success(false), timeoutSource(nullptr)
+	AsyncPropertyReply(const AsyncPropertyRequest &request);
+/*		:AsyncPropertyRequest(request), value(NULL), success(false), timeoutSource(nullptr)
 	{
-		auto timeoutfunc = [](gpointer userData) {
-			AsyncPropertyReply* thisReply = static_cast<AsyncPropertyReply*>(userData);
-			if(thisReply->success == false)
-			{
-				thisReply->error = Timeout;
-				thisReply->completed(thisReply);
-			}
-			return 0;
-		};
-
 		if(timeout)
 		{
+
+			auto timeoutfunc = [](gpointer userData) {
+                        	AsyncPropertyReply* thisReply = static_cast<AsyncPropertyReply*>(userData);
+	                        if(thisReply->success == false)
+        	                {
+                	                thisReply->error = Timeout;
+                        	        thisReply->completed(thisReply);
+	                        }
+        	                return 0;
+                	};
 			timeoutSource = g_timeout_source_new(timeout);
-			g_source_set_callback(timeoutSource,(GSourceFunc) timeoutfunc, this, nullptr);
+			g_source_set_callback(timeoutSource, [](gpointer userData) {
+                                AsyncPropertyReply* thisReply = static_cast<AsyncPropertyReply*>(userData);
+                                if(thisReply->success == false)
+                                {
+                                        thisReply->error = Timeout;
+                                        thisReply->completed(thisReply);
+                                }
+                                return 0;
+                        }, this, nullptr);
 			g_source_attach(timeoutSource, nullptr);
 		}
-	}
+	}*/
 
 	virtual ~AsyncPropertyReply()
 	{
