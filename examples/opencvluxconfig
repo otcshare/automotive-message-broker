@@ -1,5 +1,4 @@
 {
-	"mainloop" : "/usr/lib/automotive-message-broker/qtmainloopplugin.so",
 	"sources" : [ 
 		{
 			"name" : "OpenCV Lux plugin",
