@@ -16,9 +16,7 @@
 	"sinks": [
 		{
 			"name" : "Example sink",
-			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so",
-			"interface" : "lo",
-			"port" : "23000"
+			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
 		} 
 	]
 }
