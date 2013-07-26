@@ -83,13 +83,13 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 	g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
 }
 
-AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string propertyName,
+AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectName,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mPropertyName(propertyName), mConnection(connection), zoneFilter(Zone::None)
+	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None)
 {
 	startRegistration();
 
-	mObjectPath = "/" + propertyName;
+	mObjectPath = "/" + objectName;
 }
 
 AbstractDBusInterface::~AbstractDBusInterface()
@@ -242,18 +242,28 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 }
 
-std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string property)
+std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string object)
 {
-
 	std::list<AbstractDBusInterface *> l;
 	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
 	{
 		AbstractDBusInterface * interface = (*itr).second;
-		if(interface->propertyName() == property)
+		if(interface->objectName() == object)
 			l.push_back(interface);
 	}
 
 	return l;
+}
+list<AbstractDBusInterface *> AbstractDBusInterface::interfaces()
+{
+	std::list<AbstractDBusInterface*> ifaces;
+
+	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
+	{
+		ifaces.push_back((*itr).second);
+	}
+
+	return ifaces;
 }
 
 bool AbstractDBusInterface::implementsProperty(string property)

@@ -33,7 +33,7 @@ class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
 
 public:
-	DBusSink(std::string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
+	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
 	virtual ~DBusSink() { }
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid);
@@ -80,9 +80,6 @@ protected:
 
 	PropertyDBusMap propertyDBusMap;
 
-private:
-
-	bool supported;
 	std::string mSourceFilter;
 
 };

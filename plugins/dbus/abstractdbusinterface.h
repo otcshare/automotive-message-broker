@@ -34,7 +34,7 @@ class AbstractDBusInterface
 {
 
 public:
-	AbstractDBusInterface(std::string interfaceName, std::string objectPath, GDBusConnection* connection);
+	AbstractDBusInterface(std::string interfaceName, std::string objectName, GDBusConnection* connection);
 
 	virtual ~AbstractDBusInterface();
 	
@@ -53,9 +53,15 @@ public:
 
 	static std::list<AbstractDBusInterface *> getObjectsForProperty(std::string property);
 
+	static list<AbstractDBusInterface*> interfaces();
+
+	std::string interfaceName() { return mInterfaceName; }
+
 	bool implementsProperty(std::string property);
 
 	std::string objectPath() { return mObjectPath; }
+
+	bool isSupported() { return supported; }
 
 	void setObjectPath(std::string op)
 	{
@@ -66,7 +72,7 @@ public:
 		interfaceMap[mObjectPath] = this;
 	}
 
-	std::string propertyName() { return mPropertyName; }
+	std::string objectName() { return mPropertyName; }
 
 	Zone::Type zone() { return zoneFilter; }
 
@@ -90,6 +96,8 @@ protected:
 
 	Zone::Type zoneFilter;
 
+
+	bool supported;
 
 private:
 	std::string mInterfaceName;

@@ -102,7 +102,7 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 
 			T* t = new T(re, connection);
 
-			objectPath += "/" + t->propertyName();
+			objectPath += "/" + t->objectName();
 			t->setObjectPath(objectPath);
 			t->setSourceFilter(source);
 			t->unregisterObject();
@@ -114,7 +114,7 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 			Zone::Type zone = (*zoneItr).first;
 			T* t = new T(re, connection);
 			std::stringstream fullobjectPath;
-			fullobjectPath<< objectPath << "/" << zone << "/" <<t->propertyName();
+			fullobjectPath<< objectPath << "/" << zone << "/" <<t->objectName();
 			t->setObjectPath(fullobjectPath.str());
 			t->setSourceFilter(source);
 			t->setZoneFilter(zone);
@@ -154,7 +154,7 @@ void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, G
 
 			T* t = new T(prop, re, connection);
 
-			objectPath += "/" + t->propertyName();
+			objectPath += "/" + t->objectName();
 			t->setObjectPath(objectPath);
 			t->setSourceFilter(source);
 			t->unregisterObject();
@@ -166,7 +166,7 @@ void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, G
 			Zone::Type zone = (*zoneItr).first;
 			T* t = new T(prop, re, connection);
 			std::stringstream fullobjectPath;
-			fullobjectPath<< objectPath << "/" << zone << "/" <<t->propertyName();
+			fullobjectPath<< objectPath << "/" << zone << "/" <<t->objectName();
 			t->setObjectPath(fullobjectPath.str());
 			t->setSourceFilter(source);
 			t->setZoneFilter(zone);
