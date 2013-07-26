@@ -46,7 +46,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string op,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection)
+	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection), supported(false)
 {
 	interfaceMap[interfaceName] = this;
 	startRegistration();
@@ -173,16 +173,28 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 
 }
 
-AbstractDBusInterface *AbstractDBusInterface::getInterfaceForProperty(string property)
+AbstractDBusInterface *AbstractDBusInterface::getInterfaceForObject(string object)
 {
-	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
+	std::string iface = "org.automotive." + object;
+
+	if(interfaceMap.find(iface) != interfaceMap.end())
 	{
-		auto interface = (*itr).second;
-		if(interface->implementsProperty(property))
-			return interface;
+		return interfaceMap[iface];
 	}
 
-	return NULL;
+	return nullptr;
+}
+
+list<AbstractDBusInterface *> AbstractDBusInterface::interfaces()
+{
+	std::list<AbstractDBusInterface*> ifaces;
+
+	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
+	{
+		ifaces.push_back((*itr).second);
+	}
+
+	return ifaces;
 }
 
 bool AbstractDBusInterface::implementsProperty(string property)

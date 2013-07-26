@@ -4,5 +4,5 @@ Object Path: /
 
 Methods:
 
-	ObjectPath	findProperty(string property)
+	ObjectPath	findObject(string property)
 		returns object path representing the property.

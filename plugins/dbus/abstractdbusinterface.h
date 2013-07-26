@@ -51,11 +51,17 @@ public:
 	
 	static list<string> implementedProperties() { return mimplementedProperties; }
 
-	static AbstractDBusInterface* getInterfaceForProperty(std::string property);
+	static AbstractDBusInterface *getInterfaceForObject(std::string object);
+
+	static list<AbstractDBusInterface*> interfaces();
+
+	std::string interfaceName() { return mInterfaceName; }
 
 	bool implementsProperty(std::string property);
 
 	std::string objectPath() { return mObjectPath; }
+
+	bool isSupported() { return supported; }
 
 protected:
 
@@ -72,6 +78,8 @@ protected:
 	virtual GVariant * getProperty(string propertyName);
 	
 	unordered_map<string, AbstractProperty*> properties;
+
+	bool supported;
 
 private:
 	string mInterfaceName;

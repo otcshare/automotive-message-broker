@@ -59,9 +59,6 @@ protected:
 
 	PropertyDBusMap propertyDBusMap;
 
-private:
-
-	bool supported;
 };
 
 class DBusSinkManager: public AbstractSinkManager

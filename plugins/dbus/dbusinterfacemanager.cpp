@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "automotivemanager.h"
 
 ///properties:
-#include "accelerationproperty.h"
 #include "runningstatus.h"
 #include "custompropertyinterface.h"
 #include "uncategorizedproperty.h"
@@ -49,7 +48,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	new AutomotiveManager(connection);
 
 	/// properties:
-	AbstractDBusInterface* acceleration = new AccelerationProperty(iface->re, connection);
+	ConstructProperty(AccelerationProperty);
 	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
 	AbstractDBusInterface* tirePressure = new TirePressureProperty(iface->re, connection);
 	AbstractDBusInterface* engineSpeed = new EngineSpeedProperty(iface->re, connection);
