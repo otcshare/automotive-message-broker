@@ -4,5 +4,16 @@ Object Path: /
 
 Methods:
 
-	ObjectPath	findObject(string property)
-		returns object path representing the property.
+	Array{ObjectPath}	findObject(string property)
+
+		returns list of object paths that provide the given property.
+
+	Array{int32}	zonesForProperty(string property)
+
+		returns list of zones for a given property.
+
+	ObjectPath	findPropertyForZone(string property, int32 zone)
+
+		returns object path which provides the given property in the given zone.
+
+
