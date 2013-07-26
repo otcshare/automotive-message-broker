@@ -2,11 +2,13 @@ Release notes for release 0.11.0
 
 New features:
 
-- DBus objects are divided by source and zone
-- Zone DBus property
-- get{PropertyName}() DBus method returns data.
+- DBus objects are divided by source and zone.
+- Zone DBus property.
+- get{PropertyName}() DBus method returns extended data about the property.
+- new zonesForProperty and findPropertyForZone methods.
 
 Changes:
+- findProperty DBus method on org.automotive.Manager now returns an array of objects that match the property.
 
 
 Fixes:
