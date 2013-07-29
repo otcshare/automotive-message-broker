@@ -4,7 +4,7 @@ Object Path: /
 
 Methods:
 
-	ObjectPath	findObject(string objectName)
+	ObjectPath	findProperty(string objectName)
 		returns object path representing the object name.
 
 	Array{String}   list()
