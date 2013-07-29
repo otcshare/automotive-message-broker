@@ -1,4 +1,4 @@
-Release notes for release 0.10.0
+Release notes for release 0.10
 
 New features:
 
@@ -9,7 +9,7 @@ New features:
 - Added error type for get() calls
 
 Changes:
-- AbstractPropertyType class now contains information for zone and the property name
+- AbstractPropertyType class now contains information for zone and the property name (zone is unused in 0.10)
 - Clean up sink subscription process so that subscription only happens once regardless of whether the property is supported or not at the time
 
 Fixes:
