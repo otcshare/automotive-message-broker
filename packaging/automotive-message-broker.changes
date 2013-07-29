@@ -1,3 +1,7 @@
+* Mon Jul 29 2013 - <kevron.m.rees@intel.com
+- fixed findProperty call to return object names not objects that match amb property names
+- added list dbus call
+
 * Fri Jul 19 15:09:00 PST 2013 - <kevron.m.rees@intel.com>
 - readded .gbs.conf file to point to upstream branch
 - set upstream branch to track upstream so gbs will stop complaining
