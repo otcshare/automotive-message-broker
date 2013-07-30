@@ -8,7 +8,7 @@ static const gchar introspection_xml[] =
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='ao' name='response' direction='out'/>"
   "    </method>"
-  "    <method name='findPropertyForZone'>"
+  "    <method name='findObjectForZone'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='i' name='zone' direction='in'/>"
   "      <arg type='o' name='response' direction='out'/>"
@@ -16,9 +16,13 @@ static const gchar introspection_xml[] =
   "    <method name='list'>"
   "      <arg type='as' name='response' direction='out'/>"
   "    </method>"
-  "    <method name='zonesForProperty'>"
+  "    <method name='zonesForObjectName'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='ai' name='response' direction='out'/>"
+  "    </method>"
+  "    <method name='findProperty'>"
+  "      <arg type='s' name='searchstring' direction='in'/>"
+  "      <arg type='o' name='response' direction='out'/>"
   "    </method>"
   "  </interface>"
   "</node>";
@@ -37,7 +41,35 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 	std::string method = method_name;
 
-	if(method == "findObject")
+	if(method == "findProperty")
+	{
+		gchar* arg;
+
+		g_variant_get(parameters,"(s)",&arg);
+
+		std::string objectToFind = arg;
+
+		if(objectToFind == "")
+		{
+			g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
+			return;
+		}
+
+		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(objectToFind);
+
+		if(!interfaces.size())
+		{
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Object not found");
+			return;
+		}
+
+		auto itr = interfaces.begin();
+
+		g_dbus_method_invocation_return_value(invocation, g_variant_new("(o)",(*itr)->objectPath().c_str()));
+		///TODO: we might need to clean up stuff there (like var)
+	}
+
+	else if(method == "findObject")
 	{
 		gchar* arg;
 
@@ -78,7 +110,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		///TODO: we might need to clean up stuff there (like var)
 	}
 
-	else if(method == "findPropertyForZone")
+	else if(method == "findObjectForZone")
 	{
 		gchar* arg;
 		int zone;
@@ -97,7 +129,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		if(!interfaces.size())
 		{
-			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Property not found");
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 			return;
 		}
 
@@ -113,10 +145,10 @@ static void handleMethodCall(GDBusConnection       *connection,
 			}
 		}
 
-		g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Property not found");
+		g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 	}
 
-	else if (method == "zonesForProperty")
+	else if (method == "zonesForObjectName")
 	{
 		gchar* arg;
 
@@ -134,7 +166,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		if(!interfaces.size())
 		{
-			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Property not found");
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 			return;
 		}
 
