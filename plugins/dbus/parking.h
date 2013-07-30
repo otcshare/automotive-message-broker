@@ -21,7 +21,7 @@ public:
 		 **/
 		wantProperty<Security::Status>(VehicleProperty::SecurityAlertStatus,"SecurityAlert", "i", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -39,7 +39,7 @@ public:
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingBrakeStatus,"ParkingBrake", "b", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -57,7 +57,7 @@ public:
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingLightStatus,"ParkingLight", "b", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -75,7 +75,7 @@ public:
 		 **/
 		wantProperty<bool>(VehicleProperty::HazardLightStatus,"HazardLight", "b", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 

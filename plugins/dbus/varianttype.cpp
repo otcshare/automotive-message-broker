@@ -2,12 +2,13 @@
 #include "abstractroutingengine.h"
 #include "debugout.h"
 
-VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
+VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access, AbstractDBusInterface *interface)
 	:AbstractProperty(propertyName, signature, access, interface), mInitialized(false)
 {
+	mAmbPropertyName = ambPropertyName;
 	routingEngine = re;
 	//set default value:
-	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName));
+	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName));
 }
 
 void VariantType::initialize()
@@ -15,7 +16,7 @@ void VariantType::initialize()
 	if(mInitialized) return;
 
 	AsyncPropertyRequest request;
-	request.property = mPropertyName;
+	request.property = mAmbPropertyName;
 	request.sourceUuidFilter = mSourceFilter;
 	request.zoneFilter = mZoneFilter;
 
@@ -39,7 +40,7 @@ GVariant *VariantType::toGVariant()
 {
 	if(!value())
 	{
-		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
+		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
 
 		setValue(v);
 
@@ -53,11 +54,11 @@ GVariant *VariantType::toGVariant()
 
 void VariantType::fromGVariant(GVariant *val)
 {
-	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
+	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
 	v->fromVariant( val );
 
 	AsyncSetPropertyRequest request;
-	request.property = mPropertyName;
+	request.property = mAmbPropertyName;
 	request.value = v;
 	request.completed = [](AsyncPropertyReply* reply)
 	{

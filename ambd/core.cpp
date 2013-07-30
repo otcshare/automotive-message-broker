@@ -175,7 +175,12 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 		if( (isFiltered != filteredSourceSinkMap.end() && filteredSourceSinkMap[sink][property] == uuid) || isFiltered == filteredSourceSinkMap.end())
 		{
 			/// FIXME: Set this here just in case a source neglects to:
-			value->sourceUuid = uuid;
+
+			if(value->sourceUuid != uuid)
+			{
+				DebugOut(DebugOut::Warning)<<"Source not setting uuid for property "<<value->name<<endl;
+				value->sourceUuid = uuid;
+			}
 
 			sink->propertyChanged(property, value, uuid);
 		}

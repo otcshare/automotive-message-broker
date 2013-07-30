@@ -36,7 +36,7 @@ public:
 		 *  @attributeComment \brief  Must return Vehicle Speed in kilometers per hour.
 		 **/
 		wantPropertyVariant(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 
 
@@ -55,7 +55,7 @@ public:
 		 *  @attributeComment \brief  Must return Engine Speed in rotations per minute.
 		 **/
 		wantPropertyVariant(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 
 
@@ -82,7 +82,7 @@ public:
 		 *  @attributeComment \brief  Must return Vehicle Power mode (see VEHICLEPOWERMODE)
 		 **/
 		wantPropertyVariant(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -99,7 +99,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::TripMeters, "TripMeters", "aq", AbstractProperty::ReadWrite);
 
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -130,7 +130,7 @@ public:
 		 *  @attributeComment \brief  Must return acceleration on the "Z" axis as 1/1000 G (gravitational force).
 		 **/
 		wantPropertyVariant(VehicleProperty::AccelerationZ, "Z", "q", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -192,7 +192,7 @@ public:
 		wantPropertyVariant(VehicleProperty::TransmissionMode,
 														  "Mode", "y", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -216,7 +216,7 @@ public:
 		 *  @attributeComment \brief  Must return target Cruise Control speed in kilometers per hour (kph).
 		 **/
 		wantPropertyVariant(VehicleProperty::CruiseControlSpeed, "Speed", "q", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -233,7 +233,7 @@ public:
 		 *  @attributeComment \brief  Must return Wheel Brake status: Engaged = true, disengaged = false
 		 **/
 		wantPropertyVariant(VehicleProperty::WheelBrake, "Engaged", "b", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -299,7 +299,7 @@ public:
 		 *  @attributeComment \brief  Must return high beam status: on = true, off = false.
 		 **/
 		wantPropertyVariant(VehicleProperty::LightHighBeam, "HighBeam", "b", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -330,7 +330,7 @@ public:
 		 *  @attributeComment \brief  Must return center interior light status: on = true, off = false
 		 **/
 		wantPropertyVariant(VehicleProperty::InteriorLightCenter, "Center", "b", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -347,7 +347,7 @@ public:
 		 *  @attributeComment \brief  Must return horn status: on = true, off = false
 		 **/
 		wantPropertyVariant(VehicleProperty::Horn,"On","b",AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -391,7 +391,7 @@ public:
 		 *  @attributeComment \brief  Must return average fuel 'economy' in kilometers per liter of fuel since last reset.  Setting this to any value should reset the counter to '0'
 		 **/
 		wantPropertyVariant(VehicleProperty::FuelAverageEconomy,"AverageEconomy", "q", AbstractProperty::ReadWrite);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -422,7 +422,7 @@ public:
 		 *  @attributeComment \brief  Must return Engine Oil Pressure in kPa.
 		 **/
 		wantPropertyVariant(VehicleProperty::EngineOilPressure, "Pressure", "q", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 
@@ -460,7 +460,7 @@ public:
 		 *  @attributeComment \brief  Must return direction in Degrees  (0-360)
 		 **/
 		wantPropertyVariant(VehicleProperty::Direction, "Direction", "q", AbstractProperty::Read);
-		supportedChanged(re->supported());
+
 	}
 };
 

@@ -20,7 +20,7 @@ public:
 		 **/
 		wantProperty<uint>(VehicleProperty::Odometer, "Odometer", "i", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -74,7 +74,7 @@ public:
 		 *  @attributeComment \brief MUST return battery current in Amperes
 		 **/
 		wantProperty<double>(VehicleProperty::BatteryCurrent, "Current", "d", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -112,7 +112,7 @@ public:
 		 *  @attributeComment \brief MUST return right rear tire pressure in kPa.
 		 **/
 		wantProperty<double>(VehicleProperty::TirePressureRightRear, "RightRear", "d", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -150,7 +150,7 @@ public:
 		 *  @attributeComment \brief MUST return right rear tire temperature in Celcius.
 		 **/
 		wantProperty<double>(VehicleProperty::TireTemperatureRightRear, "RightRear", "d", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 

@@ -142,9 +142,10 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	
 	properties[property->name()] = property;
 
-	if(!ListPlusPlus<string>(&mimplementedProperties).contains(property->name()))
+	if(!ListPlusPlus<string>(&mimplementedProperties).contains(property->ambPropertyName()))
 	{
-		mimplementedProperties.push_back(property->name());
+		std::string pname = property->ambPropertyName();
+		mimplementedProperties.push_back(pname);
 	}
 }
 

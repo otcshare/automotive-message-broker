@@ -21,7 +21,7 @@ public:
 		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -41,7 +41,7 @@ public:
 		wantPropertyVariant(VehicleProperty::TractionControlSystem, "TractionControlSystem", "b", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -62,7 +62,7 @@ public:
 		wantPropertyVariant(VehicleProperty::VehicleTopSpeedLimit, "VehicleTopSpeedLimit", "q", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -88,7 +88,7 @@ public:
 		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", "y", AbstractProperty::Read);
 
 
-		//supportedChanged(re->supported());
+		//
 	}
 };
 
@@ -136,7 +136,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::DoorLockStatus, "ChildLockStatus", "b", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -164,7 +164,7 @@ public:
 		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "SeatBeltStatus", "a(yb)", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -197,7 +197,7 @@ public:
 		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", "a(yy)", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -225,7 +225,7 @@ public:
 		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", "a{yd}", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 

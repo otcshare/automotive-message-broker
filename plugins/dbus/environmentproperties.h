@@ -19,7 +19,7 @@ public:
 		 * @attributeComment \brief Must return the brightness outside the vehicle in lux.
 		 */
 		wantPropertyVariant(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "q", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -46,7 +46,7 @@ public:
 		 */
 		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "Exterior", "i", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -64,7 +64,7 @@ public:
 		 * @attributeComment \brief Must return level of rain intensity 0: No Rain - 10: Heaviest Rain.
 		 */
 		wantPropertyVariant(VehicleProperty::RainSensor, "RainSensor", "q", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -89,7 +89,7 @@ public:
 		 * @attributeComment \brief Must return Level of windshield whiper speed (see WIPERSPEED_)
 		 */
 		wantPropertyVariant(VehicleProperty::RainSensor, "WindshieldWiper", "y", AbstractProperty::ReadWrite);
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -196,7 +196,7 @@ public:
 		 */
 		wantPropertyVariant(VehicleProperty::SeatCooler, "SeatCooler", "b", AbstractProperty::ReadWrite);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 

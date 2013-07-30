@@ -15,9 +15,9 @@ UncategorizedPropertyInterface::UncategorizedPropertyInterface(VehicleProperty::
 
 	std::string signature = g_variant_get_type_string(temp->toVariant());
 
-	propertyDBusMap[prop] = new VariantType(re, signature, prop, VariantType::ReadWrite, this);
+	propertyDBusMap[prop] = new VariantType(re, signature, prop, prop, VariantType::ReadWrite, this);
 
 	delete temp;
 
-	supportedChanged(re->supported());
+
 }

@@ -28,7 +28,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::VIN, "VIN", "s", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -60,7 +60,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::VehicleLength, "Length", "u", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -100,7 +100,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::FuelPositionSide, "RefuelPosition", "y", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -127,7 +127,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::VehicleType, "Type", "y", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -148,7 +148,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "ay", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -172,7 +172,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::TransmissionGearType, "TransmissionGearType", "y", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -212,7 +212,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 

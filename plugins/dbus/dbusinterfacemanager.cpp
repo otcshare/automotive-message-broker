@@ -97,18 +97,6 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 
 		boost::algorithm::erase_all(objectPath, "-");
 
-		if(!zones.size())
-		{
-
-			T* t = new T(re, connection);
-
-			objectPath += "/" + t->objectName();
-			t->setObjectPath(objectPath);
-			t->setSourceFilter(source);
-			t->unregisterObject();
-			t->supportedChanged(re->supported());
-		}
-
 		for(auto zoneItr = zones.begin(); zoneItr != zones.end(); zoneItr++)
 		{
 			Zone::Type zone = (*zoneItr).first;
@@ -148,18 +136,6 @@ void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, G
 		std::string objectPath = "/" + source;
 
 		boost::algorithm::erase_all(objectPath, "-");
-
-		if(!zones.size())
-		{
-
-			T* t = new T(prop, re, connection);
-
-			objectPath += "/" + t->objectName();
-			t->setObjectPath(objectPath);
-			t->setSourceFilter(source);
-			t->unregisterObject();
-			t->supportedChanged(re->supported());
-		}
 
 		for(auto zoneItr = zones.begin(); zoneItr != zones.end(); zoneItr++)
 		{
@@ -244,12 +220,11 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	/// Create objects for unimplemented properties:
 
 	PropertyList capabilitiesList = VehicleProperty::capabilities();
+	PropertyList implemented = AbstractDBusInterface::implementedProperties();
 
 	for (auto itr = capabilitiesList.begin(); itr != capabilitiesList.end(); itr++)
 	{
 		VehicleProperty::Property prop = *itr;
-
-		PropertyList implemented = AbstractDBusInterface::implementedProperties();
 
 		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
 		{
