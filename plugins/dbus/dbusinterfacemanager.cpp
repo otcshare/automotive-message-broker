@@ -107,12 +107,11 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	/// Create objects for unimplemented properties:
 
 	PropertyList capabilitiesList = VehicleProperty::capabilities();
+	PropertyList implemented = AbstractDBusInterface::implementedProperties();
 
 	for (auto itr = capabilitiesList.begin(); itr != capabilitiesList.end(); itr++)
 	{
 		VehicleProperty::Property prop = *itr;
-
-		PropertyList implemented = AbstractDBusInterface::implementedProperties();
 
 		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
 		{

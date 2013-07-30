@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "debugout.h"
 #include "abstractpropertytype.h"
+#include "vehicleproperty.h"
 
 class AbstractDBusInterface;
 
@@ -59,6 +60,11 @@ public:
 	virtual string name() 
 	{
 		return mPropertyName;
+	}
+
+	virtual VehicleProperty::Property ambPropertyName()
+	{
+		return mAmbPropertyName;
 	}
 
 	virtual Access access()
@@ -112,6 +118,7 @@ protected:
 	
 	boost::any mAnyValue;
 	string mPropertyName;
+	VehicleProperty::Property mAmbPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;
 	Access mAccess;
