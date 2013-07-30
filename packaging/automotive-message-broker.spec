@@ -1,5 +1,5 @@
 Name:       automotive-message-broker
-Summary:    Automotive Message Broker is a vehicle network abstraction system.
+Summary:    Automotive Message Broker is a vehicle network abstraction system
 Version:    0.9.10
 Release:    1
 Group:      System/Base
@@ -33,7 +33,7 @@ Automotive Message Broker is a vehicle network abstraction system.
 It brokers information from the vehicle to applications.
 
 %package devel
-Summary:    automotive-message-broker development files
+Summary:    Automotive Message Broker development files
 Group:      Development/Libraries
 Requires:   %{name} = %{version}-%{release}
 
@@ -65,7 +65,7 @@ Requires:   %{name} = %{version}-%{release}
 OBD-II plugin that uses ELM 327-compatible scantools to access vehicle data
 
 %package plugins-websocket
-Summary:    websocket source and sink plugins
+Summary:    Websocket source and sink plugins
 Group:      System/Base
 Requires:   %{name} = %{version}-%{release}
 Requires:   libwebsockets
@@ -74,7 +74,7 @@ Requires:   libwebsockets
 websocket source and sink plugins
 
 %package plugins-wheel
-Summary:    source plugin for using the Logitech G27 racing wheel                                        
+Summary:    Source plugin for using the Logitech G27 racing wheel                                        
 Group:      System/Base
 Requires:   %{name} = %{version}-%{release}
 Requires:   libwebsockets

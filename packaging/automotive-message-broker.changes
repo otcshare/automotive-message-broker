@@ -1,3 +1,6 @@
+* Tue Jul 30 2013 - <kevron.m.rees@intel.com>
+- Fixed rmplint errors
+
 * Mon Jul 29 2013 - <kevron.m.rees@intel.com
 - fixed findProperty call to return object names not objects that match amb property names
 - added list dbus call
