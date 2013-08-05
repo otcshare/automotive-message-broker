@@ -765,6 +765,9 @@ public:
 	PROPERTYTYPEBASIC(ConvertibleRoof, bool)
 	//typedef BasicPropertyType<bool> ConvertibleRoofType;
 
+	static const Property NightMode;
+	PROPERTYTYPEBASIC(NightMode, bool)
+
 	/** END PROPERTIES **/
 
 

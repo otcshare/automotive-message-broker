@@ -6,15 +6,15 @@ Methods:
 
 	Array{ObjectPath}	findObject(string objectName)
 
-		returns list of object paths that provide the given property.
+		returns list of object paths that provide the given objectName.
 
 	Array{int32}	zonesForObjectName(string objectName)
 
-		returns list of zones for a given property.
+		returns list of zones for a given objectName.
 
 	ObjectPath	findObjectForZone(string objectName, int32 zone)
 
-		returns object path which provides the given property in the given zone.
+		returns object path which provides the given objectName in the given zone.
 
 	Array{ObjectPath}	list()
 
