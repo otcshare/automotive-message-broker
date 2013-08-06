@@ -126,16 +126,18 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 		access = "readwrite";
 	else throw -1; //FIXME: don't throw
 
+	std::string pn = property->name();
+
 	///see which properties are supported:
 	introspectionXml +=
-			"<property type='"+ property->signature() + "' name='"+ property->name()+"' access='"+access+"' />"
-			"<method name='get" + property->name() + "'>"
+			"<property type='"+ property->signature() + "' name='"+ pn +"' access='"+access+"' />"
+			"<method name='get" + pn + "'>"
 			"	<arg type='v' direction='out' name='value' />"
 			"	<arg type='d' direction='out' name='timestamp' />"
 			"	<arg type='i' direction='out' name='sequence' />"
 			"   <arg type='i' direction='out' name='updateFrequency' />"
 			"</method>"
-			"<signal name='" + property->name() + "Changed' >"
+			"<signal name='" + pn + "Changed' >"
 			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
 			"	<arg type='d' name='timestamp' direction='out' />"
 			"</signal>";

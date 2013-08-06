@@ -212,8 +212,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(as)",&builder));
 	}
 
-	g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
-
+	g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");	
 }
 
 static GVariant* getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
