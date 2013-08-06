@@ -85,7 +85,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectName,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None)
+	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None), mTime(0)
 {
 	startRegistration();
 
@@ -233,6 +233,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
 
 	g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val);
+	g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("(d)", mTime) );
 
 	GError *error2 = NULL;
 
@@ -286,12 +287,21 @@ void AbstractDBusInterface::startRegistration()
 	introspectionXml ="<node>" ;
 	introspectionXml +=
 			"<interface name='"+ mInterfaceName + "' >"
-			"<property type='i' name='Zone' access='read' />";
+			"<property type='i' name='Zone' access='read' />"
+			"<property type='d' name='Time' access='read' />";
 }
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
 	std::string pn = propertyName;
+	if(pn == "Time")
+	{
+		double time = interfaceMap[interfaceName]->time();
+
+		GVariant* value = g_variant_new("(d)", time);
+		return value;
+	}
+
 	if(pn == "Zone")
 	{
 		Zone::Type zone = interfaceMap[objectPath]->zone();
@@ -300,7 +310,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 		return value;
 	}
 
-	else if(interfaceMap.count(objectPath))
+	if(interfaceMap.count(objectPath))
 	{
 		GVariant* value = interfaceMap[objectPath]->getProperty(propertyName);
 		return value;

@@ -63,6 +63,8 @@ public:
 
 	bool isSupported() { return supported; }
 
+	double time() { return mTime; }
+
 	void setObjectPath(std::string op)
 	{
 		if(interfaceMap.find(op) != interfaceMap.end())
@@ -98,6 +100,7 @@ protected:
 
 
 	bool supported;
+	double mTime;
 
 private:
 	std::string mInterfaceName;
