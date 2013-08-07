@@ -92,7 +92,6 @@ public:
 	}
 
 private:
-	VehicleProperty::Property mAmbPropertyName;
 	AbstractRoutingEngine* routingEngine;
 };
 

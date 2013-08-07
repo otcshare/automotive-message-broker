@@ -61,6 +61,7 @@ void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPrope
 
 	AbstractProperty* prop = propertyDBusMap[property];
 	prop->setValue(value);
+	mTime = value->timestamp;
 }
 
 std::string DBusSink::uuid()
