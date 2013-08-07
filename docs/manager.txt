@@ -6,7 +6,8 @@ Methods:
 
 	Array{ObjectPath}	findObject(string objectName)
 
-		returns list of object paths that provide the given objectName.
+		returns list of object paths that provide the given objectName (ie "VehicleSpeed" is the object name for
+		the DBus object at path: "/path/to/VehicleSpeed").
 
 	Array{int32}	zonesForObjectName(string objectName)
 
