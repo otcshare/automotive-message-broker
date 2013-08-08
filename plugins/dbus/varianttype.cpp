@@ -14,7 +14,6 @@ VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, Vehic
 void VariantType::initialize()
 {
 	if(mInitialized) return;
-
 	AsyncPropertyRequest request;
 	request.property = mAmbPropertyName;
 	request.sourceUuidFilter = mSourceFilter;

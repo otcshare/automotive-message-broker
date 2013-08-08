@@ -263,7 +263,7 @@ void DBusInterfaceManager::supportedChanged(PropertyList supportedProperties)
 
 		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
 		{
-			exportProperty<CustomPropertyInterface>(prop, iface->re, connection);
+			exportProperty<CustomPropertyInterface>(prop, re, connection);
 		}
 	}
 
