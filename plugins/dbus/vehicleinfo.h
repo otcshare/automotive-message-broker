@@ -19,14 +19,14 @@ public:
 		 *  @attributeComment \brief MUST return World Manufacturer Identifier (WMI)
 		 *  @attributeComment WMI is defined by SAE ISO 3780:2009.  3 characters.
 		 **/
-		wantPropertyString(VehicleProperty::WMI, "WMI", "s", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WMI, "WMI", "s", AbstractProperty::Read);
 
 		/** @attributeName VIN
 		 *  @type DOMString
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Vehicle Identification Number (VIN) as defined by ISO 3779. 17 characters.
 		 **/
-		wantPropertyString(VehicleProperty::VIN, "VIN", "s", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VIN, "VIN", "s", AbstractProperty::Read);
 
 		supportedChanged(re->supported());
 	}

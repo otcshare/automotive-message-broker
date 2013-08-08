@@ -331,10 +331,10 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			checkButtonEvents();
 			break;
 		case 4:	//Right paddle shifter
-			this->changeMachineGuns(val);
+			this->changeGear(Transmission::TransmissionPositions(this->currentGear+1));
 			break;
 		case 5:	//Left paddle shifter
-			this->changeMachineGuns(val);
+			this->changeGear(Transmission::TransmissionPositions(this->currentGear-1));
 			break;
 		case 6:	//Right upper wheel button
 			this->changeTurnSignal(TurnSignals::Right, val);
