@@ -158,6 +158,8 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 {
 	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
 
+	iface->connection = connection;
+
 	new AutomotiveManager(connection);
 
 	/// properties:
@@ -207,31 +209,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<OccupantStatusProperty>(iface->re, connection);
 	exportProperty<ObstacleDistanceProperty>(iface->re, connection);
 
-	PropertyList list = VehicleProperty::customProperties();
-
-	for (auto itr = list.begin(); itr != list.end(); itr++)
-	{
-		VehicleProperty::Property prop = *itr;
-
-		exportProperty<CustomPropertyInterface>(prop, iface->re, connection);
-	}
-
-
-	/// Create objects for unimplemented properties:
-
-	PropertyList capabilitiesList = VehicleProperty::capabilities();
-	PropertyList implemented = AbstractDBusInterface::implementedProperties();
-
-	for (auto itr = capabilitiesList.begin(); itr != capabilitiesList.end(); itr++)
-	{
-		VehicleProperty::Property prop = *itr;
-
-		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
-		{
-			exportProperty<UncategorizedPropertyInterface>(prop, iface->re, connection);
-		}
-	}
-
+	iface->supportedChanged(PropertyList());
 }
 
 static void
@@ -254,8 +232,8 @@ on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data
 
 
 
-DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine)
-	:re(engine)
+DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine,std::map<std::string,std::string> config)
+	:AbstractSink(engine,config),re(engine)
 {
 	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
 					DBusServiceName,
@@ -271,6 +249,37 @@ DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine)
 DBusInterfaceManager::~DBusInterfaceManager()
 {
 	g_bus_unown_name(ownerId);
+}
+
+void DBusInterfaceManager::supportedChanged(PropertyList supportedProperties)
+{
+
+	PropertyList list = VehicleProperty::customProperties();
+	PropertyList implemented = AbstractDBusInterface::implementedProperties();
+
+	for (auto itr = list.begin(); itr != list.end(); itr++)
+	{
+		VehicleProperty::Property prop = *itr;
+
+		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
+		{
+			exportProperty<CustomPropertyInterface>(prop, iface->re, connection);
+		}
+	}
+
+	/// Create objects for unimplemented properties:
+
+	PropertyList capabilitiesList = VehicleProperty::capabilities();
+
+	for (auto itr = capabilitiesList.begin(); itr != capabilitiesList.end(); itr++)
+	{
+		VehicleProperty::Property prop = *itr;
+
+		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
+		{
+			exportProperty<UncategorizedPropertyInterface>(prop, re, connection);
+		}
+	}
 }
 
 
