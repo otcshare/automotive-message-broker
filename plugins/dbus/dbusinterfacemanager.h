@@ -20,20 +20,31 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef DBUSINTERFACEMANAGER_H
 #define DBUSINTERFACEMANAGER_H
 
+#include "abstractsink.h"
+#include "gio/gio.h"
+
 class AbstractRoutingEngine;
 
-class DBusInterfaceManager
+class DBusInterfaceManager: public AbstractSink
 {
 
 public:
-	DBusInterfaceManager(AbstractRoutingEngine* re);
+	DBusInterfaceManager(AbstractRoutingEngine* re, std::map<string, string> config);
 	~DBusInterfaceManager();
 
 	AbstractRoutingEngine* re;
+
+	/// From AbstractSink:
+	virtual string uuid(){ return "DBusInterfaceManager"; }
+	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) { }
+	virtual void supportedChanged(PropertyList supportedProperties);
     
+	GDBusConnection * connection;
+
 private:
 	
 	unsigned int ownerId;
+
 
 
 };
