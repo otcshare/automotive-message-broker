@@ -8,7 +8,7 @@ class VariantType: public AbstractProperty
 {
 public:
 
-	VariantType(AbstractRoutingEngine* re, string signature, string propertyName, Access access, AbstractDBusInterface* interface);
+	VariantType(AbstractRoutingEngine* re, string signature, string propertyName, string ambPropName, Access access, AbstractDBusInterface* interface);
 	GVariant* toGVariant();
 	void fromGVariant(GVariant *value);
 

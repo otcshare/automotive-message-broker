@@ -33,6 +33,7 @@ uint16_t steeringWheelAngle=0;
 uint16_t throttlePos = 0;
 uint16_t engineCoolant = 40;
 bool machineGun = false;
+uint16_t exteriorBrightness = 500;
 
 static gboolean timeoutCallback(gpointer data)
 {
@@ -69,8 +70,6 @@ string ExampleSourcePlugin::uuid()
 void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	DebugOut()<<"ExampleSource: getPropertyAsync called for property: "<<reply->property<<endl;
-
-
 
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
@@ -171,6 +170,13 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::ExteriorBrightness)
+	{
+		VehicleProperty::ExteriorBrightnessType temp(exteriorBrightness);
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
 }
 
 void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -206,6 +212,7 @@ PropertyList ExampleSourcePlugin::supported()
 	props.push_back(VehicleProperty::DoorsPerRow);
 	props.push_back(VehicleProperty::AirbagStatus);
 	props.push_back(VehicleProperty::MachineGunTurretStatus);
+	props.push_back(VehicleProperty::ExteriorBrightness);
 	
 	return props;
 }
@@ -229,6 +236,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
 	throttlePos = 1 + (100.00 * (rand() / (RAND_MAX + 1.0)));
 	engineCoolant = 1 + (40.00 * (rand() / (RAND_MAX + 140.0)));
+	exteriorBrightness = 1 + (5000 * (rand() / (RAND_MAX + 1.0)));
 	
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
@@ -241,16 +249,9 @@ void ExampleSourcePlugin::randomizeProperties()
 	VehicleProperty::ThrottlePositionType tp(throttlePos);
 	VehicleProperty::EngineCoolantTemperatureType ec(engineCoolant);
 	VehicleProperty::MachineGunTurretStatusType mgt(machineGun);
+	VehicleProperty::ExteriorBrightnessType eb(exteriorBrightness);
 
 	machineGun = !machineGun;
-
-	vel.timestamp = amb::currentTime();
-	es.timestamp = amb::currentTime();
-	ac.timestamp = amb::currentTime();
-	swa.timestamp = amb::currentTime();
-	tsp.timestamp = amb::currentTime();
-	tp.timestamp = amb::currentTime();
-	ec.timestamp = amb::currentTime();
 
 	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel, uuid());
 	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es, uuid());
@@ -260,4 +261,5 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp, uuid());
 	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid());
 	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
+	routingEngine->updateProperty(VehicleProperty::ExteriorBrightness, &eb, uuid());
 }

@@ -72,5 +72,5 @@ std::string DBusSink::uuid()
 DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, string> config)
 	:AbstractSinkManager(engine, config)
 {
-	DBusInterfaceManager* manager = new DBusInterfaceManager(engine);
+	DBusInterfaceManager* manager = new DBusInterfaceManager(engine, config);
 }

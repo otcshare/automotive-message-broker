@@ -2,12 +2,12 @@
 #include "abstractroutingengine.h"
 #include "debugout.h"
 
-VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
+VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName, string ambPropName,  Access access, AbstractDBusInterface *interface)
 	:AbstractProperty(propertyName, signature, access, interface),routingEngine(re)
 {
 	//set default value:
 	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName));
-
+	mAmbPropertyName = ambPropName;
 	AsyncPropertyRequest request;
 	request.property = mPropertyName;
 
