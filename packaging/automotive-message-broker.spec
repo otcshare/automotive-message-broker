@@ -1,8 +1,8 @@
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.9.11
+Version:    0.9.12
 Release:    1
-Group:      System/Base
+Group:      Automotive/Service
 License:    LGPL-2.1
 URL:        https://github.com/otcshare/automotive-message-broker
 Source0:    %{name}-%{version}.tar.bz2
@@ -34,7 +34,7 @@ It brokers information from the vehicle to applications.
 
 %package devel
 Summary:    Automotive Message Broker development files
-Group:      Development/Libraries
+Group:      Automotive/API
 Requires:   %{name} = %{version}-%{release}
 
 %description devel
@@ -42,7 +42,7 @@ Development files for the automotive-message-broker
 
 %package doc
 Summary:    Documentation for the automotive-message-broker API
-Group:      Documentation
+Group:      Automotive/Documentation
 Requires:   %{name} = %{version}-%{release}
 
 %description doc
@@ -50,7 +50,7 @@ Document files that describe the D-Bus API exposed by automotive-message-broker
 
 %package plugins
 Summary:    Various plugins for automotive-message-broker
-Group:      System/Base
+Group:      Automotive/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description plugins
@@ -58,7 +58,7 @@ Collection of plugins for automotive-message-broker.  Contains example, demo and
 
 %package plugins-obd2
 Summary:    OBD-II plugin
-Group:      System/Base
+Group:      Automotive/Libraries
 Requires:   %{name} = %{version}-%{release}
 
 %description plugins-obd2
@@ -66,7 +66,7 @@ OBD-II plugin that uses ELM 327-compatible scantools to access vehicle data
 
 %package plugins-websocket
 Summary:    Websocket source and sink plugins
-Group:      System/Base
+Group:      Automotive/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:   libwebsockets
 
@@ -75,7 +75,7 @@ websocket source and sink plugins
 
 %package plugins-wheel
 Summary:    Source plugin for using the Logitech G27 racing wheel                                        
-Group:      System/Base
+Group:      Automotive/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:   libwebsockets
 
@@ -84,7 +84,7 @@ source plugin for using the Logitech G27 racing wheel
 
 %package plugins-database
 Summary:    Database logging plugin for automotive-message-broker
-Group:      System/Base  
+Group:      Automotive/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:  sqlite
 
@@ -93,7 +93,7 @@ Database logging plugin for automotive-message-broker
 
 %package plugins-opencvlux
 Summary:    Plugin for simulating ExteriorBrightness using a common webcam
-Group:      System/Base
+Group:      Automotive/Libraries
 Requires:   %{name} = %{version}-%{release}
 Requires:   opencv
 
@@ -102,7 +102,7 @@ Plugin for simulating ExteriorBrightness using a common webcam
 
 %package plugins-murphy
 Summary:   Plugin for integration with the murphy policy system
-Group:     System Environment/Daemons
+Group:     Automotive/Libraries
 Requires:  %{name} = %{version}-%{release}
 Requires:  murphy
 
@@ -111,7 +111,7 @@ Plugin for integration with the murphy policy system
 
 #%package plugins-gpsd
 #Summary:   Plugin for integration with the gpsd policy system
-#Group:     System Environment/Daemons
+#Group:     Automotive/Libraries
 #Requires:  %{name} = %{version}-%{release}
 #Requires:  gpsd
 
@@ -151,7 +151,7 @@ ln -s ../ambd.service %{buildroot}%{_prefix}/lib/systemd/system/network.target.w
 
 %files devel
 %defattr(-,root,root,-)
-%{_libdir}/libamb.so*
+# %{_libdir}/libamb.so
 %{_includedir}/amb/*.h
 %{_includedir}/amb/*.hpp
 %{_libdir}/pkgconfig/*.pc
