@@ -24,9 +24,11 @@
 #include <QObject>
 #include <QVariant>
 #include <QJsonDocument>
+#include <QScriptValue>
 #include "uuidhelper.h"
 
 #include "authenticate.h"
+#include "agent.h"
 
 class IrcCommunication;
 class QScriptEngine;
@@ -44,7 +46,10 @@ public:
 	void setType(QString t);
 
 	virtual PropertyList subscriptions() { return PropertyList(); }
-	virtual void supportedChanged(PropertyList ){	}
+	virtual void supportedChanged(PropertyList )
+	{
+		DebugOut()<<"Bluemonkey Property Supported Changed"<<endl;
+	}
 
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
 
@@ -53,6 +58,7 @@ public:
 	QVariant value();
 	void setValue(QVariant v);
 
+	void getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunction);
 Q_SIGNALS:
 
 	void changed(QVariant val);
@@ -71,6 +77,8 @@ public:
 	virtual void supportedChanged(PropertyList supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
 	virtual std::string uuid();
+
+	static QScriptEngine* engine;
 
 public Q_SLOTS:
 
@@ -96,8 +104,9 @@ private Q_SLOTS: /// methods:
 private:
 	QStringList configsToLoad;
 	IrcCommunication* irc;
-	QScriptEngine* engine;
+
 	Authenticate* auth;
+	BluemonkeyAgent* agent;
 };
 
 class BluemonkeySinkManager: public AbstractSinkManager

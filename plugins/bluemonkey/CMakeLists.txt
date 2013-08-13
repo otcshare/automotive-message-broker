@@ -21,8 +21,8 @@ add_definitions(-DCOMMUNI_SHARED)
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${communi_INCLUDE_DIRS} ${QT_INCLUDE_DIRS})
 
-set(bluemonkeyplugin_headers bluemonkey.h irccoms.h authenticate.h)
-set(bluemonkeyplugin_sources bluemonkey.cpp irccoms.cpp authenticate.cpp)
+set(bluemonkeyplugin_headers bluemonkey.h irccoms.h authenticate.h agent.h)
+set(bluemonkeyplugin_sources bluemonkey.cpp irccoms.cpp authenticate.cpp agent.cpp)
 
 add_library(bluemonkeyplugin MODULE ${bluemonkeyplugin_sources})
 set_target_properties(bluemonkeyplugin PROPERTIES PREFIX "")

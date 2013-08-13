@@ -83,7 +83,8 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 
 	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
 	{
-		(*itr)->supportedChanged(mMasterPropertyList);
+		AbstractSink* s = (*itr);
+		s->supportedChanged(mMasterPropertyList);
 	}
 
 	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
