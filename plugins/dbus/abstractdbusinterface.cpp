@@ -44,7 +44,28 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 	g_assert(iface);
 
-	if(boost::algorithm::starts_with(method,"get"))
+	if(method == "getHistory")
+	{
+		double beginTime = 0;
+		double endTime = 0;
+
+		g_variant_get(parameters, "(dd)", &beginTime, &endTime);
+
+		auto propertyMap = iface->getProperties();
+
+//		auto cb = [&invocation](std::list<>){};
+
+		for(auto itr = propertyMap.begin(); itr != propertyMap.end(); itr++)
+		{
+			std::string propertyName = (*itr).first;
+
+
+		}
+
+		//AsyncRangePropertyRequest
+	}
+
+	else if(boost::algorithm::starts_with(method,"get"))
 	{
 		std::string propertyName = method.substr(3);
 		auto propertyMap = iface->getProperties();
@@ -290,7 +311,11 @@ void AbstractDBusInterface::startRegistration()
 	introspectionXml +=
 			"<interface name='"+ mInterfaceName + "' >"
 			"<property type='i' name='Zone' access='read' />"
-			"<property type='d' name='Time' access='read' />";
+			"<property type='d' name='Time' access='read' />"
+			"<method name='getHistory'>"
+			"	<arg type='d' direction='in' name='beginTimestamp' />"
+			"	<arg type='d' direction='in' name='endTimestamp' />"
+			"</method>";
 }
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
