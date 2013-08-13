@@ -63,6 +63,8 @@ public:
 
 	bool isSupported() { return supported; }
 
+	std::list<string> getAmbProperties();
+
 	double time() { return mTime; }
 
 protected:
