@@ -1,6 +1,8 @@
-* Mon Aug 12 2013 - <kevron.m.rees@intel.com>
-- New upstream release 0.9.12 ("chevelle" beta)
+* Tue Aug 13 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.9.13 ("chevelle" beta)
 - Enabled murphy plugin by default
+- Fixed memory smashing bug with json parsing
+- Added support for additional buttons in wheel plugin
 
 * Tue Jul 30 2013 - <kevron.m.rees@intel.com>
 - New upstreadm release 0.9.11 ("chevelle" beta)
