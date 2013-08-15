@@ -138,7 +138,7 @@ public:
 	AsyncRangePropertyRequest(const AsyncRangePropertyRequest &request)
 
 	{
-		this->property = request.property;
+		this->properties = request.properties;
 		this->completed = request.completed;
 		this->timeBegin = request.timeBegin;
 		this->timeEnd = request.timeEnd;
@@ -149,7 +149,7 @@ public:
 
 	virtual ~AsyncRangePropertyRequest() {}
 
-	VehicleProperty::Property property;
+	PropertyList properties;
 	std::string sourceUuid;
 	GetRangedPropertyCompletedSignal completed;
 	double timeBegin;

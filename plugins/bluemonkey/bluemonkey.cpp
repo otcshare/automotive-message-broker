@@ -176,7 +176,7 @@ void BluemonkeySink::loadConfigPriv()
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		qDebug()<<"failed to open config file: "<<str;
+		DebugOut()<<"failed to open config file: "<<str.toStdString()<<endl;
 		return;
 	}
 
@@ -184,9 +184,11 @@ void BluemonkeySink::loadConfigPriv()
 
 	file.close();
 
+	DebugOut()<<"evaluating script: "<<script.toStdString();
+
 	QScriptValue val = engine->evaluate(script);
 
-	qDebug()<<val.toString();
+	DebugOut()<<val.toString().toStdString()<<endl;
 }
 
 void BluemonkeySink::reloadEngine()
@@ -260,7 +262,7 @@ void Property::setValue(QVariant v)
 }
 
 Property::Property(VehicleProperty::Property prop, AbstractRoutingEngine* re, QObject *parent)
-	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr)
+:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr)
 {
 	setType(prop.c_str());
 }
