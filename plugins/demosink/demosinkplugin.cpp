@@ -58,6 +58,7 @@ DemoSink::DemoSink(AbstractRoutingEngine* re, map<string, string> config)
 {
 	routingEngine->subscribeToProperty(VehicleProperty::ButtonEvent, this);
 	routingEngine->subscribeToProperty(VehicleProperty::TurnSignal, this);
+	routingEngine->subscribeToProperty(VehicleProperty::MachineGunTurretStatus, this);
 }
 
 DemoSink::~DemoSink()
