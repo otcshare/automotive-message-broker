@@ -54,7 +54,7 @@ protected:
 
 	void wantPropertyVariant(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, access, this);
+		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access, this);
 	}
 
 	PropertyDBusMap propertyDBusMap;

@@ -61,6 +61,7 @@ void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPrope
 
 	AbstractProperty* prop = propertyDBusMap[property];
 	prop->setValue(value);
+	mTime = value->timestamp;
 }
 
 std::string DBusSink::uuid()
@@ -71,5 +72,5 @@ std::string DBusSink::uuid()
 DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, string> config)
 	:AbstractSinkManager(engine, config)
 {
-	DBusInterfaceManager* manager = new DBusInterfaceManager(engine);
+	DBusInterfaceManager* manager = new DBusInterfaceManager(engine, config);
 }

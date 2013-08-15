@@ -4,5 +4,8 @@ Object Path: /
 
 Methods:
 
-	ObjectPath	findObject(string property)
-		returns object path representing the property.
+	ObjectPath	findProperty(string objectName)
+		returns object path representing the object name.
+
+	Array{String}   list()
+		returns list of supported object names

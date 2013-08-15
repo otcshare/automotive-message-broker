@@ -37,16 +37,33 @@ static void handleMethodCall(GDBusConnection       *connection,
 							 GDBusMethodInvocation *invocation,
 							 gpointer               user_data)
 {
+	AbstractDBusInterface* iface = static_cast<AbstractDBusInterface*>(user_data);
 
 	std::string method = method_name;
+	if(method == "getHistory")
+	{
+		double beginTime = 0;
+		double endTime = 0;
 
+		g_variant_get(parameters, "(dd)", &beginTime, &endTime);
 
+		auto propertyList = iface->getAmbProperties();
+
+//		auto cb = [&invocation](std::list<>){};
+
+		for(auto itr = propertyList.begin(); itr != propertyList.end(); itr++)
+		{
+
+		}
+
+		//AsyncRangePropertyRequest
+	}
 
 }
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string op,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection), supported(false)
+	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection), supported(false), mTime(0)
 {
 	interfaceMap[interfaceName] = this;
 	startRegistration();
@@ -76,9 +93,10 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	
 	properties[property->name()] = property;
 
-	if(!ListPlusPlus<string>(&mimplementedProperties).contains(property->name()))
+	if(!ListPlusPlus<string>(&mimplementedProperties).contains(property->ambPropertyName()))
 	{
-		mimplementedProperties.push_back(property->name());
+		std::string pname = property->ambPropertyName();
+		mimplementedProperties.push_back(pname);
 	}
 }
 
@@ -163,6 +181,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
 
 	g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val);
+	g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("(d)", mTime) );
 
 	GError *error2 = NULL;
 
@@ -210,22 +229,51 @@ bool AbstractDBusInterface::implementsProperty(string property)
 	return false;
 }
 
+std::list<std::string> AbstractDBusInterface::getAmbProperties()
+{
+	std::list<std::string> list;
+
+	for(auto itr = properties.begin(); itr != properties.end(); itr++)
+	{
+		AbstractProperty* prop = (*itr).second;
+		list.push_back(prop->ambPropertyName());
+	}
+
+	return list;
+}
+
 void AbstractDBusInterface::startRegistration()
 {
 	unregisterObject();
 	introspectionXml ="<node>" ;
-	introspectionXml += "<interface name='"+ mInterfaceName + "' >";
+	introspectionXml += "<interface name='"+ mInterfaceName + "' >"
+
+			"<property type='d' name='Time' access='read' />"
+			"<method name='getHistory'>"
+			"	<arg type='d' direction='in' name='beginTimestamp' />"
+			"	<arg type='d' direction='in' name='endTimestamp' />"
+			"</method>";
 }
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
+	std::string pn = propertyName;
+	if(pn == "Time")
+	{
+		double time = interfaceMap[interfaceName]->time();
+
+		GVariant* value = g_variant_new("(d)", time);
+		return value;
+	}
+
 	if(interfaceMap.count(interfaceName))
 	{
 		GVariant* value = interfaceMap[interfaceName]->getProperty(propertyName);
 		return value;
 
 	}
-	debugOut("No interface for" + string(interfaceName));
+
+	DebugOut(DebugOut::Error)<<"No interface for" + string(interfaceName)<<endl;
 	return nullptr;
 }
 

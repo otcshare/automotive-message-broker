@@ -63,6 +63,10 @@ public:
 
 	bool isSupported() { return supported; }
 
+	std::list<string> getAmbProperties();
+
+	double time() { return mTime; }
+
 protected:
 
 	void startRegistration();
@@ -80,6 +84,7 @@ protected:
 	unordered_map<string, AbstractProperty*> properties;
 
 	bool supported;
+	double mTime;
 
 private:
 	string mInterfaceName;

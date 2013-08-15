@@ -4,7 +4,7 @@
 static const gchar introspection_xml[] =
   "<node>"
   "  <interface name='org.automotive.Manager'>"
-  "    <method name='findObject'>"
+  "    <method name='findProperty'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='o' name='response' direction='out'/>"
   "    </method>"
@@ -26,7 +26,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 	std::string method = method_name;
 
-	if(method == "findObject")
+	if(method == "findProperty")
 	{
 		gchar* arg;
 

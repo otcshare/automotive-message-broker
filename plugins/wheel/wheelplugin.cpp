@@ -310,13 +310,16 @@ void WheelPrivate::newButtonValue(char number, bool val)
 {
 	switch (number) {
 		case 0:	//Gear attach diamond down
+			checkButtonEvents();
 			break;
 		case 1:	//Gear attach diamond left
 			checkButtonEvents();
 			break;
 		case 2:	//Gear attach diamond right
+			checkButtonEvents();
 			break;
 		case 3:	//Gear attach diamond up
+			checkButtonEvents();
 			break;
 		case 11://Gear attach red button row, left button
 			checkButtonEvents();
@@ -331,10 +334,12 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			checkButtonEvents();
 			break;
 		case 4:	//Right paddle shifter
-			this->changeMachineGuns(val);
+			this->changeGear(Transmission::TransmissionPositions(this->currentGear+1));
+			changeMachineGuns(val);
 			break;
 		case 5:	//Left paddle shifter
-			this->changeMachineGuns(val);
+			this->changeGear(Transmission::TransmissionPositions(this->currentGear-1));
+
 			break;
 		case 6:	//Right upper wheel button
 			this->changeTurnSignal(TurnSignals::Right, val);
@@ -566,27 +571,45 @@ uint16_t WheelPrivate::calcRPM()
 
 void WheelPrivate::checkButtonEvents()
 {
-	//cout << "checkButtonEvents, b1/b11/b8/b9/b10 " << (int)this->button[1] << " " << (int)this->button[11] << " " << (int)this->button[8] << " " << (int)this->button[9] << " " << (int)this->button[10] << endl;
-	if (this->button[1]) {
-		if (this->button[11]) {
+	if (this->button[0]) {
 		//	cout << "Inside button 11!" << endl;
-			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset1Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
-		}
-		if (this->button[8]) {
-		//	cout << "Inside button 8!" << endl;
-			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset2Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
-		}
-		if (this->button[9]) {
-		//	cout << "Inside button 9!" << endl;
-			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset3Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
-		}
-		if (this->button[10]) {
-		//	cout << "Inside button 10!" << endl;
-			VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset4Button);
-			this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
-		}
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::StopButton);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
 	}
+	if (this->button[1]) {
+		//	cout << "Inside button 11!" << endl;
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::PrevButton);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
+	}
+	if (this->button[2]) {
+		//	cout << "Inside button 11!" << endl;
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::SkipButton);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
+	}
+	if (this->button[3]) {
+		//	cout << "Inside button 11!" << endl;
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::PlayButton);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
+	}
+	if (this->button[11]) {
+		//	cout << "Inside button 11!" << endl;
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset1Button);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
+	}
+	if (this->button[8]) {
+		//	cout << "Inside button 8!" << endl;
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset2Button);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
+	}
+	if (this->button[9]) {
+		//	cout << "Inside button 9!" << endl;
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset3Button);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
+	}
+	if (this->button[10]) {
+		//	cout << "Inside button 10!" << endl;
+		VehicleProperty::ButtonEventType tempButton(ButtonEvents::Preset4Button);
+		this->re->updateProperty(VehicleProperty::ButtonEvent, &tempButton, mParent->uuid());
+	}
+
 }

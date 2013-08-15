@@ -130,8 +130,8 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 			DebugOut() << "plugin config key: " << key << "value:" << valstr << endl;
 			configurationMap[key] = valstr;
 		}
-		json_object *pathobject = json_object_object_get(obj,"path");
- 		string path = string(json_object_get_string(pathobject));
+
+		string path = configurationMap["path"];
 
 		AbstractSource* plugin = loadPlugin<AbstractSource*>(path,configurationMap);
 		
@@ -139,11 +139,10 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		{
 			mSources.push_back(plugin);
 		}
-		json_object_put(pathobject);
 	}
 
 	DebugOut() << "Trying to free obj" << endl;
-	//json_object_put(sourcesobject);
+	json_object_put(sourcesobject);
 	DebugOut() << "Done first" << endl;
 	///read the sinks:
 	
@@ -181,8 +180,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		}
 
 		
-		json_object *pathobject = json_object_object_get(obj,"path");
- 		string path = string(json_object_get_string(pathobject));
+		string path = configurationMap["path"];
 
 		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path, configurationMap);
 
@@ -190,14 +188,10 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		{
 			throw std::runtime_error("plugin is not a SinkManager");
 		}
-		json_object_put(pathobject);
-		//json_object_put(obj);
-
 	}
-	DebugOut() << "Trying to free list" << endl;
-	array_list_free(sinkslist);
+
 	DebugOut() << "Trying to free obj" << endl;
-	//json_object_put(sinksobject);
+	json_object_put(sinksobject);
 	DebugOut() << "Done" << endl;
 		
 	
