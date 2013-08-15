@@ -17,11 +17,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "abstractdbusinterface.h"
-#include "debugout.h"
+
+#include <abstractroutingengine.h>
+#include <debugout.h>
 #include <boost/algorithm/string.hpp>
 #include <gio/gio.h>
+#include <listplusplus.h>
 
-#include "listplusplus.h"
 #include "abstractproperty.h"
 
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMap;
@@ -49,14 +51,47 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		auto propertyList = iface->getAmbProperties();
 
-//		auto cb = [&invocation](std::list<>){};
+		std::string ifaceName = iface->interfaceName();
 
-		for(auto itr = propertyList.begin(); itr != propertyList.end(); itr++)
+		AsyncRangePropertyRequest request;
+
+		request.properties = propertyList;
+		request.timeBegin = beginTime;
+		request.timeEnd = endTime;
+
+		request.completed = [&invocation,&ifaceName](AsyncRangePropertyReply* reply)
 		{
+			if(!reply->success)
+			{
+				stringstream str;
+				str<<"Error during request: "<<reply->error;
+				ifaceName += ".Error";
+				g_dbus_method_invocation_return_dbus_error(invocation, ifaceName.c_str(), str.str().c_str());
+				return;
+			}
 
-		}
+			if(!reply->values.size())
+			{
+				ifaceName += ".Error";
+				g_dbus_method_invocation_return_dbus_error(invocation, ifaceName.c_str(), "No results");
+				return;
+			}
 
-		//AsyncRangePropertyRequest
+			GVariantBuilder builder;
+			g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
+
+
+			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
+			{
+				AbstractPropertyType* value = *itr;
+
+				g_variant_builder_add(&builder, "{sv}", value->name.c_str(), g_variant_ref(value->toVariant()));
+			}
+
+			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a{sv})",&builder));
+		};
+
+		iface->re->getRangePropertyAsync(request);
 	}
 
 }
@@ -252,6 +287,7 @@ void AbstractDBusInterface::startRegistration()
 			"<method name='getHistory'>"
 			"	<arg type='d' direction='in' name='beginTimestamp' />"
 			"	<arg type='d' direction='in' name='endTimestamp' />"
+			"   <arg type='a{sv}' direction='out' name='result' />"
 			"</method>";
 }
 

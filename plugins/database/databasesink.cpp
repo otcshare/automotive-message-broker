@@ -463,7 +463,7 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	std::vector<std::vector<string>> data = db->select(query.str());
 
-	std::list<AbstractPropertyType*> cleanup;
+	DebugOut()<<"Dataset size "<<data.size()<<endl;
 
 	for(auto i=0;i<data.size();i++)
 	{
@@ -484,7 +484,6 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 			property->sequence = dbobj.sequence;
 
 			reply->values.push_back(property);
-			cleanup.push_back(property);
 		}
 	}
 

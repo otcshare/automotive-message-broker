@@ -32,7 +32,7 @@ DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine,
 	:AbstractDBusInterface(interface, path, connection),
 	  AbstractSink(engine, config)
 {
-
+	AbstractDBusInterface::re = engine;
 }
 
 void DBusSink::supportedChanged(PropertyList supportedProperties)
