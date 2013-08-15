@@ -17,15 +17,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "abstractdbusinterface.h"
-#include "debugout.h"
+
+#include <abstractroutingengine.h>
+#include <debugout.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <gio/gio.h>
+#include <listplusplus.h>
 
-#include "listplusplus.h"
 #include "abstractproperty.h"
 
-unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::interfaceMap;
+unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::objectMap;
 list<string> AbstractDBusInterface::mimplementedProperties;
 
 
@@ -53,16 +55,56 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 		auto propertyMap = iface->getProperties();
 
-//		auto cb = [&invocation](std::list<>){};
+		std::list<std::string> propertyList;
 
 		for(auto itr = propertyMap.begin(); itr != propertyMap.end(); itr++)
 		{
-			std::string propertyName = (*itr).first;
+			AbstractProperty* prop = (*itr).second;
 
-
+			propertyList.push_back(prop->ambPropertyName());
 		}
 
-		//AsyncRangePropertyRequest
+		std::string ifaceName = iface->interfaceName();
+
+		AsyncRangePropertyRequest request;
+
+		request.properties = propertyList;
+		request.timeBegin = beginTime;
+		request.timeEnd = endTime;
+
+		request.completed = [&invocation,&ifaceName](AsyncRangePropertyReply* reply)
+		{
+			if(!reply->success)
+			{
+				stringstream str;
+				str<<"Error during request: "<<reply->error;
+				ifaceName += ".Error";
+				g_dbus_method_invocation_return_dbus_error(invocation, ifaceName.c_str(), str.str().c_str());
+				return;
+			}
+
+			if(!reply->values.size())
+			{
+				ifaceName += ".Error";
+				g_dbus_method_invocation_return_dbus_error(invocation, ifaceName.c_str(), "No results");
+				return;
+			}
+
+			GVariantBuilder builder;
+			g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
+
+
+			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
+			{
+				AbstractPropertyType* value = *itr;
+
+				g_variant_builder_add(&builder, "{sv}", value->name.c_str(), g_variant_ref(value->toVariant()));
+			}
+
+			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a{sv})",&builder));
+		};
+
+		iface->re->getRangePropertyAsync(request);
 	}
 
 	else if(boost::algorithm::starts_with(method,"get"))
@@ -128,7 +170,7 @@ AbstractDBusInterface::~AbstractDBusInterface()
 		}
 	}
 
-	interfaceMap.erase(mInterfaceName);
+	objectMap.erase(mObjectPath);
 
 }
 
@@ -270,7 +312,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string object)
 {
 	std::list<AbstractDBusInterface *> l;
-	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
+	for(auto itr = objectMap.begin(); itr != objectMap.end(); itr++)
 	{
 		AbstractDBusInterface * interface = (*itr).second;
 		if(interface->objectName() == object)
@@ -283,7 +325,7 @@ list<AbstractDBusInterface *> AbstractDBusInterface::interfaces()
 {
 	std::list<AbstractDBusInterface*> ifaces;
 
-	for(auto itr = interfaceMap.begin(); itr != interfaceMap.end(); itr++)
+	for(auto itr = objectMap.begin(); itr != objectMap.end(); itr++)
 	{
 		ifaces.push_back((*itr).second);
 	}
@@ -315,6 +357,7 @@ void AbstractDBusInterface::startRegistration()
 			"<method name='getHistory'>"
 			"	<arg type='d' direction='in' name='beginTimestamp' />"
 			"	<arg type='d' direction='in' name='endTimestamp' />"
+			"   <arg type='a{sv}' direction='out' name='result' />"
 			"</method>";
 }
 
@@ -323,7 +366,12 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 	std::string pn = propertyName;
 	if(pn == "Time")
 	{
-		double time = interfaceMap[interfaceName]->time();
+		if(objectMap.find(objectPath) == objectMap.end())
+		{
+			DebugOut(DebugOut::Error)<<objectPath<<" is not a valid object path."<<endl;
+			return nullptr;
+		}
+		double time = objectMap[objectPath]->time();
 
 		GVariant* value = g_variant_new("(d)", time);
 		return value;
@@ -331,15 +379,21 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 
 	if(pn == "Zone")
 	{
-		Zone::Type zone = interfaceMap[objectPath]->zone();
+		if(objectMap.find(objectPath) == objectMap.end())
+		{
+			DebugOut(DebugOut::Error)<<objectPath<<" is not a valid object path."<<endl;
+			return nullptr;
+		}
+
+		Zone::Type zone = objectMap[objectPath]->zone();
 
 		GVariant* value = g_variant_new("(i)",(int)zone);
 		return value;
 	}
 
-	if(interfaceMap.count(objectPath))
+	if(objectMap.count(objectPath))
 	{
-		GVariant* value = interfaceMap[objectPath]->getProperty(propertyName);
+		GVariant* value = objectMap[objectPath]->getProperty(propertyName);
 		return value;
 	}
 
@@ -350,9 +404,9 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 
 gboolean AbstractDBusInterface::setProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GVariant* value, GError** error, gpointer userData)
 {
-	if(interfaceMap.count(objectPath))
+	if(objectMap.count(objectPath))
 	{
-		interfaceMap[objectPath]->setProperty(propertyName, value);
+		objectMap[objectPath]->setProperty(propertyName, value);
 		return true;
 	}
 

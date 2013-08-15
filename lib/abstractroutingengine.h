@@ -182,6 +182,8 @@ public:
 		values.clear();
 	}
 
+	AsyncPropertyReply::Error error;
+
 	std::list<AbstractPropertyType*> values;
 	bool success;
 };

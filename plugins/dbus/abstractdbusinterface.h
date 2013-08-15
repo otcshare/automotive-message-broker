@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/any.hpp>
 #include <nullptr.h>
 #include "abstractpropertytype.h"
+#include <abstractroutingengine.h>
 
 class AbstractProperty;
 
@@ -65,13 +66,15 @@ public:
 
 	double time() { return mTime; }
 
+	AbstractRoutingEngine* re;
+
 	void setObjectPath(std::string op)
 	{
-		if(interfaceMap.find(op) != interfaceMap.end())
-			interfaceMap.erase(op);
+		if(objectMap.find(op) != objectMap.end())
+			objectMap.erase(op);
 
 		mObjectPath = op;
-		interfaceMap[mObjectPath] = this;
+		objectMap[mObjectPath] = this;
 	}
 
 	std::string objectName() { return mPropertyName; }
@@ -108,7 +111,7 @@ private:
 	std::string mPropertyName;
 	std::string introspectionXml;
 	GDBusConnection * mConnection;
-	static std::unordered_map<std::string, AbstractDBusInterface*> interfaceMap;
+	static std::unordered_map<std::string, AbstractDBusInterface*> objectMap;
 	static std::list<std::string> mimplementedProperties;
 	guint regId;
 };

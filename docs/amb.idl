@@ -30,6 +30,24 @@ interface VehiclePropertyError   {
 	readonly attribute DOMString message;
 };
 
+[NoInterfaceObject]
+interface Dictionary {
+	DOMString objectName;
+	any value;
+}
+
+[NoInterfaceObject]
+interface VehiclePropertyType {
+	readonly attribute double Time;
+	
+	/**
+	* \brief returns dictionary of objectName and values for data between
+	* 'beginTime' and 'endTime'
+	* \arg beginTime time stamp in Seconds since Unix Epoc
+	* \arg endTime time stamp in Seconds since Unix Epoc
+	**/
+	Dictionary getHistory(double beginTime, double endTime);
+}
 enum Zone {
 	None = 0,
 	Front = 1,
@@ -39,7 +57,6 @@ enum Zone {
 	Rear = 1 << 4,
 	Center = 1 << 5
 }
-
 [NoInterfaceObject]
 interface Manager  {
 
@@ -49,7 +66,7 @@ interface Manager  {
 	sequence<DOMString> list();
 	/**  
 	 *  \brief find the DBus object path which matches "objectName" and "zone".
-     *  \arg DOMString property is the requested property to be retrieved.
+	 *  \arg DOMString property is the requested property to be retrieved.
 	 *  \arg Zone zone is the zone which the object
 	 *  \returns string representing the DBus Object path
 	**/

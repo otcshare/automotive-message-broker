@@ -179,7 +179,7 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 
 			if(value->sourceUuid != uuid)
 			{
-				DebugOut(DebugOut::Warning)<<"Source not setting uuid for property "<<value->name<<endl;
+				//DebugOut(DebugOut::Warning)<<"Source not setting uuid for property "<<value->name<<endl;
 				value->sourceUuid = uuid;
 			}
 

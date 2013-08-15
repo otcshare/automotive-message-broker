@@ -32,7 +32,7 @@ DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConn
 	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
 	  AbstractSink(engine, config)
 {
-
+	AbstractDBusInterface::re = engine;
 }
 
 void DBusSink::supportedChanged(PropertyList supportedProperties)

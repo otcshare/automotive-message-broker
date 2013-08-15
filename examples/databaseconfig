@@ -10,14 +10,18 @@
 			"name" : "Database",
 			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
 			"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
-			"databaseFile" : "storage.db",
+			"databaseFile" : "/tmp/storage",
 			"startOnLoad" : "true",
 			"bufferLength" : "1"
 		},
 		{
 			"name" : "Example Sink",
 			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
+		},
+		{
+			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
 		}
+		
 	]
 }
 
