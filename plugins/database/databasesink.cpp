@@ -445,7 +445,17 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	ostringstream query;
 	query.precision(15);
 
-	query<<"SELECT * from "<<tablename<<" WHERE key='"<<reply->property<<"' AND";
+	query<<"SELECT * from "<<tablename<<" WHERE (";
+
+	for(auto itr = reply->properties.begin(); itr != reply->properties.end(); itr++)
+	{
+		if(itr != reply->properties.begin())
+			query<<" OR ";
+
+		query<<"key='"<<(*itr)<<"'";
+	}
+
+	query<<") AND";
 
 	if(reply->timeBegin && reply->timeEnd)
 	{

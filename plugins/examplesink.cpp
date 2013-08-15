@@ -167,7 +167,12 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 		vehicleSpeedFromLastWeek.timeBegin = amb::currentTime() - 10;
 		vehicleSpeedFromLastWeek.timeEnd = amb::currentTime();
-		vehicleSpeedFromLastWeek.property = VehicleProperty::VehicleSpeed;
+
+		PropertyList requestList;
+		requestList.push_back(VehicleProperty::VehicleSpeed);
+		requestList.push_back(VehicleProperty::EngineSpeed);
+
+		vehicleSpeedFromLastWeek.properties = requestList;
 		vehicleSpeedFromLastWeek.completed = [](AsyncRangePropertyReply* reply)
 		{
 			std::list<AbstractPropertyType*> values = reply->values;

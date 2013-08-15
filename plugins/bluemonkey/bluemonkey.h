@@ -78,7 +78,7 @@ public:
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
 	virtual std::string uuid();
 
-	static QScriptEngine* engine;
+	QScriptEngine* engine;
 
 public Q_SLOTS:
 

@@ -257,9 +257,7 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
 		AbstractSource* src = (*itr);
-		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property)
-				&& (src->supportedOperations() & AbstractSource::GetRanged)
+		if((src->supportedOperations() & AbstractSource::GetRanged)
 				&& (request.sourceUuid == "" || request.sourceUuid == src->uuid()))
 		{
 			src->getRangePropertyAsync(reply);

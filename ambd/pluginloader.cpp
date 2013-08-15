@@ -140,8 +140,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 			mSources.push_back(plugin);
 		}
 	}
-	DebugOut() << "Trying to free list" << endl;
-	//array_list_free(sourceslist);
+
 	DebugOut() << "Trying to free obj" << endl;
 	json_object_put(sourcesobject);
 	DebugOut() << "Done first" << endl;

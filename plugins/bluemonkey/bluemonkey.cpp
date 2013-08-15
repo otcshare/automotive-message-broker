@@ -30,8 +30,6 @@
 
 Q_SCRIPT_DECLARE_QMETAOBJECT(QTimer, QObject*)
 
-QScriptEngine* BluemonkeySink::engine = nullptr;
-
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new BluemonkeySinkManager(routingengine, config);
@@ -88,7 +86,7 @@ QVariant gvariantToQVariant(GVariant *value)
 
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), agent(nullptr)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), agent(nullptr), engine(nullptr)
 {
 	irc = new IrcCommunication(config, this);
 
@@ -196,7 +194,7 @@ void BluemonkeySink::loadConfigPriv()
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		qDebug()<<"failed to open config file: "<<str;
+		DebugOut()<<"failed to open config file: "<<str.toStdString()<<endl;
 		return;
 	}
 
@@ -204,9 +202,11 @@ void BluemonkeySink::loadConfigPriv()
 
 	file.close();
 
+	DebugOut()<<"evaluating script: "<<script.toStdString();
+
 	QScriptValue val = engine->evaluate(script);
 
-	qDebug()<<val.toString();
+	DebugOut()<<val.toString().toStdString()<<endl;
 }
 
 void BluemonkeySink::reloadEngine()
@@ -293,12 +293,17 @@ void Property::setValue(QVariant v)
 }
 
 void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunction)
+{
 	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
 	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
 	AsyncRangePropertyRequest request;
 	request.timeBegin = b;
 	request.timeEnd = e;
-	request.property = mValue->name;
+
+	PropertyList reqlist;
+	reqlist.push_back(mValue->name);
+
+	request.properties = reqlist;
 	request.completed = [&cbFunction](AsyncRangePropertyReply* reply)
 	{
 		if(cbFunction.isFunction())
@@ -312,12 +317,16 @@ void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunctio
 				list.append(gvariantToQVariant(val->toVariant()));
 			}
 
-			cbFunction.call(QScriptValue(),BluemonkeySink::engine->newVariant(list));
+			cbFunction.call(QScriptValue(),cbFunction.engine()->newVariant(list));
 
 		}
 
 		delete reply;
 	};
+
+	routingEngine->getRangePropertyAsync(request);
+}
+
 Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, QObject *parent)
 	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr)
 {

@@ -17,11 +17,6 @@
 		{
 			"name" : "Example Sink",
 			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
-		},
-		{
-			"name" : "Websocket sink",
-			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
-			"interface" : "lo"
 		}
 	]
 }
