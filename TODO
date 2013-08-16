@@ -2,8 +2,8 @@ For 0.10.0
 - Implement all the DBus properties in the docs/ directory.
 - DBus support for time and sequece being included in dbus properties.
 - DBus support for objects with multiple sources and multiple 'zones' (ie /org/automotive/${sourceID}/${zone}/batteryVoltage/${index})
-- Document changes to the DBus API in the IDL
-- autoreconnect on a timeout when Obd2 disconnects if 'autoreconnect' is 'true' in the config
+- Document changes to the DBus API in the IDL DONE
+- update json protocol to support rangerequests with PropertyList instead of a signel property
 
 Other:
 - grep all the TODOs in the code and do them
