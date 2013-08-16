@@ -190,7 +190,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 }
 
-void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property, double start, double end, double seqstart,double seqend, string id)
+void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, PropertyList properties, double start, double end, double seqstart,double seqend, string id)
 {
 	AsyncRangePropertyRequest rangedRequest;
 
@@ -198,17 +198,6 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 	rangedRequest.timeEnd = end;
 	rangedRequest.sequenceBegin = seqstart;
 	rangedRequest.sequenceEnd = seqend;
-
-	PropertyList foo = VehicleProperty::capabilities();
-	if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
-	{
-		rangedRequest.property = property;
-	}
-	else
-	{
-		DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
-		return;
-	}
 
 	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
 	{
@@ -554,7 +543,9 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						//Invalid sequence begin/end pair
 					}
-					sinkManager->addSingleShotRangedSink(wsi,property,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
+					PropertyList propertyList;
+					propertyList.push_back(property);
+					sinkManager->addSingleShotRangedSink(wsi,propertyList,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
 				}
 			}
 			else

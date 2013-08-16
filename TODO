@@ -5,9 +5,9 @@ For 0.11
 - Implement all the DBus properties in the docs/ directory.
 - DBus support for time and sequece being an additional api call (ie, getVehicleSpeed()).  DONE
 - DBus support for objects with multiple sources and multiple 'zones' (/${sourceID}/[${zone}/]batteryVoltage) DONE
-- Document changes to the DBus API in the IDL 
-- autoreconnect on a timeout when Obd2 disconnects if 'autoreconnect' is 'true' in the config
+- Document changes to the DBus API in the IDL DONE
 - update json protocol to include getPropertyInfo calls
+- update json protocol to support rangerequests with PropertyList instead of a signel property
 - update database to support zone column 
 - no reason for pluginloader to track sources.  core already does it.
 - create docs for all plugins (README)

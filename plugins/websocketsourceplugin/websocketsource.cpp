@@ -370,19 +370,24 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					for (int i=0;i<array_list_length(dataarray);i++)
 					{
 						json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
+						json_object *keyobject = json_object_object_get(arrayobj,"name");
 						json_object *valueobject = json_object_object_get(arrayobj,"value");
 						json_object *timestampobject = json_object_object_get(arrayobj,"timestamp");
 						json_object *sequenceobject = json_object_object_get(arrayobj,"sequence");
+						std::string name = json_object_get_string(keyobject);
 						std::string value = json_object_get_string(valueobject);
 						std::string timestamp = json_object_get_string(timestampobject);
 						std::string sequence = json_object_get_string(sequenceobject);
+
+						///TODO: we might only have to free the dataobject at the end instead of this:
+
+						json_object_put(keyobject);
 						json_object_put(valueobject);
 						json_object_put(timestampobject);
 						json_object_put(sequenceobject);
 							
-						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(source->uuidRangedReplyMap[id]->property,value);
+						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
 						propertylist.push_back(type);
-						//props.push_back(string(json_object_get_string(arrayobj)));
 					}
 					//array_list_free(dataarray);
 					if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
@@ -569,14 +574,16 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
-	///TODO: fill in
 	std::string uuid = amb::createUuid();
 	uuidRangedReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 60; ///TODO: 60 second timeout, make this configurable?
 	stringstream s;  
 	s.precision(15);
 	s << "{\"type\":\"method\",\"name\":\"getRanged\",\"data\": {";
-	s << "\"property\":\""<< reply->property << "\",";
+
+	///TODO: fix me.  ranged requests over websocket source will be broken
+	//s << "\"property\":\""<< reply->property << "\",";
+
 	s << "\"timeBegin\":\"" << reply->timeBegin << "\",";
 	s << "\"timeEnd\":\"" << reply->timeEnd << "\",";
 	s << "\"sequenceBegin\":\"" << reply->sequenceBegin<< "\",";
