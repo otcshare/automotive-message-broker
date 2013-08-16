@@ -39,7 +39,7 @@ include (CMakeForceCompiler)
 option(ENABLE_ICECC "Enable icecc checking, for distributed compilation" ON)
 
 if (ENABLE_ICECC)
-   find_program(ICECC /usr/lib/icecc/bin/c++)
+   find_program(ICECC /usr/lib/icecc/bin/g++)
     if (ICECC)
         message(STATUS "icecc will be used for distributed compiling")
         cmake_force_cxx_compiler(${ICECC} icecc)
