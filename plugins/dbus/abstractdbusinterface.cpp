@@ -46,7 +46,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 	g_assert(iface);
 
-	if(method == "getHistory")
+	if(method == GetHistory")
 	{
 		double beginTime = 0;
 		double endTime = 0;
@@ -354,7 +354,7 @@ void AbstractDBusInterface::startRegistration()
 			"<interface name='"+ mInterfaceName + "' >"
 			"<property type='i' name='Zone' access='read' />"
 			"<property type='d' name='Time' access='read' />"
-			"<method name='getHistory'>"
+			"<method name='GetHistory'>"
 			"	<arg type='d' direction='in' name='beginTimestamp' />"
 			"	<arg type='d' direction='in' name='endTimestamp' />"
 			"   <arg type='a{sv}' direction='out' name='result' />"
