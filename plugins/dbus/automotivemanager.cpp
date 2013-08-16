@@ -8,7 +8,7 @@ static const gchar introspection_xml[] =
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='o' name='response' direction='out'/>"
   "    </method>"
-  "    <method name='list'>"
+  "    <method name='List'>"
   "      <arg type='as' name='response' direction='out'/>"
   "    </method>"
   "  </interface>"
@@ -57,7 +57,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)",interface->objectPath().c_str()));
 	}
 
-	else if(method == "list")
+	else if(method == "List")
 	{
 		std::list<AbstractDBusInterface*> list = AbstractDBusInterface::interfaces();
 
