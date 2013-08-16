@@ -46,7 +46,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 	g_assert(iface);
 
-	if(method == GetHistory")
+	if(method == "GetHistory")
 	{
 		double beginTime = 0;
 		double endTime = 0;
@@ -107,7 +107,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 		iface->re->getRangePropertyAsync(request);
 	}
 
-	else if(boost::algorithm::starts_with(method,"get"))
+	else if(boost::algorithm::starts_with(method,"Get"))
 	{
 		std::string propertyName = method.substr(3);
 		auto propertyMap = iface->getProperties();
@@ -194,7 +194,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	///see which properties are supported:
 	introspectionXml +=
 			"<property type='"+ property->signature() + "' name='"+ pn +"' access='"+access+"' />"
-			"<method name='get" + pn + "'>"
+			"<method name='Get" + pn + "'>"
 			"	<arg type='v' direction='out' name='value' />"
 			"	<arg type='d' direction='out' name='timestamp' />"
 			"	<arg type='i' direction='out' name='sequence' />"

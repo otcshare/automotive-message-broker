@@ -4,19 +4,19 @@
 static const gchar introspection_xml[] =
   "<node>"
   "  <interface name='org.automotive.Manager'>"
-  "    <method name='findObject'>"
+  "    <method name='FindObject'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='ao' name='response' direction='out'/>"
   "    </method>"
-  "    <method name='findObjectForZone'>"
+  "    <method name='FindObjectForZone'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='i' name='zone' direction='in'/>"
   "      <arg type='o' name='response' direction='out'/>"
   "    </method>"
-  "    <method name='list'>"
+  "    <method name='List'>"
   "      <arg type='as' name='response' direction='out'/>"
   "    </method>"
-  "    <method name='zonesForObjectName'>"
+  "    <method name='ZonesForObjectName'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='ai' name='response' direction='out'/>"
   "    </method>"
@@ -69,7 +69,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		///TODO: we might need to clean up stuff there (like var)
 	}
 
-	else if(method == "findObject")
+	else if(method == "FindObject")
 	{
 		gchar* arg;
 
@@ -110,7 +110,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		///TODO: we might need to clean up stuff there (like var)
 	}
 
-	else if(method == "findObjectForZone")
+	else if(method == "FindObjectForZone")
 	{
 		gchar* arg;
 		int zone;
@@ -148,7 +148,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 	}
 
-	else if (method == "zonesForObjectName")
+	else if (method == "ZonesForObjectName")
 	{
 		gchar* arg;
 
@@ -184,7 +184,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(ai)",&params));
 	}
 	
-	else if(method == "list")
+	else if(method == "List")
 	{
 		std::list<AbstractDBusInterface*> list = AbstractDBusInterface::interfaces();
 
