@@ -42,7 +42,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 	AbstractDBusInterface* iface = static_cast<AbstractDBusInterface*>(user_data);
 
 	std::string method = method_name;
-	if(method == "getHistory")
+	if(method == "GetHistory")
 	{
 		double beginTime = 0;
 		double endTime = 0;
@@ -284,7 +284,7 @@ void AbstractDBusInterface::startRegistration()
 	introspectionXml += "<interface name='"+ mInterfaceName + "' >"
 
 			"<property type='d' name='Time' access='read' />"
-			"<method name='getHistory'>"
+			"<method name='GetHistory'>"
 			"	<arg type='d' direction='in' name='beginTimestamp' />"
 			"	<arg type='d' direction='in' name='endTimestamp' />"
 			"   <arg type='a{sv}' direction='out' name='result' />"
