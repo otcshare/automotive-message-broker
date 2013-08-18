@@ -13,10 +13,13 @@ class IrcCommunication: public QObject
 	Q_OBJECT
 	Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
 	Q_PROPERTY(bool ssl WRITE setSsl)
+	Q_PROPERTY(bool isConnected READ isConnected NOTIFY connectedChanged)
 public:
 	IrcCommunication(std::map<std::string, std::string> config, QObject* parent=0);
 	QStringList channels() { return mChannels; }
 	void setChannels(QStringList c) { mChannels = c; }
+
+	bool isConnected();
 
 public Q_SLOTS:
 	void respond(QString target, QString msg);
@@ -38,6 +41,7 @@ Q_SIGNALS:
 	void connecting();
 	void connected();
 	void disconnected();
+	void connectedChanged();
 
 private:
 	bool mSsl;

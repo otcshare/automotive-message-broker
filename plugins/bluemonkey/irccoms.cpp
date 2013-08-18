@@ -17,9 +17,17 @@ IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QO
 	session = new IrcSession(this);
 	mSsl=false;
 
-	QObject::connect(session,SIGNAL(connected()),this,SIGNAL(connected()));
-	QObject::connect(session,SIGNAL(disconnected()),this,SIGNAL(disconnected()));
-	QObject::connect(session,SIGNAL(disconnected()),this,SLOT(reconnect()));
+	QObject::connect(session, &IrcSession::connected, [this](){
+		connectedChanged();
+		connected();
+	});
+
+	QObject::connect(session, &IrcSession::disconnected, [this](){
+		connectedChanged();
+		disconnected();
+		reconnect();
+	});
+
 	QObject::connect(session,SIGNAL(socketError(QAbstractSocket::SocketError)),this,SLOT(socketError(QAbstractSocket::SocketError)));
 	QObject::connect(session,SIGNAL(connecting()),this,SIGNAL(connecting()));
 	QObject::connect(session,SIGNAL(messageReceived(IrcMessage*)),this,SLOT(messageReceived(IrcMessage*)));
@@ -44,6 +52,11 @@ IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QO
 
 	engine->evaluate(script);
 
+}
+
+bool IrcCommunication::isConnected()
+{
+	return session->isConnected();
 }
 
 void IrcCommunication::announce(QString s)
