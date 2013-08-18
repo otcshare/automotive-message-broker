@@ -20,6 +20,7 @@ IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QO
 	QObject::connect(session, &IrcSession::connected, [this](){
 		connectedChanged();
 		connected();
+		announceDequeue();
 	});
 
 	QObject::connect(session, &IrcSession::disconnected, [this](){
@@ -59,8 +60,23 @@ bool IrcCommunication::isConnected()
 	return session->isConnected();
 }
 
+void IrcCommunication::announceDequeue()
+{
+	foreach(QString s, announceQueue)
+	{
+		announce(s);
+	}
+	announceQueue.clear();
+}
+
 void IrcCommunication::announce(QString s)
 {
+	if(!isConnected())
+	{
+		announceQueue.append(s);
+		return;
+	}
+
 	qDebug()<<"channels: "<<mChannels;
 	foreach(QString channel, mChannels)
 	{

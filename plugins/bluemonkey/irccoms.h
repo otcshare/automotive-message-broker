@@ -20,6 +20,7 @@ public:
 	void setChannels(QStringList c) { mChannels = c; }
 
 	bool isConnected();
+	void announceDequeue();
 
 public Q_SLOTS:
 	void respond(QString target, QString msg);
@@ -45,6 +46,7 @@ Q_SIGNALS:
 
 private:
 	bool mSsl;
+	QStringList announceQueue;
 	QStringList mChannels;
 	IrcSession *session;
 };
