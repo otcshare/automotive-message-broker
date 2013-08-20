@@ -78,17 +78,17 @@ static void handleMethodCall(GDBusConnection       *connection,
 			}
 
 			GVariantBuilder builder;
-			g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
+			g_variant_builder_init(&builder, G_VARIANT_TYPE ("a(svd)"));
 
 
 			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
 			{
 				AbstractPropertyType* value = *itr;
 
-				g_variant_builder_add(&builder, "{sv}", value->name.c_str(), g_variant_ref(value->toVariant()));
+				g_variant_builder_add(&builder, "(svd)", value->name.c_str(), g_variant_ref(value->toVariant()), value->timestamp);
 			}
 
-			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a{sv})",&builder));
+			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a(svd))",&builder));
 		};
 
 		iface->re->getRangePropertyAsync(request);
@@ -173,11 +173,17 @@ void AbstractDBusInterface::registerObject()
 
 	const GDBusInterfaceVTable vtable = { handleMethodCall, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 
-	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error);
+	guint tempregId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error);
 	
-	if(error) throw -1;
+	if(error)
+	{
+		DebugOut(DebugOut::Warning)<<error->message<<endl;
+	}
 	
-	g_assert(regId > 0);
+	if(tempregId > 0)
+	{
+		regId = tempregId;
+	}
 }
 
 void AbstractDBusInterface::unregisterObject()
@@ -287,7 +293,7 @@ void AbstractDBusInterface::startRegistration()
 			"<method name='GetHistory'>"
 			"	<arg type='d' direction='in' name='beginTimestamp' />"
 			"	<arg type='d' direction='in' name='endTimestamp' />"
-			"   <arg type='a{sv}' direction='out' name='result' />"
+			"   <arg type='a(svd)' direction='out' name='result' />"
 			"</method>";
 }
 

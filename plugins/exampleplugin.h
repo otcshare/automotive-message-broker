@@ -45,10 +45,13 @@ public:
 	
 	void randomizeProperties();
 	
+	void addSupported(std::string prop);
+
 private:
 	PropertyList mRequests;
 	uint16_t velocity;
 	uint16_t engineSpeed;
+	PropertyList props;
 };
 
 #endif // EXAMPLEPLUGIN_H

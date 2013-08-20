@@ -37,6 +37,9 @@ DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine,
 
 void DBusSink::supportedChanged(PropertyList supportedProperties)
 {
+	if(supported)
+		return;
+
 	startRegistration();
 
 	for(PropertyDBusMap::iterator itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)

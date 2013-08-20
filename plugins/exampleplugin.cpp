@@ -44,13 +44,44 @@ static gboolean timeoutCallback(gpointer data)
 	return true;
 }
 
+static gboolean registerCustomPropertyCb(gpointer re)
+{
+	///register a new property and set an initial value:
+	ExampleSourcePlugin* esp = static_cast<ExampleSourcePlugin*>(re);
+
+	VehicleProperty::registerProperty("ExampleSourceProperty", [](){ return new BasicPropertyType<bool>("ExampleSourceProperty",true);});
+
+	esp->addSupported("ExampleSourceProperty");
+
+	return false;
+}
+
 ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSource(re, config), velocity(0), engineSpeed(0)
 {
-	re->setSupported(supported(), this);
 	debugOut("setting timeout");
 	g_timeout_add(1000, timeoutCallback, this );
-	
+
+	g_timeout_add(10000, registerCustomPropertyCb, this);
+
+	props.push_back(VehicleProperty::EngineSpeed);
+	props.push_back(VehicleProperty::VehicleSpeed);
+	props.push_back(VehicleProperty::AccelerationX);
+	props.push_back(VehicleProperty::TransmissionShiftPosition);
+	props.push_back(VehicleProperty::SteeringWheelAngle);
+	props.push_back(VehicleProperty::ThrottlePosition);
+	props.push_back(VehicleProperty::EngineCoolantTemperature);
+	props.push_back(VehicleProperty::VIN);
+	props.push_back(VehicleProperty::WMI);
+	props.push_back(VehicleProperty::BatteryVoltage);
+	props.push_back(VehicleProperty::MachineGunTurretStatus);
+	props.push_back(VehicleProperty::ExteriorBrightness);
+	props.push_back(VehicleProperty::DoorsPerRow);
+	props.push_back(VehicleProperty::AirbagStatus);
+	props.push_back(VehicleProperty::MachineGunTurretStatus);
+	props.push_back(VehicleProperty::ExteriorBrightness);
+
+	re->setSupported(supported(), this);
 }
 
 
@@ -196,24 +227,6 @@ void ExampleSourcePlugin::subscribeToPropertyChanges(VehicleProperty::Property p
 
 PropertyList ExampleSourcePlugin::supported()
 {
-	PropertyList props;
-	props.push_back(VehicleProperty::EngineSpeed);
-	props.push_back(VehicleProperty::VehicleSpeed);
-	props.push_back(VehicleProperty::AccelerationX);
-	props.push_back(VehicleProperty::TransmissionShiftPosition);
-	props.push_back(VehicleProperty::SteeringWheelAngle);
-	props.push_back(VehicleProperty::ThrottlePosition);
-	props.push_back(VehicleProperty::EngineCoolantTemperature);
-	props.push_back(VehicleProperty::VIN);
-	props.push_back(VehicleProperty::WMI);
-	props.push_back(VehicleProperty::BatteryVoltage);
-	props.push_back(VehicleProperty::MachineGunTurretStatus);
-	props.push_back(VehicleProperty::ExteriorBrightness);
-	props.push_back(VehicleProperty::DoorsPerRow);
-	props.push_back(VehicleProperty::AirbagStatus);
-	props.push_back(VehicleProperty::MachineGunTurretStatus);
-	props.push_back(VehicleProperty::ExteriorBrightness);
-	
 	return props;
 }
 
@@ -262,4 +275,11 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid());
 	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 	routingEngine->updateProperty(VehicleProperty::ExteriorBrightness, &eb, uuid());
+}
+
+void ExampleSourcePlugin::addSupported(string prop)
+{
+	props.push_back(prop);
+
+	routingEngine->setSupported(supported(),this);
 }
