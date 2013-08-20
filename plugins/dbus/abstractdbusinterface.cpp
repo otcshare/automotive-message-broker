@@ -91,17 +91,17 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 			}
 
 			GVariantBuilder builder;
-			g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
+			g_variant_builder_init(&builder, G_VARIANT_TYPE("a(svd)"));
 
 
 			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
 			{
 				AbstractPropertyType* value = *itr;
 
-				g_variant_builder_add(&builder, "{sv}", value->name.c_str(), g_variant_ref(value->toVariant()));
+				g_variant_builder_add(&builder, "(svd)", value->name.c_str(), g_variant_ref(value->toVariant()),value->timestamp);
 			}
 
-			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a{sv})",&builder));
+			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a(svd))",&builder));
 		};
 
 		iface->re->getRangePropertyAsync(request);
@@ -357,7 +357,7 @@ void AbstractDBusInterface::startRegistration()
 			"<method name='GetHistory'>"
 			"	<arg type='d' direction='in' name='beginTimestamp' />"
 			"	<arg type='d' direction='in' name='endTimestamp' />"
-			"   <arg type='a{sv}' direction='out' name='result' />"
+			"   <arg type='a(svd)' direction='out' name='result' />"
 			"</method>";
 }
 
