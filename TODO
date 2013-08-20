@@ -3,21 +3,26 @@
 For 0.11
 
 - Implement all the DBus properties in the docs/ directory.
-- DBus support for time and sequece being an additional api call (ie, getVehicleSpeed()).  DONE
-- DBus support for objects with multiple sources and multiple 'zones' (/${sourceID}/[${zone}/]batteryVoltage) DONE
-- Document changes to the DBus API in the IDL DONE
 - update json protocol to include getPropertyInfo calls
 - update json protocol to support rangerequests with PropertyList instead of a signel property
 - update database to support zone column 
+- general support for source and zone filtering in database plugin
 - no reason for pluginloader to track sources.  core already does it.
 - create docs for all plugins (README)
 - handle badly formed messages properly (ie not crash) in websocketsink
+- GetHistory must filter on source
+
+Completed:
+
+- DBus support for time and sequece being an additional api call (ie, getVehicleSpeed()). - DONE
+- DBus support for objects with multiple sources and multiple 'zones' (/${sourceID}/[${zone}/]batteryVoltage) - DONE
+- Document changes to the DBus API in the IDL - DONE
+- add API to get number of sources per a given property (ie uint AbstractRoutingEngine::getSourcesForProperty(VehicleProperty::Property)) - DONE
+- per-source property filtering in routing engine - DONE
 
 Other:
 - grep all the TODOs in the code and do them
-- per-source property filtering in routing engine
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
 - investigate and enable use of provisioning in ssl websockets
-- add API to get number of sources per a given property (ie uint AbstractRoutingEngine::sources(VehicleProperty::Property))
 - enable ambd/plugins.d/
 - finish implementing openxc plugin
