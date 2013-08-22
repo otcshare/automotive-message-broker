@@ -215,21 +215,14 @@ static int grabImage(void *data)
 
 static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 {
-	cv::Scalar avgPixelIntensity;
-
-
-	if(shared->useOpenCl)
-	{
 #ifdef OPENCL
-		cv::Scalar stdDev;
-		cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
-#endif
-	}
-	else
-	{
-		avgPixelIntensity = cv::mean(qImg);
-	}
+	cv::Scalar avgPixelIntensity;
+	cv::Scalar stdDev;
 
+	cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
+#else
+	cv::Scalar avgPixelIntensity = cv::mean(qImg);
+#endif
 
 	double val = avgPixelIntensity.val[0];
 

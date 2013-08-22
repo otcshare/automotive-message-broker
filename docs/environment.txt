@@ -1,141 +1,100 @@
-	Environment hierarchy
+Environment hierarchy
 =================
 
 Service         org.automotive
-Object path     /org/automotive/environment/*
+Interface       org.automotive.environment
+Object path     /
 
 
+Properties		double InteriorTemperature [readonly]
 
-Interface 	org.automotive.Temperature
-Object path	/org/automotive/environment/Temperature
-Properties	
-	
-		double InteriorTemperature [readonly]
-
-			Temperature inside the vehicle in Celsius in increments of 0.1.
+				Temperature inside the vehicle in Celsius in increments of 0.1.
 				
-		double ExteriorTemprature [readonly]
+			double ExteriorTemprature [readonly]
 			
-			Temperature outside the vehicle in Celsius in increments of 0.1.
+				Temperature outside the vehicle in Celsius in increments of 0.1.
 				
-Interface       org.automotive.ExteriorBrightness
-Object path     /org/automotive/environment/ExteriorBrightness
-Properties	
-
-		double ExteriorBrightness [readonly]
+			double ExteriorBrightness [readonly]
 			
-			Brightness outside the vehicle in lux  (0 - 130,000)
-
-Interface       org.automotive.RainSensor
-Object path     /org/automotive/environment/RainSensor
-Properties
+				Brightness outside the vehicle in lux  (0 - 130,000)
 				
-		byte RainSensor [readonly]
+			byte RainSensor [readonly]
 			
-			Level of rain intensity 0: No Rain - 10: Heaviest Rain
-
-Interface       org.automotive.WindshieldWiper
-Object path     /org/automotive/environment/WindshieldWiper
-Properties
+				Level of rain intensity 0: No Rain - 10: Heaviest Rain
 				
-		byte WindshieldWiper [readwrite]
+			byte WindshieldWiper [readwrite]
 			
-			Level of windshield whiper speed:
+				Level of windshield whiper speed:
 				
-			Off = 0,
-			Slowest = 1,
-			Fastest = 5,
-			Auto = 10
-
-Interface       org.automotive.HVAC
-Object path     /org/automotive/environment/HVAC
-Properties
-						
-		byte AirflowDirection [readwrite]
-
-			Front Panel = 0,
-			Floor Duct = 1,
-			Front = 0x02,
-			Defroster = 0x04
-
-		byte FanSpeed [readwrite]
+				Off = 0,
+				Slowest = 1,
+				Fastest = 5,
+				Auto = 10
+				
+			struct{ byte, byte, byte } HVACFan [readwrite]
 			
-			Speed of the fan 0-7
-
-		byte TargetTemperature [readwrite]
-
-			Target temperature in Celcius
+				Airflow Direction (byte), Fan Speed (0-7) (byte), Target Temperature in Celsius (byte)
 				
-		bool AirConditioning [readwrite]
+				Airflow Direction:
+				
+				Front Panel = 0,
+				Floor Duct = 1,
+				Front + Floor = 2,
+				Front = 3,
+				Defroster + Floor = 4
+				
+			bool AirConditioning [readwrite]
 			
-			Air conditioning on (true) / off (false)
+				Air conditioning on (true) / off (false)
 				
-		bool AirRecirculation [readwrite]
+			bool AirRecirculation [readwrite]
 			
-			Air recirculation on (true) / off (false)
+				Air recirculation on (true) / off (false)
 				
-		bool Heater [readwrite]
+			bool Heater [readwrite]
 			
-			Heater on (true) / off (false)
+				Heater on (true) / off (false)
 				
-		dict{ byte, bool } Defrost [readwrite]
+			dict{ byte, bool } Defrost [readwrite]
 			
-			Defrost on (true) / off (false) per Postion (byte)
+				Defrost on (true) / off (false) per Postion (byte)
 				
-			Position:
+				Position:
 				
-			Windshield = 0,
-			RearWindow = 1,
-			SideMirrors = 2
+				Windshield = 0,
+				RearWindow = 1,
+				SideMirrors = 2
 				
-		bool SteeringWheelHeater [readwrite]
+			bool SteeringWheelHeater [readwrite]
 			
-			Steering wheel heater on (true) / off (false)
+				Steering wheel heater on (true) / off (false)
 				
-		bool SeatHeater [readwrite]
+			bool SeatHeater [readwrite]
 			
-			Seat heater on (true) / off (false)
+				Seat heater on (true) / off (false)
 				
-		bool SeatCooler [readwrite]
+			bool SeatCooler [readwrite]
 			
-			Seat cooler on (true) / off (false)
-
-
-Interface       org.automotive.WindowStatus
-Object path     /org/automotive/environment/WindowStatus
-Properties
+				Seat cooler on (true) / off (false)
 				
-		dict{ byte, byte } WindowStatus [readwrite]
+			dict{ byte, byte } WindowStatus [readwrite]
 			
-			Percent of openness (0-100) (byte) per window (byte)
+				Percent of openness (0-100) (byte) per window (byte)
 				
-			Window:
+				Window:
 				
-			Driver = 0,
-			Passenger = 1,
-			LeftRear = 2,
-			RightRear = 3,
-			Rear = 4
-
-Interface       org.automotive.Sunroof
-Object path     /org/automotive/environment/Sunroof
-Properties
+				Driver = 0,
+				Passenger = 1,
+				LeftRear = 2,
+				RightRear = 3
 				
-		byte Openness [readwrite]
+			struct{ byte, byte } Sunroof [readwrite]
 			
-			Percent of sunroof openness (0: Closed - 100: Fully Opened).
-
-		byte Tilt [readwrite]
-		
-			Percent of tilt (0: Closed - 100: Maximum Tilt).
+				Percent of sunroof openness (0: Closed - 100: Fully Opened) (byte) and percent of tilt (0: Closed - 100: Maximum Tilt) (byte)
 				
-Interface       org.automotive.ConvertibleRoof
-Object path     /org/automotive/environment/ConvertibleRoof
-Properties
-
-		bool ConvertibleRoof [readwrite]
+			bool ConvertibleRoof [readwrite]
 			
-			Convertible roof on (true) / off (false)
+				Convertible roof on (true) / off (false)
 			
 				
 			

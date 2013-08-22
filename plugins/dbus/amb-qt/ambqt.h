@@ -35,13 +35,11 @@ class AmbProperty: public QObject
 	{
 		if(!mDBusInterface || !mDBusInterface->isValid())
 		{
-			qDebug()<<"error Interface is not valid: "<<interfaceName();
+			qDebug()<<"error Interface is not valid";
 			return QVariant::Invalid;
 		}
 
 		QVariant value = mDBusInterface->property(propertyName().toAscii().data());
-
-		qDebug()<<"property "<<propertyName()<<" value: "<<value<<" isvalid? "<<(QVariant::Invalid == value);
 
 		return value;
 	}
@@ -50,15 +48,15 @@ class AmbProperty: public QObject
 	{
 		if(!mDBusInterface || !mDBusInterface->isValid())
 		{
-			qDebug()<<"error Interface is not valid "<<interfaceName();
+			qDebug()<<"error Interface is not valid";
 		}
 
 		mDBusInterface->setProperty(propertyName().toAscii(), v);
 	}
 
 Q_SIGNALS:
-	void propertyChanged(QVariant val, double time);
-	void valueChanged(QVariant val);
+	void propertyChanged(QVariant, double);
+	void valueChanged(QVariant);
 
 public Q_SLOTS:
 	void propertyChangedSlot(QDBusVariant val, double ts);

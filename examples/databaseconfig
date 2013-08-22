@@ -14,9 +14,6 @@
 		{
 			"name" : "Example Sink",
 			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
-		},
-		{
-			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
 		}
 	]
 }

@@ -28,7 +28,7 @@
 	registerPropertyPriv(property, []() { return new property ## Type(defaultValue); });
 
 #define REGISTERPROPERTYWITHTYPE(property, type, defaultValue) \
-	registerPropertyPriv(property, []() { return new type(property, defaultValue); });
+	registerPropertyPriv(property, []() { return new type(defaultValue); });
 
 using namespace std;
 
@@ -60,7 +60,6 @@ const VehicleProperty::Property VehicleProperty::AirIntakeTemperature = "AirInta
 const VehicleProperty::Property VehicleProperty::BatteryVoltage = "BatteryVoltage";
 const VehicleProperty::Property VehicleProperty::BatteryCurrent = "BatteryCurrent";
 const VehicleProperty::Property VehicleProperty::InteriorTemperature = "InteriorTemperature";
-const VehicleProperty::Property VehicleProperty::ExteriorTemperature = "ExteriorTemperature";
 const VehicleProperty::Property VehicleProperty::EngineOilTemperature = "EngineOilTemperature";
 const VehicleProperty::Property VehicleProperty::VIN = "VIN";
 const VehicleProperty::Property VehicleProperty::WMI = "WMI";
@@ -73,7 +72,9 @@ const VehicleProperty::Property VehicleProperty::TireTemperatureRightFront = "Ti
 const VehicleProperty::Property VehicleProperty::TireTemperatureLeftRear = "TireTemperatureLeftRear";
 const VehicleProperty::Property VehicleProperty::TireTemperatureRightRear = "TireTemperatureRightRear";
 const VehicleProperty::Property VehicleProperty::VehiclePowerMode = "VehiclePowerMode";
-const VehicleProperty::Property VehicleProperty::TripMeters = "TripMeters";
+const VehicleProperty::Property VehicleProperty::TripMeterA = "TripMeterA";
+const VehicleProperty::Property VehicleProperty::TripMeterB = "TripMeterB";
+const VehicleProperty::Property VehicleProperty::TripMeterC = "TripMeterC";
 const VehicleProperty::Property VehicleProperty::CruiseControlActive = "CruiseControlActive";
 const VehicleProperty::Property VehicleProperty::CruiseControlSpeed = "CruiseControlSpeed";
 const VehicleProperty::Property VehicleProperty::LightHead = "LightHead";
@@ -111,7 +112,6 @@ const VehicleProperty::Property VehicleProperty::TransmissionGearType = "Transmi
 const VehicleProperty::Property VehicleProperty::FrontWheelRadius = "FrontWheelRadius";
 const VehicleProperty::Property VehicleProperty::RearWheelRadius = "RearWheelRadius";
 const VehicleProperty::Property VehicleProperty::WheelTrack = "WheelTrack";
-const VehicleProperty::Property VehicleProperty::BrakePressure = "BrakePressure";
 const VehicleProperty::Property VehicleProperty::Odometer = "Odometer";
 const VehicleProperty::Property VehicleProperty::TransmissionFluidLevel = "TransmissionFluidLevel";
 const VehicleProperty::Property VehicleProperty::BrakeFluidLevel = "BrakeFluidLevel";
@@ -130,22 +130,6 @@ const VehicleProperty::Property VehicleProperty::SeatBeltStatus = "SeatBeltStatu
 const VehicleProperty::Property VehicleProperty::WindowLockStatus = "WindowLockStatus";
 const VehicleProperty::Property VehicleProperty::OccupantStatus = "OccupantStatus";
 const VehicleProperty::Property VehicleProperty::ObstacleDistance = "ObstacleDistance";
-const VehicleProperty::Property VehicleProperty::RainSensor = "RainSensor";
-const VehicleProperty::Property VehicleProperty::WindshieldWiper = "WindshieldWiper";
-const VehicleProperty::Property VehicleProperty::AirflowDirection = "AirflowDirection";
-const VehicleProperty::Property VehicleProperty::FanSpeed = "FanSpeed";
-const VehicleProperty::Property VehicleProperty::TargetTemperature = "TargetTemperature";
-const VehicleProperty::Property VehicleProperty::AirConditioning = "AirConditioning";
-const VehicleProperty::Property VehicleProperty::AirRecirculation = "AirRecirculation";
-const VehicleProperty::Property VehicleProperty::Heater = "Heater";
-const VehicleProperty::Property VehicleProperty::Defrost = "Defrost";
-const VehicleProperty::Property VehicleProperty::SteeringWheelHeater = "SteeringWheelHeater";
-const VehicleProperty::Property VehicleProperty::SeatHeater = "SeatHeater";
-const VehicleProperty::Property VehicleProperty::SeatCooler = "SeatCooler";
-const VehicleProperty::Property VehicleProperty::WindowStatus = "WindowStatus";
-const VehicleProperty::Property VehicleProperty::Sunroof = "Sunroof";
-const VehicleProperty::Property VehicleProperty::SunroofTilt = "SunroofTilt";
-const VehicleProperty::Property VehicleProperty::ConvertibleRoof = "ConvertibleRoof";
 
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
@@ -153,63 +137,58 @@ std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
 
 VehicleProperty::VehicleProperty()
 {
-	REGISTERPROPERTY( VehicleSpeed, 0);
-	REGISTERPROPERTY(EngineSpeed, 0);
-	REGISTERPROPERTY(TransmissionShiftPosition,Transmission::Neutral);
-	REGISTERPROPERTY(TransmissionGearPosition,Transmission::Neutral);
+	registerPropertyPriv( VehicleSpeed, [](){ return new VehicleSpeedType(0); });
+	registerPropertyPriv(EngineSpeed, [](){ return new EngineSpeedType(0); });
+	registerPropertyPriv(TransmissionShiftPosition, [](){ return new TransmissionShiftPositionType(Transmission::Neutral); });
+	registerPropertyPriv(TransmissionGearPosition, [](){ return new TransmissionGearPositionType(Transmission::Neutral); });
 	REGISTERPROPERTY(TransmissionMode,Transmission::Normal);
-	REGISTERPROPERTY(ThrottlePosition, 0);
-	REGISTERPROPERTY(WheelBrake, false);
+	registerPropertyPriv(ThrottlePosition, [](){ return new ThrottlePositionType(0); });
+	registerPropertyPriv(WheelBrake, [](){ return new WheelBrakeType(false); });
 	REGISTERPROPERTY(WheelBrakePressure,0);
-	REGISTERPROPERTY(SteeringWheelAngle,0);
-	REGISTERPROPERTY(TurnSignal, TurnSignals::Off);
-	REGISTERPROPERTY(ClutchStatus, false);
-	REGISTERPROPERTY(EngineOilPressure, 0);
-	REGISTERPROPERTY(EngineOilTemperature, 0);
+	registerPropertyPriv(SteeringWheelAngle, [](){ return new SteeringWheelAngleType(0); });
+	registerPropertyPriv(TurnSignal, [](){ return new TurnSignalType(TurnSignals::Off); });
+	registerPropertyPriv(ClutchStatus, [](){ return new ClutchStatusType(false); });
+	registerPropertyPriv(EngineOilPressure, [](){ return new EngineOilPressureType(0); });
+	registerPropertyPriv(EngineOilTemperature, [](){ return new EngineOilTemperatureType(0); });
 	REGISTERPROPERTY(EngineOilRemaining,0);
-	REGISTERPROPERTY(EngineCoolantTemperature, 0);
-	REGISTERPROPERTY(MachineGunTurretStatus, false);
-	REGISTERPROPERTY(AccelerationX,0);
-	REGISTERPROPERTY(AccelerationY,0);
-	REGISTERPROPERTY(AccelerationZ,0);
-	REGISTERPROPERTY(MassAirFlow,0);
-	REGISTERPROPERTY(ButtonEvent, ButtonEvents::NoButton);
+	registerPropertyPriv(EngineCoolantTemperature, [](){ return new EngineCoolantTemperatureType(0); });
+	registerPropertyPriv(MachineGunTurretStatus, [](){ return new MachineGunTurretStatusType(false); });
+	registerPropertyPriv(AccelerationX, [](){ return new AccelerationType(0); });
+	registerPropertyPriv(AccelerationY, [](){ return new AccelerationType(0); });
+	registerPropertyPriv(AccelerationZ, [](){ return new AccelerationType(0); });
+	registerPropertyPriv(MassAirFlow, [](){ return new MassAirFlowType(0); });
+	registerPropertyPriv(ButtonEvent, [](){ return new ButtonEventType(ButtonEvents::NoButton); });
 	REGISTERPROPERTY(AirIntakeTemperature,0)
-	REGISTERPROPERTY(BatteryVoltage, 0);
+	registerPropertyPriv(BatteryVoltage, [](){ return new BatteryVoltageType(0); });
 	REGISTERPROPERTY(BatteryCurrent,0);
-	REGISTERPROPERTY(InteriorTemperature, 0);
-	REGISTERPROPERTY(ExteriorTemperature,0);
-	REGISTERPROPERTY(VIN, "");
-	REGISTERPROPERTY(WMI, "");
-	REGISTERPROPERTY(TirePressureLeftFront, 0);
-	REGISTERPROPERTY(TirePressureRightFront, 0);
-	REGISTERPROPERTY(TirePressureLeftRear, 0);
-	REGISTERPROPERTY(TirePressureRightRear, 0);
-	REGISTERPROPERTY(TireTemperatureLeftFront,0);
-	REGISTERPROPERTY(TireTemperatureRightFront,0);
-	REGISTERPROPERTY(TireTemperatureLeftRear,0);
-	REGISTERPROPERTY(TireTemperatureRightRear,0);
-	REGISTERPROPERTY( VehiclePowerMode,Power::Off);
-	registerPropertyPriv(TripMeters,[](){
-		TripMetersType* t = new TripMetersType();
-		BasicPropertyType<uint16_t> v(0);
-		t->append(&v);
-		return t;
-	});
-
+	registerPropertyPriv(InteriorTemperature, [](){ return new InteriorTemperatureType(0); });
+	registerPropertyPriv(VIN, [](){ return new VINType(""); });
+	registerPropertyPriv(WMI, [](){ return new WMIType(""); });
+	REGISTERPROPERTYWITHTYPE(TirePressureLeftFront, TirePressureType, 0);
+	REGISTERPROPERTYWITHTYPE(TirePressureRightFront, TirePressureType, 0);
+	REGISTERPROPERTYWITHTYPE(TirePressureLeftRear, TirePressureType, 0);
+	REGISTERPROPERTYWITHTYPE(TirePressureRightRear, TirePressureType, 0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftFront,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureRightFront,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureLeftRear,TireTemperatureType,0);
+	REGISTERPROPERTYWITHTYPE(TireTemperatureRightRear,TireTemperatureType,0);
+	registerPropertyPriv( VehiclePowerMode,[](){ return new VehiclePowerModeType(Power::Off); } );
+	REGISTERPROPERTYWITHTYPE(TripMeterA,TripMeterType,0);
+	REGISTERPROPERTYWITHTYPE(TripMeterB,TripMeterType,0);
+	REGISTERPROPERTYWITHTYPE(TripMeterC,TripMeterType,0);
 	REGISTERPROPERTY(CruiseControlActive, false);
 	REGISTERPROPERTY(CruiseControlSpeed,0);
-	REGISTERPROPERTY(LightHead, false);
-	REGISTERPROPERTY(LightLeftTurn, false);
-	REGISTERPROPERTY(LightRightTurn, false);
-	REGISTERPROPERTY(LightParking, false);
-	REGISTERPROPERTY(LightFog, false);
-	REGISTERPROPERTY(LightHazard, false);
-	REGISTERPROPERTY(LightHighBeam, false);
-	REGISTERPROPERTY(LightBrake, false);
-	REGISTERPROPERTY(InteriorLightDriver, false);
-	REGISTERPROPERTY(InteriorLightPassenger, false);
-	REGISTERPROPERTY(InteriorLightCenter, false);
+	REGISTERPROPERTYWITHTYPE(LightHead, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightLeftTurn,LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightRightTurn, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightParking, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightFog, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightHazard, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightHighBeam, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(LightBrake, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(InteriorLightDriver, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(InteriorLightPassenger, LightStatusType, false);
+	REGISTERPROPERTYWITHTYPE(InteriorLightCenter, LightStatusType, false);
 	REGISTERPROPERTY(EngineLoad,0);
 	REGISTERPROPERTY(Horn, false);
 	REGISTERPROPERTY(FuelLevel, 0);
@@ -220,9 +199,9 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(FuelType, Fuel::Unknown);
 	REGISTERPROPERTY(FuelPositionSide, Fuel::UnknownPosition);
 	REGISTERPROPERTY(ExteriorBrightness, 0);
-	REGISTERPROPERTY(VehicleWidth,0);
-	REGISTERPROPERTY(VehicleHeight,0);
-	REGISTERPROPERTY(VehicleLength,0);
+	REGISTERPROPERTYWITHTYPE(VehicleWidth,VehicleSizeType,0);
+	REGISTERPROPERTYWITHTYPE(VehicleHeight,VehicleSizeType,0);
+	REGISTERPROPERTYWITHTYPE(VehicleLength,VehicleSizeType,0);
 	REGISTERPROPERTY(Latitude,0);
 	REGISTERPROPERTY(Longitude,0);
 	REGISTERPROPERTY(Altitude,0);
@@ -230,10 +209,9 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(VehicleType,Vehicle::Unknown);
 	registerPropertyPriv(DoorsPerRow,[]() { BasicPropertyType<uint16_t> d(0); return new DoorsPerRowType(&d); });
 	REGISTERPROPERTY(TransmissionGearType,Transmission::Unknown);
-	REGISTERPROPERTY(FrontWheelRadius, 0);
-	REGISTERPROPERTY(RearWheelRadius, 0);
+	REGISTERPROPERTYWITHTYPE(FrontWheelRadius, WheelRadiusType, 0);
+	REGISTERPROPERTYWITHTYPE(RearWheelRadius, WheelRadiusType, 0);
 	REGISTERPROPERTY(WheelTrack,0);
-	REGISTERPROPERTY(BrakePressure,0);
 	REGISTERPROPERTY(Odometer,0);
 	REGISTERPROPERTY(TransmissionFluidLevel,0);
 	REGISTERPROPERTY(BrakeFluidLevel,0);
@@ -244,8 +222,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(HazardLightStatus,false);
 	registerPropertyPriv(AirbagStatus,[]()
 	{
-		BasicPropertyType<Airbag::Location> a(AirbagStatus,Airbag::Driver);
-		BasicPropertyType<Airbag::Status> b(AirbagStatus, Airbag::Inactive);
+		BasicPropertyType<Airbag::Location> a(Airbag::Driver);
+		BasicPropertyType<Airbag::Status> b(Airbag::Inactive);
 		AirbagStatusType* t = new AirbagStatusType();
 		t->append(a,b);
 
@@ -280,6 +258,14 @@ VehicleProperty::VehicleProperty()
 		return t;
 	});
 
+	registerPropertyPriv(SeatBeltStatus,[]()
+	{
+		SeatBeltStatusType* t = new SeatBeltStatusType();
+		t->append(Seat::Driver,false);
+
+		return t;
+	});
+
 	registerPropertyPriv(OccupantStatus,[]()
 	{
 		OccupantStatusType* t = new OccupantStatusType();
@@ -295,45 +281,6 @@ VehicleProperty::VehicleProperty()
 
 		return t;
 	});
-
-	registerPropertyPriv(ObstacleDistance,[]()
-	{
-		ObstacleDistanceType* t = new ObstacleDistanceType();
-		t->append(DistanceSensor::LeftFront,0);
-
-		return t;
-	});
-
-	REGISTERPROPERTY(RainSensor,0);
-	REGISTERPROPERTY(WindshieldWiper,Window::Off);
-	REGISTERPROPERTY(AirflowDirection,HVAC::Front);
-	REGISTERPROPERTY(FanSpeed,0);
-	REGISTERPROPERTY(TargetTemperature,0);
-	REGISTERPROPERTY(AirConditioning,false);
-	REGISTERPROPERTY(AirRecirculation,false);
-	REGISTERPROPERTY(Heater,false);
-
-	registerPropertyPriv(Defrost, []()
-	{
-		DefrostType *d = new DefrostType();
-		d->append(Window::Windshield, false);
-
-		return d;
-	});
-
-	REGISTERPROPERTY(SteeringWheelHeater,false);
-	REGISTERPROPERTY(SeatHeater, false);
-	REGISTERPROPERTY(SeatCooler, false);
-	registerPropertyPriv(WindowStatus, []()
-	{
-		WindowStatusType* d = new WindowStatusType();
-		d->append(Window::Driver,100);
-
-		return d;
-	});
-	REGISTERPROPERTY(Sunroof,0);
-	REGISTERPROPERTY(SunroofTilt,0);
-	REGISTERPROPERTY(ConvertibleRoof,false);
 
 }
 

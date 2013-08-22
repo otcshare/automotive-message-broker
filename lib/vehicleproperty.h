@@ -27,7 +27,7 @@
 #include <sstream>
 #include <map>
 #include <functional>
-#include "abstractpropertytype.h"
+#include <abstractpropertytype.h>
 #include "mappropertytype.hpp"
 
 namespace ButtonEvents {
@@ -221,20 +221,8 @@ enum Location
 	Passenger,
 	LeftRear,
 	RightRear,
-	Sunroof,
-	Windshield,
-	SideMirrorLeft,
-	SideMirrorRight
+	Sunroof
 };
-
-enum WiperSpeed
-{
-	Off = 0,
-	Slowest = 1,
-	Fastest = 5,
-	Auto = 10
-};
-
 }
 
 namespace DistanceSensor
@@ -250,37 +238,6 @@ enum Location
 
 };
 }
-
-namespace HVAC
-{
-enum AirflowDirection
-{
-	FrontPanel=0,
-	FloorDuct = 1,
-	Front = 1 << 1,
-	Defroster = 1 << 2
-
-};
-}
-
-#include <boost/preprocessor/comma.hpp>
-
-#define PROPERTYTYPE(property, propertyType, baseClass, valueType) \
-	class propertyType : public baseClass { \
-	public: propertyType(): baseClass(property) {} \
-	propertyType(valueType val) : baseClass(property, val) {} \
-	};
-
-#define PROPERTYTYPEBASIC(property, valueType) \
-	class property ## Type : public BasicPropertyType<valueType> { \
-	public: property ## Type(): BasicPropertyType(property) {} \
-	property ## Type(valueType val) : BasicPropertyType(property, val) {} \
-	};
-
-#define PROPERTYTYPENOVAL(property, propertyType, baseClass) \
-	class propertyType : public baseClass { \
-	public: propertyType(): baseClass(property) {} \
-	};
 
 class VehicleProperty
 {
@@ -299,13 +256,11 @@ public:
 
 	/**< Vehicle Velocity in km/h */
 	static const Property VehicleSpeed;
-	PROPERTYTYPE(VehicleSpeed, VehicleSpeedType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> VehicleSpeedType;
+	typedef BasicPropertyType<uint16_t> VehicleSpeedType;
 
 	/**< Engine Speed in rotations per minute */
 	static const Property EngineSpeed;
-	PROPERTYTYPE(EngineSpeed, EngineSpeedType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> EngineSpeedType;
+	typedef BasicPropertyType<uint16_t> EngineSpeedType;
 
 	 /**< Transmission Shift Position
 	 * 0 = Neutral
@@ -317,9 +272,7 @@ public:
 	 * 255 = Park
 	 */
 	static const Property TransmissionShiftPosition;
-	PROPERTYTYPE(TransmissionShiftPosition, TransmissionShiftPositionType,
-				 BasicPropertyType<Transmission::TransmissionPositions>, Transmission::TransmissionPositions )
-	//typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionShiftPositionType;
+	typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionShiftPositionType;
 
 	/**< Transmission Gear Position
 	* 0 = Neutral
@@ -330,435 +283,275 @@ public:
 	* 128 = Reverse
 	*/
 	static const Property TransmissionGearPosition;
-	PROPERTYTYPE(TransmissionGearPosition, TransmissionGearPositionType,
-				 BasicPropertyType<Transmission::TransmissionPositions>, Transmission::TransmissionPositions)
-	//typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
+	typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
 
 	static const Property TransmissionMode;
-	PROPERTYTYPE(TransmissionMode, TransmissionModeType,
-				 BasicPropertyType<Transmission::Mode>, Transmission::Mode)
-	//typedef BasicPropertyType<Transmission::Mode> TransmissionModeType;
+	typedef BasicPropertyType<Transmission::Mode> TransmissionModeType;
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
-	PROPERTYTYPE(ThrottlePosition, ThrottlePositionType, BasicPropertyType<uint16_t> , uint16_t)
-	//typedef BasicPropertyType<uint16_t> ThrottlePositionType;
+	typedef BasicPropertyType<uint16_t> ThrottlePositionType;
 
 	/**< Wheel brake position.  Engaged = true, Idle = false */
 	static const Property WheelBrake;
-	PROPERTYTYPE(WheelBrake, WheelBrakeType, BasicPropertyType<bool>, bool)
-	//typedef BasicPropertyType<bool> WheelBrakeType;
+	typedef BasicPropertyType<bool> WheelBrakeType;
 
 	static const Property WheelBrakePressure;
-	PROPERTYTYPE(WheelBrakePressure, WheelBrakePressureType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> WheelBrakePressureType;
+	typedef BasicPropertyType<uint16_t> WheelBrakePressureType;
 
 	/**< Steering wheel angle (0-359) */
 	static const Property SteeringWheelAngle;
-	PROPERTYTYPE(SteeringWheelAngle, SteeringWheelAngleType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> SteeringWheelAngleType;
+	typedef BasicPropertyType<uint16_t> SteeringWheelAngleType;
 
 	/**< 0=off, 1=right, 2=left, 3=hazard */
 	static const Property TurnSignal;
-	PROPERTYTYPE(TurnSignal, TurnSignalType, BasicPropertyType<TurnSignals::TurnSignalType> ,TurnSignals::TurnSignalType)
-	//typedef BasicPropertyType<TurnSignals::TurnSignalType> TurnSignalType;
+	typedef BasicPropertyType<TurnSignals::TurnSignalType> TurnSignalType;
 
 	/**< Clutch pedal status 0=off, 1=on */
 	static const Property ClutchStatus;
-	PROPERTYTYPE(ClutchStatus, ClutchStatusType,BasicPropertyType<bool>,bool)
-	//typedef BasicPropertyType<bool> ClutchStatusType;
+	typedef BasicPropertyType<bool> ClutchStatusType;
 
 	 /**< Oil pressure TODO: units */
 	static const Property EngineOilPressure;
-	PROPERTYTYPE(EngineOilPressure, EngineOilPressureType,BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> EngineOilPressureType;
+	typedef BasicPropertyType<uint16_t> EngineOilPressureType;
 
 	/**< Engine coolant temperature in degrees celcius **/
 	static const Property EngineCoolantTemperature;
-	PROPERTYTYPE(EngineCoolantTemperature, EngineCoolantTemperatureType, BasicPropertyType<int>, int)
-	//typedef BasicPropertyType<int> EngineCoolantTemperatureType;
+	typedef BasicPropertyType<int> EngineCoolantTemperatureType;
 
 	/**< 0=off, 1=on */
 	static const Property MachineGunTurretStatus;
-	PROPERTYTYPE(MachineGunTurretStatus, MachineGunTurretStatusType, BasicPropertyType<bool>, bool)
-	//typedef BasicPropertyType<bool> MachineGunTurretStatusType;
+	typedef BasicPropertyType<bool> MachineGunTurretStatusType;
 
 	/**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationX;
-	PROPERTYTYPE(AccelerationX, AccelerationXType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> AccelerationType;
+	typedef BasicPropertyType<uint16_t> AccelerationType;
 
 	/**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationY;
-	PROPERTYTYPE(AccelerationY, AccelerationYType, BasicPropertyType<uint16_t>, uint16_t)
 
 	/**< Acceleration on the 'z' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationZ;
-	PROPERTYTYPE(AccelerationZ, AccelerationZType, BasicPropertyType<uint16_t>, uint16_t)
 
 	/**< Mass Air Flow.  TODO: units */
 	static const Property MassAirFlow;
-	PROPERTYTYPE(MassAirFlow, MassAirFlowType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> MassAirFlowType;
+	typedef BasicPropertyType<uint16_t> MassAirFlowType;
 
 	/**< Button Event @see ButtonEvents::ButtonEventType */
 	static const Property ButtonEvent;
-	PROPERTYTYPE(ButtonEvent, ButtonEventType, BasicPropertyType<ButtonEvents::ButtonEventType>, ButtonEvents::ButtonEventType)
-	//typedef BasicPropertyType<ButtonEvents::ButtonEventType> ButtonEventType;
+	typedef BasicPropertyType<ButtonEvents::ButtonEventType> ButtonEventType;
 
 	/**< Air intake temperature in degrees celcius */
 	static const Property AirIntakeTemperature;
-	PROPERTYTYPE(AirIntakeTemperature, AirIntakeTemperatureType, BasicPropertyType<int>, int)
-	//typedef BasicPropertyType<int> AirIntakeTemperatureType;
+	typedef BasicPropertyType<int> AirIntakeTemperatureType;
 
 	/**< Battery voltage in volts */
 	static const Property BatteryVoltage;
-	PROPERTYTYPE(BatteryVoltage, BatteryVoltageType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> BatteryVoltageType;
+	typedef BasicPropertyType<double> BatteryVoltageType;
 
 	static const Property BatteryCurrent;
-	PROPERTYTYPE(BatteryCurrent, BatteryCurrentType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> BatteryCurrentType;
+	typedef BasicPropertyType<double> BatteryCurrentType;
 
 	/**< Interior Air Temperature in degrees celcius */
 	static const Property InteriorTemperature;
-	PROPERTYTYPE(InteriorTemperature, InteriorTemperatureType, BasicPropertyType<int>, int)
-	//typedef BasicPropertyType<int> InteriorTemperatureType;
-
-	static const Property ExteriorTemperature;
-	PROPERTYTYPE(ExteriorTemperature, ExteriorTemperatureType, BasicPropertyType<int>, int)
-	//typedef BasicPropertyType<int> ExteriorTemperatureType;
+	typedef BasicPropertyType<int> InteriorTemperatureType;
 
 	/**< Engine Oil Temperature in degrees celcius */
 	static const Property EngineOilTemperature;
-	PROPERTYTYPE(EngineOilTemperature, EngineOilTemperatureType, BasicPropertyType<int>, int)
-	//typedef BasicPropertyType<int> EngineOilTemperatureType;
+	typedef BasicPropertyType<int> EngineOilTemperatureType;
 
 	static const Property EngineOilRemaining;
-	PROPERTYTYPE(EngineOilRemaining, EngineOilRemainingType,BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> EngineOilRemainingType;
+	typedef BasicPropertyType<uint16_t> EngineOilRemainingType;
 
 	/**< Vehicle Identification Number (ISO 3779) 17 chars**/
 	static const Property VIN;
-	PROPERTYTYPE(VIN, VINType, StringPropertyType, std::string)
-	//class VINType: public StringPropertyType { public: VINType(std::string val):StringPropertyType(VIN,val){} };
+	typedef StringPropertyType VINType;
 
 	/**< World Manufacturer Identifier (SAE) 3 characters. */
 	static const Property WMI;
-	PROPERTYTYPE(WMI, WMIType, StringPropertyType, std::string)
-	//class WMIType: public StringPropertyType { public: WMIType(std::string val):StringPropertyType(WMI,val){} };
+	typedef StringPropertyType WMIType;
 
 	/**< Tire pressure in kPa */
 	static const Property TirePressureLeftFront;
-	PROPERTYTYPE(TirePressureLeftFront, TirePressureLeftFrontType, BasicPropertyType<double>, double)
 	static const Property TirePressureRightFront;
-	PROPERTYTYPE(TirePressureRightFront, TirePressureRightFrontType, BasicPropertyType<double>, double)
 	static const Property TirePressureLeftRear;
-	PROPERTYTYPE(TirePressureLeftRear, TirePressureLeftRearType, BasicPropertyType<double>, double)
 	static const Property TirePressureRightRear;
-	PROPERTYTYPE(TirePressureRightRear, TirePressureRightRearType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> TirePressureType;
+	typedef BasicPropertyType<double> TirePressureType;
 
 	/**< Tire temperature in degrees C */
 	static const Property TireTemperatureLeftFront;
-	PROPERTYTYPE(TireTemperatureLeftFront, TireTemperatureLeftFrontType, BasicPropertyType<double>, double)
 	static const Property TireTemperatureRightFront;
-	PROPERTYTYPE(TireTemperatureRightFront, TireTemperatureRightFrontType, BasicPropertyType<double>, double)
 	static const Property TireTemperatureLeftRear;
-	PROPERTYTYPE(TireTemperatureLeftRear, TireTemperatureLeftRearType, BasicPropertyType<double>, double)
 	static const Property TireTemperatureRightRear;
-	PROPERTYTYPE(TireTemperatureRightRear, TireTemperatureRightRearType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> TireTemperatureType;
+	typedef BasicPropertyType<double> TireTemperatureType;
 	
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes
 	 */
 	static const Property VehiclePowerMode;
-	PROPERTYTYPE(VehiclePowerMode, VehiclePowerModeType, BasicPropertyType<Power::PowerModes> ,Power::PowerModes)
-	//typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
+	typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
-	static const Property TripMeters;
-	PROPERTYTYPE(TripMeters, TripMetersType, ListPropertyType<BasicPropertyType<uint16_t> >, AbstractPropertyType*)
-	//typedef ListPropertyType<BasicPropertyType<uint16_t> > TripMetersType;
+	static const Property TripMeterA;
+	static const Property TripMeterB;
+	static const Property TripMeterC;
+	typedef BasicPropertyType<uint16_t> TripMeterType;
 
 	static const Property CruiseControlActive;
-	PROPERTYTYPE(CruiseControlActive, CruiseControlActiveType, BasicPropertyType<bool>, bool)
-	//typedef BasicPropertyType<bool> CruiseControlActiveType;
+	typedef BasicPropertyType<bool> CruiseControlActiveType;
 
 	static const Property CruiseControlSpeed;
-	PROPERTYTYPE(CruiseControlSpeed, CruiseControlSpeedType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> CruiseControlSpeedType;
+	typedef BasicPropertyType<uint16_t> CruiseControlSpeedType;
 
 	static const Property LightHead;
-	PROPERTYTYPE(LightHead, LightHeadType, BasicPropertyType<bool>, bool)
 	static const Property LightRightTurn;
-	PROPERTYTYPE(LightRightTurn, LightRightTurnType, BasicPropertyType<bool>, bool)
 	static const Property LightLeftTurn;
-	PROPERTYTYPE(LightLeftTurn, LightLeftTurnType, BasicPropertyType<bool>, bool)
 	static const Property LightBrake;
-	PROPERTYTYPE(LightBrake, LightBrakeType, BasicPropertyType<bool>, bool)
 	static const Property LightFog;
-	PROPERTYTYPE(LightFog, LightFogType, BasicPropertyType<bool>, bool)
 	static const Property LightHazard;
-	PROPERTYTYPE(LightHazard, LightHazardType, BasicPropertyType<bool>, bool)
 	static const Property LightParking;
-	PROPERTYTYPE(LightParking, LightParkingType, BasicPropertyType<bool>, bool)
 	static const Property LightHighBeam;
-	PROPERTYTYPE(LightHighBeam, LightHighBeamType, BasicPropertyType<bool>, bool)
-	//typedef BasicPropertyType<bool> LightStatusType;
-
+	typedef BasicPropertyType<bool> LightStatusType;
 	static const Property InteriorLightDriver;
-	PROPERTYTYPE(InteriorLightDriver, InteriorLightDriverType, BasicPropertyType<bool>, bool)
 	static const Property InteriorLightCenter;
-	PROPERTYTYPE(InteriorLightCenter, InteriorLightCenterType, BasicPropertyType<bool>, bool)
 	static const Property InteriorLightPassenger;
-	PROPERTYTYPE(InteriorLightPassenger, InteriorLightPassengerType, BasicPropertyType<bool>, bool)
 
 	static const Property EngineLoad;
-	PROPERTYTYPE(EngineLoad, EngineLoadType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> EngineLoadType;
+	typedef BasicPropertyType<uint16_t> EngineLoadType;
 
 	static const Property Horn;
-	PROPERTYTYPE(Horn, HornType, BasicPropertyType<bool>, bool)
-	//typedef BasicPropertyType<bool> HornType;
+	typedef BasicPropertyType<bool> HornType;
 
 	static const Property FuelLevel;
-	PROPERTYTYPE(FuelLevel, FuelLevelType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> FuelLevelType;
+	typedef BasicPropertyType<uint16_t> FuelLevelType;
 
 	static const Property FuelRange;
-	PROPERTYTYPE(FuelRange, FuelRangeType, BasicPropertyType<uint16_t> , uint16_t)
-	//typedef BasicPropertyType<uint16_t> FuelRangeType;
+	typedef BasicPropertyType<uint16_t> FuelRangeType;
 
 	static const Property FuelConsumption;
-	PROPERTYTYPE(FuelConsumption, FuelConsumptionType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> FuelConsumptionType;
+	typedef BasicPropertyType<uint16_t> FuelConsumptionType;
 
 	static const Property FuelEconomy;
-	PROPERTYTYPE(FuelEconomy, FuelEconomyType, BasicPropertyType<uint16_t>, uint16_t)
-//	/typedef BasicPropertyType<uint16_t> FuelEconomyType;
+	typedef BasicPropertyType<uint16_t> FuelEconomyType;
 
 	static const Property FuelAverageEconomy;
-	PROPERTYTYPE(FuelAverageEconomy, FuelAverageEconomyType, BasicPropertyType<uint16_t> , uint16_t)
-	//typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
+	typedef BasicPropertyType<uint16_t> FuelAverageEconomyType;
 
 	static const Property FuelType;
-	PROPERTYTYPE(FuelType, FuelTypeType, BasicPropertyType<Fuel::Type>, Fuel::Type)
-	//typedef BasicPropertyType<Fuel::Type> FuelTypeType;
+	typedef BasicPropertyType<Fuel::Type> FuelTypeType;
 
 	static const Property FuelPositionSide;
-	PROPERTYTYPE(FuelPositionSide, FuelPositionSideType, BasicPropertyType<Fuel::RefuelPosition>, Fuel::RefuelPosition)
-//	/typedef BasicPropertyType<Fuel::RefuelPosition> FuelPositionSideType;
+	typedef BasicPropertyType<Fuel::RefuelPosition> FuelPositionSideType;
 
 	static const Property ExteriorBrightness;
-	PROPERTYTYPE(ExteriorBrightness, ExteriorBrightnessType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
+	typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
 	
 	static const Property Latitude;
-	PROPERTYTYPE(Latitude, LatitudeType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> LatitudeType;
+	typedef BasicPropertyType<double> LatitudeType;
 
 	static const Property Longitude;
-	PROPERTYTYPE(Longitude, LongitudeType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> LongitudeType;
+	typedef BasicPropertyType<double> LongitudeType;
 
 	static const Property Altitude;
-	PROPERTYTYPE(Altitude, AltitudeType, BasicPropertyType<double> , double)
-	//typedef BasicPropertyType<double> AltitudeType;
+	typedef BasicPropertyType<double> AltitudeType;
 
 	static const Property Direction;
-	PROPERTYTYPE(Direction, DirectionType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> DirectionType;
+	typedef BasicPropertyType<uint> DirectionType;
 
 	static const Property VehicleWidth;
-	PROPERTYTYPE(VehicleWidth, VehicleWidthType, BasicPropertyType<uint>, uint)
 	static const Property VehicleHeight;
-	PROPERTYTYPE(VehicleHeight, VehicleHeightType, BasicPropertyType<uint>, uint)
 	static const Property VehicleLength;
-	PROPERTYTYPE(VehicleLength, VehicleLengthType, BasicPropertyType<uint>, uint)
-	//typedef BasicPropertyType<uint> VehicleSizeType;
+	typedef BasicPropertyType<uint> VehicleSizeType;
+
 
 	static const Property VehicleType;
-	PROPERTYTYPE(VehicleType, VehicleTypeType, BasicPropertyType<Vehicle::Type>, Vehicle::Type)
-	//typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
+	typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
 
 	static const Property DoorsPerRow;
-	PROPERTYTYPE(DoorsPerRow, DoorsPerRowType, ListPropertyType<BasicPropertyType<uint16_t> >, AbstractPropertyType*)
-	//typedef ListPropertyType<BasicPropertyType<uint16_t> > DoorsPerRowType;
+	typedef ListPropertyType<BasicPropertyType<uint16_t> > DoorsPerRowType;
 
 	static const Property TransmissionGearType;
-	PROPERTYTYPE(TransmissionGearType, TransmissionGearTypeType, BasicPropertyType<Transmission::Type>, Transmission::Type)
-	//typedef BasicPropertyType<Transmission::Type> TransmissionGearTypeType;
+	typedef BasicPropertyType<Transmission::Type> TransmissionGearTypeType;
 
 	static const Property FrontWheelRadius;
-	PROPERTYTYPE(FrontWheelRadius, FrontWheelRadiusType, BasicPropertyType<uint16_t>, uint16_t)
 	static const Property RearWheelRadius;
-	PROPERTYTYPE(RearWheelRadius, RearWheelRadiusType, BasicPropertyType<uint16_t>, uint16_t)
-//	/typedef BasicPropertyType<uint16_t> WheelRadiusType;
+	typedef BasicPropertyType<uint16_t> WheelRadiusType;
 
 	static const Property WheelTrack;
-	PROPERTYTYPE(WheelTrack, WheelTrackType, BasicPropertyType<uint>, uint)
-//	typedef BasicPropertyType<uint> WheelTrackType;
-
-	static const Property BrakePressure;
-	PROPERTYTYPEBASIC(BrakePressure, uint16_t)
-	//typedef BasicPropertyType<uint16_t> BrakePressureType;
+	typedef BasicPropertyType<uint> WheelTrackType;
 
 	static const Property Odometer;
-	PROPERTYTYPEBASIC(Odometer, uint)
-	//typedef BasicPropertyType<uint> OdometerType;
+	typedef BasicPropertyType<uint> OdometerType;
 
 	/**< Transmission Fluid Level 0-100%.
 	 **/
 	static const Property TransmissionFluidLevel;
-	PROPERTYTYPEBASIC(TransmissionFluidLevel, uint16_t)
-	//typedef BasicPropertyType<uint16_t> TransmissionFluidLevelType;
+	typedef BasicPropertyType<uint16_t> TransmissionFluidLevelType;
 
 	/**< Brake Fluid Level 0-100%.
 	 **/
 	static const Property BrakeFluidLevel;
-	PROPERTYTYPEBASIC(BrakeFluidLevel, uint16_t)
-	//typedef BasicPropertyType<uint16_t> BrakeFluidLevelType;
+	typedef BasicPropertyType<uint16_t> BrakeFluidLevelType;
 
 	/**< Washer Fluid Level 0-100%.
 	 **/
 	static const Property WasherFluidLevel;
-	PROPERTYTYPEBASIC(WasherFluidLevel, uint16_t)
-	//typedef BasicPropertyType<uint16_t> WasherFluidLevelType;
+	typedef BasicPropertyType<uint16_t> WasherFluidLevelType;
 
 	/**< Securty Alert Status
 	 * status of security alert
 	 * @see Security::Status
 	 */
 	static const Property SecurityAlertStatus;
-	PROPERTYTYPEBASIC(SecurityAlertStatus, Security::Status)
-	//typedef BasicPropertyType<Security::Status> SecurityAlertStatusType;
+	typedef BasicPropertyType<Security::Status> SecurityAlertStatusType;
 
 	/**< Parking Brake Status
 	 * status of parking break active (true) or inactive (false)
 	 */
 	static const Property ParkingBrakeStatus;
-	PROPERTYTYPEBASIC(ParkingBrakeStatus, bool)
-	//typedef BasicPropertyType<bool> ParkingBrakeStatusType;
+	typedef BasicPropertyType<bool> ParkingBrakeStatusType;
 
 	/**< Parking Light Status
 	 * status of parking lights active (true) or inactive (false)
 	 */
 	static const Property ParkingLightStatus;
-	PROPERTYTYPEBASIC(ParkingLightStatus,bool)
-	//typedef BasicPropertyType<bool> ParkingLightStatusType;
+	typedef BasicPropertyType<bool> ParkingLightStatusType;
 
 	/**< Hazard Lights Status
 	 * status of parking lights active (true) or inactive (false)
 	 */
 	static const Property HazardLightStatus;
-	PROPERTYTYPEBASIC(HazardLightStatus, bool)
-	//typedef BasicPropertyType<bool> HazardLightStatusType;
+	typedef BasicPropertyType<bool> HazardLightStatusType;
 
 	static const Property AntilockBrakingSystem;
-	PROPERTYTYPEBASIC(AntilockBrakingSystem, bool)
-	//typedef BasicPropertyType<bool> AntilockBrakingSystemType;
+	typedef BasicPropertyType<bool> AntilockBrakingSystemType;
 
 	static const Property TractionControlSystem;
-	PROPERTYTYPEBASIC(TractionControlSystem, bool)
-	//typedef BasicPropertyType<bool> TractionControlSystemType;
+	typedef BasicPropertyType<bool> TractionControlSystemType;
 
 	static const Property VehicleTopSpeedLimit;
-	PROPERTYTYPEBASIC(VehicleTopSpeedLimit,uint16_t)
-	//typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
+	typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
 
 	static const Property AirbagStatus;
-	PROPERTYTYPENOVAL(AirbagStatus, AirbagStatusType, MapPropertyType<BasicPropertyType<Airbag::Location> BOOST_PP_COMMA() BasicPropertyType<Airbag::Status> >)
-	//typedef MapPropertyType<BasicPropertyType<Airbag::Location>, BasicPropertyType<Airbag::Status> > AirbagStatusType;
+	typedef MapPropertyType<BasicPropertyType<Airbag::Location>, BasicPropertyType<Airbag::Status> > AirbagStatusType;
 
 	static const Property DoorStatus;
-	PROPERTYTYPENOVAL(DoorStatus, DoorStatusType,
-					  MapPropertyType<BasicPropertyType<Door::Location> BOOST_PP_COMMA() BasicPropertyType<Door::Status> >)
-	//typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<Door::Status> > DoorStatusType;
+	typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<Door::Status> > DoorStatusType;
 
 	static const Property DoorLockStatus;
-	PROPERTYTYPENOVAL(DoorLockStatus, DoorLockStatusType,
-					  MapPropertyType<BasicPropertyType<Door::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+	typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<bool> > DoorLockStatusType;
 
 	static const Property SeatBeltStatus;
-	PROPERTYTYPENOVAL(SeatBeltStatus, SeatBeltStatusType,
-					  MapPropertyType<BasicPropertyType<Seat::Location> BOOST_PP_COMMA() BasicPropertyType<bool> >)
+	typedef MapPropertyType<BasicPropertyType<Seat::Location>, BasicPropertyType<bool> > SeatBeltStatusType;
 
 	static const Property WindowLockStatus;
-	PROPERTYTYPENOVAL(WindowLockStatus, WindowLockStatusType,
-					  MapPropertyType<BasicPropertyType<Window::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+	typedef MapPropertyType<BasicPropertyType<Window::Location>, BasicPropertyType<bool> > WindowLockStatusType;
 
 	static const Property OccupantStatus;
-	PROPERTYTYPENOVAL(OccupantStatus, OccupantStatusType,
-					  MapPropertyType<BasicPropertyType<Seat::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+	typedef MapPropertyType<BasicPropertyType<Seat::Location>, BasicPropertyType<bool> > OccupantStatusType;
 
 	static const Property ObstacleDistance;
-	PROPERTYTYPENOVAL(ObstacleDistance, ObstacleDistanceType,
-					  MapPropertyType<BasicPropertyType<DistanceSensor::Location> BOOST_PP_COMMA() BasicPropertyType<double> > )
+	typedef MapPropertyType<BasicPropertyType<DistanceSensor::Location>, BasicPropertyType<double> > ObstacleDistanceType;
 
-	static const Property RainSensor;
-	PROPERTYTYPEBASIC(RainSensor, uint16_t)
-	//typedef BasicPropertyType<uint16_t> RainSensorType;
-
-	static const Property WindshieldWiper;
-	PROPERTYTYPEBASIC(WindshieldWiper,Window::WiperSpeed)
-	//typedef BasicPropertyType<Window::WiperSpeed> WindshieldWiperType;
-
-	static const Property AirflowDirection;
-	PROPERTYTYPEBASIC(AirflowDirection,HVAC::AirflowDirection)
-	//typedef BasicPropertyType<HVAC::AirflowDirection> AirflowDirectionType;
-
-	static const Property FanSpeed;
-	PROPERTYTYPEBASIC(FanSpeed, uint16_t)
-	//typedef BasicPropertyType<uint16_t> FanSpeedType;
-
-	static const Property TargetTemperature;
-	PROPERTYTYPEBASIC(TargetTemperature, int)
-	//typedef BasicPropertyType<int> TargetTemperatureType;
-
-	static const Property AirConditioning;
-	PROPERTYTYPEBASIC(AirConditioning,bool)
-	//typedef BasicPropertyType<bool> AirConditioningType;
-
-	static const Property AirRecirculation;
-	PROPERTYTYPEBASIC(AirRecirculation,bool)
-	//typedef BasicPropertyType<bool> AirRecirculationType;
-
-	static const Property Heater;
-	PROPERTYTYPEBASIC(Heater, bool)
-	//typedef BasicPropertyType<bool> HeaterType;
-
-	static const Property Defrost;
-	PROPERTYTYPENOVAL(Defrost, DefrostType,
-					  MapPropertyType<BasicPropertyType<Window::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
-
-	static const Property SteeringWheelHeater;
-	PROPERTYTYPEBASIC(SteeringWheelHeater,bool)
-	//typedef BasicPropertyType<bool> SteeringWheelHeaterType;
-
-	static const Property SeatHeater;
-	PROPERTYTYPEBASIC(SeatHeater,bool)
-	//typedef BasicPropertyType<bool> SeatHeaterType;
-
-	static const Property SeatCooler;
-	PROPERTYTYPEBASIC(SeatCooler,bool)
-//	/typedef BasicPropertyType<bool> SeatCoolerType;
-
-	static const Property WindowStatus;
-	PROPERTYTYPENOVAL(WindowStatus, WindowStatusType,
-					  MapPropertyType<BasicPropertyType<Window::Location> BOOST_PP_COMMA() BasicPropertyType<uint16_t> > )
-
-	static const Property Sunroof;
-	PROPERTYTYPEBASIC(Sunroof, uint16_t)
-	//typedef BasicPropertyType<uint16_t> SunroofType;
-
-	static const Property SunroofTilt;
-	PROPERTYTYPEBASIC(SunroofTilt,uint16_t)
-	//typedef BasicPropertyType<uint16_t> SunroofTiltType;
-
-	static const Property ConvertibleRoof;
-	PROPERTYTYPEBASIC(ConvertibleRoof, bool)
-	//typedef BasicPropertyType<bool> ConvertibleRoofType;
 
 	/** END PROPERTIES **/
 

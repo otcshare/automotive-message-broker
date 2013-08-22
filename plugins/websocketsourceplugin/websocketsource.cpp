@@ -23,7 +23,7 @@
 #include <boost/lexical_cast.hpp>
 #include <glib.h>
 #include <sstream>
-//#include <json-glib/json-glib.h>
+#include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include <timestamp.h>
 #include "uuidhelper.h"
@@ -235,222 +235,261 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 
 			DebugOut(2)<<"websocket source pre-json parse time: "<<prejsonparsetime<<endl;
 
-			json_object *rootobject;
-			json_tokener *tokener = json_tokener_new();
-			enum json_tokener_error err;
-			do
-			{
-				rootobject = json_tokener_parse_ex(tokener, (char*)in,len);
-			} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-			if (err != json_tokener_success)
-			{
-				fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-				// Handle errors, as appropriate for your application.
-			}
-			if (tokener->char_offset < len) // XXX shouldn't access internal fields
-			{
-				// Handle extra characters after parsed object as desired.
-				// e.g. issue an error, parse another object from that point, etc...
-			}
 			//Incoming JSON reqest.
-			
+			GError* error = nullptr;
+			JsonParser* parser = json_parser_new();
+			if (!json_parser_load_from_data(parser,(char*)in,len,&error))
+			{
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error loading JSON"<<endl;
+				DebugOut(0) << (char*)in <<endl;
+				DebugOut(0) <<error->message<<endl;
+				return 0;
+			}
+
+			JsonNode* node = json_parser_get_root(parser);
+			if(node == nullptr)
+			{
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "Error getting root node of json"<<endl;
+				//throw std::runtime_error("Unable to get JSON root object");
+				return 0;
+			}
+
+			JsonReader* reader = json_reader_new(node);
+			if(reader == nullptr)
+			{
+				DebugOut(0) << __SMALLFILE__ <<":"<< __LINE__ << "json_reader is null!"<<endl;
+				//throw std::runtime_error("Unable to create JSON reader");
+				return 0;
+			}
+
 
 			DebugOut(5)<<"source received: "<<string((char*)in)<<endl;
+
+
+			string type;
+			json_reader_read_member(reader,"type");
+			type = json_reader_get_string_value(reader);
+			json_reader_end_member(reader);
+
+			string  name;
+			json_reader_read_member(reader,"name");
+			name = json_reader_get_string_value(reader);
+			json_reader_end_member(reader);
 			
-			json_object *typeobject= json_object_object_get(rootobject,"type");
-			json_object *nameobject= json_object_object_get(rootobject,"name");
-			json_object *transidobject= json_object_object_get(rootobject,"transactionid");
-
-
-			string type = string(json_object_get_string(typeobject));
-			string  name = string(json_object_get_string(nameobject));
 			
 			string id;
-			
-			if (json_object_get_type(transidobject) == json_type_string)
+			json_reader_read_member(reader,"transactionid");
+			if (strcmp("gchararray",g_type_name(json_node_get_value_type(json_reader_get_value(reader)))) == 0)
 			{
-				id = json_object_get_string(transidobject);
+				//Type is a string
+				id = json_reader_get_string_value(reader);
 			}
 			else
 			{
+				//Type is an integer
 				stringstream strstr;
-				strstr << json_object_get_int(transidobject);
+				strstr << json_reader_get_int_value(reader);
 				id = strstr.str();
 			}
+			json_reader_end_member(reader);
 			
 			list<pair<string,string> > pairdata;
 			if (type == "valuechanged")
 			{
-				json_object *dataobject = json_object_object_get(rootobject,"data");
-				
-				json_object *valueobject = json_object_object_get(dataobject,"value");
-				json_object *timestampobject = json_object_object_get(dataobject,"timestamp");
-				json_object *sequenceobject= json_object_object_get(dataobject,"sequence");
-				
-				string value = string(json_object_get_string(valueobject));
-				string timestamp = string(json_object_get_string(timestampobject));
-				string sequence = string(json_object_get_string(sequenceobject));
-				//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
-				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << endl;
-				//Name should be a valid property
-				//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
-				//data.front()
-				try
+				json_reader_read_member(reader,"data");
+				if (json_reader_is_object(reader))
 				{
-					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
-					type->timestamp = boost::lexical_cast<double,std::string>(timestamp);
-					type->sequence = boost::lexical_cast<double,std::string>(sequence);
-					m_re->updateProperty(name, type, source->uuid());
-					double currenttime = amb::currentTime();
-
-					/** This is now the latency between when something is available to read on the socket, until
-					 *  a property is about to be updated in AMB.  This includes libwebsockets parsing and the
-					 *  JSON parsing in this section.
-					 */
+					//Proper object.
+					json_reader_read_member(reader,"value");
+					std::string value = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
 					
-					DebugOut(2)<<"websocket parse latency: "<<(currenttime - oldTimestamp)*1000<<"ms"<<endl;
-					DebugOut(2)<<"websocket network + parse latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
-					totalTime += (currenttime - oldTimestamp)*1000;
-					numUpdates ++;
-					averageLatency = totalTime / numUpdates;
-
-					DebugOut(2)<<"Average parse latency: "<<averageLatency<<endl;
-
-					delete type;
-				}
-				catch (exception ex)
-				{
-					//printf("Exception %s\n",ex.what());
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Exception:" << ex.what() << "\n";
-				}
-				json_object_put(valueobject);
-				json_object_put(timestampobject);
-				json_object_put(sequenceobject);
-				json_object_put(dataobject);
-				//printf("Done\n");
-				/*if (name == "get")
-				{
-					if (data.size() > 0)
+					json_reader_read_member(reader,"timestamp");
+					std::string timestamp = json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+					
+					json_reader_read_member(reader,"sequence");
+					std::string sequence= json_reader_get_string_value(reader);
+					json_reader_end_member(reader);
+					//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << endl;
+					//Name should be a valid property
+					//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
+					//data.front()
+					try
 					{
+						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
+						type->timestamp = boost::lexical_cast<double,std::string>(timestamp);
+						type->sequence = boost::lexical_cast<double,std::string>(sequence);
+						m_re->updateProperty(name, type, source->uuid());
+
+						double currenttime = amb::currentTime();
+
+						/** This is now the latency between when something is available to read on the socket, until
+						 *  a property is about to be updated in AMB.  This includes libwebsockets parsing and the
+						 *  JSON parsing in this section.
+						 */
+
+						DebugOut(2)<<"websocket parse latency: "<<(currenttime - oldTimestamp)*1000<<"ms"<<endl;
+						DebugOut(2)<<"websocket network + parse latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
+
+						totalTime += (currenttime - oldTimestamp)*1000;
+						numUpdates ++;
+
+						averageLatency = totalTime / numUpdates;
+
+						DebugOut(2)<<"Average parse latency: "<<averageLatency<<endl;
+
+						delete type;
 					}
-				}*/
+					catch (exception ex)
+					{
+						//printf("Exception %s\n",ex.what());
+						DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Exception:" << ex.what() << "\n";
+					}
+					//printf("Done\n");
+					/*if (name == "get")
+					{
+						if (data.size() > 0)
+						{
+						}
+					}*/
+				}
 			}
 			else if (type == "methodReply")
 			{
-				json_object *dataobject = json_object_object_get(rootobject,"data");
 				if (name == "getSupportedEventTypes")
 				{
+					json_reader_read_member(reader,"data");
 					//printf("Got supported events!\n");
 					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupportedEventTypes request"<<endl;
 					PropertyList props;
-					if (json_object_get_type(dataobject) == json_type_array)
+					if (json_reader_is_array(reader))
 					{
-						array_list *dataarray = json_object_get_array(dataobject);
-						for (int i=0;i<array_list_length(dataarray);i++)
+						for(int i=0; i < json_reader_count_elements(reader); i++)
 						{
-							json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
-							props.push_back(string(json_object_get_string(arrayobj)));
+							json_reader_read_element(reader,i);
+							string path = json_reader_get_string_value(reader);
+							props.push_back(path);
+							json_reader_end_element(reader);
 						}
-						//array_list_free(dataarray);
 					}
 					else
 					{
-						props.push_back(string(json_object_get_string(dataobject)));
+						string path = json_reader_get_string_value(reader);
+						if (path != "")
+						{
+							props.push_back(path);;
+						}
 					}
+					json_reader_end_member(reader);
 					source->setSupported(props);
 					//m_re->updateSupported(m_supportedProperties,PropertyList());
 				}
 				else if (name == "getRanged")
 				{
-					std::list<AbstractPropertyType*> propertylist;
-					array_list *dataarray = json_object_get_array(dataobject);
-					for (int i=0;i<array_list_length(dataarray);i++)
+					json_reader_read_member(reader,"data");
+					if (json_reader_is_array(reader))
 					{
-						json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
-						json_object *valueobject = json_object_object_get(arrayobj,"value");
-						json_object *timestampobject = json_object_object_get(arrayobj,"timestamp");
-						json_object *sequenceobject = json_object_object_get(arrayobj,"sequence");
-						std::string value = json_object_get_string(valueobject);
-						std::string timestamp = json_object_get_string(timestampobject);
-						std::string sequence = json_object_get_string(sequenceobject);
-						json_object_put(valueobject);
-						json_object_put(timestampobject);
-						json_object_put(sequenceobject);
-							
-						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(source->uuidRangedReplyMap[id]->property,value);
-						propertylist.push_back(type);
-						//props.push_back(string(json_object_get_string(arrayobj)));
-					}
-					//array_list_free(dataarray);
-					if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
-					{
-						source->uuidRangedReplyMap[id]->values = propertylist;
-						source->uuidRangedReplyMap[id]->success = true;
-						source->uuidRangedReplyMap[id]->completed(source->uuidRangedReplyMap[id]);
-						source->uuidRangedReplyMap.erase(id);
-					}
-					else
-					{
-						DebugOut() << "getRanged methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
-					}
-					while (propertylist.size() > 0)
-					{
-						
-						AbstractPropertyType *type = propertylist.front();
-						delete type;
-						propertylist.pop_front();
-					}
-				}
-				else if (name == "get")
-				{
-					
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
-					if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
-					{
-						json_object *propertyobject = json_object_object_get(dataobject,"property");
-						json_object *valueobject = json_object_object_get(dataobject,"value");
-						json_object *timestampobject = json_object_object_get(dataobject,"timestamp");
-						json_object *sequenceobject = json_object_object_get(dataobject,"sequence");
-						std::string property = json_object_get_string(propertyobject);
-						std::string value = json_object_get_string(valueobject);
-						std::string timestamp = json_object_get_string(timestampobject);
-						std::string sequence = json_object_get_string(sequenceobject);
-						json_object_put(propertyobject);
-						json_object_put(valueobject);
-						json_object_put(timestampobject);
-						json_object_put(sequenceobject);
-					      
-						AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
-						v->timestamp = boost::lexical_cast<double,std::string>(timestamp);
-						v->sequence = boost::lexical_cast<double,std::string>(sequence);
-						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
+						std::list<AbstractPropertyType*> propertylist;
+						for(int i=0; i < json_reader_count_elements(reader); i++)
 						{
-							source->uuidReplyMap[id]->value = v;
-							source->uuidReplyMap[id]->success = true;
-							source->uuidReplyMap[id]->completed(source->uuidReplyMap[id]);
-							source->uuidReplyMap.erase(id);
+							json_reader_read_member(reader,"value");
+							std::string value = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+						
+							json_reader_read_member(reader,"timestamp");
+							std::string timestamp = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							json_reader_read_member(reader,"sequence");
+							std::string sequence = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(source->uuidRangedReplyMap[id]->property,value);
+							propertylist.push_back(type);
+							
+						}
+						if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
+						{
+							source->uuidRangedReplyMap[id]->values = propertylist;
+							source->uuidRangedReplyMap[id]->success = true;
+							source->uuidRangedReplyMap[id]->completed(source->uuidRangedReplyMap[id]);
+							source->uuidRangedReplyMap.erase(id);
 						}
 						else
 						{
-							DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
+							DebugOut() << "getRanged methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
 						}
+						while (propertylist.size() > 0)
+						{
+							
+							AbstractPropertyType *type = propertylist.front();
+							delete type;
+							propertylist.pop_front();
+						}
+					}
+					json_reader_end_member(reader);
+				}
+				else if (name == "get")
+				{
+					json_reader_read_member(reader,"data");
+					if (json_reader_is_object(reader))
+					{
+						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
+						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
+						{
+							json_reader_read_member(reader,"property");
+							std::string property = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							      
+							json_reader_read_member(reader,"value");
+							std::string value = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							json_reader_read_member(reader,"timestamp");
+							std::string timestamp = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+							
+							
+							json_reader_read_member(reader,"sequence");
+							std::string sequence = json_reader_get_string_value(reader);
+							json_reader_end_member(reader);
+						      
+							AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
+							v->timestamp = boost::lexical_cast<double,std::string>(timestamp);
+							v->sequence = boost::lexical_cast<double,std::string>(sequence);
+							if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
+							{
+								source->uuidReplyMap[id]->value = v;
+								source->uuidReplyMap[id]->success = true;
+								source->uuidReplyMap[id]->completed(source->uuidReplyMap[id]);
+								source->uuidReplyMap.erase(id);
+							}
+							else
+							{
+								DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
+							}
+
 							delete v;
+						}
 					}
 					else
 					{
 						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "GET Method Reply INVALID! Multiple properties detected, only single are supported!!!" << "\n";
 					}
-					
+					json_reader_end_member(reader);
 					//data will contain a property/value map.
 				}
-				json_object_put(dataobject);
 			}
-			json_object_put(rootobject);
+
 			///TODO: this will probably explode:
 			//mlc: I agree with Kevron here, it does explode.
 			//if(error) g_error_free(error);
 
-			
+			g_object_unref(reader);
+			g_object_unref(parser);
+
 			break;
 
 		}

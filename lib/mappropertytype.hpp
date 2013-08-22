@@ -3,16 +3,15 @@
 
 
 #include "abstractpropertytype.h"
-//#include "vehicleproperty.h"
 #include <map>
 #include <debugout.h>
-#include <json/json.h>
+#include <json-glib/json-glib.h>
 
 template <class T, class N>
 class MapPropertyType: public AbstractPropertyType
 {
 public:
-	MapPropertyType(std::string propertyName):AbstractPropertyType(propertyName){}
+	MapPropertyType(){}
 
 	void append(T  key, N  value)
 	{
@@ -21,7 +20,7 @@ public:
 
 	AbstractPropertyType* copy()
 	{
-		MapPropertyType<T,N> *t = new MapPropertyType<T,N>(name);
+		MapPropertyType<T,N> *t = new MapPropertyType<T,N>();
 
 		t->setMap(mMap);
 
@@ -51,34 +50,41 @@ public:
 
 	void fromString(std::string str)
 	{
-		json_object *rootobject;
-		json_tokener *tokener = json_tokener_new();
-		enum json_tokener_error err;
-		do
+		JsonParser* parser = json_parser_new();
+		GError* error = nullptr;
+		if(!json_parser_load_from_data(parser, str.c_str(), str.length(), &error))
 		{
-			rootobject = json_tokener_parse_ex(tokener, str.c_str(),str.length());
-		} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-		if (err != json_tokener_success)
-		{
-			fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-			// Handle errors, as appropriate for your application.
+			DebugOut()<<"Failed to load config: "<<error->message;
+			throw std::runtime_error("Failed to load config");
 		}
-		if (tokener->char_offset < str.length()) // XXX shouldn't access internal fields
+
+		JsonNode* node = json_parser_get_root(parser);
+
+		if(node == nullptr)
+			throw std::runtime_error("Unable to get JSON root object");
+
+		JsonReader* reader = json_reader_new(node);
+
+		if(reader == nullptr)
+			throw std::runtime_error("Unable to create JSON reader");
+
+		DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
+
+		gchar** srcMembers = json_reader_list_members(reader);
+
+		for(int i=0; i< json_reader_count_members(reader); i++)
 		{
-			// Handle extra characters after parsed object as desired.
-			// e.g. issue an error, parse another object from that point, etc...
-		}
-		//Good!
-		
-		json_object_object_foreach(rootobject, key, val)
-		{
-			T one(key);
-			N two(json_object_get_string(val));
+			json_reader_read_member(reader,srcMembers[i]);
+			T one(srcMembers[i]);
+			N two(json_reader_get_string_value(reader));
+
 			append(one,two);
-
+			json_reader_end_member(reader);
 		}
-		json_object_put(rootobject);
 
+		g_free(srcMembers);
+		g_object_unref(reader);
+		g_object_unref(parser);
 	}
 
 	GVariant* toVariant()
@@ -88,9 +94,15 @@ public:
 
 		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
 		{
+			GVariant **v = g_new(GVariant*,2);
 			auto &foo = (*itr).first;
-			g_variant_builder_add(&params,"{?*}",const_cast<T&>(foo).toVariant(),(*itr).second.toVariant());
+			v[0] = const_cast<T&>(foo).toVariant();
+			v[1] = (*itr).second.toVariant();
+			GVariant* tuple = g_variant_new_tuple(v,2);
 
+			g_variant_builder_add_value(&params,tuple);
+
+			g_free(v);
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -100,7 +112,7 @@ public:
 
 	void fromVariant(GVariant*)
 	{
-		/// TODO: fill this in
+
 	}
 
 	void setMap(std::map<T, N> m)

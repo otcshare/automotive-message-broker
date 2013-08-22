@@ -12,14 +12,6 @@ Properties:
 
 			Distance in km
 
-Interface       org.automotive.BrakePressure
-Object path     /org/automotive/maintenance/BrakePressure
-Properties:
-
-		byte Pressure [readonly]
-
-			Pressure of Brake 0-100%
-
 Interface       org.automotive.fluid
 Object path     /org/automotive/maintenance/fluid
 Properties:

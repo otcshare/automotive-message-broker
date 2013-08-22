@@ -104,9 +104,5 @@ Properties:
 		uint32 Track [readonly]
 
 			Wheel Track in mm.
-
-		bool ABS [readonly]
-
-			Status of Antilock Brake System (ABS) on=true, off=false
 				
 			

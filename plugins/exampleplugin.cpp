@@ -88,7 +88,7 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	}
 	else if(reply->property == VehicleProperty::AccelerationX)
 	{
-		VehicleProperty::AccelerationXType temp(accelerationX);
+		VehicleProperty::AccelerationType temp(accelerationX);
 		reply->value = &temp;
 		reply->success = true;
 		reply->completed(reply);
@@ -227,7 +227,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	
 	VehicleProperty::VehicleSpeedType vel(velocity);
 	VehicleProperty::EngineSpeedType es(engineSpeed);
-	VehicleProperty::AccelerationXType ac(accelerationX);
+	VehicleProperty::AccelerationType ac(accelerationX);
 	VehicleProperty::SteeringWheelAngleType swa(steeringWheelAngle);
 	VehicleProperty::TransmissionShiftPositionType tsp(transmissionShiftPostion);
 	VehicleProperty::ThrottlePositionType tp(throttlePos);

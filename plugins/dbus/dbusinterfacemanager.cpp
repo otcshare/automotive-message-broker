@@ -30,7 +30,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "vehicleinfo.h"
 #include "maintenance.h"
 #include "parking.h"
-#include "drivingsafety.h"
 
 #define ConstructProperty(property) \
 	new property(iface->re, connection);
@@ -57,13 +56,6 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(FuelProperty);
 	ConstructProperty(EngineOilProperty);
 	ConstructProperty(ExteriorBrightnessProperty);
-	ConstructProperty(Temperature);
-	ConstructProperty(RainSensor);
-	ConstructProperty(WindshieldWiper);
-	ConstructProperty(HVACProperty);
-	ConstructProperty(WindowStatusProperty);
-	ConstructProperty(Sunroof);
-	ConstructProperty(ConvertibleRoof);
 	ConstructProperty(VehicleId);
 	ConstructProperty(TransmissionInfoProperty);
 	ConstructProperty(VehicleTypeProperty);
@@ -72,21 +64,11 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(DoorsProperty);
 	ConstructProperty(WheelInformationProperty);
 	ConstructProperty(OdometerProperty);
-	ConstructProperty(FluidProperty);
 	ConstructProperty(BatteryProperty);
 	ConstructProperty(SecurityAlertProperty);
 	ConstructProperty(ParkingBrakeProperty);
 	ConstructProperty(ParkingLightProperty);
 	ConstructProperty(HazardLightProperty);
-	ConstructProperty(LocationProperty);
-	ConstructProperty(AntilockBrakingSystemProperty);
-	ConstructProperty(TractionControlSystemProperty);
-	ConstructProperty(VehicleTopSpeedLimitProperty);
-	ConstructProperty(AirbagStatusProperty);
-	ConstructProperty(DoorStatusProperty);
-	ConstructProperty(SeatBeltStatusProperty);
-	ConstructProperty(OccupantStatusProperty);
-	ConstructProperty(ObstacleDistanceProperty);
 
 	PropertyList list = VehicleProperty::customProperties();
 

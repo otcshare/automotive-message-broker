@@ -23,7 +23,7 @@
 #include <boost/lexical_cast.hpp>
 #include <glib.h>
 #include <sstream>
-//#include <json-glib/json-glib.h>
+#include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include "debugout.h"
 #include "bluetooth.hpp"
@@ -76,7 +76,7 @@ std::string reply;
 	{
 		//No reply found
 		//printf("Error!\n");
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM"<<endl;
+		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM\n";
 	}
 	else
 	{

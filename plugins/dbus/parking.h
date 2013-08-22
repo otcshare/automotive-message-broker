@@ -6,7 +6,7 @@
 #include "abstractdbusinterface.h"
 #include "abstractroutingengine.h"
 
-/** @interface SecurityAlert : VehiclePropertyType **/
+/** @interface SecurityAlert **/
 class SecurityAlertProperty: public DBusSink
 {
 public:
@@ -17,7 +17,6 @@ public:
 		/** @attributeName SecurityAlert
 		 *  @type boolean
 		 *  @access readonly
-		 *  @attributeComment \brief MUST return
 		 **/
 		wantProperty<Security::Status>(VehicleProperty::SecurityAlertStatus,"SecurityAlert", "i", AbstractProperty::Read);
 
@@ -25,7 +24,7 @@ public:
 	}
 };
 
-/** @interface ParkingBrake : VehiclePropertyType **/
+/** @interface ParkingBrake **/
 class ParkingBrakeProperty: public DBusSink
 {
 public:
@@ -35,7 +34,6 @@ public:
 		/** @attributeName ParkingBrake
 		 *  @type boolean
 		 *  @access readonly
-		 *  @attributeComment must return status of parking brake:  Engaged = true, Disengaged = false.
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingBrakeStatus,"ParkingBrake", "b", AbstractProperty::Read);
 
@@ -43,7 +41,7 @@ public:
 	}
 };
 
-/** @interface ParkingLight : VehiclePropertyType **/
+/** @interface ParkingLight **/
 class ParkingLightProperty: public DBusSink
 {
 public:
@@ -53,7 +51,6 @@ public:
 		/** @attributeName ParkingLight
 		 *  @type boolean
 		 *  @access readonly
-		 *  @attributeComment must return status of parking light:  Engaged = true, Disengaged = false.
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingLightStatus,"ParkingLight", "b", AbstractProperty::Read);
 
@@ -61,7 +58,7 @@ public:
 	}
 };
 
-/** @interface HazardLight : VehiclePropertyType **/
+/** @interface HazardLight **/
 class HazardLightProperty: public DBusSink
 {
 public:
@@ -71,7 +68,6 @@ public:
 		/** @attributeName HazardLight
 		 *  @type boolean
 		 *  @access readonly
-		 *  @attributeComment must return status of hazard light:  Engaged = true, Disengaged = false.
 		 **/
 		wantProperty<bool>(VehicleProperty::HazardLightStatus,"HazardLight", "b", AbstractProperty::Read);
 

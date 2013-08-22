@@ -115,6 +115,5 @@ void DemoSink::propertyChanged(VehicleProperty::Property property, AbstractPrope
 
 void DemoSink::supportedChanged(PropertyList list)
 {
-	routingEngine->subscribeToProperty(VehicleProperty::ButtonEvent, this);
-	routingEngine->subscribeToProperty(VehicleProperty::TurnSignal, this);
+
 }

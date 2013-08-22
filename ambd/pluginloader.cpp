@@ -19,11 +19,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "pluginloader.h"
 #include "glibmainloop.h"
-#include <json.h>
+
 #include <iostream>
 #include <stdexcept>
-#include <boost/concept_check.hpp>
-//#include <json-glib/json-glib.h>
+#include <json-glib/json-glib.h>
 
 
 using namespace std;
@@ -37,50 +36,35 @@ using namespace std;
  * 
 **********************************************/
 
-std::string get_file_contents(const char *filename)
-{
-  //FILE *in = fopen(filename,"r");
-  
-  std::ifstream in(filename, std::ios::in);
-  std::string output;
-  std::string line;
-  while(in.good())
-  {
-    getline(in,line);
-    output.append(line);
-  }
-  return output;
-}
 PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int argc, char** argv): f_create(NULL), routingEngine(re), mMainLoop(nullptr)
 {
-  
 	DebugOut()<<"Loading config file: "<<configFile<<endl;
-	json_object *rootobject;
-	json_tokener *tokener = json_tokener_new();
-	std::string configBuffer = get_file_contents(configFile.c_str());
-	enum json_tokener_error err;
-	do
+	
+	JsonParser* parser = json_parser_new();
+	GError* error = nullptr;
+	if(!json_parser_load_from_file(parser, configFile.c_str(), &error))
 	{
-		rootobject = json_tokener_parse_ex(tokener, configBuffer.c_str(),configBuffer.length());
-	} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-	if (err != json_tokener_success)
-	{
-		fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-		// Handle errors, as appropriate for your application.
-	}
-	if (tokener->char_offset < configFile.length()) // XXX shouldn't access internal fields
-	{
-		// Handle extra characters after parsed object as desired.
-		// e.g. issue an error, parse another object from that point, etc...
+		DebugOut()<<"Failed to load config: "<<error->message;
+		throw std::runtime_error("Failed to load config");
 	}
 	
-	//DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
-	json_object *mainloopobject = json_object_object_get(rootobject,"mainloop");
-	if (mainloopobject)
+	JsonNode* node = json_parser_get_root(parser);
+	
+	if(node == nullptr)
+		throw std::runtime_error("Unable to get JSON root object");
+	
+	JsonReader* reader = json_reader_new(node);
+	
+	if(reader == nullptr)
+		throw std::runtime_error("Unable to create JSON reader");
+	
+	DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
+
+	if(json_reader_read_member(reader,"mainloop"))
 	{
 		/// there is a mainloop entry.  Load the plugin:
 
-		string mainloopstr = string(json_object_get_string(mainloopobject));
+		string mainloopstr = json_reader_get_string_value(reader);
 
 		mMainLoop = loadMainLoop(mainloopstr,argc, argv);
 
@@ -96,38 +80,39 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		mMainLoop = new GlibMainLoop(argc,argv);
 	}
 	
-	json_object *sourcesobject = json_object_object_get(rootobject,"sources");
+	json_reader_end_member(reader);
 
-	if(!sourcesobject)
+	if(!json_reader_read_member(reader,"sources"))
 	{
-		DebugOut()<<"Error getting sources member: "<<endl;
+
+		const GError * srcReadError = json_reader_get_error(reader);
+
+		DebugOut()<<"Error getting sources member: "<<srcReadError->message<<endl;
 		throw std::runtime_error("Error getting sources member");
 	}
 	
-	//g_assert(json_reader_is_array(reader));
-	g_assert(json_object_get_type(sourcesobject)==json_type_array);
+	g_assert(json_reader_is_array(reader));
 	
 	
-	array_list *sourceslist = json_object_get_array(sourcesobject);
-	if (!sourceslist)
+	for(int i=0; i < json_reader_count_elements(reader); i++)
 	{
-	  DebugOut() << "Error getting source list" << endl;
-	  throw std::runtime_error("Error getting sources list");
-	}
-	
-	for(int i=0; i < array_list_length(sourceslist); i++)
-	{
-		json_object *obj = (json_object*)array_list_get_idx(sourceslist,i); //This is an object
+		json_reader_read_element(reader,i);
 		
+		gchar** srcMembers = json_reader_list_members(reader);
+
 		std::map<std::string, std::string> configurationMap;
-		json_object_object_foreach(obj, key, val)
+
+		for(int i=0; i< json_reader_count_members(reader); i++)
 		{
-			string valstr = json_object_get_string(val);
-			DebugOut() << "plugin config key: " << key << "value:" << valstr << endl;
-			configurationMap[key] = valstr;
+			json_reader_read_member(reader,srcMembers[i]);
+			configurationMap[srcMembers[i]] = json_reader_get_string_value(reader);
+			DebugOut()<<"plugin config key: "<<srcMembers[i]<<" value: "<<configurationMap[srcMembers[i]]<<endl;
+			json_reader_end_member(reader);
 		}
-		json_object *pathobject = json_object_object_get(obj,"path");
- 		string path = string(json_object_get_string(pathobject));
+
+		json_reader_read_member(reader, "path");
+		string path = json_reader_get_string_value(reader);
+		json_reader_end_member(reader);
 
 		AbstractSource* plugin = loadPlugin<AbstractSource*>(path,configurationMap);
 		
@@ -135,51 +120,34 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		{
 			mSources.push_back(plugin);
 		}
-		json_object_put(pathobject);
+
+		json_reader_end_element(reader);
 	}
-	DebugOut() << "Trying to free list" << endl;
-	array_list_free(sourceslist);
-	DebugOut() << "Trying to free obj" << endl;
-	//json_object_put(sourcesobject);
-	DebugOut() << "Done first" << endl;
+			
+	json_reader_end_member(reader);
+
 	///read the sinks:
-	
-	json_object *sinksobject = json_object_object_get(rootobject,"sinks");
-	
-	if (!sinksobject)
+		
+	json_reader_read_member(reader,"sinks");
+
+	for(int i=0; i < json_reader_count_elements(reader); i++)
 	{
-	  DebugOut() << "Error getting sink object" << endl;
-	  throw std::runtime_error("Error getting sink object");
-	}
-	
-	
-	
-	array_list *sinkslist = json_object_get_array(sinksobject);
-	
-	
-	if (!sinkslist)
-	{
-	  DebugOut() << "Error getting sink list" << endl;
-	  throw std::runtime_error("Error getting sink list");
-	}
-	
-	
-	for(int i=0; i < array_list_length(sinkslist); i++)
-	{
-		json_object *obj = (json_object*)array_list_get_idx(sinkslist,i);
+		json_reader_read_element(reader,i);
+
+		gchar** srcMembers = json_reader_list_members(reader);
 
 		std::map<std::string, std::string> configurationMap;
 
-		json_object_object_foreach(obj, key, val)
+		for(int i=0; i< json_reader_count_members(reader); i++)
 		{
-			string valstr = json_object_get_string(val);
-			DebugOut() << "plugin config key: " << key << "value:" << valstr << endl;
-			configurationMap[key] = valstr;
+			json_reader_read_member(reader,srcMembers[i]);
+			configurationMap[srcMembers[i]] = json_reader_get_string_value(reader);
+			json_reader_end_member(reader);
 		}
 
-		
-		json_object *pathobject = json_object_object_get(obj,"path");
- 		string path = string(json_object_get_string(pathobject));
+		json_reader_read_member(reader, "path");
+		string path = json_reader_get_string_value(reader);
+		json_reader_end_member(reader);
 
 		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path, configurationMap);
 
@@ -187,24 +155,19 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		{
 			throw std::runtime_error("plugin is not a SinkManager");
 		}
-		json_object_put(pathobject);
-		//json_object_put(obj);
 
+		json_reader_end_element(reader);
 	}
-	DebugOut() << "Trying to free list" << endl;
-	array_list_free(sinkslist);
-	DebugOut() << "Trying to free obj" << endl;
-	//json_object_put(sinksobject);
-	DebugOut() << "Done" << endl;
-		
+
+	json_reader_end_member(reader);
 	
 	///TODO: this will probably explode:
 	
-	//if(error) g_error_free(error);
+	if(error) g_error_free(error);
 	
-	//g_object_unref(reader);
-	//g_object_unref(parser);
-	//*/
+	g_object_unref(reader);
+	g_object_unref(parser);
+	
 }
 
 PluginLoader::~PluginLoader()
