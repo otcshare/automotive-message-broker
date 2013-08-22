@@ -143,7 +143,7 @@ ln -s ../ambd.service %{buildroot}%{_prefix}/lib/systemd/system/network.target.w
 
 %files
 %defattr(-,root,root,-)
-#%manifest ambd.manifest
+#%manifest amb.manifest
 %config %{_sysconfdir}/ambd/config
 %{_sysconfdir}/ambd/examples/*
 %{_bindir}/*
