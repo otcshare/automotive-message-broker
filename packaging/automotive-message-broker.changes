@@ -1,3 +1,8 @@
+* Thu Aug 22 2013 - <kevron.m.rees@intel.com>
+- New upstream 0.9.15 ("chevelle" beta)
+- new GetHistory call
+- fixed some minor issues with properties registering on dbus
+
 * Tue Aug 13 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.9.13 ("chevelle" beta)
 - Enabled murphy plugin by default
