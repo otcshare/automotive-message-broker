@@ -1,4 +1,4 @@
-* Thu Aug 22 2013 - <kevron.m.rees@intel.com>
+* Thu Aug 23 2013 - <kevron.m.rees@intel.com>
 - New upstream 0.9.15 ("chevelle" beta)
 - new GetHistory call
 - fixed some minor issues with properties registering on dbus
