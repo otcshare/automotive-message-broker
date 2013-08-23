@@ -1,7 +1,7 @@
 Automotive Message Broker is a vehicle network abstraction system.  It brokers information from the vehicle
-to applications.
+to applications.  It provides application with a rich API for accessing vehicle data.
 
-Automotive Message Broker is built using CMake and requires libltdl (libtool), json-glib, and boost packages.  
+Automotive Message Broker is built using CMake and requires libltdl (libtool), libjson-c, and boost packages.  
 
 
 About the Git Tree:
@@ -71,8 +71,8 @@ To learn about running AMB with other plugins, please see the plugins/*/README.
 
 Running with the Qt mainloop:
 
-Some source and sink plugins may want to use the Qt-based mainloop.  To enable the Qt mainloop, run cmake
-with -Duse_qtcore=On:
+Some source and sink plugins may want to use the Qt-based mainloop to take advantage of Qt features. To enable
+the Qt mainloop, run cmake with -Duse_qtcore=On:
 
 cmake .. -Duse_qtcore=On
 
