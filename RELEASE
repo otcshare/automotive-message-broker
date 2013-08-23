@@ -4,11 +4,14 @@ New features:
 
 - DBus objects are divided by source and zone.
 - Zone DBus property.
-- get{PropertyName}() DBus method returns extended data about the property.
-- new zonesForProperty and findPropertyForZone methods.
+- Get{PropertyName}() DBus method returns extended data about the property.
+- new ZonesForProperty and FindPropertyForZone methods.
+- new GetHistory DBus method.
+- new FindObject DBus method replaces findProperty
 
 Changes:
-- findProperty DBus method on org.automotive.Manager now returns an array of objects that match the property.
+- findProperty DBus method on org.automotive.Manager is deprecated.
+
 
 
 Fixes:
