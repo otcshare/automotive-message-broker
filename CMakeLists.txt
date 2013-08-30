@@ -29,6 +29,7 @@ option(gpsd_plugin "gpsd location plugin" OFF)
 option(murphy_plugin "murphy policy framework plugin" OFF)
 option(test_plugin "Test Plugin" ON)
 option(bluemonkey_plugin "bluemonkey irc plugin" OFF)
+option(gpsnmea_plugin "gps NMEA location plugin" OFF)
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")
