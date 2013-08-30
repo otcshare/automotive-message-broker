@@ -24,11 +24,14 @@
 
 #include <QJsonDocument>
 #include <QScriptEngine>
+#include <QDateTime>
 #include <QString>
 #include <QFile>
 #include <QTimer>
 
 Q_SCRIPT_DECLARE_QMETAOBJECT(QTimer, QObject*)
+
+#define foreach Q_FOREACH
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -255,6 +258,51 @@ void BluemonkeySink::log(QString str)
 	DebugOut()<<str.toStdString()<<endl;
 }
 
+void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction)
+{
+	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
+	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
+	AsyncRangePropertyRequest request;
+	request.timeBegin = b;
+	request.timeEnd = e;
+
+	PropertyList reqlist;
+
+	foreach(QString prop, properties)
+	{
+		reqlist.push_back(prop.toStdString());
+	}
+
+	request.properties = reqlist;
+	request.completed = [&cbFunction](AsyncRangePropertyReply* reply)
+	{
+		if(!reply->success)
+		{
+			DebugOut(DebugOut::Error)<<"bluemoney get history call failed"<<endl;
+			return;
+		}
+
+		if(cbFunction.isFunction())
+		{
+			QVariantList list;
+
+			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
+			{
+				AbstractPropertyType *val = *itr;
+
+				list.append(gvariantToQVariant(val->toVariant()));
+			}
+
+			cbFunction.call(QScriptValue(),cbFunction.engine()->newVariant(list));
+
+		}
+
+		delete reply;
+	};
+
+	routingEngine->getRangePropertyAsync(request);
+}
+
 
 QVariant Property::value()
 {
@@ -306,6 +354,12 @@ void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunctio
 	request.properties = reqlist;
 	request.completed = [&cbFunction](AsyncRangePropertyReply* reply)
 	{
+		if(!reply->success)
+		{
+			DebugOut(DebugOut::Error)<<"bluemoney get history call failed"<<endl;
+			return;
+		}
+
 		if(cbFunction.isFunction())
 		{
 			QVariantList list;

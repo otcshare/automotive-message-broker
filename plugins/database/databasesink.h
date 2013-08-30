@@ -41,6 +41,10 @@ public:
 		g_mutex_init(&mutex);
 		g_cond_init(&cond);
 	}
+	~Queue()
+	{
+		g_mutex_free(&mutex);
+	}
 
 	int count()
 	{

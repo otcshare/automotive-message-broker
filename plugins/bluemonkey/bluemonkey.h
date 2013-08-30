@@ -24,6 +24,7 @@
 #include <QObject>
 #include <QVariant>
 #include <QJsonDocument>
+#include <QDateTime>
 #include <QScriptValue>
 #include "uuidhelper.h"
 
@@ -96,6 +97,8 @@ public Q_SLOTS:
 	void writeProgram(QString program);
 
 	void log(QString str);
+
+	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction);
 
 private Q_SLOTS: /// methods:
 

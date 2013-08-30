@@ -240,7 +240,7 @@ void DatabaseSink::parseConfig()
 		DebugOut()<<"DatabaseSink logging: "<<prop<<endl;
 	}
 
-	json_object_put(propobject);
+	//json_object_put(propobject);
 	json_object_put(rootobject);
 }
 
