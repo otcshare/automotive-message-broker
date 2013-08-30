@@ -47,7 +47,8 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 			prop->setSourceFilter(mSourceFilter);
 			prop->setZoneFilter(zoneFilter);
 			prop->initialize();
-			routingEngine->subscribeToProperty((*itr).first, mSourceFilter, this);
+			VehicleProperty::Property p = (*itr).first;
+			routingEngine->subscribeToProperty(p, mSourceFilter, this);
 			addProperty(prop);
 			supported = true;
 		}

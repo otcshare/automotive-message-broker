@@ -319,6 +319,10 @@ void Core::subscribeToProperty(VehicleProperty::Property property, string source
 		propertyFilter[property] = sourceUuidFilter;
 		filteredSourceSinkMap[sink] = propertyFilter;
 	}
+	else if(sourceUuidFilter != "")
+	{
+		filteredSourceSinkMap[sink][property] = sourceUuidFilter;
+	}
 
 	subscribeToProperty(property,sink);
 }

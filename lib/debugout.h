@@ -49,9 +49,9 @@ public:
 			out<<bufferTime(amb::currentTime())<<" | ";
 
 			if(mDebugLevel == Error)
-				out<<" ERROR ";
+				out<<"ERROR ";
 			if(mDebugLevel == Warning)
-				out<<" WARNING ";
+				out<<"WARNING ";
 		}
 	}
 

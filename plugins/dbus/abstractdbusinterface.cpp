@@ -256,9 +256,15 @@ void AbstractDBusInterface::registerObject()
 
 	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error2);
 	
-	if(error2) throw -1;
+	if(error2)
+	{
+		DebugOut(DebugOut::Error)<<error2->message<<endl;
+	}
 	
-	g_assert(regId > 0);
+	if(regId <= 0)
+	{
+		DebugOut(DebugOut::Error)<<"We failed to register on DBus"<<endl;
+	}
 }
 
 void AbstractDBusInterface::unregisterObject()

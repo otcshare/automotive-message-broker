@@ -18,16 +18,22 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "gpsnmea.h"
 #include "timestamp.h"
+#include "serialport.hpp"
+#include "bluetooth.hpp"
 
 #include <iostream>
 #include <boost/assert.hpp>
 #include <boost/regex.hpp>
+#include <boost/algorithm/string.hpp>
 #include <time.h>
+
 
 using namespace std;
 
 #include "debugout.h"
 #include "abstractpropertytype.h"
+
+#define GPSTIME "GpsTime"
 
 std::string gprmcRegEx = "[\\$]?GPRMC,([0-1][0-9]|2[0-3])([0-5][0-9])([0-5][0-9])," /** time hh mm ss **/
 		"([AV])," /** Status A= Active, V= Void **/
@@ -45,7 +51,7 @@ std::string gprmcRegEx = "[\\$]?GPRMC,([0-1][0-9]|2[0-3])([0-5][0-9])([0-5][0-9]
 class Location
 {
 public:
-	Location();
+	Location(AbstractRoutingEngine* re, std::string uuid);
 
 	void parse(std::string gprmc);
 
@@ -82,6 +88,7 @@ public:
 private: ///methods:
 
 	void parseGprmc(string gprmc);
+	void parseGpgga(string gpgga);
 
 	void parseTime(std::string h, std::string m, std::string s);
 	void parseLatitude(std::string d, std::string m, std::string ns);
@@ -104,19 +111,27 @@ private:
 	boost::regex regularExpression;
 	bool isActive;
 
+	std::string mUuid;
+
+	AbstractRoutingEngine* routingEngine;
+
 };
 
-Location::Location()
-	:mGpsTime("GpsTime",0), isActive(false)
+Location::Location(AbstractRoutingEngine* re, std::string uuid)
+	:mGpsTime(GPSTIME,0), isActive(false), routingEngine(re), mUuid(uuid)
 {
 
 }
 
 void Location::parse(string nmea)
 {
-	if(boost::algorithm::starts_with(nmea,"$GPRMC"))
+	if(boost::algorithm::starts_with(nmea,"GPRMC"))
 	{
 		parseGprmc(nmea);
+	}
+	else if(boost::algorithm::starts_with(nmea,"GPGGA"))
+	{
+		parseGpgga(nmea);
 	}
 }
 
@@ -142,6 +157,30 @@ void Location::parseGprmc(string gprmc)
 	}
 }
 
+void Location::parseGpgga(string gpgga)
+{
+
+	std::vector<std::string> tokens;
+	boost::split(tokens, gpgga, boost::is_any_of(","));
+
+	if(tokens.size() != 15)
+	{
+		DebugOut()<<"Invalid GPGGA message: "<<gpgga<<endl;
+		return;
+	}
+
+	parseTime(tokens[1].substr(0,2),tokens[1].substr(2,2),tokens[1].substr(4,2));
+	parseLatitude(tokens[2],"",tokens[3]);
+	parseLongitude(tokens[4],"",tokens[5]);
+	if(tokens[6] != "0")
+	{
+		isActive = true;
+	}
+	else isActive = false;
+
+	parseAltitude(tokens[9]);
+}
+
 void Location::parseTime(string h, string m, string s)
 {
 	tm t;
@@ -151,7 +190,13 @@ void Location::parseTime(string h, string m, string s)
 
 	time_t time = mktime(&t);
 
-	mGpsTime.setValue((double)time);
+	BasicPropertyType<double> temp(GPSTIME,(double)time);
+
+	if(mGpsTime != temp)
+	{
+		mGpsTime = temp;
+		routingEngine->updateProperty(GPSTIME, &mGpsTime, mUuid);
+	}
 }
 
 void Location::parseLatitude(string d, string m, string ns)
@@ -162,7 +207,13 @@ void Location::parseLatitude(string d, string m, string ns)
 	if(ns == "S")
 		dec *= -1;
 
-	mLatitude.setValue(dec);
+	VehicleProperty::LatitudeType temp(dec);
+
+	if(mLatitude != temp)
+	{
+		mLatitude = temp;\
+		routingEngine->updateProperty(VehicleProperty::Latitude, &mLatitude, mUuid);
+	}
 }
 
 void Location::parseLongitude(string d, string m, string ew)
@@ -170,10 +221,16 @@ void Location::parseLongitude(string d, string m, string ew)
 	double degs = boost::lexical_cast<double>(d + m);
 	double dec = degsToDecimal(degs);
 
-	if(ew == "E")
+	if(ew == "W")
 		dec *= -1;
 
-	mLongitude.setValue(dec);
+	VehicleProperty::LongitudeType temp(dec);
+
+	if(mLongitude != temp)
+	{
+		mLongitude = temp;\
+		routingEngine->updateProperty(VehicleProperty::Longitude, &mLongitude, mUuid);
+	}
 }
 
 void Location::parseSpeed(string spd)
@@ -182,19 +239,38 @@ void Location::parseSpeed(string spd)
 
 	///to kph:
 	s *= 1.852;
-
-	mSpeed = VehicleProperty::VehicleSpeedType(s);
+	VehicleProperty::VehicleSpeedType temp(s);
+	if(mSpeed != temp)
+	{
+		mSpeed = temp;
+		routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &mSpeed, mUuid);
+	}
 }
 
 void Location::parseDirection(string dir)
 {
 	uint16_t d = boost::lexical_cast<double>(dir);
-	mDirection = VehicleProperty::DirectionType(d);
+
+	VehicleProperty::DirectionType temp(d);
+	if(mDirection != temp)
+	{
+		mDirection = temp;
+		routingEngine->updateProperty(VehicleProperty::Direction, &mDirection, mUuid);
+	}
 }
 
 void Location::parseAltitude(string alt)
 {
+	double a = boost::lexical_cast<double>(alt);
 
+	VehicleProperty::AltitudeType temp(a);
+	if(mAltitude != temp)
+	{
+		mAltitude = temp;
+		routingEngine->updateProperty(VehicleProperty::Altitude, &mAltitude, mUuid);
+	}
+
+	mAltitude = VehicleProperty::AltitudeType(a);
 }
 
 double Location::degsToDecimal(double degs)
@@ -204,6 +280,30 @@ double Location::degsToDecimal(double degs)
 	return deg + (min / 60.0);
 }
 
+bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
+{
+//	DebugOut(5) << "Polling..." << condition << endl;
+
+	if(condition & G_IO_ERR)
+	{
+		DebugOut(DebugOut::Error)<<"GpsNmeaSource polling error."<<endl;
+	}
+
+	if (condition & G_IO_HUP)
+	{
+		//Hang up. Returning false closes out the GIOChannel.
+		//printf("Callback on G_IO_HUP\n");
+		DebugOut(DebugOut::Warning)<<"socket hangup event..."<<endl;
+		return false;
+	}
+
+	GpsNmeaSource* src = static_cast<GpsNmeaSource*>(data);
+
+	src->canHasData();
+
+	return true;
+}
+
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new GpsNmeaSource(routingengine, config);
@@ -211,26 +311,78 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 }
 
 GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> config)
-	:AbstractSource(re,config)
+	:AbstractSource(re,config), mUuid("33d86462-1708-4f78-a001-99ea8d55422b")
 {
+	location =new Location(re, mUuid);
+
+	VehicleProperty::registerProperty(GPSTIME,[](){ return new BasicPropertyType<double>(GPSTIME,0); });
+
 	addPropertySupport(VehicleProperty::Latitude, Zone::None);
 	addPropertySupport(VehicleProperty::Longitude, Zone::None);
-	//addPropertySupport(VehicleProperty::Altitude, Zone::None);
+	addPropertySupport(VehicleProperty::Altitude, Zone::None);
 	addPropertySupport(VehicleProperty::VehicleSpeed, Zone::None);
 	addPropertySupport(VehicleProperty::Direction, Zone::None);
+	addPropertySupport(GPSTIME, Zone::None);
 
 
 	///test:
 
-	Location location;
-	location.parse("$GPRMC,061211,A,2351.9605,S,15112.5239,E,000.0,053.4,170303,009.9,E*6E");
+	if(config.find("test") != config.end())
+	{
+		Location location(routingEngine, mUuid);
+		location.parse("GPRMC,061211,A,2351.9605,S,15112.5239,E,000.0,053.4,170303,009.9,E*6E");
 
-	DebugOut()<<location.latitude().toString()<<endl;
+		DebugOut()<<"lat: "<<location.latitude().toString()<<endl;
+
+		g_assert(location.latitude().toString() == "-23.86600833");
+
+		location.parse("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47");
+
+		DebugOut()<<"alt: "<<location.altitude().toString()<<endl;
+		DebugOut()<<"lat: "<<location.latitude().toString()<<endl;
+		g_assert(location.altitude().toString() == "545.4");
+		g_assert(location.latitude().toString() == "48.1173");
+	}
+
+	std::string btaddapter = config["bluetoothAdapter"];
+
+	if(config.find("device")!= config.end())
+	{
+		std::string dev = config["device"];
+		if(dev.find(":") != string::npos)
+		{
+			GpsBluetoothDevice bt;
+			dev = bt.getDeviceForAddress(dev, btaddapter);
+		}
+
+		device = new SerialPort(dev);
+
+		if(!device->open())
+		{
+			DebugOut(DebugOut::Error)<<"Failed to open gps tty: "<<config["device"]<<endl;
+			perror("Error");
+			return;
+		}
+
+		DebugOut()<<"read from device: "<<device->read()<<endl;
+
+		GIOChannel *chan = g_io_channel_unix_new(device->fileDescriptor());
+		g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
+		g_io_channel_set_close_on_unref(chan, true);
+		g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
+	}
+
+	re->setSupported(supported(), this);
+}
+
+GpsNmeaSource::~GpsNmeaSource()
+{
+	device->close();
 }
 
 string GpsNmeaSource::uuid()
 {
-	return "33d86462-1708-4f78-a001-99ea8d55422b";
+	return mUuid;
 }
 
 
@@ -263,6 +415,20 @@ PropertyList GpsNmeaSource::supported()
 int GpsNmeaSource::supportedOperations()
 {
 	return Get;
+}
+
+void GpsNmeaSource::canHasData()
+{
+	std::string data = device->read();
+
+	std::vector<std::string> lines;
+
+	boost::split(lines,data,boost::is_any_of("$"));
+
+	for(int i = 0; i < lines.size(); i++)
+	{
+		location->parse(lines[i]);
+	}
 }
 
 void GpsNmeaSource::unsubscribeToPropertyChanges(VehicleProperty::Property property)

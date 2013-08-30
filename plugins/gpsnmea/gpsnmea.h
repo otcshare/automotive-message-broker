@@ -22,13 +22,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <abstractsource.h>
 #include <string>
 
+#include "abstractio.hpp"
+
 using namespace std;
+
+class Location;
 
 class GpsNmeaSource: public AbstractSource
 {
 
 public:
 	GpsNmeaSource(AbstractRoutingEngine* re, map<string, string> config);
+	~GpsNmeaSource();
 	
 	string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
@@ -50,6 +55,8 @@ public:
 
 		return PropertyInfo::invalid();
 	}
+
+	void canHasData();
 	
 private:
 
@@ -59,6 +66,11 @@ private:
 
 	PropertyList mRequests;
 	PropertyList mSupported;
+
+	AbstractIo* device;
+	Location *location;
+
+	std::string mUuid;
 };
 
 #endif // EXAMPLEPLUGIN_H

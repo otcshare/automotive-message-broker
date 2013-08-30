@@ -758,7 +758,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 	return 0; 
 }
 
-bool gioPollingFunc(GIOChannel *source, GIOCondition condition,gpointer data)
+bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
 {
 	DebugOut(5) << "Polling..." << condition << endl;
 
