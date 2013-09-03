@@ -23,7 +23,6 @@
 #include <boost/lexical_cast.hpp>
 #include <glib.h>
 #include <sstream>
-//#include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include <timestamp.h>
 #include "uuidhelper.h"
