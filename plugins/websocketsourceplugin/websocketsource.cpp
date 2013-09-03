@@ -23,7 +23,6 @@
 #include <boost/lexical_cast.hpp>
 #include <glib.h>
 #include <sstream>
-//#include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include <timestamp.h>
 #include "uuidhelper.h"
@@ -546,16 +545,6 @@ void WebSocketSource::unsubscribeToPropertyChanges(VehicleProperty::Property pro
 
 void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 {
-	///TODO: fill in
-	//s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
-	//m_re->getPropertyAsync();
-	/*reply.value = 1;
-	  reply->completed(reply);
-	  reply->completed = [](AsyncPropertyReply* reply) {
-	  DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
-	  delete reply;
-	};*/
-	//propertyReplyMap[reply->property] = reply;
 	std::string uuid = amb::createUuid();
 	uuidReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 10.0; ///TODO: 10 second timeout, make this configurable?
@@ -581,8 +570,21 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	s.precision(15);
 	s << "{\"type\":\"method\",\"name\":\"getRanged\",\"data\": {";
 
-	///TODO: fix me.  ranged requests over websocket source will be broken
-	//s << "\"property\":\""<< reply->property << "\",";
+	s << "\"properties\":[";
+
+	for (auto itr = reply->properties.begin(); itr != reply->properties.end(); itr++)
+	{
+		std::string prop = *itr;
+
+		if(itr != reply->properties.begin())
+		{
+			s<<",";
+		}
+
+		s<<"\""<<prop<<"\"";
+	}
+
+	s<<"],";
 
 	s << "\"timeBegin\":\"" << reply->timeBegin << "\",";
 	s << "\"timeEnd\":\"" << reply->timeEnd << "\",";

@@ -1,3 +1,8 @@
+* Tue Sep 03 2013 - <kevron.m.rees@intel.com>
+- Fixed TIVI-1708
+- New upstream release 0.9.16 ("chevelle" beta)
+
+
 * Thu Aug 23 2013 - <kevron.m.rees@intel.com>
 - New upstream 0.9.15 ("chevelle" beta)
 - new GetHistory call
