@@ -76,14 +76,26 @@ OpenXCPlugin::OpenXCPlugin(AbstractRoutingEngine* re, map<string, string> config
 	openXC2AmbMap["longitude"] = VehicleProperty::Longitude;
 	openXC2AmbMap["button_event"] = VehicleProperty::ButtonEvent;
 
+	bool test = false;
+	if(config.find("test") != config.end())
+	{
+		test = config["test"] == "true";
+	}
+
+	if(test)
+	{
+		testParseEngine();
+	}
+
 	std::string bluetoothAddy = config["device"];
+	std::string bluetoothAdapter = config["bluetoothAdapter"];
 	std::string serialDevice;
 
 	if(bluetoothAddy != "")
 	{
 		BluetoothDevice btDevice;
 
-		serialDevice = btDevice.getDeviceForAddress(bluetoothAddy);
+		serialDevice = btDevice.getDeviceForAddress(bluetoothAddy, bluetoothAdapter);
 	}
 
 	device = new SerialPort(serialDevice);
@@ -98,16 +110,6 @@ OpenXCPlugin::OpenXCPlugin(AbstractRoutingEngine* re, map<string, string> config
 	g_io_add_watch(chan,G_IO_ERR,(GIOFunc)gioPollingFunc,this);
 	g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 
-	bool test = false;
-	if(config.find("testMode") != config.end())
-	{
-		test = config["testMode"] == "true";
-	}
-
-	if(test)
-	{
-		testParseEngine();
-	}
 
 }
 
@@ -175,6 +177,8 @@ bool OpenXCPlugin::translateOpenXCEvent(string json)
 	json_object *rootobject;
 	json_tokener *tokener = json_tokener_new();
 
+
+	///TODO: we have several json leaks here
 
 	enum json_tokener_error err;
 	do
@@ -373,6 +377,7 @@ bool OpenXCPlugin::translateOpenXCEvent(string json)
 		else if (property == VehicleProperty::ButtonEvent)
 		{
 			/// TODO: implement
+			DebugOut(DebugOut::Error)<<"OpenXC button event not implemented"<<endl;
 			return false;
 		}
 	}

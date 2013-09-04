@@ -2,7 +2,7 @@ gps nmea plugin
 
 This plugin uses NMEA-compatible devices to provide location information to AMB.
 
-To enable the GPS NMEA plugin, run cmake and enable the database_plugin option:
+To enable the GPS NMEA plugin, run cmake and enable the gpsnmea_plugin option:
 
 cmake -Dgpsnmea_plugin=On ..
 
@@ -30,12 +30,14 @@ Default: none
 
 "bluetoothAdapter"
 bluetooth adapter to use.  This is only used if "device" is also a bluetooth device.
+If left blank, the system default adapter will be used.
 
 Default: none
 
 AMB Properties:
 
 GpsTime
-Type: double
 Timestamp in seconds from epoc UTC parsed from the NMEA output.
 
+Type: double
+Access: readonly
