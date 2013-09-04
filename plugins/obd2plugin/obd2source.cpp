@@ -179,7 +179,7 @@ void threadLoop(gpointer data)
 
 				if (source->m_isBluetooth)
 				{
-					ObdBluetoothDevice bt;
+					BluetoothDevice bt;
 					std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
 					if(tempPort != "")
 					{
@@ -214,7 +214,7 @@ void threadLoop(gpointer data)
 				{
 					if (source->m_isBluetooth)
 					{
-						ObdBluetoothDevice bt;
+						BluetoothDevice bt;
 						std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
 						if(tempPort != "")
 						{
@@ -251,7 +251,7 @@ void threadLoop(gpointer data)
 			{
 				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Using queued disconnect" << (ulong)req << endl;
 				obd->closePort();
-				ObdBluetoothDevice bt;
+				BluetoothDevice bt;
 				bt.disconnect(source->m_btDeviceAddress, source->m_btAdapterAddress);
 				connected = false;
 				StatusMessage *statusreq = new StatusMessage();
@@ -568,7 +568,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		m_isBluetooth = true;
 		///TODO: bluetooth!!
 		DebugOut()<<"bluetooth device?"<<endl;
-		ObdBluetoothDevice bt;
+		BluetoothDevice bt;
 
 		std::string tempPort = bt.getDeviceForAddress(port, btadapter);
 		if(tempPort != "")

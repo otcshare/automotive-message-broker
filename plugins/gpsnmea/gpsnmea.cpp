@@ -351,7 +351,7 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		std::string dev = config["device"];
 		if(dev.find(":") != string::npos)
 		{
-			GpsBluetoothDevice bt;
+			BluetoothDevice bt;
 			dev = bt.getDeviceForAddress(dev, btaddapter);
 		}
 

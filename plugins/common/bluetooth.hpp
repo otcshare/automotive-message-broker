@@ -7,7 +7,7 @@
 #include "bluetoothserialproxy.h"
 
 
-class GpsBluetoothDevice
+class BluetoothDevice
 {
 public:
 
