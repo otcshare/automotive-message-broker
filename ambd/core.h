@@ -36,7 +36,7 @@ public:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
 	void updateSupported(PropertyList added, PropertyList removed);
-	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, string uuid);
+	void updateProperty(AbstractPropertyType* value, const std::string &uuid);
 	
 	/// sinks:
 

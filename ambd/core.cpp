@@ -151,10 +151,12 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	}
 }
 
-void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
+void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 {
+	VehicleProperty::Property property = value->name;
+
 	SinkList list = propertySinkMap[property];
-	
+
 	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<property<<endl;
 
 	propertiesPerSecond++;

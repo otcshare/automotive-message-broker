@@ -195,7 +195,14 @@ public:
 
 	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
 	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
-	virtual void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid) = 0;
+	/// Deprecated:
+	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
+	{
+		DebugOut(DebugOut::Warning)<<"updateProperty(VehicleProperty::Property,AbstractPropertyType*,std::string) is deprecated.  use new updateProperty(AbstractPropertyType*, const std::string &)"<<endl;
+		updateProperty(value,uuid);
+	}
+
+	virtual void updateProperty(AbstractPropertyType* value, const std::string &uuid) = 0;
 	virtual PropertyList supported() = 0;
 
 	/// sinks:
