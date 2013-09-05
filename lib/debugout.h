@@ -40,12 +40,11 @@ public:
 	DebugOut(int debugLevel = 4)
 	{
 		mDebugLevel = debugLevel;
-		ostream out(buf);
-
-		out.precision(15);
 
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 		{
+			ostream out(buf);
+			out.precision(15);
 			out<<bufferTime(amb::currentTime())<<" | ";
 
 			if(mDebugLevel == Error)
@@ -57,34 +56,36 @@ public:
 
 	DebugOut const& operator << (string message) const
 	{
-		ostream out(buf);
-
-		out.precision(15);
-
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
-			 out<<message<<" ";
+		{
+			ostream out(buf);
+			out.precision(15);
+			out<<message<<" ";
+		}
 		return *this;
 	}
 
 	DebugOut const& operator << (ostream & (*manip)(std::ostream&)) const
 	{
-		ostream out(buf);
 
-		out.precision(15);
 
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
-			 out<<endl;
+		{
+			ostream out(buf);
+			out.precision(15);
+			out<<endl;
+		}
 		return *this;
 	}
 	
 	DebugOut const & operator << (double val) const
 	{
-		ostream out(buf);
-
-		out.precision(15);
-
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
-			 out<<val<<" ";
+		{
+			ostream out(buf);
+			out.precision(15);
+			out<<val<<" ";
+		}
 		return *this;
 	}
 

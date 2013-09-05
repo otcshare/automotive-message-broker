@@ -39,7 +39,7 @@ public:
     MurphySource(AbstractRoutingEngine* re, map<string, string> config);
     ~MurphySource();
 
-    string uuid() { return "murphy"; };
+	const string uuid() { return "murphy"; }
     void getPropertyAsync(AsyncPropertyReply *reply);
     void getRangePropertyAsync(AsyncRangePropertyReply *reply);
     AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
@@ -49,7 +49,6 @@ public:
 
     int supportedOperations();
 
-    void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
     void supportedChanged(PropertyList) {}
 
     void processValue(string propertyName, AbstractPropertyType *value);

@@ -124,7 +124,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	return new WheelSourcePlugin(routingengine, config);
 }
 
-string WheelSourcePlugin::uuid()
+const string WheelSourcePlugin::uuid()
 {
 	return "c0ffee8a-c605-4a06-9034-59c1deadbeef";
 }

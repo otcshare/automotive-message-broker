@@ -113,7 +113,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	
 }
 
-string OpenCvLuxPlugin::uuid()
+const string OpenCvLuxPlugin::uuid()
 {
 	return "3c7a1ea0-7d2e-11e2-9e96-0800200c9a66";
 }

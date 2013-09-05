@@ -150,8 +150,8 @@ public:
 	DatabaseSink(AbstractRoutingEngine* engine, map<string, string> config);
 	~DatabaseSink();
 	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
-	virtual std::string uuid();
+	virtual void propertyChanged(AbstractPropertyType *value, const std::string &uuid);
+	const std::string uuid();
 
 	///source role:
 	virtual void getPropertyAsync(AsyncPropertyReply *reply);

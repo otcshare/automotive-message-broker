@@ -193,12 +193,13 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	g_timeout_add(10000, getRangedCb, routingEngine);
 }
 
-void ExampleSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
+void ExampleSink::propertyChanged(AbstractPropertyType* value, const string &uuid)
 {
+	VehicleProperty::Property property = value->name;
 	DebugOut()<<property<<" value: "<<value->toString()<<endl;
 }
 
-std::string ExampleSink::uuid()
+const string ExampleSink::uuid()
 {
 	return "f7e4fab2-eb73-4842-9fb0-e1c550eb2d81";
 }

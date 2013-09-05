@@ -30,7 +30,7 @@ class ExampleSourcePlugin: public AbstractSource
 public:
 	ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, string> config);
 	
-	string uuid();
+	const string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
@@ -40,7 +40,6 @@ public:
 
 	int supportedOperations();
 	
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
 	void randomizeProperties();

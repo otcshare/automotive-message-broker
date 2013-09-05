@@ -372,8 +372,10 @@ void DatabaseSink::setDatabaseFileName(string filename)
 	routingEngine->setSupported(mSupported, this);
 }
 
-void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
+void DatabaseSink::propertyChanged(AbstractPropertyType *value, const std::string &uuid)
 {
+	VehicleProperty::Property property = value->name;
+
 	if(!shared)
 		return;
 
@@ -394,7 +396,7 @@ void DatabaseSink::propertyChanged(VehicleProperty::Property property, AbstractP
 }
 
 
-std::string DatabaseSink::uuid()
+const string DatabaseSink::uuid()
 {
 	return "9f88156e-cb92-4472-8775-9c08addf50d3";
 }

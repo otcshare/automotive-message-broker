@@ -31,9 +31,9 @@ public:
 	DemoSink(AbstractRoutingEngine* re, map<string, string> config);
 	~DemoSink();
 	
-	string uuid();
+	const string uuid();
 	
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid);
+	void propertyChanged(AbstractPropertyType* value, const string &uuid);
 	void supportedChanged(PropertyList);
 
 	friend class WheelPrivate;	

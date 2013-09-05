@@ -33,7 +33,7 @@ class WebSocketSource : public AbstractSource
 
 public:
 	WebSocketSource(AbstractRoutingEngine* re, std::map<std::string, std::string> config);
-	std::string uuid();
+	const std::string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
@@ -51,7 +51,6 @@ public:
 	PropertyList activeRequests;
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid) {}
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(std::map<std::string, std::string> config);
 	//map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;

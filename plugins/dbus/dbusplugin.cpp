@@ -61,8 +61,10 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 		unregisterObject();
 }
 
-void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
+void DBusSink::propertyChanged(AbstractPropertyType *value, const std::string &uuid)
 {
+	VehicleProperty::Property property = value->name;
+
 	if(propertyDBusMap.find(property) == propertyDBusMap.end() || value->zone != zoneFilter)
 		return;
 
@@ -71,7 +73,7 @@ void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPrope
 	mTime = value->timestamp;
 }
 
-std::string DBusSink::uuid()
+const string DBusSink::uuid()
 {
 	return "c2e6cafa-eef5-4b8a-99a0-0f2c9be1057d";
 }

@@ -35,7 +35,7 @@ public:
 	AbstractRoutingEngine* re;
 
 	/// From AbstractSink:
-	virtual string uuid(){ return "DBusInterfaceManager"; }
+	virtual const string uuid(){ return "DBusInterfaceManager"; }
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) { }
 	virtual void supportedChanged(PropertyList supportedProperties);
     

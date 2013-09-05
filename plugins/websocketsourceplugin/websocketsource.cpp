@@ -518,7 +518,7 @@ int WebSocketSource::supportedOperations()
 	return Get | Set | GetRanged;
 }
 
-string WebSocketSource::uuid()
+const string WebSocketSource::uuid()
 {
 	return "d293f670-f0b3-11e1-aff1-0800200c9a66";
 }

@@ -133,7 +133,7 @@ class OBD2Source : public AbstractSource
 public:
 	OBD2Source(AbstractRoutingEngine* re, map<string, string> config);
 	~OBD2Source();
-	string uuid();
+	const string uuid();
 	int portHandle;
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply){}
@@ -153,7 +153,7 @@ public:
 	void engineCoolantTemp(int temp);
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
+
 	void supportedChanged(PropertyList) {}
 	GAsyncQueue* commandQueue;
 	GAsyncQueue* statusQueue;

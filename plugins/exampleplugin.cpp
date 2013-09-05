@@ -90,7 +90,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	
 }
 
-string ExampleSourcePlugin::uuid()
+const string ExampleSourcePlugin::uuid()
 {
 	return "6dd4268a-c605-4a06-9034-59c1e8344c8e";
 }

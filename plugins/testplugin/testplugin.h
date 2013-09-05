@@ -41,7 +41,7 @@ class TestPlugin : public AbstractSource
 public:
 	TestPlugin(AbstractRoutingEngine* re, map<string, string> config);
 	~TestPlugin();
-	string uuid();
+	const string uuid();
 	int portHandle;
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply){}
@@ -53,7 +53,6 @@ public:
 	int supportedOperations();
 
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();

@@ -102,7 +102,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	return new TestPlugin(routingengine, config);
 	
 }
-string TestPlugin::uuid()
+const string TestPlugin::uuid()
 {
 	return "f77af740-f1f8-11e1-aff1-0800200c9a66";
 }

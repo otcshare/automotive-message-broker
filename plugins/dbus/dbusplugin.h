@@ -36,8 +36,8 @@ public:
 	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
 	virtual ~DBusSink() { }
 	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid);
-	virtual std::string uuid();
+	virtual void propertyChanged(AbstractPropertyType *value, const std::string &uuid);
+	virtual const std::string uuid();
 
 	std::list<VehicleProperty::Property> wantsProperties()
 	{
