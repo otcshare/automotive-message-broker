@@ -148,7 +148,7 @@ void BluemonkeySink::propertyChanged(VehicleProperty::Property property, Abstrac
 
 }
 
-std::string BluemonkeySink::uuid()
+const string BluemonkeySink::uuid()
 {
 	return "bluemonkey";
 }
@@ -382,7 +382,7 @@ void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunctio
 }
 
 Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, QObject *parent)
-	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr)
+	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr), mUuid(amb::createUuid())
 {
 	setType(prop.c_str());
 }

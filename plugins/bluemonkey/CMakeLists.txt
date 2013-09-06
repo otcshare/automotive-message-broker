@@ -9,7 +9,12 @@ if(Qt5Core_FOUND)
 
 	set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5Script_INCLUDE_DIRS})
 	set(QT_LIBRARIES ${Qt5Core_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Script_LIBRARIES})
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS} -mcmodel=large")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+	message(STATUS "size of void_p: ${CMAKE_SIZEOF_VOID_P}")
+	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		message(STATUS "can has 64bits")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=large")
+	endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
 	add_definitions(${Qt5Core_DEFINITIONS})
 
 endif(Qt5Core_FOUND)
