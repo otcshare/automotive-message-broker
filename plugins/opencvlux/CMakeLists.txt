@@ -18,6 +18,15 @@ else(ocl)
 	message(STATUS "no opencv ocl headers found (ocl.hpp). no opencl support")
 endif(ocl)
 
+find_path(cuda gpu.hpp PATH_SUFFIXES opencv/gpu opencv2/gpu DOC "opencv cuda headers")
+
+if(cuda)
+	message(STATUS "found opencv cuda headers.  enabling cuda support. ${cuda}")
+	add_definitions(-DCUDA)
+else(cuda)
+	message(STATUS "no opencv cuda headers found.  no cuda support")
+endif(cuda)
+
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${OpenCV_INCLUDE_DIRS})
 
 set(opencvluxplugin_headers opencvluxplugin.h)

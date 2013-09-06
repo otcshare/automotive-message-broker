@@ -74,3 +74,12 @@ NOTE: This option has not been tested because at implementation, OpenCL 1.2 was 
 on-hand.
 
 Default: "false"
+
+"cuda"
+Use nvidia cuda gpu processing to process image data.  This will only work if OpenCV was compiled with
+cuda support.
+
+NOTE: this does not appear to have a noticable impact on processing given the way we are using it.
+this does however make memory usage explode.
+
+Default: "false"

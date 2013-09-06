@@ -36,6 +36,7 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::Latitude, this);
 	routingEngine->subscribeToProperty(VehicleProperty::Longitude, this);
+	routingEngine->subscribeToProperty(VehicleProperty::ExteriorBrightness, this);
 
 	supportedChanged(engine->supported());
 }

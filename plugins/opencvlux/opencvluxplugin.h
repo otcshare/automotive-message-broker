@@ -42,6 +42,7 @@ public:
 		bool threaded;
 		bool kinect;
 		bool useOpenCl;
+        bool useCuda;
 		int pixelLowerBound;
 		int pixelUpperBound;
 	};

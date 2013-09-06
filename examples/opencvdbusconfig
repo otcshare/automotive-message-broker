@@ -4,6 +4,7 @@
 			"name" : "OpenCV LUX",
 			"path" : "/usr/lib/automotive-message-broker/opencvluxplugin.so",
 			"threaded" : "true",
+			"cuda" : "true",
 			"fps" : "30",
 			"pixelLowerBound" : "18",
 			"pixelUpperBound" : "255",
