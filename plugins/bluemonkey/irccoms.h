@@ -34,7 +34,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void onMessageReceived(IrcMessage*);
-	void sslError(QList<QSslError> &);
+	void sslError(QList<QSslError>);
 	void socketError(QAbstractSocket::SocketError);
 
 Q_SIGNALS:

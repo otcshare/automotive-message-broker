@@ -12,20 +12,27 @@ void BluemonkeyAgent::scriptLoad(qint64 id, const QString &program, const QStrin
 {
 	DebugOut()<<"executing script"<<endl;
 
-	QTimer* timer = new QTimer(this);
-
-	timer->setInterval(20000);
+	QTimer *timer = new QTimer();
 	timer->setSingleShot(true);
-	timer->start();
+	timer->connect(timer, SIGNAL(timeout(QPrivateSignal)), this, SLOT(timeout(QPrivateSignal)));
+	timer->start(5000);
 
-	QScriptEngine* e = engine();
+	timerIdMap[timer] = id;
+}
 
-	connect(timer, &QTimer::timeout, [id,&e,&timer,this](){
-		if(idList.contains(id))
-		{
-			e->abortEvaluation();
-		}
-	});
+void BluemonkeyAgent::timeout(QPrivateSignal)
+{
+	quint64 id = timerIdMap[sender()];
+
+	if(idList.contains(id))
+	{
+		DebugOut()<<"script aborted evaluation.  timed out."<<endl;
+		engine()->abortEvaluation();
+	}
+
+	timerIdMap.remove(sender());
+
+	sender()->deleteLater();
 }
 
 void BluemonkeyAgent::scriptUnload(qint64 id)

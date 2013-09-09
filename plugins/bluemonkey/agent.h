@@ -12,8 +12,12 @@ public:
 	void scriptLoad (qint64 id, const QString  &program, const QString  &fileName, int baseLineNumber );
 	void scriptUnload(qint64 id);
 
+private Q_SLOTS:
+	void timeout(QPrivateSignal);
+
 private:
 	QList<quint64> idList;
+	QMap<QObject*,quint64> timerIdMap;
 };
 
 

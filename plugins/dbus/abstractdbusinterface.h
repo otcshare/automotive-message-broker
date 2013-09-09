@@ -66,6 +66,13 @@ public:
 
 	double time() { return mTime; }
 
+	AbstractProperty* property(std::string propertyName)
+	{
+		if(properties.find(propertyName) != properties.end())
+			return properties[propertyName];
+		return nullptr;
+	}
+
 	AbstractRoutingEngine* re;
 
 	void setObjectPath(std::string op)

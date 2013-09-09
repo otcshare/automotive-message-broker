@@ -203,7 +203,8 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 			"<signal name='" + pn + "Changed' >"
 			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
 			"	<arg type='d' name='timestamp' direction='out' />"
-			"</signal>";
+			"</signal>"
+			"<property type='i' name='" + property->name() + "Sequence' access='read' />";
 	
 	properties[property->name()] = property;
 
@@ -304,6 +305,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
 
 	g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val);
+	g_variant_builder_add(&builder, "{sv}", std::string(property->name() + "Sequence").c_str(), g_variant_new("(i)", property->sequence()));
 	g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("(d)", mTime) );
 
 	GError *error2 = NULL;
@@ -380,6 +382,28 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 		double time = objectMap[objectPath]->time();
 
 		GVariant* value = g_variant_new("(d)", time);
+		return value;
+	}
+
+	if(boost::ends_with(pn, "Sequence"))
+	{
+		AbstractDBusInterface* t = static_cast<AbstractDBusInterface*>(userData);
+
+		int pos = pn.find("Sequence");
+
+		std::string p = pn.substr(0,pos);
+
+		AbstractProperty* theProperty = t->property(p);
+
+		if(!theProperty)
+		{
+			DebugOut(DebugOut::Error)<<"Invalid Sequence property: "<<p<<endl;
+			return nullptr;
+		}
+
+		int sequence = theProperty->sequence();
+
+		GVariant* value = g_variant_new("(i)", sequence);
 		return value;
 	}
 

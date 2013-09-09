@@ -89,7 +89,7 @@ QVariant gvariantToQVariant(GVariant *value)
 
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), agent(nullptr), engine(nullptr)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), agent(nullptr), engine(nullptr), mSilentMode(false)
 {
 	irc = new IrcCommunication(config, this);
 
@@ -116,7 +116,8 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 		{
 			if(!auth->isAuthorized(prefix))
 			{
-				irc->respond(sender, "denied");
+				if(!mSilentMode)
+					irc->respond(sender, "denied");
 				return;
 			}
 
@@ -124,11 +125,12 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 
 			codes = codes.mid(bm.length()+1);
 
-			irc->respond(sender, engine->evaluate(codes).toString());
+			QString response = engine->evaluate(codes).toString();
+
+			if(!mSilentMode || response != "undefined" )
+				irc->respond(sender, response);
 		}
 	});
-
-
 
 }
 

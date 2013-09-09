@@ -101,6 +101,11 @@ public Q_SLOTS:
 
 	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction);
 
+	void setSilentMode(bool m)
+	{
+		mSilentMode = m;
+	}
+
 private Q_SLOTS: /// methods:
 
 	void loadConfigPriv();
@@ -111,6 +116,7 @@ private:
 
 	Authenticate* auth;
 	BluemonkeyAgent* agent;
+	bool mSilentMode;
 };
 
 class BluemonkeySinkManager: public AbstractSinkManager

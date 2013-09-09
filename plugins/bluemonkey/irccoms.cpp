@@ -164,7 +164,7 @@ void IrcCommunication::reconnect()
 		QTimer::singleShot(5000,this,SLOT(open()));
 }
 
-void IrcCommunication::sslError(QList<QSslError> &)
+void IrcCommunication::sslError(QList<QSslError> )
 {
 	qDebug()<<"some ssl errors!! trying to ignore them";
 	QSslSocket* sock = qobject_cast<QSslSocket*>(socket());
@@ -183,5 +183,5 @@ void IrcCommunication::socketError(QAbstractSocket::SocketError error)
 void IrcCommunication::setIgnoreInvalidCert(bool ignore)
 {
 	if(ignore)
-		QObject::connect(socket(),SIGNAL(sslErrors(QList<QSslError>&)),this,SLOT(sslError(QList<QSslError>&)));
+		QObject::connect(socket(),SIGNAL(sslErrors(QList<QSslError>)),this,SLOT(sslError(QList<QSslError>)));
 }
