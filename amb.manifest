@@ -1,0 +1,25 @@
+<manifest>
+  <define>
+     <domain name="AMB" />
+     <provide>
+       <label name="AMB::machinegun" />
+     </provide>
+     <request>
+       <smack request="AMB::machinegun" type="rw" />
+     </request>
+  </define>
+  <assign>
+    <dbus name="org.automotive.message.broker" own="AMB" bus="system">
+      <node name="/org/automotive/uncategorized/MachineGunTurretStatus">
+        <interface name="org.freedesktop.DBus.Properties">
+          <method name="Set" >
+            <annotation name="com.tizen.smack" value="AMB::machinegun" />
+          </method>
+        </interface>
+      </node>
+    </dbus>
+  </assign>
+  <request>
+    <domain name="AMB" />
+  </request>
+</manifest>
