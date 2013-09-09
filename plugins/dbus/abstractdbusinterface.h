@@ -68,6 +68,13 @@ public:
 
 	double time() { return mTime; }
 
+	AbstractProperty* property(std::string propertyName)
+	{
+		if(properties.find(propertyName) != properties.end())
+			return properties[propertyName];
+		return nullptr;
+	}
+
 	AbstractRoutingEngine* re;
 
 protected:
@@ -83,6 +90,8 @@ protected:
     
 	virtual void setProperty(string propertyName, GVariant * value);
 	virtual GVariant * getProperty(string propertyName);
+
+
 	
 	unordered_map<string, AbstractProperty*> properties;
 

@@ -80,6 +80,13 @@ public:
 		return mTimestamp;
 	}
 
+	int sequence()
+	{
+		if(mValue)
+			return mValue->sequence;
+		return 0;
+	}
+
 	virtual void setValue(AbstractPropertyType* val)
 	{
 		if(mValue) delete mValue;
@@ -87,6 +94,7 @@ public:
 		mValue = val->copy();
 		mAnyValue = val->anyValue();
 		mTimestamp = val->timestamp;
+
 		updateValue();
 	}
 
