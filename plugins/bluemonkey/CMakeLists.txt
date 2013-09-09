@@ -20,7 +20,7 @@ if(Qt5Core_FOUND)
 endif(Qt5Core_FOUND)
 
 set(CMAKE_AUTOMOC ON)
-set(communi_INCLUDE_DIRS /usr/include/qt4/Communi)
+set(communi_INCLUDE_DIRS /usr/include/qt5/Communi)
 set(communi_LIBRARIES -lCommuni)
 add_definitions(-DCOMMUNI_SHARED)
 

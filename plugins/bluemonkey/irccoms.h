@@ -3,23 +3,23 @@
 #include <QObject>
 #include <QVariant>
 #include <QStringList>
+#include <QSslError>
 #include <map>
+#include <QAbstractSocket>
 
 #include <IrcSession>
 #include <IrcMessage>
 
-class IrcCommunication: public QObject
+class IrcCommunication: public IrcSession
 {
 	Q_OBJECT
 	Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
 	Q_PROPERTY(bool ssl WRITE setSsl)
-	Q_PROPERTY(bool isConnected READ isConnected NOTIFY connectedChanged)
 public:
 	IrcCommunication(std::map<std::string, std::string> config, QObject* parent=0);
 	QStringList channels() { return mChannels; }
 	void setChannels(QStringList c) { mChannels = c; }
 
-	bool isConnected();
 	void announceDequeue();
 
 public Q_SLOTS:
@@ -33,22 +33,16 @@ public Q_SLOTS:
 	void reconnect();
 
 private Q_SLOTS:
-	void messageReceived(IrcMessage*);
-//	void sslError(QList<QSslError>);
+	void onMessageReceived(IrcMessage*);
+	void sslError(QList<QSslError> &);
 	void socketError(QAbstractSocket::SocketError);
 
 Q_SIGNALS:
 	void message(QString sender, QString prefix, QString codes);
-	void connecting();
-	void connected();
-	void disconnected();
-	void connectedChanged();
 
 private:
-	bool mSsl;
 	QStringList announceQueue;
 	QStringList mChannels;
-	IrcSession *session;
 };
 
 #endif // COMMUNICATION_H

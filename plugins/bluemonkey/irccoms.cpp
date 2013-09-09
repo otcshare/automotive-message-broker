@@ -3,35 +3,31 @@
 #include <IrcCommand>
 #include <IrcMessage>
 #include <QSslSocket>
+#include <QSslError>
 #include <QFile>
 #include <QNetworkProxy>
 #include <QTimer>
 #include <QScriptEngine>
+#include <debugout.h>
 
 #define foreach Q_FOREACH
 
 IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QObject* parent)
-	:QObject(parent)
+	:IrcSession(parent)
 {
 
-	session = new IrcSession(this);
-	mSsl=false;
-
-	QObject::connect(session, &IrcSession::connected, [this](){
-		connectedChanged();
-		connected();
+	QObject::connect(this, &IrcCommunication::connected, [this](){
 		announceDequeue();
+		connectedChanged(true);
 	});
 
-	QObject::connect(session, &IrcSession::disconnected, [this](){
-		connectedChanged();
-		disconnected();
+	QObject::connect(this, &IrcCommunication::disconnected, [this](){
+		connectedChanged(false);
 		reconnect();
 	});
 
-	QObject::connect(session,SIGNAL(socketError(QAbstractSocket::SocketError)),this,SLOT(socketError(QAbstractSocket::SocketError)));
-	QObject::connect(session,SIGNAL(connecting()),this,SIGNAL(connecting()));
-	QObject::connect(session,SIGNAL(messageReceived(IrcMessage*)),this,SLOT(messageReceived(IrcMessage*)));
+	QObject::connect(this,SIGNAL(socketError(QAbstractSocket::SocketError)),this,SLOT(socketError(QAbstractSocket::SocketError)));
+	QObject::connect(this,SIGNAL(messageReceived(IrcMessage*)),this,SLOT(onMessageReceived(IrcMessage*)));
 
 	QScriptEngine *engine = new QScriptEngine(this);
 
@@ -43,7 +39,7 @@ IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QO
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		qDebug()<<"failed to open irc config file: "<<str;
+		DebugOut(DebugOut::Error)<<"failed to open irc config file: "<<str.toStdString()<<endl;
 		return;
 	}
 
@@ -51,13 +47,10 @@ IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QO
 
 	file.close();
 
-	engine->evaluate(script);
+	QScriptValue response = engine->evaluate(script);
 
-}
+	DebugOut()<<response.toString().toStdString()<<endl;
 
-bool IrcCommunication::isConnected()
-{
-	return session->isConnected();
 }
 
 void IrcCommunication::announceDequeue()
@@ -84,20 +77,20 @@ void IrcCommunication::announce(QString s)
 		IrcCommand command;
 		command.setType(IrcCommand::Message);
 		command.setParameters(QStringList()<<channel<<s);
-		session->sendCommand(&command);
+		sendCommand(&command);
 	}
 }
 
 void IrcCommunication::respond(QString target, QString s)
 {
 	IrcCommand *command = IrcCommand::createMessage(target,s);
-	session->sendCommand(command);
+	sendCommand(command);
 
 	delete command;
 
 }
 
-void IrcCommunication::messageReceived(IrcMessage *msg)
+void IrcCommunication::onMessageReceived(IrcMessage *msg)
 {
 	qDebug()<<"message received "<<msg->type()<<" prefix: "<<msg->sender().prefix()<<" params:"<<msg->parameters();
 
@@ -116,11 +109,11 @@ void IrcCommunication::messageReceived(IrcMessage *msg)
 
 void IrcCommunication::connect(QString host, int port, QString proxy, QString user, QString nick, QString pass)
 {
-	session->setHost(host);
-	session->setPort(port);
-	session->setUserName(user);
-	session->setNickName(nick);
-	session->setRealName(nick);
+	setHost(host);
+	setPort(port);
+	setUserName(user);
+	setNickName(nick);
+	setRealName(nick);
 
 	if(!proxy.isEmpty())
 	{
@@ -141,13 +134,15 @@ void IrcCommunication::connect(QString host, int port, QString proxy, QString us
 	}
 
 	qDebug()<<"opening irc session";
-	session->open();
+	open();
 }
 
 void IrcCommunication::setSsl(bool use)
 {
 	if(use)
-		session->setSocket(new QSslSocket(this));
+	{
+		setSecure(true);
+	}
 }
 
 void IrcCommunication::join(QString channel)
@@ -158,26 +153,26 @@ void IrcCommunication::join(QString channel)
 	IrcCommand command;
 	command.setType(IrcCommand::Join);
 	command.setParameters(QStringList()<<channel);
-	session->sendCommand(&command);
+	sendCommand(&command);
 }
 
 void IrcCommunication::reconnect()
 {
-	if(session->socket()->state() == QAbstractSocket::ConnectingState)
+	if(socket()->state() == QAbstractSocket::ConnectingState)
 		QTimer::singleShot(5000,this,SLOT(reconnect()));
 	else
-		QTimer::singleShot(5000,session,SLOT(open()));
+		QTimer::singleShot(5000,this,SLOT(open()));
 }
 
-/*void IrcCommunication::sslError(QList<QSslError>)
+void IrcCommunication::sslError(QList<QSslError> &)
 {
 	qDebug()<<"some ssl errors!! trying to ignore them";
-	QSslSocket* socket = qobject_cast<QSslSocket*>(session->socket());
-	if(socket)
+	QSslSocket* sock = qobject_cast<QSslSocket*>(socket());
+	if(sock)
 	{
-		socket->ignoreSslErrors();
+		sock->ignoreSslErrors();
 	}
-}*/
+}
 
 void IrcCommunication::socketError(QAbstractSocket::SocketError error)
 {
@@ -188,5 +183,5 @@ void IrcCommunication::socketError(QAbstractSocket::SocketError error)
 void IrcCommunication::setIgnoreInvalidCert(bool ignore)
 {
 	if(ignore)
-		QObject::connect(session->socket(),SIGNAL(),this,SLOT(sslError(QList<QSslError>)));
+		QObject::connect(socket(),SIGNAL(sslErrors(QList<QSslError>&)),this,SLOT(sslError(QList<QSslError>&)));
 }
