@@ -43,6 +43,14 @@ using namespace std;
 static void
 on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
+	DebugOut()<<"DBus bus acquired"<<endl;
+}
+
+static void
+on_name_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
+{
+	DebugOut()<<"DBus service name acquired: "<<name<<endl;
+
 	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
 
 	iface->connection = connection;
@@ -97,11 +105,6 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	ConstructProperty(ObstacleDistanceProperty);
 
 	iface->supportedChanged(PropertyList());
-}
-
-static void
-on_name_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
-{
 
 }
 
