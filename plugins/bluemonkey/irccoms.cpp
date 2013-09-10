@@ -158,7 +158,10 @@ void IrcCommunication::join(QString channel)
 
 void IrcCommunication::reconnect()
 {
-	if(socket()->state() == QAbstractSocket::ConnectingState)
+	if(socket()->state() == QAbstractSocket::ConnectedState)
+		return;
+
+	if(socket()->state() == QAbstractSocket::ConnectingState && socket()->state() != QAbstractSocket::ConnectedState)
 		QTimer::singleShot(5000,this,SLOT(reconnect()));
 	else
 		QTimer::singleShot(5000,this,SLOT(open()));
