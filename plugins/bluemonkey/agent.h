@@ -13,7 +13,7 @@ public:
 	void scriptUnload(qint64 id);
 
 private Q_SLOTS:
-	void timeout(QPrivateSignal);
+	void timeout();
 
 private:
 	QList<quint64> idList;

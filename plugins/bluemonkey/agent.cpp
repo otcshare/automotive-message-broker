@@ -14,13 +14,13 @@ void BluemonkeyAgent::scriptLoad(qint64 id, const QString &program, const QStrin
 
 	QTimer *timer = new QTimer();
 	timer->setSingleShot(true);
-	timer->connect(timer, SIGNAL(timeout(QPrivateSignal)), this, SLOT(timeout(QPrivateSignal)));
+	timer->connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
 	timer->start(5000);
 
 	timerIdMap[timer] = id;
 }
 
-void BluemonkeyAgent::timeout(QPrivateSignal)
+void BluemonkeyAgent::timeout()
 {
 	quint64 id = timerIdMap[sender()];
 
