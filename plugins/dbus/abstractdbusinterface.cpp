@@ -224,8 +224,8 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
 
 	g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val);
-	g_variant_builder_add(&builder, "{sv}", std::string(property->name() + "Sequence").c_str(), g_variant_new("(i)", property->sequence()));
-	g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("(d)", mTime) );
+	g_variant_builder_add(&builder, "{sv}", std::string(property->name() + "Sequence").c_str(), g_variant_new("i", property->sequence()));
+	g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("d", mTime) );
 
 	GError *error2 = NULL;
 
@@ -307,7 +307,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 	{
 		double time = interfaceMap[interfaceName]->time();
 
-		GVariant* value = g_variant_new("(d)", time);
+		GVariant* value = g_variant_new("d", time);
 		return value;
 	}
 
@@ -329,7 +329,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 
 		int sequence = theProperty->sequence();
 
-		GVariant* value = g_variant_new("(i)", sequence);
+		GVariant* value = g_variant_new("i", sequence);
 		return value;
 	}
 
