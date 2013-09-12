@@ -1,6 +1,6 @@
 * Thu Sep 12 2013 - <kevron.m.rees@intel.com>
-- Official 0.10.0 ("chevelle") release
-- added LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so to fix opencvlux plugin issues
+- Official 0.10.0 ("chevelle") release.
+- added LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so to fix opencvlux plugin issues.
 
 * Tue Sep 10 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.9.19 ("chevelle" beta).
