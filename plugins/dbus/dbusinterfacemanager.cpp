@@ -55,8 +55,6 @@ on_name_acquired (GDBusConnection *connection, const gchar *name, gpointer user_
 
 	iface->connection = connection;
 
-	new AutomotiveManager(connection);
-
 	/// properties:
 	ConstructProperty(AccelerationProperty);
 	AbstractDBusInterface* vehicleSpeed = new VehicleSpeedProperty(iface->re, connection);
@@ -103,6 +101,8 @@ on_name_acquired (GDBusConnection *connection, const gchar *name, gpointer user_
 	ConstructProperty(SeatBeltStatusProperty);
 	ConstructProperty(OccupantStatusProperty);
 	ConstructProperty(ObstacleDistanceProperty);
+
+	new AutomotiveManager(connection);
 
 	iface->supportedChanged(PropertyList());
 
