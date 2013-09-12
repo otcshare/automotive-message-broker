@@ -9,6 +9,7 @@ After=syslog.target
 [Service]
 Type=dbus
 BusName=org.automotive.message.broker
+Environment=LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so
 ExecStart=/usr/bin/ambd 
 
 [Install]
