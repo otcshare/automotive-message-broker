@@ -28,5 +28,5 @@ const int DebugOut::Warning = 1 << 24;
 
 void debugOut(string message)
 {
-	DebugOut()<<"DEBUG: "<<message<<endl;
+	DebugOut()<<"DEBUG: "<<message.c_str()<<endl;
 }

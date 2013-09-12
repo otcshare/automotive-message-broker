@@ -31,7 +31,7 @@ class OpenXCPlugin: public AbstractSource
 public:
 	OpenXCPlugin(AbstractRoutingEngine* re, map<string, string> config);
 	
-	string uuid();
+	const string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);

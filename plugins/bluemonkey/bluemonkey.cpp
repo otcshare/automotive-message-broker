@@ -93,13 +93,13 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 {
 	irc = new IrcCommunication(config, this);
 
-	reloadEngine();
+	QTimer::singleShot(1,this,SLOT(reloadEngine()));
 
 	auth = new Authenticate(config, this);
 
 	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
 
-		if(codes.contains("authenticate"))
+		if(codes.startsWith("authenticate"))
 		{
 
 			int i = codes.indexOf("authenticate");
@@ -185,17 +185,6 @@ bool BluemonkeySink::authenticate(QString pass)
 
 void BluemonkeySink::loadConfig(QString str)
 {
-	configsToLoad.append(str);
-	QTimer::singleShot(1,this,SLOT(loadConfigPriv()));
-}
-
-void BluemonkeySink::loadConfigPriv()
-{
-	if(!configsToLoad.count()) return;
-
-	QString str = configsToLoad.first();
-	configsToLoad.pop_front();
-
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
@@ -207,7 +196,7 @@ void BluemonkeySink::loadConfigPriv()
 
 	file.close();
 
-	DebugOut()<<"evaluating script: "<<script.toStdString();
+	DebugOut()<<"evaluating script: "<<script.toStdString()<<endl;
 
 	QScriptValue val = engine->evaluate(script);
 
@@ -225,7 +214,7 @@ void BluemonkeySink::reloadEngine()
 
 	agent = new BluemonkeyAgent(engine);
 
-	engine->setAgent(agent);
+	//engine->setAgent(agent);
 
 	QScriptValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
@@ -241,6 +230,13 @@ void BluemonkeySink::reloadEngine()
 
 void BluemonkeySink::writeProgram(QString program)
 {
+	QScriptSyntaxCheckResult result = QScriptEngine::checkSyntax(program);
+	if(result.state() != QScriptSyntaxCheckResult::Valid)
+	{
+		DebugOut(DebugOut::Error)<<"Syntax error in program: "<<result.errorMessage().toStdString()<<endl;
+		return;
+	}
+
 	QFile file(configuration["customPrograms"].c_str());
 
 	if(!file.open(QIODevice::ReadWrite | QIODevice::Append))

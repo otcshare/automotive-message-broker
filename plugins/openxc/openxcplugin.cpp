@@ -121,7 +121,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	
 }
 
-string OpenXCPlugin::uuid()
+const string OpenXCPlugin::uuid()
 {
 	return "openxc";
 }

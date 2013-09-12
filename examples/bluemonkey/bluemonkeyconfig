@@ -3,7 +3,7 @@
 
 	"sources" : [ 
 		{
-			"path" : "/usr/lib/automotive-message-broker/murphysourceplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so"
 		}
 	],
 	"sinks": [

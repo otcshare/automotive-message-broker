@@ -380,7 +380,7 @@ GpsNmeaSource::~GpsNmeaSource()
 	device->close();
 }
 
-string GpsNmeaSource::uuid()
+const string GpsNmeaSource::uuid()
 {
 	return mUuid;
 }

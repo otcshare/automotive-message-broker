@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
 #include "timestamp.h"
 
 using namespace std;
@@ -53,7 +52,6 @@ public:
 				out<<"WARNING ";
 		}
 	}
-
 	DebugOut const& operator << (string message) const
 	{
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)

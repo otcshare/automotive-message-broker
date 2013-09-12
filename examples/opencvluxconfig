@@ -7,7 +7,7 @@
 			"threaded" : "true",
 			"kinect" : "false",
 			"opencl" : "false",
-			"cuda" : "false",
+			"cuda" : "true",
 			"pixelLowerBound" : "0",
 			"pixelUpperBound" : "255",
 			"fps" : "30",
