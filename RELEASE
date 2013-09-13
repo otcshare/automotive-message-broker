@@ -1,4 +1,4 @@
-Release notes for release 0.11.0
+Release notes for release 0.11
 
 New features:
 
@@ -6,8 +6,10 @@ New features:
 - Zone DBus property.
 - Get{PropertyName}() DBus method returns extended data about the property.
 - new ZonesForProperty and FindPropertyForZone methods.
-- new GetHistory DBus method.
 - new FindObject DBus method replaces findProperty
+- OpenCV plugin has experimental CUDA support
+- new "bluemonkey" plugin - a AMB -> javascript gateway
+
 
 Changes:
 - findProperty DBus method on org.automotive.Manager is deprecated.
