@@ -20,7 +20,7 @@
 #ifndef BluemonkeySink_H
 #define BluemonkeySink_H
 
-#include "abstractsink.h"
+#include "abstractsource.h"
 #include <QObject>
 #include <QVariant>
 #include <QJsonDocument>
@@ -70,7 +70,7 @@ private:
 
 };
 
-class BluemonkeySink : public QObject, public AbstractSink
+class BluemonkeySink : public QObject, public AbstractSource
 {
 Q_OBJECT
 public:
@@ -81,6 +81,22 @@ public:
 	virtual const std::string uuid();
 
 	QScriptEngine* engine;
+
+	/// source methods:
+	virtual void getPropertyAsync(AsyncPropertyReply *reply);
+	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
+	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
+	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
+	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
+	virtual PropertyList supported();
+
+	virtual int supportedOperations();
+
+private: //source privates
+
+	PropertyList mSupported;
+	std::list<AbstractPropertyType*> propertyValueCache;
+
 
 public Q_SLOTS:
 
@@ -106,9 +122,7 @@ public Q_SLOTS:
 		mSilentMode = m;
 	}
 
-private Q_SLOTS: /// methods:
-
-	void loadConfigPriv();
+	void createCustomProperty(QString name, QScriptValue defaultValue);
 
 private:
 	QStringList configsToLoad;

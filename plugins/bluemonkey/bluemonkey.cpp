@@ -89,7 +89,7 @@ QVariant gvariantToQVariant(GVariant *value)
 
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSink(e, config), agent(nullptr), engine(nullptr), mSilentMode(false)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSource(e, config), agent(nullptr), engine(nullptr), mSilentMode(false)
 {
 	irc = new IrcCommunication(config, this);
 
@@ -153,6 +153,36 @@ void BluemonkeySink::propertyChanged(VehicleProperty::Property property, Abstrac
 const string BluemonkeySink::uuid()
 {
 	return "bluemonkey";
+}
+
+void BluemonkeySink::getPropertyAsync(AsyncPropertyReply *reply)
+{
+}
+
+void BluemonkeySink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
+{
+}
+
+AsyncPropertyReply *BluemonkeySink::setProperty(AsyncSetPropertyRequest request)
+{
+}
+
+void BluemonkeySink::subscribeToPropertyChanges(VehicleProperty::Property property)
+{
+}
+
+void BluemonkeySink::unsubscribeToPropertyChanges(VehicleProperty::Property property)
+{
+}
+
+PropertyList BluemonkeySink::supported()
+{
+	return mSupported;
+}
+
+int BluemonkeySink::supportedOperations()
+{
+	return AbstractSource::Get | AbstractSource::Set;
 }
 
 QObject *BluemonkeySink::subscribeTo(QString str)
@@ -299,6 +329,35 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 	};
 
 	routingEngine->getRangePropertyAsync(request);
+}
+
+void BluemonkeySink::createCustomProperty(QString name, QScriptValue defaultValue)
+{
+
+	auto create = [defaultValue, name]() -> AbstractPropertyType*
+	{
+			QVariant var = defaultValue.toVariant();
+
+			if(!var.isValid())
+				return nullptr;
+
+			if(var.type() == QVariant::UInt)
+				return new BasicPropertyType<uint>(name.toStdString(),var.toUInt());
+			else if(var.type() == QVariant::Double)
+				return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
+			else if(var.type() == QVariant::Bool)
+				return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
+			else if(var.type() == QVariant::Int)
+				return new BasicPropertyType<int>(name.toStdString(),var.toInt());
+			else if(var.type() == QVariant::String)
+				return new StringPropertyType(name.toStdString(),var.toString().toStdString());
+
+
+			return nullptr;
+	};
+
+	VehicleProperty::registerProperty(name.toStdString(),create);
+	mSupported.push_back(name.toStdString());
 }
 
 
