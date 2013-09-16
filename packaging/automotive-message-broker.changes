@@ -1,3 +1,6 @@
+* Mon Sep 16 2013 - <kevron.m.rees@intel.com>
+- reenabled murphy plugin
+
 * Thu Sep 12 2013 - <kevron.m.rees@intel.com>
 - Official 0.10.0 ("chevelle") release.
 - added LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so to fix opencvlux plugin issues.
