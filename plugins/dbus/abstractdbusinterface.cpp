@@ -148,7 +148,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectName,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None), mTime(0)
+	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None), mTime(0), regId(0)
 {
 	startRegistration();
 
@@ -262,7 +262,7 @@ void AbstractDBusInterface::registerObject()
 		DebugOut(DebugOut::Error)<<error2->message<<endl;
 	}
 	
-	if(regId <= 0)
+	if(regId == 0)
 	{
 		DebugOut(DebugOut::Error)<<"We failed to register on DBus"<<endl;
 	}
@@ -270,7 +270,8 @@ void AbstractDBusInterface::registerObject()
 
 void AbstractDBusInterface::unregisterObject()
 {
-	g_dbus_connection_unregister_object(mConnection, regId);
+	if(regId)
+		g_dbus_connection_unregister_object(mConnection, regId);
 }
 
 void AbstractDBusInterface::updateValue(AbstractProperty *property)
