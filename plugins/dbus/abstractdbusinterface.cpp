@@ -99,7 +99,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string op,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection), supported(false), mTime(0)
+	: mInterfaceName(interfaceName), mObjectPath(op), mConnection(connection), supported(false), mTime(0), regId(0)
 {
 	interfaceMap[interfaceName] = this;
 	startRegistration();
@@ -175,21 +175,25 @@ void AbstractDBusInterface::registerObject()
 
 	const GDBusInterfaceVTable vtable = { handleMethodCall, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
 
-	guint tempregId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error);
+	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error);
 	
 	if(error)
 	{
-		DebugOut(DebugOut::Warning)<<error->message<<endl;
+		DebugOut(DebugOut::Error)<<error->message<<endl;
 	}
-	
-	if(tempregId > 0)
+
+	if(!regId)
 	{
-		regId = tempregId;
+		DebugOut(DebugOut::Error)<<"Failed to register on DBus"<<endl;
 	}
 }
 
 void AbstractDBusInterface::unregisterObject()
 {
+	if(!regId)
+		return;
+
+	DebugOut()<<"Unregistering DBus object: "<<objectPath()<<endl;
 	g_dbus_connection_unregister_object(mConnection, regId);
 }
 
