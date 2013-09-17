@@ -1,3 +1,7 @@
+* Tue Sep 17 2013 - <kevron.m.rees@intel.com>
+- disable example plugin (TIVI-1734)
+- enable ico vehicle plugin (TIVI-1799)
+
 * Mon Sep 16 2013 - <kevron.m.rees@intel.com>
 - reenabled murphy plugin
 
