@@ -1,7 +1,10 @@
 * Tue Sep 17 2013 - <kevron.m.rees@intel.com>
+- New upstream bug fix release
+- Fix for race condition which prevents AMB from being used under certain boot contitions
+
+* Tue Sep 17 2013 - <kevron.m.rees@intel.com>
 - disable example plugin (TIVI-1734)
 - enable ico vehicle plugin (TIVI-1799)
-- Fix for race condition which prevents AMB from being used under certain boot contitions
 
 * Mon Sep 16 2013 - <kevron.m.rees@intel.com>
 - reenabled murphy plugin
