@@ -305,6 +305,9 @@ public:
 		return value<T>() > other.value<T>();
 	}
 
+	/** this is used for nameless property types.  It should not be used for typical properties
+	 * that should have a name
+	 */
 	BasicPropertyType( T val)
 		:AbstractPropertyType("")
 	{
