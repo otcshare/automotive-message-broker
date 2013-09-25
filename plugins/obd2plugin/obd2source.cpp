@@ -63,15 +63,18 @@ bool beginsWith(std::string a, std::string b)
 	return (a.compare(0, b.length(), b) == 0);
 }
 
-void connect(obdLib* obd, std::string device, std::string strbaud)
+bool connect(obdLib* obd, std::string device, std::string strbaud)
 {
 	//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
 	std::string port = device;
 	DebugOut() << "Obd2Source::Connect()" << device << strbaud << endl;
 	int baud = boost::lexical_cast<int>(strbaud);
-	obd->openPort(port.c_str(),baud);
-ObdPid::ByteArray replyVector;
-std::string reply;
+
+	if(obd->openPort(port.c_str(),baud) == -1)
+		return false;
+
+	ObdPid::ByteArray replyVector;
+	std::string reply;
 	obd->sendObdRequestString("ATZ\r",4,&replyVector,500,3);
 	for (unsigned int i=0;i<replyVector.size();i++)
 	{
@@ -82,6 +85,7 @@ std::string reply;
 		//No reply found
 		//printf("Error!\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error resetting ELM"<<endl;
+		return false;
 	}
 	else
 	{
@@ -91,23 +95,29 @@ std::string reply;
 	{
 		//printf("Error sending echo\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error setting auto protocol"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATE0"))
 	{
 		//printf("Error sending echo\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off echo"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATH0"))
 	{
 		//printf("Error sending headers off\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off headers"<<endl;
+		return false;
 	}
 	if (!sendElmCommand(obd,"ATL0"))
 	{
 		//printf("Error turning linefeeds off\n");
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off linefeeds"<<endl;
+		return false;
 	}
 	obd->sendObdRequestString("010C1\r",6,&replyVector,500,5);
+
+	return true;
 }
 
 void threadLoop(gpointer data)
@@ -164,12 +174,12 @@ void threadLoop(gpointer data)
 			//commandMap[req->req] = req->arg;
 			//printf("Command: %s\n",req->req.c_str());
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << endl;
-			if (req->req == "connect")
+			if (req->req == "connect" )
 			{
-				
+
 				if (source->m_isBluetooth)
 				{
-					ObdBluetoothDevice bt;
+					BluetoothDevice bt;
 					std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
 					if(tempPort != "")
 					{
@@ -182,11 +192,20 @@ void threadLoop(gpointer data)
 					port = req->arglist[0];
 					baud = req->arglist[1];
 				}
-				connect(obd,port,baud);
-				connected = true;
-				StatusMessage *statusreq = new StatusMessage();
-				statusreq->statusStr = "connected";
-				g_async_queue_push(privStatusQueue,statusreq);
+				connected = connect(obd,port,baud);
+
+				if(connected)
+				{
+					StatusMessage *statusreq = new StatusMessage();
+					statusreq->statusStr = "connected";
+					g_async_queue_push(privStatusQueue,statusreq);
+				}
+				else
+				{
+					StatusMessage *statusreq = new StatusMessage();
+					statusreq->statusStr = "disconnected";
+					g_async_queue_push(privStatusQueue,statusreq);
+				}
 				
 			}
 			else if (req->req == "connectifnot")
@@ -195,19 +214,32 @@ void threadLoop(gpointer data)
 				{
 					if (source->m_isBluetooth)
 					{
-						ObdBluetoothDevice bt;
+						BluetoothDevice bt;
 						std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
 						if(tempPort != "")
 						{
 							DebugOut(3)<<"Using bluetooth device \""<<source->m_btDeviceAddress<<"\" bound to: "<<tempPort<<endl;
 							port = tempPort;
 						}
+						else
+						{
+							DebugOut(DebugOut::Error)<<"Error creating bluetooth device"<<endl;
+						}
 					}
-					connect(obd,port,baud);
-					connected = true;
-					StatusMessage *statusreq = new StatusMessage();
-					statusreq->statusStr = "connected";
-					g_async_queue_push(privStatusQueue,statusreq);
+					connected = connect(obd,port,baud);
+
+					if(connected)
+					{
+						StatusMessage *statusreq = new StatusMessage();
+						statusreq->statusStr = "connected";
+						g_async_queue_push(privStatusQueue,statusreq);
+					}
+					else
+					{
+						StatusMessage *statusreq = new StatusMessage();
+						statusreq->statusStr = "disconnected";
+						g_async_queue_push(privStatusQueue,statusreq);
+					}
 				}
 			}
 			else if (req->req == "setportandbaud")
@@ -219,7 +251,7 @@ void threadLoop(gpointer data)
 			{
 				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Using queued disconnect" << (ulong)req << endl;
 				obd->closePort();
-				ObdBluetoothDevice bt;
+				BluetoothDevice bt;
 				bt.disconnect(source->m_btDeviceAddress, source->m_btAdapterAddress);
 				connected = false;
 				StatusMessage *statusreq = new StatusMessage();
@@ -410,13 +442,12 @@ static int updateProperties( gpointer data)
 		StatusMessage *reply = (StatusMessage*)retval;
 		if (reply->statusStr == "disconnected")
 		{
-
-			BasicPropertyType<bool> val(false);
+			OBD2Source::Obd2ConnectType val(Obd2Connected,false);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "connected")
 		{
-			BasicPropertyType<bool> val(true);
+			OBD2Source::Obd2ConnectType val(Obd2Connected, true);
 			src->updateProperty(Obd2Connected,&val);
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
@@ -433,6 +464,7 @@ static int updateProperties( gpointer data)
 				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on unrequested property:" << reply->property << endl;
 			}
 		}
+		delete reply;
 	}
 	while(gpointer retval = g_async_queue_try_pop(src->responseQueue))
 	{
@@ -455,7 +487,14 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
 		propertyReplyMap[property]->value = value;
-		propertyReplyMap[property]->completed(propertyReplyMap[property]);
+		propertyReplyMap[property]->success = true;
+		try {
+			propertyReplyMap[property]->completed(propertyReplyMap[property]);
+		}catch(...)
+		{
+			DebugOut(DebugOut::Error)<<"failed to call reply completed callback"<<endl;
+		}
+
 		propertyReplyMap.erase(property);
 	}
 	else
@@ -529,7 +568,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		m_isBluetooth = true;
 		///TODO: bluetooth!!
 		DebugOut()<<"bluetooth device?"<<endl;
-		ObdBluetoothDevice bt;
+		BluetoothDevice bt;
 
 		std::string tempPort = bt.getDeviceForAddress(port, btadapter);
 		if(tempPort != "")
@@ -619,7 +658,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	return new OBD2Source(routingengine, config);
 	
 }
-string OBD2Source::uuid()
+const string OBD2Source::uuid()
 {
 	return "f77af740-f1f8-11e1-aff1-0800200c9a66";
 }
@@ -681,7 +720,7 @@ void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property
 void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << "getPropertyAsync requested for " << reply->property << endl;
-	propertyReplyMap[reply->property] = reply;
+
 	VehicleProperty::Property property = reply->property;
 
 
@@ -690,6 +729,8 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
 		return;
 	}
+
+	propertyReplyMap[reply->property] = reply;
 
 	ObdPid* requ = obd2AmbInstance->createPidforProperty(property);
 	g_async_queue_push(singleShotQueue,requ);
@@ -702,8 +743,13 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 {
 	AsyncPropertyReply* reply = new AsyncPropertyReply (request);
 
+
+
 	if(request.property == Obd2Connected)
 	{
+		propertyReplyMap[reply->property] = reply;
+		reply->success = true;
+
 		if(request.value->value<bool>() == true)
 		{
 			CommandRequest *req = new CommandRequest();
@@ -717,21 +763,21 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 			g_async_queue_push(commandQueue,req);
 		}
 
-		reply->success = true;
 	}
 
 	else
 	{
 		reply->success = false;
+		try
+		{
+			reply->completed(reply);
+		}
+		catch (...)
+		{
+
+		}
 	}
 
-	try
-	{
-		reply->completed(reply);
-	}
-	catch (...)
-	{
 
-	}
 	return reply;
 }

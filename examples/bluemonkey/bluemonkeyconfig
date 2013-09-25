@@ -1,0 +1,21 @@
+{
+	"mainloop" : "/usr/lib/automotive-message-broker/qtmainloopplugin.so",
+
+	"sources" : [ 
+		{
+			"path" : "/usr/lib/automotive-message-broker/bluemonkeyplugin.so",
+			"authSettings" : "authSettings.js",
+			"ircSettings" : "ircSettings.js",
+			"config" : "config.js",
+			"customPrograms" : "customPrograms.js"
+		}
+	],
+
+	"sinks" : [
+
+		{
+			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
+		}
+	]
+}
+

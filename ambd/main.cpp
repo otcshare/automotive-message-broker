@@ -76,6 +76,12 @@ static const struct option longopts[] = {
 	{ NULL, 0, NULL, 0 } ///< End
 };
 
+void printVersion()
+{
+	DebugOut(0)<<PROJECT_NAME<<endl;
+	DebugOut(0)<<"Version: "<<PROJECT_VERSION<<" ("<<PROJECT_CODENAME<<")"<<endl;
+}
+
 int main(int argc, char **argv) 
 {
 
@@ -95,12 +101,11 @@ int main(int argc, char **argv)
 				break;
 				
 			case 'v':
-				cout<<PROJECT_NAME<<endl;
-				cout<<"Version: "<<PROJECT_VERSION<<" ("<<PROJECT_CODENAME<<")"<<endl;
+				printVersion();
 				return (0);
 				break;
 			case 'c':
-				cout<<"Config: "<<optarg<<endl;
+				DebugOut(0)<<"Config: "<<optarg<<endl;
 				config=optarg;
 				break;
 			case 'd':
@@ -111,7 +116,7 @@ int main(int argc, char **argv)
 				logfn = optarg;
 				break;
 			default:
-				cerr<<"Unknown option "<<optc<<endl;
+				DebugOut(0)<<"Unknown option "<<optc<<endl;
 				printhelp(argv[0]);
 				return (0);
 				break;
@@ -126,8 +131,6 @@ int main(int argc, char **argv)
 		logfile.open(logfn, ios::out | ios::trunc);
 		DebugOut::setOutput(logfile);
 	}
-
-	g_type_init();
 
 	VehicleProperty::factory();
 	

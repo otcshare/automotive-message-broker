@@ -32,6 +32,7 @@ sqlitedatabase::init(const std::string & d)
 sqlitedatabase::~sqlitedatabase()
 {
 	sqlite3_close((sqlite3 *)m_odb->db);
+	delete m_odb;
 }
 
 bool sqlitedatabase::Connected()

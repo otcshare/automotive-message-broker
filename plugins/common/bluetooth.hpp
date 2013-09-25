@@ -7,7 +7,7 @@
 #include "bluetoothserialproxy.h"
 
 
-class ObdBluetoothDevice
+class BluetoothDevice
 {
 public:
 

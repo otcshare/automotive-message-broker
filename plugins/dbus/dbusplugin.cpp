@@ -28,11 +28,11 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DBusSinkManager(routingengine, config);
 }
 
-DBusSink::DBusSink(string interface, string path, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
-	:AbstractDBusInterface(interface, path, connection),
-	  AbstractSink(engine, config), supported(false)
+DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
+	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
+	  AbstractSink(engine, config)
 {
-
+	AbstractDBusInterface::re = engine;
 }
 
 void DBusSink::supportedChanged(PropertyList supportedProperties)
@@ -43,8 +43,13 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 	{
 		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr).first))
 		{
-			routingEngine->subscribeToProperty((*itr).first, this);
-			addProperty((*itr).second);
+			VariantType* prop = (*itr).second;
+			prop->setSourceFilter(mSourceFilter);
+			prop->setZoneFilter(zoneFilter);
+			prop->initialize();
+			VehicleProperty::Property p = (*itr).first;
+			routingEngine->subscribeToProperty(p, mSourceFilter, this);
+			addProperty(prop);
 			supported = true;
 		}
 	}
@@ -52,18 +57,23 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 
 	if(supported)
 		registerObject();
+	else
+		unregisterObject();
 }
 
-void DBusSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
+void DBusSink::propertyChanged(AbstractPropertyType *value, const std::string &uuid)
 {
-	if(!propertyDBusMap.count(property))
+	VehicleProperty::Property property = value->name;
+
+	if(propertyDBusMap.find(property) == propertyDBusMap.end() || value->zone != zoneFilter)
 		return;
 
 	AbstractProperty* prop = propertyDBusMap[property];
 	prop->setValue(value);
+	mTime = value->timestamp;
 }
 
-std::string DBusSink::uuid()
+const string DBusSink::uuid()
 {
 	return "c2e6cafa-eef5-4b8a-99a0-0f2c9be1057d";
 }
@@ -71,5 +81,5 @@ std::string DBusSink::uuid()
 DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, string> config)
 	:AbstractSinkManager(engine, config)
 {
-	DBusInterfaceManager* manager = new DBusInterfaceManager(engine);
+	DBusInterfaceManager* manager = new DBusInterfaceManager(engine, config);
 }

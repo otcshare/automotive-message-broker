@@ -1,0 +1,27 @@
+Service: org.automotive.message.broker
+Interface: org.automotive.Manager
+Object Path: /
+
+Methods:
+
+	Array{ObjectPath}	findObject(string objectName)
+
+		returns list of object paths that provide the given objectName (ie "VehicleSpeed" is the object name for
+		the DBus object at path: "/path/to/VehicleSpeed").
+
+	Array{int32}	zonesForObjectName(string objectName)
+
+		returns list of zones for a given objectName.
+
+	ObjectPath	findObjectForZone(string objectName, int32 zone)
+
+		returns object path which provides the given objectName in the given zone.
+
+	Array{ObjectPath}	list()
+
+		returns list of ObjectNames which are supported by the system
+
+	ObjectPath 	findProperty(string objectName) [deprecated]
+
+		returns first object matching the objectName.
+		WARNING: this method is deprecated, use findObject() instead

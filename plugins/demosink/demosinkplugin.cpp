@@ -58,6 +58,7 @@ DemoSink::DemoSink(AbstractRoutingEngine* re, map<string, string> config)
 {
 	routingEngine->subscribeToProperty(VehicleProperty::ButtonEvent, this);
 	routingEngine->subscribeToProperty(VehicleProperty::TurnSignal, this);
+	routingEngine->subscribeToProperty(VehicleProperty::MachineGunTurretStatus, this);
 }
 
 DemoSink::~DemoSink()
@@ -70,13 +71,15 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DemoSinkManager(routingengine, config);
 }
 
-string DemoSink::uuid()
+const string DemoSink::uuid()
 {
 	return "5b0e8a04-d6d7-43af-b827-1663627a25d9";
 }
 
-void DemoSink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
+void DemoSink::propertyChanged(AbstractPropertyType *value, const string &uuid)
 {
+	VehicleProperty::Property property = value->name;
+
 	std::string app = configuration["script"];
 	std::string strValue = value->toString();
 

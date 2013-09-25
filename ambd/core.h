@@ -36,9 +36,11 @@ public:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
 	void updateSupported(PropertyList added, PropertyList removed);
-	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, string uuid);
+	void updateProperty(AbstractPropertyType* value, const std::string &uuid);
 	
 	/// sinks:
+
+	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
 	
 	void registerSink(AbstractSink *self);
 	void unregisterSink(AbstractSink *self);
@@ -46,8 +48,13 @@ public:
 	AsyncRangePropertyReply* getRangePropertyAsync(AsyncRangePropertyRequest request);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
+	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self);
+	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	PropertyList supported() { return mMasterPropertyList; }
+
+	PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid);
+	std::list<std::string> getSourcesForProperty(VehicleProperty::Property property);
     
 	~Core();
 	
@@ -60,6 +67,8 @@ private:
 	int propertiesPerSecond;
 	
 	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
+
+	std::map<AbstractSink*, std::map<VehicleProperty::Property, std::string> > filteredSourceSinkMap;
 
 	std::map<VehicleProperty::Property, std::string> previousValueMap;
     

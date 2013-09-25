@@ -3,7 +3,7 @@
 
 
 #include "abstractpropertytype.h"
-//#include "vehicleproperty.h"
+
 #include <map>
 #include <debugout.h>
 #include <json/json.h>
@@ -24,6 +24,11 @@ public:
 		MapPropertyType<T,N> *t = new MapPropertyType<T,N>(name);
 
 		t->setMap(mMap);
+		t->timestamp = timestamp;
+		t->sequence = sequence;
+		t->sourceUuid = sourceUuid;
+		t->name = name;
+		t->zone = zone;
 
 		return t;
 	}
@@ -85,12 +90,10 @@ public:
 	{
 		GVariantBuilder params;
 		g_variant_builder_init(&params, G_VARIANT_TYPE_DICTIONARY);
-
 		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
 		{
 			auto &foo = (*itr).first;
 			g_variant_builder_add(&params,"{?*}",const_cast<T&>(foo).toVariant(),(*itr).second.toVariant());
-
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -98,9 +101,27 @@ public:
 		return var;
 	}
 
-	void fromVariant(GVariant*)
+	void fromVariant(GVariant* variant)
 	{
 		/// TODO: fill this in
+		gsize dictsize = g_variant_n_children(variant);
+		for (int i=0;i<dictsize;i++)
+		{
+			GVariant *childvariant = g_variant_get_child_value(variant,i);
+			gsize dictvalsize = g_variant_n_children(childvariant);
+			if (dictvalsize == 2)
+			{
+				//It is a dictionary entry
+				GVariant *keyvariant = g_variant_get_child_value(childvariant,0);
+				GVariant *valvariant = g_variant_get_child_value(childvariant,1);
+				T t = T();
+				t.fromVariant(keyvariant);
+				N n = N();
+				n.fromVariant(valvariant);
+				appendPriv(t,n);
+			}
+		}
+		
 	}
 
 	void setMap(std::map<T, N> m)

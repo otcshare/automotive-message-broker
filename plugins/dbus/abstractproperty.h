@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "debugout.h"
 #include "abstractpropertytype.h"
+#include "abstractroutingengine.h"
+#include "vehicleproperty.h"
 
 class AbstractDBusInterface;
 
@@ -61,10 +63,18 @@ public:
 		return mPropertyName;
 	}
 
+	virtual VehicleProperty::Property ambPropertyName()
+	{
+		return mAmbPropertyName;
+	}
+
 	virtual Access access()
 	{
 		return mAccess;
 	}
+
+	void setSourceFilter(std::string filter) { mSourceFilter = filter; }
+	void setZoneFilter(Zone::Type zone) { mZoneFilter = zone; }
 	
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
@@ -74,22 +84,38 @@ public:
 		return mTimestamp;
 	}
 
+	int sequence()
+	{
+		if(mValue)
+			return mValue->sequence;
+		return 0;
+	}
+
 	virtual void setValue(AbstractPropertyType* val)
 	{
 		if(mValue) delete mValue;
 
+		PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);
+
 		mValue = val->copy();
 		mAnyValue = val->anyValue();
 		mTimestamp = val->timestamp;
+		if(info.isValid())
+			mUpdateFrequency = info.updateFrequency();
 		updateValue();
 	}
 
-	template<typename T>
+	int updateFrequency()
+	{
+		return mUpdateFrequency;
+	}
+
+	/*template<typename T>
 	void setValue(T val)
 	{
 		mAnyValue = val;
 		updateValue();
-	}
+	}*/
 
 
 
@@ -107,11 +133,17 @@ public:
 protected: ///methods:
 
 	void updateValue();
+
+	std::string mSourceFilter;
+	Zone::Type mZoneFilter;
+	int mUpdateFrequency;
+	AbstractRoutingEngine* routingEngine;
 	
 protected:
 	
 	boost::any mAnyValue;
 	string mPropertyName;
+	VehicleProperty::Property mAmbPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;
 	Access mAccess;

@@ -31,25 +31,38 @@
 #include <glib.h>
 #include <list>
 #include "timestamp.h"
+#include <debugout.h>
+#include <boost/algorithm/string.hpp>
 
 namespace Zone {
+
 enum Type {
 	None = 0,
-	Driver = 1,
-	FrontMiddle = 1 << 1,
-	Passenger = 1 << 2,
-	LeftRear = 1 << 3,
-	MiddleRear = 1 << 4,
-	RightRear = 1 << 5
+	Front = 1,
+	Middle = 1 << 1,
+	Right = 1 << 2,
+	Left = 1 << 3,
+	Rear = 1 << 4,
+	Center = 1 << 5
 };
+
+const Zone::Type FrontRight = Zone::Type(Front | Right);
+const Zone::Type FrontLeft = Zone::Type(Front | Left);
+const Zone::Type MiddleRight = Zone::Type(Middle | Right);
+const Zone::Type MiddleLeft = Zone::Type(Middle | Left);
+const Zone::Type RearRight = Zone::Type(Rear | Right);
+const Zone::Type RearLeft = Zone::Type(Rear| Left);
+
+typedef std::list<Zone::Type> ZoneList;
+
 }
 
 class AbstractPropertyType
 {
 public:
-	//AbstractPropertyType(): timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
+	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None) {}
 
-	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None), index(0) {}
+	virtual ~AbstractPropertyType() { }
 
 	virtual std::string toString() const = 0;
 
@@ -68,6 +81,13 @@ public:
 		return one == two;
 	}
 
+	bool operator != (AbstractPropertyType &other)
+	{
+		std::string one = toString();
+		std::string two = other.toString();
+		return one != two;
+	}
+
 	std::string name;
 
 	double timestamp;
@@ -77,8 +97,6 @@ public:
 	std::string sourceUuid;
 
 	Zone::Type zone;
-
-	int index;
 
 	void setValue(boost::any val)
 	{
@@ -116,6 +134,11 @@ public:
 	{
 		return g_variant_get_int32(v);
 	}
+
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -127,6 +150,10 @@ public:
 	static double value(GVariant* v)
 	{
 		return g_variant_get_double(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
 	}
 };
 
@@ -140,6 +167,10 @@ public:
 	{
 		return g_variant_get_uint16(v);
 	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -151,6 +182,10 @@ public:
 	static int16_t value(GVariant* v)
 	{
 		return g_variant_get_int16(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
 	}
 };
 
@@ -164,6 +199,10 @@ public:
 	{
 		return g_variant_get_byte(v);
 	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -175,6 +214,10 @@ public:
 	static uint32_t value(GVariant* v)
 	{
 		return g_variant_get_uint32(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
 	}
 };
 
@@ -188,6 +231,10 @@ public:
 	{
 		return g_variant_get_int64(v);
 	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
 };
 
 template <>
@@ -198,7 +245,11 @@ public:
 
 	static uint64_t value(GVariant* v)
 	{
-		g_variant_get_uint64(v);
+		return g_variant_get_uint64(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
 	}
 };
 
@@ -211,6 +262,11 @@ public:
 	static bool value(GVariant *v)
 	{
 		return g_variant_get_boolean(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		boost::algorithm::to_lower(v);
+		return v == "true" ? "1":"0";
 	}
 };
 
@@ -230,8 +286,9 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
+
 	}
 
 	BasicPropertyType & operator = (BasicPropertyType const & other)
@@ -240,8 +297,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 
 		return *this;
 	}
@@ -338,7 +395,7 @@ private:
 	template <class N>
 	void serialize(std::string  val,  typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
 	{
-		std::stringstream stream(val);
+		std::stringstream stream(GVS<T>::stringize(val));
 		N someTemp;
 		stream>>someTemp;
 		setValue(someTemp);
@@ -398,8 +455,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 	}
 
 	StringPropertyType & operator = (StringPropertyType const & other)
@@ -408,8 +465,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 
 		return *this;
 	}
@@ -472,8 +529,8 @@ public:
 		timestamp = other.timestamp;
 		sequence = other.sequence;
 		sourceUuid = other.sourceUuid;
-		index = other.index;
 		name = other.name;
+		zone = other.zone;
 	}
 
 	~ListPropertyType()
@@ -565,12 +622,15 @@ public:
 	{
 
 		GVariantBuilder params;
-		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
+		g_variant_builder_init(&params, ((const GVariantType *) "av"));
 
 		for(auto itr = mList.begin(); itr != mList.end(); itr++)
 		{
 			AbstractPropertyType* t = *itr;
-			g_variant_builder_add_value(&params, t->toVariant());
+			GVariant *var = t->toVariant();
+			GVariant *newvar = g_variant_new("v",var);
+			g_variant_builder_add_value(&params, newvar);
+			
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -582,6 +642,15 @@ public:
 	void fromVariant(GVariant* v)
 	{
 		/// TODO: fill this in
+		gsize dictsize = g_variant_n_children(v);
+		for (int i=0;i<dictsize;i++)
+		{
+			GVariant *childvariant = g_variant_get_child_value(v,i);
+			GVariant *innervariant = g_variant_get_variant(childvariant);
+			T *t = new T();
+			t->fromVariant(innervariant);
+			appendPriv(t);
+		}
 	}
 
 	std::list<AbstractPropertyType*> list() { return mList; }

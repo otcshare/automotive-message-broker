@@ -2,27 +2,44 @@
 #include "abstractroutingengine.h"
 #include "debugout.h"
 
-VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, signature, access, interface),routingEngine(re)
+VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access, AbstractDBusInterface *interface)
+	:AbstractProperty(propertyName, signature, access, interface), mInitialized(false)
 {
+	mAmbPropertyName = ambPropertyName;
+	routingEngine = re;
 	//set default value:
-	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(propertyName));
+	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName));
+}
 
+void VariantType::initialize()
+{
+	if(mInitialized) return;
 	AsyncPropertyRequest request;
-	request.property = mPropertyName;
+	request.property = mAmbPropertyName;
+	request.sourceUuidFilter = mSourceFilter;
+	request.zoneFilter = mZoneFilter;
 
 	using namespace std::placeholders;
-	request.completed = std::bind(&VariantType::asyncReply, this, _1);
+	request.completed = [this](AsyncPropertyReply* reply)
+	{
+		if(reply->success)
+			setValue(reply->value);
+		else
+			DebugOut(DebugOut::Error)<<"get request unsuccessful for "<<reply->property<<" : "<<reply->error<<endl;
 
-	re->getPropertyAsync(request);
+		mInitialized = true;
 
+		delete reply;
+	};
+
+	routingEngine->getPropertyAsync(request);
 }
 
 GVariant *VariantType::toGVariant()
 {
 	if(!value())
 	{
-		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
+		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
 
 		setValue(v);
 
@@ -36,18 +53,18 @@ GVariant *VariantType::toGVariant()
 
 void VariantType::fromGVariant(GVariant *val)
 {
-	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mPropertyName);
+	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
 	v->fromVariant( val );
 
 	AsyncSetPropertyRequest request;
-	request.property = mPropertyName;
+	request.property = mAmbPropertyName;
 	request.value = v;
 	request.completed = [](AsyncPropertyReply* reply)
 	{
 		/// TODO: throw dbus exception
 		if(!reply->success)
 		{
-			DebugOut(0)<<"Success fail";
+			DebugOut(DebugOut::Error)<<"setProperty fail: "<<reply->error<<endl;
 		}
 		delete reply;
 	};
@@ -55,10 +72,3 @@ void VariantType::fromGVariant(GVariant *val)
 	routingEngine->setProperty(request);
 }
 
-void VariantType::asyncReply(AsyncPropertyReply * reply)
-{
-	if(reply->success)
-		setValue(reply->value);
-
-	delete reply;
-}

@@ -83,7 +83,8 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 
 	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
 	{
-		(*itr)->supportedChanged(mMasterPropertyList);
+		AbstractSink* s = (*itr);
+		s->supportedChanged(mMasterPropertyList);
 	}
 
 	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
@@ -150,10 +151,12 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	}
 }
 
-void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyType *value, std::string uuid)
+void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 {
+	VehicleProperty::Property property = value->name;
+
 	SinkList list = propertySinkMap[property];
-	
+
 	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<property<<endl;
 
 	propertiesPerSecond++;
@@ -161,8 +164,49 @@ void Core::updateProperty(VehicleProperty::Property property, AbstractPropertyTy
 
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{
-		(*itr)->propertyChanged(property, value, uuid);
+		AbstractSink* sink = *itr;
+
+		auto isFiltered = filteredSourceSinkMap.find(sink);
+
+		if(isFiltered != filteredSourceSinkMap.end() )
+		{
+
+			std::string u = filteredSourceSinkMap[sink][property];
+			DebugOut()<<"Property ("<<property<<") for sink is filtered for source: "<<u<<endl;
+		}
+
+		if( (isFiltered != filteredSourceSinkMap.end() && filteredSourceSinkMap[sink][property] == uuid) || isFiltered == filteredSourceSinkMap.end())
+		{
+			/// FIXME: Set this here just in case a source neglects to:
+
+			if(value->sourceUuid != uuid)
+			{
+				//DebugOut(DebugOut::Warning)<<"Source not setting uuid for property "<<value->name<<endl;
+				value->sourceUuid = uuid;
+			}
+
+			sink->propertyChanged(property, value, uuid);
+		}
 	}
+}
+
+std::list<std::string> Core::sourcesForProperty(VehicleProperty::Property property)
+{
+	std::list<std::string> l;
+
+	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = *itr;
+
+		PropertyList s = src->supported();
+
+		if(ListPlusPlus<VehicleProperty::Property>(&s).contains(property))
+		{
+			l.push_back(src->uuid());
+		}
+	}
+
+	return l;
 }
 
 void Core::registerSink(AbstractSink *self)
@@ -194,8 +238,9 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 
 		bool supportsGet = supportedOps & AbstractSource::Get;
 
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet)
+		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet && (request.sourceUuidFilter == "" || request.sourceUuidFilter == src->uuid()))
 		{
+
 			src->getPropertyAsync(reply);
 
 			/** right now the owner of the reply becomes the requestor that called this method.
@@ -214,8 +259,8 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
 		AbstractSource* src = (*itr);
-		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::GetRanged)
+		if((src->supportedOperations() & AbstractSource::GetRanged)
+				&& (request.sourceUuid == "" || request.sourceUuid == src->uuid()))
 		{
 			src->getRangePropertyAsync(reply);
 		}
@@ -244,29 +289,18 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 {
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 
-	/** TODO: Change behavior of subscribe to subscribe even if no sources provide a
-	 *  given property.  When subscribers come online with support, core should tell
-	 *  the sources what properties have already been subscribed to.
-	 */
-
-	/*if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((property)))
-	{
-		DebugOut(1)<<__FUNCTION__<<"(): property not supported: "<<property<<endl;
-		return; 
-	}*/
-	
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
 		propertySinkMap[property] = SinkList();
 	}
-	
+
 	SinkList list = propertySinkMap[property];
-	
+
 	if(!ListPlusPlus<AbstractSink*>(&list).contains(self))
 	{
 		propertySinkMap[property].push_back(self);
 	}
-	
+
 	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
 		AbstractSource* src = (*itr);
@@ -276,17 +310,44 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 			src->subscribeToPropertyChanges(property);
 		}
 	}
+
+}
+
+void Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
+{
+	if(filteredSourceSinkMap.find(sink) == filteredSourceSinkMap.end() && sourceUuidFilter != "")
+	{
+		std::map<VehicleProperty::Property, std::string> propertyFilter;
+		propertyFilter[property] = sourceUuidFilter;
+		filteredSourceSinkMap[sink] = propertyFilter;
+	}
+	else if(sourceUuidFilter != "")
+	{
+		filteredSourceSinkMap[sink][property] = sourceUuidFilter;
+	}
+
+	subscribeToProperty(property,sink);
+}
+
+void Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self)
+{
+
 }
 
 void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		DebugOut(1)<<__FUNCTION__<<"property not supported: "<<property<<endl;
+		DebugOut(1)<<__FUNCTION__<<" property not subscribed to: "<<property<<endl;
 		return; 
 	}
 		
 	ListPlusPlus<AbstractSink*>(&propertySinkMap[property]).removeOne(self);
+
+	if( filteredSourceSinkMap.find(self) != filteredSourceSinkMap.end())
+	{
+		filteredSourceSinkMap.erase(self);
+	}
 
 	/// Now we check to see if this is the last subscriber
 	if(propertySinkMap.find(property) == propertySinkMap.end())
@@ -302,5 +363,39 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 			}
 		}
 	}
+}
+
+PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
+{
+	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = *itr;
+
+		if(src->uuid() == sourceUuid)
+		{
+			return src->getPropertyInfo(property);
+		}
+	}
+
+	return PropertyInfo::invalid();
+}
+
+std::list<string> Core::getSourcesForProperty(VehicleProperty::Property property)
+{
+	std::list<std::string> list;
+
+	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	{
+		AbstractSource* src = *itr;
+
+		PropertyList supportedProperties = src->supported();
+
+		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(property))
+		{
+			list.push_back(src->uuid());
+		}
+	}
+
+	return list;
 }
 

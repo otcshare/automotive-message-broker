@@ -4,6 +4,22 @@
 static const gchar introspection_xml[] =
   "<node>"
   "  <interface name='org.automotive.Manager'>"
+  "    <method name='FindObject'>"
+  "      <arg type='s' name='searchstring' direction='in'/>"
+  "      <arg type='ao' name='response' direction='out'/>"
+  "    </method>"
+  "    <method name='FindObjectForZone'>"
+  "      <arg type='s' name='searchstring' direction='in'/>"
+  "      <arg type='i' name='zone' direction='in'/>"
+  "      <arg type='o' name='response' direction='out'/>"
+  "    </method>"
+  "    <method name='List'>"
+  "      <arg type='as' name='response' direction='out'/>"
+  "    </method>"
+  "    <method name='ZonesForObjectName'>"
+  "      <arg type='s' name='searchstring' direction='in'/>"
+  "      <arg type='ai' name='response' direction='out'/>"
+  "    </method>"
   "    <method name='findProperty'>"
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='o' name='response' direction='out'/>"
@@ -21,6 +37,8 @@ static void handleMethodCall(GDBusConnection       *connection,
 							 gpointer               user_data)
 {
 
+	AutomotiveManager* manager = static_cast<AutomotiveManager*>(user_data);
+
 	std::string method = method_name;
 
 	if(method == "findProperty")
@@ -28,6 +46,76 @@ static void handleMethodCall(GDBusConnection       *connection,
 		gchar* arg;
 
 		g_variant_get(parameters,"(s)",&arg);
+
+		std::string objectToFind = arg;
+
+		if(objectToFind == "")
+		{
+			g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
+			return;
+		}
+
+		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(objectToFind);
+
+		if(!interfaces.size())
+		{
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Object not found");
+			return;
+		}
+
+		auto itr = interfaces.begin();
+
+		g_dbus_method_invocation_return_value(invocation, g_variant_new("(o)",(*itr)->objectPath().c_str()));
+		///TODO: we might need to clean up stuff there (like var)
+	}
+
+	else if(method == "FindObject")
+	{
+		gchar* arg;
+
+		g_variant_get(parameters,"(s)",&arg);
+
+		std::string objectToFind = arg;
+
+		if(objectToFind == "")
+		{
+			g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
+			return;
+		}
+
+		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(objectToFind);
+
+		if(!interfaces.size())
+		{
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Object not found");
+			return;
+		}
+
+		GVariantBuilder params;
+		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
+
+		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
+		{
+			AbstractDBusInterface* t = *itr;
+			if(!t->isSupported())
+				continue;
+			GVariant *newvar = g_variant_new("o",t->objectPath().c_str());
+			g_variant_builder_add_value(&params, newvar);
+
+		}
+
+		//GVariant* var =  g_variant_builder_end(&params);
+
+		g_dbus_method_invocation_return_value(invocation, g_variant_new("(ao)",&params));
+		///TODO: we might need to clean up stuff there (like var)
+	}
+
+	else if(method == "FindObjectForZone")
+	{
+		gchar* arg;
+		int zone;
+
+		g_variant_get(parameters,"(si)", &arg, &zone);
 
 		std::string propertyToFind = arg;
 
@@ -37,17 +125,94 @@ static void handleMethodCall(GDBusConnection       *connection,
 			return;
 		}
 
-		AbstractDBusInterface* interface = AbstractDBusInterface::getInterfaceForProperty(propertyToFind);
+		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(propertyToFind);
 
-		if(!interface)
+		if(!interfaces.size())
 		{
-			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Property not found");
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 			return;
 		}
 
-		g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)",interface->objectPath().c_str()));
+
+
+		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
+		{
+			AbstractDBusInterface* t = *itr;
+			if(t->zone() == (Zone::Type)zone)
+			{
+				g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)", t->objectPath().c_str()));
+				return;
+			}
+		}
+
+		g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 	}
 
+	else if (method == "ZonesForObjectName")
+	{
+		gchar* arg;
+
+		g_variant_get(parameters,"(s)",&arg);
+
+		std::string propertyToFind = arg;
+
+		if(propertyToFind == "")
+		{
+			g_dbus_method_invocation_return_error(invocation, G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
+			return;
+		}
+
+		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(propertyToFind);
+
+		if(!interfaces.size())
+		{
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
+			return;
+		}
+
+		GVariantBuilder params;
+		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
+
+		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
+		{
+			AbstractDBusInterface* t = *itr;
+			GVariant *newvar = g_variant_new("i",t->zone());
+			g_variant_builder_add_value(&params, newvar);
+
+		}
+
+		g_dbus_method_invocation_return_value(invocation,g_variant_new("(ai)",&params));
+	}
+	
+	else if(method == "List")
+	{
+		std::list<AbstractDBusInterface*> list = AbstractDBusInterface::interfaces();
+
+		if(!list.size())
+		{
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.Error", "No supported objects");
+			return;
+		}
+
+		GVariantBuilder builder;
+		g_variant_builder_init(&builder, G_VARIANT_TYPE_ARRAY);
+
+
+		for(auto itr = list.begin(); itr != list.end(); itr++)
+		{
+			if(!(*itr)->isSupported())
+				continue;
+
+			std::string objectName = (*itr)->objectName();
+
+			g_variant_builder_add(&builder, "s", objectName.c_str());
+		}
+
+
+		g_dbus_method_invocation_return_value(invocation,g_variant_new("(as)",&builder));
+	}
+
+	g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");	
 }
 
 static GVariant* getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
@@ -77,7 +242,7 @@ AutomotiveManager::AutomotiveManager(GDBusConnection *connection)
 	GDBusNodeInfo* introspection = g_dbus_node_info_new_for_xml(introspection_xml, &error);
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, "org.automotive.Manager");
 
-	regId = g_dbus_connection_register_object(mConnection, "/", mInterfaceInfo, &interfaceVTable, NULL, NULL, &error);
+	regId = g_dbus_connection_register_object(mConnection, "/", mInterfaceInfo, &interfaceVTable, this, NULL, &error);
 
 	if(error) throw -1;
 

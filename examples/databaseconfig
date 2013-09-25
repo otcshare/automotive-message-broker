@@ -10,6 +10,7 @@
 			"name" : "Database",
 			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
 			"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
+			"databaseFile" : "/tmp/storage",
 			"startOnLoad" : "true",
 			"bufferLength" : "1"
 		},
@@ -18,10 +19,9 @@
 			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
 		},
 		{
-			"name" : "Websocket sink",
-			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
-			"interface" : "lo"
+			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
 		}
+		
 	]
 }
 

@@ -19,6 +19,8 @@ target_link_libraries(examplesinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${
 install(TARGETS examplesinkplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 install(TARGETS examplesourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
+add_subdirectory(common)
+
 add_subdirectory(wheel)
 add_subdirectory(dbus)
 add_subdirectory(websocketsink)
@@ -30,3 +32,7 @@ add_subdirectory(database)
 add_subdirectory(opencvlux)
 add_subdirectory(gpsd)
 add_subdirectory(murphyplugin)
+add_subdirectory(testplugin)
+add_subdirectory(bluemonkey)
+add_subdirectory(gpsnmea)
+add_subdirectory(openxc)

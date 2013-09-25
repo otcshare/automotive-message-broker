@@ -44,7 +44,6 @@ public:
 	~PluginLoader();
 
 	SourceList sources();
-	SinkList sinks();
 
 	IMainLoop* mainloop();
 

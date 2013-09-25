@@ -10,7 +10,7 @@ class AntilockBrakingSystemProperty: public DBusSink
 {
 public:
 	AntilockBrakingSystemProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.AntilockBrakingSystem","/org/automotive/drivingSafety/AntilockBrakingSystem", re, connection, map<string, string>())
+		:DBusSink("AntilockBrakingSystem", re, connection, map<string, string>())
 	{
 
 		/** @attributeName AntilockBrakingSystem
@@ -21,7 +21,7 @@ public:
 		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -30,7 +30,7 @@ class TractionControlSystemProperty: public DBusSink
 {
 public:
 	TractionControlSystemProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.TractionControlSystem","/org/automotive/drivingSafety/TractionControlSystem", re, connection, map<string, string>())
+		:DBusSink("TractionControlSystem", re, connection, map<string, string>())
 	{
 
 		/** @attributeName TractionControlSystem
@@ -41,7 +41,7 @@ public:
 		wantPropertyVariant(VehicleProperty::TractionControlSystem, "TractionControlSystem", "b", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -51,7 +51,7 @@ class VehicleTopSpeedLimitProperty: public DBusSink
 {
 public:
 	VehicleTopSpeedLimitProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.VehicleTopSpeedLimit","/org/automotive/drivingSafety/VehicleTopSpeedLimit", re, connection, map<string, string>())
+		:DBusSink("VehicleTopSpeedLimit", re, connection, map<string, string>())
 	{
 
 		/** @attributeName VehicleTopSpeedLimit
@@ -62,7 +62,7 @@ public:
 		wantPropertyVariant(VehicleProperty::VehicleTopSpeedLimit, "VehicleTopSpeedLimit", "q", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -71,14 +71,10 @@ class AirbagStatusProperty: public DBusSink
 {
 public:
 	AirbagStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.AirbagStatus","/org/automotive/drivingSafety/AirbagStatus", re, connection, map<string, string>())
+		:DBusSink("AirbagStatus", re, connection, map<string, string>())
 	{
 
 		/**
-		 * @enum const unsigned short AIRBAGLOCATION_DRIVER = 0;
-		 * @enum const unsigned short AIRBAGLOCATION_PASSENGER= 1;
-		 * @enum const unsigned short AIRBAGLOCATION_LEFTSIDE = 2;
-		 * @enum const unsigned short AIRBAGLOCATION_RIGHTSIDE = 3;
 		 * @enum const unsigned short AIRBAGSTATUS_INACTIVE = 0;
 		 * @enum const unsigned short AIRBAGSTATUS_ACTIVE = 1;
 		 * @enum const unsigned short AIRBAGSTATUS_DEPLOYED = 2;
@@ -87,12 +83,12 @@ public:
 		/** @attributeName AirbagStatus
 		 *  @type object
 		 *  @access readonly
-		 *  @attributeComment \brief MUST returns a dictionary of Airbag (byte) and Status (byte) (see AIRBAGLOCATION_* and AIRBAGSTATUS_*)
+		 *  @attributeComment \brief MUST returns airbag status (byte) (see AIRBAGSTATUS_*)
 		 **/
-		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", "a{yy}", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", "y", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		//
 	}
 };
 
@@ -101,7 +97,7 @@ class DoorStatusProperty: public DBusSink
 {
 public:
 	DoorStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.DoorStatus","/org/automotive/drivingSafety/DoorStatus", re, connection, map<string, string>())
+		:DBusSink("DoorStatus", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short DOORLOCATION_DRIVER= 0;
@@ -140,7 +136,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::DoorLockStatus, "ChildLockStatus", "b", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -149,7 +145,7 @@ class SeatBeltStatusProperty: public DBusSink
 {
 public:
 	SeatBeltStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.SeatBeltStatus","/org/automotive/drivingSafety/SeatBeltStatus", re, connection, map<string, string>())
+		:DBusSink("SeatBeltStatus", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short SEATBELTLOCATION_DRIVER= 0;
@@ -168,7 +164,7 @@ public:
 		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "SeatBeltStatus", "a(yb)", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -177,7 +173,7 @@ class OccupantStatusProperty: public DBusSink
 {
 public:
 	OccupantStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.OccupantStatus","/org/automotive/drivingSafety/OccupantStatus", re, connection, map<string, string>())
+		:DBusSink("OccupantStatus", re, connection, map<string, string>())
 	{
 
 
@@ -201,7 +197,7 @@ public:
 		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", "a(yy)", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -210,7 +206,7 @@ class ObstacleDistanceProperty: public DBusSink
 {
 public:
 	ObstacleDistanceProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.ObstacleDistance","/org/automotive/drivingSafety/ObstacleDistance", re, connection, map<string, string>())
+		:DBusSink("ObstacleDistance", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short DISTANCESENSORLOCATION_LEFTFRONT = 0;
@@ -229,7 +225,7 @@ public:
 		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", "a{yd}", AbstractProperty::Read);
 
 
-		supportedChanged(re->supported());
+		
 	}
 };
 

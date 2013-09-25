@@ -96,11 +96,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
     switch (type) {
         case MRP_MSG_FIELD_STRING:
         {
-            StringPropertyType *prop = new StringPropertyType(value.str);
+			StringPropertyType *prop = new StringPropertyType(dstr,value.str);
 
             if (!s->hasProperty(dstr)) {
                 VehicleProperty::registerProperty(dstr,
-                        [](){return new StringPropertyType("");});
+						[dstr](){return new StringPropertyType(dstr,"");});
             }
 
             // std::cout << "string:" << value.str << std::endl;
@@ -110,11 +110,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
         case MRP_MSG_FIELD_DOUBLE:
         {
             BasicPropertyType<double> *prop =
-                    new BasicPropertyType<double>(value.dbl);
+					new BasicPropertyType<double>(dstr,value.dbl);
 
             if (!s->hasProperty(dstr)) {
                 VehicleProperty::registerProperty(dstr,
-                        [](){return new BasicPropertyType<double>(0);});
+						[dstr](){return new BasicPropertyType<double>(dstr,0);});
             }
 
             // std::cout << "double:" << value.dbl << std::endl;
@@ -124,11 +124,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
         case MRP_MSG_FIELD_BOOL:
         {
             BasicPropertyType<bool> *prop =
-                    new BasicPropertyType<bool>(value.bln);
+					new BasicPropertyType<bool>(dstr,value.bln);
 
             if (!s->hasProperty(dstr)) {
                 VehicleProperty::registerProperty(dstr,
-                        [](){return new BasicPropertyType<bool>(FALSE);});
+						[dstr](){return new BasicPropertyType<bool>(dstr,FALSE);});
             }
 
             // std::cout << "boolean:" << value.bln << std::endl;
@@ -138,11 +138,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
         case MRP_MSG_FIELD_UINT32:
         {
             BasicPropertyType<uint32_t> *prop =
-                    new BasicPropertyType<uint32_t>(value.u32);
+					new BasicPropertyType<uint32_t>(dstr,value.u32);
 
             if (!s->hasProperty(dstr)) {
                 VehicleProperty::registerProperty(dstr,
-                        [](){return new BasicPropertyType<uint32_t>(0);});
+						[dstr](){return new BasicPropertyType<uint32_t>(dstr,0);});
             }
 
             // std::cout << "uint32:" << value.u32 << std::endl;
@@ -152,11 +152,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
         case MRP_MSG_FIELD_UINT16:
         {
             BasicPropertyType<uint16_t> *prop =
-                    new BasicPropertyType<uint16_t>(value.u16);
+					new BasicPropertyType<uint16_t>(dstr,value.u16);
 
             if (!s->hasProperty(dstr)) {
                 VehicleProperty::registerProperty(dstr,
-                        [](){return new BasicPropertyType<uint16_t>(0);});
+						[dstr](){return new BasicPropertyType<uint16_t>(dstr,0);});
             }
 
             // std::cout << "uint16:" << value.u16 << std::endl;
@@ -166,11 +166,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
         case MRP_MSG_FIELD_INT32:
         {
             BasicPropertyType<int32_t> *prop =
-                    new BasicPropertyType<int32_t>(value.s32);
+					new BasicPropertyType<int32_t>(dstr, value.s32);
 
             if (!s->hasProperty(dstr)) {
                 VehicleProperty::registerProperty(dstr,
-                        [](){return new BasicPropertyType<int32_t>(0);});
+						[dstr](){return new BasicPropertyType<int32_t>(dstr,0);});
             }
 
             // std::cout << "int32:" << value.s32 << std::endl;
@@ -180,11 +180,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
         case MRP_MSG_FIELD_INT16:
         {
             BasicPropertyType<int16_t> *prop =
-                    new BasicPropertyType<int16_t>(value.s16);
+					new BasicPropertyType<int16_t>(dstr, value.s16);
 
             if (!s->hasProperty(dstr)) {
                 VehicleProperty::registerProperty(dstr,
-                        [](){return new BasicPropertyType<int16_t>(0);});
+						[dstr](){return new BasicPropertyType<int16_t>(dstr, 0);});
             }
 
             // std::cout << "int16:" << value.s16 << std::endl;

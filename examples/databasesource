@@ -3,7 +3,8 @@
 		{
 			"name" : "Database Source",
 			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
-			"playbackOnLoad" : "true"
+			"playbackOnLoad" : "true",
+			"databaseFile" : "storage.db"
 		}
 	],
 	"sinks": [

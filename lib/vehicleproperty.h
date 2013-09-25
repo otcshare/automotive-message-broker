@@ -30,6 +30,7 @@
 #include "abstractpropertytype.h"
 #include "mappropertytype.hpp"
 
+
 namespace ButtonEvents {
 enum ButtonEventType {
 	NoButton = 0,
@@ -155,13 +156,6 @@ enum Status
 }
 
 namespace Airbag {
-enum Location
-{
-	Driver = 0,
-	Passenger,
-	LeftSide,
-	RightSide
-};
 
 enum Status
 {
@@ -285,8 +279,8 @@ enum AirflowDirection
 
 #define PROPERTYTYPEBASIC1(property, valueType) \
 	class property ## Type : public BasicPropertyType<valueType> { \
-	public: property ## Type(): BasicPropertyType("property") {} \
-	property ## Type(valueType val) : BasicPropertyType("property", val) {} \
+	public: property ## Type(): BasicPropertyType( #property) {} \
+	property ## Type(valueType val) : BasicPropertyType(#property, val) {} \
 	};
 
 #define PROPERTYTYPENOVAL(property, propertyType, baseClass) \
@@ -680,8 +674,7 @@ public:
 	//typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
 
 	static const Property AirbagStatus;
-	PROPERTYTYPENOVAL(AirbagStatus, AirbagStatusType, MapPropertyType<BasicPropertyType<Airbag::Location> BOOST_PP_COMMA() BasicPropertyType<Airbag::Status> >)
-	//typedef MapPropertyType<BasicPropertyType<Airbag::Location>, BasicPropertyType<Airbag::Status> > AirbagStatusType;
+	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
 
 	static const Property DoorStatus;
 	PROPERTYTYPENOVAL(DoorStatus, DoorStatusType,
@@ -771,6 +764,9 @@ public:
 	static const Property ConvertibleRoof;
 	PROPERTYTYPEBASIC(ConvertibleRoof, bool)
 	//typedef BasicPropertyType<bool> ConvertibleRoofType;
+
+	static const Property NightMode;
+	PROPERTYTYPEBASIC(NightMode, bool)
 
 	/** END PROPERTIES **/
 

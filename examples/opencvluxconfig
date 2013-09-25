@@ -7,6 +7,7 @@
 			"threaded" : "true",
 			"kinect" : "false",
 			"opencl" : "false",
+			"cuda" : "true",
 			"pixelLowerBound" : "0",
 			"pixelUpperBound" : "255",
 			"fps" : "30",
@@ -16,9 +17,7 @@
 	"sinks": [
 		{
 			"name" : "Example sink",
-			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so",
-			"interface" : "lo",
-			"port" : "23000"
+			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
 		} 
 	]
 }

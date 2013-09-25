@@ -29,8 +29,8 @@ class WebSocketSink : public AbstractSink
 public:
 	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty);
 	~WebSocketSink();
-	string uuid() ;
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string  uuid);
+	const string uuid() ;
+	void propertyChanged(AbstractPropertyType *value, const std::string &uuid);
 	void supportedChanged(PropertyList supportedProperties);
 	PropertyList subscriptions();
 	libwebsocket *socket() { return m_wsi; }

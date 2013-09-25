@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
 #include "timestamp.h"
 
 using namespace std;
@@ -40,51 +39,51 @@ public:
 	DebugOut(int debugLevel = 4)
 	{
 		mDebugLevel = debugLevel;
-		ostream out(buf);
-
-		out.precision(15);
 
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 		{
+			ostream out(buf);
+			out.precision(15);
 			out<<bufferTime(amb::currentTime())<<" | ";
 
 			if(mDebugLevel == Error)
-				out<<" ERROR ";
+				out<<"ERROR ";
 			if(mDebugLevel == Warning)
-				out<<" WARNING ";
+				out<<"WARNING ";
 		}
 	}
-
 	DebugOut const& operator << (string message) const
 	{
-		ostream out(buf);
-
-		out.precision(15);
-
-		if(mDebugLevel <= debugThreshhold)
-			 out<<message<<" ";
+		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
+		{
+			ostream out(buf);
+			out.precision(15);
+			out<<message<<" ";
+		}
 		return *this;
 	}
 
 	DebugOut const& operator << (ostream & (*manip)(std::ostream&)) const
 	{
-		ostream out(buf);
 
-		out.precision(15);
 
-		if(mDebugLevel <= debugThreshhold)
-			 out<<endl;
+		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
+		{
+			ostream out(buf);
+			out.precision(15);
+			out<<endl;
+		}
 		return *this;
 	}
 	
 	DebugOut const & operator << (double val) const
 	{
-		ostream out(buf);
-
-		out.precision(15);
-
-		if(mDebugLevel <= debugThreshhold)
-			 out<<val<<" ";
+		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
+		{
+			ostream out(buf);
+			out.precision(15);
+			out<<val<<" ";
+		}
 		return *this;
 	}
 

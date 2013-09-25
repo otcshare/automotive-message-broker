@@ -46,10 +46,40 @@ static gboolean timeoutCallback(gpointer data)
 ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSource(re, config), velocity(0), engineSpeed(0)
 {
-	re->setSupported(supported(), this);
 	debugOut("setting timeout");
 	g_timeout_add(1000, timeoutCallback, this );
-	
+
+	addPropertySupport(VehicleProperty::EngineSpeed, Zone::None);
+	addPropertySupport(VehicleProperty::VehicleSpeed, Zone::None);
+	addPropertySupport(VehicleProperty::AccelerationX, Zone::None);
+	addPropertySupport(VehicleProperty::TransmissionShiftPosition, Zone::None);
+	addPropertySupport(VehicleProperty::SteeringWheelAngle, Zone::None);
+	addPropertySupport(VehicleProperty::ThrottlePosition, Zone::None);
+	addPropertySupport(VehicleProperty::EngineCoolantTemperature, Zone::None);
+	addPropertySupport(VehicleProperty::VIN, Zone::None);
+	addPropertySupport(VehicleProperty::WMI, Zone::None);
+	addPropertySupport(VehicleProperty::BatteryVoltage, Zone::None);
+	addPropertySupport(VehicleProperty::MachineGunTurretStatus, Zone::None);
+	addPropertySupport(VehicleProperty::ExteriorBrightness, Zone::None);
+	addPropertySupport(VehicleProperty::DoorsPerRow, Zone::None);
+	addPropertySupport(VehicleProperty::AirbagStatus, Zone::FrontLeft);
+
+	Zone::ZoneList airbagZones;
+	airbagZones.push_back(Zone::FrontLeft);
+	airbagZones.push_back(Zone::FrontRight);
+	airbagZones.push_back(Zone::RearLeft);
+	airbagZones.push_back(Zone::RearRight);
+
+	airbagStatus[Zone::FrontLeft] = Airbag::Active;
+	airbagStatus[Zone::FrontRight] = Airbag::Inactive;
+	airbagStatus[Zone::RearLeft] = Airbag::Deployed;
+	airbagStatus[Zone::RearRight] = Airbag::Deployed;
+
+	PropertyInfo airbagInfo(0,airbagZones);
+
+	propertyInfoMap[VehicleProperty::AirbagStatus] = airbagInfo;
+
+	re->setSupported(supported(), this);
 }
 
 
@@ -60,7 +90,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	
 }
 
-string ExampleSourcePlugin::uuid()
+const string ExampleSourcePlugin::uuid()
 {
 	return "6dd4268a-c605-4a06-9034-59c1e8344c8e";
 }
@@ -153,22 +183,36 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	}
 	else if(reply->property == VehicleProperty::AirbagStatus)
 	{
-		VehicleProperty::AirbagStatusType temp;
+		if(airbagStatus.find(reply->zoneFilter) == airbagStatus.end())
+		{
+			reply->success = false;
+			reply->error = AsyncPropertyReply::ZoneNotSupported;
+			reply->completed(reply);
+		}
 
-		temp.append(Airbag::Driver, Airbag::Active);
-		temp.append(Airbag::Passenger, Airbag::Active);
-		temp.append(Airbag::LeftSide, Airbag::Active);
-		temp.append(Airbag::RightSide, Airbag::Active);
+		else
+		{
 
-		reply->value = &temp;
-		reply->success = true;
-		reply->completed(reply);
+			VehicleProperty::AirbagStatusType temp;
+			temp.setValue(airbagStatus[reply->zoneFilter]);
+			temp.zone = reply->zoneFilter;
+
+			reply->value = &temp;
+			reply->success = true;
+			reply->completed(reply);
+		}
 	}
 	else if(reply->property == VehicleProperty::MachineGunTurretStatus)
 	{
 		VehicleProperty::MachineGunTurretStatusType temp(true);
 		reply->value = &temp;
 		reply->success = true;
+		reply->completed(reply);
+	}
+	else
+	{
+		reply->success=false;
+		reply->error = AsyncPropertyReply::InvalidOperation;
 		reply->completed(reply);
 	}
 }
@@ -190,24 +234,7 @@ void ExampleSourcePlugin::subscribeToPropertyChanges(VehicleProperty::Property p
 
 PropertyList ExampleSourcePlugin::supported()
 {
-	PropertyList props;
-	props.push_back(VehicleProperty::EngineSpeed);
-	props.push_back(VehicleProperty::VehicleSpeed);
-	props.push_back(VehicleProperty::AccelerationX);
-	props.push_back(VehicleProperty::TransmissionShiftPosition);
-	props.push_back(VehicleProperty::SteeringWheelAngle);
-	props.push_back(VehicleProperty::ThrottlePosition);
-	props.push_back(VehicleProperty::EngineCoolantTemperature);
-	props.push_back(VehicleProperty::VIN);
-	props.push_back(VehicleProperty::WMI);
-	props.push_back(VehicleProperty::BatteryVoltage);
-	props.push_back(VehicleProperty::MachineGunTurretStatus);
-	props.push_back(VehicleProperty::ExteriorBrightness);
-	props.push_back(VehicleProperty::DoorsPerRow);
-	props.push_back(VehicleProperty::AirbagStatus);
-	props.push_back(VehicleProperty::MachineGunTurretStatus);
-	
-	return props;
+	return mSupported;
 }
 
 int ExampleSourcePlugin::supportedOperations()
@@ -260,4 +287,17 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp, uuid());
 	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid());
 	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
+}
+
+void ExampleSourcePlugin::addPropertySupport(VehicleProperty::Property property, Zone::Type zone)
+{
+	mSupported.push_back(property);
+
+	std::list<Zone::Type> zones;
+
+	zones.push_back(zone);
+
+	PropertyInfo info(0, zones);
+
+	propertyInfoMap[property] = info;
 }

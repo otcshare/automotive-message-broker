@@ -1,0 +1,25 @@
+# ambd - ambd job file
+
+description "ambd service"
+author "Me <myself@i.com>"
+
+# Stanzas
+#
+# Stanzas control when and how a process is started and stopped
+# See a list of stanzas here: http://upstart.ubuntu.com/wiki/Stanzas#respawn
+
+start on stopped rc
+stop on stopping bluetooth
+
+# Automatically restart process if crashed
+respawn
+
+# Essentially lets upstart know the process will detach itself to the background
+expect fork
+
+# Run before process
+pre-start script
+end script
+
+# Start the process
+exec ambd -c /etc/ambd/config.tripzero -l /home/ubuntu/ambd.log -D -d5

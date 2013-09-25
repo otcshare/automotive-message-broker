@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <boost/assert.hpp>
 
+#include <listplusplus.h>
+
 using namespace std;
 
 #include "debugout.h"
@@ -122,12 +124,13 @@ string GpsdPlugin::uuid()
 
 void GpsdPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
-	/*if(reply->property == VehicleProperty::ExteriorBrightness)
+	PropertyList s = supported();
+	if(ListPlusPlus<VehicleProperty::Property>(&s).contains(reply->property))
 	{
 		replyQueue.push_back(reply);
-	}*/
+	}
 
-//	else  ///We don't support what you are asking for.  Reply false
+	else  ///We don't support what you are asking for.  Reply false
 	{
 		reply->value = NULL;
 		reply->success = false;
@@ -181,32 +184,42 @@ void GpsdPlugin::updateProperty()
 {
 	VehicleProperty::LatitudeType lat(shared->gps.fix.latitude);
 
-	if(lat.toString() != shared->oldlat)
+	if(shared->oldlat == nullptr || lat != (*shared->oldlat))
 	{
-		shared->oldlat = lat.toString();
+		if(shared->oldlat) delete shared->oldlat;
+
+		shared->oldlat = lat.copy();
+
 		routingEngine->updateProperty(VehicleProperty::Latitude,&lat, uuid());
 	}
 
 	VehicleProperty::LongitudeType lon(shared->gps.fix.longitude);
-	if(lon.toString() != shared->oldlon)
+	if(shared->oldlon == nullptr || lon != (*shared->oldlon))
 	{
-		shared->oldlon = lon.toString();
+		if(shared->oldlon) delete shared->oldlon;
+
+		shared->oldlon = lon.copy();
 		routingEngine->updateProperty(VehicleProperty::Longitude, &lon, uuid());
 	}
 
 	VehicleProperty::AltitudeType alt(shared->gps.fix.altitude);
 
-	if(alt.toString() != shared->oldalt)
+	if(shared->oldalt == nullptr || alt != (*shared->oldalt))
 	{
-		shared->oldalt = alt.toString();
+		if(shared->oldalt) delete shared->oldalt;
+
+		shared->oldalt = alt.copy();
+
 		routingEngine->updateProperty(VehicleProperty::Altitude, &alt, uuid());
 	}
 
 	VehicleProperty::DirectionType heading(shared->gps.fix.track);
 
-	if(heading.toString() != shared->oldheading)
+	if(shared->oldheading == nullptr || heading != (*shared->oldheading))
 	{
-		shared->oldalt = heading.toString();
+		if(shared->oldheading) delete shared->oldheading;
+
+		shared->oldheading = heading.copy();
 		routingEngine->updateProperty(VehicleProperty::Direction, &heading, uuid());
 	}
 
@@ -214,11 +227,44 @@ void GpsdPlugin::updateProperty()
 	{
 		VehicleProperty::VehicleSpeedType speed(shared->gps.fix.speed);
 
-		if(speed.toString() != shared->oldspeed)
+		if(shared->oldspeed == nullptr || speed != (*shared->oldspeed))
 		{
-			shared->oldspeed = speed.toString();
+			if(shared->oldspeed) delete shared->oldspeed;
+
+			shared->oldspeed = speed.copy();
 			routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &speed, uuid());
 		}
 	}
+
+	for(auto itr = replyQueue.begin(); itr != replyQueue.end(); itr++)
+	{
+		AsyncPropertyReply* reply = (*itr);
+		if(reply->property == shared->oldheading->name)
+		{
+			reply->value = shared->oldheading;
+		}
+		else if(reply->property == shared->oldalt->name)
+		{
+			reply->value = shared->oldalt;
+		}
+		else if(reply->property == shared->oldlat->name)
+		{
+			reply->value = shared->oldlat;
+		}
+		else if(reply->property == shared->oldlon->name)
+		{
+			reply->value = shared->oldlon;
+		}
+		else if(reply->property == shared->oldspeed->name)
+		{
+			reply->value = shared->oldspeed;
+		}
+
+		reply->success = true;
+		reply->completed(reply);
+	}
+
+	replyQueue.clear();
+
 }
 

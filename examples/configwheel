@@ -8,8 +8,8 @@
 	],
 	"sinks": [
 		{
-			 "name" : "WebSocketSink",
-			 "path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so"
+			 "name" : "DBusSink",
+			 "path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
 		} 
 	]
 }

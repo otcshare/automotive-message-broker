@@ -11,7 +11,7 @@ class OdometerProperty: public DBusSink
 {
 public:
 	OdometerProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.Odometer","/org/automotive/maintenance/Odometer", re, connection, map<string, string>())
+		:DBusSink("Odometer", re, connection, map<string, string>())
 	{
 		/** @attributeName Odometer
 		 *  @type unsigned long
@@ -20,7 +20,7 @@ public:
 		 **/
 		wantProperty<uint>(VehicleProperty::Odometer, "Odometer", "i", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -29,7 +29,7 @@ class FluidProperty : public DBusSink
 {
 public:
 	FluidProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.Fluid","/org/automotive/maintenance/Fluid", re, connection, map<string, string>())
+		:DBusSink("Fluid", re, connection, map<string, string>())
 	{
 		/** @attributeName Transmission
 		 *  @type unsigned short
@@ -59,7 +59,7 @@ class BatteryProperty: public DBusSink
 {
 public:
 	BatteryProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.Battery","/org/automotive/maintenance/Battery", re, connection, map<string, string>())
+		:DBusSink("Battery", re, connection, map<string, string>())
 	{
 		/** @attributeName Voltage
 		 *  @type double
@@ -74,7 +74,7 @@ public:
 		 *  @attributeComment \brief MUST return battery current in Amperes
 		 **/
 		wantProperty<double>(VehicleProperty::BatteryCurrent, "Current", "d", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -83,7 +83,7 @@ class TirePressureProperty: public DBusSink
 {
 public:
 	TirePressureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.TirePressure","/org/automotive/maintenance/TirePressure", re, connection, map<string, string>())
+		:DBusSink("TirePressure", re, connection, map<string, string>())
 	{
 		/** @attributeName LeftFront
 		 *  @type double
@@ -112,7 +112,7 @@ public:
 		 *  @attributeComment \brief MUST return right rear tire pressure in kPa.
 		 **/
 		wantProperty<double>(VehicleProperty::TirePressureRightRear, "RightRear", "d", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -121,7 +121,7 @@ class TireTemperatureProperty: public DBusSink
 {
 public:
 	TireTemperatureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.TireTemperature","/org/automotive/maintenance/TireTemperature", re, connection, map<string, string>())
+		:DBusSink("TireTemperature", re, connection, map<string, string>())
 	{
 		/** @attributeName LeftFront
 		 *  @type double
@@ -150,7 +150,7 @@ public:
 		 *  @attributeComment \brief MUST return right rear tire temperature in Celcius.
 		 **/
 		wantProperty<double>(VehicleProperty::TireTemperatureRightRear, "RightRear", "d", AbstractProperty::Read);
-		supportedChanged(re->supported());
+		
 	}
 };
 

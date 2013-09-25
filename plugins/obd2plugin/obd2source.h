@@ -1,4 +1,3 @@
-
 /*
 Copyright (C) 2012 Intel Corporation
 
@@ -134,7 +133,7 @@ class OBD2Source : public AbstractSource
 public:
 	OBD2Source(AbstractRoutingEngine* re, map<string, string> config);
 	~OBD2Source();
-	string uuid();
+	const string uuid();
 	int portHandle;
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply){}
@@ -154,7 +153,7 @@ public:
 	void engineCoolantTemp(int temp);
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
+
 	void supportedChanged(PropertyList) {}
 	GAsyncQueue* commandQueue;
 	GAsyncQueue* statusQueue;
@@ -177,11 +176,13 @@ public:
 	bool m_threadLive;
 	GThread *m_gThread;
 
+	typedef BasicPropertyType<bool> Obd2ConnectType;
+
 private:
 	PropertyList m_supportedProperties;
 	std::map<VehicleProperty::Property, AbstractPropertyType*> oldValueMap;
 	GMutex *threadQueueMutex;
-	typedef BasicPropertyType<bool> Obd2ConnectType;
+
 
 };
 

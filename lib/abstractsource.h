@@ -28,12 +28,13 @@
 #include "vehicleproperty.h"
 #include "abstractroutingengine.h"
 #include "abstractpropertytype.h"
+#include "propertyinfo.hpp"
 
-using namespace std;
+
 
 class AbstractSource;
 
-typedef list<AbstractSource*> SourceList;
+typedef std::list<AbstractSource*> SourceList;
 
 
 
@@ -60,13 +61,15 @@ public:
 	virtual PropertyList supported() = 0;
 
 	virtual int supportedOperations() = 0;
+
+	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 	
 
 protected:
 	AbstractRoutingEngine* routingEngine;
 	
 private:
-	AbstractSource():AbstractSink(nullptr, map<string,string>()) { }
+	AbstractSource():AbstractSink(nullptr, std::map<std::string,std::string>()) { }
 };
 
 #endif // ABSTRACTSOURCE_H

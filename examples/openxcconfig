@@ -1,0 +1,17 @@
+{
+	"sources" : [ 
+		{
+			"name" : "openxc plugin",
+			"path" : "/usr/lib/automotive-message-broker/openxcplugin.so",
+			"test" : "true",
+			"device" : "10:C6:FC:27:C3:1C",
+			"bluetoothAdapter" : ""
+		}
+	],
+	"sinks": [
+		{
+			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
+		}
+	]
+}
+

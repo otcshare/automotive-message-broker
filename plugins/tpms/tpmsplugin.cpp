@@ -102,9 +102,9 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	
 }
 
-string TpmsPlugin::uuid()
+const string TpmsPlugin::uuid()
 {
-	return "CHANGE THIS 6dd4268a-c605-4a06-9034-59c1e8344c8e";
+	return "5e896a00-15b3-11e3-8ffd-0800200c9a66";
 }
 
 
@@ -113,48 +113,58 @@ void TpmsPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	DebugOut() << "TPMS: getPropertyAsync called for property: " << reply->property << endl;
 
     if(reply->property == VehicleProperty::TirePressureLeftFront) {
-      VehicleProperty::TirePressureType temp(lfPressure);
+	  VehicleProperty::TirePressureLeftFrontType temp(lfPressure);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
     else if(reply->property == VehicleProperty::TirePressureRightFront) {
-      VehicleProperty::TirePressureType temp(rfPressure);
+	  VehicleProperty::TirePressureRightFrontType temp(rfPressure);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
     else if(reply->property == VehicleProperty::TirePressureLeftRear) {
-      VehicleProperty::TirePressureType temp(lrPressure);
+	  VehicleProperty::TirePressureLeftRearType temp(lrPressure);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
     else if(reply->property == VehicleProperty::TirePressureRightRear) {
-      VehicleProperty::TirePressureType temp(rrPressure);
+	  VehicleProperty::TirePressureRightRearType temp(rrPressure);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
     else if(reply->property == VehicleProperty::TireTemperatureLeftFront) {
-      VehicleProperty::EngineSpeedType temp(lfTemperature);
+	  VehicleProperty::TireTemperatureLeftFrontType temp(lfTemperature);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
     else if(reply->property == VehicleProperty::TireTemperatureRightFront) {
-      VehicleProperty::EngineSpeedType temp(rfTemperature);
+	  VehicleProperty::TireTemperatureRightFrontType temp(rfTemperature);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
     else if(reply->property == VehicleProperty::TireTemperatureLeftRear) {
-      VehicleProperty::EngineSpeedType temp(lrTemperature);
+	  VehicleProperty::TireTemperatureLeftRearType temp(lrTemperature);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
     else if(reply->property == VehicleProperty::TireTemperatureRightRear) {
-      VehicleProperty::EngineSpeedType temp(rrTemperature);
+	  VehicleProperty::TireTemperatureRightRearType temp(rrTemperature);
+	  reply->success = true;
       reply->value = &temp;
       reply->completed(reply);
     }
 
     else {
       DebugOut() << "TPMS: no such getProperty type: " << reply->property << endl;
+	  reply->success = false;
+	  reply->error = AsyncPropertyReply::InvalidOperation;
       reply->value = nullptr;
       reply->completed(reply);
 	}
@@ -290,23 +300,23 @@ int TpmsPlugin::readValues()
     }
   }
 
-  VehicleProperty::TirePressureType lfPres(lfPressure);
-  VehicleProperty::TirePressureType rfPres(rfPressure);
-  VehicleProperty::TirePressureType lrPres(lrPressure);
-  VehicleProperty::TirePressureType rrPres(rrPressure);
-  VehicleProperty::TireTemperatureType lfTemp(lfTemperature);
-  VehicleProperty::TireTemperatureType rfTemp(rfTemperature);
-  VehicleProperty::TireTemperatureType lrTemp(lrTemperature);
-  VehicleProperty::TireTemperatureType rrTemp(rrTemperature);
+  VehicleProperty::TirePressureLeftFrontType lfPres(lfPressure);
+  VehicleProperty::TirePressureRightFrontType rfPres(rfPressure);
+  VehicleProperty::TirePressureLeftRearType lrPres(lrPressure);
+  VehicleProperty::TirePressureRightRearType rrPres(rrPressure);
+  VehicleProperty::TireTemperatureLeftFrontType lfTemp(lfTemperature);
+  VehicleProperty::TireTemperatureRightFrontType rfTemp(rfTemperature);
+  VehicleProperty::TireTemperatureLeftRearType lrTemp(lrTemperature);
+  VehicleProperty::TireTemperatureRightRearType rrTemp(rrTemperature);
 
-  routingEngine->updateProperty(VehicleProperty::TirePressureLeftFront, &lfPres, uuid());
-  routingEngine->updateProperty(VehicleProperty::TirePressureRightFront, &rfPres, uuid());
-  routingEngine->updateProperty(VehicleProperty::TirePressureLeftRear, &lrPres, uuid());
-  routingEngine->updateProperty(VehicleProperty::TirePressureRightRear, &rrPres, uuid());
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftFront, &lfTemp, uuid());
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightFront, &rfTemp, uuid());
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureLeftRear, &lrTemp, uuid());
-  routingEngine->updateProperty(VehicleProperty::TireTemperatureRightRear, &rrTemp, uuid());
+  routingEngine->updateProperty(&lfPres, uuid());
+  routingEngine->updateProperty(&rfPres, uuid());
+  routingEngine->updateProperty(&lrPres, uuid());
+  routingEngine->updateProperty(&rrPres, uuid());
+  routingEngine->updateProperty(&lfTemp, uuid());
+  routingEngine->updateProperty(&rfTemp, uuid());
+  routingEngine->updateProperty(&lrTemp, uuid());
+  routingEngine->updateProperty(&rrTemp, uuid());
 
   return 0;
 }

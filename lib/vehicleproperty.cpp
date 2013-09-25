@@ -146,6 +146,7 @@ const VehicleProperty::Property VehicleProperty::WindowStatus = "WindowStatus";
 const VehicleProperty::Property VehicleProperty::Sunroof = "Sunroof";
 const VehicleProperty::Property VehicleProperty::SunroofTilt = "SunroofTilt";
 const VehicleProperty::Property VehicleProperty::ConvertibleRoof = "ConvertibleRoof";
+const VehicleProperty::Property VehicleProperty::NightMode = "NightMode";
 
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
@@ -242,15 +243,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ParkingBrakeStatus,false);
 	REGISTERPROPERTY(ParkingLightStatus,false);
 	REGISTERPROPERTY(HazardLightStatus,false);
-	registerPropertyPriv(AirbagStatus,[]()
-	{
-		BasicPropertyType<Airbag::Location> a(AirbagStatus,Airbag::Driver);
-		BasicPropertyType<Airbag::Status> b(AirbagStatus, Airbag::Inactive);
-		AirbagStatusType* t = new AirbagStatusType();
-		t->append(a,b);
-
-		return t;
-	});
+	REGISTERPROPERTY(AirbagStatus, Airbag::Inactive);
 
 	REGISTERPROPERTY(AntilockBrakingSystem,false);
 	REGISTERPROPERTY(TractionControlSystem,false);
@@ -334,6 +327,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Sunroof,0);
 	REGISTERPROPERTY(SunroofTilt,0);
 	REGISTERPROPERTY(ConvertibleRoof,false);
+	REGISTERPROPERTY(NightMode,false);
 
 }
 

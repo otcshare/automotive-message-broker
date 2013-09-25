@@ -4,7 +4,7 @@
 #include "listplusplus.h"
 
 CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop, AbstractRoutingEngine *re, GDBusConnection *connection)
-	:DBusSink("org.automotive."+prop,"/org/automotive/custom/"+prop, re, connection, map<string, string>())
+	:DBusSink(prop, re, connection, map<string, string>())
 {
 	PropertyList list = VehicleProperty::customProperties();
 
@@ -19,10 +19,10 @@ CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop,
 
 		std::string signature = g_variant_get_type_string(temp->toVariant());
 
-		propertyDBusMap[prop] = new VariantType(re, signature, prop, VariantType::ReadWrite, this);
+		propertyDBusMap[prop] = new VariantType(re, signature, prop, prop, VariantType::ReadWrite, this);
 
 		delete temp;
 	}
 
-	supportedChanged(re->supported());
+
 }

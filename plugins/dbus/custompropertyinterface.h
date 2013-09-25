@@ -3,7 +3,7 @@
 
 #include "dbusplugin.h"
 
-class CustomPropertyInterface: DBusSink
+class CustomPropertyInterface: public DBusSink
 {
 public:
 	CustomPropertyInterface(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection);

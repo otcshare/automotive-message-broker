@@ -190,7 +190,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	AsyncPropertyReply* reply = routingEngine->getPropertyAsync(velocityRequest);
 }
 
-void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, VehicleProperty::Property property, double start, double end, double seqstart,double seqend, string id)
+void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, PropertyList properties, double start, double end, double seqstart,double seqend, string id)
 {
 	AsyncRangePropertyRequest rangedRequest;
 
@@ -198,17 +198,6 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Vehicle
 	rangedRequest.timeEnd = end;
 	rangedRequest.sequenceBegin = seqstart;
 	rangedRequest.sequenceEnd = seqend;
-
-	PropertyList foo = VehicleProperty::capabilities();
-	if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
-	{
-		rangedRequest.property = property;
-	}
-	else
-	{
-		DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
-		return;
-	}
 
 	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
 	{
@@ -535,27 +524,45 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					json_object *timeEndObject = json_object_object_get(dataobject,"timeEnd");
 					json_object *sequenceBeginObject = json_object_object_get(dataobject,"sequenceBegin");
 					json_object *sequenceEndObject = json_object_object_get(dataobject,"sequenceEnd");
-					json_object *propertyObject = json_object_object_get(dataobject,"property");
+					json_object *propertyObject = json_object_object_get(dataobject,"properties");
 					double timeBegin = boost::lexical_cast<double,std::string>(json_object_get_string(timeBeginObject));
 					double timeEnd = boost::lexical_cast<double,std::string>(json_object_get_string(timeEndObject));
 					double sequenceBegin = boost::lexical_cast<double,std::string>(json_object_get_string(sequenceBeginObject));
 					double sequenceEnd = boost::lexical_cast<double,std::string>(json_object_get_string(sequenceEndObject));
-					string property = string(json_object_get_string(propertyObject));
+
+					array_list *plist = json_object_get_array(propertyObject);
+
+					PropertyList propertyList;
+
+					for(int i=0; i < array_list_length(plist); i++)
+					{
+						json_object *prop = (json_object*)array_list_get_idx(plist,i);
+
+						std::string pstr = json_object_get_string(prop);
+
+						propertyList.push_back(pstr);
+					}
+
 					json_object_put(timeBeginObject);
 					json_object_put(timeEndObject);
 					json_object_put(sequenceBeginObject);
 					json_object_put(sequenceEndObject);
 					json_object_put(propertyObject);
+
 					if ((timeBegin < 0 && timeEnd > 0) || (timeBegin > 0 && timeEnd < 0))
 					{
-						//Invalid time begin/end pair
+						DebugOut(DebugOut::Warning)<<"Invalid time begin/end pair"<<endl;
 					}
-					if ((sequenceBegin < 0 && sequenceEnd > 0) || (sequenceBegin > 0 && sequenceEnd < 0))
+					else if ((sequenceBegin < 0 && sequenceEnd > 0) || (sequenceBegin > 0 && sequenceEnd < 0))
 					{
-						//Invalid sequence begin/end pair
+						DebugOut(DebugOut::Warning)<<"Invalid sequence begin/end pair"<<endl;
 					}
-					sinkManager->addSingleShotRangedSink(wsi,property,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
+					else
+					{
+						sinkManager->addSingleShotRangedSink(wsi,propertyList,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
+					}
 				}
+				json_object_put(dataobject);
 			}
 			else
 			{
@@ -767,7 +774,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 	return 0; 
 }
 
-bool gioPollingFunc(GIOChannel *source, GIOCondition condition,gpointer data)
+bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
 {
 	DebugOut(5) << "Polling..." << condition << endl;
 

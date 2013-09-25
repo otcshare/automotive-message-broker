@@ -26,6 +26,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <opencv/ocl/ocl.hpp>
 #endif
 
+#ifdef CUDA
+#include <opencv2/gpu/gpu.hpp>
+#endif
+
 using namespace std;
 
 #include "debugout.h"
@@ -43,6 +47,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	shared->threaded = false;
 	shared->kinect = false;
 	shared->useOpenCl = false;
+	shared->useCuda = false;
 
 	shared->fps=30;
 	device="0";
@@ -94,12 +99,39 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 		shared->useOpenCl = config["opencl"] == "true";
 	}
 
+	if(config.find("cuda") != config.end())
+	{
+		shared->useCuda = config["cuda"] == "true";
+	}
+
 
 #ifdef OPENCL
-	if(useOpenCl)
+	if(shared->useOpenCl)
 	{
 		std::vector<cv::ocl::Info> info;
 		cv::ocl::getDevice(info);
+	}
+#endif
+
+#ifdef CUDA
+	if(shared->useCuda)
+	{
+		int devices = cv::gpu::getCudaEnabledDeviceCount();
+		DebugOut()<<"There are "<<devices<<" CUDA devices on this system"<<endl;
+		if(devices)
+		{
+			DebugOut()<<"We will use 0 as the default device"<<endl;
+			cv::gpu::DeviceInfo info(0);
+			DebugOut()<<"Cuda Device Name: "<<info.name()<<endl;
+			DebugOut()<<"Version: "<<info.majorVersion()<<"major"<<info.minorVersion()<<"minor"<<endl;
+			DebugOut()<<"Streaming processor count: "<<info.multiProcessorCount()<<endl;
+			cv::gpu::setDevice(0);
+		}
+		else
+		{
+			DebugOut(DebugOut::Warning)<<"No CUDA device found.  Disabling CUDA."<<endl;
+			shared->useCuda = false;
+		}
 	}
 #endif
 
@@ -113,7 +145,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	
 }
 
-string OpenCvLuxPlugin::uuid()
+const string OpenCvLuxPlugin::uuid()
 {
 	return "3c7a1ea0-7d2e-11e2-9e96-0800200c9a66";
 }
@@ -172,7 +204,6 @@ PropertyList OpenCvLuxPlugin::supported()
 {
 	PropertyList props;
 	props.push_back(VehicleProperty::ExteriorBrightness);
-
 	
 	return props;
 }
@@ -223,6 +254,24 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 #ifdef OPENCL
 		cv::Scalar stdDev;
 		cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
+#endif
+	}
+	else if(shared->useCuda)
+	{
+#ifdef CUDA
+		cv::gpu::GpuMat src(qImg), dest;
+		cv::gpu::cvtColor(src, dest, CV_BGR2GRAY);
+		cv::Scalar stdDev;
+		try
+		{
+
+			cv::gpu::meanStdDev(dest, avgPixelIntensity, stdDev);
+		}
+		catch(...)
+		{
+			DebugOut(DebugOut::Error)<<"CUDA pixel intensity calculation failed."<<endl;
+		}
+
 #endif
 	}
 	else
@@ -281,7 +330,13 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 		AsyncPropertyReply* reply = *itr;
 		reply->value = &l;
 		reply->success = true;
-		reply->completed(reply);
+		try{
+			reply->completed(reply);
+		}
+		catch(...)
+		{
+			DebugOut(DebugOut::Warning)<<"reply failed"<<endl;
+		}
 	}
 
 	replyQueue.clear();

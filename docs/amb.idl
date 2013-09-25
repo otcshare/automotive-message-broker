@@ -12,17 +12,6 @@ Details.
 
 module Vehicle {
 
-partial interface Navigator   { 
-	readonly attribute Vehicle vehicle;
-};
-
-[NoInterfaceObject]
-interface VehiclePropertyType: Event { 
-	/** /brief time at which the vehicle generated the property
-	 **/
-	readonly attribute DOMTimeStamp time;
-};
-
 [NoInterfaceObject]
 interface VehiclePropertyError   { 
 	const unsigned short PERMISSION_DENIED = 1; 
@@ -41,50 +30,61 @@ interface VehiclePropertyError   {
 	readonly attribute DOMString message;
 };
 
-callback VehiclePropertyCallback = void (VehiclePropertyType value); 
-
-callback VehiclePropertyErrorCallback = void (VehiclePropertyError error); 
-
-callback VehiclePropertyListCallback = void (sequence<VehiclePropertyType> values); 
-
-callback SupportedPropertiesCallback = void (sequence<DOMString> properties);
-
+[NoInterfaceObject]
+interface Dictionary {
+	DOMString objectName;
+	any value;
+}
 
 [NoInterfaceObject]
-interface Vehicle  { 
+interface VehiclePropertyType {
+	readonly attribute double Time;
+	
+	/**
+	* \brief returns dictionary of objectName and values for data between
+	* 'beginTime' and 'endTime'
+	* \arg beginTime time stamp in Seconds since Unix Epoc
+	* \arg endTime time stamp in Seconds since Unix Epoc
+	**/
+	Dictionary getHistory(double beginTime, double endTime);
+}
+enum Zone {
+	None = 0,
+	Front = 1,
+	Middle = 1 << 1,
+	Right = 1 << 2,
+	Left = 1 << 3,
+	Rear = 1 << 4,
+	Center = 1 << 5
+}
+[NoInterfaceObject]
+interface Manager  {
 
 	/**  
-	 *  \brief returns supported properties  
-	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
-     *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
+	 *  \brief returns supported properties
 	**/
-    getSupported(SupportedPropertiesCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
+	sequence<DOMString> list();
 	/**  
-	 *  \brief fetch the current value for 'property'.  
-     *  \arg DOMString property is the requested property to be retrieved.
-	 *  \arg VehiclePropertyCallback successCallback function to be called when method has completed successfully  
-     *  \arg VehiclePropertyErrorCallback errorCallback this function is called when an error has occured.
+	 *  \brief find the DBus object path which matches "objectName" and "zone".
+	 *  \arg DOMString property is the requested property to be retrieved.
+	 *  \arg Zone zone is the zone which the object
+	 *  \returns string representing the DBus Object path
 	**/
-	get(DOMString property, VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+	DOMString findObjectForZone(DOMString objectName, Zone zone);
 	
 	/**  
-	 *  \brief set the given property to value  
-	 *  \arg DOMString property property to set  
-	 *  \arg VehiclePropertyType value value to set  
-     *  \arg VehiclePropertyCallback successCallback callback if operation is successfull
-	 *  \arg VehiclePropertyErrorCallback errorCallback callback if error has been called.  
+	 *  \brief find the DBus object path matching the given "objectName"
+	 *  \arg DOMString objectName to find
+	 *  \returns list of object paths that provide the given object Name.
 	**/
-    set(DOMString property, VehiclePropertyType value, optional VehiclePropertyCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);
+	sequence<DOMString> findObject(DOMString objectName)
         
 	/**  
-	 *  \brief get values for a given property within a certain past time period between 'startTime' and 'endTime'  
-	 *  \arg DOMString property property to request  
-	 *  \arg Date startTime, starting period of time.  
-	 *  \arg Date endTime, ending period of time.  
-	 *  \arg VehiclePropertyListCallback successCallback. Callback with the result of the method call  
-	 *  \arg VehiclePropertyErrorCallback errorCallback. Callback if an error has occurred.  
+	 *  \brief get a list of zones for a given objectName.
+	 *  \arg DOMString objectName object name.
+	 *  \returns list of zones for the given objectName (@see Zone)
 	**/
-	getHistory(DOMString property, Date startTime, Date endTime, VehiclePropertyListCallback successCallback, optional VehiclePropertyErrorCallback errorCallback);  
+	sequence<unsigned short> zonesForObjectName(DOMString objectName)
 };
 
 [NoInterfaceObject]

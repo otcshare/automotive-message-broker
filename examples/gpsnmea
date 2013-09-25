@@ -1,0 +1,16 @@
+{
+	"sources" : [ 
+		{
+			"name" : "gps nmea plugin",
+			"path" : "/usr/lib/automotive-message-broker/gpsnmea.so",
+			"test" : "true",
+			"device" : "10:C6:FC:27:C3:1C"
+		}
+	],
+	"sinks": [
+		{
+			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
+		}
+	]
+}
+

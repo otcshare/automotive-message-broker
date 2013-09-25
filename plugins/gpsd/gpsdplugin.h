@@ -35,17 +35,17 @@ public:
 	{
 	public:
 		Shared(GpsdPlugin* p)
-			:oldspeed(0), oldalt(0), oldlat(0), oldlon(0), oldheading(0), parent(p)
+			: parent(p), oldspeed(nullptr), oldalt(nullptr), oldlat(nullptr),oldlon(nullptr),oldheading(nullptr)
 		{
 
 		}
 
 		struct gps_data_t gps;
-		std::string oldspeed;
-		std::string oldalt;
-		std::string oldlat;
-		std::string oldlon;
-		std::string oldheading;
+		AbstractPropertyType* oldspeed;
+		AbstractPropertyType* oldalt;
+		AbstractPropertyType* oldlat;
+		AbstractPropertyType* oldlon;
+		AbstractPropertyType* oldheading;
 		GpsdPlugin* parent;
 	};
 

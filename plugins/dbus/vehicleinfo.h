@@ -11,7 +11,7 @@ class VehicleId: public DBusSink
 {
 public:
 	VehicleId(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.VehicleId","/org/automotive/vehicleinfo/VehicleId", re, connection, map<string, string>())
+		:DBusSink("VehicleId", re, connection, map<string, string>())
 	{
 		/** @attributeName WMI
 		 *  @type DOMString
@@ -19,16 +19,16 @@ public:
 		 *  @attributeComment \brief MUST return World Manufacturer Identifier (WMI)
 		 *  @attributeComment WMI is defined by SAE ISO 3780:2009.  3 characters.
 		 **/
-		wantPropertyString(VehicleProperty::WMI, "WMI", "s", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WMI, "WMI", "s", AbstractProperty::Read);
 
 		/** @attributeName VIN
 		 *  @type DOMString
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Vehicle Identification Number (VIN) as defined by ISO 3779. 17 characters.
 		 **/
-		wantPropertyString(VehicleProperty::VIN, "VIN", "s", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VIN, "VIN", "s", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -37,30 +37,30 @@ class SizeProperty: public DBusSink
 {
 public:
 	SizeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.Size","/org/automotive/vehicleinfo/Size", re, connection, map<string, string>())
+		:DBusSink("Size", re, connection, map<string, string>())
 	{
 		/** @attributeName Width
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return width of vehicle in mm
 		 **/
-		wantProperty<uint>(VehicleProperty::VehicleWidth, "Width", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleWidth, "Width", "u", AbstractProperty::Read);
 
 		/** @attributeName Height
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return height of vehicle in mm
 		 **/
-		wantProperty<uint>(VehicleProperty::VehicleHeight, "Height", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleHeight, "Height", "u", AbstractProperty::Read);
 
 		/** @attributeName Length
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return length of vehicle in mm
 		 **/
-		wantProperty<uint>(VehicleProperty::VehicleLength, "Length", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleLength, "Length", "u", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -69,7 +69,7 @@ class FuelInfoProperty: public DBusSink
 {
 public:
 	FuelInfoProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.FuelInfo","/org/automotive/vehicleinfo/FuelInfo", re, connection, map<string, string>())
+		:DBusSink("FuelInfo", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short FUELTYPE_GASOLINE = 0;
@@ -84,7 +84,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return type of fuel.  integer 0-4 (see FUELTYPE_*)
 		 **/
-		wantProperty<Fuel::Type>(VehicleProperty::FuelType, "Type", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelType, "Type", "y", AbstractProperty::Read);
 
 		/**
 		 * @enum const unsigned short REFUELPOSITION_LEFT = 0;
@@ -98,9 +98,9 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return position of refuling (see REFUELPOSITION_*)
 		 **/
-		wantProperty<Fuel::RefuelPosition>(VehicleProperty::FuelPositionSide, "RefuelPosition", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelPositionSide, "RefuelPosition", "y", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -109,7 +109,7 @@ class VehicleTypeProperty: public DBusSink
 {
 public:
 	VehicleTypeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.VehicleType","/org/automotive/vehicleinfo/VehicleType", re, connection, map<string, string>())
+		:DBusSink("VehicleType", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short VEHICLETYPE_SEDAN = 0;
@@ -125,9 +125,9 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return type of Vehicle.  Integer 0-5 (see VEHICLETYPE_*)
 		 **/
-		wantProperty<Vehicle::Type>(VehicleProperty::VehicleType, "Type", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleType, "Type", "y", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -136,7 +136,7 @@ class DoorsProperty: public DBusSink
 {
 public:
 	DoorsProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.Doors","/org/automotive/vehicleinfo/Doors", re, connection, map<string, string>())
+		:DBusSink("Doors", re, connection, map<string, string>())
 	{
 		/** @attributeName DoorsPerRow
 		 *  @type sequence<unsigned short>
@@ -148,7 +148,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "ay", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -157,7 +157,7 @@ class TransmissionInfoProperty: public DBusSink
 {
 public:
 	TransmissionInfoProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.TransmissionGearType","/org/automotive/vehicleinfo/TransmissionGearType", re, connection, map<string, string>())
+		:DBusSink("TransmissionGearType", re, connection, map<string, string>())
 	{
 		/**
 		 * @enum const unsigned short TRANSMISSIONGEARTYPE_AUTO=0;
@@ -170,9 +170,9 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV).  See TRANSMISSIONGEARTYPE_*.
 		 **/
-		wantProperty<Transmission::Type>(VehicleProperty::TransmissionGearType, "TransmissionGearType", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionGearType, "TransmissionGearType", "y", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 
@@ -181,7 +181,7 @@ class WheelInformationProperty: public DBusSink
 {
 public:
 	WheelInformationProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("org.automotive.WheelInformation","/org/automotive/vehicleinfo/WheelInformation", re, connection, map<string, string>())
+		:DBusSink("WheelInformation", re, connection, map<string, string>())
 	{
 
 		/** @attributeName FrontWheelRadius
@@ -189,14 +189,14 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Radius of Front Wheel(s) in mm.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "q", AbstractProperty::Read);
 
 		/** @attributeName RearWheelRadius
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Radius of Rear Wheel(s) in mm.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::RearWheelRadius, "RearWheelRadius", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::RearWheelRadius, "RearWheelRadius", "q", AbstractProperty::Read);
 
 		/** @attributeName WheelTrack
 		 *  @type unsigned long
@@ -212,7 +212,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
 
-		supportedChanged(re->supported());
+		
 	}
 };
 

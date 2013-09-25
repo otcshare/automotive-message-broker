@@ -170,10 +170,12 @@ static int checkTimeouts(gpointer data)
 				src->uuidRangedReplyMap.erase((*i).first);
 				src->uuidTimeoutMap.erase((*i).first);
 				i--;
+
 				if (src->uuidTimeoutMap.size() == 0)
 				{
 					return 0;
 				}
+
 			}
 			else
 			{
@@ -185,6 +187,7 @@ static int checkTimeouts(gpointer data)
 			//Reply has already come back, ignore and erase from list.
 			src->uuidTimeoutMap.erase((*i).first);
 			i--;
+
 			if (src->uuidTimeoutMap.size() == 0)
 			{
 				return 0;
@@ -367,19 +370,24 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					for (int i=0;i<array_list_length(dataarray);i++)
 					{
 						json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
+						json_object *keyobject = json_object_object_get(arrayobj,"name");
 						json_object *valueobject = json_object_object_get(arrayobj,"value");
 						json_object *timestampobject = json_object_object_get(arrayobj,"timestamp");
 						json_object *sequenceobject = json_object_object_get(arrayobj,"sequence");
+						std::string name = json_object_get_string(keyobject);
 						std::string value = json_object_get_string(valueobject);
 						std::string timestamp = json_object_get_string(timestampobject);
 						std::string sequence = json_object_get_string(sequenceobject);
+
+						///TODO: we might only have to free the dataobject at the end instead of this:
+
+						json_object_put(keyobject);
 						json_object_put(valueobject);
 						json_object_put(timestampobject);
 						json_object_put(sequenceobject);
 							
-						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(source->uuidRangedReplyMap[id]->property,value);
+						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
 						propertylist.push_back(type);
-						//props.push_back(string(json_object_get_string(arrayobj)));
 					}
 					//array_list_free(dataarray);
 					if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
@@ -422,12 +430,12 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 							source->uuidReplyMap[id]->success = true;
 							source->uuidReplyMap[id]->completed(source->uuidReplyMap[id]);
 							source->uuidReplyMap.erase(id);
+
 						}
 						else
 						{
 							DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
 						}
-							delete v;
 					}
 					else
 					{
@@ -468,7 +476,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 }
 void WebSocketSource::setSupported(PropertyList list)
 {
-  DebugOut() << "SET SUPPORTED";
+	DebugOut() <<__SMALLFILE__ << ":" << __LINE__ <<"SET SUPPORTED"<<endl;
 	m_supportedProperties = list;
 	m_re->updateSupported(list,PropertyList());
 }
@@ -510,7 +518,7 @@ int WebSocketSource::supportedOperations()
 	return Get | Set | GetRanged;
 }
 
-string WebSocketSource::uuid()
+const string WebSocketSource::uuid()
 {
 	return "d293f670-f0b3-11e1-aff1-0800200c9a66";
 }
@@ -538,16 +546,6 @@ void WebSocketSource::unsubscribeToPropertyChanges(VehicleProperty::Property pro
 
 void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 {
-	///TODO: fill in
-	//s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
-	//m_re->getPropertyAsync();
-	/*reply.value = 1;
-	  reply->completed(reply);
-	  reply->completed = [](AsyncPropertyReply* reply) {
-	  DebugOut()<<"Velocity Async request completed: "<<reply->value->toString()<<endl;
-	  delete reply;
-	};*/
-	//propertyReplyMap[reply->property] = reply;
 	std::string uuid = amb::createUuid();
 	uuidReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 10.0; ///TODO: 10 second timeout, make this configurable?
@@ -566,14 +564,29 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
-	///TODO: fill in
 	std::string uuid = amb::createUuid();
 	uuidRangedReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 60; ///TODO: 60 second timeout, make this configurable?
 	stringstream s;  
 	s.precision(15);
 	s << "{\"type\":\"method\",\"name\":\"getRanged\",\"data\": {";
-	s << "\"property\":\""<< reply->property << "\",";
+
+	s << "\"properties\":[";
+
+	for (auto itr = reply->properties.begin(); itr != reply->properties.end(); itr++)
+	{
+		std::string prop = *itr;
+
+		if(itr != reply->properties.begin())
+		{
+			s<<",";
+		}
+
+		s<<"\""<<prop<<"\"";
+	}
+
+	s<<"],";
+
 	s << "\"timeBegin\":\"" << reply->timeBegin << "\",";
 	s << "\"timeEnd\":\"" << reply->timeEnd << "\",";
 	s << "\"sequenceBegin\":\"" << reply->sequenceBegin<< "\",";

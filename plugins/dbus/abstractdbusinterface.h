@@ -26,17 +26,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <gio/gio.h>
 #include <boost/any.hpp>
 #include <nullptr.h>
+#include "abstractpropertytype.h"
+#include <abstractroutingengine.h>
 
 class AbstractProperty;
-
-using namespace std;
 
 class AbstractDBusInterface
 {
 
 public:
-	AbstractDBusInterface(string interfaceName, string objectPath, GDBusConnection* connection);
+	AbstractDBusInterface(std::string interfaceName, std::string objectName, GDBusConnection* connection);
 
+	virtual ~AbstractDBusInterface();
 	
 	void setDBusConnection(GDBusConnection* connection)
 	{
@@ -49,13 +50,45 @@ public:
 	void addProperty(AbstractProperty* property);
 	virtual void updateValue(AbstractProperty* property);
 	
-	static list<string> implementedProperties() { return mimplementedProperties; }
+	static std::list<std::string> implementedProperties() { return mimplementedProperties; }
 
-	static AbstractDBusInterface* getInterfaceForProperty(std::string property);
+	static std::list<AbstractDBusInterface *> getObjectsForProperty(std::string property);
+
+	static list<AbstractDBusInterface*> interfaces();
+
+	std::string interfaceName() { return mInterfaceName; }
 
 	bool implementsProperty(std::string property);
 
 	std::string objectPath() { return mObjectPath; }
+
+	bool isSupported() { return supported; }
+
+	double time() { return mTime; }
+
+	AbstractProperty* property(std::string propertyName)
+	{
+		if(properties.find(propertyName) != properties.end())
+			return properties[propertyName];
+		return nullptr;
+	}
+
+	AbstractRoutingEngine* re;
+
+	void setObjectPath(std::string op)
+	{
+		if(objectMap.find(op) != objectMap.end())
+			objectMap.erase(op);
+
+		mObjectPath = op;
+		objectMap[mObjectPath] = this;
+	}
+
+	std::string objectName() { return mPropertyName; }
+
+	Zone::Type zone() { return zoneFilter; }
+
+	std::unordered_map<std::string, AbstractProperty*> getProperties() { return properties; }
 
 protected:
 
@@ -68,18 +101,25 @@ protected:
 								const gchar *interfaceName, const gchar * propertyName, GVariant *value,
 								GError** error, gpointer userData);
     
-	virtual void setProperty(string propertyName, GVariant * value);
-	virtual GVariant * getProperty(string propertyName);
+	virtual void setProperty(std::string propertyName, GVariant * value);
+	virtual GVariant * getProperty(std::string propertyName);
 	
-	unordered_map<string, AbstractProperty*> properties;
+	std::unordered_map<std::string, AbstractProperty*> properties;
+
+	Zone::Type zoneFilter;
+
+
+	bool supported;
+	double mTime;
 
 private:
-	string mInterfaceName;
-	string mObjectPath;
-	string introspectionXml;
+	std::string mInterfaceName;
+	std::string mObjectPath;
+	std::string mPropertyName;
+	std::string introspectionXml;
 	GDBusConnection * mConnection;
-	static unordered_map<string, AbstractDBusInterface*> interfaceMap;
-	static list<string> mimplementedProperties;
+	static std::unordered_map<std::string, AbstractDBusInterface*> objectMap;
+	static std::list<std::string> mimplementedProperties;
 	guint regId;
 };
 
