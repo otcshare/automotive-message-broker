@@ -51,7 +51,7 @@ const Zone::Type FrontLeft = Zone::Type(Front | Left);
 const Zone::Type MiddleRight = Zone::Type(Middle | Right);
 const Zone::Type MiddleLeft = Zone::Type(Middle | Left);
 const Zone::Type RearRight = Zone::Type(Rear | Right);
-const Zone::Type RearLeft = Zone::Type(Rear| Left);
+const Zone::Type RearLeft = Zone::Type(Rear | Left);
 
 typedef std::list<Zone::Type> ZoneList;
 
