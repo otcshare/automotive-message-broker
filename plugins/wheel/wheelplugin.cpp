@@ -37,6 +37,7 @@ using namespace std;
 
 #define JSNAMELEN 128
 #define LG27 "G27 Racing Wheel"
+#define MAX_GEARS 6
 
 double gearRatio[8] = {
 	0.0,	//Neutral
@@ -334,12 +335,15 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			checkButtonEvents();
 			break;
 		case 4:	//Right paddle shifter
-			this->changeGear(Transmission::TransmissionPositions(this->currentGear+1));
-			changeMachineGuns(val);
+			if(this->currentGear < MAX_GEARS)
+			{
+				this->changeGear(Transmission::TransmissionPositions(this->currentGear+1));
+				changeMachineGuns(val);
+			}
 			break;
 		case 5:	//Left paddle shifter
-			this->changeGear(Transmission::TransmissionPositions(this->currentGear-1));
-
+			if(this->currentGear > 0)
+				this->changeGear(Transmission::TransmissionPositions(this->currentGear-1));
 			break;
 		case 6:	//Right upper wheel button
 			this->changeTurnSignal(TurnSignals::Right, val);
