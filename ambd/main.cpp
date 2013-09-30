@@ -64,7 +64,7 @@ void daemonize();
 
 void printhelp(const char *argv0);
 
-static const char shortopts[] = "hvDc:d:l:";
+static const char shortopts[] = "hvDc:d:l:we";
 
 static const struct option longopts[] = {
 	{ "help", no_argument, NULL, 'h' }, ///< Print the help text
@@ -73,6 +73,8 @@ static const struct option longopts[] = {
 	{ "config", required_argument, NULL, 'c' },
 	{ "debug", required_argument, NULL, 'd' },
 	{ "log", required_argument, NULL, 'l' },
+	{ "warn", no_argument, NULL, 'w' },
+	{ "err", no_argument, NULL, 'e' },
 	{ NULL, 0, NULL, 0 } ///< End
 };
 
@@ -114,6 +116,12 @@ int main(int argc, char **argv)
 				break;
 			case 'l':
 				logfn = optarg;
+				break;
+			case 'w':
+				DebugOut::setThrowWarn(true);
+				break;
+			case 'e':
+				DebugOut::setThrowErr(true);
 				break;
 			default:
 				DebugOut(0)<<"Unknown option "<<optc<<endl;
@@ -189,12 +197,15 @@ void daemonize()
 void printhelp(const char *argv0)
 {
 	printf("Usage: %s [args]\n"
-		   "   [-D|--daemonise]\n"
-		   "   [-v|--version]\n"
-		   "   [-c|--config </path/to/config> \t]\n"
-		   "   [-d|--debug <level (0-5)>\t]\n"
-		   "   [-l]--log </path/to/logfile>\t]\n"
-		   "   [-h|--help]\n"
+		   "   [-D|--daemonise] run ambd in daemon mode\n"
+		   "   [-v|--version] spit out the version then exit\n"
+		   "   [-c|--config </path/to/config> ] specify which config to use\n"
+		   "   [-d|--debug <level (0-5)> ] set the debug level\n"
+		   "   [-l]--log </path/to/logfile> ] specify an debug output log file\n"
+		   "   [-w]--warn] throw on warnings\n"
+		   "   [-e]--err] throw on errors\n"
+		   "   [-h|--help] print this menu and exit\n"
 		   , argv0);
 }
+
 
