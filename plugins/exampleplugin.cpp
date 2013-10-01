@@ -209,6 +209,20 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::ThrottlePosition)
+	{
+		VehicleProperty::ThrottlePositionType temp(throttlePos);
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
+	else if(reply->property == VehicleProperty::EngineCoolantTemperature)
+	{
+		VehicleProperty::EngineCoolantTemperatureType temp(engineCoolant);
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
 	else
 	{
 		reply->success=false;
@@ -271,22 +285,14 @@ void ExampleSourcePlugin::randomizeProperties()
 
 	machineGun = !machineGun;
 
-	vel.timestamp = amb::currentTime();
-	es.timestamp = amb::currentTime();
-	ac.timestamp = amb::currentTime();
-	swa.timestamp = amb::currentTime();
-	tsp.timestamp = amb::currentTime();
-	tp.timestamp = amb::currentTime();
-	ec.timestamp = amb::currentTime();
+	routingEngine->updateProperty(&vel, uuid());
+	routingEngine->updateProperty(&es, uuid());
+	routingEngine->updateProperty(&ac, uuid());
+	routingEngine->updateProperty(&swa, uuid());
+	routingEngine->updateProperty(&tsp, uuid());
+	routingEngine->updateProperty(&tp, uuid());
+	routingEngine->updateProperty(&ec, uuid());
 
-	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &vel, uuid());
-	routingEngine->updateProperty(VehicleProperty::EngineSpeed, &es, uuid());
-	routingEngine->updateProperty(VehicleProperty::AccelerationX, &ac, uuid());
-	routingEngine->updateProperty(VehicleProperty::SteeringWheelAngle, &swa, uuid());
-	routingEngine->updateProperty(VehicleProperty::TransmissionShiftPosition,&tsp, uuid());
-	routingEngine->updateProperty(VehicleProperty::ThrottlePosition, &tp, uuid());
-	routingEngine->updateProperty(VehicleProperty::EngineCoolantTemperature, &ec, uuid());
-	//routingEngine->updateProperty(VehicleProperty::MachineGunTurretStatus, &mgt);
 }
 
 void ExampleSourcePlugin::addPropertySupport(VehicleProperty::Property property, Zone::Type zone)

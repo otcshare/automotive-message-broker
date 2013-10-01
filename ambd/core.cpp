@@ -185,7 +185,7 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 				value->sourceUuid = uuid;
 			}
 
-			sink->propertyChanged(property, value, uuid);
+			sink->propertyChanged(value, uuid);
 		}
 	}
 }

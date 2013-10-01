@@ -1,6 +1,7 @@
 #include "varianttype.h"
 #include "abstractroutingengine.h"
 #include "debugout.h"
+#include "listplusplus.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access, AbstractDBusInterface *interface)
 	:AbstractProperty(propertyName, signature, access, interface), mInitialized(false)
@@ -32,7 +33,11 @@ void VariantType::initialize()
 		delete reply;
 	};
 
-	routingEngine->getPropertyAsync(request);
+	/// do not request if not supported:
+	PropertyList proplist = routingEngine->supported();
+
+	if(contains(proplist,mAmbPropertyName))
+		routingEngine->getPropertyAsync(request);
 }
 
 GVariant *VariantType::toGVariant()
