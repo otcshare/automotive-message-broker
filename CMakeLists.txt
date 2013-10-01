@@ -6,12 +6,14 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.10.999")
+set(PROJECT_VERSION "0.10.800")
 set(PROJECT_CODENAME "challenger")
+set(PROJECT_QUALITY "alpha")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
 add_definitions(-DPROJECT_CODENAME="${PROJECT_CODENAME}")
+add_definitions(-DPROJECT_QUALITY="${PROJECT_QUALITY}")
 
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" CACHE STRING "Directory where lib will install")

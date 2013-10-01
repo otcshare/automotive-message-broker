@@ -43,6 +43,8 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 	if(method == "findProperty")
 	{
+		DebugOut(DebugOut::Warning)<<"org.automotive.Manager.findProperty() is deprecated.  Use org.automotive.Manager.FindObject() instead."<<endl;
+
 		gchar* arg;
 
 		g_variant_get(parameters,"(s)",&arg);

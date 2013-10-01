@@ -81,7 +81,7 @@ static const struct option longopts[] = {
 void printVersion()
 {
 	DebugOut(0)<<PROJECT_NAME<<endl;
-	DebugOut(0)<<"Version: "<<PROJECT_VERSION<<" ("<<PROJECT_CODENAME<<")"<<endl;
+	DebugOut(0)<<"Version: "<<PROJECT_VERSION<<" ( "<<PROJECT_CODENAME<<" "<<PROJECT_QUALITY<<" )"<<endl;
 }
 
 int main(int argc, char **argv) 
