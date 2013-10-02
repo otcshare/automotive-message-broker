@@ -1,9 +1,9 @@
 Automotive Message Broker DBus API Documentation
 
-AMB organizes the API into two general interfaces.  First a Manager interface which includes
-tools for using the other interfaces.  Second is a series of interfaces that represent vehicle
-data.  The later follows the schema of "org.automotive.DataType" and are contained in verious
-DBus paths.
+AMB organizes the API into two general interfaces.  First a Manager interface (see manager.txt)
+which includes tools for using the other interfaces.  Second is a series of interfaces that 
+represent vehicle data.  The later follows the schema of "org.automotive.DataType" and are 
+contained in verious DBus paths.
 
 The data types are documented in the various *.txt files in this document folder.  The manager
 interface is documented in the manager.txt document.
