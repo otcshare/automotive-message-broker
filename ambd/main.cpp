@@ -140,6 +140,11 @@ int main(int argc, char **argv)
 		DebugOut::setOutput(logfile);
 	}
 
+	if(getuid() == 0)
+	{
+		DebugOut(DebugOut::Error)<<"Running as root.  This is dangerous."<<endl;
+	}
+
 	VehicleProperty::factory();
 	
 	Core routingEngine;
