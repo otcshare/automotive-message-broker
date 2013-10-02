@@ -76,11 +76,11 @@ public:
 
 			if((mDebugLevel == Error && throwErr))
 			{
-				throw std::runtime_error("Error");
+				throw std::runtime_error("Abort on Error is set");
 			}
 			else if ((mDebugLevel == Warning && throwWarn))
 			{
-				throw std::runtime_error("Warning");
+				throw std::runtime_error("Abort on Warning is set");
 			}
 		}
 		return *this;
