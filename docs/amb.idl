@@ -48,6 +48,7 @@ interface VehiclePropertyType {
 	**/
 	Dictionary getHistory(double beginTime, double endTime);
 }
+
 enum Zone {
 	None = 0,
 	Front = 1,
@@ -57,34 +58,35 @@ enum Zone {
 	Rear = 1 << 4,
 	Center = 1 << 5
 }
+
 [NoInterfaceObject]
 interface Manager  {
 
 	/**  
 	 *  \brief returns supported properties
 	**/
-	sequence<DOMString> list();
+	sequence<DOMString> List();
 	/**  
 	 *  \brief find the DBus object path which matches "objectName" and "zone".
 	 *  \arg DOMString property is the requested property to be retrieved.
 	 *  \arg Zone zone is the zone which the object
 	 *  \returns string representing the DBus Object path
 	**/
-	DOMString findObjectForZone(DOMString objectName, Zone zone);
+	DOMString FindObjectForZone(DOMString objectName, Zone zone);
 	
 	/**  
 	 *  \brief find the DBus object path matching the given "objectName"
 	 *  \arg DOMString objectName to find
 	 *  \returns list of object paths that provide the given object Name.
 	**/
-	sequence<DOMString> findObject(DOMString objectName)
+	sequence<DOMString> FindObject(DOMString objectName)
         
 	/**  
 	 *  \brief get a list of zones for a given objectName.
 	 *  \arg DOMString objectName object name.
 	 *  \returns list of zones for the given objectName (@see Zone)
 	**/
-	sequence<unsigned short> zonesForObjectName(DOMString objectName)
+	sequence<unsigned short> ZonesForObjectName(DOMString objectName)
 };
 
 [NoInterfaceObject]
@@ -859,6 +861,24 @@ interface ObstacleDistance : VehiclePropertyType  {
 	 *   \brief MUST returns dictionary of Distance Sensor (byte, see DISTANCESENSORLOCATION) and distance (double) in m.    
 	 **/
 	readonly attribute object ObstacleDistance;
+};
+
+[NoInterfaceObject]
+interface NightMode : VehiclePropertyType {
+	
+	/*!
+	 * \brief MUST return whether or not the system is in NightMode or not.  True = Night time, False = Day time
+	 **/
+	readonly attribute boolean NightMode;
+};
+
+[NoInterfaceObject]
+interface DrivingMode : VehiclePropertyType {
+
+        /*!
+         * \brief MUST return whether or not the system is in DrivingMode or not.  1 = Driving, 0 = Not Driving
+         **/
+        readonly attribute unsigned short DrivingMode;   
 };
 
 };

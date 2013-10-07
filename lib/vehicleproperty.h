@@ -257,6 +257,15 @@ enum AirflowDirection
 };
 }
 
+namespace Driving
+{
+enum Mode
+{
+	None = 0,
+	Driving
+};
+}
+
 #include <boost/preprocessor/comma.hpp>
 
 #define PROPERTYTYPE(property, propertyType, baseClass, valueType) \
@@ -767,6 +776,9 @@ public:
 
 	static const Property NightMode;
 	PROPERTYTYPEBASIC(NightMode, bool)
+
+	static const Property DrivingMode;
+	PROPERTYTYPEBASIC(DrivingMode, Driving::Mode)
 
 	/** END PROPERTIES **/
 

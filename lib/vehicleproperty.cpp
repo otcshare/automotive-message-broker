@@ -147,7 +147,7 @@ const VehicleProperty::Property VehicleProperty::Sunroof = "Sunroof";
 const VehicleProperty::Property VehicleProperty::SunroofTilt = "SunroofTilt";
 const VehicleProperty::Property VehicleProperty::ConvertibleRoof = "ConvertibleRoof";
 const VehicleProperty::Property VehicleProperty::NightMode = "NightMode";
-
+const VehicleProperty::Property VehicleProperty::DrivingMode = "DrivingMode";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -328,6 +328,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(SunroofTilt,0);
 	REGISTERPROPERTY(ConvertibleRoof,false);
 	REGISTERPROPERTY(NightMode,false);
+	REGISTERPROPERTY(DrivingMode,Driving::None);
 
 }
 
