@@ -6,12 +6,14 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.10.999")
+set(PROJECT_VERSION "0.10.800")
 set(PROJECT_CODENAME "challenger")
+set(PROJECT_QUALITY "alpha")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
 add_definitions(-DPROJECT_CODENAME="${PROJECT_CODENAME}")
+add_definitions(-DPROJECT_QUALITY="${PROJECT_QUALITY}")
 
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" CACHE STRING "Directory where lib will install")
@@ -67,7 +69,7 @@ pkg_check_modules(glib REQUIRED glib-2.0 gobject-2.0)
 pkg_check_modules(json REQUIRED json)
 
 
-add_definitions(-std=c++0x)
+add_definitions(-std=c++11)
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
 set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
@@ -83,7 +85,6 @@ if(qtmainloop)
 		set(QT_LIBRARIES ${Qt5Core_LIBRARIES})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 		if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-			message(STATUS "can has 64bits")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=large")
 		endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
 		add_definitions(${Qt5Core_DEFINITIONS})

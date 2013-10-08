@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdexcept>
 #include "timestamp.h"
 
 using namespace std;
@@ -72,6 +73,15 @@ public:
 			ostream out(buf);
 			out.precision(15);
 			out<<endl;
+
+			if((mDebugLevel == Error && throwErr))
+			{
+				throw std::runtime_error("Abort on Error is set");
+			}
+			else if ((mDebugLevel == Warning && throwWarn))
+			{
+				throw std::runtime_error("Abort on Warning is set");
+			}
 		}
 		return *this;
 	}
@@ -97,6 +107,16 @@ public:
 		buf = o.rdbuf();
 	}
 
+	static void setThrowWarn(bool v)
+	{
+		throwWarn = v;
+	}
+
+	static void setThrowErr(bool v)
+	{
+		throwErr = v;
+	}
+
 private:
 
 	std::string bufferTime(double time)
@@ -117,6 +137,8 @@ private:
 
 	static int debugThreshhold;
 	static std::streambuf *buf;
+	static bool throwWarn;
+	static bool throwErr;
 	int mDebugLevel;
 };
 

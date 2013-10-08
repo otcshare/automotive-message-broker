@@ -335,14 +335,14 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			checkButtonEvents();
 			break;
 		case 4:	//Right paddle shifter
-			if(this->currentGear < MAX_GEARS)
+			if(val && this->currentGear < MAX_GEARS)
 			{
 				this->changeGear(Transmission::TransmissionPositions(this->currentGear+1));
 				changeMachineGuns(val);
 			}
 			break;
 		case 5:	//Left paddle shifter
-			if(this->currentGear > 0)
+			if(val && this->currentGear > 0)
 				this->changeGear(Transmission::TransmissionPositions(this->currentGear-1));
 			break;
 		case 6:	//Right upper wheel button

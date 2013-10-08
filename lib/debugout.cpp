@@ -22,6 +22,8 @@ using namespace std;
 
 int DebugOut::debugThreshhold = 0;
 std::streambuf * DebugOut::buf = cout.rdbuf();
+bool DebugOut::throwErr = false;
+bool DebugOut::throwWarn = false;
 
 const int DebugOut::Error = 1 << 16;
 const int DebugOut::Warning = 1 << 24;
