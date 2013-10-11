@@ -40,6 +40,11 @@ class AsyncRangePropertyReply;
 typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
 typedef std::function<void (AsyncRangePropertyReply*)> GetRangedPropertyCompletedSignal;
 
+/*!
+ * \brief The AsyncPropertyRequest class is used by sinks to request property values.
+ * \see AbstractRoutingEngine::getPropertyAsync
+ * \see AsyncPropertyReply
+ */
 class AsyncPropertyRequest
 {
 public:
@@ -71,13 +76,43 @@ public:
 
 	virtual ~AsyncPropertyRequest() { }
 
+	/*!
+	 * \brief property property to request.
+	 */
 	VehicleProperty::Property property;
+
+	/*!
+	 * \brief sourceUuidFilter the requesting sink should use this to filter on a specific source or leave blank to use any source
+	 */
 	std::string sourceUuidFilter;
+
+	/*!
+	 * \brief zoneFilter the requesting sink should use this if he wants to filter on a specific zone
+	 */
 	Zone::Type zoneFilter;
+
+	/*!
+	 * \brief completed the callback when the request has been completed.
+	 */
 	GetPropertyCompletedSignal completed;
+
+	/*!
+	 * \brief use to specify a timeout in ms for the request.  When a timeout occurs, the 'completed' callback
+	 * will be called with an error.  @see AsyncPropertyReply
+	 * default value is: 10000 ms
+	 */
 	uint timeout;
 };
 
+/*!
+ * \brief The AsyncPropertyReply class is used by sources to reply to Get and Set operations.  The source should
+ * set success to true if the call is successful or 'false' if the request was not successful and set 'error'
+ * to the appropriate error.
+ * \see AbstractRoutingEngine::getPropertyAsync
+ * \see AsyncPropertyReply
+ * \see AbstractSource::Operations
+ * \see AbstractSource::getPropertyAsync
+ */
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
@@ -92,6 +127,9 @@ public:
 		}
 	}
 
+	/*!
+	 * \brief The Error enum
+	 */
 	enum Error {
 		NoError = 0,
 		Timeout,
@@ -100,17 +138,33 @@ public:
 		ZoneNotSupported
 	};
 
-	/**
-	 * @brief value of the reply.  This may be null if success = false.  This is owned by the source.
+	/*!
+	 * \brief value of the reply.  This may be null if success = false.  This is owned by the source.
 	 */
 	AbstractPropertyType* value;
+
+	/*!
+	 * \brief success indicates if the request was successfull or not.  True means success.  False means fail and the 'error'
+	 * member should be set.
+	 */
 	bool success;
+
+	/*!
+	 * \brief error contains the error if the request was not successful.\
+	 * \see Error
+	 */
 	Error error;
 
 private:
 	GSource* timeoutSource;
 };
 
+/*!
+ * \brief The AsyncSetPropertyRequest class is used by sinks to set a property to the 'value'.  The source will reply
+ * with a AsyncPropertyReply containing the new value or an error
+ * \see AbstractRoutingEngine::setProperty
+ * \see AsyncPropertyReply
+ */
 class AsyncSetPropertyRequest: public AsyncPropertyRequest
 {
 public:
@@ -128,9 +182,16 @@ public:
 
 	virtual ~AsyncSetPropertyRequest() { }
 
+	/*!
+	 * \brief value the new value to set the property to.
+	 */
 	AbstractPropertyType* value;
 };
 
+/*!
+ * \brief The AsyncRangePropertyRequest class is used by sinks to request values within a time or sequence range
+ * \see AbstractRoutingEngine::getRangePropertyAsync
+ */
 class AsyncRangePropertyRequest
 {
 public:
@@ -141,7 +202,6 @@ public:
 	}
 
 	AsyncRangePropertyRequest(const AsyncRangePropertyRequest &request)
-
 	{
 		this->properties = request.properties;
 		this->completed = request.completed;
@@ -154,15 +214,51 @@ public:
 
 	virtual ~AsyncRangePropertyRequest() {}
 
+	/*!
+	 * \brief properties list of properties to request
+	 */
 	PropertyList properties;
+
+	/*!
+	 * \brief sourceUuid if the sink wishes to request a specific source, this should be set to the uuid of the source.
+	 */
 	std::string sourceUuid;
+
+	/*!
+	 * \brief completed callback that is called when the ranged request is complete.
+	 */
 	GetRangedPropertyCompletedSignal completed;
+
+	/*!
+	 * \brief timeBegin set this to request values for the specified property beggining at this time.  Time is seconds\
+	 * since the unix epoc.  Set this to '0' if you do not want values within a time range.
+	 */
 	double timeBegin;
+
+	/*!
+	 * \brief timeEnd set this to request values for the specified property beggining at this time.  Time is seconds\
+	 * since the unix epoc.  Set this to '0' if you do not want values within a time range.
+	 */
 	double timeEnd;
+
+	/*!
+	 * \brief sequenceBegin set this to request values with a sequence >= to the sequenceBegin value.  Set to -1 if
+	 * you don't want values within a sequence ranges.
+	 */
 	int32_t sequenceBegin;
+
+	/*!
+	 * \brief sequenceEnd set this to request values with a sequence <= to the sequenceEnd value.  Set to -1 if
+	 * you don't want values within a sequence ranges.
+	 */
 	int32_t sequenceEnd;
 };
 
+/*!
+ * \brief The AsyncRangePropertyReply class is used by a source to reply to an AsyncRangePropertyRequest.
+ * the source should set success to 'true' and populate the 'values' member if the request was successful.
+ * If the request is not successful, 'success' should be set to 'false' and the 'error' member should be set.
+ */
 class AsyncRangePropertyReply: public AsyncRangePropertyRequest
 {
 public:
@@ -182,9 +278,19 @@ public:
 		values.clear();
 	}
 
+	/*!
+	 * \brief error this is set if there was an error in the request.  "success" will also be set to false.
+	 */
 	AsyncPropertyReply::Error error;
 
+	/*!
+	 * \brief values if the request was successful, this will contain a list of values meeting the criteria of the request.
+	 */
 	std::list<AbstractPropertyType*> values;
+
+	/*!
+	 * \brief success this will be true if the request was successful.  If not, this is false and error is set.
+	 */
 	bool success;
 };
 
@@ -211,19 +317,19 @@ public:
 	virtual void  unregisterSink(AbstractSink* self) = 0;
 
 	/**
-	 * @brief sourcesForProperty
-	 * @param property
-	 * @return list of source uuid's that support the "property"
+	 * /brief sourcesForProperty
+	 * /param property
+	 * /return list of source uuid's that support the "property"
 	 */
 	virtual std::list<std::string> sourcesForProperty(VehicleProperty::Property property) = 0;
 
 	/**
-	 * @brief getPropertyAsync requests a property value from a source.  This call has a timeout and will always return.
-	 * @see AsyncPropertyRequest
-	 * @see AsyncPropertyReply.
-	 * @param request requested property.
-	 * @return AsyncPropertyReply. The returned AsyncPropertyReply is owned by the caller of getPropertyAsync.
-	 * @example AsyncPropertyRequest request;
+	 * /brief getPropertyAsync requests a property value from a source.  This call has a timeout and will always return.
+	 * /see AsyncPropertyRequest
+	 * /see AsyncPropertyReply.
+	 * /param request requested property.
+	 * /return AsyncPropertyReply. The returned AsyncPropertyReply is owned by the caller of getPropertyAsync.
+	 * /example AsyncPropertyRequest request;
 	 * request.property = VehicleProperty::VehicleSpeed
 	 * request.completed = [](AsyncPropertyReply* reply) { delete reply; };
 	 * routingEngine->getPropertyAsync(request);

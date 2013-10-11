@@ -67,12 +67,15 @@ public:
 	  */
 	virtual void propertyChanged(AbstractPropertyType* value, const string &uuid) {}
 
+	/*! supportedChanged() is called when the supported properties changes
+	 * @arg supportedProperties the new list of supported properties.
+	 */
 	virtual void supportedChanged(PropertyList supportedProperties) = 0;
 	
-
-	virtual void setConfiguration(map<string, string> config);
-
 protected:
+	/*!
+	 * \brief routingEngine is the core of AMB.  It is used to pass plugin and property information to other plugins
+	 */
 	AbstractRoutingEngine* routingEngine;
 	map<string, string> configuration;
 };

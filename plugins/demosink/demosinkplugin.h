@@ -50,7 +50,6 @@ public:
 	:AbstractSinkManager(engine, config)
 	{
 		DemoSink* sink = new DemoSink(routingEngine, config);
-		sink->setConfiguration(config);
 	}
 
 	void setConfiguration(map<string, string> config)

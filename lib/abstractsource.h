@@ -42,6 +42,9 @@ class AbstractSource: public AbstractSink
 {
 
 public:
+	/*!
+	 * \brief The Operations enum is a bitmask flag used to specify which operations are supported by the source plugin
+	 */
 	enum Operations {
 		Get = 0x01,
 		Set = 0x02,
@@ -53,19 +56,70 @@ public:
 	
 	///pure virtual methods:
 
+	/*!
+	 * \brief getPropertyAsync is called when a sink requests the value for given property.
+	 * This is only called if the source supports the Get operation (@see Operation)
+	 * \param reply the reply variable.  @see AsyncPropertyReply
+	 */
 	virtual void getPropertyAsync(AsyncPropertyReply *reply) = 0;
+
+	/*!
+	 * \brief getRangePropertyAsync is called when a sink requests a series of values for a given
+	 * property within a specified time or sequencial range.  This will only be called if the source
+	 * support the Ranged Operation (@see Operations)
+	 * \param reply is the reply variable.  @see AsyncRangePropertyReply
+	 */
 	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply) = 0;
+
+	/*!
+	 * \brief setProperty is called when a sink requests to set a value for a given property.
+	 * This is only called if the source supports the Set Operation (@see Operation)
+	 * \param request the requested property to set.
+	 * \return returns a pointer to the new value for the property.  @see AsyncPropertyReply
+	 */
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
+
+	/*!
+	 * \brief subscribeToPropertyChanges is called when a sink requests a subscription.  Source plugins
+	 * can keep track of subscriptions and may wish to sleep if there are no subscriptions.
+	 * \param property the property that is being subscribed.
+	 * @see unsubscribeToPropertyChanges
+	 */
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property) = 0;
+
+	/*!
+	 * \brief unsubscribeToPropertyChanges is called when a sink requests to unsubscribe from a given property's changes.
+	 * \param property the property to unsubscribe to
+	 * @see subscribeToPropertyChanges
+	 */
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property) = 0;
+
+	/*!
+	 * \brief supported is called by the routingEngine (@see AbstractRoutingEngine) to understand what properties this source supports
+	 * \return returns a list of supported properties.  If the the supported properties changed, the source should call AbstractRoutingEngine::setSupported.
+	 */
 	virtual PropertyList supported() = 0;
 
+	/*!
+	 * \brief supportedOperations
+	 * \return returns the supported operations.  @see Operations
+	 */
 	virtual int supportedOperations() = 0;
 
+	/*!
+	 * \brief getPropertyInfo used to return specific information about a property @see PropertyInfo
+	 * the source should override this otherwise a PropertyInfo::invalid() will be returned for the property
+	 * \param property the property to get info for.
+	 * \return a PropertyInfo object.
+	 */
 	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 	
 
 protected:
+	/*!
+	 * \brief routingEngine the core routing engine used to send property updates to sink plugins.
+	 * @see AbstractRoutingEngine
+	 */
 	AbstractRoutingEngine* routingEngine;
 	
 private:
