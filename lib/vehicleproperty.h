@@ -303,9 +303,17 @@ class VehicleProperty
 public:
 	
 
+	/*!
+	 * \brief factory constructs a static instance of VehicleProperty.  This should be called once before VehicleProperty is used in the app
+	 */
 	static void factory();
 
 	typedef std::string Property;
+
+	/*!
+	 * \brief PropertyTypeFactoryCallback callback used to construct a AbstractPropertyType for a property
+	 * \see registerProperty
+	 */
 	typedef std::function<AbstractPropertyType* (void)> PropertyTypeFactoryCallback;
 
 	/// Various property types:
@@ -783,22 +791,32 @@ public:
 	/** END PROPERTIES **/
 
 
+	/*!
+	 * \brief capabilities
+	 * \return returns list of all registered properties
+	 * \see VehicleProperty::registerProperty
+	 */
 	static std::list<VehicleProperty::Property> capabilities();
+
+	/*!
+	 * \brief customProperties
+	 * \return returns list of custom properties defined by plugins using VehicleProperty::registerProperty
+	 */
 	static std::list<VehicleProperty::Property> customProperties();
 
-	/*! getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
+	/*! \brief getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
 	  * with the value specified by 'value'.  Ownership of the returned AbstractPropertyType* is
 	  * transfered to the caller.
 	  */
 	static AbstractPropertyType* getPropertyTypeForPropertyNameValue(Property name, std::string value="");
 
-	/*! registerProperty registers properties with the Vehicle Property system.  Returns true if property
+	/*! \brief registerProperty registers properties with the Vehicle Property system.  Returns true if property
 	 *  has been registered successfully.
-	 *  @param name - name of property.  Name cannot match any existing property or it will be rejected and
+	 *  \param name - name of property.  Name cannot match any existing property or it will be rejected and
 	 *  this method will return false.
-	 *  @param factor - callback function that returns an AbstractPropertyType representation of the value.
+	 *  \param factor - callback function that returns an AbstractPropertyType representation of the value.
 	 *  custom properties will need to return a custom AbstractPropertyType based object.
-	 *  @example :
+	 *  \example :
 	 *
 	 *  #include <vehicleproperty.h>
 	 *  #include <abstractpropertytype.h>
