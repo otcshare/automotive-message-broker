@@ -418,7 +418,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 
 		Zone::Type zone = objectMap[objectPath]->zone();
 
-		GVariant* value = g_variant_new("(i)",(int)zone);
+		GVariant* value = g_variant_new("i",(int)zone);
 		return value;
 	}
 
