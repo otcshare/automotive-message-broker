@@ -106,7 +106,7 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 			t->setObjectPath(fullobjectPath.str());
 			t->setSourceFilter(source);
 			t->setZoneFilter(zone);
-			t->unregisterObject();
+			//t->unregisterObject();
 			t->supportedChanged(re->supported());
 		}
 
@@ -146,7 +146,7 @@ void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, G
 			t->setObjectPath(fullobjectPath.str());
 			t->setSourceFilter(source);
 			t->setZoneFilter(zone);
-			t->unregisterObject();
+			//t->unregisterObject();
 			t->supportedChanged(re->supported());
 		}
 
