@@ -1,3 +1,10 @@
+* Tue Oct 16 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.800 ("challenger" alpha)
+- Changes DBus API with the concent of zones
+- New location plugin that uses nmea devices
+- updated packaging
+- lots more docs are now available in the docs package
+
 * Thu Sep 12 2013 - <kevron.m.rees@intel.com>
 - Official 0.10.0 ("chevelle") release
 - added LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so to fix opencvlux plugin issues
