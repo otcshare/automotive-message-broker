@@ -7,7 +7,11 @@ OBDLink MX
 OBDLink S
 OBDPro USB
 
-To use the OBD-II Source plugin, add the following config to your /etc/ambd/config:
+To use the OBD-II Source plugin enable the plugin by running 
+
+cmake -Dobd2_plugin=ON .. 
+
+and add the following config to your /etc/ambd/config:
 
 
 "sources" : [
