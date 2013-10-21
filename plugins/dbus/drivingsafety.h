@@ -134,7 +134,8 @@ public:
 		 *  @attributeComment Setting this to 'true' will prevent the rear doors from being opened
 		 *  @attributeComment from the inside.
 		 **/
-		wantPropertyVariant(VehicleProperty::DoorLockStatus, "ChildLockStatus", "b", AbstractProperty::Read);
+		///TODO: need to define ChildLockStatus
+		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLockStatus", "b", AbstractProperty::Read);
 
 		
 	}

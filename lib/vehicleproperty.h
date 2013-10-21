@@ -693,14 +693,18 @@ public:
 	static const Property AirbagStatus;
 	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
 
+	///TODO: Make DoorStatus a zoned property instead of a map.
 	static const Property DoorStatus;
 	PROPERTYTYPENOVAL(DoorStatus, DoorStatusType,
 					  MapPropertyType<BasicPropertyType<Door::Location> BOOST_PP_COMMA() BasicPropertyType<Door::Status> >)
 	//typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<Door::Status> > DoorStatusType;
 
+	///TODO: Make DoorLockStatus a zoned property instead of a map.
 	static const Property DoorLockStatus;
 	PROPERTYTYPENOVAL(DoorLockStatus, DoorLockStatusType,
 					  MapPropertyType<BasicPropertyType<Door::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+
+	///TODO: Add ChildLockStatus
 
 	static const Property SeatBeltStatus;
 	PROPERTYTYPENOVAL(SeatBeltStatus, SeatBeltStatusType,
