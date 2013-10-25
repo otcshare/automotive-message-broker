@@ -4,20 +4,20 @@ Object Path: /
 
 Methods:
 
-	Array{ObjectPath}	findObject(string objectName)
+	Array{ObjectPath}	FindObject(string objectName)
 
 		returns list of object paths that provide the given objectName (ie "VehicleSpeed" is the object name for
 		the DBus object at path: "/path/to/VehicleSpeed").
 
-	Array{int32}	zonesForObjectName(string objectName)
+	Array{int32}	ZonesForObjectName(string objectName)
 
 		returns list of zones for a given objectName.
 
-	ObjectPath	findObjectForZone(string objectName, int32 zone)
+	ObjectPath	FindObjectForZone(string objectName, int32 zone)
 
 		returns object path which provides the given objectName in the given zone.
 
-	Array{ObjectPath}	list()
+	Array{ObjectPath}	List()
 
 		returns list of ObjectNames which are supported by the system
 
