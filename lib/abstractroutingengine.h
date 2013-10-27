@@ -377,11 +377,46 @@ public:
 	 * \see AsyncPropertyReply
 	 * \param request the request containing the property and the value to set
 	 * \return a pointer to the reply which is owned by the caller of this method
+	 * \example 
 	 */
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
-	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
-	virtual void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self) = 0;
-	virtual void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
+
+	/*!
+	 * \brief subscribeToProperty subscribe to changes made to a property value.
+	 * \param propertyName name of the property to request a subscription for.
+	 * \param self pointer to the sink who is subscribing.
+	 * \example
+	 * //somewhere in the sink:
+	 * routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
+	 *
+	 * //... elsewhere in the sink, this will be called when a property changes:
+	 * void MySink::propertyChanged(const AbstractPropertyType* property)
+	 * {
+	 *   if(property->name == VehicleProperty::EngineSpeed)
+	 *   {
+	 *      ...
+	 *   }
+	 * }
+	 */
+	virtual void subscribeToProperty(VehicleProperty::Property propertyName, AbstractSink* self) = 0;
+
+	/*!
+	 * \brief subscribeToProperty subscribe to changes made to a property value.
+	 * \param propertyName name of the property to request a subscription for.
+	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
+	 * \param self pointer to the sink who is subscribing.
+	 */
+	virtual void subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, AbstractSink *self) = 0;
+
+	/*!
+	 * \brief subscribeToProperty subscribe to changes made to a property value.
+	 * \param propertyName name of the property to request a subscription for.
+	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
+	 * \param zoneFilter zone to filter.  Only updates from this zone will be passed to the sink.
+	 * \param self pointer to the sink who is subscribing.
+	 */
+	virtual void subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
+
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 
 	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid) = 0;

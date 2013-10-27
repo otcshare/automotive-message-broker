@@ -372,7 +372,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 	routingEngine->setSupported(mSupported, this);
 }
 
-void DatabaseSink::propertyChanged(AbstractPropertyType *value, const std::string &uuid)
+void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 
@@ -388,7 +388,7 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value, const std::strin
 	DBObject* obj = new DBObject;
 	obj->key = property;
 	obj->value = value->toString();
-	obj->source = uuid;
+	obj->source = value->sourceUuid;
 	obj->time = value->timestamp;
 	obj->sequence = value->sequence;
 

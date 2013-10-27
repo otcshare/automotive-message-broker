@@ -97,7 +97,7 @@ public:
 
 		PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);
 
-		mValue = val->copy();
+		mValue = val;
 		mAnyValue = val->anyValue();
 		mTimestamp = val->timestamp;
 		if(info.isValid())

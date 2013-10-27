@@ -30,7 +30,7 @@ public:
 	ExampleSink(AbstractRoutingEngine* engine, map<string, string> config);
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(AbstractPropertyType* value, const std::string &uuid);
+	virtual void propertyChanged( AbstractPropertyType* value);
 	virtual const std::string uuid();
 };
 

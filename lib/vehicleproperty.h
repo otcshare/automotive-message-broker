@@ -166,40 +166,20 @@ enum Status
 
 }
 
-namespace Door {
-enum Location
+namespace Door
 {
-	Driver=0,
-	Passenger,
-	LeftRear,
-	RightRear,
-	Trunk,
-	FuelCap,
-	Hood
-};
-
 enum Status
 {
 	Closed = 0,
 	Open,
 	Ajar
 };
-
 }
 
 namespace Seat
 {
-enum Location
-{
-	Driver = 0,
-	FrontMiddle = 1,
-	Passenger,
-	LeftRear,
-	MiddleRear,
-	RightRear
-};
 
-enum Status
+enum Occupant
 {
 	Vacant = 0,
 	Child,
@@ -419,7 +399,7 @@ public:
 	static const Property AccelerationZ;
 	PROPERTYTYPE(AccelerationZ, AccelerationZType, BasicPropertyType<uint16_t>, uint16_t)
 
-	/**< Mass Air Flow.  TODO: units */
+	/**< Mass Air Flow.  grams/sec */
 	static const Property MassAirFlow;
 	PROPERTYTYPE(MassAirFlow, MassAirFlowType, BasicPropertyType<uint16_t>, uint16_t)
 	//typedef BasicPropertyType<uint16_t> MassAirFlowType;
@@ -694,29 +674,25 @@ public:
 	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
 
 	static const Property DoorStatus;
-	PROPERTYTYPENOVAL(DoorStatus, DoorStatusType,
-					  MapPropertyType<BasicPropertyType<Door::Location> BOOST_PP_COMMA() BasicPropertyType<Door::Status> >)
-	//typedef MapPropertyType<BasicPropertyType<Door::Location>, BasicPropertyType<Door::Status> > DoorStatusType;
+	PROPERTYTYPEBASIC(DoorStatus, Door::Status)
 
 	static const Property DoorLockStatus;
-	PROPERTYTYPENOVAL(DoorLockStatus, DoorLockStatusType,
-					  MapPropertyType<BasicPropertyType<Door::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+	PROPERTYTYPEBASIC(DoorLockStatus, bool)
+
+	static const Property ChildLockStatus;
+	PROPERTYTYPEBASIC(ChildLockStatus, bool)
 
 	static const Property SeatBeltStatus;
-	PROPERTYTYPENOVAL(SeatBeltStatus, SeatBeltStatusType,
-					  MapPropertyType<BasicPropertyType<Seat::Location> BOOST_PP_COMMA() BasicPropertyType<bool> >)
+	PROPERTYTYPEBASIC(SeatBeltStatus, bool)
 
 	static const Property WindowLockStatus;
-	PROPERTYTYPENOVAL(WindowLockStatus, WindowLockStatusType,
-					  MapPropertyType<BasicPropertyType<Window::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+	PROPERTYTYPEBASIC(WindowLockStatus, bool )
 
 	static const Property OccupantStatus;
-	PROPERTYTYPENOVAL(OccupantStatus, OccupantStatusType,
-					  MapPropertyType<BasicPropertyType<Seat::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+	PROPERTYTYPEBASIC(OccupantStatus, Seat::Occupant)
 
 	static const Property ObstacleDistance;
-	PROPERTYTYPENOVAL(ObstacleDistance, ObstacleDistanceType,
-					  MapPropertyType<BasicPropertyType<DistanceSensor::Location> BOOST_PP_COMMA() BasicPropertyType<double> > )
+	PROPERTYTYPEBASIC(ObstacleDistance, double)
 
 	static const Property RainSensor;
 	PROPERTYTYPEBASIC(RainSensor, uint16_t)

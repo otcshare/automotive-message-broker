@@ -45,7 +45,6 @@ public:
 
 	int supportedOperations();
 	
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
 	PropertyInfo getPropertyInfo(VehicleProperty::Property property)

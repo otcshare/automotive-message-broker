@@ -65,15 +65,15 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 	addPropertySupport(VehicleProperty::AirbagStatus, Zone::FrontLeft);
 
 	Zone::ZoneList airbagZones;
-	airbagZones.push_back(Zone::FrontLeft);
-	airbagZones.push_back(Zone::FrontRight);
-	airbagZones.push_back(Zone::RearLeft);
-	airbagZones.push_back(Zone::RearRight);
+	airbagZones.push_back(Zone::FrontLeft | Zone::FrontSide);
+	airbagZones.push_back(Zone::FrontRight | Zone::FrontSide);
+	airbagZones.push_back(Zone::RearLeft | Zone::LeftSide);
+	airbagZones.push_back(Zone::RearRight | Zone::RightSide);
 
-	airbagStatus[Zone::FrontLeft] = Airbag::Active;
-	airbagStatus[Zone::FrontRight] = Airbag::Inactive;
-	airbagStatus[Zone::RearLeft] = Airbag::Deployed;
-	airbagStatus[Zone::RearRight] = Airbag::Deployed;
+	airbagStatus[Zone::FrontLeft | Zone::FrontSide] = Airbag::Active;
+	airbagStatus[Zone::FrontRight | Zone::FrontSide] = Airbag::Inactive;
+	airbagStatus[Zone::RearLeft | Zone::LeftSide] = Airbag::Deployed;
+	airbagStatus[Zone::RearRight | Zone::RightSide] = Airbag::Deployed;
 
 	PropertyInfo airbagInfo(0,airbagZones);
 

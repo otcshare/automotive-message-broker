@@ -61,7 +61,7 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 		unregisterObject();
 }
 
-void DBusSink::propertyChanged(AbstractPropertyType *value, const std::string &uuid)
+void DBusSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 
@@ -69,7 +69,7 @@ void DBusSink::propertyChanged(AbstractPropertyType *value, const std::string &u
 		return;
 
 	AbstractProperty* prop = propertyDBusMap[property];
-	prop->setValue(value);
+	prop->setValue(value->copy());
 	mTime = value->timestamp;
 }
 

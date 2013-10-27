@@ -50,22 +50,13 @@ public:
 	  */
 	virtual const string uuid() = 0;
 
-
-	/// Deprecated:
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid)
-	{
-		DebugOut(DebugOut::Warning)<<"propertyChanged(VehicleProperty::Property, AbstractPropertyType*,string) is deprecated.  Use propertyChanged(AbstractPropertyType*, const string &)"<<endl;
-		propertyChanged(value, uuid);
-	}
-
-	/*! propertyChanged is called when a subscribed to property changes.
-	  * @see AbstractRoutingEngine::subscribeToPropertyChanges()
-	  * @param value value of the property that changed. this is a temporary pointer that will be destroyed.
+	/*! \brief propertyChanged is called when a subscribed to property changes.
+	  * \see AbstractRoutingEngine::subscribeToPropertyChanges()
+	  * \param value value of the property that changed. this is a temporary pointer that will be destroyed.
 	  * Do not destroy it.  If you need to store the value use value.anyValue(), value.value<T>() or
 	  * value->copy() to copy.
-	  * @param uuid Unique identifier representing the source
 	  */
-	virtual void propertyChanged(AbstractPropertyType* value, const string &uuid) {}
+	virtual void propertyChanged(AbstractPropertyType *value){ (void)value; }
 
 	/*! supportedChanged() is called when the supported properties changes
 	 * @arg supportedProperties the new list of supported properties.

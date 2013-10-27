@@ -116,7 +116,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	
 }
 
-string GpsdPlugin::uuid()
+const string GpsdPlugin::uuid()
 {
 	return "326011dd-65cd-4be6-a75e-3e8d46a05b5e";
 }
