@@ -69,7 +69,7 @@ void DBusSink::propertyChanged(AbstractPropertyType *value)
 		return;
 
 	AbstractProperty* prop = propertyDBusMap[property];
-	prop->setValue(value->copy());
+	prop->updateValue(value->copy());
 	mTime = value->timestamp;
 }
 

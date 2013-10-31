@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "exampleplugin.h"
 #include "timestamp.h"
+#include "listplusplus.h"
 
 #include <iostream>
 #include <boost/assert.hpp>
@@ -223,6 +224,23 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::AirbagStatus)
+	{
+		if(airbagStatus.find(reply->zoneFilter) == airbagStatus.end())
+		{
+			reply->success = false;
+			reply->error = AsyncPropertyReply::ZoneNotSupported;
+			reply->completed(reply);
+		}
+		else
+		{
+			VehicleProperty::AirbagStatusType temp(airbagStatus[reply->zoneFilter]);
+			reply->success = true;
+			reply->value = &temp;
+			reply->completed(reply);
+		}
+	}
+
 	else
 	{
 		reply->success=false;
@@ -258,7 +276,8 @@ int ExampleSourcePlugin::supportedOperations()
 
 void ExampleSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	mRequests.remove(property);
+	if(contains(mRequests,property))
+		mRequests.remove(property);
 }
 
 void ExampleSourcePlugin::randomizeProperties()

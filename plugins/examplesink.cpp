@@ -132,10 +132,13 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 	{
 		AsyncPropertyRequest airbagStatus;
 		airbagStatus.property = VehicleProperty::AirbagStatus;
+		airbagStatus.zoneFilter = Zone::FrontRight | Zone::FrontSide;
 		airbagStatus.completed = [](AsyncPropertyReply* reply)
 		{
 			if(!reply->success)
+			{
 				DebugOut(DebugOut::Error)<<"Airbag Async request failed ("<<reply->error<<")"<<endl;
+			}
 			else
 				DebugOut(1)<<"Airbag Status: "<<reply->value->toString()<<endl;
 			delete reply;

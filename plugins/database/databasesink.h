@@ -43,7 +43,7 @@ public:
 	}
 	~Queue()
 	{
-		g_mutex_free(&mutex);
+
 	}
 
 	int count()
