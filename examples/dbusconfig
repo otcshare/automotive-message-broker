@@ -9,7 +9,8 @@
 		{
 			"name" : "DBusSink",
 			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
-		} 
+		}
+
 	]
 }
 

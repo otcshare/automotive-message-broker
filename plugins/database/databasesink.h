@@ -43,7 +43,7 @@ public:
 	}
 	~Queue()
 	{
-		g_mutex_free(&mutex);
+
 	}
 
 	int count()
@@ -150,7 +150,7 @@ public:
 	DatabaseSink(AbstractRoutingEngine* engine, map<string, string> config);
 	~DatabaseSink();
 	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(AbstractPropertyType *value, const std::string &uuid);
+	virtual void propertyChanged(AbstractPropertyType *value);
 	const std::string uuid();
 
 	///source role:

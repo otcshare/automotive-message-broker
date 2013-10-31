@@ -45,7 +45,7 @@ const string WebSocketSink::uuid()
 {
 	return m_uuid;
 }
-void WebSocketSink::propertyChanged(AbstractPropertyType *value, const string &uuid)
+void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 

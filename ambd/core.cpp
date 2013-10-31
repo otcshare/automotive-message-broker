@@ -185,7 +185,7 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 				value->sourceUuid = uuid;
 			}
 
-			sink->propertyChanged(value, uuid);
+			sink->propertyChanged(value);
 		}
 	}
 }
@@ -331,7 +331,8 @@ void Core::subscribeToProperty(VehicleProperty::Property property, string source
 
 void Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self)
 {
-
+	/// TODO: implement
+	throw std::runtime_error("Not implemented");
 }
 
 void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)

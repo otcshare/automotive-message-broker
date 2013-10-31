@@ -126,6 +126,7 @@ const VehicleProperty::Property VehicleProperty::TractionControlSystem = "Tracti
 const VehicleProperty::Property VehicleProperty::VehicleTopSpeedLimit = "VehicleTopSpeedLimit";
 const VehicleProperty::Property VehicleProperty::DoorStatus = "DoorStatus";
 const VehicleProperty::Property VehicleProperty::DoorLockStatus = "DoorLockStatus";
+const VehicleProperty::Property VehicleProperty::ChildLockStatus = "ChildLockStatus";
 const VehicleProperty::Property VehicleProperty::SeatBeltStatus = "SeatBeltStatus";
 const VehicleProperty::Property VehicleProperty::WindowLockStatus = "WindowLockStatus";
 const VehicleProperty::Property VehicleProperty::OccupantStatus = "OccupantStatus";
@@ -249,53 +250,14 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(TractionControlSystem,false);
 	REGISTERPROPERTY(VehicleTopSpeedLimit,0);
 
-	registerPropertyPriv(DoorStatus,[]()
-	{
-		DoorStatusType* t = new DoorStatusType();
-		t->append(Door::Driver,Door::Closed);
 
-		return t;
-	});
-
-	registerPropertyPriv(DoorLockStatus,[]()
-	{
-		DoorLockStatusType* t = new DoorLockStatusType();
-		t->append(Door::Driver,false);
-
-		return t;
-	});
-
-	registerPropertyPriv(SeatBeltStatus,[]()
-	{
-		SeatBeltStatusType* t = new SeatBeltStatusType();
-		t->append(Seat::Driver,false);
-
-		return t;
-	});
-
-	registerPropertyPriv(OccupantStatus,[]()
-	{
-		OccupantStatusType* t = new OccupantStatusType();
-		t->append(Seat::Driver,false);
-
-		return t;
-	});
-
-	registerPropertyPriv(WindowLockStatus,[]()
-	{
-		WindowLockStatusType* t = new WindowLockStatusType();
-		t->append(Window::Driver,false);
-
-		return t;
-	});
-
-	registerPropertyPriv(ObstacleDistance,[]()
-	{
-		ObstacleDistanceType* t = new ObstacleDistanceType();
-		t->append(DistanceSensor::LeftFront,0);
-
-		return t;
-	});
+	REGISTERPROPERTY(DoorStatus, Door::Closed);
+	REGISTERPROPERTY(DoorLockStatus, false);
+	REGISTERPROPERTY(ChildLockStatus, false);
+	REGISTERPROPERTY(SeatBeltStatus, false);
+	REGISTERPROPERTY(OccupantStatus, Seat::Vacant);
+	REGISTERPROPERTY(WindowLockStatus, false);
+	REGISTERPROPERTY(ObstacleDistance, 0);
 
 	REGISTERPROPERTY(RainSensor,0);
 	REGISTERPROPERTY(WindshieldWiper,Window::Off);

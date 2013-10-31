@@ -55,15 +55,15 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	: AbstractSource(re, config)
 {
   DebugOut() << "Testing MapPropertyType... " << endl;
-  MapPropertyType<BasicPropertyType<Door::Location>,BasicPropertyType<Door::Status>> propmap("something");
-  MapPropertyType<BasicPropertyType<Door::Location>,BasicPropertyType<Door::Status>> propmaptwo("something");
-  propmap.append(Door::LeftRear,Door::Ajar);
+  MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmap("something");
+  MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmaptwo("something");
+  propmap.append(Zone::RearLeft,Door::Ajar);
   GVariant *var = propmap.toVariant();
   gsize dictsize = g_variant_n_children(var);
   //DebugOut() << var << endl;
   propmaptwo.fromVariant(var);
 
-  g_assert(propmap.toString() == propmap.toString());
+  g_assert(propmaptwo.toString() == propmap.toString());
 
   DebugOut() << "Testing ListPropertyType... " << endl;
   VehicleProperty::TripMetersType* tfirst = new VehicleProperty::TripMetersType();

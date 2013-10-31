@@ -118,14 +118,14 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST returns dictionary of Door (byte) and Status (byte).  See DOORLOCATION_* and DOORSTATUS_*
 		 **/
-		wantPropertyVariant(VehicleProperty::DoorStatus, "DoorStatus", "a(yy)", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorStatus, "DoorStatus", "b", AbstractProperty::Read);
 
 		/** @attributeName DoorLockStatus
 		 *  @type object
 		 *  @access readonly
 		 *  @attributeComment \brief MUST returns dictionary of Door (byte) and Status (bool locked = true, unlocked = false).  See DOORLOCATION_*.
 		 **/
-		wantPropertyVariant(VehicleProperty::DoorLockStatus, "DoorLockStatus", "a(yb)", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorLockStatus, "DoorLockStatus", "b", AbstractProperty::Read);
 
 		/** @attributeName ChildLockStatus
 		 *  @type boolean
@@ -134,7 +134,6 @@ public:
 		 *  @attributeComment Setting this to 'true' will prevent the rear doors from being opened
 		 *  @attributeComment from the inside.
 		 **/
-		///TODO: need to define ChildLockStatus
 		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLockStatus", "b", AbstractProperty::Read);
 
 		
@@ -162,7 +161,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST returns dictionary of Seat Belt (byte, see SEATBELTLOCATION) and Status (bool: Fasten = true, Unfastened = false)
 		 **/
-		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "SeatBeltStatus", "a(yb)", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "SeatBeltStatus", "b", AbstractProperty::Read);
 
 
 		
@@ -195,7 +194,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST returns dictionary of Occupant (byte see OCCUPANTLOCATION) and Status (byte, see OCCUPANTSTATUS_*)
 		 **/
-		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", "a(yy)", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", "i", AbstractProperty::Read);
 
 
 		
@@ -223,7 +222,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST returns dictionary of Distance Sensor (byte, see DISTANCESENSORLOCATION) and distance (double) in m.
 		 **/
-		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", "a{yd}", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", "d", AbstractProperty::Read);
 
 
 		
