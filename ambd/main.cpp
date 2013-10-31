@@ -145,6 +145,10 @@ int main(int argc, char **argv)
 		DebugOut(DebugOut::Error)<<"Running as root.  This is dangerous."<<endl;
 	}
 
+#ifndef GLIB_VERSION_2_36
+	g_type_init();
+#endif
+
 	VehicleProperty::factory();
 	
 	Core routingEngine;
