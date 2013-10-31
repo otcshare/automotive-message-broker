@@ -76,7 +76,7 @@ const string DemoSink::uuid()
 	return "5b0e8a04-d6d7-43af-b827-1663627a25d9";
 }
 
-void DemoSink::propertyChanged(AbstractPropertyType *value, const string &uuid)
+void DemoSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 

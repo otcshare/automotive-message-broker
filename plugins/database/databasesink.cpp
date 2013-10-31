@@ -180,7 +180,7 @@ DatabaseSink::~DatabaseSink()
 		shared->queue.append(obj);
 
 		g_thread_join(thread);
-		g_thread_unref(thread);
+//		g_thread_unref(thread);
 		delete shared;
 	}
 
@@ -350,6 +350,8 @@ void DatabaseSink::setLogging(bool b)
 	request.value = new DatabaseLoggingType(b);
 
 	setProperty(request);
+
+	delete request.value;
 }
 
 void DatabaseSink::setDatabaseFileName(string filename)
@@ -372,7 +374,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 	routingEngine->setSupported(mSupported, this);
 }
 
-void DatabaseSink::propertyChanged(AbstractPropertyType *value, const std::string &uuid)
+void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 
@@ -388,7 +390,7 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value, const std::strin
 	DBObject* obj = new DBObject;
 	obj->key = property;
 	obj->value = value->toString();
-	obj->source = uuid;
+	obj->source = value->sourceUuid;
 	obj->time = value->timestamp;
 	obj->sequence = value->sequence;
 
@@ -514,14 +516,14 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 			startDb();
 			reply->success = true;
 			DatabaseLoggingType temp(true);
-			routingEngine->updateProperty(DatabaseLogging,&temp,uuid());
+			routingEngine->updateProperty(&temp,uuid());
 		}
 		else
 		{
 			stopDb();
 			reply->success = true;
 			DatabaseLoggingType temp(false);
-			routingEngine->updateProperty(DatabaseLogging,&temp,uuid());
+			routingEngine->updateProperty(&temp,uuid());
 		}
 	}
 
@@ -546,7 +548,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 
 			DatabasePlaybackType temp(playback);
 
-			routingEngine->updateProperty(DatabasePlayback,&temp,uuid());
+			routingEngine->updateProperty(&temp,uuid());
 		}
 		else
 		{
@@ -557,7 +559,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 
 			DatabasePlaybackType temp(playback);
 
-			routingEngine->updateProperty(DatabasePlayback, &temp, uuid());
+			routingEngine->updateProperty(&temp,uuid());
 		}
 
 		reply->success = true;

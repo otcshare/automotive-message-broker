@@ -33,7 +33,7 @@ public:
 	
 	const string uuid();
 	
-	void propertyChanged(AbstractPropertyType* value, const string &uuid);
+	void propertyChanged( AbstractPropertyType* value);
 	void supportedChanged(PropertyList);
 
 	friend class WheelPrivate;	

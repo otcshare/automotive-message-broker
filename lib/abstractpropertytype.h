@@ -34,28 +34,36 @@
 #include <debugout.h>
 #include <boost/algorithm/string.hpp>
 
-namespace Zone {
+class Zone {
 
-enum Type {
-	None = 0,
-	Front = 1,
-	Middle = 1 << 1,
-	Right = 1 << 2,
-	Left = 1 << 3,
-	Rear = 1 << 4,
-	Center = 1 << 5
-};
+public:
 
-const Zone::Type FrontRight = Zone::Type(Front | Right);
-const Zone::Type FrontLeft = Zone::Type(Front | Left);
-const Zone::Type MiddleRight = Zone::Type(Middle | Right);
-const Zone::Type MiddleLeft = Zone::Type(Middle | Left);
-const Zone::Type RearRight = Zone::Type(Rear | Right);
-const Zone::Type RearLeft = Zone::Type(Rear | Left);
+	typedef int Type;
+
+	enum {
+		None = 0,
+		Front = 1,
+		Middle = 1 << 1,
+		Right = 1 << 2,
+		Left = 1 << 3,
+		Rear = 1 << 4,
+		Center = 1 << 5,
+		LeftSide = 1 << 6,
+		RightSide = 1 << 7,
+		FrontSide = 1 << 8,
+		BackSide = 1 << 9
+	};
+
+static const Zone::Type FrontRight = Zone::Type(Front | Right);
+static const Zone::Type FrontLeft = Zone::Type(Front | Left);
+static const Zone::Type MiddleRight = Zone::Type(Middle | Right);
+static const Zone::Type MiddleLeft = Zone::Type(Middle | Left);
+static const Zone::Type RearRight = Zone::Type(Rear | Right);
+static const Zone::Type RearLeft = Zone::Type(Rear | Left);
 
 typedef std::list<Zone::Type> ZoneList;
 
-}
+};
 
 class AbstractPropertyType
 {

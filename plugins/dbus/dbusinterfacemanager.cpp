@@ -87,9 +87,13 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 
 	delete t;
 
+	DebugOut()<<"There are "<<uniqueSourcesList.size()<<" unique sources "<<endl;
+
 	for(auto itr = uniqueSourcesList.begin(); itr != uniqueSourcesList.end(); itr++)
 	{
 		std::map<Zone::Type, bool> zones = (*itr).second;
+
+		DebugOut()<<"There are "<<zones.size()<<" zones"<<endl;
 
 		std::string source = (*itr).first;
 
@@ -233,7 +237,7 @@ on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data
 
 
 DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine,std::map<std::string,std::string> config)
-	:AbstractSink(engine,config),re(engine)
+	:AbstractSink(engine,config),re(engine), connection(nullptr)
 {
 	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
 					DBusServiceName,
@@ -253,6 +257,8 @@ DBusInterfaceManager::~DBusInterfaceManager()
 
 void DBusInterfaceManager::supportedChanged(PropertyList supportedProperties)
 {
+	if(!connection)
+		return;
 
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();

@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "exampleplugin.h"
 #include "timestamp.h"
+#include "listplusplus.h"
 
 #include <iostream>
 #include <boost/assert.hpp>
@@ -65,15 +66,15 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 	addPropertySupport(VehicleProperty::AirbagStatus, Zone::FrontLeft);
 
 	Zone::ZoneList airbagZones;
-	airbagZones.push_back(Zone::FrontLeft);
-	airbagZones.push_back(Zone::FrontRight);
-	airbagZones.push_back(Zone::RearLeft);
-	airbagZones.push_back(Zone::RearRight);
+	airbagZones.push_back(Zone::FrontLeft | Zone::FrontSide);
+	airbagZones.push_back(Zone::FrontRight | Zone::FrontSide);
+	airbagZones.push_back(Zone::RearLeft | Zone::LeftSide);
+	airbagZones.push_back(Zone::RearRight | Zone::RightSide);
 
-	airbagStatus[Zone::FrontLeft] = Airbag::Active;
-	airbagStatus[Zone::FrontRight] = Airbag::Inactive;
-	airbagStatus[Zone::RearLeft] = Airbag::Deployed;
-	airbagStatus[Zone::RearRight] = Airbag::Deployed;
+	airbagStatus[Zone::FrontLeft | Zone::FrontSide] = Airbag::Active;
+	airbagStatus[Zone::FrontRight | Zone::FrontSide] = Airbag::Inactive;
+	airbagStatus[Zone::RearLeft | Zone::LeftSide] = Airbag::Deployed;
+	airbagStatus[Zone::RearRight | Zone::RightSide] = Airbag::Deployed;
 
 	PropertyInfo airbagInfo(0,airbagZones);
 
@@ -223,6 +224,23 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::AirbagStatus)
+	{
+		if(airbagStatus.find(reply->zoneFilter) == airbagStatus.end())
+		{
+			reply->success = false;
+			reply->error = AsyncPropertyReply::ZoneNotSupported;
+			reply->completed(reply);
+		}
+		else
+		{
+			VehicleProperty::AirbagStatusType temp(airbagStatus[reply->zoneFilter]);
+			reply->success = true;
+			reply->value = &temp;
+			reply->completed(reply);
+		}
+	}
+
 	else
 	{
 		reply->success=false;
@@ -258,7 +276,8 @@ int ExampleSourcePlugin::supportedOperations()
 
 void ExampleSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	mRequests.remove(property);
+	if(contains(mRequests,property))
+		mRequests.remove(property);
 }
 
 void ExampleSourcePlugin::randomizeProperties()

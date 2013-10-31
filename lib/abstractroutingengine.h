@@ -324,22 +324,99 @@ public:
 	virtual std::list<std::string> sourcesForProperty(VehicleProperty::Property property) = 0;
 
 	/**
-	 * /brief getPropertyAsync requests a property value from a source.  This call has a timeout and will always return.
+	 * /brief getPropertyAsync requests a property value from a source.  This call has a timeout and the callback specified in the request will always be called.
 	 * /see AsyncPropertyRequest
 	 * /see AsyncPropertyReply.
 	 * /param request requested property.
 	 * /return AsyncPropertyReply. The returned AsyncPropertyReply is owned by the caller of getPropertyAsync.
 	 * /example AsyncPropertyRequest request;
 	 * request.property = VehicleProperty::VehicleSpeed
-	 * request.completed = [](AsyncPropertyReply* reply) { delete reply; };
+	 * request.completed = [](AsyncPropertyReply* reply)
+	 * {
+	 *   //you own the reply
+	 *   delete reply;
+	 * };
 	 * routingEngine->getPropertyAsync(request);
 	 */
 	virtual AsyncPropertyReply * getPropertyAsync(AsyncPropertyRequest request) = 0;
+
+	/*!
+	 * \brief getRangePropertyAsync is used for getting a range of properties that are within the specified time or sequence parameters.
+	 * \param request the request containing the property and other information required by the query
+	 * \return a pointer to the reply.
+	 * \example AsyncRangePropertyRequest vehicleSpeedFromLastWeek;
+	 *
+	 *	vehicleSpeedFromLastWeek.timeBegin = amb::currentTime() - 10;
+	 *	vehicleSpeedFromLastWeek.timeEnd = amb::currentTime();
+	 *
+	 *	PropertyList requestList;
+	 *	requestList.push_back(VehicleProperty::VehicleSpeed);
+	 *	requestList.push_back(VehicleProperty::EngineSpeed);
+	 *
+	 *	vehicleSpeedFromLastWeek.properties = requestList;
+	 *	vehicleSpeedFromLastWeek.completed = [](AsyncRangePropertyReply* reply)
+	 *	{
+	 *		std::list<AbstractPropertyType*> values = reply->values;
+	 *		for(auto itr = values.begin(); itr != values.end(); itr++)
+	 *		{
+	 *			auto val = *itr;
+	 *			DebugOut(1)<<"Value from past: ("<<val->name<<"): "<<val->toString()<<" time: "<<val->timestamp<<endl;
+	 *		}
+	 *
+	 *		delete reply;
+	 *	};
+	 *
+	 *	routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);
+	 *
+	 */
 	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
+
+	/*!
+	 * \brief setProperty sets a property to a value.
+	 * \see AsyncSetPropertyRequest
+	 * \see AsyncPropertyReply
+	 * \param request the request containing the property and the value to set
+	 * \return a pointer to the reply which is owned by the caller of this method
+	 * \example 
+	 */
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
-	virtual void subscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
-	virtual void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self) = 0;
-	virtual void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
+
+	/*!
+	 * \brief subscribeToProperty subscribe to changes made to a property value.
+	 * \param propertyName name of the property to request a subscription for.
+	 * \param self pointer to the sink who is subscribing.
+	 * \example
+	 * //somewhere in the sink:
+	 * routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
+	 *
+	 * //... elsewhere in the sink, this will be called when a property changes:
+	 * void MySink::propertyChanged(const AbstractPropertyType* property)
+	 * {
+	 *   if(property->name == VehicleProperty::EngineSpeed)
+	 *   {
+	 *      ...
+	 *   }
+	 * }
+	 */
+	virtual void subscribeToProperty(VehicleProperty::Property propertyName, AbstractSink* self) = 0;
+
+	/*!
+	 * \brief subscribeToProperty subscribe to changes made to a property value.
+	 * \param propertyName name of the property to request a subscription for.
+	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
+	 * \param self pointer to the sink who is subscribing.
+	 */
+	virtual void subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, AbstractSink *self) = 0;
+
+	/*!
+	 * \brief subscribeToProperty subscribe to changes made to a property value.
+	 * \param propertyName name of the property to request a subscription for.
+	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
+	 * \param zoneFilter zone to filter.  Only updates from this zone will be passed to the sink.
+	 * \param self pointer to the sink who is subscribing.
+	 */
+	virtual void subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
+
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 
 	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid) = 0;

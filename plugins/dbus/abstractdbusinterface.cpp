@@ -255,6 +255,8 @@ void AbstractDBusInterface::registerObject()
 
 	GError* error2=NULL;
 
+	DebugOut()<<"registering DBus path: "<<mObjectPath<<endl;
+
 	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error2);
 	
 	if(error2)
@@ -282,23 +284,20 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	}
 
 	GError *error = NULL;
+	GVariant* val = g_variant_ref(property->toGVariant());
 
-	GVariant **params = g_new(GVariant*,2);
-	GVariant *val = g_variant_ref(property->toGVariant());
-	params[0] = g_variant_new("v",val);
-	params[1] = g_variant_new("d",property->timestamp());
+	std::string temp = property->value()->toString();
 
-	GVariant *tuple_variant = g_variant_new_tuple(params,2);
+	DebugOut(0)<<property->ambPropertyName()<<" is: "<<temp<<endl;
 
-	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(), tuple_variant, &error);
+	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(),
+								  g_variant_new("(vd)",val,property->timestamp()), &error);
 
 	if(error)
 	{
 		DebugOut(DebugOut::Error)<<error->message<<endl;
 		g_error_free(error);
 	}
-
-
 
 	/// Send PropertiesChanged signal
 
@@ -314,8 +313,14 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), "org.freedesktop.DBus.Properties", "PropertiesChanged", g_variant_new("(sa{sv}as)",
 																																				mInterfaceName.c_str(),
 																																				&builder, NULL), &error2);
-	g_variant_unref(val);
 
+	if(error2)
+	{
+		DebugOut(DebugOut::Error)<<error2->message<<endl;
+		g_error_free(error2);
+	}
+
+	g_variant_unref(val);
 }
 
 std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string object)

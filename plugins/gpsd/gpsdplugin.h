@@ -51,7 +51,7 @@ public:
 
 	GpsdPlugin(AbstractRoutingEngine* re, map<string, string> config);
 	~GpsdPlugin();
-	string uuid();
+	const string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
@@ -60,8 +60,6 @@ public:
 	PropertyList supported();
 
 	int supportedOperations();
-	
-	void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string uuid) {}
 	void supportedChanged(PropertyList) {}
 	
 	void updateProperty();

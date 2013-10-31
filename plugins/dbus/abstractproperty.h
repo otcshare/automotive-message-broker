@@ -81,7 +81,9 @@ public:
 
 	double timestamp()
 	{
-		return mTimestamp;
+		if(mValue)
+			return mValue->timestamp;
+		return 0;
 	}
 
 	int sequence()
@@ -97,32 +99,20 @@ public:
 
 		PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);
 
-		mValue = val->copy();
-		mAnyValue = val->anyValue();
-		mTimestamp = val->timestamp;
+		mValue = val;
 		if(info.isValid())
 			mUpdateFrequency = info.updateFrequency();
+	}
+
+	virtual void updateValue(AbstractPropertyType* val)
+	{
+		setValue(val);
 		updateValue();
 	}
 
 	int updateFrequency()
 	{
 		return mUpdateFrequency;
-	}
-
-	/*template<typename T>
-	void setValue(T val)
-	{
-		mAnyValue = val;
-		updateValue();
-	}*/
-
-
-
-	template<typename T>
-	T anyValue()
-	{
-		return boost::any_cast<T>(mAnyValue);
 	}
 
 	AbstractPropertyType* value()
@@ -141,13 +131,11 @@ protected: ///methods:
 	
 protected:
 	
-	boost::any mAnyValue;
 	string mPropertyName;
 	VehicleProperty::Property mAmbPropertyName;
 	string mSignature;
 	SetterFunc mSetterFunc;
 	Access mAccess;
-	double mTimestamp;
 	AbstractPropertyType* mValue;
 	AbstractDBusInterface* mInterface;
 };

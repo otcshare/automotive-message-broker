@@ -24,7 +24,7 @@ void VariantType::initialize()
 	request.completed = [this](AsyncPropertyReply* reply)
 	{
 		if(reply->success)
-			setValue(reply->value);
+			setValue(reply->value->copy());
 		else
 			DebugOut(DebugOut::Error)<<"get request unsuccessful for "<<reply->property<<" : "<<reply->error<<endl;
 

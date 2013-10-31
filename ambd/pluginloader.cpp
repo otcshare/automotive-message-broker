@@ -141,9 +141,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		}
 	}
 
-	DebugOut() << "Trying to free obj" << endl;
 	json_object_put(sourcesobject);
-	DebugOut() << "Done first" << endl;
 	///read the sinks:
 	
 	json_object *sinksobject = json_object_object_get(rootobject,"sinks");
@@ -190,9 +188,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		}
 	}
 
-	DebugOut() << "Trying to free obj" << endl;
 	json_object_put(sinksobject);
-	DebugOut() << "Done" << endl;
 }
 
 PluginLoader::~PluginLoader()

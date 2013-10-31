@@ -36,7 +36,7 @@ public:
 	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
 	virtual ~DBusSink() { }
 	virtual void supportedChanged(PropertyList supportedProperties);
-	virtual void propertyChanged(AbstractPropertyType *value, const std::string &uuid);
+	virtual void propertyChanged(AbstractPropertyType *value);
 	virtual const std::string uuid();
 
 	std::list<VehicleProperty::Property> wantsProperties()
@@ -73,9 +73,9 @@ protected:
 		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access, this);
 	}
 
-	void wantPropertyVariant(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
+	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access, this);
+		propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access, this);
 	}
 
 	PropertyDBusMap propertyDBusMap;
