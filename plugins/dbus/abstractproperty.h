@@ -95,6 +95,9 @@ public:
 
 	virtual void setValue(AbstractPropertyType* val)
 	{
+		if(!val)
+			return;
+
 		if(mValue) delete mValue;
 
 		PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);

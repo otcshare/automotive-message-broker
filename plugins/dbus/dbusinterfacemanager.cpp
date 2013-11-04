@@ -277,6 +277,8 @@ void DBusInterfaceManager::supportedChanged(PropertyList supportedProperties)
 
 	/// Create objects for unimplemented properties:
 
+	implemented = AbstractDBusInterface::implementedProperties();
+
 	PropertyList capabilitiesList = VehicleProperty::capabilities();
 
 	for (auto itr = capabilitiesList.begin(); itr != capabilitiesList.end(); itr++)
