@@ -62,6 +62,11 @@ std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(Abstract
 
 			std::list<Zone::Type> zoneList = info.zones();
 
+			if(!zoneList.size())
+			{
+				uniqueZoneList[Zone::None] = true;
+			}
+
 			for(auto zoneItr = zoneList.begin(); zoneItr != zoneList.end(); zoneItr++)
 			{
 				uniqueZoneList[*zoneItr] = true;
@@ -87,13 +92,9 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 
 	delete t;
 
-	DebugOut()<<"There are "<<uniqueSourcesList.size()<<" unique sources "<<endl;
-
 	for(auto itr = uniqueSourcesList.begin(); itr != uniqueSourcesList.end(); itr++)
 	{
 		std::map<Zone::Type, bool> zones = (*itr).second;
-
-		DebugOut()<<"There are "<<zones.size()<<" zones"<<endl;
 
 		std::string source = (*itr).first;
 
@@ -110,7 +111,6 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 			t->setObjectPath(fullobjectPath.str());
 			t->setSourceFilter(source);
 			t->setZoneFilter(zone);
-			//t->unregisterObject();
 			t->supportedChanged(re->supported());
 		}
 
@@ -125,7 +125,6 @@ void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, G
 	/// check if we need more than one instance:
 
 	std::list<VehicleProperty::Property> implementedProperties = t->wantsProperties();
-
 
 	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
 
@@ -150,7 +149,6 @@ void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, G
 			t->setObjectPath(fullobjectPath.str());
 			t->setSourceFilter(source);
 			t->setZoneFilter(zone);
-			//t->unregisterObject();
 			t->supportedChanged(re->supported());
 		}
 
@@ -213,7 +211,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<OccupantStatusProperty>(iface->re, connection);
 	exportProperty<ObstacleDistanceProperty>(iface->re, connection);
 
-	iface->supportedChanged(PropertyList());
+	iface->supportedChanged(iface->re->supported());
 }
 
 static void
@@ -257,8 +255,12 @@ DBusInterfaceManager::~DBusInterfaceManager()
 
 void DBusInterfaceManager::supportedChanged(PropertyList supportedProperties)
 {
+	DebugOut()<<"supported Properties: "<<supportedProperties.size()<<endl;
 	if(!connection)
+	{
+		DebugOut(DebugOut::Warning)<<"supportedChanged called before we have a dbus connection"<<endl;
 		return;
+	}
 
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();

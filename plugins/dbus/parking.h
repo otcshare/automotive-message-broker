@@ -73,7 +73,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment must return status of hazard light:  Engaged = true, Disengaged = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::HazardLightStatus,"HazardLight", "b", AbstractProperty::Read);
+		wantProperty<bool>(VehicleProperty::HazardLightStatus,"HazardLight", "b", AbstractProperty::ReadWrite);
 
 		
 	}
