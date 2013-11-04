@@ -198,7 +198,8 @@ enum Location
 	Sunroof,
 	Windshield,
 	SideMirrorLeft,
-	SideMirrorRight
+	SideMirrorRight,
+	Rear
 };
 
 enum WiperSpeed
@@ -209,20 +210,6 @@ enum WiperSpeed
 	Auto = 10
 };
 
-}
-
-namespace DistanceSensor
-{
-enum Location
-{
-	LeftFront = 0,
-	RightFront = 1,
-	LeftRear = 2,
-	RightRear = 3,
-	LeftBlindSpot = 4,
-	RightBlindSPot = 5
-
-};
 }
 
 namespace HVAC
