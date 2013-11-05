@@ -81,7 +81,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Vehicle Power mode (see VEHICLEPOWERMODE)
 		 **/
-		wantPropertyVariant(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","b",AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","i",AbstractProperty::Read);
 
 	}
 };
