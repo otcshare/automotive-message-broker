@@ -55,7 +55,7 @@ class RainSensor: public DBusSink
 {
 public:
 	RainSensor(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("InteriorTemperature", re, connection, map<string, string>())
+		:DBusSink("RainSensor", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName RainSensor
