@@ -726,7 +726,7 @@ public:
 	//typedef BasicPropertyType<bool> SteeringWheelHeaterType;
 
 	static const Property SeatHeater;
-	PROPERTYTYPEBASIC(SeatHeater,bool)
+	PROPERTYTYPEBASIC(SeatHeater,int)
 	//typedef BasicPropertyType<bool> SeatHeaterType;
 
 	static const Property SeatCooler;

@@ -193,7 +193,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 
 	///see which properties are supported:
 	introspectionXml +=
-			"<property type='"+ property->signature() + "' name='"+ pn +"' access='"+access+"' />"
+			"<property type='"+ string(property->signature()) + "' name='"+ pn +"' access='"+access+"' />"
 			"<method name='Get" + pn + "'>"
 			"	<arg type='v' direction='out' name='value' />"
 			"	<arg type='d' direction='out' name='timestamp' />"

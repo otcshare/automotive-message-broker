@@ -4,7 +4,7 @@
 #include "listplusplus.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, signature, access, interface), mInitialized(false)
+	:AbstractProperty(propertyName, access, interface), mInitialized(false)
 {
 	mAmbPropertyName = ambPropertyName;
 	routingEngine = re;

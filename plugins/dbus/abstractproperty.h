@@ -46,16 +46,21 @@ public:
 		ReadWrite
 	};
 
-	AbstractProperty(string propertyName, string signature, Access access, AbstractDBusInterface* interface);
+	AbstractProperty(string propertyName, Access access, AbstractDBusInterface* interface);
 	
 	virtual void setSetterFunction(SetterFunc setterFunc)
 	{
 		mSetterFunc = setterFunc;
 	}
 	
-	virtual string signature()
+	virtual const char* signature()
 	{
-		return mSignature;
+		GVariant* var = toGVariant();
+		if(!var) return "";
+
+		const char * s = g_variant_get_type_string(var);
+		g_variant_unref(var);
+		return s;
 	}
 	
 	virtual string name() 
@@ -136,7 +141,6 @@ protected:
 	
 	string mPropertyName;
 	VehicleProperty::Property mAmbPropertyName;
-	string mSignature;
 	SetterFunc mSetterFunc;
 	Access mAccess;
 	AbstractPropertyType* mValue;
