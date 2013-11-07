@@ -28,6 +28,18 @@ AbstractRoutingEngine::~AbstractRoutingEngine()
 AsyncPropertyReply::AsyncPropertyReply(const AsyncPropertyRequest &request)
 	:AsyncPropertyRequest(request), value(NULL), success(false), timeoutSource(nullptr)
 {
+	setTimeout();
+}
+
+AsyncPropertyReply::AsyncPropertyReply(const AsyncSetPropertyRequest &request)
+	:AsyncPropertyRequest(request), value(request.value), success(false), timeoutSource(nullptr)
+{
+	setTimeout();
+	value->zone = request.zoneFilter;
+}
+
+void AsyncPropertyReply::setTimeout()
+{
 	auto timeoutfunc = [](gpointer userData) {
 		AsyncPropertyReply* thisReply = static_cast<AsyncPropertyReply*>(userData);
 		if(thisReply->success == false)

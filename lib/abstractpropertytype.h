@@ -54,12 +54,12 @@ public:
 		BackSide = 1 << 9
 	};
 
-static const Zone::Type FrontRight = Zone::Type(Front | Right);
-static const Zone::Type FrontLeft = Zone::Type(Front | Left);
-static const Zone::Type MiddleRight = Zone::Type(Middle | Right);
-static const Zone::Type MiddleLeft = Zone::Type(Middle | Left);
-static const Zone::Type RearRight = Zone::Type(Rear | Right);
-static const Zone::Type RearLeft = Zone::Type(Rear | Left);
+static const Zone::Type FrontRight;
+static const Zone::Type FrontLeft;
+static const Zone::Type MiddleRight;
+static const Zone::Type MiddleLeft;
+static const Zone::Type RearRight;
+static const Zone::Type RearLeft;
 
 typedef std::list<Zone::Type> ZoneList;
 

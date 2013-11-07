@@ -63,7 +63,7 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 	addPropertySupport(VehicleProperty::MachineGunTurretStatus, Zone::None);
 	addPropertySupport(VehicleProperty::ExteriorBrightness, Zone::None);
 	addPropertySupport(VehicleProperty::DoorsPerRow, Zone::None);
-	addPropertySupport(VehicleProperty::AirbagStatus, Zone::FrontLeft);
+	addPropertySupport(VehicleProperty::AirbagStatus, Zone::None);
 
 	Zone::ZoneList airbagZones;
 	airbagZones.push_back(Zone::FrontLeft | Zone::FrontSide);
@@ -79,6 +79,18 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 	PropertyInfo airbagInfo(0,airbagZones);
 
 	propertyInfoMap[VehicleProperty::AirbagStatus] = airbagInfo;
+
+	addPropertySupport(VehicleProperty::AirConditioning, Zone::None);
+
+	Zone::ZoneList acZones;
+	acZones.push_back(Zone::FrontLeft);
+	acZones.push_back(Zone::Front | Zone::Right);
+
+	acStatus[Zone::Front | Zone::Left] = true;
+	acStatus[Zone::Front | Zone::Right] = false;
+
+	PropertyInfo acInfo(0,acZones);
+	propertyInfoMap[VehicleProperty::AirConditioning] = acInfo;
 
 	re->setSupported(supported(), this);
 }
@@ -240,6 +252,22 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 			reply->completed(reply);
 		}
 	}
+	else if(reply->property == VehicleProperty::AirConditioning)
+	{
+		if(acStatus.find(reply->zoneFilter) == acStatus.end())
+		{
+			reply->success = false;
+			reply->error = AsyncPropertyReply::ZoneNotSupported;
+			reply->completed(reply);
+		}
+		else
+		{
+			VehicleProperty::AirConditioningType temp(acStatus[reply->zoneFilter]);
+			reply->success = true;
+			reply->value = &temp;
+			reply->completed(reply);
+		}
+	}
 
 	else
 	{
@@ -256,7 +284,29 @@ void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 AsyncPropertyReply *ExampleSourcePlugin::setProperty(AsyncSetPropertyRequest request )
 {
+	AsyncPropertyReply *reply = new AsyncPropertyReply(request);
 
+	if(reply->property == VehicleProperty::AirConditioning)
+	{
+		if(acStatus.find(reply->zoneFilter) == acStatus.end())
+		{
+			reply->success = false;
+			reply->error = AsyncPropertyReply::ZoneNotSupported;
+			reply->completed(reply);
+		}
+		else
+		{
+			acStatus[reply->zoneFilter] = reply->value->value<bool>();
+
+			///we need to update subscribers of this change:
+			routingEngine->updateProperty(reply->value,uuid());
+
+			///Now reply to the set request:
+			reply->success = true;
+			reply->completed(reply);
+
+		}
+	}
 }
 
 void ExampleSourcePlugin::subscribeToPropertyChanges(VehicleProperty::Property property)

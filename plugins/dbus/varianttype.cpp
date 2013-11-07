@@ -58,19 +58,21 @@ GVariant *VariantType::toGVariant()
 
 void VariantType::fromGVariant(GVariant *val)
 {
-	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
+	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
 	v->fromVariant( val );
 
 	AsyncSetPropertyRequest request;
 	request.property = mAmbPropertyName;
 	request.value = v;
-	request.completed = [](AsyncPropertyReply* reply)
+	request.zoneFilter = mZoneFilter;
+	request.completed = [&](AsyncPropertyReply* reply)
 	{
 		/// TODO: throw dbus exception
 		if(!reply->success)
 		{
 			DebugOut(DebugOut::Error)<<"setProperty fail: "<<reply->error<<endl;
 		}
+		delete v;
 		delete reply;
 	};
 

@@ -35,6 +35,7 @@ class AbstractSink;
 class AbstractSource;
 class AsyncPropertyReply;
 class AsyncRangePropertyReply;
+class AsyncSetPropertyRequest;
 
 
 typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
@@ -118,6 +119,8 @@ class AsyncPropertyReply: public AsyncPropertyRequest
 public:
 	AsyncPropertyReply(const AsyncPropertyRequest &request);
 
+	AsyncPropertyReply(const AsyncSetPropertyRequest &request);
+
 	virtual ~AsyncPropertyReply()
 	{
 		if(timeoutSource)
@@ -156,12 +159,13 @@ public:
 	Error error;
 
 private:
+	void setTimeout();
 	GSource* timeoutSource;
 };
 
 /*!
  * \brief The AsyncSetPropertyRequest class is used by sinks to set a property to the 'value'.  The source will reply
- * with a AsyncPropertyReply containing the new value or an error
+ * with a AsyncPropertyReply containing the new value or an error.
  * \see AbstractRoutingEngine::setProperty
  * \see AsyncPropertyReply
  */
@@ -180,7 +184,10 @@ public:
 
 	}
 
-	virtual ~AsyncSetPropertyRequest() { }
+	virtual ~AsyncSetPropertyRequest()
+	{
+
+	}
 
 	/*!
 	 * \brief value the new value to set the property to.
