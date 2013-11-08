@@ -377,6 +377,8 @@ void AbstractDBusInterface::startRegistration()
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
+	DebugOut(6)<<"getProperty call from: "<<sender<<endl;
+
 	std::string pn = propertyName;
 	if(pn == "Time")
 	{
