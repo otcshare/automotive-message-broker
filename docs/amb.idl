@@ -447,9 +447,9 @@ interface HVAC : VehiclePropertyType  {
 	attribute boolean SteeringWheelHeater;
 
 	/**  SeatHeater
-	 *   \brief Must return seat heater status: on (true) / off (false).    
+	 *   \brief Must return seat heater status: 0-100%.
 	 **/
-	attribute boolean SeatHeater;
+	attribute unsigned short SeatHeater;
 
 	/**  SeatCooler
 	 *   \brief Must return seat heater status: on (true) / off (false).    

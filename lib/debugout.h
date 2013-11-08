@@ -117,6 +117,11 @@ public:
 		throwErr = v;
 	}
 
+	static const int getDebugThreshhold()
+	{
+		return debugThreshhold;
+	}
+
 private:
 
 	std::string bufferTime(double time)

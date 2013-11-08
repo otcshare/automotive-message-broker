@@ -277,7 +277,7 @@ VehicleProperty::VehicleProperty()
 	});
 
 	REGISTERPROPERTY(SteeringWheelHeater,false);
-	REGISTERPROPERTY(SeatHeater, false);
+	REGISTERPROPERTY(SeatHeater, 0);
 	REGISTERPROPERTY(SeatCooler, false);
 	registerPropertyPriv(WindowStatus, []()
 	{

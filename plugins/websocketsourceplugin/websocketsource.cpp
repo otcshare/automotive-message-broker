@@ -126,6 +126,12 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	
 
 }
+
+PropertyInfo WebSocketSource::getPropertyInfo(VehicleProperty::Property property)
+{
+	return PropertyInfo::invalid();
+}
+
 bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
 {
 	//This is the polling function. If it return false, glib will stop polling this FD.

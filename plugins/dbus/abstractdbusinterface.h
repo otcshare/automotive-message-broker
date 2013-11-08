@@ -121,6 +121,7 @@ private:
 	static std::unordered_map<std::string, AbstractDBusInterface*> objectMap;
 	static std::list<std::string> mimplementedProperties;
 	guint regId;
+
 };
 
 #endif // ABSTRACTDBUSINTERFACE_H

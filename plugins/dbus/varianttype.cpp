@@ -4,7 +4,7 @@
 #include "listplusplus.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, signature, access, interface), mInitialized(false)
+	:AbstractProperty(propertyName, access, interface), mInitialized(false)
 {
 	mAmbPropertyName = ambPropertyName;
 	routingEngine = re;
@@ -58,19 +58,21 @@ GVariant *VariantType::toGVariant()
 
 void VariantType::fromGVariant(GVariant *val)
 {
-	AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
+	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
 	v->fromVariant( val );
 
 	AsyncSetPropertyRequest request;
 	request.property = mAmbPropertyName;
 	request.value = v;
-	request.completed = [](AsyncPropertyReply* reply)
+	request.zoneFilter = mZoneFilter;
+	request.completed = [&](AsyncPropertyReply* reply)
 	{
 		/// TODO: throw dbus exception
 		if(!reply->success)
 		{
 			DebugOut(DebugOut::Error)<<"setProperty fail: "<<reply->error<<endl;
 		}
+		delete v;
 		delete reply;
 	};
 

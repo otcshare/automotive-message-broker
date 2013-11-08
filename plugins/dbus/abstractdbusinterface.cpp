@@ -30,6 +30,42 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::objectMap;
 list<string> AbstractDBusInterface::mimplementedProperties;
 
+const uint getPid(const char *owner)
+{
+	GError* error = nullptr;
+	GDBusProxy* dbus = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, NULL,
+													 "org.freedesktop.DBus",
+													 "/",
+													 "org.freedesktop.DBus",
+													 NULL,
+													 &error);
+
+	if(error)
+	{
+		throw std::runtime_error(error->message);
+	}
+
+	error = nullptr;
+
+	GVariant* pid = g_dbus_proxy_call_sync(dbus, "GetConnectionUnixProcessID", g_variant_new("(s)", owner), G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
+
+	if(error)
+	{
+		throw std::runtime_error(error->message);
+	}
+
+	const char* p = g_variant_get_type_string(pid);
+
+	DebugOut()<<"pid "<<p<<endl;
+
+	uint thePid=0;
+
+	g_variant_get(pid,"(u)",&thePid);
+
+	return thePid;
+}
+
+
 
 static void handleMyMethodCall(GDBusConnection       *connection,
 							 const gchar           *sender,
@@ -43,6 +79,12 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 	std::string method = method_name;
 	AbstractDBusInterface* iface = static_cast<AbstractDBusInterface*>(user_data);
+
+	if(DebugOut::getDebugThreshhold() >= 6)
+	{
+		DebugOut(6)<<"DBus method call from: "<<sender<< " pid: " <<getPid(sender)<< " interface: "<<interface_name<<" method: "<<method<<endl;
+		DebugOut(6)<<"DBus method call path: "<<object_path<<endl;
+	}
 
 	g_assert(iface);
 
@@ -193,7 +235,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 
 	///see which properties are supported:
 	introspectionXml +=
-			"<property type='"+ property->signature() + "' name='"+ pn +"' access='"+access+"' />"
+			"<property type='"+ string(property->signature()) + "' name='"+ pn +"' access='"+access+"' />"
 			"<method name='Get" + pn + "'>"
 			"	<arg type='v' direction='out' name='value' />"
 			"	<arg type='d' direction='out' name='timestamp' />"
@@ -377,6 +419,12 @@ void AbstractDBusInterface::startRegistration()
 
 GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
+	if(DebugOut::getDebugThreshhold() >= 6)
+	{
+		DebugOut(6)<<"DBus GetProperty call from: "<<sender<< " pid: " <<getPid(sender)<< " interface: "<<interfaceName<<" property: "<<propertyName<<endl;
+		DebugOut(6)<<"DBus GetProperty call path: "<<objectPath<<endl;
+	}
+
 	std::string pn = propertyName;
 	if(pn == "Time")
 	{
@@ -440,6 +488,12 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 
 gboolean AbstractDBusInterface::setProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GVariant* value, GError** error, gpointer userData)
 {
+	if(DebugOut::getDebugThreshhold() >= 6)
+	{
+		DebugOut(6)<<"DBus SetProperty call from: "<<sender<< " pid: " <<getPid(sender)<< " interface: "<<interfaceName<<" property: "<<propertyName<<endl;
+		DebugOut(6)<<"DBus SetProperty call path: "<<objectPath<<endl;
+	}
+
 	if(objectMap.count(objectPath))
 	{
 		objectMap[objectPath]->setProperty(propertyName, value);
