@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 #include <boost/assert.hpp>
+#include <boost/thread/future.hpp>
 
 #ifdef OPENCL
 #include <opencv/ocl/ocl.hpp>
@@ -229,9 +230,16 @@ static int grabImage(void *data)
 		*(shared->m_capture) >> m_image;
 	}
 
-	uint lux = evalImage(m_image,shared);
-
-	shared->parent->updateProperty(lux);
+	/*if(shared->threaded)
+	{
+		auto luxFuture = boost::async([m_image, &shared](){ return evalImage(m_image,shared); });
+		luxFuture.then([&shared](boost::shared_future<uint> f) { shared->parent->updateProperty(f.get()); });
+	}
+	else*/
+	{
+		int lux = evalImage(m_image,shared);
+		shared->parent->updateProperty(lux);
+	}
 
 	if(shared->mRequests.size())
 	{
