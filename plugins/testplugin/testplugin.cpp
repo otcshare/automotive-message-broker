@@ -33,6 +33,16 @@ AbstractRoutingEngine *m_re;
 
 //std::list<ObdPid*> Obd2Amb::supportedPidsList;
 
+void testBooleanToStringFromString()
+{
+	BasicPropertyType<bool> boolean(true);
+	std::string isTrue = boolean.toString();
+	boolean.fromString(boolean.toString());
+	std::string isTrue2 = boolean.toString();
+
+	g_assert(isTrue == isTrue2);
+}
+
 bool beginsWith(std::string a, std::string b)
 {
 	return (a.compare(0, b.length(), b) == 0);
@@ -77,6 +87,8 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
   tsecond->fromVariant(tfirst->toVariant());
 
   g_assert (tfirst->toString() == tsecond->toString());
+
+  testBooleanToStringFromString();
 
   DebugOut() << "Exiting..." << endl;
   exit(-1);

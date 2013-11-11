@@ -273,6 +273,9 @@ public:
 	}
 	static std::string stringize(std::string v)
 	{
+		if(v == "0" || v == "1")
+			return v;
+
 		boost::algorithm::to_lower(v);
 		return v == "true" ? "1":"0";
 	}
