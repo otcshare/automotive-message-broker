@@ -23,14 +23,13 @@
 #include <boost/lexical_cast.hpp>
 #include <glib.h>
 #include <sstream>
-//#include <json-glib/json-glib.h>
 #include <listplusplus.h>
 #include <timestamp.h>
 #include "uuidhelper.h"
 
 #include "debugout.h"
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
-libwebsocket_context *context;
+libwebsocket_context *context = NULL;
 WebSocketSource *source;
 AbstractRoutingEngine *m_re;
 
@@ -79,7 +78,8 @@ void WebSocketSource::checkSubscriptions()
 		char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 		new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 		strcpy(new_response,replystr.c_str());
-		libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+		if(clientsocket)
+			libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 		delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	}
 }
@@ -233,7 +233,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 			new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 			strcpy(new_response,replystr.c_str());
-			libwebsocket_write(wsi, (unsigned char*)(new_response), strlen(new_response), LWS_WRITE_TEXT);  
+			libwebsocket_write(wsi, (unsigned char*)(new_response), strlen(new_response), LWS_WRITE_TEXT);
 			delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 
 			break;
@@ -272,7 +272,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 
 
 			string type = string(json_object_get_string(typeobject));
-			string  name = string(json_object_get_string(nameobject));
+			string name = string(json_object_get_string(nameobject));
 			
 			string id;
 			
@@ -426,7 +426,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						json_object_put(valueobject);
 						json_object_put(timestampobject);
 						json_object_put(sequenceobject);
-					      
+						
 						AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
 						v->timestamp = boost::lexical_cast<double,std::string>(timestamp);
 						v->sequence = boost::lexical_cast<double,std::string>(sequence);
@@ -442,6 +442,8 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 						{
 							DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
 						}
+
+						delete v;
 					}
 					else
 					{
@@ -465,7 +467,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
 		{
-		  DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "Adding poll for websocket IO channel" << endl;
+			DebugOut(5) << __SMALLFILE__ << ":" << __LINE__ << "Adding poll for websocket IO channel" << endl;
 			//Add a FD to the poll list.
 			GIOChannel *chan = g_io_channel_unix_new(libwebsocket_get_socket_fd(wsi));
 
@@ -492,7 +494,7 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	m_sslEnabled = false;
 	clientConnected = false;
 	source = this;
-	m_re = re;  
+	m_re = re;
 	struct lws_context_creation_info info;
 	memset(&info, 0, sizeof info);
 	info.protocols = protocols;
@@ -555,7 +557,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	std::string uuid = amb::createUuid();
 	uuidReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 10.0; ///TODO: 10 second timeout, make this configurable?
-	stringstream s;  
+	stringstream s;
 	
 	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << uuid << "\"}";
 	string replystr = s.str();
@@ -564,7 +566,8 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
-	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	if(clientsocket)
+		libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 }
 
@@ -573,7 +576,7 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	std::string uuid = amb::createUuid();
 	uuidRangedReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 60; ///TODO: 60 second timeout, make this configurable?
-	stringstream s;  
+	stringstream s;
 	s.precision(15);
 	s << "{\"type\":\"method\",\"name\":\"getRanged\",\"data\": {";
 
@@ -604,7 +607,8 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
 	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(new_response,replystr.c_str());
-	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
+	if(clientsocket)
+		libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
 	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 }
 

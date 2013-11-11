@@ -78,7 +78,7 @@ public:
 		json_object_object_foreach(rootobject, key, val)
 		{
 			T one(key);
-			N two(json_object_get_string(val));
+			N two(std::string(json_object_get_string(val)));
 			append(one,two);
 
 		}

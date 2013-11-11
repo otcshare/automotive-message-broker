@@ -91,7 +91,9 @@
 *        errorCB: error callback, called with the eventlist that failed to unsubscribe
 *
 ******************************************************************************/
-
+/*
+(function () {
+*/
 function Vehicle(sCB, eCB, url, protocol)
 {
     /* store a copy of Vehicle this for reference in callbacks */
@@ -120,8 +122,8 @@ function Vehicle(sCB, eCB, url, protocol)
     this.socketProtocol = "http-only";
 
     /* override the websocket address if parameters are given */
-    if(url != undefined) this.socketUrl = url;
-    if(protocol != undefined) this.socketProtocol = protocol;
+    if(url !== undefined) this.socketUrl = url;
+    if(protocol !== undefined) this.socketProtocol = protocol;
 
     this.VehicleMethodCall = function(id, name, successCB, errorCB)
     {
@@ -134,7 +136,7 @@ function Vehicle(sCB, eCB, url, protocol)
         this.start = function()
         {
             me.timeout = setTimeout(function(){
-                if(me.errorCB != undefined)
+                if(me.errorCB !== undefined)
                 {
                     me.errorCB("\""+me.name+"\" method timed out after "+self.timeouttime+"ms");
                 }
@@ -143,7 +145,7 @@ function Vehicle(sCB, eCB, url, protocol)
         }
         this.finish = function()
         {
-            if(me.timeout != undefined)
+            if(me.timeout !== undefined)
             {
                 clearTimeout(me.timeout);
             }
@@ -215,7 +217,7 @@ Vehicle.prototype.send = function(obj, successCB, errorCB)
 {
     if(!this.connected)
     {
-        if(errorCB != undefined)
+        if(errorCB !== undefined)
         {
             errorCB("\""+obj.name+"\" method failed because socket is closed");
         }
@@ -242,18 +244,24 @@ Vehicle.prototype.getSupportedEventTypes = function(type, writeable, successCB, 
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.get = function(namelist, successCB, errorCB)
+Vehicle.prototype.get = function(namelist, zone, successCB, errorCB)
 {
     if(namelist.length <= 0)
     {
         return;
     }
 
+	var properties = [];
+
+    for(var i = 0; i < namelist.length; i++)
+    {
+        properties[i] = {"property" : namelist[i], "zone" : zone};
+    }
     var obj = {
         "type" : "method",
         "name": "get",
         "transactionid" : this.generateTransactionId(),
-        "data" : namelist
+        "data" : properties
     };
     this.send(obj, successCB, errorCB);
 }
@@ -271,7 +279,7 @@ Vehicle.prototype.getHistory = function(event, startTime, endTime, successCB, er
 
 }
 
-Vehicle.prototype.set = function(namelist, valuelist, successCB, errorCB)
+Vehicle.prototype.set = function(namelist, valuelist, zoneList, successCB, errorCB)
 {
     if((namelist.length != valuelist.length)||(namelist.length <= 0))
     {
@@ -287,31 +295,33 @@ Vehicle.prototype.set = function(namelist, valuelist, successCB, errorCB)
     var list = [];
     for(var i = 0; i < namelist.length; i++)
     {
-        var val = {"property" : namelist[i], "value" : valuelist[i]};
+        var val = {"property" : namelist[i], "value" : valuelist[i],"zone" : zoneList[i]};
         list[list.length] = val;
     }
     obj.data = list;
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.subscribe = function(namelist, successCB, errorCB)
+Vehicle.prototype.subscribe = function(namelist, zoneList, successCB, errorCB)
 {
     var obj = {
         "type" : "method",
         "name": "subscribe",
         "transactionid" : this.generateTransactionId(),
-        "data" : namelist
+        "data" : namelist,
+        "zone" : zoneList
     };
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.unsubscribe = function(namelist, successCB, errorCB)
+Vehicle.prototype.unsubscribe = function(namelist, zoneList, successCB, errorCB)
 {
     var obj = {
         "type" : "method",
         "name": "unsubscribe",
         "transactionid" : this.generateTransactionId(),
-        "data" : namelist
+        "data" : namelist,
+        "zone" : zoneList
     };
     this.send(obj, successCB, errorCB);
 }
@@ -355,11 +365,11 @@ Vehicle.prototype.receive = function(msg)
                 if(call&&(!call.done)&&(call.transactionid === event.transactionid))
                 {
                     call.finish();
-                    if(event.error != undefined)
+                    if(event.error !== undefined)
                     {
                         call.errorCB(event.error);
                     }
-                    if(event.data != undefined)
+                    else if(event.data !== undefined && call.successCB !== undefined)
                     {
                         call.successCB(event.data);
                     }
@@ -373,3 +383,27 @@ Vehicle.prototype.receive = function(msg)
         }
     }
 }
+
+/*
+    // AMD / RequireJS
+    if (typeof define !== 'undefined' && define.amd) {
+        define([], function () {
+            return {
+                Vehicle: Vehicle
+            };
+        });
+    }
+    // Node.js
+    else if (typeof module !== 'undefined' && module.exports) {
+        module.exports = {
+                Vehicle: Vehicle
+            };
+    }
+    // included directly via <script> tag
+    else {
+        root.vehicle = {
+                Vehicle: Vehicle
+            };
+    }
+})();
+*/

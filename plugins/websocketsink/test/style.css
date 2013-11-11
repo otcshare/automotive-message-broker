@@ -19,14 +19,14 @@
     top: 0px;
     left: 0%;
     height: 100%;
-    width: 520px;
+    width: 620px;
     overflow-y: auto;
 }
 
 #result {
     position: absolute;
     top: 0px;
-    left: 520px;
+    left: 620px;
     height: 98%;
     width: 1380px;
     padding-top: 1%;
@@ -40,7 +40,7 @@
     position: relative;
     left: 0px;
     height: 67px;
-    width: 500px;
+    width: 700px;
     overflow: hidden;
 }
 
@@ -49,15 +49,21 @@
     top: 32px;
     left: 0px;
     height: 35px;
-    width: 430px;
+    width: 630px;
 }
 
+.smallText {
+    text-align: left;
+    color: #FFFFFF;
+    font: 18px Arial;
+    display: inline;
+}
 .propinfo {
     position: absolute;
     top: 0px;
     left: 0px;
     height: 67px;
-    width: 500px;
+    width: 600px;
     text-align: left;
     color: #FFFFFF;
     font: 18px Arial;
