@@ -97,15 +97,25 @@ public:
 
 	ObdPid* createPidFromReply(ByteArray replyVector)
 	{
+		ByteArray replyVectorClean = ObdPid::cleanup(replyVector);
+		ByteArray replyVectorCompressed = ObdPid::compress(replyVectorClean);
+
 		for(auto itr = supportedPidsList.begin(); itr != supportedPidsList.end(); itr++)
 		{
-			if (!(*itr)->tryParse(replyVector))
+			ObdPid* p = *itr;
+
+			if(p->needsCompress())
+			{
+					replyVector = replyVectorCompressed;
+			}
+			else replyVector = replyVectorClean;
+
+			if (!p->tryParse(replyVector))
 			{
 				continue;
 			}
 			
 			ObdPid* pid = (*itr)->create();
-			//pid->tryParse(replyVector);
 			return pid;
 		}
 		return 0;
@@ -182,7 +192,7 @@ private:
 	PropertyList m_supportedProperties;
 	std::map<VehicleProperty::Property, AbstractPropertyType*> oldValueMap;
 	GMutex *threadQueueMutex;
-
+	Obd2ConnectType obd2Connected;
 
 };
 

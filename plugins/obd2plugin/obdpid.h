@@ -20,6 +20,7 @@ public:
 	static ByteArray cleanup(ByteArray replyVector)
 	{
 		ByteArray tmp;
+
 		for (int i=0;i<replyVector.size();i++)
 		{
 			if ((replyVector[i] != 0x20) && (replyVector[i] != '\r') && (replyVector[i] != '\n'))
@@ -50,8 +51,9 @@ public:
 		parse(replyVector);
 		return true;
 	}
-	virtual void parse(ByteArray replyVector) = 0;
-	virtual bool isValid(ByteArray replyVector) = 0;
+	virtual void parse(const ByteArray &replyVector) = 0;
+	virtual bool isValid(const ByteArray &replyVector) = 0;
+	virtual bool needsCompress() { return true; }
 
 	VehicleProperty::Property property;
 	std::string pid;
@@ -90,26 +92,25 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray &replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != id)
-		{
-			isValidVal = false;
-			return false;
-		}
 		isValidVal = true;
-		return true;
+		if (replyVector[1] != id)
+		{
+			return isValidVal = false;
+		}
+
+		return isValidVal;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray &replyVector)
 	{
 		if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
-		int mph = tmp[2];
+
+		int mph = replyVector[2];
 		value = boost::lexical_cast<std::string>(mph);
 	}
 };
@@ -123,10 +124,9 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray &replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != id)
+		if (replyVector[1] != id)
 		{
 			isValidVal = false;
 			return false;
@@ -134,15 +134,14 @@ public:
 		isValidVal = true;
 		return true;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray &replyVector)
 	{
 		if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
-		double rpm = ((tmp[2] << 8) + tmp[3]) / 4.0;
+		double rpm = ((replyVector[2] << 8) + replyVector[3]) / 4.0;
 		value = boost::lexical_cast<std::string>(rpm);
 	}
 };
@@ -156,10 +155,9 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray &replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != id)
+		if (replyVector[1] != id)
 		{
 			isValidVal = false;
 			return false;
@@ -167,15 +165,14 @@ public:
 		isValidVal = true;
 		return true;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray &replyVector)
 	{
 		if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
-		int temp = tmp[2] - 40;
+		int temp = replyVector[2] - 40;
 		value = boost::lexical_cast<std::string>(temp);
 	}
 };
@@ -189,10 +186,9 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray &replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != id)
+		if (replyVector[1] != id)
 		{
 			isValidVal = false;
 			return false;
@@ -200,15 +196,15 @@ public:
 		isValidVal = true;
 		return true;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray &replyVector)
 	{
 		if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
-		maf = ((tmp[2] << 8) + tmp[3]) / 100.0;
+
+		maf = ((replyVector[2] << 8) + replyVector[3]) / 100.0;
 		value = boost::lexical_cast<std::string>(maf);
 	}
 
@@ -225,18 +221,18 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray &replyVector)
 	{
 		return isValidVal = MassAirFlowPid::isValid(replyVector);
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray & replyVector)
 	{
 	  if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
+
 		timespec t;
 		clock_gettime(CLOCK_REALTIME, &t);
 
@@ -265,18 +261,18 @@ public:
 	{
 		type = 0x49;
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray & replyVector)
 	{
 		isValidVal = true;
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[0] != 0x49 || tmp[1] != 0x02)
+
+		if (replyVector[0] != 0x49 || replyVector[1] != 0x02)
 		{
 			isValidVal = false;
 
 		}
 		return isValidVal;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray & replyVector)
 	{
 		if (!isValidVal)
 		{
@@ -284,17 +280,16 @@ public:
 			return;
 		}
 		std::string vinstring;
-		ByteArray tmp = compress(cleanup(replyVector));
-		for (int j=0;j<tmp.size();j++)
+		for (int j=0;j<replyVector.size();j++)
 		{
-			if(tmp[j] == 0x49 && tmp[j+1] == 0x02)
+			if(replyVector[j] == 0x49 && replyVector[j+1] == 0x02)
 			{
 				//We're at a reply header
 				j+=3;
 			}
-			if (tmp[j] != 0x00)
+			if (replyVector[j] != 0x00)
 			{
-				vinstring += (char)tmp[j];
+				vinstring += (char)replyVector[j];
 				//printf("VIN: %i %c\n",replyVector[j],replyVector[j]);
 			}
 		}
@@ -312,11 +307,11 @@ public:
 	{
 		property = VehicleProperty::WMI;
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray & replyVector)
 	{
 		return isValidVal = VinPid::isValid(replyVector);
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray &replyVector)
 	{
 		if (!isValidVal)
 		{
@@ -336,10 +331,9 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray & replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != id)
+		if (replyVector[1] != id)
 		{
 			isValidVal = false;
 			return false;
@@ -347,15 +341,14 @@ public:
 		isValidVal = true;
 		return true;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray & replyVector)
 	{
 		if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
-		int temp = tmp[2] - 40;
+		int temp = replyVector[2] - 40;
 		value = boost::lexical_cast<std::string>(temp);
 	}
 };
@@ -368,10 +361,9 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray & replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != id)
+		if (replyVector[1] != id)
 		{
 			isValidVal = false;
 			return false;
@@ -379,15 +371,14 @@ public:
 		isValidVal = true;
 		return true;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray &replyVector)
 	{
 		if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
-		int load = tmp[2]*100.0/255.0;
+		int load = replyVector[2]*100.0/255.0;
 		value = boost::lexical_cast<std::string>(load);
 	}
 };
@@ -400,10 +391,9 @@ public:
 	{
 
 	}
-	bool isValid(ByteArray replyVector)
+	bool isValid(const ByteArray & replyVector)
 	{
-		ByteArray tmp = compress(cleanup(replyVector));
-		if (tmp[1] != id)
+		if (replyVector[1] != id)
 		{
 			isValidVal = false;
 			return false;
@@ -411,15 +401,14 @@ public:
 		isValidVal = true;
 		return true;
 	}
-	void parse(ByteArray replyVector)
+	void parse(const ByteArray & replyVector)
 	{
 		if (!isValidVal)
 		{
 			//TODO: Determine if we should throw an exception here, rather than just returning without a value?
 			return;
 		}
-		ByteArray tmp = compress(cleanup(replyVector));
-		int temp = tmp[2]*100.0/255.0;
+		int temp = replyVector[2]*100.0/255.0;
 		value = boost::lexical_cast<std::string>(temp);
 	}
 };
@@ -433,22 +422,23 @@ public:
 
 	}
 
-	bool isValid(ByteArray replyVector)
+	bool needsCompress() { return false; }
+
+	bool isValid(const ByteArray & replyVector)
 	{
-		ByteArray tmp = cleanup(replyVector);
-		if(tmp[tmp.size() - 1] == 'V')
+		if(replyVector[replyVector.size() - 1] == 'V')
 		{
 			return isValidVal = true;
 		}
 		return false;
 	}
-	void parse(ByteArray replyVector)
+
+	void parse(const ByteArray & replyVector)
 	{
-		ByteArray tmp = cleanup(replyVector);
 		value = "";
-		for(int i=0; i<tmp.size() - 1; i++)
+		for(int i=0; i<replyVector.size() - 1; i++)
 		{
-			value += tmp[i];
+			value += replyVector[i];
 		}
 	}
 

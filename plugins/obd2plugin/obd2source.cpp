@@ -224,8 +224,10 @@ void threadLoop(gpointer data)
 						else
 						{
 							DebugOut(DebugOut::Error)<<"Error creating bluetooth device"<<endl;
+							continue;
 						}
 					}
+
 					connected = connect(obd,port,baud);
 
 					if(connected)
@@ -456,8 +458,14 @@ static int updateProperties( gpointer data)
 			{
 				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on property:" << reply->property << endl;
 				src->propertyReplyMap[reply->property]->success = false;
+				src->propertyReplyMap[reply->property]->error = AsyncPropertyReply::InvalidOperation;
 				src->propertyReplyMap[reply->property]->completed(src->propertyReplyMap[reply->property]);
 				src->propertyReplyMap.erase(reply->property);
+
+				/// Remove support for this pid:
+				PropertyList list = src->supported();
+				list.remove(reply->property);
+				src->setSupported(list);
 			}
 			else
 			{
@@ -474,7 +482,6 @@ static int updateProperties( gpointer data)
 		AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
 		src->updateProperty(reply->property, value);
 		delete value;
-		delete reply;
 	}
 
 	return true;
@@ -482,7 +489,8 @@ static int updateProperties( gpointer data)
 
 void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
 {
-
+	if(property == Obd2Connected)
+		obd2Connected.setValue(value->anyValue());
 	
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
@@ -513,7 +521,7 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 
 		oldValueMap[property] = value->copy();
 
-		m_re->updateProperty(property,value,uuid());
+		m_re->updateProperty(value,uuid());
 	}
 }
 
@@ -567,7 +575,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		m_btAdapterAddress = btadapter;
 		m_isBluetooth = true;
 		///TODO: bluetooth!!
-		DebugOut()<<"bluetooth device?"<<endl;
+		/*DebugOut()<<"bluetooth device?"<<endl;
 		BluetoothDevice bt;
 
 		std::string tempPort = bt.getDeviceForAddress(port, btadapter);
@@ -581,7 +589,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 			DebugOut(0)<<"Device Error"<<endl;
 			///Don't throw here.
 			//throw std::runtime_error("Device Error");
-		}
+		}*/
 	}
 
 	//connect(obd, port, baud);
@@ -599,7 +607,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 }
 
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
-	: AbstractSource(re, config)
+	: AbstractSource(re, config),obd2Connected(Obd2Connected,false)
 {
 	bool success = VehicleProperty::registerProperty(Obd2Connected,[](){ return new Obd2ConnectType(Obd2Connected,false); });
 
@@ -727,6 +735,14 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
 	{
 		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
+		return;
+	}
+
+	if(reply->property == Obd2Connected)
+	{
+		reply->success = true;
+		reply->value = &obd2Connected;
+		reply->completed(reply);
 		return;
 	}
 
