@@ -541,8 +541,6 @@ bool GpsNmeaSource::checksum(std::string sentence)
 		return false;
 	}
 
-	DebugOut(7)<<"checking: "<<sentence<<endl;
-
 	int checksum = 0;
 
 	for(auto i : sentence)
