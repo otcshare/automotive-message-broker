@@ -53,12 +53,12 @@ public:
 		mSetterFunc = setterFunc;
 	}
 	
-	virtual const char* signature()
+	virtual const string signature()
 	{
 		GVariant* var = toGVariant();
 		if(!var) return "";
 
-		const char * s = g_variant_get_type_string(var);
+		const string s = g_variant_get_type_string(var);
 		g_variant_unref(var);
 		return s;
 	}
