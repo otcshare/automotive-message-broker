@@ -1,0 +1,1 @@
+stamp=submit/trunk/$(date --utc +%Y%m%d.%H%M%S); git tag -a $stamp -m "$stamp"
