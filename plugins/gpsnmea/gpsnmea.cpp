@@ -35,6 +35,15 @@ using namespace std;
 
 #define GPSTIME "GpsTime"
 
+template<typename T2>
+inline T2 lexical_cast(const std::string &in) {
+	T2 out;
+	std::stringstream ss;
+	ss << std::hex << in;
+	ss >> out;
+	return out;
+}
+
 std::string gprmcRegEx = "[\\$]?GPRMC,([0-1][0-9]|2[0-3])([0-5][0-9])([0-5][0-9])," /** time hh mm ss **/
 		"([AV])," /** Status A= Active, V= Void **/
 		"([0-8][0-9]|90)([0-5][0-9]\\.[0-9]{4})," /** latitude **/
@@ -85,6 +94,20 @@ public:
 		return mGpsTime;
 	}
 
+	std::list<AbstractPropertyType*> fix()
+	{
+		std::list<AbstractPropertyType*> l;
+
+		l.push_back(&mLatitude);
+		l.push_back(&mLongitude);
+		l.push_back(&mAltitude);
+		l.push_back(&mDirection);
+		l.push_back(&mSpeed);
+		l.push_back(&mGpsTime);
+
+		return l;
+	}
+
 private: ///methods:
 
 	void parseGprmc(string gprmc);
@@ -118,7 +141,7 @@ private:
 };
 
 Location::Location(AbstractRoutingEngine* re, std::string uuid)
-	:mGpsTime(GPSTIME,0), isActive(false), routingEngine(re), mUuid(uuid)
+	:mLatitude(0), mLongitude(0), mAltitude(0), mDirection(0), mSpeed(0), mGpsTime(GPSTIME,0), isActive(false), routingEngine(re), mUuid(uuid)
 {
 
 }
@@ -137,6 +160,8 @@ void Location::parse(string nmea)
 
 void Location::parseGprmc(string gprmc)
 {
+	DebugOut(7)<<"parsing gprmc message"<<endl;
+
 	regularExpression.assign(gprmcRegEx);
 
 	boost::smatch tokens;
@@ -195,41 +220,60 @@ void Location::parseTime(string h, string m, string s)
 	if(mGpsTime != temp)
 	{
 		mGpsTime = temp;
-		routingEngine->updateProperty(GPSTIME, &mGpsTime, mUuid);
+		routingEngine->updateProperty(&mGpsTime, mUuid);
 	}
 }
 
 void Location::parseLatitude(string d, string m, string ns)
 {
-	double degs = boost::lexical_cast<double>(d + m);
-	double dec = degsToDecimal(degs);
-
-	if(ns == "S")
-		dec *= -1;
-
-	VehicleProperty::LatitudeType temp(dec);
-
-	if(mLatitude != temp)
+	try
 	{
-		mLatitude = temp;\
-		routingEngine->updateProperty(VehicleProperty::Latitude, &mLatitude, mUuid);
+		if(d.empty() )
+			return;
+
+		double degs = boost::lexical_cast<double>(d + m);
+		double dec = degsToDecimal(degs);
+
+		if(ns == "S")
+			dec *= -1;
+
+		VehicleProperty::LatitudeType temp(dec);
+
+		if(mLatitude != temp)
+		{
+			mLatitude = temp;\
+			routingEngine->updateProperty(&mLatitude, mUuid);
+		}
+	}
+	catch(...)
+	{
+		DebugOut(DebugOut::Warning)<<"Failed to parse latitude"<<endl;
 	}
 }
 
 void Location::parseLongitude(string d, string m, string ew)
 {
-	double degs = boost::lexical_cast<double>(d + m);
-	double dec = degsToDecimal(degs);
-
-	if(ew == "W")
-		dec *= -1;
-
-	VehicleProperty::LongitudeType temp(dec);
-
-	if(mLongitude != temp)
+	try
 	{
-		mLongitude = temp;\
-		routingEngine->updateProperty(VehicleProperty::Longitude, &mLongitude, mUuid);
+		if(d.empty()) return;
+
+		double degs = boost::lexical_cast<double>(d + m);
+		double dec = degsToDecimal(degs);
+
+		if(ew == "W")
+			dec *= -1;
+
+		VehicleProperty::LongitudeType temp(dec);
+
+		if(mLongitude != temp)
+		{
+			mLongitude = temp;\
+			routingEngine->updateProperty(&mLongitude, mUuid);
+		}
+	}
+	catch(...)
+	{
+		DebugOut(DebugOut::Warning)<<"failed to parse longitude"<<endl;
 	}
 }
 
@@ -243,7 +287,7 @@ void Location::parseSpeed(string spd)
 	if(mSpeed != temp)
 	{
 		mSpeed = temp;
-		routingEngine->updateProperty(VehicleProperty::VehicleSpeed, &mSpeed, mUuid);
+		routingEngine->updateProperty(&mSpeed, mUuid);
 	}
 }
 
@@ -255,22 +299,31 @@ void Location::parseDirection(string dir)
 	if(mDirection != temp)
 	{
 		mDirection = temp;
-		routingEngine->updateProperty(VehicleProperty::Direction, &mDirection, mUuid);
+		routingEngine->updateProperty(&mDirection, mUuid);
 	}
 }
 
 void Location::parseAltitude(string alt)
 {
-	double a = boost::lexical_cast<double>(alt);
+	try{
 
-	VehicleProperty::AltitudeType temp(a);
-	if(mAltitude != temp)
-	{
-		mAltitude = temp;
-		routingEngine->updateProperty(VehicleProperty::Altitude, &mAltitude, mUuid);
+		if(alt.empty()) return;
+
+		double a = boost::lexical_cast<double>(alt);
+
+		VehicleProperty::AltitudeType temp(a);
+		if(mAltitude != temp)
+		{
+			mAltitude = temp;
+			routingEngine->updateProperty(&mAltitude, mUuid);
+		}
+
+		mAltitude = VehicleProperty::AltitudeType(a);
 	}
-
-	mAltitude = VehicleProperty::AltitudeType(a);
+	catch(...)
+	{
+		DebugOut(DebugOut::Warning)<<"failed to parse altitude"<<endl;
+	}
 }
 
 double Location::degsToDecimal(double degs)
@@ -390,6 +443,22 @@ void GpsNmeaSource::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	DebugOut()<<"GpsNmeaSource: getPropertyAsync called for property: "<<reply->property<<endl;
 
+	std::list<AbstractPropertyType*> f = location->fix();
+
+	for(auto property : f)
+	{
+		if(property->name == reply->property)
+		{
+			reply->success = true;
+			reply->value = property;
+			reply->completed(reply);
+			return;
+		}
+	}
+
+	reply->success = false;
+	reply->error = AsyncPropertyReply::InvalidOperation;
+	reply->completed(reply);
 }
 
 void GpsNmeaSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -427,7 +496,23 @@ void GpsNmeaSource::canHasData()
 
 	for(int i = 0; i < lines.size(); i++)
 	{
-		location->parse(lines[i]);
+		if(checksum(lines[i]))
+		{
+			buffer = lines[i];
+		}
+		else
+		{
+			buffer += lines[i];
+		}
+
+		if(checksum(buffer))
+		{
+			/// we have a complete message.  parse it!
+			location->parse(buffer);
+		}
+
+		DebugOut(7)<<"buffer: "<<buffer<<endl;
+
 	}
 }
 
@@ -447,4 +532,38 @@ void GpsNmeaSource::addPropertySupport(VehicleProperty::Property property, Zone:
 	PropertyInfo info(0, zones);
 
 	propertyInfoMap[property] = info;
+}
+
+bool GpsNmeaSource::checksum(std::string sentence)
+{
+	if(sentence.empty() || sentence.length() < 4)
+	{
+		return false;
+	}
+
+	DebugOut(7)<<"checking: "<<sentence<<endl;
+
+	int checksum = 0;
+
+	for(auto i : sentence)
+	{
+		if(i == '*')
+			break;
+		if(i != '\n' || i != '\r')
+			checksum ^= i;
+	}
+
+	std::string sentenceCheckStr = sentence.substr(sentence.length()-4,2);
+
+	try
+	{
+		int sentenceCheck = lexical_cast<int>(sentenceCheckStr);
+
+		return sentenceCheck == checksum;
+	}
+	catch(...)
+
+	{
+		return false;
+	}
 }

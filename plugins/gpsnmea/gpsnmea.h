@@ -61,6 +61,8 @@ private:
 
 	void addPropertySupport(VehicleProperty::Property property, Zone::Type zone);
 
+	bool checksum(string sentence);
+
 	std::map<VehicleProperty::Property, PropertyInfo> propertyInfoMap;
 
 	PropertyList mRequests;
@@ -70,6 +72,8 @@ private:
 	Location *location;
 
 	std::string mUuid;
+
+	std::string buffer;
 };
 
 #endif // EXAMPLEPLUGIN_H

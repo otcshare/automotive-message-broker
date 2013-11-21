@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.10.803")
+set(PROJECT_VERSION "0.10.804")
 set(PROJECT_CODENAME "challenger")
 set(PROJECT_QUALITY "alpha")
 
@@ -33,6 +33,7 @@ option(test_plugin "Test Plugin" ON)
 option(bluemonkey_plugin "bluemonkey irc plugin" OFF)
 option(gpsnmea_plugin "gps NMEA location plugin" OFF)
 option(openxc_plugin "OpenXC plugin" OFF)
+option(obdlinkcan_plugin "ObdLink mx CAN plugin" OFF)
 option(enable_icecc "Enable icecc checking, for distributed compilation" ON)
 option(enable_docs "enable Doxygen doc generation" OFF)
 

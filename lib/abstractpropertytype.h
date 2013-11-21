@@ -68,7 +68,10 @@ typedef std::list<Zone::Type> ZoneList;
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None) {}
+	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None)
+	{
+		void*(name);
+	}
 
 	virtual ~AbstractPropertyType() { }
 
@@ -346,7 +349,13 @@ public:
 		else setValue(T());
 	}
 
-	BasicPropertyType(std::string val)
+	BasicPropertyType(std::string propertyName)
+		:AbstractPropertyType(propertyName)
+	{
+
+	}
+
+	/*BasicPropertyType(std::string val)
 		:AbstractPropertyType("")
 	{
 		if(!val.empty() && val != "")
@@ -354,7 +363,7 @@ public:
 			serialize<T>(val);
 		}
 		else setValue(T());
-	}
+	}*/
 
 	AbstractPropertyType* copy()
 	{

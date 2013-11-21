@@ -73,13 +73,19 @@ public:
 
 	std::string read()
 	{
-		memset(buff,'\0',sizeof(buff));
-		int bytesread = ::read(fd,buff,512);
+		char buff;
+		std::string result;
+		int bytesread = 0;
+		while( bytesread = ::read(fd,&buff,1) > 0 )
+		{
+			result += buff;
+		}
 
-		/*if(bytesread == -1)
-			perror("Error while reading: ");*/
 
-		return std::string(buff);
+		if(bytesread == -1)
+			perror("Error while reading: ");
+
+		return result;
 	}
 
 	void write(std::string data)
@@ -94,7 +100,7 @@ public:
 private:
 	int fd;
 	std::string tty;
-	char buff[512];
+
 };
 
 
