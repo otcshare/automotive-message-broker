@@ -393,11 +393,6 @@ interface WindshieldWiper : VehiclePropertyType  {
 	readonly attribute unsigned short WindshieldWiper;
 };
 
-dictionary DefrostDictionary {
-	unsigned short window;
-	boolean defrost;
-}
-
 [NoInterfaceObject]
 interface HVAC : VehiclePropertyType  { 
 	const unsigned short AIRFLOWDIRECTION_FRONTPANEL = 0;    
@@ -435,12 +430,6 @@ interface HVAC : VehiclePropertyType  {
 	 **/
 	attribute boolean Heater;
 
-	/**  Defrost
-	 *   \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of DefrostDictionary that represents    
-	 *   \brief each window and its defrost status.    
-	 **/
-	attribute DefrostDictionary Defrost;
-
 	/**  SteeringWheelHeater
 	 *   \brief Must return air recirculation on (true) / off (false).    
 	 **/
@@ -459,17 +448,16 @@ interface HVAC : VehiclePropertyType  {
 
 [NoInterfaceObject]
 interface WindowStatus : VehiclePropertyType  { 
-	const unsigned short WINDOWLOCATION_DRIVER= 0;    
-	const unsigned short WINDOWLOCATION_PASSENGER = 1;    
-	const unsigned short WINDOWLOCATION_LEFTREAR = 2;    
-	const unsigned short WINDOWLOCATION_RIGHTREAR = 3;    
-	const unsigned short WINDOWLOCATION_REAR = 4;    
 
 	/**  WindowStatus
-	 *   \brief Must return window status for each window location.  object returned is a    
-	 *   dictionary { unsigned short windowlocation, unsigned short percentage opened }    
+	 *   \brief Must return window status for the window location see "zone" attribute
 	 **/
-	readwrite attribute object WindowStatus;
+	attribute unsigned short WindowStatus;
+
+	/**  Defrost
+	 *   \brief Must return the defrost status of the window equiped with a defroster.
+	 **/
+	attribute boolean Defrost;
 };
 
 [NoInterfaceObject]

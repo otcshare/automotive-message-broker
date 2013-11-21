@@ -78,16 +78,6 @@ Properties
 			
 			Heater on (true) / off (false)
 				
-		dict{ byte, bool } Defrost [readwrite]
-			
-			Defrost on (true) / off (false) per Postion (byte)
-				
-			Position:
-				
-			Windshield = 0,
-			RearWindow = 1,
-			SideMirrors = 2
-				
 		bool SteeringWheelHeater [readwrite]
 			
 			Steering wheel heater on (true) / off (false)
@@ -102,20 +92,16 @@ Properties
 
 
 Interface       org.automotive.WindowStatus
-Object path     /org/automotive/environment/WindowStatus
+Object path     {source_id}/{zone}/WindowStatus
 Properties
 				
-		dict{ byte, byte } WindowStatus [readwrite]
+		uInt16 WindowStatus [readwrite]
 			
-			Percent of openness (0-100) (byte) per window (byte)
-				
-			Window:
-				
-			Driver = 0,
-			Passenger = 1,
-			LeftRear = 2,
-			RightRear = 3,
-			Rear = 4
+			Percent of openness (0-100) (uInt16)
+
+		bool Defrost [readwrite]
+
+			Defrost on (true) / off (false) per Postion (byte)
 
 Interface       org.automotive.Sunroof
 Object path     /org/automotive/environment/Sunroof

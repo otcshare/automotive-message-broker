@@ -268,24 +268,12 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(AirRecirculation,false);
 	REGISTERPROPERTY(Heater,false);
 
-	registerPropertyPriv(Defrost, []()
-	{
-		DefrostType *d = new DefrostType();
-		d->append(Window::Windshield, false);
-
-		return d;
-	});
+	REGISTERPROPERTY(Defrost,false);
 
 	REGISTERPROPERTY(SteeringWheelHeater,false);
 	REGISTERPROPERTY(SeatHeater, 0);
 	REGISTERPROPERTY(SeatCooler, false);
-	registerPropertyPriv(WindowStatus, []()
-	{
-		WindowStatusType* d = new WindowStatusType();
-		d->append(Window::Driver,100);
-
-		return d;
-	});
+	REGISTERPROPERTY(WindowStatus, 100);
 	REGISTERPROPERTY(Sunroof,0);
 	REGISTERPROPERTY(SunroofTilt,0);
 	REGISTERPROPERTY(ConvertibleRoof,false);

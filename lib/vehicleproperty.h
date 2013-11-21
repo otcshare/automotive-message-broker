@@ -718,8 +718,7 @@ public:
 	//typedef BasicPropertyType<bool> HeaterType;
 
 	static const Property Defrost;
-	PROPERTYTYPENOVAL(Defrost, DefrostType,
-					  MapPropertyType<BasicPropertyType<Window::Location> BOOST_PP_COMMA() BasicPropertyType<bool> > )
+	PROPERTYTYPEBASIC(Defrost, bool )
 
 	static const Property SteeringWheelHeater;
 	PROPERTYTYPEBASIC(SteeringWheelHeater,bool)
@@ -734,8 +733,7 @@ public:
 //	/typedef BasicPropertyType<bool> SeatCoolerType;
 
 	static const Property WindowStatus;
-	PROPERTYTYPENOVAL(WindowStatus, WindowStatusType,
-					  MapPropertyType<BasicPropertyType<Window::Location> BOOST_PP_COMMA() BasicPropertyType<uint16_t> > )
+	PROPERTYTYPEBASIC(WindowStatus, uint16_t)
 
 	static const Property Sunroof;
 	PROPERTYTYPEBASIC(Sunroof, uint16_t)

@@ -164,15 +164,6 @@ public:
 		wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
 
 		/**
-		 * @attributeName Defrost
-		 * @type object
-		 * @access readwrite
-		 * @attributeComment \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of { unsigned short, boolean } that represents
-		 * @attributeComment \brief each window and its defrost status.
-		 */
-		//wantPropertyVariant(VehicleProperty::Defrost, "Defrost", "a(yb)", AbstractProperty::ReadWrite);
-
-		/**
 		 * @attributeName SteeringWheelHeater
 		 * @type boolean
 		 * @access readwrite
@@ -220,9 +211,18 @@ public:
 		 * @type object
 		 * @access readwrite
 		 * @attributeComment \brief Must return window status for each window location.  object returned is a
-		 * @attributeComment dictionary { unsigned short windowlocation, unsigned short percentage opened }
+		 * @attributeComment unsigned short percentage opened
 		 */
-		wantPropertyVariant(VehicleProperty::WindowStatus,"WindowStatus","a(bb)", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowStatus,"WindowStatus", "q", AbstractProperty::ReadWrite);
+
+		/**
+		 * @attributeName Defrost
+		 * @type object
+		 * @access readwrite
+		 * @attributeComment \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of { unsigned short, boolean } that represents
+		 * @attributeComment \brief each window and its defrost status.
+		 */
+		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", "b", AbstractProperty::ReadWrite);
 	}
 };
 

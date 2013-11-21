@@ -4,7 +4,7 @@
 			"name" : "gps nmea plugin",
 			"path" : "/usr/lib/automotive-message-broker/gpsnmea.so",
 			"test" : "true",
-			"device" : "/dev/ttyACM0"
+			"device" : "00:1C:88:13:4E:9C"
 		}
 	],
 	"sinks": [
