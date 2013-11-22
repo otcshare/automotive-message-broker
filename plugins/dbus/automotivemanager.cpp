@@ -245,8 +245,12 @@ AutomotiveManager::AutomotiveManager(GDBusConnection *connection)
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, "org.automotive.Manager");
 
 	regId = g_dbus_connection_register_object(mConnection, "/", mInterfaceInfo, &interfaceVTable, this, NULL, &error);
+	g_dbus_node_info_unref(introspection);
 
-	if(error) throw -1;
+	if(error){
+		g_error_free(error);
+		throw -1;
+	}
 
 	g_assert(regId > 0);
 }

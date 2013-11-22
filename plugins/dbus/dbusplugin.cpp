@@ -78,8 +78,17 @@ const string DBusSink::uuid()
 	return "c2e6cafa-eef5-4b8a-99a0-0f2c9be1057d";
 }
 
-DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, string> config)
-	:AbstractSinkManager(engine, config)
+DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, string> config) :
+	AbstractSinkManager(engine, config),
+	manager(nullptr)
 {
-	DBusInterfaceManager* manager = new DBusInterfaceManager(engine, config);
+	manager = new DBusInterfaceManager(engine, config);
+}
+
+DBusSinkManager::~DBusSinkManager()
+{
+	if(manager){
+		delete manager;
+		manager = nullptr;
+	}
 }

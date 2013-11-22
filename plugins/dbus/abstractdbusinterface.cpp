@@ -207,7 +207,8 @@ AbstractDBusInterface::~AbstractDBusInterface()
 	{
 		if(properties.find(*itr) != properties.end())
 		{
-			delete properties[*itr];
+			// Deleted in ~DBusSink()
+			//delete properties[*itr];
 			properties.erase(*itr);
 		}
 	}
@@ -300,10 +301,11 @@ void AbstractDBusInterface::registerObject()
 	DebugOut()<<"registering DBus path: "<<mObjectPath<<endl;
 
 	regId = g_dbus_connection_register_object(mConnection, mObjectPath.c_str(), mInterfaceInfo, &vtable, this, NULL, &error2);
-	
+	g_dbus_node_info_unref(introspection);
 	if(error2)
 	{
 		DebugOut(DebugOut::Error)<<error2->message<<endl;
+		g_error_free(error2);
 	}
 	
 	if(regId == 0)
