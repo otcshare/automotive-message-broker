@@ -8,5 +8,6 @@ var searchData=
   ['completed',['completed',['../classAsyncPropertyRequest.html#a12e1115b879ffc69a4d9bfd34df3e4be',1,'AsyncPropertyRequest::completed()'],['../classAsyncRangePropertyRequest.html#a81777a8e0304bd6929c05d39c650454d',1,'AsyncRangePropertyRequest::completed()']]],
   ['convertibleroof',['ConvertibleRoof',['../interfaceVehicle_1_1ConvertibleRoof.html',1,'Vehicle']]],
   ['cruisecontrolstatus',['CruiseControlStatus',['../interfaceVehicle_1_1CruiseControlStatus.html',1,'Vehicle']]],
-  ['current',['Current',['../interfaceVehicle_1_1Battery.html#a6a2b4d5ed3897ad2046d46f0d15f6d0f',1,'Vehicle::Battery']]]
+  ['current',['Current',['../interfaceVehicle_1_1Battery.html#a6a2b4d5ed3897ad2046d46f0d15f6d0f',1,'Vehicle::Battery']]],
+  ['customproperties',['customProperties',['../classVehicleProperty.html#a5a9afad3f68db690652b80cfccdffc66',1,'VehicleProperty']]]
 ];

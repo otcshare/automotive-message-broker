@@ -1,0 +1,524 @@
+\hypertarget{classVehicleProperty}{\section{Vehicle\-Property Class Reference}
+\label{classVehicleProperty}\index{Vehicle\-Property@{Vehicle\-Property}}
+}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classVehicleProperty_acf303d050168f571e838813f3e6042d1}{typedef std\-::string {\bfseries Property}}\label{classVehicleProperty_acf303d050168f571e838813f3e6042d1}
+
+\item 
+typedef std\-::function\\*
+$<$ \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$(void)$>$ \hyperlink{classVehicleProperty_a6fdd075ce5b867b571020fcdc723ddcf}{Property\-Type\-Factory\-Callback}
+\begin{DoxyCompactList}\small\item\em Property\-Type\-Factory\-Callback callback used to construct a \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} for a property. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classVehicleProperty_a768a0be8079ce3e1645cdc259a84adf7}{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E} (\hyperlink{classVehicleProperty_ae486d9ea26918460822086b797018800}{Transmission\-Shift\-Position}, Transmission\-Shift\-Position\-Type, \hyperlink{classBasicPropertyType}{Basic\-Property\-Type}$<$ Transmission\-::\-Transmission\-Positions $>$, Transmission\-::\-Transmission\-Positions) static const Property Transmission\-Gear\-Position
+\item 
+\hypertarget{classVehicleProperty_af9df28b1bc1bef05442b6b1cce40c80e}{{\bfseries P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E} (Transmission\-Gear\-Position, Transmission\-Gear\-Position\-Type, \hyperlink{classBasicPropertyType}{Basic\-Property\-Type}$<$ Transmission\-::\-Transmission\-Positions $>$, Transmission\-::\-Transmission\-Positions) static const Property Transmission\-Mode}\label{classVehicleProperty_af9df28b1bc1bef05442b6b1cce40c80e}
+
+\item 
+\hyperlink{classVehicleProperty_ac6527b3ae7e7697c2a23c5903b471172}{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E} (Transmission\-Mode, Transmission\-Mode\-Type, \hyperlink{classBasicPropertyType}{Basic\-Property\-Type}$<$ Transmission\-::\-Mode $>$, Transmission\-::\-Mode) static const Property Throttle\-Position
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classVehicleProperty_a528c8e2ee75036f6e50c0121f4184fa2}{static void \hyperlink{classVehicleProperty_a528c8e2ee75036f6e50c0121f4184fa2}{factory} ()}\label{classVehicleProperty_a528c8e2ee75036f6e50c0121f4184fa2}
+
+\begin{DoxyCompactList}\small\item\em factory constructs a static instance of \hyperlink{classVehicleProperty}{Vehicle\-Property}. This should be called once before \hyperlink{classVehicleProperty}{Vehicle\-Property} is used in the app \end{DoxyCompactList}\item 
+static std\-::list\\*
+$<$ Vehicle\-Property\-::\-Property $>$ \hyperlink{classVehicleProperty_aa238272767b6b4101b9bef14bf09631b}{capabilities} ()
+\begin{DoxyCompactList}\small\item\em capabilities \end{DoxyCompactList}\item 
+static std\-::list\\*
+$<$ Vehicle\-Property\-::\-Property $>$ \hyperlink{classVehicleProperty_a5a9afad3f68db690652b80cfccdffc66}{custom\-Properties} ()
+\begin{DoxyCompactList}\small\item\em custom\-Properties \end{DoxyCompactList}\item 
+\hypertarget{classVehicleProperty_a60e654875a0d5901af8ab2d3dc596472}{static \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$ \hyperlink{classVehicleProperty_a60e654875a0d5901af8ab2d3dc596472}{get\-Property\-Type\-For\-Property\-Name\-Value} (Property name, std\-::string value=\char`\"{}\char`\"{})}\label{classVehicleProperty_a60e654875a0d5901af8ab2d3dc596472}
+
+\begin{DoxyCompactList}\small\item\em get\-Property\-Type\-For\-Property\-Name\-Value returns an Abstract\-Property\-Type$\ast$ for the property name with the value specified by 'value'. Ownership of the returned Abstract\-Property\-Type$\ast$ is transfered to the caller. \end{DoxyCompactList}\item 
+\hypertarget{classVehicleProperty_aec55cb2758688c0e92dc53f67b320208}{static bool {\bfseries register\-Property} (Property name, \hyperlink{classVehicleProperty_a6fdd075ce5b867b571020fcdc723ddcf}{Property\-Type\-Factory\-Callback} \hyperlink{classVehicleProperty_a528c8e2ee75036f6e50c0121f4184fa2}{factory})}\label{classVehicleProperty_aec55cb2758688c0e92dc53f67b320208}
+
+\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static const Property \hyperlink{classVehicleProperty_ae013e9c1f3fb57d646211d3e6bb4ca9e}{No\-Value} = \char`\"{}No\-Value\char`\"{}
+\begin{DoxyCompactList}\small\item\em Various property types\-: \end{DoxyCompactList}\item 
+\hypertarget{classVehicleProperty_af457ed63f945a7f6b4e074f3ba8b904f}{static const Property {\bfseries Vehicle\-Speed} = \char`\"{}Vehicle\-Speed\char`\"{}}\label{classVehicleProperty_af457ed63f945a7f6b4e074f3ba8b904f}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_a7949fe3d031814fc2644de14f8cec9a0}{Engine\-Speed} = \char`\"{}Engine\-Speed\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_ae486d9ea26918460822086b797018800}{Transmission\-Shift\-Position} = \char`\"{}Transmission\-Shift\-Position\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_ad4f1ec038bee5ef30fbf8308aaba2794}{Wheel\-Brake} = \char`\"{}Wheel\-Brake\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_a617cc19f62d99f7f72a047d5066dcd96}{static const Property {\bfseries Wheel\-Brake\-Pressure} = \char`\"{}Wheel\-Brake\-Pressure\char`\"{}}\label{classVehicleProperty_a617cc19f62d99f7f72a047d5066dcd96}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_aba4832663e4f850acbcf09c7cfbc6959}{Steering\-Wheel\-Angle} = \char`\"{}Steering\-Wheel\-Angle\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a0aae609c370a46a92dc52a31d2cc0310}{Turn\-Signal} = \char`\"{}Turn\-Signal\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_acdca2ca718fd392c7ad9b8adc817baec}{Clutch\-Status} = \char`\"{}Clutch\-Status\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_ab7fad273c7149dbd338f53f2536aca26}{Engine\-Oil\-Pressure} = \char`\"{}Engine\-Oil\-Pressure\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_ae4f240ad9cecbbb9d0cb3a615865b60a}{Engine\-Coolant\-Temperature} = \char`\"{}Engine\-Coolant\-Temperature\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a8b9faaa1094c2d162ed171a3063b7ffc}{Machine\-Gun\-Turret\-Status} = \char`\"{}Machine\-Gun\-Turret\-Status\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a94eac12d319850190e9ece93690517f7}{Acceleration\-X} = \char`\"{}Acceleration\-X\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_af56803eeb7710aeae2954f4cd9b66cf6}{Acceleration\-Y} = \char`\"{}Acceleration\-Y\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a1ce0b3be3a09d5a96741890d0d67496f}{Acceleration\-Z} = \char`\"{}Acceleration\-Z\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_aabc6b6b50b8a31bfe197cbd3ae0827a1}{static const Property {\bfseries Mass\-Air\-Flow} = \char`\"{}Mass\-Air\-Flow\char`\"{}}\label{classVehicleProperty_aabc6b6b50b8a31bfe197cbd3ae0827a1}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_ab9fa252d209fbd2eb014c4d934d3d615}{Button\-Event} = \char`\"{}Button\-Event\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_af4cbbae11228729335c50aa2d1fa2e28}{Air\-Intake\-Temperature} = \char`\"{}Air\-Intake\-Temperature\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a43a70a277b955ae35a9ba795d2052591}{Battery\-Voltage} = \char`\"{}Battery\-Voltage\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_a3447a00e8ca09d12b208bc7c210a61b8}{static const Property {\bfseries Battery\-Current} = \char`\"{}Battery\-Current\char`\"{}}\label{classVehicleProperty_a3447a00e8ca09d12b208bc7c210a61b8}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_adbbb68033f8531903ff3e3024864eef3}{Interior\-Temperature} = \char`\"{}Interior\-Temperature\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_ad9510186dc9ef236b59743371f093d36}{static const Property {\bfseries Exterior\-Temperature} = \char`\"{}Exterior\-Temperature\char`\"{}}\label{classVehicleProperty_ad9510186dc9ef236b59743371f093d36}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_a9d4a610d94b12f139ea00b271804a73f}{Engine\-Oil\-Temperature} = \char`\"{}Engine\-Oil\-Temperature\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_aeeece192dedcd20cb112dea6905aa80c}{static const Property {\bfseries Engine\-Oil\-Remaining} = \char`\"{}Engine\-Oil\-Remaining\char`\"{}}\label{classVehicleProperty_aeeece192dedcd20cb112dea6905aa80c}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_ae72c1c7de185f330862c62dfb9d93a34}{V\-I\-N} = \char`\"{}V\-I\-N\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a32f980d900d97cf94171ea9fa25408e0}{W\-M\-I} = \char`\"{}W\-M\-I\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_ac9231c21753a535525d8526889f7a998}{Tire\-Pressure\-Left\-Front} = \char`\"{}Tire\-Pressure\-Left\-Front\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_ad11bf5a2d63d1b934ab6b33a9f351824}{static const Property {\bfseries Tire\-Pressure\-Right\-Front} = \char`\"{}Tire\-Pressure\-Right\-Front\char`\"{}}\label{classVehicleProperty_ad11bf5a2d63d1b934ab6b33a9f351824}
+
+\item 
+\hypertarget{classVehicleProperty_af10c5b8637f549de87ae9da4e0188cf7}{static const Property {\bfseries Tire\-Pressure\-Left\-Rear} = \char`\"{}Tire\-Pressure\-Left\-Rear\char`\"{}}\label{classVehicleProperty_af10c5b8637f549de87ae9da4e0188cf7}
+
+\item 
+\hypertarget{classVehicleProperty_aa8f728b02a1ba3e12b28fdde64f4ddf0}{static const Property {\bfseries Tire\-Pressure\-Right\-Rear} = \char`\"{}Tire\-Pressure\-Right\-Rear\char`\"{}}\label{classVehicleProperty_aa8f728b02a1ba3e12b28fdde64f4ddf0}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_aed78bc0c777f0850dee1ee878c8d613a}{Tire\-Temperature\-Left\-Front} = \char`\"{}Tire\-Temperature\-Left\-Front\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_ac5c976a11640f09fa709f13830f69c75}{static const Property {\bfseries Tire\-Temperature\-Right\-Front} = \char`\"{}Tire\-Temperature\-Right\-Front\char`\"{}}\label{classVehicleProperty_ac5c976a11640f09fa709f13830f69c75}
+
+\item 
+\hypertarget{classVehicleProperty_abf066893a9d17c252b222d617497578d}{static const Property {\bfseries Tire\-Temperature\-Left\-Rear} = \char`\"{}Tire\-Temperature\-Left\-Rear\char`\"{}}\label{classVehicleProperty_abf066893a9d17c252b222d617497578d}
+
+\item 
+\hypertarget{classVehicleProperty_aaf68ca684bd75f1e2d8ac78881701318}{static const Property {\bfseries Tire\-Temperature\-Right\-Rear} = \char`\"{}Tire\-Temperature\-Right\-Rear\char`\"{}}\label{classVehicleProperty_aaf68ca684bd75f1e2d8ac78881701318}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_a80cc1f343da6754346e4bcc0cc7ae009}{Vehicle\-Power\-Mode} = \char`\"{}Vehicle\-Power\-Mode\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_a893b05cb0e292082070458efa6066e91}{static const Property {\bfseries Trip\-Meters} = \char`\"{}Trip\-Meters\char`\"{}}\label{classVehicleProperty_a893b05cb0e292082070458efa6066e91}
+
+\item 
+\hypertarget{classVehicleProperty_a3203c1cb22ff3b530a887228096863e5}{static const Property {\bfseries Cruise\-Control\-Active} = \char`\"{}Cruise\-Control\-Active\char`\"{}}\label{classVehicleProperty_a3203c1cb22ff3b530a887228096863e5}
+
+\item 
+\hypertarget{classVehicleProperty_a50c00b5a2d7cfd500a1cd7473124c737}{static const Property {\bfseries Cruise\-Control\-Speed} = \char`\"{}Cruise\-Control\-Speed\char`\"{}}\label{classVehicleProperty_a50c00b5a2d7cfd500a1cd7473124c737}
+
+\item 
+\hypertarget{classVehicleProperty_ae98356a8b49f28837a94b13094156e90}{static const Property {\bfseries Light\-Head} = \char`\"{}Light\-Head\char`\"{}}\label{classVehicleProperty_ae98356a8b49f28837a94b13094156e90}
+
+\item 
+\hypertarget{classVehicleProperty_a73cfc2a3afd2dc81f495936dfcf46793}{static const Property {\bfseries Light\-Right\-Turn} = \char`\"{}Light\-Right\-Turn\char`\"{}}\label{classVehicleProperty_a73cfc2a3afd2dc81f495936dfcf46793}
+
+\item 
+\hypertarget{classVehicleProperty_a4430db4d7c36d7d047766d88f9fc977c}{static const Property {\bfseries Light\-Left\-Turn} = \char`\"{}Light\-Left\-Turn\char`\"{}}\label{classVehicleProperty_a4430db4d7c36d7d047766d88f9fc977c}
+
+\item 
+\hypertarget{classVehicleProperty_aa4f2ae234bd0d045b95cf9980e980dd5}{static const Property {\bfseries Light\-Brake} = \char`\"{}Light\-Brake\char`\"{}}\label{classVehicleProperty_aa4f2ae234bd0d045b95cf9980e980dd5}
+
+\item 
+\hypertarget{classVehicleProperty_a6eb38fc244331a26b487f7f9beb69b0c}{static const Property {\bfseries Light\-Fog} = \char`\"{}Light\-Fog\char`\"{}}\label{classVehicleProperty_a6eb38fc244331a26b487f7f9beb69b0c}
+
+\item 
+\hypertarget{classVehicleProperty_a0d3992f2e0e50bb74baa5e670f6111f0}{static const Property {\bfseries Light\-Hazard} = \char`\"{}Light\-Hazard\char`\"{}}\label{classVehicleProperty_a0d3992f2e0e50bb74baa5e670f6111f0}
+
+\item 
+\hypertarget{classVehicleProperty_a144920830af1df5a59433f98ebd29504}{static const Property {\bfseries Light\-Parking} = \char`\"{}Light\-Parking\char`\"{}}\label{classVehicleProperty_a144920830af1df5a59433f98ebd29504}
+
+\item 
+\hypertarget{classVehicleProperty_acce36f505d4b0233c753f0d5f568e255}{static const Property {\bfseries Light\-High\-Beam} = \char`\"{}Light\-High\-Beam\char`\"{}}\label{classVehicleProperty_acce36f505d4b0233c753f0d5f568e255}
+
+\item 
+\hypertarget{classVehicleProperty_a16b99ec2210fd4ca509a00e59b80f8c0}{static const Property {\bfseries Interior\-Light\-Driver} = \char`\"{}Interior\-Light\-Driver\char`\"{}}\label{classVehicleProperty_a16b99ec2210fd4ca509a00e59b80f8c0}
+
+\item 
+\hypertarget{classVehicleProperty_a86c0bb4ab676e06e3c807d90c92e7240}{static const Property {\bfseries Interior\-Light\-Center} = \char`\"{}Interior\-Light\-Center\char`\"{}}\label{classVehicleProperty_a86c0bb4ab676e06e3c807d90c92e7240}
+
+\item 
+\hypertarget{classVehicleProperty_af60682429c3b2c7517715801d4ac0f92}{static const Property {\bfseries Interior\-Light\-Passenger} = \char`\"{}Interior\-Light\-Passenger\char`\"{}}\label{classVehicleProperty_af60682429c3b2c7517715801d4ac0f92}
+
+\item 
+\hypertarget{classVehicleProperty_a89cb1e6e8dcb7910270c333d79200665}{static const Property {\bfseries Engine\-Load} = \char`\"{}Engine\-Load\char`\"{}}\label{classVehicleProperty_a89cb1e6e8dcb7910270c333d79200665}
+
+\item 
+\hypertarget{classVehicleProperty_a69370e86d3520734d83a4c154b533642}{static const Property {\bfseries Horn} = \char`\"{}Horn\char`\"{}}\label{classVehicleProperty_a69370e86d3520734d83a4c154b533642}
+
+\item 
+\hypertarget{classVehicleProperty_a9bfbe5beb9e13c8de62c7514b3b22fc9}{static const Property {\bfseries Fuel\-Level} = \char`\"{}Fuel\-Level\char`\"{}}\label{classVehicleProperty_a9bfbe5beb9e13c8de62c7514b3b22fc9}
+
+\item 
+\hypertarget{classVehicleProperty_ae0c98c8cbfb6b8553faabfb9d4a42b35}{static const Property {\bfseries Fuel\-Range} = \char`\"{}Fuel\-Range\char`\"{}}\label{classVehicleProperty_ae0c98c8cbfb6b8553faabfb9d4a42b35}
+
+\item 
+\hypertarget{classVehicleProperty_afdc1b7b9ecf211d26221b155aef9a35a}{static const Property {\bfseries Fuel\-Consumption} = \char`\"{}Fuel\-Consumption\char`\"{}}\label{classVehicleProperty_afdc1b7b9ecf211d26221b155aef9a35a}
+
+\item 
+\hypertarget{classVehicleProperty_af34bb142d87eb300ce82e112598d5376}{static const Property {\bfseries Fuel\-Economy} = \char`\"{}Fuel\-Economy\char`\"{}}\label{classVehicleProperty_af34bb142d87eb300ce82e112598d5376}
+
+\item 
+\hypertarget{classVehicleProperty_aa453a0e6b9edee8da30b1f5b9a32edeb}{static const Property {\bfseries Fuel\-Average\-Economy} = \char`\"{}Fuel\-Average\-Economy\char`\"{}}\label{classVehicleProperty_aa453a0e6b9edee8da30b1f5b9a32edeb}
+
+\item 
+\hypertarget{classVehicleProperty_a2df3b5ff14ec4a92fba65ad72be7d5b7}{static const Property {\bfseries Fuel\-Type} = \char`\"{}Fuel\-Type\char`\"{}}\label{classVehicleProperty_a2df3b5ff14ec4a92fba65ad72be7d5b7}
+
+\item 
+\hypertarget{classVehicleProperty_a574a971800258aa3d53126ec01e85477}{static const Property {\bfseries Fuel\-Position\-Side} = \char`\"{}Fuel\-Position\-Side\char`\"{}}\label{classVehicleProperty_a574a971800258aa3d53126ec01e85477}
+
+\item 
+\hypertarget{classVehicleProperty_a490658c5e633ab54a5bbf11b5f38e994}{static const Property {\bfseries Exterior\-Brightness} = \char`\"{}Exterior\-Brightness\char`\"{}}\label{classVehicleProperty_a490658c5e633ab54a5bbf11b5f38e994}
+
+\item 
+\hypertarget{classVehicleProperty_a225bcbd3adba51c5d571a086a98f6b4f}{static const Property {\bfseries Latitude} = \char`\"{}Latitude\char`\"{}}\label{classVehicleProperty_a225bcbd3adba51c5d571a086a98f6b4f}
+
+\item 
+\hypertarget{classVehicleProperty_ac5565746cd2dfd2e3f8870d8e292b392}{static const Property {\bfseries Longitude} = \char`\"{}Longitude\char`\"{}}\label{classVehicleProperty_ac5565746cd2dfd2e3f8870d8e292b392}
+
+\item 
+\hypertarget{classVehicleProperty_a0411474f4450758ba2dbcdc136ef7391}{static const Property {\bfseries Altitude} = \char`\"{}Altitude\char`\"{}}\label{classVehicleProperty_a0411474f4450758ba2dbcdc136ef7391}
+
+\item 
+\hypertarget{classVehicleProperty_a89d7508f610bdbbeaaec742ee3d4f656}{static const Property {\bfseries Direction} = \char`\"{}Direction\char`\"{}}\label{classVehicleProperty_a89d7508f610bdbbeaaec742ee3d4f656}
+
+\item 
+\hypertarget{classVehicleProperty_a4e3c78c74cee15e4f0c8b5f1c11215e7}{static const Property {\bfseries Vehicle\-Width} = \char`\"{}Vehicle\-Width\char`\"{}}\label{classVehicleProperty_a4e3c78c74cee15e4f0c8b5f1c11215e7}
+
+\item 
+\hypertarget{classVehicleProperty_a0fde8e98bbffe557982301ecfbe595b1}{static const Property {\bfseries Vehicle\-Height} = \char`\"{}Vehicle\-Height\char`\"{}}\label{classVehicleProperty_a0fde8e98bbffe557982301ecfbe595b1}
+
+\item 
+\hypertarget{classVehicleProperty_a9f2d02d1ff69cf8547c6bf8b4ab20a93}{static const Property {\bfseries Vehicle\-Length} = \char`\"{}Vehicle\-Length\char`\"{}}\label{classVehicleProperty_a9f2d02d1ff69cf8547c6bf8b4ab20a93}
+
+\item 
+\hypertarget{classVehicleProperty_a5f6f4c19869a4d6307a38bbcb14f3325}{static const Property {\bfseries Vehicle\-Type} = \char`\"{}Vehicle\-Type\char`\"{}}\label{classVehicleProperty_a5f6f4c19869a4d6307a38bbcb14f3325}
+
+\item 
+\hypertarget{classVehicleProperty_a0818b919a2721ebc9242fe4fd62c1c06}{static const Property {\bfseries Doors\-Per\-Row} = \char`\"{}Doors\-Per\-Row\char`\"{}}\label{classVehicleProperty_a0818b919a2721ebc9242fe4fd62c1c06}
+
+\item 
+\hypertarget{classVehicleProperty_a1255b40637cabbcc28901a9ca5efce8c}{static const Property {\bfseries Transmission\-Gear\-Type} = \char`\"{}Transmission\-Gear\-Type\char`\"{}}\label{classVehicleProperty_a1255b40637cabbcc28901a9ca5efce8c}
+
+\item 
+\hypertarget{classVehicleProperty_a61603d2610548667c65b21e2e5dc146b}{static const Property {\bfseries Front\-Wheel\-Radius} = \char`\"{}Front\-Wheel\-Radius\char`\"{}}\label{classVehicleProperty_a61603d2610548667c65b21e2e5dc146b}
+
+\item 
+\hypertarget{classVehicleProperty_a7317a413f21ad1c44667ada3883be9e6}{static const Property {\bfseries Rear\-Wheel\-Radius} = \char`\"{}Rear\-Wheel\-Radius\char`\"{}}\label{classVehicleProperty_a7317a413f21ad1c44667ada3883be9e6}
+
+\item 
+\hypertarget{classVehicleProperty_a02d72875c252d2763a40b6b0eb5dbe75}{static const Property {\bfseries Wheel\-Track} = \char`\"{}Wheel\-Track\char`\"{}}\label{classVehicleProperty_a02d72875c252d2763a40b6b0eb5dbe75}
+
+\item 
+\hypertarget{classVehicleProperty_a4e7d3a126e0055cf51cac18598fdf845}{static const Property {\bfseries Brake\-Pressure} = \char`\"{}Brake\-Pressure\char`\"{}}\label{classVehicleProperty_a4e7d3a126e0055cf51cac18598fdf845}
+
+\item 
+\hypertarget{classVehicleProperty_ad97147489a5be3babe1bb94dbb2cf970}{static const Property {\bfseries Odometer} = \char`\"{}Odometer\char`\"{}}\label{classVehicleProperty_ad97147489a5be3babe1bb94dbb2cf970}
+
+\item 
+static const Property \hyperlink{classVehicleProperty_a288aa5c2be698825142da9d87c13c447}{Transmission\-Fluid\-Level} = \char`\"{}Transmission\-Fluid\-Level\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a83bc635222e9ba14dfa134defa21e825}{Brake\-Fluid\-Level} = \char`\"{}Brake\-Fluid\-Level\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a37c8c7e827625705d2f560ab53ee8d23}{Washer\-Fluid\-Level} = \char`\"{}Washer\-Fluid\-Level\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a7bc28af663879a2ac9145e5b97a5da4f}{Security\-Alert\-Status} = \char`\"{}Security\-Alert\-Status\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a848ad7334c7aa14709fe2e8c3a1b2608}{Parking\-Brake\-Status} = \char`\"{}Parking\-Brake\-Status\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a505ffc37974f674df55a97c27a7ba0b7}{Parking\-Light\-Status} = \char`\"{}Parking\-Light\-Status\char`\"{}
+\item 
+static const Property \hyperlink{classVehicleProperty_a21058071101327c72251e2e09e24cb67}{Hazard\-Light\-Status} = \char`\"{}Hazard\-Light\-Status\char`\"{}
+\item 
+\hypertarget{classVehicleProperty_ab3ed7359914eb1aad8aff1a3409b1f0c}{static const Property {\bfseries Antilock\-Braking\-System} = \char`\"{}Antilock\-Braking\-System\char`\"{}}\label{classVehicleProperty_ab3ed7359914eb1aad8aff1a3409b1f0c}
+
+\item 
+\hypertarget{classVehicleProperty_a16b20920ac636662cc4accacde1a434f}{static const Property {\bfseries Traction\-Control\-System} = \char`\"{}Traction\-Control\-System\char`\"{}}\label{classVehicleProperty_a16b20920ac636662cc4accacde1a434f}
+
+\item 
+\hypertarget{classVehicleProperty_aa33a83620bfe2ece493a8e8e7e1fdbcc}{static const Property {\bfseries Vehicle\-Top\-Speed\-Limit} = \char`\"{}Vehicle\-Top\-Speed\-Limit\char`\"{}}\label{classVehicleProperty_aa33a83620bfe2ece493a8e8e7e1fdbcc}
+
+\item 
+\hypertarget{classVehicleProperty_a341a783cf4746bb7388ee460e62c309e}{static const Property {\bfseries Airbag\-Status} = \char`\"{}Airbag\-Status\char`\"{}}\label{classVehicleProperty_a341a783cf4746bb7388ee460e62c309e}
+
+\item 
+\hypertarget{classVehicleProperty_aec1cd341d1eda388b27e5e2c167f377b}{static const Property \hyperlink{classVehicleProperty_aec1cd341d1eda388b27e5e2c167f377b}{Door\-Status} = \char`\"{}Door\-Status\char`\"{}}\label{classVehicleProperty_aec1cd341d1eda388b27e5e2c167f377b}
+
+\begin{DoxyCompactList}\small\item\em T\-O\-D\-O\-: Make Door\-Status a zoned property instead of a map. \end{DoxyCompactList}\item 
+\hypertarget{classVehicleProperty_a3d6b7274ee30b454864351c1c91bf694}{static const Property \hyperlink{classVehicleProperty_a3d6b7274ee30b454864351c1c91bf694}{Door\-Lock\-Status} = \char`\"{}Door\-Lock\-Status\char`\"{}}\label{classVehicleProperty_a3d6b7274ee30b454864351c1c91bf694}
+
+\begin{DoxyCompactList}\small\item\em T\-O\-D\-O\-: Make Door\-Lock\-Status a zoned property instead of a map. \end{DoxyCompactList}\item 
+\hypertarget{classVehicleProperty_a8da7bc1ecdd1b8d0ca6e96a708b00ab2}{static const Property {\bfseries Child\-Lock\-Status} = \char`\"{}Child\-Lock\-Status\char`\"{}}\label{classVehicleProperty_a8da7bc1ecdd1b8d0ca6e96a708b00ab2}
+
+\item 
+\hypertarget{classVehicleProperty_a6189236af616f7e8326ccb1b45d005c4}{static const Property \hyperlink{classVehicleProperty_a6189236af616f7e8326ccb1b45d005c4}{Seat\-Belt\-Status} = \char`\"{}Seat\-Belt\-Status\char`\"{}}\label{classVehicleProperty_a6189236af616f7e8326ccb1b45d005c4}
+
+\begin{DoxyCompactList}\small\item\em T\-O\-D\-O\-: Add Child\-Lock\-Status. \end{DoxyCompactList}\item 
+\hypertarget{classVehicleProperty_aa2db4c5710bc329bf294102a628e7c37}{static const Property {\bfseries Window\-Lock\-Status} = \char`\"{}Window\-Lock\-Status\char`\"{}}\label{classVehicleProperty_aa2db4c5710bc329bf294102a628e7c37}
+
+\item 
+\hypertarget{classVehicleProperty_a581909689c6ad9ffea21a4de61109150}{static const Property {\bfseries Occupant\-Status} = \char`\"{}Occupant\-Status\char`\"{}}\label{classVehicleProperty_a581909689c6ad9ffea21a4de61109150}
+
+\item 
+\hypertarget{classVehicleProperty_a0b3f901f17dd92086b59a1923b9124c4}{static const Property {\bfseries Obstacle\-Distance} = \char`\"{}Obstacle\-Distance\char`\"{}}\label{classVehicleProperty_a0b3f901f17dd92086b59a1923b9124c4}
+
+\item 
+\hypertarget{classVehicleProperty_aaf332f3700a7dabc3ebe138c8442c854}{static const Property {\bfseries Rain\-Sensor} = \char`\"{}Rain\-Sensor\char`\"{}}\label{classVehicleProperty_aaf332f3700a7dabc3ebe138c8442c854}
+
+\item 
+\hypertarget{classVehicleProperty_afe911cbe3c105b89c0f5b9f0163698c8}{static const Property {\bfseries Windshield\-Wiper} = \char`\"{}Windshield\-Wiper\char`\"{}}\label{classVehicleProperty_afe911cbe3c105b89c0f5b9f0163698c8}
+
+\item 
+\hypertarget{classVehicleProperty_adeeec47dbbcc60ee78b30c8c1a917836}{static const Property {\bfseries Airflow\-Direction} = \char`\"{}Airflow\-Direction\char`\"{}}\label{classVehicleProperty_adeeec47dbbcc60ee78b30c8c1a917836}
+
+\item 
+\hypertarget{classVehicleProperty_afd2a544499ec8ddc83127ef268f9e5e5}{static const Property {\bfseries Fan\-Speed} = \char`\"{}Fan\-Speed\char`\"{}}\label{classVehicleProperty_afd2a544499ec8ddc83127ef268f9e5e5}
+
+\item 
+\hypertarget{classVehicleProperty_a14d5cc6734fa65eb1e352d9ddbe05c17}{static const Property {\bfseries Target\-Temperature} = \char`\"{}Target\-Temperature\char`\"{}}\label{classVehicleProperty_a14d5cc6734fa65eb1e352d9ddbe05c17}
+
+\item 
+\hypertarget{classVehicleProperty_a45738d294fe38c6fa5f198c30b17153c}{static const Property {\bfseries Air\-Conditioning} = \char`\"{}Air\-Conditioning\char`\"{}}\label{classVehicleProperty_a45738d294fe38c6fa5f198c30b17153c}
+
+\item 
+\hypertarget{classVehicleProperty_aa5c99592d51aa0a05eb277563c2273d7}{static const Property {\bfseries Air\-Recirculation} = \char`\"{}Air\-Recirculation\char`\"{}}\label{classVehicleProperty_aa5c99592d51aa0a05eb277563c2273d7}
+
+\item 
+\hypertarget{classVehicleProperty_ad5a3fdf51333943c486fa216e894cb29}{static const Property {\bfseries Heater} = \char`\"{}Heater\char`\"{}}\label{classVehicleProperty_ad5a3fdf51333943c486fa216e894cb29}
+
+\item 
+\hypertarget{classVehicleProperty_a1f1ade6fb94a977e8dbc31b3a90b1cc3}{static const Property {\bfseries Defrost} = \char`\"{}Defrost\char`\"{}}\label{classVehicleProperty_a1f1ade6fb94a977e8dbc31b3a90b1cc3}
+
+\item 
+\hypertarget{classVehicleProperty_a50ba22b48049e141acfd9c24549573c2}{static const Property {\bfseries Steering\-Wheel\-Heater} = \char`\"{}Steering\-Wheel\-Heater\char`\"{}}\label{classVehicleProperty_a50ba22b48049e141acfd9c24549573c2}
+
+\item 
+\hypertarget{classVehicleProperty_aaf891a6fb7485be67ab8dfae96636076}{static const Property {\bfseries Seat\-Heater} = \char`\"{}Seat\-Heater\char`\"{}}\label{classVehicleProperty_aaf891a6fb7485be67ab8dfae96636076}
+
+\item 
+\hypertarget{classVehicleProperty_aa5ccd72b6b86bd1741d05281fb0490c6}{static const Property {\bfseries Seat\-Cooler} = \char`\"{}Seat\-Cooler\char`\"{}}\label{classVehicleProperty_aa5ccd72b6b86bd1741d05281fb0490c6}
+
+\item 
+\hypertarget{classVehicleProperty_aafce44d9eb4eb200970bf1146cdd77d3}{static const Property {\bfseries Window\-Status} = \char`\"{}Window\-Status\char`\"{}}\label{classVehicleProperty_aafce44d9eb4eb200970bf1146cdd77d3}
+
+\item 
+\hypertarget{classVehicleProperty_ae7498970718f7bf52ef6a5800084b91b}{static const Property {\bfseries Sunroof} = \char`\"{}Sunroof\char`\"{}}\label{classVehicleProperty_ae7498970718f7bf52ef6a5800084b91b}
+
+\item 
+\hypertarget{classVehicleProperty_aaa5b7fe1aa9c1df58285370a2223a9a7}{static const Property {\bfseries Sunroof\-Tilt} = \char`\"{}Sunroof\-Tilt\char`\"{}}\label{classVehicleProperty_aaa5b7fe1aa9c1df58285370a2223a9a7}
+
+\item 
+\hypertarget{classVehicleProperty_ac81ed60b4ae5140288191380470aa6fe}{static const Property {\bfseries Convertible\-Roof} = \char`\"{}Convertible\-Roof\char`\"{}}\label{classVehicleProperty_ac81ed60b4ae5140288191380470aa6fe}
+
+\item 
+\hypertarget{classVehicleProperty_af85dc0e35b81d1ce30818c0dc2cbde94}{static const Property {\bfseries Night\-Mode} = \char`\"{}Night\-Mode\char`\"{}}\label{classVehicleProperty_af85dc0e35b81d1ce30818c0dc2cbde94}
+
+\item 
+\hypertarget{classVehicleProperty_a4b68af6a7539a07a2be7438bd6ced9f0}{static const Property {\bfseries Driving\-Mode} = \char`\"{}Driving\-Mode\char`\"{}}\label{classVehicleProperty_a4b68af6a7539a07a2be7438bd6ced9f0}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Typedef Documentation}
+\hypertarget{classVehicleProperty_a6fdd075ce5b867b571020fcdc723ddcf}{\index{Vehicle\-Property@{Vehicle\-Property}!Property\-Type\-Factory\-Callback@{Property\-Type\-Factory\-Callback}}
+\index{Property\-Type\-Factory\-Callback@{Property\-Type\-Factory\-Callback}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Property\-Type\-Factory\-Callback}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\-::function$<${\bf Abstract\-Property\-Type}$\ast$ (void)$>$ {\bf Vehicle\-Property\-::\-Property\-Type\-Factory\-Callback}}}\label{classVehicleProperty_a6fdd075ce5b867b571020fcdc723ddcf}
+
+
+Property\-Type\-Factory\-Callback callback used to construct a \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} for a property. 
+
+\begin{DoxySeeAlso}{See Also}
+register\-Property 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classVehicleProperty_aa238272767b6b4101b9bef14bf09631b}{\index{Vehicle\-Property@{Vehicle\-Property}!capabilities@{capabilities}}
+\index{capabilities@{capabilities}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{capabilities}]{\setlength{\rightskip}{0pt plus 5cm}std\-::list$<$ Vehicle\-Property\-::\-Property $>$ Vehicle\-Property\-::capabilities (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_aa238272767b6b4101b9bef14bf09631b}
+
+
+capabilities 
+
+E\-N\-D P\-R\-O\-P\-E\-R\-T\-I\-E\-S
+
+\begin{DoxyReturn}{Returns}
+returns list of all registered properties 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See Also}
+Vehicle\-Property\-::register\-Property 
+\end{DoxySeeAlso}
+\hypertarget{classVehicleProperty_a5a9afad3f68db690652b80cfccdffc66}{\index{Vehicle\-Property@{Vehicle\-Property}!custom\-Properties@{custom\-Properties}}
+\index{custom\-Properties@{custom\-Properties}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{custom\-Properties}]{\setlength{\rightskip}{0pt plus 5cm}std\-::list$<$ Vehicle\-Property\-::\-Property $>$ Vehicle\-Property\-::custom\-Properties (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a5a9afad3f68db690652b80cfccdffc66}
+
+
+custom\-Properties 
+
+\begin{DoxyReturn}{Returns}
+returns list of custom properties defined by plugins using Vehicle\-Property\-::register\-Property 
+\end{DoxyReturn}
+\hypertarget{classVehicleProperty_a768a0be8079ce3e1645cdc259a84adf7}{\index{Vehicle\-Property@{Vehicle\-Property}!P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E@{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E}}
+\index{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E@{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E}]{\setlength{\rightskip}{0pt plus 5cm}Vehicle\-Property\-::\-P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E (
+\begin{DoxyParamCaption}
+\item[{{\bf Transmission\-Shift\-Position}}]{, }
+\item[{Transmission\-Shift\-Position\-Type}]{, }
+\item[{{\bf Basic\-Property\-Type}$<$ Transmission\-::\-Transmission\-Positions $>$}]{, }
+\item[{Transmission\-::\-Transmission\-Positions}]{}
+\end{DoxyParamCaption}
+) const}}\label{classVehicleProperty_a768a0be8079ce3e1645cdc259a84adf7}
+$<$ Transmission Gear Position 0 = Neutral 1 = 1st 2 = 2nd ... 64 = C\-V\-T 128 = Reverse \hypertarget{classVehicleProperty_ac6527b3ae7e7697c2a23c5903b471172}{\index{Vehicle\-Property@{Vehicle\-Property}!P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E@{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E}}
+\index{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E@{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E}]{\setlength{\rightskip}{0pt plus 5cm}Vehicle\-Property\-::\-P\-R\-O\-P\-E\-R\-T\-Y\-T\-Y\-P\-E (
+\begin{DoxyParamCaption}
+\item[{Transmission\-Mode}]{, }
+\item[{Transmission\-Mode\-Type}]{, }
+\item[{{\bf Basic\-Property\-Type}$<$ Transmission\-::\-Mode $>$}]{, }
+\item[{Transmission\-::\-Mode}]{}
+\end{DoxyParamCaption}
+) const}}\label{classVehicleProperty_ac6527b3ae7e7697c2a23c5903b471172}
+$<$ Throttle position 0-\/100\% 
+
+\subsection{Member Data Documentation}
+\hypertarget{classVehicleProperty_a94eac12d319850190e9ece93690517f7}{\index{Vehicle\-Property@{Vehicle\-Property}!Acceleration\-X@{Acceleration\-X}}
+\index{Acceleration\-X@{Acceleration\-X}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Acceleration\-X}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Acceleration\-X = \char`\"{}Acceleration\-X\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a94eac12d319850190e9ece93690517f7}
+$<$ Acceleration on the 'x' axis in 1/1000 gravitational acceleration \char`\"{}g-\/force\char`\"{} \hypertarget{classVehicleProperty_af56803eeb7710aeae2954f4cd9b66cf6}{\index{Vehicle\-Property@{Vehicle\-Property}!Acceleration\-Y@{Acceleration\-Y}}
+\index{Acceleration\-Y@{Acceleration\-Y}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Acceleration\-Y}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Acceleration\-Y = \char`\"{}Acceleration\-Y\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_af56803eeb7710aeae2954f4cd9b66cf6}
+$<$ Acceleration on the 'y' axis in 1/1000 gravitational acceleration \char`\"{}g-\/force\char`\"{} Acceleration on the 'z' axis in 1/1000 gravitational acceleration \char`\"{}g-\/force\char`\"{} \hypertarget{classVehicleProperty_a1ce0b3be3a09d5a96741890d0d67496f}{\index{Vehicle\-Property@{Vehicle\-Property}!Acceleration\-Z@{Acceleration\-Z}}
+\index{Acceleration\-Z@{Acceleration\-Z}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Acceleration\-Z}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Acceleration\-Z = \char`\"{}Acceleration\-Z\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a1ce0b3be3a09d5a96741890d0d67496f}
+Mass Air Flow. grams/sec \hypertarget{classVehicleProperty_af4cbbae11228729335c50aa2d1fa2e28}{\index{Vehicle\-Property@{Vehicle\-Property}!Air\-Intake\-Temperature@{Air\-Intake\-Temperature}}
+\index{Air\-Intake\-Temperature@{Air\-Intake\-Temperature}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Air\-Intake\-Temperature}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Air\-Intake\-Temperature = \char`\"{}Air\-Intake\-Temperature\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_af4cbbae11228729335c50aa2d1fa2e28}
+$<$ Air intake temperature in degrees celcius \hypertarget{classVehicleProperty_a43a70a277b955ae35a9ba795d2052591}{\index{Vehicle\-Property@{Vehicle\-Property}!Battery\-Voltage@{Battery\-Voltage}}
+\index{Battery\-Voltage@{Battery\-Voltage}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Battery\-Voltage}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Battery\-Voltage = \char`\"{}Battery\-Voltage\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a43a70a277b955ae35a9ba795d2052591}
+$<$ Battery voltage in volts \hypertarget{classVehicleProperty_a83bc635222e9ba14dfa134defa21e825}{\index{Vehicle\-Property@{Vehicle\-Property}!Brake\-Fluid\-Level@{Brake\-Fluid\-Level}}
+\index{Brake\-Fluid\-Level@{Brake\-Fluid\-Level}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Brake\-Fluid\-Level}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Brake\-Fluid\-Level = \char`\"{}Brake\-Fluid\-Level\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a83bc635222e9ba14dfa134defa21e825}
+$<$ Brake Fluid Level 0-\/100\%. \hypertarget{classVehicleProperty_ab9fa252d209fbd2eb014c4d934d3d615}{\index{Vehicle\-Property@{Vehicle\-Property}!Button\-Event@{Button\-Event}}
+\index{Button\-Event@{Button\-Event}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Button\-Event}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Button\-Event = \char`\"{}Button\-Event\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ab9fa252d209fbd2eb014c4d934d3d615}
+$<$ Button Event\begin{DoxySeeAlso}{See Also}
+Button\-Events\-::\-Button\-Event\-Type 
+\end{DoxySeeAlso}
+\hypertarget{classVehicleProperty_acdca2ca718fd392c7ad9b8adc817baec}{\index{Vehicle\-Property@{Vehicle\-Property}!Clutch\-Status@{Clutch\-Status}}
+\index{Clutch\-Status@{Clutch\-Status}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Clutch\-Status}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Clutch\-Status = \char`\"{}Clutch\-Status\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_acdca2ca718fd392c7ad9b8adc817baec}
+$<$ Clutch pedal status 0=off, 1=on \hypertarget{classVehicleProperty_ae4f240ad9cecbbb9d0cb3a615865b60a}{\index{Vehicle\-Property@{Vehicle\-Property}!Engine\-Coolant\-Temperature@{Engine\-Coolant\-Temperature}}
+\index{Engine\-Coolant\-Temperature@{Engine\-Coolant\-Temperature}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Engine\-Coolant\-Temperature}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Engine\-Coolant\-Temperature = \char`\"{}Engine\-Coolant\-Temperature\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ae4f240ad9cecbbb9d0cb3a615865b60a}
+$<$ Engine coolant temperature in degrees celcius \hypertarget{classVehicleProperty_ab7fad273c7149dbd338f53f2536aca26}{\index{Vehicle\-Property@{Vehicle\-Property}!Engine\-Oil\-Pressure@{Engine\-Oil\-Pressure}}
+\index{Engine\-Oil\-Pressure@{Engine\-Oil\-Pressure}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Engine\-Oil\-Pressure}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Engine\-Oil\-Pressure = \char`\"{}Engine\-Oil\-Pressure\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ab7fad273c7149dbd338f53f2536aca26}
+$<$ Oil pressure T\-O\-D\-O\-: units \hypertarget{classVehicleProperty_a9d4a610d94b12f139ea00b271804a73f}{\index{Vehicle\-Property@{Vehicle\-Property}!Engine\-Oil\-Temperature@{Engine\-Oil\-Temperature}}
+\index{Engine\-Oil\-Temperature@{Engine\-Oil\-Temperature}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Engine\-Oil\-Temperature}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Engine\-Oil\-Temperature = \char`\"{}Engine\-Oil\-Temperature\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a9d4a610d94b12f139ea00b271804a73f}
+$<$ Engine Oil Temperature in degrees celcius \hypertarget{classVehicleProperty_a7949fe3d031814fc2644de14f8cec9a0}{\index{Vehicle\-Property@{Vehicle\-Property}!Engine\-Speed@{Engine\-Speed}}
+\index{Engine\-Speed@{Engine\-Speed}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Engine\-Speed}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Engine\-Speed = \char`\"{}Engine\-Speed\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a7949fe3d031814fc2644de14f8cec9a0}
+$<$ Engine Speed in rotations per minute \hypertarget{classVehicleProperty_a21058071101327c72251e2e09e24cb67}{\index{Vehicle\-Property@{Vehicle\-Property}!Hazard\-Light\-Status@{Hazard\-Light\-Status}}
+\index{Hazard\-Light\-Status@{Hazard\-Light\-Status}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Hazard\-Light\-Status}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Hazard\-Light\-Status = \char`\"{}Hazard\-Light\-Status\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a21058071101327c72251e2e09e24cb67}
+$<$ Hazard Lights Status status of parking lights active (true) or inactive (false) \hypertarget{classVehicleProperty_adbbb68033f8531903ff3e3024864eef3}{\index{Vehicle\-Property@{Vehicle\-Property}!Interior\-Temperature@{Interior\-Temperature}}
+\index{Interior\-Temperature@{Interior\-Temperature}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Interior\-Temperature}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Interior\-Temperature = \char`\"{}Interior\-Temperature\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_adbbb68033f8531903ff3e3024864eef3}
+$<$ Interior Air Temperature in degrees celcius \hypertarget{classVehicleProperty_a8b9faaa1094c2d162ed171a3063b7ffc}{\index{Vehicle\-Property@{Vehicle\-Property}!Machine\-Gun\-Turret\-Status@{Machine\-Gun\-Turret\-Status}}
+\index{Machine\-Gun\-Turret\-Status@{Machine\-Gun\-Turret\-Status}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Machine\-Gun\-Turret\-Status}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Machine\-Gun\-Turret\-Status = \char`\"{}Machine\-Gun\-Turret\-Status\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a8b9faaa1094c2d162ed171a3063b7ffc}
+$<$ 0=off, 1=on \hypertarget{classVehicleProperty_ae013e9c1f3fb57d646211d3e6bb4ca9e}{\index{Vehicle\-Property@{Vehicle\-Property}!No\-Value@{No\-Value}}
+\index{No\-Value@{No\-Value}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{No\-Value}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-No\-Value = \char`\"{}No\-Value\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ae013e9c1f3fb57d646211d3e6bb4ca9e}
+
+
+Various property types\-: 
+
+Vehicle Velocity in km/h \hypertarget{classVehicleProperty_a848ad7334c7aa14709fe2e8c3a1b2608}{\index{Vehicle\-Property@{Vehicle\-Property}!Parking\-Brake\-Status@{Parking\-Brake\-Status}}
+\index{Parking\-Brake\-Status@{Parking\-Brake\-Status}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Parking\-Brake\-Status}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Parking\-Brake\-Status = \char`\"{}Parking\-Brake\-Status\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a848ad7334c7aa14709fe2e8c3a1b2608}
+$<$ Parking Brake Status status of parking break active (true) or inactive (false) \hypertarget{classVehicleProperty_a505ffc37974f674df55a97c27a7ba0b7}{\index{Vehicle\-Property@{Vehicle\-Property}!Parking\-Light\-Status@{Parking\-Light\-Status}}
+\index{Parking\-Light\-Status@{Parking\-Light\-Status}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Parking\-Light\-Status}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Parking\-Light\-Status = \char`\"{}Parking\-Light\-Status\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a505ffc37974f674df55a97c27a7ba0b7}
+$<$ Parking Light Status status of parking lights active (true) or inactive (false) \hypertarget{classVehicleProperty_a7bc28af663879a2ac9145e5b97a5da4f}{\index{Vehicle\-Property@{Vehicle\-Property}!Security\-Alert\-Status@{Security\-Alert\-Status}}
+\index{Security\-Alert\-Status@{Security\-Alert\-Status}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Security\-Alert\-Status}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Security\-Alert\-Status = \char`\"{}Security\-Alert\-Status\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a7bc28af663879a2ac9145e5b97a5da4f}
+$<$ Securty Alert Status status of security alert \begin{DoxySeeAlso}{See Also}
+Security\-::\-Status 
+\end{DoxySeeAlso}
+\hypertarget{classVehicleProperty_aba4832663e4f850acbcf09c7cfbc6959}{\index{Vehicle\-Property@{Vehicle\-Property}!Steering\-Wheel\-Angle@{Steering\-Wheel\-Angle}}
+\index{Steering\-Wheel\-Angle@{Steering\-Wheel\-Angle}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Steering\-Wheel\-Angle}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Steering\-Wheel\-Angle = \char`\"{}Steering\-Wheel\-Angle\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_aba4832663e4f850acbcf09c7cfbc6959}
+$<$ Steering wheel angle (0-\/359) \hypertarget{classVehicleProperty_ac9231c21753a535525d8526889f7a998}{\index{Vehicle\-Property@{Vehicle\-Property}!Tire\-Pressure\-Left\-Front@{Tire\-Pressure\-Left\-Front}}
+\index{Tire\-Pressure\-Left\-Front@{Tire\-Pressure\-Left\-Front}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Tire\-Pressure\-Left\-Front}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Tire\-Pressure\-Left\-Front = \char`\"{}Tire\-Pressure\-Left\-Front\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ac9231c21753a535525d8526889f7a998}
+$<$ Tire pressure in k\-Pa \hypertarget{classVehicleProperty_aed78bc0c777f0850dee1ee878c8d613a}{\index{Vehicle\-Property@{Vehicle\-Property}!Tire\-Temperature\-Left\-Front@{Tire\-Temperature\-Left\-Front}}
+\index{Tire\-Temperature\-Left\-Front@{Tire\-Temperature\-Left\-Front}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Tire\-Temperature\-Left\-Front}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Tire\-Temperature\-Left\-Front = \char`\"{}Tire\-Temperature\-Left\-Front\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_aed78bc0c777f0850dee1ee878c8d613a}
+$<$ Tire temperature in degrees C \hypertarget{classVehicleProperty_a288aa5c2be698825142da9d87c13c447}{\index{Vehicle\-Property@{Vehicle\-Property}!Transmission\-Fluid\-Level@{Transmission\-Fluid\-Level}}
+\index{Transmission\-Fluid\-Level@{Transmission\-Fluid\-Level}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Transmission\-Fluid\-Level}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Transmission\-Fluid\-Level = \char`\"{}Transmission\-Fluid\-Level\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a288aa5c2be698825142da9d87c13c447}
+$<$ Transmission Fluid Level 0-\/100\%. \hypertarget{classVehicleProperty_ae486d9ea26918460822086b797018800}{\index{Vehicle\-Property@{Vehicle\-Property}!Transmission\-Shift\-Position@{Transmission\-Shift\-Position}}
+\index{Transmission\-Shift\-Position@{Transmission\-Shift\-Position}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Transmission\-Shift\-Position}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Transmission\-Shift\-Position = \char`\"{}Transmission\-Shift\-Position\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ae486d9ea26918460822086b797018800}
+$<$ Transmission Shift Position 0 = Neutral 1 = 1st 2 = 2nd ... 96 = Drive 128 = Reverse 255 = Park \hypertarget{classVehicleProperty_a0aae609c370a46a92dc52a31d2cc0310}{\index{Vehicle\-Property@{Vehicle\-Property}!Turn\-Signal@{Turn\-Signal}}
+\index{Turn\-Signal@{Turn\-Signal}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Turn\-Signal}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Turn\-Signal = \char`\"{}Turn\-Signal\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a0aae609c370a46a92dc52a31d2cc0310}
+$<$ 0=off, 1=right, 2=left, 3=hazard \hypertarget{classVehicleProperty_a80cc1f343da6754346e4bcc0cc7ae009}{\index{Vehicle\-Property@{Vehicle\-Property}!Vehicle\-Power\-Mode@{Vehicle\-Power\-Mode}}
+\index{Vehicle\-Power\-Mode@{Vehicle\-Power\-Mode}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Vehicle\-Power\-Mode}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Vehicle\-Power\-Mode = \char`\"{}Vehicle\-Power\-Mode\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a80cc1f343da6754346e4bcc0cc7ae009}
+$<$ Vehicle Power Mode. \begin{DoxySeeAlso}{See Also}
+Power\-::\-Power\-Modes 
+\end{DoxySeeAlso}
+\hypertarget{classVehicleProperty_ae72c1c7de185f330862c62dfb9d93a34}{\index{Vehicle\-Property@{Vehicle\-Property}!V\-I\-N@{V\-I\-N}}
+\index{V\-I\-N@{V\-I\-N}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{V\-I\-N}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-V\-I\-N = \char`\"{}V\-I\-N\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ae72c1c7de185f330862c62dfb9d93a34}
+$<$ Vehicle Identification Number (I\-S\-O 3779) 17 chars \hypertarget{classVehicleProperty_a37c8c7e827625705d2f560ab53ee8d23}{\index{Vehicle\-Property@{Vehicle\-Property}!Washer\-Fluid\-Level@{Washer\-Fluid\-Level}}
+\index{Washer\-Fluid\-Level@{Washer\-Fluid\-Level}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Washer\-Fluid\-Level}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Washer\-Fluid\-Level = \char`\"{}Washer\-Fluid\-Level\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a37c8c7e827625705d2f560ab53ee8d23}
+$<$ Washer Fluid Level 0-\/100\%. \hypertarget{classVehicleProperty_ad4f1ec038bee5ef30fbf8308aaba2794}{\index{Vehicle\-Property@{Vehicle\-Property}!Wheel\-Brake@{Wheel\-Brake}}
+\index{Wheel\-Brake@{Wheel\-Brake}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{Wheel\-Brake}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-Wheel\-Brake = \char`\"{}Wheel\-Brake\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_ad4f1ec038bee5ef30fbf8308aaba2794}
+$<$ Wheel brake position. Engaged = true, Idle = false \hypertarget{classVehicleProperty_a32f980d900d97cf94171ea9fa25408e0}{\index{Vehicle\-Property@{Vehicle\-Property}!W\-M\-I@{W\-M\-I}}
+\index{W\-M\-I@{W\-M\-I}!VehicleProperty@{Vehicle\-Property}}
+\subsubsection[{W\-M\-I}]{\setlength{\rightskip}{0pt plus 5cm}const Vehicle\-Property\-::\-Property Vehicle\-Property\-::\-W\-M\-I = \char`\"{}W\-M\-I\char`\"{}\hspace{0.3cm}{\ttfamily [static]}}}\label{classVehicleProperty_a32f980d900d97cf94171ea9fa25408e0}
+$<$ World Manufacturer Identifier (S\-A\-E) 3 characters. 
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/vehicleproperty.\-h\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/vehicleproperty.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,24 @@
+\hypertarget{AsyncRangePropertyRequest-example}{\section{Async\-Range\-Property\-Request}
+}
+get\-Range\-Property\-Async is used for getting a range of properties that are within the specified time or sequence parameters. 
+\begin{DoxyParams}{Parameters}
+{\em request} & the request containing the property and other information required by the query \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a pointer to the reply. vehicle\-Speed\-From\-Last\-Week;
+\end{DoxyReturn}
+vehicle\-Speed\-From\-Last\-Week.\-time\-Begin = amb\-::current\-Time() -\/ 10; vehicle\-Speed\-From\-Last\-Week.\-time\-End = amb\-::current\-Time();
+
+Property\-List request\-List; request\-List.\-push\-\_\-back(\-Vehicle\-Property\-::\-Vehicle\-Speed); request\-List.\-push\-\_\-back(\-Vehicle\-Property\-::\-Engine\-Speed);
+
+vehicle\-Speed\-From\-Last\-Week.\-properties = request\-List; vehicle\-Speed\-From\-Last\-Week.\-completed = \mbox{[}\mbox{]}(Async\-Range\-Property\-Reply$\ast$ reply) \{ std\-::list$<$\-Abstract\-Property\-Type$\ast$$>$ values = reply-\/$>$values; for(auto itr = values.\-begin(); itr != values.\-end(); itr++) \{ auto val = $\ast$itr; Debug\-Out(1)$<$$<$\char`\"{}\-Value from past\-: (\char`\"{}$<$$<$val-\/$>$name$<$$<$\char`\"{})\-: \char`\"{}$<$$<$val-\/$>$to\-String()$<$$<$\char`\"{} time\-: \char`\"{}$<$$<$val-\/$>$timestamp$<$$<$endl; \}
+
+delete reply; \};
+
+routing\-Engine-\/$>$get\-Range\-Property\-Async(vehicle\-Speed\-From\-Last\-Week);
+
+
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ 

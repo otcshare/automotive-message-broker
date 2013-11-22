@@ -1,9 +1,9 @@
 var searchData=
 [
   ['seatbeltstatus',['SeatBeltStatus',['../interfaceVehicle_1_1SeatBeltStatus.html',1,'Vehicle']]],
-  ['seatbeltstatus',['SeatBeltStatus',['../interfaceVehicle_1_1SeatBeltStatus.html#a88d4017d671010ab66ca424a5e4977f2',1,'Vehicle::SeatBeltStatus']]],
+  ['seatbeltstatus',['SeatBeltStatus',['../classVehicleProperty.html#a6189236af616f7e8326ccb1b45d005c4',1,'VehicleProperty::SeatBeltStatus()'],['../interfaceVehicle_1_1SeatBeltStatus.html#a88d4017d671010ab66ca424a5e4977f2',1,'Vehicle::SeatBeltStatus::SeatBeltStatus()']]],
   ['seatcooler',['SeatCooler',['../interfaceVehicle_1_1HVAC.html#a8ff708ae94435d515ba61e22a35fd4ec',1,'Vehicle::HVAC']]],
-  ['seatheater',['SeatHeater',['../interfaceVehicle_1_1HVAC.html#a7c335d0be074701fb7a9520b9a237b41',1,'Vehicle::HVAC']]],
+  ['seatheater',['SeatHeater',['../interfaceVehicle_1_1HVAC.html#ad8fa919cd65bcb69651ee4853f1f0a1f',1,'Vehicle::HVAC']]],
   ['securityalert',['SecurityAlert',['../interfaceVehicle_1_1SecurityAlert.html',1,'Vehicle']]],
   ['securityalert',['SecurityAlert',['../interfaceVehicle_1_1SecurityAlert.html#aabea98f4f053520f6429db25df33ef4a',1,'Vehicle::SecurityAlert']]],
   ['securityalertstatus',['SecurityAlertStatus',['../classVehicleProperty.html#a7bc28af663879a2ac9145e5b97a5da4f',1,'VehicleProperty']]],
@@ -18,6 +18,7 @@ var searchData=
   ['steeringwheelangle',['SteeringWheelAngle',['../classVehicleProperty.html#aba4832663e4f850acbcf09c7cfbc6959',1,'VehicleProperty']]],
   ['steeringwheelheater',['SteeringWheelHeater',['../interfaceVehicle_1_1HVAC.html#a8142d0336d5e8e6366683514d72a30b6',1,'Vehicle::HVAC']]],
   ['stringpropertytype',['StringPropertyType',['../classStringPropertyType.html',1,'']]],
+  ['subscribetoproperty',['subscribeToProperty',['../classAbstractRoutingEngine.html#ab6df903e812321f89de573bbf6cae45a',1,'AbstractRoutingEngine::subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, AbstractSink *self)=0'],['../classAbstractRoutingEngine.html#a65f259d8129b223f78c39cf70fa8f8e9',1,'AbstractRoutingEngine::subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self)=0']]],
   ['subscribetopropertychanges',['subscribeToPropertyChanges',['../classAbstractSource.html#ae9c042e159f080c298b2ae37c47618e9',1,'AbstractSource']]],
   ['success',['success',['../classAsyncPropertyReply.html#aed1f10990a65664ce0c630039cae01bb',1,'AsyncPropertyReply::success()'],['../classAsyncRangePropertyReply.html#a4eab37dada60970211e62b0fc3aeac92',1,'AsyncRangePropertyReply::success()']]],
   ['sunroof',['Sunroof',['../interfaceVehicle_1_1Sunroof.html',1,'Vehicle']]],

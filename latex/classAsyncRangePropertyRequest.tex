@@ -1,0 +1,61 @@
+\hypertarget{classAsyncRangePropertyRequest}{\section{Async\-Range\-Property\-Request Class Reference}
+\label{classAsyncRangePropertyRequest}\index{Async\-Range\-Property\-Request@{Async\-Range\-Property\-Request}}
+}
+
+
+The \hyperlink{classAsyncRangePropertyRequest}{Async\-Range\-Property\-Request} class is used by sinks to request values within a time or sequence range.  
+
+
+
+
+{\ttfamily \#include $<$abstractroutingengine.\-h$>$}
+
+Inheritance diagram for Async\-Range\-Property\-Request\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classAsyncRangePropertyRequest}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncRangePropertyRequest_aefe0f0167ce9bcabcd4450a21c7ea0e5}{{\bfseries Async\-Range\-Property\-Request} (const \hyperlink{classAsyncRangePropertyRequest}{Async\-Range\-Property\-Request} \&request)}\label{classAsyncRangePropertyRequest_aefe0f0167ce9bcabcd4450a21c7ea0e5}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncRangePropertyRequest_afd6f95a06376fef905faf5ab1b580bc9}{Property\-List \hyperlink{classAsyncRangePropertyRequest_afd6f95a06376fef905faf5ab1b580bc9}{properties}}\label{classAsyncRangePropertyRequest_afd6f95a06376fef905faf5ab1b580bc9}
+
+\begin{DoxyCompactList}\small\item\em properties list of properties to request \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyRequest_a626258d5d401e0598d619b84600689f9}{std\-::string \hyperlink{classAsyncRangePropertyRequest_a626258d5d401e0598d619b84600689f9}{source\-Uuid}}\label{classAsyncRangePropertyRequest_a626258d5d401e0598d619b84600689f9}
+
+\begin{DoxyCompactList}\small\item\em source\-Uuid if the sink wishes to request a specific source, this should be set to the uuid of the source. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyRequest_a81777a8e0304bd6929c05d39c650454d}{Get\-Ranged\-Property\-Completed\-Signal \hyperlink{classAsyncRangePropertyRequest_a81777a8e0304bd6929c05d39c650454d}{completed}}\label{classAsyncRangePropertyRequest_a81777a8e0304bd6929c05d39c650454d}
+
+\begin{DoxyCompactList}\small\item\em completed callback that is called when the ranged request is complete. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyRequest_a2dc2927f6c771707f15a767358a58e69}{double \hyperlink{classAsyncRangePropertyRequest_a2dc2927f6c771707f15a767358a58e69}{time\-Begin}}\label{classAsyncRangePropertyRequest_a2dc2927f6c771707f15a767358a58e69}
+
+\begin{DoxyCompactList}\small\item\em time\-Begin set this to request values for the specified property beggining at this time. Time is seconds\textbackslash{} since the unix epoc. Set this to '0' if you do not want values within a time range. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyRequest_acd2a28137c227b0fb6a51576d84f5f30}{double \hyperlink{classAsyncRangePropertyRequest_acd2a28137c227b0fb6a51576d84f5f30}{time\-End}}\label{classAsyncRangePropertyRequest_acd2a28137c227b0fb6a51576d84f5f30}
+
+\begin{DoxyCompactList}\small\item\em time\-End set this to request values for the specified property beggining at this time. Time is seconds\textbackslash{} since the unix epoc. Set this to '0' if you do not want values within a time range. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyRequest_a024dab8e12c45ea8988b7f3e4b3c85c0}{int32\-\_\-t \hyperlink{classAsyncRangePropertyRequest_a024dab8e12c45ea8988b7f3e4b3c85c0}{sequence\-Begin}}\label{classAsyncRangePropertyRequest_a024dab8e12c45ea8988b7f3e4b3c85c0}
+
+\begin{DoxyCompactList}\small\item\em sequence\-Begin set this to request values with a sequence $>$= to the sequence\-Begin value. Set to -\/1 if you don't want values within a sequence ranges. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyRequest_a352afdecef1d1e6fc1f82384d0c9edfe}{int32\-\_\-t \hyperlink{classAsyncRangePropertyRequest_a352afdecef1d1e6fc1f82384d0c9edfe}{sequence\-End}}\label{classAsyncRangePropertyRequest_a352afdecef1d1e6fc1f82384d0c9edfe}
+
+\begin{DoxyCompactList}\small\item\em sequence\-End set this to request values with a sequence $<$= to the sequence\-End value. Set to -\/1 if you don't want values within a sequence ranges. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{classAsyncRangePropertyRequest}{Async\-Range\-Property\-Request} class is used by sinks to request values within a time or sequence range. 
+
+\begin{DoxySeeAlso}{See Also}
+Abstract\-Routing\-Engine\-::get\-Range\-Property\-Async 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/abstractroutingengine.\-h\end{DoxyCompactItemize}
