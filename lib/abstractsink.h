@@ -78,6 +78,7 @@ class AbstractSinkManager
 public:
 	
 	AbstractSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
+	virtual ~AbstractSinkManager(){}
 	
 protected:
 	AbstractRoutingEngine* routingEngine;

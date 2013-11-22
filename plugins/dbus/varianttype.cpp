@@ -48,7 +48,7 @@ GVariant *VariantType::toGVariant()
 
 		setValue(v);
 
-		delete v;
+		delete v; //TODO: Needs to be veriefied if it will CRASH here. Does setValue() take ownership ???
 	}
 
 	auto v = value();

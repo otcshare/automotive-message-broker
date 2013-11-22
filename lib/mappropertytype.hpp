@@ -83,6 +83,7 @@ public:
 
 		}
 		json_object_put(rootobject);
+		json_tokener_free(tokener);
 
 	}
 
