@@ -1,6 +1,7 @@
 * Thu Nov 21 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.10.804 ("challenger" alpha)
 - Fixes TIVI-2081, TIVI-2122
+- Cleaned up branch with new release patches
 
 * Fri Nov 11 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.10.803 ("challenger" alpha)
