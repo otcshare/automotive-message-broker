@@ -660,18 +660,14 @@ public:
 	static const Property AirbagStatus;
 	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
 
-	///TODO: Make DoorStatus a zoned property instead of a map.
 	static const Property DoorStatus;
 	PROPERTYTYPEBASIC(DoorStatus, Door::Status)
 
-	///TODO: Make DoorLockStatus a zoned property instead of a map.
 	static const Property DoorLockStatus;
 	PROPERTYTYPEBASIC(DoorLockStatus, bool)
 
 	static const Property ChildLockStatus;
 	PROPERTYTYPEBASIC(ChildLockStatus, bool)
-
-	///TODO: Add ChildLockStatus
 
 	static const Property SeatBeltStatus;
 	PROPERTYTYPEBASIC(SeatBeltStatus, bool)

@@ -14,31 +14,34 @@ module Vehicle {
 
 [NoInterfaceObject]
 interface VehiclePropertyError   { 
-	const unsigned short PERMISSION_DENIED = 1; 
-	const unsigned short PROPERTY_UNAVAILABLE = 2; 
-	const unsigned short TIMEOUT = 3; 
-	const unsigned short UNKNOWN = 10;
+	const UInt16 PERMISSION_DENIED = 1;
+	const UInt16 PROPERTY_UNAVAILABLE = 2;
+	const UInt16 TIMEOUT = 3;
+	const UInt16 UNKNOWN = 10;
 	
 	/**  code
 	 *   MUST return error code. 
 	 **/
-	readonly attribute unsigned short code;
+	readonly attribute UInt16 code;
 
 	/**  message
 	 *   MUST return error message 
 	 **/
-	readonly attribute DOMString message;
+	readonly attribute String message;
 };
 
 [NoInterfaceObject]
-interface Dictionary {
-	DOMString objectName;
-	any value;
-}
-
-[NoInterfaceObject]
 interface VehiclePropertyType {
-	readonly attribute double Time;
+
+	/**
+	* \brief time stamp marking the last time a property in the interface updated
+	**/
+	readonly attribute Double Time;
+
+	/**
+	* \brief Zone in which the interface is situated.
+	**/
+	readonly attribute Zone Zone;
 	
 	/**
 	* \brief returns dictionary of objectName and values for data between
@@ -46,7 +49,7 @@ interface VehiclePropertyType {
 	* \arg beginTime time stamp in Seconds since Unix Epoc
 	* \arg endTime time stamp in Seconds since Unix Epoc
 	**/
-	Dictionary getHistory(double beginTime, double endTime);
+	Dict{String,Variant} GetHistory(Double beginTime, Double endTime);
 }
 
 enum Zone {
@@ -59,60 +62,64 @@ enum Zone {
 	Center = 1 << 5
 }
 
+/** org.automotive.Manager
+ * \brief Manager is a helper interface for discovering and finding available objects
+ **/
 [NoInterfaceObject]
-interface Manager  {
+interface org.automotive.Manager  {
 
 	/**  
 	 *  \brief returns supported properties
 	**/
-	sequence<DOMString> List();
+	Array{String} List();
+
 	/**  
 	 *  \brief find the DBus object path which matches "objectName" and "zone".
-	 *  \arg DOMString property is the requested property to be retrieved.
+	 *  \arg String property is the requested property to be retrieved.
 	 *  \arg Zone zone is the zone which the object
 	 *  \returns string representing the DBus Object path
 	**/
-	DOMString FindObjectForZone(DOMString objectName, Zone zone);
+	String FindObjectForZone(String objectName, Zone zone);
 	
 	/**  
 	 *  \brief find the DBus object path matching the given "objectName"
-	 *  \arg DOMString objectName to find
+	 *  \arg String objectName to find
 	 *  \returns list of object paths that provide the given object Name.
 	**/
-	sequence<DOMString> FindObject(DOMString objectName)
+	Array<String> FindObject(String objectName)
         
 	/**  
 	 *  \brief get a list of zones for a given objectName.
-	 *  \arg DOMString objectName object name.
+	 *  \arg String objectName object name.
 	 *  \returns list of zones for the given objectName (@see Zone)
 	**/
-	sequence<unsigned short> ZonesForObjectName(DOMString objectName)
+	Array<UInt16> ZonesForObjectName(String objectName)
 };
 
 [NoInterfaceObject]
-interface VehicleSpeed : VehiclePropertyType  { 
+interface org.automotive.VehicleSpeed : VehiclePropertyType  {
 
 	/**  VehicleSpeed
 	 *   \brief  Must return Vehicle Speed in kilometers per hour.    
 	 **/
-	readonly attribute unsigned long VehicleSpeed;
+	readonly attribute UInt16 VehicleSpeed;
 };
 
 [NoInterfaceObject]
-interface EngineSpeed : VehiclePropertyType  { 
+interface org.automotive.EngineSpeed : VehiclePropertyType  {
 
 	/**  EngineSpeed
 	 *   \brief  Must return Engine Speed in rotations per minute.    
 	 **/
-	readonly attribute unsigned long EngineSpeed;
+	readonly attribute UInt16 EngineSpeed;
 };
 
 [NoInterfaceObject]
-interface VehiclePowerMode : VehiclePropertyType  { 
-	const unsigned short VEHICLEPOWERMODE_OFF = 0,    
-	const unsigned short VEHICLEPOWERMODE_ACCESSORY1 = 1,    
-	const unsigned short VEHICLEPOWERMODE_ACCESSORY2 = 2,    
-	const unsigned short VEHICLEPOWERMODE_RUN = 3;    
+interface org.automotive.VehiclePowerMode : VehiclePropertyType  {
+	const UInt16 VEHICLEPOWERMODE_OFF = 0,
+	const UInt16 VEHICLEPOWERMODE_ACCESSORY1 = 1,
+	const UInt16 VEHICLEPOWERMODE_ACCESSORY2 = 2,
+	const UInt16 VEHICLEPOWERMODE_RUN = 3;
 
 	/**  VehiclePowerMode
 	 *   \brief  Must return Vehicle Power mode (see VEHICLEPOWERMODE)    
@@ -121,54 +128,54 @@ interface VehiclePowerMode : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface TripMeter : VehiclePropertyType  { 
+interface org.automotive.TripMeter : VehiclePropertyType  {
 
 	/**  TripMeters
 	 *   \brief  Must return trip meters.  Changing any items in the array will reset the item's value to '0'.
 	 **/
-	 attribute sequence<unsigned long> TripMeters;
+	 attribute Array<UInt16> TripMeters;
 };
 
 [NoInterfaceObject]
-interface Acceleration : VehiclePropertyType  { 
+interface org.automotive.Acceleration : VehiclePropertyType  {
 
 	/**  X
 	 *   \brief  Must return acceleration on the "X" axis as 1/1000 G (gravitational force).    
 	 **/
-	readonly attribute unsigned long X;
+	readonly attribute UInt16 X;
 
 	/**  Y
 	 *   \brief  Must return acceleration on the "Y" axis as 1/1000 G (gravitational force).    
 	 **/
-	readonly attribute unsigned long Y;
+	readonly attribute UInt16 Y;
 
 	/**  Z
 	 *   \brief  Must return acceleration on the "Z" axis as 1/1000 G (gravitational force).    
 	 **/
-	readonly attribute unsigned long Z;
+	readonly attribute UInt16 Z;
 };
 
 [NoInterfaceObject]
-interface Transmission : VehiclePropertyType  { 
-	const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0;    
-	const unsigned short TRANSMISSIONPOSITION_FIRST = 1;    
-	const unsigned short TRANSMISSIONPOSITION_SECOND = 2;    
-	const unsigned short TRANSMISSIONPOSITION_THIRD = 3;    
-	const unsigned short TRANSMISSIONPOSITION_FORTH = 4;    
-	const unsigned short TRANSMISSIONPOSITION_FIFTH = 5;    
-	const unsigned short TRANSMISSIONPOSITION_SIXTH = 6;    
-	const unsigned short TRANSMISSIONPOSITION_SEVENTH = 7;    
-	const unsigned short TRANSMISSIONPOSITION_EIGHTH = 8;    
-	const unsigned short TRANSMISSIONPOSITION_NINTH = 9;    
-	const unsigned short TRANSMISSIONPOSITION_TENTH = 10;    
-	const unsigned short TRANSMISSIONPOSITION_CVT = 64;    
-	const unsigned short TRANSMISSIONPOSITION_REVERSE = 128;    
-	const unsigned short TRANSMISSIONPOSITION_PARK = 255;    
-	const unsigned short TRANSMISSIONMODE_NORMAL = 0;    
-	const unsigned short TRANSMISSIONMODE_SPORT = 1;    
-	const unsigned short TRANSMISSIONMODE_ECONOMY = 2;    
-	const unsigned short TRANSMISSIONMODE_OEMCUSTOM1 = 3;    
-	const unsigned short TRANSMISSIONMODE_OEMCUSTOM2 = 4;    
+interface org.automotive.Transmission : VehiclePropertyType  {
+	const UInt16 TRANSMISSIONPOSITION_NEUTRAL = 0;
+	const UInt16 TRANSMISSIONPOSITION_FIRST = 1;
+	const UInt16 TRANSMISSIONPOSITION_SECOND = 2;
+	const UInt16 TRANSMISSIONPOSITION_THIRD = 3;
+	const UInt16 TRANSMISSIONPOSITION_FORTH = 4;
+	const UInt16 TRANSMISSIONPOSITION_FIFTH = 5;
+	const UInt16 TRANSMISSIONPOSITION_SIXTH = 6;
+	const UInt16 TRANSMISSIONPOSITION_SEVENTH = 7;
+	const UInt16 TRANSMISSIONPOSITION_EIGHTH = 8;
+	const UInt16 TRANSMISSIONPOSITION_NINTH = 9;
+	const UInt16 TRANSMISSIONPOSITION_TENTH = 10;
+	const UInt16 TRANSMISSIONPOSITION_CVT = 64;
+	const UInt16 TRANSMISSIONPOSITION_REVERSE = 128;
+	const UInt16 TRANSMISSIONPOSITION_PARK = 255;
+	const UInt16 TRANSMISSIONMODE_NORMAL = 0;
+	const UInt16 TRANSMISSIONMODE_SPORT = 1;
+	const UInt16 TRANSMISSIONMODE_ECONOMY = 2;
+	const UInt16 TRANSMISSIONMODE_OEMCUSTOM1 = 3;
+	const UInt16 TRANSMISSIONMODE_OEMCUSTOM2 = 4;
 
 	/**  GearPosition
 	 *   \brief  Must return transmission gear position (see TRANSMISSIONPOSITION)    
@@ -182,136 +189,136 @@ interface Transmission : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface CruiseControlStatus : VehiclePropertyType  { 
+interface org.automotive.CruiseControlStatus : VehiclePropertyType  {
 
 	/**  Activated
 	 *   \brief  Must return whether or not the Cruise Control system is active (true) or inactive (false)    
 	 **/
-	readonly attribute boolean Activated;
+	readonly attribute Boolean Activated;
 
 	/**  Speed
 	 *   \brief  Must return target Cruise Control speed in kilometers per hour (kph).    
 	 **/
-	readonly attribute unsigned short Speed;
+	readonly attribute UInt16 Speed;
 };
 
 [NoInterfaceObject]
-interface WheelBrake : VehiclePropertyType  { 
+interface org.automotive.WheelBrake : VehiclePropertyType  {
 
 	/**  Engaged
 	 *   \brief  Must return Wheel Brake status: Engaged = true, disengaged = false    
 	 **/
-	readonly attribute boolean Engaged;
+	readonly attribute Boolean Engaged;
 };
 
 [NoInterfaceObject]
-interface LightStatus : VehiclePropertyType  { 
+interface org.automotive.LightStatus : VehiclePropertyType  {
 
 	/**  Head
 	 *   \brief  Must return headlight status: on = true, off = false.    
 	 **/
-	readonly attribute boolean Head;
+	readonly attribute Boolean Head;
 
 	/**  RightTurn
 	 *   \brief  Must return right turn signal status: on = true, off = false.    
 	 **/
-	readonly attribute boolean RightTurn;
+	readonly attribute Boolean RightTurn;
 
 	/**  LeftTurn
 	 *   \brief  Must return left turn signal status: on = true, off = false.    
 	 **/
-	readonly attribute boolean LeftTurn;
+	readonly attribute Boolean LeftTurn;
 
 	/**  Brake
 	 *   \brief  Must return  brake signal light status: on = true, off = false.    
 	 **/
-	readonly attribute boolean Brake;
+	readonly attribute Boolean Brake;
 
 	/**  Fog
 	 *   \brief  Must return fog light status: on = true, off = false.    
 	 **/
-	readonly attribute boolean Fog;
+	readonly attribute Boolean Fog;
 
 	/**  Hazard
 	 *   \brief  Must return hazard light status: on = true, off = false.    
 	 **/
-	readonly attribute boolean Hazard;
+	readonly attribute Boolean Hazard;
 
 	/**  Parking
 	 *   \brief  Must return parking light status: on = true, off = false.    
 	 **/
-	readonly attribute boolean Parking;
+	readonly attribute Boolean Parking;
 
 	/**  HighBeam
 	 *   \brief  Must return high beam status: on = true, off = false.    
 	 **/
-	readonly attribute boolean HighBeam;
+	readonly attribute Boolean HighBeam;
 };
 
 [NoInterfaceObject]
-interface InteriorLightStatus : VehiclePropertyType  { 
+interface org.automotive.InteriorLightStatus : VehiclePropertyType  {
 
 	/**  Passenger
 	 *   \brief  Must return passenger interior light status: on = true, off = false    
 	 **/
-	readonly attribute boolean Passenger;
+	readonly attribute Boolean Passenger;
 
 	/**  Driver
 	 *   \brief  Must return driver interior light status: on = true, off = false    
 	 **/
-	readonly attribute boolean Driver;
+	readonly attribute Boolean Driver;
 
 	/**  Center
 	 *   \brief  Must return center interior light status: on = true, off = false    
 	 **/
-	readonly attribute boolean Center;
+	readonly attribute Boolean Center;
 };
 
 [NoInterfaceObject]
-interface Horn : VehiclePropertyType  { 
+interface org.automotive.Horn : VehiclePropertyType  {
 
 	/**  On
 	 *   \brief  Must return horn status: on = true, off = false    
 	 **/
-	readonly attribute boolean On;
+	readonly attribute Boolean On;
 };
 
 [NoInterfaceObject]
-interface Fuel : VehiclePropertyType  { 
+interface org.automotive.Fuel : VehiclePropertyType  {
 
 	/**  Level
 	 *   \brief  Must return fuel level as a percentage of fullness.    
 	 **/
-	readonly attribute unsigned short Level;
+	readonly attribute UInt16 Level;
 
 	/**  Range
 	 *   \brief  Must return estimated fuel range in kilometers.    
 	 **/
-	readonly attribute unsigned short Range;
+	readonly attribute UInt16 Range;
 
 	/**  InstantConsumption
 	 *   \brief  Must return instant fuel consumption in milliliters of fuel per second.    
 	 **/
-	readonly attribute unsigned short InstantConsumption;
+	readonly attribute UInt16 InstantConsumption;
 
 	/**  InstantEconomy
 	 *   \brief  Must return instant fuel 'economy' in kilometers per liter of fuel.    
 	 **/
-	readonly attribute unsigned short InstantEconomy;
+	readonly attribute UInt16 InstantEconomy;
 
 	/**  AverageEconomy
 	 *   \brief  Must return average fuel 'economy' in kilometers per liter of fuel since last reset.  Setting this to any value should reset the counter to '0'    
 	 **/
-	 attribute unsigned short AverageEconomy;
+	 attribute UInt16 AverageEconomy;
 };
 
 [NoInterfaceObject]
-interface EngineOil : VehiclePropertyType  { 
+interface org.automotive.EngineOil : VehiclePropertyType  {
 
 	/**  Remaining
 	 *   \brief  Must return remaining engine oil as percentage of fullness.    
 	 **/
-	readonly attribute unsigned short Remaining;
+	readonly attribute UInt16 Remaining;
 
 	/**  Temperature
 	 *   \brief  Must return Engine Oil Temperature in Celcius.    
@@ -321,44 +328,44 @@ interface EngineOil : VehiclePropertyType  {
 	/**  Pressure
 	 *   \brief  Must return Engine Oil Pressure in kPa.    
 	 **/
-	readonly attribute unsigned short Pressure;
+	readonly attribute UInt16 Pressure;
 };
 
 [NoInterfaceObject]
-interface Location : VehiclePropertyType  { 
+interface org.automotive.Location : VehiclePropertyType  {
 
 	/**  Latitude
 	 *   \brief  Must return latitude in Deg.Min (-180, +180)    
 	 **/
-	readonly attribute double Latitude;
+	readonly attribute Double Latitude;
 
 	/**  Longitude
 	 *   \brief  Must return longitude in Deg.Min (-90, +90)    
 	 **/
-	readonly attribute double Longitude;
+	readonly attribute Double Longitude;
 
 	/**  Altitude
 	 *   \brief  Must return altitude in meters above sea-level (0).    
 	 **/
-	readonly attribute double Altitude;
+	readonly attribute Double Altitude;
 
 	/**  Direction
 	 *   \brief  Must return direction in Degrees  (0-360)    
 	 **/
-	readonly attribute unsigned short Direction;
+	readonly attribute UInt16 Direction;
 };
 
 [NoInterfaceObject]
-interface ExteriorBrightness : VehiclePropertyType  { 
+interface org.automotive.ExteriorBrightness : VehiclePropertyType  {
 
 	/**  ExteriorBrightness
 	 *   \brief Must return the brightness outside the vehicle in lux.    
 	 **/
-	readonly attribute unsigned long ExteriorBrightness;
+	readonly attribute UInt16 ExteriorBrightness;
 };
 
 [NoInterfaceObject]
-interface Temperature : VehiclePropertyType  { 
+interface org.automotive.Temperature : VehiclePropertyType  {
 
 	/**  Interior
 	 *   \brief Must return the temperature of the interior of the vehicle in celcius.    
@@ -372,191 +379,191 @@ interface Temperature : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface RainSensor : VehiclePropertyType  { 
+interface org.automotive.RainSensor : VehiclePropertyType  {
 
 	/**  RainSensor
 	 *   \brief Must return level of rain intensity 0: No Rain - 10: Heaviest Rain.    
 	 **/
-	readonly attribute unsigned short RainSensor;
+	readonly attribute UInt16 RainSensor;
 };
 
 [NoInterfaceObject]
-interface WindshieldWiper : VehiclePropertyType  { 
-	const unsigned short WIPERSPEED_OFF = 0;    
-	const unsigned short WIPERSPEED_SLOWEST= 1;    
-	const unsigned short WIPERSPEED_FASTEST = 5;    
-	const unsigned short WIPERSPEED_AUTO = 10;    
+interface org.automotive.WindshieldWiper : VehiclePropertyType  {
+	const UInt16 WIPERSPEED_OFF = 0;
+	const UInt16 WIPERSPEED_SLOWEST= 1;
+	const UInt16 WIPERSPEED_FASTEST = 5;
+	const UInt16 WIPERSPEED_AUTO = 10;
 
 	/**  WindshieldWiper
 	 *   \brief Must return Level of windshield whiper speed (see WIPERSPEED)    
 	 **/
-	readonly attribute unsigned short WindshieldWiper;
+	readonly attribute UInt16 WindshieldWiper;
 };
 
 [NoInterfaceObject]
-interface HVAC : VehiclePropertyType  { 
-	const unsigned short AIRFLOWDIRECTION_FRONTPANEL = 0;    
-	const unsigned short AIRFLOWDIRECTION_FLOORDUCT= 1;    
-	const unsigned short AIRFLOWDIRECTION_FRONT = 0x02;    
-	const unsigned short AIRFLOWDIRECTION_DEFROSTER = 0x04;    
+interface org.automotive.HVAC : VehiclePropertyType  {
+	const UInt16 AIRFLOWDIRECTION_FRONTPANEL = 0;
+	const UInt16 AIRFLOWDIRECTION_FLOORDUCT= 1;
+	const UInt16 AIRFLOWDIRECTION_FRONT = 0x02;
+	const UInt16 AIRFLOWDIRECTION_DEFROSTER = 0x04;
 
 	/**  AirflowDirection
 	 *   \brief Must return airflow direction.  See 
 	 **/
-	attribute unsigned short AirflowDirection;
+	attribute UInt16 AirflowDirection;
 
 	/**  FanSpeed
 	 *   \brief Must return speed of the fan (0-7)    
 	 **/
-	attribute unsigned short FanSpeed;
+	attribute UInt16 FanSpeed;
 
 	/**  TargetTemperature
 	 *   \brief Must return target desired temperature in celcius.    
 	 **/
-	attribute unsigned short TargetTemperature;
+	attribute UInt16 TargetTemperature;
 
 	/**  AirConditioning
 	 *   \brief Must return air conditioning on (true) / off (false).    
 	 **/
-	attribute boolean AirConditioning;
+	attribute Boolean AirConditioning;
 
 	/**  AirRecirculation
 	 *   \brief Must return air recirculation on (true) / off (false).    
 	 **/
-	readwrite attribute boolean AirRecirculation;
+	attribute Boolean AirRecirculation;
 
 	/**  Heater
 	 *   \brief Must return heater on (true) / off (false).    
 	 **/
-	attribute boolean Heater;
+	attribute Boolean Heater;
 
 	/**  SteeringWheelHeater
 	 *   \brief Must return air recirculation on (true) / off (false).    
 	 **/
-	attribute boolean SteeringWheelHeater;
+	attribute Boolean SteeringWheelHeater;
 
 	/**  SeatHeater
 	 *   \brief Must return seat heater status: 0-100%.
 	 **/
-	attribute unsigned short SeatHeater;
+	attribute UInt16 SeatHeater;
 
 	/**  SeatCooler
 	 *   \brief Must return seat heater status: on (true) / off (false).    
 	 **/
-	attribute boolean SeatCooler;
+	attribute Boolean SeatCooler;
 };
 
 [NoInterfaceObject]
-interface WindowStatus : VehiclePropertyType  { 
+interface org.automotive.WindowStatus : VehiclePropertyType  {
 
 	/**  WindowStatus
 	 *   \brief Must return window status for the window location see "zone" attribute
 	 **/
-	attribute unsigned short WindowStatus;
+	attribute UInt16 WindowStatus;
 
 	/**  Defrost
 	 *   \brief Must return the defrost status of the window equiped with a defroster.
 	 **/
-	attribute boolean Defrost;
+	attribute Boolean Defrost;
 };
 
 [NoInterfaceObject]
-interface Sunroof : VehiclePropertyType  { 
+interface org.automotive.Sunroof : VehiclePropertyType  {
 
 	/**  Openness
 	 *   \brief Must return window status for sunroof openness percentage.    
 	 **/
-	readwrite attribute unsigned short Openness;
+	attribute UInt16 Openness;
 
 	/**  Tilt
 	 *   \brief Must return tilt status for sunroof percentage.    
 	 **/
-	readwrite attribute unsigned short Tilt;
+	attribute UInt16 Tilt;
 };
 
 [NoInterfaceObject]
-interface ConvertibleRoof : VehiclePropertyType  { 
+interface org.automotive.ConvertibleRoof : VehiclePropertyType  {
 
 	/**  Openness
 	 *   \brief Must return window status for sunroof openness percentage.    
 	 **/
-	readwrite attribute unsigned short Openness;
+	 attribute UInt16 Openness;
 };
 
 [NoInterfaceObject]
-interface VehicleId : VehiclePropertyType  { 
+interface org.automotive.VehicleId : VehiclePropertyType  {
 
 	/**  WMI
 	 *   \brief MUST return World Manufacturer Identifier (WMI)    
 	 *   WMI is defined by SAE ISO 3780:2009.  3 characters.    
 	 **/
-	readonly attribute DOMString WMI;
+	readonly attribute String WMI;
 
 	/**  VIN
 	 *   \brief MUST return Vehicle Identification Number (VIN) as defined by ISO 3779. 17 characters.    
 	 **/
-	readonly attribute DOMString VIN;
+	readonly attribute String VIN;
 };
 
 [NoInterfaceObject]
-interface Size : VehiclePropertyType  { 
+interface org.automotive.Size : VehiclePropertyType  {
 
 	/**  Width
 	 *   \brief MUST return width of vehicle in mm    
 	 **/
-	readonly attribute unsigned long Width;
+	readonly attribute UInt16 Width;
 
 	/**  Height
 	 *   \brief MUST return height of vehicle in mm    
 	 **/
-	readonly attribute unsigned long Height;
+	readonly attribute UInt16 Height;
 
 	/**  Length
 	 *   \brief MUST return length of vehicle in mm    
 	 **/
-	readonly attribute unsigned long Length;
+	readonly attribute UInt16 Length;
 };
 
 [NoInterfaceObject]
-interface FuelInfo : VehiclePropertyType  { 
-	const unsigned short FUELTYPE_GASOLINE = 0;    
-	const unsigned short FUELTYPE_HIGH_OCTANE= 1;    
-	const unsigned short FUELTYPE_DIESEL = 2;    
-	const unsigned short FUELTYPE_ELECTRIC = 3;    
-	const unsigned short FUELTYPE_HYDROGEN = 4;    
-	const unsigned short REFUELPOSITION_LEFT = 0;    
-	const unsigned short REFUELPOSITION_RIGHT= 1;    
-	const unsigned short REFUELPOSITION_FRONT = 2;    
-	const unsigned short REFUELPOSITION_REAR = 3;    
+interface org.automotive.FuelInfo : VehiclePropertyType  {
+	const UInt16 FUELTYPE_GASOLINE = 0;
+	const UInt16 FUELTYPE_HIGH_OCTANE= 1;
+	const UInt16 FUELTYPE_DIESEL = 2;
+	const UInt16 FUELTYPE_ELECTRIC = 3;
+	const UInt16 FUELTYPE_HYDROGEN = 4;
+	const UInt16 REFUELPOSITION_LEFT = 0;
+	const UInt16 REFUELPOSITION_RIGHT= 1;
+	const UInt16 REFUELPOSITION_FRONT = 2;
+	const UInt16 REFUELPOSITION_REAR = 3;
 
 	/**  Type
 	 *   \brief MUST return type of fuel.  integer 0-4 (see 
 	 **/
-	readonly attribute unsigned short Type;
+	readonly attribute UInt16 Type;
 
 	/**  RefuelPosition
 	 *   \brief MUST return position of refuling (see 
 	 **/
-	readonly attribute unsigned short RefuelPosition;
+	readonly attribute UInt16 RefuelPosition;
 };
 
 [NoInterfaceObject]
-interface VehicleType : VehiclePropertyType  { 
-	const unsigned short VEHICLETYPE_SEDAN = 0;    
-	const unsigned short VEHICLETYPE_COUPE= 1;    
-	const unsigned short VEHICLETYPE_CABRIOLE = 2;    
-	const unsigned short VEHICLETYPE_ROADSTER = 3;    
-	const unsigned short VEHICLETYPE_SUV = 4;    
-	const unsigned short VEHICLETYPE_TRUCK = 5;    
+interface org.automotive.VehicleType : VehiclePropertyType  {
+	const UInt16 VEHICLETYPE_SEDAN = 0;
+	const UInt16 VEHICLETYPE_COUPE= 1;
+	const UInt16 VEHICLETYPE_CABRIOLE = 2;
+	const UInt16 VEHICLETYPE_ROADSTER = 3;
+	const UInt16 VEHICLETYPE_SUV = 4;
+	const UInt16 VEHICLETYPE_TRUCK = 5;
 
 	/**  Type
 	 *   \brief MUST return type of Vehicle.  Integer 0-5 (see 
 	 **/
-	readonly attribute unsigned short Type;
+	readonly attribute UInt16 Type;
 };
 
 [NoInterfaceObject]
-interface Doors : VehiclePropertyType  { 
+interface org.automotive.Doors : VehiclePropertyType  {
 
 	/**  DoorsPerRow
 	 *   \brief MUST return Number of doors in each row.  The index represents the row.  Position '0'    
@@ -564,309 +571,279 @@ interface Doors : VehiclePropertyType  {
 	 *   Example a common mini-van may have Doors[0] = 2 doors,    
 	 *   Doors[1] = 1 (side door), Doors[2] = 1 (trunk).    
 	 **/
-	readonly attribute sequence<unsigned short> DoorsPerRow;
+	readonly attribute Array<UInt16> DoorsPerRow;
 };
 
 [NoInterfaceObject]
-interface TransmissionGearType : VehiclePropertyType  { 
-	const unsigned short TRANSMISSIONGEARTYPE_AUTO=0;    
-	const unsigned short TRANSMISSIONGEARTYPE_MANUAL=1;    
-	const unsigned short TRANSMISSIONGEARTYPE_CV=2;    
+interface org.automotive.TransmissionGearType : VehiclePropertyType  {
+	const UInt16 TRANSMISSIONGEARTYPE_AUTO=0;
+	const UInt16 TRANSMISSIONGEARTYPE_MANUAL=1;
+	const UInt16 TRANSMISSIONGEARTYPE_CV=2;
 
 	/**  TransmissionGearType
 	 *   \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV).  See 
 	 **/
-	readonly attribute unsigned short TransmissionGearType;
+	readonly attribute UInt16 TransmissionGearType;
 };
 
 [NoInterfaceObject]
-interface WheelInformation : VehiclePropertyType  { 
+interface org.automotive.WheelInformation : VehiclePropertyType  {
 
 	/**  FrontWheelRadius
 	 *   \brief MUST return Radius of Front Wheel(s) in mm.    
 	 **/
-	readonly attribute unsigned short FrontWheelRadius;
+	readonly attribute UInt16 FrontWheelRadius;
 
 	/**  RearWheelRadius
 	 *   \brief MUST return Radius of Rear Wheel(s) in mm.    
 	 **/
-	readonly attribute unsigned short RearWheelRadius;
+	readonly attribute UInt16 RearWheelRadius;
 
 	/**  WheelTrack
 	 *   \brief MUST return Wheel Track in mm.    
 	 **/
-	readonly attribute unsigned long WheelTrack;
+	readonly attribute UInt16 WheelTrack;
 
 	/**  ABS
 	 *   \brief MUST return Antilock Brake System status: on = true, off = false.    
 	 **/
-	readonly attribute boolean ABS;
+	readonly attribute Boolean ABS;
 };
 
 [NoInterfaceObject]
-interface Odometer : VehiclePropertyType  { 
+interface org.automotive.Odometer : VehiclePropertyType  {
 
 	/**  Odometer
 	 *   \brief MUST return Distance traveled in km    
 	 **/
-	readonly attribute unsigned long Odometer;
+	readonly attribute UInt16 Odometer;
 };
 
 [NoInterfaceObject]
-interface Fluid : VehiclePropertyType  { 
+interface org.automotive.Fluid : VehiclePropertyType  {
 
 	/**  Transmission
 	 *   \brief MUST return Transmission fluid level percentage. 0-100.    
 	 **/
-	readonly attribute unsigned short Transmission;
+	readonly attribute UInt16 Transmission;
 
 	/**  Brake
 	 *   \brief MUST return Brake fluid level percentage. 0-100.    
 	 **/
-	readonly attribute unsigned short Brake;
+	readonly attribute UInt16 Brake;
 
 	/**  Washer
 	 *   \brief MUST return Washer fluid level percentage. 0-100.    
 	 **/
-	readonly attribute unsigned short Washer;
+	readonly attribute UInt16 Washer;
 };
 
 [NoInterfaceObject]
-interface Battery : VehiclePropertyType  { 
+interface org.automotive.Battery : VehiclePropertyType  {
 
 	/**  Voltage
 	 *   \brief MUST return battery voltage.    
 	 **/
-	readonly attribute double Voltage;
+	readonly attribute Double Voltage;
 
 	/**  Current
 	 *   \brief MUST return battery current in Amperes    
 	 **/
-	readonly attribute double Current;
+	readonly attribute Double Current;
 };
 
 [NoInterfaceObject]
-interface TirePressure : VehiclePropertyType  { 
+interface org.automotive.TirePressure : VehiclePropertyType  {
 
 	/**  LeftFront
 	 *   \brief MUST return left front tire pressure in kPa.    
 	 **/
-	readonly attribute double LeftFront;
+	readonly attribute Double LeftFront;
 
 	/**  RightFront
 	 *   \brief MUST return right front tire pressure in kPa.    
 	 **/
-	readonly attribute double RightFront;
+	readonly attribute Double RightFront;
 
 	/**  LeftRear
 	 *   \brief MUST return left rear tire pressure in kPa.    
 	 **/
-	readonly attribute double LeftRear;
+	readonly attribute Double LeftRear;
 
 	/**  RightRear
 	 *   \brief MUST return right rear tire pressure in kPa.    
 	 **/
-	readonly attribute double RightRear;
+	readonly attribute Double RightRear;
 };
 
 [NoInterfaceObject]
-interface TireTemperature : VehiclePropertyType  { 
+interface org.automotive.TireTemperature : VehiclePropertyType  {
 
 	/**  LeftFront
 	 *   \brief MUST return left front tire temperature in Celcius.    
 	 **/
-	readonly attribute double LeftFront;
+	readonly attribute Double LeftFront;
 
 	/**  RightFront
 	 *   \brief MUST return right front tire temperature in Celcius.    
 	 **/
-	readonly attribute double RightFront;
+	readonly attribute Double RightFront;
 
 	/**  LeftRear
 	 *   \brief MUST return left rear tire temperature in Celcius.    
 	 **/
-	readonly attribute double LeftRear;
+	readonly attribute Double LeftRear;
 
 	/**  RightRear
 	 *   \brief MUST return right rear tire temperature in Celcius.    
 	 **/
-	readonly attribute double RightRear;
+	readonly attribute Double RightRear;
 };
 
 [NoInterfaceObject]
-interface SecurityAlert : VehiclePropertyType  { 
+interface org.automotive.SecurityAlert : VehiclePropertyType  {
 
 	/**  SecurityAlert
 	 *   \brief MUST return    
 	 **/
-	readonly attribute boolean SecurityAlert;
+	readonly attribute Boolean SecurityAlert;
 };
 
 [NoInterfaceObject]
-interface ParkingBrake : VehiclePropertyType  { 
+interface org.automotive.ParkingBrake : VehiclePropertyType  {
 
 	/**  ParkingBrake
 	 *   must return status of parking brake:  Engaged = true, Disengaged = false.    
 	 **/
-	readonly attribute boolean ParkingBrake;
+	readonly attribute Boolean ParkingBrake;
 };
 
 [NoInterfaceObject]
-interface ParkingLight : VehiclePropertyType  { 
+interface org.automotive.ParkingLight : VehiclePropertyType  {
 
 	/**  ParkingLight
 	 *   must return status of parking light:  Engaged = true, Disengaged = false.    
 	 **/
-	readonly attribute boolean ParkingLight;
+	readonly attribute Boolean ParkingLight;
 };
 
 [NoInterfaceObject]
-interface HazardLight : VehiclePropertyType  { 
+interface org.automotive.HazardLight : VehiclePropertyType  {
 
 	/**  HazardLight
 	 *   must return status of hazard light:  Engaged = true, Disengaged = false.    
 	 **/
-	readonly attribute boolean HazardLight;
+	readonly attribute Boolean HazardLight;
 };
 
 [NoInterfaceObject]
-interface AntilockBrakingSystem : VehiclePropertyType  { 
+interface org.automotive.AntilockBrakingSystem : VehiclePropertyType  {
 
 	/**  AntilockBrakingSystem
 	 *   \brief MUST return whether Antilock Braking System is Idle (false) or Engaged (true)    
 	 **/
-	readonly attribute boolean AntilockBrakingSystem;
+	readonly attribute Boolean AntilockBrakingSystem;
 };
 
 [NoInterfaceObject]
-interface TractionControlSystem : VehiclePropertyType  { 
+interface org.automotive.TractionControlSystem : VehiclePropertyType  {
 
 	/**  TractionControlSystem
 	 *   \brief MUST return whether Traction Control System is Off (false) or On (true)    
 	 **/
-	readonly attribute boolean TractionControlSystem;
+	readonly attribute Boolean TractionControlSystem;
 };
 
 [NoInterfaceObject]
-interface VehicleTopSpeedLimit : VehiclePropertyType  { 
+interface org.automotive.VehicleTopSpeedLimit : VehiclePropertyType  {
 
 	/**  VehicleTopSpeedLimit
 	 *   \brief MUST returns top rated speed in km/h. 0 = no limit    
 	 **/
-	readonly attribute unsigned short VehicleTopSpeedLimit;
+	readonly attribute UInt16 VehicleTopSpeedLimit;
 };
 
 [NoInterfaceObject]
-interface AirbagStatus : VehiclePropertyType  { 
-	const unsigned short AIRBAGLOCATION_DRIVER = 0;    
-	const unsigned short AIRBAGLOCATION_PASSENGER= 1;    
-	const unsigned short AIRBAGLOCATION_LEFTSIDE = 2;    
-	const unsigned short AIRBAGLOCATION_RIGHTSIDE = 3;    
-	const unsigned short AIRBAGSTATUS_INACTIVE = 0;    
-	const unsigned short AIRBAGSTATUS_ACTIVE = 1;    
-	const unsigned short AIRBAGSTATUS_DEPLOYED = 2;    
+interface org.automotive.AirbagStatus : VehiclePropertyType  {
+
+	const UInt16 AIRBAGSTATUS_INACTIVE = 0;
+	const UInt16 AIRBAGSTATUS_ACTIVE = 1;
+	const UInt16 AIRBAGSTATUS_DEPLOYED = 2;
 
 	/**  AirbagStatus
-	 *   \brief MUST returns a dictionary of Airbag (byte) and Status (byte) (see 
+	 *   \brief MUST returns Airbag status (byte) (see AIRBAGSTATUS_*)
 	 **/
-	readonly attribute object AirbagStatus;
+	readonly attribute UInt16 AirbagStatus;
 };
 
 [NoInterfaceObject]
-interface DoorStatus : VehiclePropertyType  { 
-	const unsigned short DOORLOCATION_DRIVER= 0;    
-	const unsigned short DOORLOCATION_PASSENGER = 1;    
-	const unsigned short DOORLOCATION_LEFTREAR = 2;    
-	const unsigned short DOORLOCATION_RIGHTREAR = 3;    
-	const unsigned short DOORLOCATION_TRUNK = 4;    
-	const unsigned short DOORLOCATION_FUELCAP = 5;    
-	const unsigned short DOORLOCATION_HOOD = 6;    
-	const unsigned short DOORSTATUS_CLOSED = 0;    
-	const unsigned short DOORSTATUS_OPEN = 1;    
-	const unsigned short DOORSTATUS_AJAR = 2;    
+interface org.automotive.DoorStatus : VehiclePropertyType  {
+
+	const UInt16 DOORSTATUS_CLOSED = 0;
+	const UInt16 DOORSTATUS_OPEN = 1;
+	const UInt16 DOORSTATUS_AJAR = 2;
 
 	/**  DoorStatus
-	 *   \brief MUST returns dictionary of Door (byte) and Status (byte).  See 
+	 *   \brief MUST returns Door status (byte).  See DOORSTATUS_*
 	 **/
-	readonly attribute object DoorStatus;
+	readonly attribute UInt16 DoorStatus;
 
 	/**  DoorLockStatus
-	 *   \brief MUST returns dictionary of Door (byte) and Status (bool locked = true, unlocked = false).  See 
+	 *   \brief MUST returns Door status (bool locked = true, unlocked = false).
 	 **/
-	readonly attribute object DoorLockStatus;
+	readonly attribute Boolean DoorLockStatus;
 
 	/**  ChildLockStatus
 	 *   \brief MUST returns Child lock status of rear doors.  active = true, inactive = false.    
 	 *   Setting this to 'true' will prevent the rear doors from being opened    
 	 *   from the inside.    
 	 **/
-	readonly attribute boolean ChildLockStatus;
+	readonly attribute Boolean ChildLockStatus;
 };
 
 [NoInterfaceObject]
-interface SeatBeltStatus : VehiclePropertyType  { 
-	const unsigned short SEATBELTLOCATION_DRIVER= 0;    
-	const unsigned short SEATBELTLOCATION_MIDDLEFRONT = 1;    
-	const unsigned short SEATBELTLOCATION_PASSENGER = 2;    
-	const unsigned short SEATBELTLOCATION_LEFTREAR = 3;    
-	const unsigned short SEATBELTLOCATION_MIDDLEREAR = 4;    
-	const unsigned short SEATBELTLOCATION_RIGHTREAR = 5;    
+interface org.automotive.SeatBeltStatus : VehiclePropertyType  {
 
 	/**  SeatBeltStatus
-	 *   \brief MUST returns dictionary of Seat Belt (byte, see SEATBELTLOCATION) and Status (bool: Fasten = true, Unfastened = false)    
+	 *   \brief MUST return Seat Belt Status (bool: Fasten = true, Unfastened = false)
 	 **/
-	readonly attribute object SeatBeltStatus;
+	readonly attribute Boolean SeatBeltStatus;
 };
 
 [NoInterfaceObject]
-interface OccupantStatus : VehiclePropertyType  { 
-	const unsigned short OCCUPANTLOCATION_DRIVER = 0;    
-	const unsigned short OCCUPANTLOCATION_FRONTMIDDLE = 1;    
-	const unsigned short OCCUPANTLOCATION_PASSENGER= 2;    
-	const unsigned short OCCUPANTLOCATION_LEFTREAR = 3;    
-	const unsigned short OCCUPANTLOCATION_MIDDLEREAR = 4;    
-	const unsigned short OCCUPANTLOCATION_RIGHTREAR = 5;    
-	const unsigned short OCCUPANTSTATUS_VACANT = 0;    
-	const unsigned short OCCUPANTSTATUS_CHILD = 1;    
-	const unsigned short OCCUPANTSTATUS_ADULT = 2;    
+interface org.automotive.OccupantStatus : VehiclePropertyType  {
 
 	/**  OccupantStatus
-	 *   \brief MUST returns dictionary of Occupant (byte see OCCUPANTLOCATION) and Status (byte, see 
+	 *   \brief MUST returns status of Occupant (byte, see
 	 **/
-	readonly attribute object OccupantStatus;
+	readonly attribute UInt16 OccupantStatus;
 };
 
 [NoInterfaceObject]
-interface ObstacleDistance : VehiclePropertyType  { 
-	const unsigned short DISTANCESENSORLOCATION_LEFTFRONT = 0;    
-	const unsigned short DISTANCESENSORLOCATION_RIGHTFRONT = 1;    
-	const unsigned short DISTANCESENSORLOCATION_LEFTREAR = 2;    
-	const unsigned short DISTANCESENSORLOCATION_RIGHTREAR = 3;    
-	const unsigned short DISTANCESENSORLOCATION_LEFTBLINDSPOT = 4;    
-	const unsigned short DISTANCESENSORLOCATION_RIGHTBLINDSPOT = 5;    
+interface org.automotive.ObstacleDistance : VehiclePropertyType  {
 
 	/**  ObstacleDistance
-	 *   \brief MUST returns dictionary of Distance Sensor (byte, see DISTANCESENSORLOCATION) and distance (double) in m.    
+	 *   \brief MUST returns Distance Sensor distance (Double) in m.
 	 **/
-	readonly attribute object ObstacleDistance;
+	readonly attribute Double ObstacleDistance;
 };
 
 [NoInterfaceObject]
-interface NightMode : VehiclePropertyType {
+interface org.automotive.NightMode : VehiclePropertyType {
 	
 	/*!
 	 * \brief MUST return whether or not the system is in NightMode or not.  True = Night time, False = Day time
 	 **/
-	readonly attribute boolean NightMode;
+	readonly attribute Boolean NightMode;
 };
 
 [NoInterfaceObject]
-interface DrivingMode : VehiclePropertyType {
+interface org.automotive.DrivingMode : VehiclePropertyType {
 
         /*!
          * \brief MUST return whether or not the system is in DrivingMode or not.  1 = Driving, 0 = Not Driving
          **/
-        readonly attribute unsigned short DrivingMode;   
+		readonly attribute UInt16 DrivingMode;
 };
 
 };
