@@ -155,7 +155,7 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 
 %files
 %defattr(-,root,root,-)
-#%manifest amb.manifest
+%manifest packaging.in/amb.manifest
 %config %{_sysconfdir}/ambd/config
 %config %{_sysconfdir}/ambd/config.tizen
 %{_sysconfdir}/ambd/examples/*
