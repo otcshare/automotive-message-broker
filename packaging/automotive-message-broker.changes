@@ -1,3 +1,7 @@
+* Fri Nov 22 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.805 ("challenger" alpha)
+- Install smack manifest file
+
 * Thu Nov 21 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.10.804 ("challenger" alpha)
 - Fixes TIVI-2081, TIVI-2122
