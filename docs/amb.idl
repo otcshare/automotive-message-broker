@@ -456,13 +456,14 @@ interface org.automotive.HVAC : VehiclePropertyType  {
 [NoInterfaceObject]
 interface org.automotive.WindowStatus : VehiclePropertyType  {
 
-	/**  WindowStatus
-	 *   \brief Must return window status for the window location see "zone" attribute
+	/**  Openness
+	 *   \brief Must return window openness percentage (100% fully open, 0% fully closed)
+	 *  for the window location see "zone" attribute
 	 **/
-	attribute UInt16 WindowStatus;
+	attribute UInt16 Openness;
 
 	/**  Defrost
-	 *   \brief Must return the defrost status of the window equiped with a defroster.
+	 *   \brief Must return the defroster status of the window. On = true, Off = false.
 	 **/
 	attribute Boolean Defrost;
 };
@@ -485,7 +486,7 @@ interface org.automotive.Sunroof : VehiclePropertyType  {
 interface org.automotive.ConvertibleRoof : VehiclePropertyType  {
 
 	/**  Openness
-	 *   \brief Must return window status for sunroof openness percentage.    
+	 *   \brief Must return convertible roof openness percentage.
 	 **/
 	 attribute UInt16 Openness;
 };
