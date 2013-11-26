@@ -803,12 +803,12 @@ interface org.automotive.DoorStatus : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface org.automotive.SeatBeltStatus : VehiclePropertyType  {
+interface org.automotive.SeatBelt : VehiclePropertyType  {
 
-	/**  SeatBeltStatus
-	 *   \brief MUST return Seat Belt Status (bool: Fasten = true, Unfastened = false)
+	/** Status
+	 *  \brief MUST return Seat Belt Status (bool: Fasten = true, Unfastened = false)
 	 **/
-	readonly attribute Boolean SeatBeltStatus;
+	readonly attribute Boolean Status;
 };
 
 [NoInterfaceObject]
@@ -832,7 +832,7 @@ interface org.automotive.ObstacleDistance : VehiclePropertyType  {
 [NoInterfaceObject]
 interface org.automotive.NightMode : VehiclePropertyType {
 	
-	/*!
+	/**
 	 * \brief MUST return whether or not the system is in NightMode or not.  True = Night time, False = Day time
 	 **/
 	readonly attribute Boolean NightMode;
@@ -841,10 +841,10 @@ interface org.automotive.NightMode : VehiclePropertyType {
 [NoInterfaceObject]
 interface org.automotive.DrivingMode : VehiclePropertyType {
 
-        /*!
-         * \brief MUST return whether or not the system is in DrivingMode or not.  1 = Driving, 0 = Not Driving
-         **/
-		readonly attribute UInt16 DrivingMode;
+	/**
+	* \brief MUST return whether or not the system is in DrivingMode or not.  1 = Driving, 0 = Not Driving
+	**/
+	readonly attribute UInt16 DrivingMode;
 };
 
 };
