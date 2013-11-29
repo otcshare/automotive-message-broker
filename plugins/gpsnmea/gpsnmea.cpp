@@ -52,7 +52,7 @@ std::string gprmcRegEx = "[\\$]?GPRMC,([0-1][0-9]|2[0-3])([0-5][0-9])([0-5][0-9]
 		"([EW])," /** lon E or W **/
 		"([0-9]{3}\\.[0-9])," /** Speed in knots **/
 		"(3[0-5][0-9]|[0-2][0-9]{2}\\.[0-9])," /** Direction **/
-		"(3[0-1]|[1-2][0-9]|0[1-9])(0[1-9]|1[0-2])([0-9]{2}),"
+		"(3[0-1]|[1-2][0-9]|0[1-9])(0[1-9]|1[0-2])([0-9]{2})," /** Date stamp **/
 		"(180|[1][0-7][0-9]|[0][0-9]{2}\\.[0-9])," /** Magnetic variation **/
 		"([EW])" /** Magnetic Direction **/
 		"\\*([0-9,A-F]{2})";
@@ -113,7 +113,7 @@ private: ///methods:
 	void parseGprmc(string gprmc);
 	void parseGpgga(string gpgga);
 
-	void parseTime(std::string h, std::string m, std::string s);
+	void parseTime(std::string h, std::string m, std::string s, string dd, string mm, string yy);
 	void parseLatitude(std::string d, std::string m, std::string ns);
 	void parseLongitude(std::string d, string m, string ew);
 	void parseSpeed(std::string spd);
@@ -168,12 +168,21 @@ void Location::parseGprmc(string gprmc)
 
 	if (boost::regex_match (gprmc, tokens, regularExpression) )
 	{
-		parseTime(tokens[1],tokens[2],tokens[3]);
+
 
 		if(tokens[4] == "A")
 		{
 			isActive = true;
 		}
+
+		int i=0;
+		for(auto tok : tokens)
+		{
+			DebugOut(0)<<i++<<":"<<tok<<endl;
+
+		}
+
+		parseTime(tokens[1],tokens[2],tokens[3],tokens[13],tokens[14],tokens[15]);
 
 		parseLatitude(tokens[5], tokens[6], tokens[7]);
 		parseLongitude(tokens[8], tokens[9], tokens[10]);
@@ -194,7 +203,6 @@ void Location::parseGpgga(string gpgga)
 		return;
 	}
 
-	parseTime(tokens[1].substr(0,2),tokens[1].substr(2,2),tokens[1].substr(4,2));
 	parseLatitude(tokens[2],"",tokens[3]);
 	parseLongitude(tokens[4],"",tokens[5]);
 	if(tokens[6] != "0")
@@ -206,12 +214,15 @@ void Location::parseGpgga(string gpgga)
 	parseAltitude(tokens[9]);
 }
 
-void Location::parseTime(string h, string m, string s)
+void Location::parseTime(string h, string m, string s, string dd, string mm, string yy)
 {
 	tm t;
 	t.tm_hour = boost::lexical_cast<int>(h);
 	t.tm_min = boost::lexical_cast<int>(m);
 	t.tm_sec = boost::lexical_cast<int>(s);
+	t.tm_mday = boost::lexical_cast<int>(dd);
+	t.tm_mon = boost::lexical_cast<int>(mm);
+	t.tm_year = boost::lexical_cast<int>(yy) + 100;
 
 	time_t time = mktime(&t);
 
@@ -388,6 +399,7 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		DebugOut()<<"lat: "<<location.latitude().toString()<<endl;
 
 		g_assert(location.latitude().toString() == "-23.86600833");
+		g_assert(location.gpsTime().toString() == "1050585131");
 
 		location.parse("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47");
 

@@ -199,30 +199,8 @@ public:
 	WindowStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindowStatus", re, connection, map<string, string>())
 	{
-		/**
-		 * @enum const unsigned short WINDOWLOCATION_DRIVER= 0;
-		 * @enum const unsigned short WINDOWLOCATION_PASSENGER = 1;
-		 * @enum const unsigned short WINDOWLOCATION_LEFTREAR = 2;
-		 * @enum const unsigned short WINDOWLOCATION_RIGHTREAR = 3;
-		 * @enum const unsigned short WINDOWLOCATION_REAR = 4;
-		 **/
+		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", "q", AbstractProperty::ReadWrite);
 
-		/**
-		 * @attributeName WindowStatus
-		 * @type object
-		 * @access readwrite
-		 * @attributeComment \brief Must return window status for each window location.  object returned is a
-		 * @attributeComment unsigned short percentage opened
-		 */
-		wantPropertyVariant(VehicleProperty::WindowStatus,"WindowStatus", "q", AbstractProperty::ReadWrite);
-
-		/**
-		 * @attributeName Defrost
-		 * @type object
-		 * @access readwrite
-		 * @attributeComment \brief Must return the defrost status of all windows equiped with defrosters.  This will return a dictionary of { unsigned short, boolean } that represents
-		 * @attributeComment \brief each window and its defrost status.
-		 */
 		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", "b", AbstractProperty::ReadWrite);
 	}
 };
@@ -234,20 +212,8 @@ public:
 	Sunroof(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Sunroof", re, connection, map<string, string>())
 	{
-		/**
-		 * @attributeName Openness
-		 * @type unsigned short
-		 * @access readwrite
-		 * @attributeComment \brief Must return window status for sunroof openness percentage.
-		 */
 		wantPropertyVariant(VehicleProperty::Sunroof, "Openness", "y", AbstractProperty::ReadWrite);
 
-		/**
-		 * @attributeName Tilt
-		 * @type unsigned short
-		 * @access readwrite
-		 * @attributeComment \brief Must return tilt status for sunroof percentage.
-		 */
 		wantPropertyVariant(VehicleProperty::SunroofTilt, "Tilt", "y", AbstractProperty::ReadWrite);
 
 	}
@@ -260,13 +226,7 @@ public:
 	ConvertibleRoof(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ConvertibleRoof", re, connection, map<string, string>())
 	{
-		/**
-		 * @attributeName Openness
-		 * @type unsigned short
-		 * @access readwrite
-		 * @attributeComment \brief Must return window status for sunroof openness percentage.
-		 */
-		wantPropertyVariant(VehicleProperty::ConvertibleRoof, "ConvertibleRoof", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::ConvertibleRoof, "Openness", "y", AbstractProperty::ReadWrite);
 	}
 };
 #endif
