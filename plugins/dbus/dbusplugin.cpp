@@ -88,7 +88,7 @@ DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, stri
 DBusSinkManager::~DBusSinkManager()
 {
 	if(manager){
-		delete manager;
+		// delete manager; <-- currently AbstractSink* instances are deleted in Core::~Core()
 		manager = nullptr;
 	}
 }
