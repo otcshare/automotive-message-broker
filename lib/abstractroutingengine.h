@@ -50,7 +50,7 @@ class AsyncPropertyRequest
 {
 public:
 	AsyncPropertyRequest()
-		:property(VehicleProperty::NoValue),timeout(10000)
+		:property(VehicleProperty::NoValue),zoneFilter(Zone::None), timeout(10000)
 	{
 
 	}

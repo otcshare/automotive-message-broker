@@ -274,11 +274,12 @@ public:
 	 * \brief factory constructs a static instance of VehicleProperty.  This should be called once before VehicleProperty is used in the app
 	 */
 	static void factory();
+	
 	/*!
 	 *
-     * \brief destroys static instance of VehicleProperty. This should be called at application shutdown
-     */
-    static void shutdown();
+	 * \brief destroys static instance of VehicleProperty. This should be called at application shutdown
+	 */
+	static void shutdown();
 
 	typedef std::string Property;
 

@@ -44,11 +44,7 @@ GVariant *VariantType::toGVariant()
 {
 	if(!value())
 	{
-		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
-
-		setValue(v);
-
-		delete v; //TODO: Needs to be veriefied if it will CRASH here. Does setValue() take ownership ???
+		setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName));
 	}
 
 	auto v = value();
