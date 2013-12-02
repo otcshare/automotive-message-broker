@@ -194,7 +194,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		}
 		else
 		{
-			mSinks.push_back(plugin);
+			mSinkManagers.push_back(plugin);
 		}
 	}
 
@@ -205,12 +205,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 
 PluginLoader::~PluginLoader()
 {
-	for(auto itr = mSinks.begin(); itr != mSinks.end(); itr++)
-	{
-		delete *itr;
-	}
-
-	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	for(auto itr = mSinkManagers.begin(); itr != mSinkManagers.end(); itr++)
 	{
 		delete *itr;
 	}

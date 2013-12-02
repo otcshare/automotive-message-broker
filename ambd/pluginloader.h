@@ -121,7 +121,7 @@ private:
 	AbstractRoutingEngine* routingEngine;
 	
 	SourceList mSources;
-	list<AbstractSinkManager*> mSinks;
+	list<AbstractSinkManager*> mSinkManagers;
 	
 	create_t * f_create;
 	create_mainloop_t * m_create;
