@@ -791,7 +791,7 @@ public:
 	 *  //Somewhere in a source plugin:
 	 *  ...
 	 *  Property VehicleJetEngineStatus = "VehicleJetEngineStatus";
-	 *  VehicleProperty::registerProperty(VehicleJetEngineStatus, [](){return new BasicPropertyType<bool>(false);});
+	 *  VehicleProperty::registerProperty(VehicleJetEngineStatus, [](){return new BasicPropertyType<bool>(VehicleJetEngineStatus, false);});
 	 *  ...
 	 *  //other initialization
 	 */
