@@ -47,6 +47,7 @@ public:
 	};
 
 	AbstractProperty(string propertyName, Access access, AbstractDBusInterface* interface);
+	virtual ~AbstractProperty();
 	
 	virtual void setSetterFunction(SetterFunc setterFunc)
 	{

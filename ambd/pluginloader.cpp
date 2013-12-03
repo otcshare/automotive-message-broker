@@ -53,7 +53,12 @@ std::string get_file_contents(const char *filename)
 }
 PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int argc, char** argv): f_create(NULL), routingEngine(re), mMainLoop(nullptr)
 {
-  
+	if(lt_dlinit())
+	{
+		cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<lt_dlerror()<<endl;
+		throw std::runtime_error("Error initializing libtool. Aborting");
+	}
+
 	DebugOut()<<"Loading config file: "<<configFile<<endl;
 	json_object *rootobject;
 	json_tokener *tokener = json_tokener_new();
@@ -71,6 +76,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 	{
 		fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
 		// Handle errors, as appropriate for your application.
+		throw std::runtime_error("Invalid config");
 	}
 	if (tokener->char_offset < configFile.length()) // XXX shouldn't access internal fields
 	{
@@ -141,7 +147,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		}
 	}
 
-	json_object_put(sourcesobject);
+	//json_object_put(sourcesobject);
 	///read the sinks:
 	
 	json_object *sinksobject = json_object_object_get(rootobject,"sinks");
@@ -186,13 +192,28 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		{
 			throw std::runtime_error("plugin is not a SinkManager");
 		}
+		else
+		{
+			mSinkManagers.push_back(plugin);
+		}
 	}
 
-	json_object_put(sinksobject);
+	//json_object_put(sinksobject);
+	json_object_put(rootobject);
+	json_tokener_free(tokener);
 }
 
 PluginLoader::~PluginLoader()
 {
+	for(auto itr = mSinkManagers.begin(); itr != mSinkManagers.end(); itr++)
+	{
+		delete *itr;
+	}
+
+	auto handle = openHandles.begin();
+	while(handle != openHandles.end())
+		lt_dlclose(*handle++);
+	lt_dlexit();
 }
 
 IMainLoop *PluginLoader::mainloop()

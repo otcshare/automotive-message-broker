@@ -168,6 +168,8 @@ int main(int argc, char **argv)
 
 	mainloop->exec();
 	
+	VehicleProperty::shutdown();
+
 	if(logfile.is_open())
 		logfile.close();
 

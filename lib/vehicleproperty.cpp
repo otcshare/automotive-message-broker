@@ -288,6 +288,17 @@ void VehicleProperty::factory()
 		thereCanOnlyBeOne = new VehicleProperty();
 }
 
+void VehicleProperty::shutdown()
+{
+    if(thereCanOnlyBeOne){
+        delete thereCanOnlyBeOne;
+        thereCanOnlyBeOne = nullptr;
+    }
+    registeredPropertyFactoryMap.clear();
+    mCapabilities.clear();
+    mCustomProperties.clear();
+}
+
 std::list<VehicleProperty::Property> VehicleProperty::capabilities()
 {
 	return mCapabilities;

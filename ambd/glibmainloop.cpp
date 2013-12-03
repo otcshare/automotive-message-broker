@@ -11,6 +11,7 @@ GlibMainLoop::GlibMainLoop(int argc, char **argv)
 GlibMainLoop::~GlibMainLoop()
 {
 	g_main_loop_quit(mainLoop);
+	g_main_loop_unref(mainLoop);
 	//exit(0);
 }
 

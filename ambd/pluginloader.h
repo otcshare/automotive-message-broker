@@ -92,15 +92,6 @@ private: ///methods:
 		{
 			DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 
-			if(lt_dlinit())
-			{
-				mErrorString = lt_dlerror();
-				cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-				return nullptr;
-			}
-
-			lt_dlerror();
-
 			lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
 
 			if(!handle)
@@ -109,6 +100,7 @@ private: ///methods:
 				cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 				return nullptr;
 			}
+			openHandles.push_back(handle);
 
 			m_create = (create_mainloop_t *)lt_dlsym(handle, "create");
 
@@ -129,13 +121,15 @@ private:
 	AbstractRoutingEngine* routingEngine;
 	
 	SourceList mSources;
-	SinkList mSinks;
+	list<AbstractSinkManager*> mSinkManagers;
 	
 	create_t * f_create;
 	create_mainloop_t * m_create;
 
 
 	IMainLoop* mMainLoop;
+
+	std::vector<lt_dlhandle> openHandles;
 };
 
 #endif // PLUGINLOADER_H

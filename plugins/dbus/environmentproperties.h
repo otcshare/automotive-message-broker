@@ -161,7 +161,8 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return air recirculation on (true) / off (false).
 		 */
-		wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
+		//DUPLICATED!
+		//wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName SteeringWheelHeater

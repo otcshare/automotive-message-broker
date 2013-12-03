@@ -46,7 +46,7 @@ static int updateGpsposition(gpointer data)
 	}
 #else
 
-	gps_poll(&gps);
+	gps_poll(&shared->gps);
 
 #endif
 

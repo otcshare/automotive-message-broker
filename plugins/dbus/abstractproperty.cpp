@@ -26,6 +26,14 @@ AbstractProperty::AbstractProperty(string pn, Access access, AbstractDBusInterfa
 
 }
 
+AbstractProperty::~AbstractProperty()
+{
+	if(mValue){
+		delete mValue;
+		mValue = nullptr;
+	}
+}
+
 void AbstractProperty::updateValue()
 {
 	mInterface->updateValue(this);

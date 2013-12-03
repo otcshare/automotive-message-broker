@@ -44,11 +44,7 @@ GVariant *VariantType::toGVariant()
 {
 	if(!value())
 	{
-		AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
-
-		setValue(v);
-
-		delete v;
+		setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName));
 	}
 
 	auto v = value();

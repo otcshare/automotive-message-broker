@@ -35,7 +35,8 @@ AsyncPropertyReply::AsyncPropertyReply(const AsyncSetPropertyRequest &request)
 	:AsyncPropertyRequest(request), value(request.value), success(false), timeoutSource(nullptr)
 {
 	setTimeout();
-	value->zone = request.zoneFilter;
+	if(value)
+		value->zone = request.zoneFilter;
 }
 
 void AsyncPropertyReply::setTimeout()
