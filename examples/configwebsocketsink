@@ -2,7 +2,8 @@
 	"sources" : [ 
 		{
 			"name" : "ExampleSouce",
-			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so"
+			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so",
+			"delay" : "1"
 		}
 	],
 	"sinks": [

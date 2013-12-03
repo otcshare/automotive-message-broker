@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 #include <boost/assert.hpp>
+#include <boost/lexical_cast.hpp>
 #include <glib.h>
 
 using namespace std;
@@ -48,7 +49,15 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 :AbstractSource(re, config), velocity(0), engineSpeed(0)
 {
 	debugOut("setting timeout");
-	g_timeout_add(1000, timeoutCallback, this );
+
+	int delay = 1000;
+
+	if(config.find("delay") != config.end())
+	{
+		delay = boost::lexical_cast<int>(config["delay"]);
+	}
+
+	g_timeout_add(delay, timeoutCallback, this );
 
 	addPropertySupport(VehicleProperty::EngineSpeed, Zone::None);
 	addPropertySupport(VehicleProperty::VehicleSpeed, Zone::None);

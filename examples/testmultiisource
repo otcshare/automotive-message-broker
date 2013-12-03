@@ -6,13 +6,13 @@ config=$1
 
 #start initial ambd client:
 
-ambd -D -c $config -d7 -l host.output
+ambd -D -c $config -d1 -l host.output
 
 sleep 10
 
 for (( i=1; i<=$numclients; i++ ))
 do
-	ambd -D -c configwebsocketsource -d4 -l client.$i.output
+	ambd -D -c configwebsocketsource -d2 -l client.$i.output
 done
 
 sleep 60

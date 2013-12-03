@@ -309,7 +309,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
 					type->timestamp = boost::lexical_cast<double,std::string>(timestamp);
 					type->sequence = boost::lexical_cast<double,std::string>(sequence);
-					m_re->updateProperty(name, type, source->uuid());
+					m_re->updateProperty(type, source->uuid());
 					double currenttime = amb::currentTime();
 
 					/** This is now the latency between when something is available to read on the socket, until

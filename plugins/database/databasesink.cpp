@@ -96,7 +96,7 @@ int getNextEvent(gpointer data)
 
 	if(value)
 	{
-		pbshared->routingEngine->updateProperty(obj->key, value, pbshared->uuid);
+		pbshared->routingEngine->updateProperty(value, pbshared->uuid);
 		value->timestamp = obj->time;
 		//value->sequence = obj->sequence;
 	}
@@ -535,7 +535,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 
 		DatabaseFileType temp(databaseName);
 
-		routingEngine->updateProperty(DatabaseFile,&temp,uuid());
+		routingEngine->updateProperty(&temp,uuid());
 
 		reply->success = true;
 	}

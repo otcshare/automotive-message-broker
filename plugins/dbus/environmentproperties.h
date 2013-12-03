@@ -156,15 +156,6 @@ public:
 		wantPropertyVariant(VehicleProperty::Heater, "Heater", "b", AbstractProperty::ReadWrite);
 
 		/**
-		 * @attributeName Defrost
-		 * @type boolean
-		 * @access readwrite
-		 * @attributeComment \brief Must return air recirculation on (true) / off (false).
-		 */
-		//DUPLICATED!
-		//wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", "b", AbstractProperty::ReadWrite);
-
-		/**
 		 * @attributeName SteeringWheelHeater
 		 * @type boolean
 		 * @access readwrite

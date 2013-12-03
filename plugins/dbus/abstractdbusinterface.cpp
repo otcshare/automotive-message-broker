@@ -330,10 +330,6 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	GError *error = NULL;
 	GVariant* val = g_variant_ref(property->toGVariant());
 
-	std::string temp = property->value()->toString();
-
-	DebugOut(0)<<property->ambPropertyName()<<" is: "<<temp<<endl;
-
 	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(),
 								  g_variant_new("(vd)",val,property->timestamp()), &error);
 
