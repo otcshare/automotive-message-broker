@@ -1,4 +1,6 @@
-Running Status hierarchy
+Deprecated.  Please use amb.idl
+
+Personalization hierarchy
 =================
 
 Service         org.automotive
