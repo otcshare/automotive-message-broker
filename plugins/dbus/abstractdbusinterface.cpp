@@ -330,6 +330,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	GError *error = NULL;
 	GVariant* val = g_variant_ref(property->toGVariant());
 
+	/// TODO deprecate this.  there's no need for two signals to be sent
 	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(),
 								  g_variant_new("(vd)",val,property->timestamp()), &error);
 

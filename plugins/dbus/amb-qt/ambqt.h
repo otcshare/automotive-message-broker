@@ -24,26 +24,20 @@ class AmbProperty: public QObject
 	AUTOPROPERTY(QString, interfaceName, InterfaceName)
 	Q_PROPERTY(QString objectPath READ objectPath WRITE setObjectPath)
 	AUTOPROPERTY(QString, objectPath, ObjectPath)
+	Q_PROPERTY(int zone READ zone WRITE setZone)
+	AUTOPROPERTY(int, zone, Zone)
+	Q_PROPERTY(double time READ time)
+
 
 	public:
 
-		AmbProperty():mDBusInterface(NULL) { }
+		AmbProperty():mDBusInterface(NULL),mZone(0),mTime(0) { }
 
 	AmbProperty(QString op, QString iface, QString propName);
 
 	QVariant value()
 	{
-		if(!mDBusInterface || !mDBusInterface->isValid())
-		{
-			qDebug()<<"error Interface is not valid: "<<interfaceName();
-			return QVariant::Invalid;
-		}
-
-		QVariant value = mDBusInterface->property(propertyName().toAscii().data());
-
-		qDebug()<<"property "<<propertyName()<<" value: "<<value<<" isvalid? "<<(QVariant::Invalid == value);
-
-		return value;
+		return mValue;
 	}
 
 	void setValue(QVariant v)
@@ -53,19 +47,29 @@ class AmbProperty: public QObject
 			qDebug()<<"error Interface is not valid "<<interfaceName();
 		}
 
-		mDBusInterface->setProperty(propertyName().toAscii(), v);
+		mDBusInterface->setProperty(propertyName().toUtf8(), v);
 	}
 
-Q_SIGNALS:
-	void propertyChanged(QVariant val, double time);
+	double time(){ return mTime; }
+
+Q_SIGNALS:	
 	void valueChanged(QVariant val);
 
+	///TODO: remove
+	void signalChanged(QVariant val);
+
 public Q_SLOTS:
-	void propertyChangedSlot(QDBusVariant val, double ts);
 	void connect();
 
+private Q_SLOTS:
+	void propertyChangedSlot(QString, QVariantMap values, QVariantMap);
+	void propertyChanged1(QDBusVariant, double);
+
 private:
+	void getObjectPath();
 	QDBusInterface* mDBusInterface;
+	double mTime;
+	QVariant mValue;
 };
 
 #endif // AMBQT_H

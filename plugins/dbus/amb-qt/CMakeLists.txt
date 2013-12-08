@@ -1,18 +1,28 @@
 if(qt_bindings)
 
-FIND_PACKAGE(Qt4 COMPONENTS QtCore QtDBus QtDeclarative REQUIRED)
-include(${QT_USE_FILE})
-ADD_DEFINITIONS(${QT_DEFINITIONS})
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Quick REQUIRED)
+find_package(Qt5DBus REQUIRED)
 
-set(QT_USE_QTDBUS TRUE)
-set(QT_DONT_USE_QTGUI TRUE)
+if(Qt5Core_FOUND)
+	message(STATUS "using Qt5")
+
+	set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} ${Qt5Quick_INCLUDE_DIRS} ${Qt5DBus_INCLUDE_DIRS})
+	set(QT_LIBRARIES ${Qt5Core_LIBRARIES} ${Qt5Quick_LIBRARIES} ${Qt5DBus_LIBRARIES})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+	message(STATUS "size of void_p: ${CMAKE_SIZEOF_VOID_P}")
+	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		message(STATUS "can has 64bits")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=large")
+	endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
+	add_definitions(${Qt5Core_DEFINITIONS})
+	set(CMAKE_AUTOMOC ON)
+endif(Qt5Core_FOUND)
+
 set(ambqt_headers ambqt.h amb-qt_global.h)
 set(ambqt_sources ambqt.cpp)
 set(ambqtquick_sources ambqtquick.cpp)
 set(ambqtquick_headers ambqtquick.h)
-
-QT4_WRAP_CPP(ambqt_headers_moc ${ambqt_headers})
-QT4_WRAP_CPP(ambqtquick_headers_moc ${ambqtquick_headers})
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${QT_INCLUDE_DIRS})
 
@@ -22,10 +32,13 @@ add_library(ambqtquick MODULE ${ambqtquick_sources} ${ambqtquick_headers_moc})
 target_link_libraries(amb-qt amb ${QT_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES})
 target_link_libraries(ambqtquick amb-qt ${QT_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES})
 
+add_executable(ambtestclient test.cpp)
+target_link_libraries(ambtestclient amb amb-qt ${QT_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES})
+
 install (TARGETS amb-qt LIBRARY DESTINATION lib${LIB_SUFFIX})
 
 install (FILES ${ambqt_headers} DESTINATION ${INCLUDE_INSTALL_DIR}/ COMPONENT Devel)
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/qmldir DESTINATION ${LIB_INSTALL_DIR}/qt4/imports/amb COMPONENT Devel)
-install (TARGETS ambqtquick DESTINATION ${LIB_INSTALL_DIR}/qt4/imports/amb)
-
+install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/qmldir DESTINATION ${LIB_INSTALL_DIR}/qt5/qml/amb COMPONENT Devel)
+install (TARGETS ambqtquick DESTINATION ${LIB_INSTALL_DIR}/qt5/qml/amb)
+install (TARGETS ambtestclient RUNTIME DESTINATION bin)
 endif(qt_bindings)
