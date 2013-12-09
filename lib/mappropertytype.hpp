@@ -74,11 +74,13 @@ public:
 			// e.g. issue an error, parse another object from that point, etc...
 		}
 		//Good!
-		
+
+		clear();
+
 		json_object_object_foreach(rootobject, key, val)
 		{
-			T one(key);
-			N two(std::string(json_object_get_string(val)));
+			T one("", key);
+			N two("", std::string(json_object_get_string(val)));
 			append(one,two);
 
 		}
@@ -104,6 +106,7 @@ public:
 
 	void fromVariant(GVariant* variant)
 	{
+		clear();
 		/// TODO: fill this in
 		gsize dictsize = g_variant_n_children(variant);
 		for (int i=0;i<dictsize;i++)
@@ -131,6 +134,11 @@ public:
 	}
 
 private:
+
+	void clear()
+	{
+		mMap.clear();
+	}
 
 	void appendPriv(T  key, N  value)
 	{

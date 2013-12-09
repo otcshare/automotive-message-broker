@@ -352,7 +352,7 @@ public:
 	BasicPropertyType(std::string propertyName)
 		:AbstractPropertyType(propertyName)
 	{
-
+		mValue = T();
 	}
 
 	/*BasicPropertyType(std::string val)
@@ -555,10 +555,7 @@ public:
 
 	~ListPropertyType()
 	{
-		for(auto itr = mList.begin(); itr != mList.end(); itr++)
-		{
-			delete *itr;
-		}
+		clear();
 	}
 
 	/** append - appends a property to the list
@@ -613,6 +610,8 @@ public:
 
 	void fromString(std::string str )
 	{
+		clear();
+
 		if(!str.length())
 			return;
 
@@ -630,10 +629,8 @@ public:
 		std::string element;
 		while(std::getline(f,element,','))
 		{
-			T *foo = new T(element);
-			append (foo);
-
-			delete foo;
+			T foo("", element);
+			append (&foo);
 		}
 	}
 
@@ -661,6 +658,8 @@ public:
 
 	void fromVariant(GVariant* v)
 	{
+		clear();
+
 		/// TODO: fill this in
 		gsize dictsize = g_variant_n_children(v);
 		for (int i=0;i<dictsize;i++)
@@ -676,6 +675,16 @@ public:
 	std::list<AbstractPropertyType*> list() { return mList; }
 
 private:
+
+	void clear()
+	{
+		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		{
+			delete *itr;
+		}
+		mList.clear();
+	}
+
 	void appendPriv(AbstractPropertyType* i)
 	{
 		mList.push_back(i);
