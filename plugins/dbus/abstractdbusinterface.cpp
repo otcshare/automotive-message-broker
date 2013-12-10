@@ -330,16 +330,6 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	GError *error = NULL;
 	GVariant* val = g_variant_ref(property->toGVariant());
 
-	/// TODO deprecate this.  there's no need for two signals to be sent
-	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), mInterfaceName.c_str(), string(property->name() + "Changed").c_str(),
-								  g_variant_new("(vd)",val,property->timestamp()), &error);
-
-	if(error)
-	{
-		DebugOut(DebugOut::Error)<<error->message<<endl;
-		g_error_free(error);
-	}
-
 	/// Send PropertiesChanged signal
 
 	GVariantBuilder builder;
@@ -349,16 +339,14 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	g_variant_builder_add(&builder, "{sv}", std::string(property->name() + "Sequence").c_str(), g_variant_new("i", property->sequence()));
 	g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("d", mTime) );
 
-	GError *error2 = NULL;
-
 	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), "org.freedesktop.DBus.Properties", "PropertiesChanged", g_variant_new("(sa{sv}as)",
 																																				mInterfaceName.c_str(),
-																																				&builder, NULL), &error2);
+																																				&builder, NULL), &error);
 
-	if(error2)
+	if(error)
 	{
-		DebugOut(DebugOut::Error)<<error2->message<<endl;
-		g_error_free(error2);
+		DebugOut(DebugOut::Error)<<error->message<<endl;
+		g_error_free(error);
 	}
 
 	g_variant_unref(val);
