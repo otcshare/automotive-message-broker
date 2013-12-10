@@ -6,9 +6,9 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.10.804")
+set(PROJECT_VERSION "0.10.900")
 set(PROJECT_CODENAME "challenger")
-set(PROJECT_QUALITY "alpha")
+set(PROJECT_QUALITY "beta")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
