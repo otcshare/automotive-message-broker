@@ -54,10 +54,6 @@ const uint getPid(const char *owner)
 		throw std::runtime_error(error->message);
 	}
 
-	const char* p = g_variant_get_type_string(pid);
-
-	DebugOut()<<"pid "<<p<<endl;
-
 	uint thePid=0;
 
 	g_variant_get(pid,"(u)",&thePid);
