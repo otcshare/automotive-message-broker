@@ -342,7 +342,7 @@ bool VehicleProperty::registerPropertyPriv(VehicleProperty::Property name, Vehic
 {
 	if(ListPlusPlus<Property>(&mCapabilities).contains(name))
 	{
-		DebugOut(0)<<__FUNCTION__<<" ERROR: property '"<<name<<"'' already registered."<<endl;
+		DebugOut(0)<<__FUNCTION__<<" ERROR: property '"<<name<<"' already registered."<<endl;
 		return false;
 	}
 

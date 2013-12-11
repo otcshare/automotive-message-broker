@@ -41,6 +41,12 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 	std::string method = method_name;
 
+	if(DebugOut::getDebugThreshhold() >= 6)
+	{
+		DebugOut(6)<<"DBus method call from: "<<sender<< " pid: " <<getPid(sender)<< " interface: "<<interface_name<<" method: "<<method<<endl;
+		DebugOut(6)<<"DBus method call path: "<<object_path<<endl;
+	}
+
 	if(method == "findProperty")
 	{
 		DebugOut(DebugOut::Warning)<<"org.automotive.Manager.findProperty() is deprecated.  Use org.automotive.Manager.FindObject() instead."<<endl;
