@@ -69,18 +69,18 @@ protected:
 	template <typename T>
 	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access, this);
+		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
 	}
 
 
 	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access, this);
+		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
 	}
 
 	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access, this);
+		propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
 	}
 
 	PropertyDBusMap propertyDBusMap;

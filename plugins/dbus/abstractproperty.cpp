@@ -20,8 +20,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "abstractproperty.h"
 #include "abstractdbusinterface.h"
 
-AbstractProperty::AbstractProperty(string pn, Access access, AbstractDBusInterface* interface)
-	: mPropertyName(pn), mAccess(access), mInterface(interface), mValue(NULL), mZoneFilter(Zone::None), mUpdateFrequency(0)
+AbstractProperty::AbstractProperty(string pn, Access access)
+	: mPropertyName(pn), mAccess(access), mValue(NULL), mZoneFilter(Zone::None), mUpdateFrequency(0)
 {
 
 }
@@ -32,9 +32,4 @@ AbstractProperty::~AbstractProperty()
 		delete mValue;
 		mValue = nullptr;
 	}
-}
-
-void AbstractProperty::updateValue()
-{
-	mInterface->updateValue(this);
 }

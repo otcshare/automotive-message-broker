@@ -21,7 +21,7 @@ CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop,
 		std::string signature = g_variant_get_type_string(var);
 		g_variant_unref(var);
 
-		propertyDBusMap[prop] = new VariantType(re, signature, prop, prop, VariantType::ReadWrite, this);
+		propertyDBusMap[prop] = new VariantType(re, signature, prop, prop, VariantType::ReadWrite);
 
 		delete temp;
 	}

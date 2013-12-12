@@ -3,8 +3,8 @@
 #include "debugout.h"
 #include "listplusplus.h"
 
-VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access, AbstractDBusInterface *interface)
-	:AbstractProperty(propertyName, access, interface), mInitialized(false)
+VariantType::VariantType(AbstractRoutingEngine* re, std::string signature, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access)
+	:AbstractProperty(propertyName, access), mInitialized(false)
 {
 	mAmbPropertyName = ambPropertyName;
 	routingEngine = re;

@@ -46,7 +46,7 @@ public:
 		ReadWrite
 	};
 
-	AbstractProperty(string propertyName, Access access, AbstractDBusInterface* interface);
+	AbstractProperty(string propertyName, Access access);
 	virtual ~AbstractProperty();
 	
 	virtual void setSetterFunction(SetterFunc setterFunc)
@@ -116,7 +116,6 @@ public:
 	virtual void updateValue(AbstractPropertyType* val)
 	{
 		setValue(val);
-		updateValue();
 	}
 
 	int updateFrequency()
@@ -130,8 +129,6 @@ public:
 	}
 	
 protected: ///methods:
-
-	void updateValue();
 
 	std::string mSourceFilter;
 	Zone::Type mZoneFilter;
