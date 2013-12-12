@@ -69,8 +69,8 @@ void DBusSink::propertyChanged(AbstractPropertyType *value)
 		return;
 
 	AbstractProperty* prop = propertyDBusMap[property];
-	prop->updateValue(value->copy());
 	mTime = value->timestamp;
+	prop->updateValue(value->copy());
 }
 
 const string DBusSink::uuid()
