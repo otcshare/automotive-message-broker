@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <nullptr.h>
 #include "abstractpropertytype.h"
 #include <abstractroutingengine.h>
+#include "dbussignaller.hpp"
 
 class AbstractProperty;
 
@@ -105,6 +106,8 @@ protected:
     
 	virtual void setProperty(std::string propertyName, GVariant * value);
 	virtual GVariant * getProperty(std::string propertyName);
+
+	void setTimeout(int timeout);
 	
 	std::unordered_map<std::string, AbstractProperty*> properties;
 
@@ -123,6 +126,7 @@ private:
 	static std::unordered_map<std::string, AbstractDBusInterface*> objectMap;
 	static std::list<std::string> mimplementedProperties;
 	guint regId;
+	int mTimeout;
 
 };
 

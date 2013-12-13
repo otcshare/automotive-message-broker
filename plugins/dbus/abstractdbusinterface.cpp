@@ -192,11 +192,6 @@ AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string object
 											 GDBusConnection* connection)
 	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None), mTime(0), regId(0)
 {
-	if(!signaller)
-	{
-		signaller = DBusSignaller::factory(50);
-	}
-
 	startRegistration();
 
 	mObjectPath = "/" + objectName;
@@ -491,5 +486,13 @@ GVariant *AbstractDBusInterface::getProperty(string propertyName)
 		return properties[propertyName]->toGVariant();
 	else
 		throw -1;
+}
+
+void AbstractDBusInterface::setTimeout(int timeout)
+{
+	if(signaller)
+		delete signaller;
+
+	signaller = DBusSignaller::factory(timeout);
 }
 

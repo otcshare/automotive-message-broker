@@ -16,6 +16,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include <boost/lexical_cast.hpp>
 
 #include "dbusplugin.h"
 #include "abstractroutingengine.h"
@@ -33,6 +34,17 @@ DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConn
 	  AbstractSink(engine, config)
 {
 	AbstractDBusInterface::re = engine;
+
+	int timeout = 50;
+
+	if(config.find("frequency") != config.end())
+	{
+		int t = boost::lexical_cast<int>(config["frequency"]);
+
+		timeout = 1000 / t;
+	}
+
+	setTimeout(timeout);
 }
 
 void DBusSink::supportedChanged(PropertyList supportedProperties)

@@ -1,5 +1,5 @@
 #ifndef _DBUSSIGNALLER_H_
-#define _DBUSSINGALLER_H_
+#define _DBUSSIGNALLER_H_
 
 #include <gio/gio.h>
 #include <map>
