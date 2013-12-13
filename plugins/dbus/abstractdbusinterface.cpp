@@ -27,6 +27,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "abstractproperty.h"
 
+#include "dbussignaller.hpp"
+
+static DBusSignaller* signaller = nullptr;
+
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::objectMap;
 list<string> AbstractDBusInterface::mimplementedProperties;
 
@@ -188,6 +192,11 @@ AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string object
 											 GDBusConnection* connection)
 	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None), mTime(0), regId(0)
 {
+	if(!signaller)
+	{
+		signaller = DBusSignaller::factory(50);
+	}
+
 	startRegistration();
 
 	mObjectPath = "/" + objectName;
@@ -323,29 +332,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 		return;
 	}
 
-	GError *error = NULL;
-	GVariant* val = g_variant_ref(property->toGVariant());
-
-	/// Send PropertiesChanged signal
-
-	GVariantBuilder builder;
-	g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
-
-	g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val);
-	g_variant_builder_add(&builder, "{sv}", std::string(property->name() + "Sequence").c_str(), g_variant_new("i", property->sequence()));
-	g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("d", mTime) );
-
-	g_dbus_connection_emit_signal(mConnection, NULL, mObjectPath.c_str(), "org.freedesktop.DBus.Properties", "PropertiesChanged", g_variant_new("(sa{sv}as)",
-																																				mInterfaceName.c_str(),
-																																				&builder, NULL), &error);
-
-	if(error)
-	{
-		DebugOut(DebugOut::Error)<<error->message<<endl;
-		g_error_free(error);
-	}
-
-	g_variant_unref(val);
+	signaller->fireSignal(mConnection, mObjectPath, "org.freedesktop.DBus.Properties", "PropertiesChanged", property);
 }
 
 std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string object)

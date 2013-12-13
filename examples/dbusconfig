@@ -3,7 +3,7 @@
 		{
 			"name" : "ExampleSouce",
 			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so",
-			"delay" : "1000"
+			"delay" : "6"
 		}
 	],
 	"sinks": [

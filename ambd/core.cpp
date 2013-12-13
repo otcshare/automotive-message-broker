@@ -40,6 +40,8 @@ static int PPSUpdate(void* data)
 	}
 
 	*pps = 0;
+
+	return 1;
 }
 
 Core::Core()
