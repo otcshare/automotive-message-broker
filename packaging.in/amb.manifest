@@ -7,14 +7,17 @@
        <label name="AMB::machinegun" />
      </provide>
      <request>
-       <smack request="System" type="rw" />
+       <smack request="_" type="l" />
+       <smack request="System" type="rwx" />
+       <smack request="System::Run" type="rwxat" />
+       <smack request="System::Shared" type="rx" />
        <smack request="AMB::readall" type="rw" />
        <smack request="AMB::writeall" type="rw" />
        <smack request="AMB::machinegun" type="rw" />
      </request>
      <permit>
        <smack permit="_" type="w" />
-       <smack permit="System" type="rw" />
+       <smack permit="System" type="rwx" />
        <smack permit="User" type="w" />
      </permit>
   </define>
@@ -28,6 +31,7 @@
         </interface>
       </node>
     </dbus>
+    <filesystem path="/usr/bin/ambd" exec_label="AMB" />
   </assign>
   <request>
     <domain name="AMB" />
