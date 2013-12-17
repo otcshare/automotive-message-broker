@@ -1,6 +1,7 @@
 * Mon Dec 16 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.10.900 ("challenger" beta)
 - Fixed manifest so ambd now runs as new AMB domain
+- Cleaned up tree
 
 * Fri Nov 22 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.10.805 ("challenger" alpha)
