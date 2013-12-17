@@ -12,6 +12,7 @@ Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:	libjson
 Requires:       libuuid
+Requires:       default-ac-domains
 BuildRequires:  cmake
 BuildRequires:  boost-devel
 BuildRequires:  libjson-devel
