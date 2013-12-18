@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/thread/future.hpp>
 
 #ifdef OPENCL
-#include <opencv/ocl/ocl.hpp>
+#include <opencv2/ocl/ocl.hpp>
 #endif
 
 #ifdef CUDA
@@ -260,8 +260,9 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 	if(shared->useOpenCl)
 	{
 #ifdef OPENCL
+		cv::ocl::oclMat m(qImg);
 		cv::Scalar stdDev;
-		cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
+		cv::ocl::meanStdDev(m, avgPixelIntensity, stdDev);
 #endif
 	}
 	else if(shared->useCuda)
