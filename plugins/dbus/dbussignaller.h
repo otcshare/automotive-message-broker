@@ -14,7 +14,9 @@ public:
 
 	static DBusSignaller* factory(int timeout)
 	{
-		return new DBusSignaller(timeout);
+		if(!singleton)
+			return singleton = new DBusSignaller(timeout);
+		return singleton;
 	}
 
 	void fireSignal(GDBusConnection* conn, std::string objPath, std::string iface, std::string sigName, AbstractProperty* prop)
@@ -93,7 +95,7 @@ private:
 
 	std::map<std::string, DBusSignal> queue;
 
-
+	static DBusSignaller * singleton;
 };
 
 #endif

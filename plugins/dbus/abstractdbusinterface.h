@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <nullptr.h>
 #include "abstractpropertytype.h"
 #include <abstractroutingengine.h>
-#include "dbussignaller.hpp"
+#include "dbussignaller.h"
 
 class AbstractProperty;
 

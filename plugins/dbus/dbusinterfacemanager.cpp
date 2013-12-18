@@ -224,10 +224,10 @@ static void
 on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {
 
-	DebugOut(0)<<"DBus: Lost bus name"<<endl;
+	DebugOut(DebugOut::Error)<<"DBus: Lost bus name"<<endl;
 
 	if(!connection){
-		DebugOut(0)<<"DBus: Connection could not be established."<<endl;
+		DebugOut(DebugOut::Error)<<"DBus: Connection could not be established."<<endl;
 		throw std::runtime_error("Could not establish DBus connection.");
 	}
 }

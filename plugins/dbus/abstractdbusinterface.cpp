@@ -27,7 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "abstractproperty.h"
 
-#include "dbussignaller.hpp"
+#include "dbussignaller.h"
 
 static DBusSignaller* signaller = nullptr;
 
@@ -490,9 +490,7 @@ GVariant *AbstractDBusInterface::getProperty(string propertyName)
 
 void AbstractDBusInterface::setTimeout(int timeout)
 {
-	if(signaller)
-		delete signaller;
-
-	signaller = DBusSignaller::factory(timeout);
+	if(!signaller)
+		signaller = DBusSignaller::factory(timeout);
 }
 
