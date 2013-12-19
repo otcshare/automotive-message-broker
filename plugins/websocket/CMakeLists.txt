@@ -1,0 +1,44 @@
+if(websocket_plugin)
+
+include(CheckIncludeFiles)
+include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
+
+find_package(Qt5Core REQUIRED)
+
+if(Qt5Core_FOUND)
+	message(STATUS "using Qt5")
+
+	set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} )
+	set(QT_LIBRARIES ${Qt5Core_LIBRARIES} )
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+	message(STATUS "size of void_p: ${CMAKE_SIZEOF_VOID_P}")
+	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		message(STATUS "can has 64bits")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=large")
+	endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
+	add_definitions(${Qt5Core_DEFINITIONS} -DQTBINARY_DATA)
+	set(CMAKE_AUTOMOC ON)
+endif(Qt5Core_FOUND)
+
+pkg_check_modules(websockets REQUIRED libwebsockets)
+
+include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${QT_INCLUDE_DIRS})
+
+set(websocketsinkplugin_headers websocketsink.h websocketmanager.h)
+set(websocketsinkplugin_sources websocketsinkmanager.cpp websocketsink.cpp)
+add_library(websocketsinkplugin MODULE ${websocketsinkplugin_sources})
+set_target_properties(websocketsinkplugin PROPERTIES PREFIX "")
+target_link_libraries(websocketsinkplugin amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES})
+
+install(TARGETS websocketsinkplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
+
+
+set(websocketsourceplugin_headers websocketsource.h)
+set(websocketsourceplugin_sources websocketsource.cpp)
+add_library(websocketsourceplugin MODULE ${websocketsourceplugin_sources})
+set_target_properties(websocketsourceplugin PROPERTIES PREFIX "")
+target_link_libraries(websocketsourceplugin amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
+
+install(TARGETS websocketsourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
+
+endif(websocket_plugin)

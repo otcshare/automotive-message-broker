@@ -26,6 +26,10 @@
 #include <listplusplus.h>
 #include <memory>
 
+#include <QVariantMap>
+#include <QJsonDocument>
+#include <QStringList>
+
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 
 //Global variables, these will be moved into the class
@@ -151,23 +155,28 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 	request.completed = [socket,id,property](AsyncPropertyReply* reply)
 	{
 		DebugOut()<<"Got property: "<<reply->property.c_str()<<endl;
-		if(!reply->value){
+		if(!reply->success || !reply->value)
+		{
 			DebugOut()<<"Property value is null"<<endl;
 			delete reply;
 			return;
 		}
 
-		stringstream s;
-		s.precision(15);
+		QVariantMap data;
+		data["property"] = property.c_str();
+		data["zone"] = reply->value->zone;
+		data["value"] = reply->value->toString().c_str();
+		data["timestamp"] = reply->value->timestamp;
+		data["sequence"] = reply->value->sequence;
 
-		s << "{\"type\":\"methodReply\",\"name\":\"get\",\"data\":{";
-		s << "\"property\":\"" << property << "\",\"zone\":\"" << reply->value->zone << "\",\"value\":\"" << reply->value->toString() << "\",\"timestamp\":\""<<reply->value->timestamp<<"\",";
-		s <<"\"sequence\": \""<<reply->value->sequence<<"\"}";
-		s << ",\"transactionid\":\"" << id << "\"}";
+		QVariantMap replyvar;
 
-		string replystr = s.str();
-		//printf("Reply: %s\n",replystr.c_str());
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << endl;
+		replyvar["type"]="methodReply";
+		replyvar["name"]="get";
+		replyvar["data"]= data;
+		replyvar["transactionid"]=id.c_str();
+
+		string replystr = QJsonDocument::fromVariant(replyvar).toBinaryData().data();
 
 		lwsWrite(socket, replystr);
 
@@ -188,29 +197,26 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 
 	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
 	{
-		stringstream s;
+		QVariantMap replyvar;
+		QVariantList list;
 
-		stringstream data;
-		data.precision(15);
-		data<< "[";
 		std::list<AbstractPropertyType*> values = reply->values;
 		for(auto itr = values.begin(); itr != values.end(); itr++)
 		{
-			if(itr != values.begin())
-			{
-				data<<",";
-			}
+			QVariantMap obj;
+			obj["value"]= (*itr)->toString().c_str();
+			obj["timestamp"] = (*itr)->timestamp;
+			obj["sequence"] = (*itr)->sequence;
 
-			data << "{ \"value\" : " << "\"" << (*itr)->toString() << "\", \"timestamp\" : \"" << (*itr)->timestamp << "\", \"sequence\" : \""<<(*itr)->sequence<<"\" }";
+			list.append(obj);
 		}
 
-		data<<"]";
+		replyvar["type"]="methodReply";
+		replyvar["name"]="getRanged";
+		replyvar["data"]=list;
+		replyvar["transactionid"]=id.c_str();
 
-		s << "{\"type\":\"methodReply\",\"name\":\"getRanged\",\"data\":"<<data.str()<<",\"transactionid\":\"" << id << "\"}";
-
-		string replystr = s.str();
-		//printf("Reply: %s\n",replystr.c_str());
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+		string replystr = QJsonDocument::fromVariant(replyvar).toBinaryData().data();
 
 		lwsWrite(socket, replystr);
 
@@ -233,12 +239,13 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 
 		m_sinkMap.erase(property);
 
-		stringstream s;
-		s << "{\"type\":\"methodReply\",\"name\":\"unsubscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
+		QVariantMap reply;
+		reply["type"]="methodReply";
+		reply["name"]="unsubscribe";
+		reply["data"]=property.c_str();
+		reply["transactionid"]= uuid.c_str();
 
-		string replystr = s.str();
-		//printf("Reply: %s\n",replystr.c_str());
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+		string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
 
 		lwsWrite(socket, replystr);
 	}
@@ -253,16 +260,17 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 	request.zoneFilter = zone;
 	request.completed = [&](AsyncPropertyReply* reply)
 	{
-		///TODO: do something here on !reply->success
-		stringstream s;
-		s << "{\"type\":\"methodReply\",\"name\":\"set\",\"data\":[{\"property\":\"" << property << "\",\"zone\":" << reply->zoneFilter
-			<< "}],\"transactionid\":\"" << uuid << "\"";
-		if(!reply->success)
-			s << ",\"error\":\"method call failed\"";
-		s << "}";
+		QVariantMap data;
+		data["property"] = property.c_str();
+		data["zone"] = zone;
+		data["source"] = reply->value->sourceUuid.c_str();
 
-		string replystr = s.str();
-		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+		QVariantMap replyvar;
+		replyvar["type"]="methodReply";
+		replyvar["name"]="set";
+		replyvar["data"]= data;
+		replyvar["transactionid"]=uuid.c_str();
+		string replystr = QJsonDocument::fromVariant(replyvar).toBinaryData().data();
 
 		lwsWrite(socket, replystr);
 
@@ -276,31 +284,25 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 }
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
 {
-	stringstream s;
-
-	string tmpstr = "";
+	PropertyList foo = VehicleProperty::capabilities();
+	if (!ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
 	{
-		PropertyList foo = VehicleProperty::capabilities();
-		if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
-		{
-			tmpstr = property;
-		}
-		else
-		{
-			//Invalid property requested.
-			return;
-		}
-
+		DebugOut(DebugOut::Warning)<<"Invalid property requested: "<<property<<endl;
+		return;
 	}
-	s << "{\"type\":\"methodReply\",\"name\":\"subscribe\",\"data\":[\"" << property << "\"],\"transactionid\":\"" << uuid << "\"}";
 
-	string replystr = s.str();
-	//printf("Reply: %s\n",replystr.c_str());
-	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
+	QVariantMap reply;
+
+	reply["type"] = "methodReply";
+	reply["name"] = "subscribe";
+	reply["data"] = property.c_str();
+	reply["transactionid"] = uuid.c_str();
+
+	string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
 
 	lwsWrite(socket, replystr);
 
-	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,tmpstr);
+	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property);
 	m_sinkMap[property].push_back(sink);
 }
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
@@ -397,38 +399,25 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 	{
 		case LWS_CALLBACK_CLIENT_WRITEABLE:
 		{
-			//Connection has been established.
-			//printf("Connection established\n");
 			break;
 		}
 		case LWS_CALLBACK_CLOSED:
 		{
-			//Connection is closed, we need to remove all related sinks
 			sinkManager->disconnectAll(wsi);
-			/*g_io_
-			GIOChannel *chan = g_io_channel_unix_new((int)(long)user);
-			g_io_add_watch(chan,G_IO_IN,(GIOFunc)gioPollingFunc,0);
-			g_io_add_watch(chan,G_IO_PRI,(GIOFunc)gioPollingFunc,0);
-			pollfds[count_pollfds].fd = (int)(long)user;
-			pollfds[count_pollfds].events = (int)len;
-// 			pollfds[count_pollfds++].revents = 0;*/
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
-			//printf("Client writable\n");
 			break;
 		}
 		case LWS_CALLBACK_SERVER_WRITEABLE:
 		{
-			//printf("Server writable\n");
 			break;
 		}
 
 		case LWS_CALLBACK_RECEIVE:
 		{
-			//printf("Data Received: %s\n",(char*)in);
-			//The lack of a break; here is intentional.
+
 		}
 		case LWS_CALLBACK_HTTP:
 		{
@@ -438,84 +427,28 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 			std::string tempInput((char*)in);
 
-			json_object *rootobject;
-			json_tokener *tokener = json_tokener_new();
-			enum json_tokener_error err;
-			do
-			{
-				rootobject = json_tokener_parse_ex(tokener, tempInput.c_str(),len);
-			} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-			if (err != json_tokener_success)
-			{
-				fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-				throw std::runtime_error("JSON Parsing error");
-				// Handle errors, as appropriate for your application.
-			}
-			if(!rootobject)
-			{
-				DebugOut(0)<<"failed to parse json: "<<tempInput<<endl;
-			}
+			QJsonDocument doc = QJsonDocument::fromJson(tempInput.c_str());
 
-			if (tokener->char_offset < len) // XXX shouldn't access internal fields
-			{
-				// Handle extra characters after parsed object as desired.
-				// e.g. issue an error, parse another object from that point, etc...
+			QVariantMap call = doc.toVariant().toMap();
 
-			}
-			// Success, use jobj here.
-			json_object *typeobject = json_object_object_get(rootobject,"type");
-			json_object *nameobject = json_object_object_get(rootobject,"name");
-			json_object *transidobject = json_object_object_get(rootobject,"transactionid");
-			
-			string type = string(json_object_get_string(typeobject));
-			string name = string(json_object_get_string(nameobject));
-			string id;
-			if (json_object_get_type(transidobject) == json_type_string)
+			string type = call["type"].toString().toStdString();
+			string name = call["name"].toString().toStdString();
+			string id = call["transactionid"].toString().toStdString();
+
+			if (type == "method")
 			{
-				id = string(json_object_get_string(transidobject));
-			}
-			else
-			{
-				stringstream strstr;
-				strstr << json_object_get_int(transidobject);
-				id = strstr.str();
-			}
-			json_object_put(typeobject);
-			json_object_put(nameobject);
-			json_object_put(transidobject);
-			if (type == "method" && name == "getRanged")
-			{
-				json_object *dataobject = json_object_object_get(rootobject,"data");
-				if (json_object_get_type(dataobject) == json_type_object)
+				if(name == "getRanged")
 				{
-					json_object *timeBeginObject = json_object_object_get(dataobject,"timeBegin");
-					json_object *timeEndObject = json_object_object_get(dataobject,"timeEnd");
-					json_object *sequenceBeginObject = json_object_object_get(dataobject,"sequenceBegin");
-					json_object *sequenceEndObject = json_object_object_get(dataobject,"sequenceEnd");
-					json_object *propertyObject = json_object_object_get(dataobject,"properties");
-					double timeBegin = boost::lexical_cast<double,std::string>(json_object_get_string(timeBeginObject));
-					double timeEnd = boost::lexical_cast<double,std::string>(json_object_get_string(timeEndObject));
-					double sequenceBegin = boost::lexical_cast<double,std::string>(json_object_get_string(sequenceBeginObject));
-					double sequenceEnd = boost::lexical_cast<double,std::string>(json_object_get_string(sequenceEndObject));
-
-					array_list *plist = json_object_get_array(propertyObject);
+					QVariantMap data = call["data"].toMap();
 
 					PropertyList propertyList;
 
-					for(int i=0; i < array_list_length(plist); i++)
-					{
-						json_object *prop = (json_object*)array_list_get_idx(plist,i);
+					propertyList.push_back(data["property"].toString().toStdString());
 
-						std::string pstr = json_object_get_string(prop);
-
-						propertyList.push_back(pstr);
-					}
-
-					json_object_put(timeBeginObject);
-					json_object_put(timeEndObject);
-					json_object_put(sequenceBeginObject);
-					json_object_put(sequenceEndObject);
-					json_object_put(propertyObject);
+					double timeBegin = data["timeBegin"].toDouble();
+					double timeEnd = data["timeEnd"].toDouble();
+					double sequenceBegin = data["sequenceBegin"].toInt();
+					double sequenceEnd = data["sequenceEnd"].toInt();
 
 					if ((timeBegin < 0 && timeEnd > 0) || (timeBegin > 0 && timeEnd < 0))
 					{
@@ -530,171 +463,64 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						sinkManager->addSingleShotRangedSink(wsi,propertyList,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
 					}
 				}
-				json_object_put(dataobject);
-			}
-			else
-			{
-
-				vector<string> data;
-				list<string> key;
-				list<string> value;
-				list<Zone::Type> zone;
-				json_object *dataobject = json_object_object_get(rootobject,"data");
-				if (json_object_get_type(dataobject) == json_type_array)
+				else if (name == "get")
 				{
-					array_list *arraylist = json_object_get_array(dataobject);
-					for (int i=0;i<array_list_length(arraylist);i++)
+					QVariantMap data = call["data"].toMap();
+					Zone::Type zone = Zone::None;
+					if(data.contains("zone"))
 					{
-						json_object *arrayobject = (json_object*)array_list_get_idx(arraylist,i);
-						if (json_object_get_type(arrayobject) == json_type_object)
-						{
-							json_object *propobject = json_object_object_get(arrayobject,"property");
-							json_object *valueobject = json_object_object_get(arrayobject,"value");
-							json_object *zoneobject = json_object_object_get(arrayobject,"zone");
-							string keystr = string(propobject ? json_object_get_string(propobject) : "");
-							string valuestr = string(valueobject ? json_object_get_string(valueobject): "");
-							key.push_back(keystr);
-							value.push_back(valuestr);
-							Zone::Type z(Zone::None);
-							if(zoneobject){
-								try {
-									z = static_cast<Zone::Type>(boost::lexical_cast<int,std::string>(json_object_get_string(zoneobject)));
-								} catch (...) { }
-							}
-							zone.push_back(z);
-							json_object_put(propobject);
-							json_object_put(valueobject);
-							json_object_put(zoneobject);
-						}
-						else if (json_object_get_type(arrayobject) == json_type_string)
-						{
-							string path = string(json_object_get_string(arrayobject));
-							data.push_back(path);
-						}
+						zone = data["zone"].toInt();
 					}
-					//array_list_free(arraylist);
+					sinkManager->addSingleShotSink(wsi,data["property"].toString().toStdString(),zone,id);
+
+				}
+				else if (name == "set")
+				{
+					QVariantMap data = call["data"].toMap();
+					Zone::Type zone(Zone::None);
+					if(data.contains("zone"))
+					{
+						zone = data["zone"].toInt();
+					}
+					sinkManager->setValue(wsi,data["property"].toString().toStdString(), data["value"].toString().toStdString(), zone, id);
+				}
+				else if (name == "subscribe")
+				{
+					std::string data = call["data"].toString().toStdString();
+					sinkManager->addSink(wsi, data, id);
+
+				}
+				else if (name == "unsubscribe")
+				{
+					std::string data = call["data"].toString().toStdString();
+					sinkManager->removeSink(wsi,data,id);
+
+				}
+				else if (name == "getSupportedEventTypes")
+				{
+					QVariantMap reply;
+					QStringList list;
+
+					PropertyList supported = sinkManager->getSupportedProperties();
+					for(VehicleProperty::Property i : supported)
+					{
+						list.append(i.c_str());
+					}
+
+					reply["type"] = "methodReply";
+					reply["name"] = "getSupportedEventTypes";
+					reply["transactionid"] = id.c_str();
+					reply["data"] = list;
+
+					string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
+
+					lwsWrite(wsi, replystr);
 				}
 				else
 				{
-					string path = json_object_get_string(dataobject);
-					if (path != "")
-					{
-						data.push_back(path);
-					}
-				}
-				json_object_put(dataobject);
-				if (type == "method")
-				{
-					if (name == "get")
-					{
-						if (data.size() > 0)
-						{
-							//GetProperty is going to be a singleshot sink.
-							sinkManager->addSingleShotSink(wsi,data.front(),Zone::None,id);
-						}
-						else if (key.size() > 0 && key.size() == zone.size())
-						{
-							//GetProperty is going to be a singleshot sink.
-							sinkManager->addSingleShotSink(wsi,key.front(),zone.front(),id);
-						}
-						else
-						{
-							DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " \"get\" method called with no data! Transaction ID:" << id << "\n";
-						}
-					}
-					else if (name == "set")
-					{
-						if (data.size() > 0)
-						{
-							//Should not happen
-						}
-						else if (value.size() > 0)
-						{
-							if (key.size() != value.size())
-							{
-								DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "\"set\" method called with an invalid key value pair count\n";
-							}
-							else
-							{
-								list<string>::iterator d = value.begin();
-								list<Zone::Type>::iterator z = zone.begin();
-								for (list<string>::iterator i=key.begin();i!=key.end();++i)
-								{
-									DebugOut() << __SMALLFILE__ << ":" << __LINE__ <<
-									"websocketsinkmanager setting " << (*i) << "to " << (*d) << "in zone " << (*z) << "\n";
-									//(*i);
-									sinkManager->setValue(wsi,(*i),(*d),(*z), id);
-									//(*d);
-									++d;
-									++z;
-								}
-
-							}
-						}
-					}
-					else if (name == "subscribe")
-					{
-						//Websocket wants to subscribe to an event, data.front();
-						for (auto i=data.begin();i!=data.end();i++)
-						{
-							sinkManager->addSink(wsi,(*i),id);
-						}
-					}
-					else if (name == "unsubscribe")
-					{
-						//Websocket wants to unsubscribe to an event, data.front();
-						for (auto i=data.begin();i!=data.end();i++)
-						{
-							sinkManager->removeSink(wsi,(*i),id);
-						}
-					}
-					else if (name == "getSupportedEventTypes")
-					{
-						//If data.front() dosen't contain a property name, return a list of properties supported.
-						//if it does, then return the event types that particular property supports.
-						string typessupported = "";
-						if (data.size() == 0)
-						{
-							//Send what properties we support
-							PropertyList foo = sinkManager->getSupportedProperties();
-							PropertyList::const_iterator i=foo.cbegin();
-							while (i != foo.cend())
-							{
-								if(i==foo.cbegin())
-									typessupported.append("\"").append((*i)).append("\"");
-								else
-									typessupported.append(",\"").append((*i)).append("\"");
-								i++;
-							}
-						}
-						else
-						{
-							//Send what events a particular property supports
-							PropertyList foo = sinkManager->getSupportedProperties();
-							if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(data.front()))
-							{
-								//sinkManager->addSingleShotSink(wsi,data.front(),id);
-								typessupported = "\"get\",\"subscribe\",\"unsubscribe\",\"getSupportedEventTypes\"";
-							}
-						}
-						stringstream s;
-						string s2;
-						s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
-						string replystr = s.str();
-						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " JSON Reply: " << replystr << "\n";
-						//printf("Reply: %s\n",replystr.c_str());
-						lwsWrite(wsi, replystr);
-					}
-					else
-					{
-						DebugOut(0)<<"Unknown method called."<<endl;
-					}
+					DebugOut(0)<<"Unknown method called."<<endl;
 				}
 			}
-
-			
-
-			
 			break;
 		}
 		case LWS_CALLBACK_ADD_POLL_FD:
