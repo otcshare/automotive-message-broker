@@ -159,20 +159,23 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %manifest packaging.in/amb.manifest
 %config %{_sysconfdir}/ambd/config
 %config %{_sysconfdir}/ambd/config.tizen
-%{_sysconfdir}/ambd/examples/*
-%{_bindir}/*
+%config %{_sysconfdir}/ambd/examples/*
+%{_bindir}/ambd
 %{_libdir}/libamb.so*
-%{_prefix}/lib/systemd/*
+%{_prefix}/lib/systemd/system/ambd.service
+%{_prefix}/lib/systemd/system/network.target.wants/ambd.service
+%{_prefix}/lib/systemd/system/multi-user.target.wants/ambd.service
 
 %files devel
 %defattr(-,root,root,-)
-# %{_libdir}/libamb.so
+%manifest packaging.in/amb.manifest.plugins
 %{_includedir}/amb/*.h
 %{_includedir}/amb/*.hpp
 %{_libdir}/pkgconfig/*.pc
 
 %files plugins
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/examplesourceplugin.so
 %{_libdir}/%{name}/examplesinkplugin.so
 %{_libdir}/%{name}/dbussinkplugin.so
@@ -180,38 +183,47 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 /etc/dbus-1/system.d/amb.conf
 
 %files plugins-common
+%manifest packaging.in/amb.manifest.plugins
 %defattr(-,root,root,-)
 %{_libdir}/libamb-plugins-common.so
 
 %files plugins-wheel
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/wheelsourceplugin.so
 
 %files plugins-websocket
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/websocketsourceplugin.so
 %{_libdir}/%{name}/websocketsinkplugin.so
 
 %files plugins-obd2
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/obd2sourceplugin.so
 
 %files plugins-database
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/databasesinkplugin.so
 
 %files plugins-opencvlux
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/opencvluxplugin.so
 
 %files plugins-murphy
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/murphysourceplugin.so
 
 %files plugins-gpsnmea
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/gpsnmea.so
 
 %files doc
 %defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
 %doc %{_docdir}/%{name}/*.txt
