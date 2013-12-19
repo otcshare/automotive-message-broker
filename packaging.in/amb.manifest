@@ -8,7 +8,7 @@
      </provide>
      <request>
        <smack request="_" type="l" />
-       <smack request="System" type="rwx" />
+       <smack request="System" type="wx" />
        <smack request="System::Run" type="rwxat" />
        <smack request="System::Shared" type="rx" />
        <smack request="AMB::readall" type="rw" />
@@ -23,7 +23,7 @@
   </define>
   <assign>
     <dbus name="org.automotive.message.broker" own="AMB" bus="system">
-      <node name="/f68f8b9afafb42848cedb45b5d720185/0/MachineGunTurretStatus" >
+      <node name="*/0/MachineGunTurretStatus" >
         <interface name="org.freedesktop.DBus.Properties">
           <method name="Set" >
             <annotation name="com.tizen.smack" value="AMB::machinegun" />
