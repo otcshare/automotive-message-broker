@@ -30,6 +30,19 @@
 #include <sstream>
 #include "debugout.h"
 
+#include <QJsonDocument>
+#include <QVariantMap>
+
+static int lwsWrite(struct libwebsocket *lws, const std::string& strToWrite)
+{
+	std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + strToWrite.length() + LWS_SEND_BUFFER_POST_PADDING]);
+
+	char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
+	strcpy(buf, strToWrite.c_str());
+
+	//NOTE: delete[] on buffer is not needed since std::unique_ptr<char[]> is used
+	return libwebsocket_write(lws, (unsigned char*)buf, strToWrite.length(), LWS_WRITE_TEXT);
+}
 
 
 WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty) : AbstractSink(re,map<string, string> ())
@@ -49,6 +62,7 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 
+#ifndef QTBINARY_DATA
 	stringstream s;
 	
 	//TODO: Dirty hack hardcoded stuff, jsut to make it work.
@@ -73,16 +87,28 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 	//printf("Reply: %s\n",replystr.c_str());
 	
 	DebugOut() << "Reply:" << replystr << "\n";
+#else
+	QVariantMap data;
+	QVariantMap reply;
 
-	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-	strcpy(new_response,replystr.c_str());
-	libwebsocket_write(m_wsi, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-	delete [] (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+	data["value"] = value->toString().c_str();
+	data["zone"] = value->zone;
+	data["timestamp"]=value->timestamp;
+	data["sequence"]=value->sequence;
+
+	reply["data"]=data;
+	reply["type"]="valuechanged";
+	reply["name"]=property.c_str();
+	reply["transactionid"]=m_uuid.c_str();
+
+	string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
+#endif
+
+	lwsWrite(m_wsi, replystr);
 }
 WebSocketSink::~WebSocketSink()
 {
-	m_re->unsubscribeToProperty(m_amdbproperty,this);
+	m_re->unsubscribeToProperty(m_amdbproperty, this);
 }
 void WebSocketSink::supportedChanged(PropertyList supportedProperties)
 {
