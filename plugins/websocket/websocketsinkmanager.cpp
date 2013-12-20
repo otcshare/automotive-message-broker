@@ -29,6 +29,7 @@
 #include <QVariantMap>
 #include <QJsonDocument>
 #include <QStringList>
+#include <QByteArray>
 
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 
@@ -41,15 +42,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data);
 
 // libwebsocket_write helper function
-static int lwsWrite(struct libwebsocket *lws, const std::string& strToWrite)
+static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
 {
-	std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + strToWrite.length() + LWS_SEND_BUFFER_POST_PADDING]);
+	/*std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + strToWrite.length() + LWS_SEND_BUFFER_POST_PADDING]);
 
 	char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(buf, strToWrite.c_str());
-
+*/
 	//NOTE: delete[] on buffer is not needed since std::unique_ptr<char[]> is used
-	return libwebsocket_write(lws, (unsigned char*)buf, strToWrite.length(), LWS_WRITE_TEXT);
+	return libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
 }
 
 WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config):AbstractSinkManager(engine, config)
@@ -176,9 +177,9 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		replyvar["data"]= data;
 		replyvar["transactionid"]=id.c_str();
 
-		string replystr = QJsonDocument::fromVariant(replyvar).toBinaryData().data();
+		QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 
-		lwsWrite(socket, replystr);
+		lwsWrite(socket, replystr.data(), replystr.length());
 
 		delete reply;
 	};
@@ -216,9 +217,9 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 		replyvar["data"]=list;
 		replyvar["transactionid"]=id.c_str();
 
-		string replystr = QJsonDocument::fromVariant(replyvar).toBinaryData().data();
+		QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 
-		lwsWrite(socket, replystr);
+		lwsWrite(socket, replystr.data(), replystr.length());
 
 		delete reply;
 	};
@@ -245,9 +246,9 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		reply["data"]=property.c_str();
 		reply["transactionid"]= uuid.c_str();
 
-		string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
+		QByteArray replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 
-		lwsWrite(socket, replystr);
+		lwsWrite(socket, replystr.data(), replystr.length());
 	}
 }
 void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Property property,string value,Zone::Type zone,string uuid)
@@ -270,9 +271,10 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 		replyvar["name"]="set";
 		replyvar["data"]= data;
 		replyvar["transactionid"]=uuid.c_str();
-		string replystr = QJsonDocument::fromVariant(replyvar).toBinaryData().data();
 
-		lwsWrite(socket, replystr);
+		QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+
+		lwsWrite(socket, replystr.data(), replystr.length());
 
 		delete reply;
 	};
@@ -298,9 +300,9 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	reply["data"] = property.c_str();
 	reply["transactionid"] = uuid.c_str();
 
-	string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
+	QByteArray replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 
-	lwsWrite(socket, replystr);
+	lwsWrite(socket, replystr.data(), replystr.length());
 
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property);
 	m_sinkMap[property].push_back(sink);
@@ -425,9 +427,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			//TODO: Do we want exceptions, or just to return an invalid json reply? Probably an invalid json reply.
 			DebugOut() << __SMALLFILE__ << ":" << __LINE__ << " Requested: " << (char*)in << "\n";
 
-			std::string tempInput((char*)in);
+			QByteArray d((char*)in,len);
 
-			QJsonDocument doc = QJsonDocument::fromJson(tempInput.c_str());
+			QJsonDocument doc = QJsonDocument::fromBinaryData(d);
+
+			if(doc.isNull())
+			{
+				DebugOut(DebugOut::Error)<<"Invalid message"<<endl;
+				return 0;
+			}
 
 			QVariantMap call = doc.toVariant().toMap();
 
@@ -512,9 +520,9 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					reply["transactionid"] = id.c_str();
 					reply["data"] = list;
 
-					string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
+					QByteArray replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 
-					lwsWrite(wsi, replystr);
+					lwsWrite(wsi, replystr.data(), replystr.length());
 				}
 				else
 				{

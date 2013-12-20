@@ -1,7 +1,7 @@
 Example protocol messages
 
 Property changed event:
-{"type":"valuechanged","name":"VehicleSpeed","data":"217","transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66", "timestamp":"1354521964.60253","sequence":"0"}
+{"type":"valuechanged","name":"VehicleSpeed","data":{"value":"217","zone": 0, "timestamp":"1354521964.60253","sequence":"0"}, "transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66", }
 
 Get property request: 
 {"type":"method","name":"get","data":"VehicleSpeed","transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
@@ -16,7 +16,7 @@ Get supported reply:
 {"type":"methodReply","name":"getSupportedEventTypes","data":[EngineSpeed","VehicleSpeed"],"transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
 
 Subscribe to data:
-{"type":"method","name":"subscribe","data": {"property":"EngineSpeed", "zone": 0,"transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
+{"type":"method","name":"subscribe","data": {"property":"EngineSpeed", "zone": 0},"transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
 
 Subscribe to data reply:
 {"type":"methodReply","name":"subscribe","data":["EngineSpeed"],"transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}

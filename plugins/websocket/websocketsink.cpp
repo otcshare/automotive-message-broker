@@ -33,15 +33,15 @@
 #include <QJsonDocument>
 #include <QVariantMap>
 
-static int lwsWrite(struct libwebsocket *lws, const std::string& strToWrite)
+static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
 {
-	std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + strToWrite.length() + LWS_SEND_BUFFER_POST_PADDING]);
+	/*std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + strToWrite.length() + LWS_SEND_BUFFER_POST_PADDING]);
 
 	char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
 	strcpy(buf, strToWrite.c_str());
-
+*/
 	//NOTE: delete[] on buffer is not needed since std::unique_ptr<char[]> is used
-	return libwebsocket_write(lws, (unsigned char*)buf, strToWrite.length(), LWS_WRITE_TEXT);
+	return libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
 }
 
 
@@ -62,32 +62,6 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 
-#ifndef QTBINARY_DATA
-	stringstream s;
-	
-	//TODO: Dirty hack hardcoded stuff, jsut to make it work.
-	std::string tmpstr="";
-	if (m_property != property)
-	{
-		tmpstr = m_property;
-	}
-	else
-	{
-		tmpstr = property;
-	}
-	
-	s.precision(15);
-	
-	s << "{\"type\":\"valuechanged\",\"name\":\"" << tmpstr << "\",\"data\":";
-	s << "{ \"value\":\"" << value->toString() << "\",\"zone\":\""<<value->zone;
-	s << "\",\"timestamp\":\""<<value->timestamp<<"\",\"sequence\":\""<<value->sequence<<"\"},";
-	s << "\"transactionid\":\"" << m_uuid << "\"}";
-	
-	string replystr = s.str();
-	//printf("Reply: %s\n",replystr.c_str());
-	
-	DebugOut() << "Reply:" << replystr << "\n";
-#else
 	QVariantMap data;
 	QVariantMap reply;
 
@@ -101,10 +75,9 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 	reply["name"]=property.c_str();
 	reply["transactionid"]=m_uuid.c_str();
 
-	string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
-#endif
+	QByteArray replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 
-	lwsWrite(m_wsi, replystr);
+	lwsWrite(m_wsi, replystr.data(),replystr.length());
 }
 WebSocketSink::~WebSocketSink()
 {

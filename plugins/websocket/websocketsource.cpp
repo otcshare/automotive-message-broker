@@ -29,6 +29,7 @@
 
 #include <QVariantMap>
 #include <QJsonDocument>
+#include <QStringList>
 
 #include "debugout.h"
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
@@ -40,6 +41,16 @@ double oldTimestamp=0;
 double totalTime=0;
 double numUpdates=0;
 double averageLatency=0;
+
+static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
+{
+	//std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
+
+	//char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
+	//strcpy(buf, strToWrite);
+
+	return libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
+}
 
 static int lwsWrite(struct libwebsocket *lws, const std::string& strToWrite)
 {
@@ -72,7 +83,6 @@ static struct libwebsocket_protocols protocols[] = {
 //Called when a client connects, subscribes, or unsubscribes.
 void WebSocketSource::checkSubscriptions()
 {
-	PropertyList notSupportedList;
 	while (queuedRequests.size() > 0)
 	{
 		VehicleProperty::Property prop = queuedRequests.front();
@@ -90,9 +100,9 @@ void WebSocketSource::checkSubscriptions()
 		reply["data"] = prop.c_str();
 		reply["transactionid"] = "d293f670-f0b3-11e1-aff1-0800200c9a66";
 
-		string replystr = QJsonDocument::fromVariant(reply).toBinaryData().data();
+		QByteArray replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 
-		lwsWrite(clientsocket,replystr);
+		lwsWrite(clientsocket, replystr.data(), replystr.length());
 	}
 }
 void WebSocketSource::setConfiguration(map<string, string> config)
@@ -237,90 +247,44 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			source->checkSubscriptions();
 			//printf("Incoming connection!\n");
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming connection" << endl;
-			stringstream s;
-			s << "{\"type\":\"method\",\"name\":\"getSupportedEventTypes\",\"data\":[],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
 
-			string replystr = s.str();
-			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
-			char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-			new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-			strcpy(new_response,replystr.c_str());
-			libwebsocket_write(wsi, (unsigned char*)(new_response), strlen(new_response), LWS_WRITE_TEXT);
-			delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+			QVariantMap toSend;
+			toSend["type"] = "method";
+			toSend["name"] = "getSupportedEventTypes";
+			toSend["transactionid"] = amb::createUuid().c_str();
+
+			QByteArray data = QJsonDocument::fromVariant(toSend).toBinaryData();
+
+			lwsWrite(wsi,data.data(),data.length());
 
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
-			double prejsonparsetime = (amb::currentTime() - oldTimestamp)*1000;
+			QByteArray d((char*)in,len);
+			QJsonDocument doc = QJsonDocument::fromBinaryData(d);
+			QVariantMap call = doc.toVariant().toMap();
 
-			DebugOut(2)<<"websocket source pre-json parse time: "<<prejsonparsetime<<endl;
+			string type = call["type"].toString().toStdString();
+			string name = call["name"].toString().toStdString();
+			string id = call["transactionid"].toString().toStdString();
 
-			json_object *rootobject;
-			json_tokener *tokener = json_tokener_new();
-			enum json_tokener_error err;
-			do
-			{
-				rootobject = json_tokener_parse_ex(tokener, (char*)in,len);
-			} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-			if (err != json_tokener_success)
-			{
-				fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-				// Handle errors, as appropriate for your application.
-			}
-			if (tokener->char_offset < len) // XXX shouldn't access internal fields
-			{
-				// Handle extra characters after parsed object as desired.
-				// e.g. issue an error, parse another object from that point, etc...
-			}
-			//Incoming JSON reqest.
-			
-
-			DebugOut(5)<<"source received: "<<string((char*)in)<<endl;
-			
-			json_object *typeobject= json_object_object_get(rootobject,"type");
-			json_object *nameobject= json_object_object_get(rootobject,"name");
-			json_object *transidobject= json_object_object_get(rootobject,"transactionid");
-
-
-			string type = string(json_object_get_string(typeobject));
-			string name = string(json_object_get_string(nameobject));
-			
-			string id;
-			
-			if (json_object_get_type(transidobject) == json_type_string)
-			{
-				id = json_object_get_string(transidobject);
-			}
-			else
-			{
-				stringstream strstr;
-				strstr << json_object_get_int(transidobject);
-				id = strstr.str();
-			}
-			
 			list<pair<string,string> > pairdata;
 			if (type == "valuechanged")
 			{
-				json_object *dataobject = json_object_object_get(rootobject,"data");
-				
-				json_object *valueobject = json_object_object_get(dataobject,"value");
-				json_object *timestampobject = json_object_object_get(dataobject,"timestamp");
-				json_object *sequenceobject= json_object_object_get(dataobject,"sequence");
-				
-				string value = string(json_object_get_string(valueobject));
-				string timestamp = string(json_object_get_string(timestampobject));
-				string sequence = string(json_object_get_string(sequenceobject));
-				//printf("Value changed: %s, %s\n",name.c_str(),data.front().c_str());
+				QVariantMap data = call["data"].toMap();
+
+				string value = data["value"].toString().toStdString();
+				double timestamp = data["timestamp"].toDouble();
+				int sequence = data["sequence"].toInt();
+
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << endl;
-				//Name should be a valid property
-				//	routingEngine->updateProperty(VehicleProperty::VehicleSpeed, velocity);
-				//data.front()
+
 				try
 				{
 					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
-					type->timestamp = boost::lexical_cast<double,std::string>(timestamp);
-					type->sequence = boost::lexical_cast<double,std::string>(sequence);
+					type->timestamp = timestamp;
+					type->sequence = sequence;
 					m_re->updateProperty(type, source->uuid());
 					double currenttime = amb::currentTime();
 
@@ -329,7 +293,6 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					 *  JSON parsing in this section.
 					 */
 					
-					DebugOut(2)<<"websocket parse latency: "<<(currenttime - oldTimestamp)*1000<<"ms"<<endl;
 					DebugOut(2)<<"websocket network + parse latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
 					totalTime += (currenttime - oldTimestamp)*1000;
 					numUpdates ++;
@@ -344,70 +307,49 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					//printf("Exception %s\n",ex.what());
 					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Exception:" << ex.what() << "\n";
 				}
-				json_object_put(valueobject);
-				json_object_put(timestampobject);
-				json_object_put(sequenceobject);
-				json_object_put(dataobject);
-				//printf("Done\n");
-				/*if (name == "get")
-				{
-					if (data.size() > 0)
-					{
-					}
-				}*/
 			}
 			else if (type == "methodReply")
 			{
-				json_object *dataobject = json_object_object_get(rootobject,"data");
 				if (name == "getSupportedEventTypes")
 				{
-					//printf("Got supported events!\n");
+
+					QVariant data = call["data"];
+
+					QStringList supported = data.toStringList();
+
 					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupportedEventTypes request"<<endl;
 					PropertyList props;
-					if (json_object_get_type(dataobject) == json_type_array)
+
+					Q_FOREACH(QString p, supported)
 					{
-						array_list *dataarray = json_object_get_array(dataobject);
-						for (int i=0;i<array_list_length(dataarray);i++)
-						{
-							json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
-							props.push_back(string(json_object_get_string(arrayobj)));
-						}
-						//array_list_free(dataarray);
+						props.push_back(p.toStdString());
 					}
-					else
-					{
-						props.push_back(string(json_object_get_string(dataobject)));
-					}
+
 					source->setSupported(props);
 					//m_re->updateSupported(m_supportedProperties,PropertyList());
 				}
 				else if (name == "getRanged")
 				{
+					QVariantList data = call["data"].toList();
+
 					std::list<AbstractPropertyType*> propertylist;
-					array_list *dataarray = json_object_get_array(dataobject);
-					for (int i=0;i<array_list_length(dataarray);i++)
+
+					Q_FOREACH(QVariant d, data)
 					{
-						json_object *arrayobj = (json_object*)array_list_get_idx(dataarray,i);
-						json_object *keyobject = json_object_object_get(arrayobj,"name");
-						json_object *valueobject = json_object_object_get(arrayobj,"value");
-						json_object *timestampobject = json_object_object_get(arrayobj,"timestamp");
-						json_object *sequenceobject = json_object_object_get(arrayobj,"sequence");
-						std::string name = json_object_get_string(keyobject);
-						std::string value = json_object_get_string(valueobject);
-						std::string timestamp = json_object_get_string(timestampobject);
-						std::string sequence = json_object_get_string(sequenceobject);
+						QVariantMap obj = d.toMap();
 
-						///TODO: we might only have to free the dataobject at the end instead of this:
+						std::string name = obj["name"].toString().toStdString();
+						std::string value = obj["value"].toString().toStdString();
+						double timestamp = obj["timestamp"].toDouble();
+						int sequence = obj["sequence"].toInt();
 
-						json_object_put(keyobject);
-						json_object_put(valueobject);
-						json_object_put(timestampobject);
-						json_object_put(sequenceobject);
-							
 						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
+						type->timestamp = timestamp;
+						type->sequence = sequence;
+
 						propertylist.push_back(type);
 					}
-					//array_list_free(dataarray);
+
 					if (source->uuidRangedReplyMap.find(id) != source->uuidRangedReplyMap.end())
 					{
 						source->uuidRangedReplyMap[id]->values = propertylist;
@@ -426,22 +368,17 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
 					if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
 					{
-						json_object *propertyobject = json_object_object_get(dataobject,"property");
-						json_object *valueobject = json_object_object_get(dataobject,"value");
-						json_object *timestampobject = json_object_object_get(dataobject,"timestamp");
-						json_object *sequenceobject = json_object_object_get(dataobject,"sequence");
-						std::string property = json_object_get_string(propertyobject);
-						std::string value = json_object_get_string(valueobject);
-						std::string timestamp = json_object_get_string(timestampobject);
-						std::string sequence = json_object_get_string(sequenceobject);
-						json_object_put(propertyobject);
-						json_object_put(valueobject);
-						json_object_put(timestampobject);
-						json_object_put(sequenceobject);
+						QVariantMap obj = call["data"].toMap();
+
+						std::string property = obj["property"].toString().toStdString();
+						std::string value = obj["value"].toString().toStdString();
+						double timestamp = obj["timestamp"].toDouble();
+						int sequence = obj["sequence"].toInt();
 						
 						AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
-						v->timestamp = boost::lexical_cast<double,std::string>(timestamp);
-						v->sequence = boost::lexical_cast<double,std::string>(sequence);
+						v->timestamp = timestamp;
+						v->sequence = sequence;
+
 						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
 						{
 							source->uuidReplyMap[id]->value = v;
@@ -464,9 +401,8 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					
 					//data will contain a property/value map.
 				}
-				json_object_put(dataobject);
+
 			}
-			json_object_put(rootobject);
 
 			break;
 
@@ -569,18 +505,20 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	std::string uuid = amb::createUuid();
 	uuidReplyMap[uuid] = reply;
 	uuidTimeoutMap[uuid] = amb::currentTime() + 10.0; ///TODO: 10 second timeout, make this configurable?
-	stringstream s;
-	
-	s << "{\"type\":\"method\",\"name\":\"get\",\"data\":[\"" << reply->property << "\"],\"transactionid\":\"" << uuid << "\"}";
-	string replystr = s.str();
-	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Sending:" << replystr <<endl;
-	//printf("Reply: %s\n",replystr.c_str());
-	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-	strcpy(new_response,replystr.c_str());
-	if(clientsocket)
-		libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+
+	QVariantMap data;
+	data["property"] = reply->property.c_str();
+	data["zone"] = reply->zoneFilter;
+
+	QVariantMap replyvar;
+	replyvar["type"] = "method";
+	replyvar["name"] = "get";
+	replyvar["data"] = data;
+	replyvar["transactionid"] = uuid.c_str();
+
+	QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+
+	lwsWrite(clientsocket, replystr.data(), replystr.length());
 }
 
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -592,53 +530,53 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	s.precision(15);
 	s << "{\"type\":\"method\",\"name\":\"getRanged\",\"data\": {";
 
-	s << "\"properties\":[";
+	QVariantMap replyvar;
+	replyvar["type"] = "method";
+	replyvar["name"] = "getRanged";
+	replyvar["transactionid"] = uuid.c_str();
+	replyvar["timeBegin"] = reply->timeBegin;
+	replyvar["timeEnd"] = reply->timeEnd;
+	replyvar["sequenceBegin"] = reply->sequenceBegin;
+	replyvar["sequenceEnd"] = reply->sequenceEnd;
+
+
+	QStringList properties;
 
 	for (auto itr = reply->properties.begin(); itr != reply->properties.end(); itr++)
 	{
-		std::string prop = *itr;
-
-		if(itr != reply->properties.begin())
-		{
-			s<<",";
-		}
-
-		s<<"\""<<prop<<"\"";
+		VehicleProperty::Property p = *itr;
+		properties.append(p.c_str());
 	}
 
-	s<<"],";
+	replyvar["data"] = properties;
 
-	s << "\"timeBegin\":\"" << reply->timeBegin << "\",";
-	s << "\"timeEnd\":\"" << reply->timeEnd << "\",";
-	s << "\"sequenceBegin\":\"" << reply->sequenceBegin<< "\",";
-	s << "\"sequenceEnd\":\"" << reply->sequenceEnd << "\"}";
-	s<< ",\"transactionid\":\"" << uuid << "\"}";
-	string replystr = s.str();
-	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr <<endl;
-	//printf("Reply: %s\n",replystr.c_str());
-	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-	strcpy(new_response,replystr.c_str());
-	if(clientsocket)
-		libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
+	QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+
+	lwsWrite(clientsocket, replystr.data(), replystr.length());
 }
 
 AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest request )
 {
-	///TODO: fill in
-		AsyncPropertyReply* reply = new AsyncPropertyReply(request);
+	AsyncPropertyReply* reply = new AsyncPropertyReply(request);
+
+	QVariantMap data;
+	data["property"] = request.property.c_str();
+	data["value"] = request.value->toString().c_str();
+	data["zone"] = request.zoneFilter;
+
+
+	QVariantMap replyvar;
+	replyvar["type"] = "method";
+	replyvar["name"] = "set";
+	replyvar["data"] = data;
+	replyvar["transactionid"] = amb::createUuid().c_str();
+
+	QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+
+	lwsWrite(clientsocket, replystr.data(), replystr.length());
+
+	///TODO: we should actually wait for a response before we simply complete the call
 	reply->success = true;
-	stringstream s;
-	s << "{\"type\":\"method\",\"name\":\"set\",\"data\":[\"property\" : \"" << request.property << "\",\"value\" : \"" << request.value << "\"],\"transactionid\":\"" << "d293f670-f0b3-11e1-aff1-0800200c9a66" << "\"}";
-	string replystr = s.str();
-	DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Reply:" << replystr << "\n";
-	//printf("Reply: %s\n",replystr.c_str());
-	char *new_response = new char[LWS_SEND_BUFFER_PRE_PADDING + strlen(replystr.c_str()) + LWS_SEND_BUFFER_POST_PADDING];
-	new_response+=LWS_SEND_BUFFER_PRE_PADDING;
-	strcpy(new_response,replystr.c_str());
-	libwebsocket_write(clientsocket, (unsigned char*)new_response, strlen(new_response), LWS_WRITE_TEXT);
-	delete (char*)(new_response-LWS_SEND_BUFFER_PRE_PADDING);
 	reply->completed(reply);
 	return reply;
 }
