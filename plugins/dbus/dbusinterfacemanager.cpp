@@ -45,7 +45,7 @@ std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(Abstract
 	for(auto itr = implementedProperties.begin(); itr != implementedProperties.end(); itr++)
 	{
 		VehicleProperty::Property property = *itr;
-		std::list<std::string> sources = re->getSourcesForProperty(property);
+		std::list<std::string> sources = re->sourcesForProperty(property);
 
 		for(auto itr2 = sources.begin(); itr2 != sources.end(); itr2++)
 		{
