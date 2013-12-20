@@ -40,8 +40,6 @@ public:
 	
 	/// sinks:
 
-	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
-	
 	void registerSink(AbstractSink *self);
 	void unregisterSink(AbstractSink *self);
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
@@ -54,7 +52,7 @@ public:
 	PropertyList supported() { return mMasterPropertyList; }
 
 	PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid);
-	std::list<std::string> getSourcesForProperty(VehicleProperty::Property property);
+	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
     
 	~Core();
 	
