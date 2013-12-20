@@ -232,7 +232,8 @@ public:
 	std::string sourceUuid;
 
 	/*!
-	 * \brief completed callback that is called when the ranged request is complete.
+	 * \brief completed callback that is called when the ranged request is complete. The reply from this request is passed
+	 * into the completed call.  The completed callback must free the reply before it returns or there will be a leak.
 	 */
 	GetRangedPropertyCompletedSignal completed;
 

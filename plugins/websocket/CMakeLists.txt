@@ -37,7 +37,7 @@ set(websocketsourceplugin_headers websocketsource.h)
 set(websocketsourceplugin_sources websocketsource.cpp)
 add_library(websocketsourceplugin MODULE ${websocketsourceplugin_sources})
 set_target_properties(websocketsourceplugin PROPERTIES PREFIX "")
-target_link_libraries(websocketsourceplugin amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
+target_link_libraries(websocketsourceplugin amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES})
 
 install(TARGETS websocketsourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
