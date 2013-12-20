@@ -427,7 +427,6 @@ public:
 	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 
 	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid) = 0;
-	virtual std::list<std::string> getSourcesForProperty(VehicleProperty::Property) = 0;
 };
 
 #endif // ABSTRACTROUTINGENGINE_H

@@ -190,25 +190,6 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 	}
 }
 
-std::list<std::string> Core::sourcesForProperty(VehicleProperty::Property property)
-{
-	std::list<std::string> l;
-
-	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
-	{
-		AbstractSource* src = *itr;
-
-		PropertyList s = src->supported();
-
-		if(ListPlusPlus<VehicleProperty::Property>(&s).contains(property))
-		{
-			l.push_back(src->uuid());
-		}
-	}
-
-	return l;
-}
-
 void Core::registerSink(AbstractSink *self)
 {
 	if(!ListPlusPlus<AbstractSink*>(&mSinks).contains(self))
@@ -381,7 +362,7 @@ PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string so
 	return PropertyInfo::invalid();
 }
 
-std::list<string> Core::getSourcesForProperty(VehicleProperty::Property property)
+std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
 {
 	std::list<std::string> list;
 
