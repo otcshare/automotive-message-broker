@@ -115,7 +115,7 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	
 	for(PropertyList::iterator itr = added.begin(); itr != added.end(); itr++)
 	{
-		if(ListPlusPlus<VehicleProperty::Property>(&added).contains(*itr))
+		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains(*itr))
 		{
 			mMasterPropertyList.push_back(*itr);
 		}

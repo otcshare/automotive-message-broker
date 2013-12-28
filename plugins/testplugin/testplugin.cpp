@@ -52,6 +52,30 @@ void TestPlugin::updateProperty(VehicleProperty::Property property,AbstractPrope
 
 }
 
+bool TestPlugin::testCoreUpdateSupported()
+{
+	bool success = false;
+
+	PropertyList toAdd;
+	toAdd.push_back(VehicleProperty::ClutchStatus);
+
+	routingEngine->updateSupported(toAdd,PropertyList());
+
+	PropertyList supported = routingEngine->supported();
+
+	success = ListPlusPlus<VehicleProperty::Property>(&supported).contains(VehicleProperty::ClutchStatus);
+
+	PropertyList toRemove = toAdd;
+
+	routingEngine->updateSupported(PropertyList(),toRemove);
+
+	supported = routingEngine->supported();
+
+	success &= !ListPlusPlus<VehicleProperty::Property>(&supported).contains(VehicleProperty::ClutchStatus);
+
+	return success;
+}
+
 void TestPlugin::setSupported(PropertyList list)
 {
 	m_re->updateSupported(list,PropertyList());
@@ -89,6 +113,8 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
   g_assert (tfirst->toString() == tsecond->toString());
 
   testBooleanToStringFromString();
+
+  g_assert (testCoreUpdateSupported());
 
   DebugOut() << "Exiting..." << endl;
   exit(-1);

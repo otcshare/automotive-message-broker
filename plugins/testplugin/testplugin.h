@@ -59,6 +59,7 @@ public:
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
 
 private:
+	bool testCoreUpdateSupported();
 	PropertyList m_supportedProperties;
 };
 
