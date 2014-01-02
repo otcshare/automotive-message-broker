@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 #include <boost/assert.hpp>
-#include <boost/thread/future.hpp>
 
 #ifdef OPENCL
 #include <opencv2/ocl/ocl.hpp>
