@@ -8,9 +8,6 @@ else(OpenCV_LIBS)
 	 message(FATAL_ERROR "opencv missing.  please install opencv")
 endif(OpenCV_LIBS)
 
-find_package(Boost COMPONENTS thread REQUIRED)
-find_package(Threads REQUIRED)
-
 #find opencv ocl headers:
 find_path(ocl ocl.hpp PATH_SUFFIXES opencv/ocl opencv2/ocl DOC "opencv ocl headers")
 

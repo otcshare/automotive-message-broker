@@ -172,9 +172,9 @@ function eventListener(e) {
     }
 }
 
-function subscribe(eventlist) {
-   var zoneList =  getZone(eventlist);
-    window.vehicle.subscribe(eventlist, zoneList,
+function subscribe(event) {
+   var zoneList =  getZone(event);
+    window.vehicle.subscribe(event, zoneList,
         function(data) {
             PRINT.pass("Subscribe success for: " + data);
             for (var i = 0; i < data.length; i++) {
@@ -191,14 +191,13 @@ function subscribe(eventlist) {
     );
 }
 
-function unsubscribe(eventlist, zoneList) {
-    zoneList =  getZone(eventlist);
+function unsubscribe(event, zoneList) {
+    zoneList =  getZone(event);
     /* kill the handers first, so even if the service fails to acknowledge */
     /* we've stopped listening */
-    for (var i = 0; i < eventlist.length; i++) {
-        document.removeEventListener(eventlist[i], eventListener, false);
-    }
-    window.vehicle.unsubscribe(eventlist, zoneList,
+    document.removeEventListener(event, eventListener, false);
+
+    window.vehicle.unsubscribe(event, zoneList,
         function(data) {
             PRINT.pass("Unsubscribe success for: " + data);
             for (var i = 0; i < data.length; i++) {
@@ -254,12 +253,12 @@ function select(elem) {
         return;
 
     var idx = selected.indexOf(name);
-    if (elem.className == "propinfo") {
+    if (elem.className === "propinfo") {
         if (idx < 0) {
             selected[selected.length] = name;
         }
         elem.className = "propinfo select";
-    } else if (elem.className == "propinfo select") {
+    } else if (elem.className === "propinfo select") {
         if (idx >= 0) {
             selected.splice(idx, 1);
         }
@@ -279,8 +278,8 @@ function start(msg) {
     var part = ['<div class="proptest"><div class="propinfo" onclick=select(this)>',
         '</div><div class="buttons"><div class="testbutton types" onclick=getTypes("',
         '")></div><div id="',
-        '_subscribe" class="testbutton subscribe" onclick=subscribe(["',
-        '"])></div><div id="',
+        '_subscribe" class="testbutton subscribe" onclick=subscribe("',
+        '")></div><div id="',
         '_unsubscribe" class="testbutton unsubscribe" onclick=unsubscribe(["',
         '"])></div><div class="testbutton get" onclick=getValue(["',
         '"])></div><div class="testbutton set" onclick=setValue(["',

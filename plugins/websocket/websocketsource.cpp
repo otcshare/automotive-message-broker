@@ -42,27 +42,27 @@ double totalTime=0;
 double numUpdates=0;
 double averageLatency=0;
 
+static bool doBinary = false;
+
 static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
 {
-	//std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
+	int retval = -1;
 
-	//char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
-	//strcpy(buf, strToWrite);
+	if(doBinary)
+	{
+		retval = libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
+	}
+	else
+	{
+		std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
+		char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
+		strcpy(buf, strToWrite);
 
-	return libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
+		retval = libwebsocket_write(lws, (unsigned char*)buf, len, LWS_WRITE_TEXT);
+	}
+
+	return retval;
 }
-
-static int lwsWrite(struct libwebsocket *lws, const std::string& strToWrite)
-{
-	std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + strToWrite.length() + LWS_SEND_BUFFER_POST_PADDING]);
-
-	char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
-	strcpy(buf, strToWrite.c_str());
-
-	//NOTE: delete[] on buffer is not needed since std::unique_ptr<char[]> is used
-	return libwebsocket_write(lws, (unsigned char*)buf, strToWrite.length(), LWS_WRITE_TEXT);
-}
-
 
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len);
 static struct libwebsocket_protocols protocols[] = {
@@ -100,7 +100,12 @@ void WebSocketSource::checkSubscriptions()
 		reply["data"] = prop.c_str();
 		reply["transactionid"] = "d293f670-f0b3-11e1-aff1-0800200c9a66";
 
-		QByteArray replystr = QJsonDocument::fromVariant(reply).toBinaryData();
+		QByteArray replystr;
+
+		if(doBinary)
+			replystr = QJsonDocument::fromVariant(reply).toBinaryData();
+		else
+			replystr = QJsonDocument::fromVariant(reply).toJson();
 
 		lwsWrite(clientsocket, replystr.data(), replystr.length());
 	}
@@ -111,6 +116,12 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	std::string ip;
 	int port;
 	configuration = config;
+
+	if(config.find("binaryProtocol") != config.end())
+	{
+		doBinary = config["binaryProtocol"] == "true";
+	}
+
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Incoming setting for WebSocketSource:" << (*i).first << ":" << (*i).second << "\n";
@@ -253,16 +264,36 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			toSend["name"] = "getSupportedEventTypes";
 			toSend["transactionid"] = amb::createUuid().c_str();
 
-			QByteArray data = QJsonDocument::fromVariant(toSend).toBinaryData();
+			QByteArray replystr;
 
-			lwsWrite(wsi,data.data(),data.length());
+			if(doBinary)
+				replystr = QJsonDocument::fromVariant(toSend).toBinaryData();
+			else
+				replystr = QJsonDocument::fromVariant(toSend).toJson();
+
+			lwsWrite(wsi,replystr.data(),replystr.length());
 
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
 			QByteArray d((char*)in,len);
-			QJsonDocument doc = QJsonDocument::fromBinaryData(d);
+			QJsonDocument doc;
+
+			if(doBinary)
+				doc = QJsonDocument::fromBinaryData(d);
+			else
+			{
+				doc = QJsonDocument::fromJson(d);
+				DebugOut(7)<<d.data()<<endl;
+			}
+
+			if(doc.isNull())
+			{
+				DebugOut(DebugOut::Error)<<"Invalid message"<<endl;
+				break;
+			}
+
 			QVariantMap call = doc.toVariant().toMap();
 
 			string type = call["type"].toString().toStdString();
@@ -516,7 +547,12 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	replyvar["data"] = data;
 	replyvar["transactionid"] = uuid.c_str();
 
-	QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+	QByteArray replystr;
+
+	if(doBinary)
+		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+	else
+		replystr = QJsonDocument::fromVariant(replyvar).toJson();
 
 	lwsWrite(clientsocket, replystr.data(), replystr.length());
 }
@@ -550,7 +586,12 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	replyvar["data"] = properties;
 
-	QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+	QByteArray replystr;
+
+	if(doBinary)
+		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+	else
+		replystr = QJsonDocument::fromVariant(replyvar).toJson();
 
 	lwsWrite(clientsocket, replystr.data(), replystr.length());
 }
@@ -571,7 +612,12 @@ AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest reque
 	replyvar["data"] = data;
 	replyvar["transactionid"] = amb::createUuid().c_str();
 
-	QByteArray replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+	QByteArray replystr;
+
+	if(doBinary)
+		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
+	else
+		replystr = QJsonDocument::fromVariant(replyvar).toJson();
 
 	lwsWrite(clientsocket, replystr.data(), replystr.length());
 
