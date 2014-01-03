@@ -33,15 +33,27 @@
 #include <QJsonDocument>
 #include <QVariantMap>
 
+bool WebSocketSink::doBinary = false;
+
+// libwebsocket_write helper function
 static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
 {
-	/*std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + strToWrite.length() + LWS_SEND_BUFFER_POST_PADDING]);
+	int retval = -1;
 
-	char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
-	strcpy(buf, strToWrite.c_str());
-*/
-	//NOTE: delete[] on buffer is not needed since std::unique_ptr<char[]> is used
-	return libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
+	if(WebSocketSink::doBinary)
+	{
+		retval = libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
+	}
+	else
+	{
+		std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
+		char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
+		strcpy(buf, strToWrite);
+
+		retval = libwebsocket_write(lws, (unsigned char*)buf, len, LWS_WRITE_TEXT);
+	}
+
+	return retval;
 }
 
 
@@ -75,7 +87,11 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 	reply["name"]=property.c_str();
 	reply["transactionid"]=m_uuid.c_str();
 
-	QByteArray replystr = QJsonDocument::fromVariant(reply).toBinaryData();
+	QByteArray replystr;
+	if(WebSocketSink::doBinary)
+		replystr = QJsonDocument::fromVariant(reply).toBinaryData();
+	else
+		replystr = QJsonDocument::fromVariant(reply).toJson();
 
 	lwsWrite(m_wsi, replystr.data(),replystr.length());
 }
@@ -91,3 +107,5 @@ PropertyList WebSocketSink::subscriptions()
 	return PropertyList();
 } 
 
+/// 6% and 4% cpu with json
+/// 5% and 4% with binary

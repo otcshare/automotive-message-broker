@@ -12,7 +12,8 @@
 			"path" : "/usr/lib/automotive-message-broker/websocketsinkplugin.so",
 			"interface" : "lo",
 			"ssl" : "false",
-			"port" : "23000"
+			"port" : "23000",
+			"binaryProtocol" : "true"
 		} 
 	]
 }

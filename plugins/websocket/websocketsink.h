@@ -34,6 +34,9 @@ public:
 	void supportedChanged(PropertyList supportedProperties);
 	PropertyList subscriptions();
 	libwebsocket *socket() { return m_wsi; }
+
+	static bool doBinary;
+
 private:
 	char *webSocketBuffer;
 	string m_amdbproperty;
