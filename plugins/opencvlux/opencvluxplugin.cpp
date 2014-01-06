@@ -111,6 +111,22 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	{
 		std::vector<cv::ocl::Info> info;
 		cv::ocl::getDevice(info);
+
+		DebugOut()<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
+
+		if(!info.size())
+		{
+			DebugOut()<<"No CL devices.  Disabling OpenCL"<<endl;
+			shared->useOpenCl = false;
+		}
+
+		for(cv::ocl::Info i : info)
+		{
+			for(auto name : i.DeviceName)
+			{
+				DebugOut()<<"DeviceName: "<<name<<endl;
+			}
+		}
 	}
 #endif
 
@@ -261,7 +277,8 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 	{
 #ifdef OPENCL
 		cv::Scalar stdDev;
-		cv::ocl::meanStdDev(qImg, avgPixelIntensity, stdDev);
+		cv::ocl::oclMat src(qImg);
+		cv::ocl::meanStdDev(src, avgPixelIntensity, stdDev);
 #endif
 	}
 	else if(shared->useCuda)
