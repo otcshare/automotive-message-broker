@@ -26,28 +26,34 @@
 using namespace std::placeholders;
 
 int lastpps=0;
+int lastfpps=0;
 
 static int PPSUpdate(void* data)
 {
-	int* pps = (int*)data;
+	Core::Performance *performance = (Core::Performance*)data;
 
-	int temp = *pps;
-
-	if(temp > 0 && temp != lastpps)
+	if(performance->propertiesPerSecond > 0 && performance->propertiesPerSecond != lastpps)
 	{
-		lastpps = temp;
-		DebugOut(1)<<"Property updates per second: "<<temp<<endl;
+		lastpps = performance->propertiesPerSecond;
+		DebugOut(1)<<"Property updates per second: "<<performance->propertiesPerSecond<<endl;
 	}
 
-	*pps = 0;
+	performance->propertiesPerSecond = 0;
+
+	if(performance->firedPropertiesPerSecond > 0 && performance->firedPropertiesPerSecond != lastfpps)
+	{
+		lastfpps = performance->firedPropertiesPerSecond;
+		DebugOut(1)<<"Fired property updates per second: "<<performance->firedPropertiesPerSecond<<endl;
+	}
+
+	performance->firedPropertiesPerSecond = 0;
 
 	return 1;
 }
 
 Core::Core()
-	:propertiesPerSecond(0)
 {
-	g_timeout_add(1000,PPSUpdate,&propertiesPerSecond);
+	g_timeout_add(1000,PPSUpdate,&performance);
 }
 
 Core::~Core()
@@ -161,8 +167,12 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 
 	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<property<<endl;
 
-	propertiesPerSecond++;
+	performance.propertiesPerSecond++;
 
+	if(list.size())
+	{
+		performance.firedPropertiesPerSecond++;
+	}
 
 	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
 	{

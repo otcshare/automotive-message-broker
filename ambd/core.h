@@ -31,7 +31,7 @@ class Core: public AbstractRoutingEngine
 	
 public:
 	Core();
-        
+	~Core();
 	/// sources:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
@@ -53,16 +53,20 @@ public:
 
 	PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid);
 	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
-    
-	~Core();
 	
+	struct Performance {
+		Performance(): propertiesPerSecond(0), firedPropertiesPerSecond(0) {}
+		int propertiesPerSecond;
+		int firedPropertiesPerSecond;
+	};
+
 private:
 	PropertyList mMasterPropertyList;
 	
 	SourceList mSources;
 	SinkList mSinks;
 
-	int propertiesPerSecond;
+	Performance performance;
 	
 	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
 
