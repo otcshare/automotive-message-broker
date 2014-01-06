@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/thread/future.hpp>
 
 #ifdef OPENCL
-#include <opencv/ocl/ocl.hpp>
+#include <opencv2/ocl/ocl.hpp>
 #endif
 
 #ifdef CUDA
