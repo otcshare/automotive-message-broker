@@ -1,3 +1,7 @@
+* Wed Jan 08 2013 - <kevron.m.rees@intel.com>
+- Upstream 0.10.902
+- Temporarily install rule-less manifest so security=none works
+
 * Thu Dec 19 2013 - <kevron.m.rees@intel.com>
 - New upstream release 0.10.901
 - Fixed packaging to install manifests for all subpackages
