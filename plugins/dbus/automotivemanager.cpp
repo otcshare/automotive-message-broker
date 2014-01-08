@@ -31,10 +31,6 @@ static const gchar introspection_xml[] =
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='as' name='response' direction='out'/>"
   "    </method>"
-  "    <method name='findProperty'>"
-  "      <arg type='s' name='searchstring' direction='in'/>"
-  "      <arg type='o' name='response' direction='out'/>"
-  "    </method>"
   "  </interface>"
   "</node>";
 
@@ -60,37 +56,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		DebugOut(6)<<"DBus method call path: "<<object_path<<endl;
 	}
 
-	if(method == "findProperty")
-	{
-		DebugOut(DebugOut::Warning)<<"org.automotive.Manager.findProperty() is deprecated.  Use org.automotive.Manager.FindObject() instead."<<endl;
-
-		gchar* arg;
-
-		g_variant_get(parameters,"(s)",&arg);
-
-		std::string objectToFind = arg;
-
-		if(objectToFind == "")
-		{
-			g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
-			return;
-		}
-
-		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(objectToFind);
-
-		if(!interfaces.size())
-		{
-			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.PropertyNotFound", "Object not found");
-			return;
-		}
-
-		auto itr = interfaces.begin();
-
-		g_dbus_method_invocation_return_value(invocation, g_variant_new("(o)",(*itr)->objectPath().c_str()));
-		///TODO: we might need to clean up stuff there (like var)
-	}
-
-	else if(method == "FindObject")
+	if(method == "FindObject")
 	{
 		gchar* arg;
 

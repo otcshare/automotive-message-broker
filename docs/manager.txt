@@ -33,7 +33,3 @@ Methods:
 
 		returns list of sources that provide the given objectName.
 
-	ObjectPath 	findProperty(string objectName) [deprecated]
-
-		returns first object matching the objectName.
-		WARNING: this method is deprecated, use findObject() instead
