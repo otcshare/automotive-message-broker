@@ -1,5 +1,6 @@
 #include "automotivemanager.h"
 #include "abstractdbusinterface.h"
+#include "listplusplus.h"
 
 static const gchar introspection_xml[] =
   "<node>"
@@ -51,9 +52,11 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 	std::string method = method_name;
 
+	uint pid = getPid(sender);
+
 	if(DebugOut::getDebugThreshhold() >= 6)
 	{
-		DebugOut(6)<<"DBus method call from: "<<sender<< " pid: " <<getPid(sender)<< " interface: "<<interface_name<<" method: "<<method<<endl;
+		DebugOut(6)<<"DBus method call from: "<<sender<< " pid: " <<pid<< " interface: "<<interface_name<<" method: "<<method<<endl;
 		DebugOut(6)<<"DBus method call path: "<<object_path<<endl;
 	}
 
@@ -117,9 +120,20 @@ static void handleMethodCall(GDBusConnection       *connection,
 			AbstractDBusInterface* t = *itr;
 			if(!t->isSupported())
 				continue;
+
+			if(!t->isRegistered())
+				t->registerObject();
+
+			std::list<std::string> processes = manager->subscribedProcesses[t];
+
+			if(!contains(processes,sender))
+			{
+				DebugOut()<<"Referencing "<<t->objectPath()<<" with sender: "<<sender<<endl;
+				manager->subscribedProcesses[t].push_back(sender);
+			}
+
 			GVariant *newvar = g_variant_new("o",t->objectPath().c_str());
 			g_variant_builder_add_value(&params, newvar);
-
 		}
 
 		//GVariant* var =  g_variant_builder_end(&params);
@@ -311,6 +325,48 @@ static void handleMethodCall(GDBusConnection       *connection,
 	}
 }
 
+static void signalCallback( GDBusConnection *connection,
+																												 const gchar *sender_name,
+																												 const gchar *object_path,
+																												 const gchar *interface_name,
+																												 const gchar *signal_name,
+																												 GVariant *parameters,
+																												 gpointer user_data)
+{
+	AutomotiveManager* manager = static_cast<AutomotiveManager*>(user_data);
+
+	gchar* name=nullptr;
+	gchar* newOwner=nullptr;
+	gchar* oldOwner = nullptr;
+	g_variant_get(parameters,"(sss)",&name, &oldOwner, &newOwner);
+
+	if(std::string(newOwner) == "")
+	{
+		for(auto i : manager->subscribedProcesses)
+		{
+			AbstractDBusInterface* iface = i.first;
+			for(auto n : i.second)
+			{
+				if(n == name)
+				{
+					DebugOut()<<"unreferencing "<<n<<" from the subscription of "<<iface->objectPath()<<endl;
+					manager->subscribedProcesses[iface].remove(n);
+				}
+			}
+
+			if(manager->subscribedProcesses[iface].empty())
+			{
+				DebugOut()<<"No more subscribers.  Unregistering."<<endl;
+				iface->unregisterObject();
+			}
+		}
+	}
+
+	g_free(name);
+	g_free(newOwner);
+	g_free(oldOwner);
+}
+
 static GVariant* getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
 {
 	return NULL;
@@ -347,6 +403,10 @@ AutomotiveManager::AutomotiveManager(GDBusConnection *connection)
 	}
 
 	g_assert(regId > 0);
+
+	g_dbus_connection_signal_subscribe(g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL,NULL), "org.freedesktop.DBus", "org.freedesktop.DBus",
+																					   "NameOwnerChanged", "/org/freedesktop/DBus", NULL, G_DBUS_SIGNAL_FLAGS_NONE,
+																					   signalCallback, this, NULL);
 }
 
 AutomotiveManager::~AutomotiveManager()

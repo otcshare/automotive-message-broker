@@ -318,6 +318,8 @@ void AbstractDBusInterface::unregisterObject()
 {
 	if(regId)
 		g_dbus_connection_unregister_object(mConnection, regId);
+
+	regId=0;
 }
 
 void AbstractDBusInterface::updateValue(AbstractProperty *property)
@@ -327,7 +329,8 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 		return;
 	}
 
-	signaller->fireSignal(mConnection, mObjectPath, "org.freedesktop.DBus.Properties", "PropertiesChanged", property);
+	if(isRegistered())
+		signaller->fireSignal(mConnection, mObjectPath, "org.freedesktop.DBus.Properties", "PropertiesChanged", property);
 }
 
 std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string object)

@@ -95,6 +95,8 @@ public:
 
 	std::unordered_map<std::string, AbstractProperty*> getProperties() { return properties; }
 
+	bool isRegistered() { return regId > 0; }
+
 protected:
 
 	void startRegistration();

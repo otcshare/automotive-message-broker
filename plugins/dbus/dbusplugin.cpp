@@ -65,12 +65,6 @@ void DBusSink::supportedChanged(PropertyList supportedProperties)
 			supported = true;
 		}
 	}
-
-
-	if(supported)
-		registerObject();
-	else
-		unregisterObject();
 }
 
 void DBusSink::propertyChanged(AbstractPropertyType *value)
