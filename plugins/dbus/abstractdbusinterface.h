@@ -91,6 +91,8 @@ public:
 
 	Zone::Type zone() { return zoneFilter; }
 
+	std::string source() { return mSourceFilter; }
+
 	std::unordered_map<std::string, AbstractProperty*> getProperties() { return properties; }
 
 protected:
@@ -116,6 +118,7 @@ protected:
 
 	bool supported;
 	double mTime;
+	std::string mSourceFilter;
 
 private:
 	std::string mInterfaceName;

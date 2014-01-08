@@ -9,13 +9,14 @@ else(OpenCV_LIBS)
 endif(OpenCV_LIBS)
 
 #find opencv ocl headers:
-find_path(ocl ocl.hpp PATH_SUFFIXES opencv/ocl opencv2/ocl DOC "opencv ocl headers")
+INCLUDE (CheckLibraryExists)
+CHECK_LIBRARY_EXISTS(cl clCreateImage /usr/lib/beignet ocl)
 
 if(ocl)
 	message(STATUS "found opencv ocl headers. enabling opencl support. ${ocl}")
 	add_definitions(-DOPENCL)
 else(ocl)
-	message(STATUS "no opencv ocl headers found (ocl.hpp). no opencl support")
+	message(STATUS "no opencl support")
 endif(ocl)
 
 find_path(cuda gpu.hpp PATH_SUFFIXES opencv/gpu opencv2/gpu DOC "opencv cuda headers")

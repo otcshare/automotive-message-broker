@@ -85,7 +85,7 @@ protected:
 
 	PropertyDBusMap propertyDBusMap;
 
-	std::string mSourceFilter;
+
 
 };
 

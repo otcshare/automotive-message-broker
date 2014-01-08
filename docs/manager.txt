@@ -4,22 +4,34 @@ Object Path: /
 
 Methods:
 
-	Array{ObjectPath}	FindObject(string objectName)
+	Array{ObjectPath}	FindObject(String objectName)
 
 		returns list of object paths that provide the given objectName (ie "VehicleSpeed" is the object name for
-		the DBus object at path: "/path/to/VehicleSpeed").
+		the DBus object at path: "/path/to/VehicleSpeed") or org.automotive.Manager.ObjectNotFound if the object
+		name is not supported.  If the path does not already exist, the path will be created.  The path will 
+		disappear when all processes that call this method disconnect from DBus or closes.
 
-	Array{int32}	ZonesForObjectName(string objectName)
+	Array{Int32}	ZonesForObjectName(String objectName)
 
 		returns list of zones for a given objectName.
 
-	ObjectPath	FindObjectForZone(string objectName, int32 zone)
+	ObjectPath	FindObjectForSourceZone(String objectName, String sourceId, Int32 zone)
 
-		returns object path which provides the given objectName in the given zone.
+		returns object path which provides the given objectName for the source and zone or 
+		org.automotive.Manager.ObjectNotFound if the object name is not supported.
+
+	ObjectPath	FindObjectForZone(String objectName, Int32 zone)
+
+		returns object path which provides the given objectName in the given zone or
+		org.automotive.Manager.ObjectNotFound if the object name is not supported.
 
 	Array{ObjectPath}	List()
 
 		returns list of ObjectNames which are supported by the system
+
+	Array{String}	SourcesForObjectName(String objectName)
+
+		returns list of sources that provide the given objectName.
 
 	ObjectPath 	findProperty(string objectName) [deprecated]
 
