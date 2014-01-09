@@ -1,3 +1,6 @@
+* Wed Jan 09 2014 - <kevron.m.rees@intel.com>
+- Fixed up tree so obs can build it
+
 * Wed Jan  8 23:41:34 UTC 2014 - tracy.graydon@intel.com
 - Fix the date in the previous changelog entry to make OBS happy 
 
