@@ -1,0 +1,14 @@
+#!/bin/sh
+##/etc/init.d/gps-manager Lv : S90
+
+## This file is boot script of /usr/libexec/gps-manager
+## This script should be run after brcm-gps-daemon
+
+if [ -x /usr/bin/ambd ]; then
+#	if [ -z "`pgrep ambd`" ]; then
+#		echo "ambd already started, restarting"
+	#	killall ambd
+#	fi
+	echo "starting ambd"
+	/usr/bin/ambd -D
+fi
