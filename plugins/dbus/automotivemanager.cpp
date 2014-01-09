@@ -81,11 +81,15 @@ static void handleMethodCall(GDBusConnection       *connection,
 		GVariantBuilder params;
 		g_variant_builder_init(&params, G_VARIANT_TYPE_ARRAY);
 
+		bool hasItems = false;
+
 		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
 		{
 			AbstractDBusInterface* t = *itr;
 			if(!t->isSupported())
 				continue;
+
+			hasItems = true;
 
 			if(!t->isRegistered())
 				t->registerObject();
@@ -102,10 +106,11 @@ static void handleMethodCall(GDBusConnection       *connection,
 			g_variant_builder_add_value(&params, newvar);
 		}
 
-		//GVariant* var =  g_variant_builder_end(&params);
+		if(hasItems)
+			g_dbus_method_invocation_return_value(invocation, g_variant_new("(ao)",&params));
+		else
+			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 
-		g_dbus_method_invocation_return_value(invocation, g_variant_new("(ao)",&params));
-		///TODO: we might need to clean up stuff there (like var)
 	}
 
 	else if(method == "FindObjectForZone")
