@@ -97,7 +97,7 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 
 	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
 
-	for(map<VehicleProperty::Property, SinkList>::iterator itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
+	for(auto itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
 	{
 		VehicleProperty::Property  property = (*itr).first;
 
@@ -143,7 +143,7 @@ void Core::updateSupported(PropertyList added, PropertyList removed)
 	
 	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
 	
-	for(map<VehicleProperty::Property, SinkList>::iterator itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
+	for(auto itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
 	{
 		VehicleProperty::Property  property = (*itr).first;
 		
@@ -204,7 +204,7 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 
 void Core::registerSink(AbstractSink *self)
 {
-	if(!ListPlusPlus<AbstractSink*>(&mSinks).contains(self))
+	if(!contains(mSinks,self))
 	{
 		mSinks.push_back(self);
 	}
@@ -212,10 +212,7 @@ void Core::registerSink(AbstractSink *self)
 
 void Core::unregisterSink(AbstractSink *self)
 {
-	if(ListPlusPlus<AbstractSink*>(&mSinks).contains(self))
-	{
-		ListPlusPlus<AbstractSink*>(&mSinks).removeOne(self);
-	}
+	removeOne(&mSinks, self);
 }
 
 
@@ -289,7 +286,7 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 
 	SinkList list = propertySinkMap[property];
 
-	if(!ListPlusPlus<AbstractSink*>(&list).contains(self))
+	if(!contains(list, self))
 	{
 		propertySinkMap[property].push_back(self);
 	}
@@ -336,7 +333,7 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 		return; 
 	}
 		
-	ListPlusPlus<AbstractSink*>(&propertySinkMap[property]).removeOne(self);
+	removeOne(&propertySinkMap[property],self);
 
 	if( filteredSourceSinkMap.find(self) != filteredSourceSinkMap.end())
 	{

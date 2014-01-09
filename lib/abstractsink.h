@@ -22,6 +22,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <map>
 #include <functional>
 #include <boost/any.hpp>
@@ -34,7 +35,7 @@ using namespace std;
 class AbstractRoutingEngine;
 class AbstractSink;
 
-typedef list<AbstractSink*> SinkList;
+typedef vector<AbstractSink*> SinkList;
 
 class AbstractSink
 {

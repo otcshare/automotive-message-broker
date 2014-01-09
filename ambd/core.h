@@ -24,6 +24,7 @@
 #include "abstractsource.h"
 #include "abstractroutingengine.h"
 
+#include <unordered_map>
 #include <map>
 
 class Core: public AbstractRoutingEngine
@@ -68,7 +69,7 @@ private:
 
 	Performance performance;
 	
-	std::map<VehicleProperty::Property, SinkList> propertySinkMap;
+	std::unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
 
 	std::map<AbstractSink*, std::map<VehicleProperty::Property, std::string> > filteredSourceSinkMap;
 
