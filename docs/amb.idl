@@ -297,7 +297,7 @@ interface org.automotive.Fuel : VehiclePropertyType  {
 	readonly attribute UInt16 Range;
 
 	/**  InstantConsumption
-	 *   \brief  Must return instant fuel consumption in milliliters of fuel per second.    
+	 *   \brief  Must return instant fuel consumption in microiliters of fuel per second.
 	 **/
 	readonly attribute UInt16 InstantConsumption;
 

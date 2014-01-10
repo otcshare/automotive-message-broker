@@ -358,38 +358,14 @@ public:
 	FuelProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("Fuel", re, connection, map<string, string>())
 	{
-		/** @attributeName Level
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return fuel level as a percentage of fullness.
-		 **/
 		wantPropertyVariant(VehicleProperty::FuelLevel,"Level", "y", AbstractProperty::Read);
 
-		/** @attributeName Range
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return estimated fuel range in kilometers.
-		 **/
 		wantPropertyVariant(VehicleProperty::FuelRange,"Range", "q", AbstractProperty::Read);
 
-		/** @attributeName InstantConsumption
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return instant fuel consumption in milliliters of fuel per second.
-		 **/
 		wantPropertyVariant(VehicleProperty::FuelConsumption,"InstantConsumption", "q", AbstractProperty::Read);
 
-		/** @attributeName InstantEconomy
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return instant fuel 'economy' in kilometers per liter of fuel.
-		 **/
 		wantPropertyVariant(VehicleProperty::FuelEconomy,"InstantEconomy", "q", AbstractProperty::Read);
 
-		/** @attributeName AverageEconomy
-		 *  @type unsigned short
-		 *  @attributeComment \brief  Must return average fuel 'economy' in kilometers per liter of fuel since last reset.  Setting this to any value should reset the counter to '0'
-		 **/
 		wantPropertyVariant(VehicleProperty::FuelAverageEconomy,"AverageEconomy", "q", AbstractProperty::ReadWrite);
 
 	}
