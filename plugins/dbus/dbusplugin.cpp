@@ -35,7 +35,7 @@ DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConn
 {
 	AbstractDBusInterface::re = engine;
 
-	int timeout = 50;
+	int timeout = 60;
 
 	if(config.find("frequency") != config.end())
 	{

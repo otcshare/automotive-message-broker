@@ -2,11 +2,11 @@
 	"sources" : [ 
 		{
 			"name" : "WebsocketSource",
-			"path" : "/usr/lib/automotive-message-broker/websocketsourceplugin.so",
+			"path" : "/usr/lib/automotive-message-broker/websocketsource.so",
 			"port" : "23000",
 			"ssl" : "false",
 			"ip" : "127.0.0.1",
-			"binaryProtocol" : "true"
+			"binaryProtocol" : "false"
 		}
 	],
 	"sinks": [

@@ -141,8 +141,20 @@ static void handleMethodCall(GDBusConnection       *connection,
 		for(auto itr = interfaces.begin(); itr != interfaces.end(); itr++)
 		{
 			AbstractDBusInterface* t = *itr;
+
 			if(t->zone() == (Zone::Type)zone)
 			{
+				if(!t->isRegistered())
+					t->registerObject();
+
+				std::list<std::string> processes = manager->subscribedProcesses[t];
+
+				if(!contains(processes,sender))
+				{
+					DebugOut()<<"Referencing "<<t->objectPath()<<" with sender: "<<sender<<endl;
+					manager->subscribedProcesses[t].push_back(sender);
+				}
+
 				g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)", t->objectPath().c_str()));
 				return;
 			}
@@ -283,6 +295,17 @@ static void handleMethodCall(GDBusConnection       *connection,
 			boost::algorithm::erase_all(targetSource, "-");
 			if(t->zone() == (Zone::Type)zone && source == targetSource)
 			{
+				if(!t->isRegistered())
+					t->registerObject();
+
+				std::list<std::string> processes = manager->subscribedProcesses[t];
+
+				if(!contains(processes,sender))
+				{
+					DebugOut()<<"Referencing "<<t->objectPath()<<" with sender: "<<sender<<endl;
+					manager->subscribedProcesses[t].push_back(sender);
+				}
+
 				g_dbus_method_invocation_return_value(invocation,g_variant_new("(o)", t->objectPath().c_str()));
 				return;
 			}
