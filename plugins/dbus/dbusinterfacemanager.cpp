@@ -167,12 +167,11 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	/// properties:
 	exportProperty<AccelerationProperty>(iface->re,connection);
 	exportProperty<VehicleSpeedProperty>(iface->re, connection);
-	exportProperty<TirePressureProperty>(iface->re, connection);
+	exportProperty<TireProperty>(iface->re, connection);
 	exportProperty<EngineSpeedProperty>(iface->re, connection);
 	exportProperty<VehiclePowerModeProperty>(iface->re, connection);
 	exportProperty<TripMeterProperty>(iface->re, connection);
 	exportProperty<TransmissionProperty>(iface->re, connection);
-	exportProperty<TireTemperatureProperty>(iface->re, connection);
 	exportProperty<CruiseControlProperty>(iface->re, connection);
 	exportProperty<WheelBrakeProperty>(iface->re, connection);
 	exportProperty<LightStatusProperty>(iface->re, connection);
@@ -188,7 +187,6 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<Sunroof>(iface->re, connection);
 	exportProperty<ConvertibleRoof>(iface->re, connection);
 	exportProperty<VehicleId>(iface->re, connection);
-	exportProperty<TransmissionInfoProperty>(iface->re, connection);
 	exportProperty<VehicleTypeProperty>(iface->re, connection);
 	exportProperty<FuelInfoProperty>(iface->re, connection);
 	exportProperty<SizeProperty>(iface->re, connection);

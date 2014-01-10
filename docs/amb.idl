@@ -182,6 +182,16 @@ interface org.automotive.Transmission : VehiclePropertyType  {
 	 **/
 	readonly attribute octet GearPosition;
 
+	const UInt16 TRANSMISSIONGEARTYPE_AUTO=0;
+	const UInt16 TRANSMISSIONGEARTYPE_MANUAL=1;
+	const UInt16 TRANSMISSIONGEARTYPE_CV=2;
+
+	/**  TransmissionGearType
+	 *   \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV). 
+	 *   See TRANSMISSIONGEARTYPE
+	 **/
+	readonly attribute octet Type;
+
 	/**  Mode
 	 *   \brief  Must return transmission Mode (see 
 	 **/
@@ -576,18 +586,6 @@ interface org.automotive.Doors : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface org.automotive.TransmissionGearType : VehiclePropertyType  {
-	const UInt16 TRANSMISSIONGEARTYPE_AUTO=0;
-	const UInt16 TRANSMISSIONGEARTYPE_MANUAL=1;
-	const UInt16 TRANSMISSIONGEARTYPE_CV=2;
-
-	/**  TransmissionGearType
-	 *   \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV).  See 
-	 **/
-	readonly attribute UInt16 TransmissionGearType;
-};
-
-[NoInterfaceObject]
 interface org.automotive.WheelInformation : VehiclePropertyType  {
 
 	/**  FrontWheelRadius
@@ -654,51 +652,17 @@ interface org.automotive.Battery : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface org.automotive.TirePressure : VehiclePropertyType  {
+interface org.automotive.Tire : VehiclePropertyType  {
 
-	/**  LeftFront
-	 *   \brief MUST return left front tire pressure in kPa.    
+	/**  Pressure
+	 *   \brief MUST return tire pressure in kPa.    
 	 **/
-	readonly attribute Double LeftFront;
+	readonly attribute Double Pressure;
 
-	/**  RightFront
-	 *   \brief MUST return right front tire pressure in kPa.    
-	 **/
-	readonly attribute Double RightFront;
-
-	/**  LeftRear
-	 *   \brief MUST return left rear tire pressure in kPa.    
-	 **/
-	readonly attribute Double LeftRear;
-
-	/**  RightRear
-	 *   \brief MUST return right rear tire pressure in kPa.    
-	 **/
-	readonly attribute Double RightRear;
-};
-
-[NoInterfaceObject]
-interface org.automotive.TireTemperature : VehiclePropertyType  {
-
-	/**  LeftFront
+	/**  Temperature
 	 *   \brief MUST return left front tire temperature in Celcius.    
 	 **/
-	readonly attribute Double LeftFront;
-
-	/**  RightFront
-	 *   \brief MUST return right front tire temperature in Celcius.    
-	 **/
-	readonly attribute Double RightFront;
-
-	/**  LeftRear
-	 *   \brief MUST return left rear tire temperature in Celcius.    
-	 **/
-	readonly attribute Double LeftRear;
-
-	/**  RightRear
-	 *   \brief MUST return right rear tire temperature in Celcius.    
-	 **/
-	readonly attribute Double RightRear;
+	readonly attribute Double Temperature;
 };
 
 [NoInterfaceObject]

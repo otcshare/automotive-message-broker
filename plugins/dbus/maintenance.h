@@ -79,78 +79,14 @@ public:
 };
 
 /** @interface TirePressure : VehiclePropertyType **/
-class TirePressureProperty: public DBusSink
+class TireProperty: public DBusSink
 {
 public:
-	TirePressureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("TirePressure", re, connection, map<string, string>())
+	TireProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("Tire", re, connection, map<string, string>())
 	{
-		/** @attributeName LeftFront
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return left front tire pressure in kPa.
-		 **/
-		wantProperty<double>(VehicleProperty::TirePressureLeftFront, "LeftFront", "d", AbstractProperty::Read);
-
-		/** @attributeName RightFront
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return right front tire pressure in kPa.
-		 **/
-		wantProperty<double>(VehicleProperty::TirePressureRightFront, "RightFront", "d", AbstractProperty::Read);
-
-		/** @attributeName LeftRear
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return left rear tire pressure in kPa.
-		 **/
-		wantProperty<double>(VehicleProperty::TirePressureLeftRear, "LeftRear", "d", AbstractProperty::Read);
-
-		/** @attributeName RightRear
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return right rear tire pressure in kPa.
-		 **/
-		wantProperty<double>(VehicleProperty::TirePressureRightRear, "RightRear", "d", AbstractProperty::Read);
-		
-	}
-};
-
-/** @interface TireTemperature : VehiclePropertyType **/
-class TireTemperatureProperty: public DBusSink
-{
-public:
-	TireTemperatureProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("TireTemperature", re, connection, map<string, string>())
-	{
-		/** @attributeName LeftFront
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return left front tire temperature in Celcius.
-		 **/
-		wantProperty<double>(VehicleProperty::TireTemperatureLeftFront, "LeftFront", "d", AbstractProperty::Read);
-
-		/** @attributeName RightFront
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return right front tire temperature in Celcius.
-		 **/
-		wantProperty<double>(VehicleProperty::TireTemperatureRightFront, "RightFront", "d", AbstractProperty::Read);
-
-		/** @attributeName LeftRear
-		 *  @type double
-		 *  @access readonly
-		 * @attributeComment \brief MUST return left rear tire temperature in Celcius.
-		 **/
-		wantProperty<double>(VehicleProperty::TireTemperatureLeftRear, "LeftRear", "d", AbstractProperty::Read);
-
-		/** @attributeName RightRear
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return right rear tire temperature in Celcius.
-		 **/
-		wantProperty<double>(VehicleProperty::TireTemperatureRightRear, "RightRear", "d", AbstractProperty::Read);
-		
+		wantProperty<double>(VehicleProperty::TirePressure, "Pressure", "d", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TireTemperature, "Temperature", "d", AbstractProperty::Read);
 	}
 };
 

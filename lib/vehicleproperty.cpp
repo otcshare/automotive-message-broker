@@ -64,14 +64,8 @@ const VehicleProperty::Property VehicleProperty::ExteriorTemperature = "Exterior
 const VehicleProperty::Property VehicleProperty::EngineOilTemperature = "EngineOilTemperature";
 const VehicleProperty::Property VehicleProperty::VIN = "VIN";
 const VehicleProperty::Property VehicleProperty::WMI = "WMI";
-const VehicleProperty::Property VehicleProperty::TirePressureLeftFront = "TirePressureLeftFront";
-const VehicleProperty::Property VehicleProperty::TirePressureRightFront = "TirePressureRightFront";
-const VehicleProperty::Property VehicleProperty::TirePressureLeftRear = "TirePressureLeftRear";
-const VehicleProperty::Property VehicleProperty::TirePressureRightRear = "TirePressureRightRear";
-const VehicleProperty::Property VehicleProperty::TireTemperatureLeftFront = "TireTemperatureLeftFront";
-const VehicleProperty::Property VehicleProperty::TireTemperatureRightFront = "TireTemperatureRightFront";
-const VehicleProperty::Property VehicleProperty::TireTemperatureLeftRear = "TireTemperatureLeftRear";
-const VehicleProperty::Property VehicleProperty::TireTemperatureRightRear = "TireTemperatureRightRear";
+const VehicleProperty::Property VehicleProperty::TirePressure = "TirePressure";
+const VehicleProperty::Property VehicleProperty::TireTemperature = "TireTemperature";
 const VehicleProperty::Property VehicleProperty::VehiclePowerMode = "VehiclePowerMode";
 const VehicleProperty::Property VehicleProperty::TripMeters = "TripMeters";
 const VehicleProperty::Property VehicleProperty::CruiseControlActive = "CruiseControlActive";
@@ -183,14 +177,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ExteriorTemperature,0);
 	REGISTERPROPERTY(VIN, "");
 	REGISTERPROPERTY(WMI, "");
-	REGISTERPROPERTY(TirePressureLeftFront, 0);
-	REGISTERPROPERTY(TirePressureRightFront, 0);
-	REGISTERPROPERTY(TirePressureLeftRear, 0);
-	REGISTERPROPERTY(TirePressureRightRear, 0);
-	REGISTERPROPERTY(TireTemperatureLeftFront,0);
-	REGISTERPROPERTY(TireTemperatureRightFront,0);
-	REGISTERPROPERTY(TireTemperatureLeftRear,0);
-	REGISTERPROPERTY(TireTemperatureRightRear,0);
+	REGISTERPROPERTY(TirePressure, 0);
+	REGISTERPROPERTY(TireTemperature,0);
 	REGISTERPROPERTY( VehiclePowerMode,Power::Off);
 	registerPropertyPriv(TripMeters,[](){
 		TripMetersType* t = new TripMetersType();

@@ -445,26 +445,12 @@ public:
 	//class WMIType: public StringPropertyType { public: WMIType(std::string val):StringPropertyType(WMI,val){} };
 
 	/**< Tire pressure in kPa */
-	static const Property TirePressureLeftFront;
-	PROPERTYTYPE(TirePressureLeftFront, TirePressureLeftFrontType, BasicPropertyType<double>, double)
-	static const Property TirePressureRightFront;
-	PROPERTYTYPE(TirePressureRightFront, TirePressureRightFrontType, BasicPropertyType<double>, double)
-	static const Property TirePressureLeftRear;
-	PROPERTYTYPE(TirePressureLeftRear, TirePressureLeftRearType, BasicPropertyType<double>, double)
-	static const Property TirePressureRightRear;
-	PROPERTYTYPE(TirePressureRightRear, TirePressureRightRearType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> TirePressureType;
+	static const Property TirePressure;
+	PROPERTYTYPEBASIC(TirePressure, double)
 
 	/**< Tire temperature in degrees C */
-	static const Property TireTemperatureLeftFront;
-	PROPERTYTYPE(TireTemperatureLeftFront, TireTemperatureLeftFrontType, BasicPropertyType<double>, double)
-	static const Property TireTemperatureRightFront;
-	PROPERTYTYPE(TireTemperatureRightFront, TireTemperatureRightFrontType, BasicPropertyType<double>, double)
-	static const Property TireTemperatureLeftRear;
-	PROPERTYTYPE(TireTemperatureLeftRear, TireTemperatureLeftRearType, BasicPropertyType<double>, double)
-	static const Property TireTemperatureRightRear;
-	PROPERTYTYPE(TireTemperatureRightRear, TireTemperatureRightRearType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> TireTemperatureType;
+	static const Property TireTemperature;
+	PROPERTYTYPEBASIC(TireTemperature, double)
 	
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes

@@ -141,58 +141,17 @@ public:
 	TransmissionProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("Transmission", re, connection, map<string, string>())
 	{
-		/**
-		 * @enum const unsigned short TRANSMISSIONPOSITION_NEUTRAL = 0;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_FIRST = 1;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_SECOND = 2;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_THIRD = 3;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_FORTH = 4;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_FIFTH = 5;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_SIXTH = 6;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_SEVENTH = 7;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_EIGHTH = 8;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_NINTH = 9;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_TENTH = 10;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_CVT = 64;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_REVERSE = 128;
-		 * @enum const unsigned short TRANSMISSIONPOSITION_PARK = 255;
-		 **/
 
-
-
-		/** @ attributeName ShiftPosition
-		 *  @ type octet
-		 *  @ access readonly
-		 *  @ attributeComment \brief  Must return transmission shift position
-		 **/
 		wantPropertyVariant(VehicleProperty::TransmissionShiftPosition,
 														  "ShiftPosition", "y", AbstractProperty::Read);
 
-		/** @attributeName GearPosition
-		 *  @type octet
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return transmission gear position (see TRANSMISSIONPOSITION)
-		 **/
 		wantPropertyVariant(VehicleProperty::TransmissionGearPosition,
 														  "GearPosition", "y", AbstractProperty::Read);
 
-		/**
-		 * @enum const unsigned short TRANSMISSIONMODE_NORMAL = 0;
-		 * @enum const unsigned short TRANSMISSIONMODE_SPORT = 1;
-		 * @enum const unsigned short TRANSMISSIONMODE_ECONOMY = 2;
-		 * @enum const unsigned short TRANSMISSIONMODE_OEMCUSTOM1 = 3;
-		 * @enum const unsigned short TRANSMISSIONMODE_OEMCUSTOM2 = 4;
-		 **/
-
-		/** @attributeName Mode
-		 *  @type octet
-		 *  @attributeComment \brief  Must return transmission Mode (see TRANSMISSIONMODE_*)
-		 *  @access readonly
-		 **/
 		wantPropertyVariant(VehicleProperty::TransmissionMode,
 														  "Mode", "y", AbstractProperty::Read);
 
-
+		wantPropertyVariant(VehicleProperty::TransmissionGearType, "Type", "q", AbstractProperty::Read);
 	}
 };
 
