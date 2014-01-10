@@ -143,6 +143,21 @@ const VehicleProperty::Property VehicleProperty::SunroofTilt = "SunroofTilt";
 const VehicleProperty::Property VehicleProperty::ConvertibleRoof = "ConvertibleRoof";
 const VehicleProperty::Property VehicleProperty::NightMode = "NightMode";
 const VehicleProperty::Property VehicleProperty::DrivingMode = "DrivingMode";
+const VehicleProperty::Property VehicleProperty::KeyId = "KeyId";
+const VehicleProperty::Property VehicleProperty::Language = "Language";
+const VehicleProperty::Property VehicleProperty::MeasurementSystem = "MeasurementSystem";
+const VehicleProperty::Property VehicleProperty::MirrorSettingPan = "MirrorPanSetting";
+const VehicleProperty::Property VehicleProperty::MirrorSettingTilt= "MirrorTiltSetting";
+const VehicleProperty::Property VehicleProperty::SteeringWheelPositionSlide = "SteeringWheelPositionSlide";
+const VehicleProperty::Property VehicleProperty::SteeringWheelPositionTilt = "SteeringWheelPositionTilt";
+const VehicleProperty::Property VehicleProperty::SeatPositionRecline = "SeatPositionRecline";
+const VehicleProperty::Property VehicleProperty::SeatPositionSlide = "SeatPositionSlide";
+const VehicleProperty::Property VehicleProperty::SeatPositionCushionHeight = "SeatPositionCushionHeight";
+const VehicleProperty::Property VehicleProperty::SeatPositionHeadrest = "SeatPositionHeadrest";
+const VehicleProperty::Property VehicleProperty::SeatPositionBackCushion = "SeatPositionBackCushion";
+const VehicleProperty::Property VehicleProperty::SeatPositionSideCushion = "SeatPositionSideCushion";
+const VehicleProperty::Property VehicleProperty::DashboardIllumination = "DashboardIllumination";
+const VehicleProperty::Property VehicleProperty::GeneratedVehicleSoundMode = "GeneratedVehicleSoundMode";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -267,6 +282,21 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ConvertibleRoof,false);
 	REGISTERPROPERTY(NightMode,false);
 	REGISTERPROPERTY(DrivingMode,Driving::None);
+	REGISTERPROPERTY(KeyId,"");
+	REGISTERPROPERTY(Language,"");
+	REGISTERPROPERTY(MeasurementSystem,Measurement::Metric);
+	REGISTERPROPERTY(MirrorSettingPan,0);
+	REGISTERPROPERTY(MirrorSettingTilt,0);
+	REGISTERPROPERTY(SteeringWheelPositionSlide,0);
+	REGISTERPROPERTY(SteeringWheelPositionTilt,0);
+	REGISTERPROPERTY(SeatPositionRecline,0);
+	REGISTERPROPERTY(SeatPositionSlide,0);
+	REGISTERPROPERTY(SeatPositionCushionHeight,0);
+	REGISTERPROPERTY(SeatPositionHeadrest,0);
+	REGISTERPROPERTY(SeatPositionBackCushion,0);
+	REGISTERPROPERTY(SeatPositionSideCushion,0);
+	REGISTERPROPERTY(DashboardIllumination,0);
+	REGISTERPROPERTY(GeneratedVehicleSoundMode, Vehicle::Normal);
 
 }
 

@@ -811,5 +811,107 @@ interface org.automotive.DrivingMode : VehiclePropertyType {
 	readonly attribute UInt16 DrivingMode;
 };
 
+[NoInterfaceObject]
+interface org.automotive.KeyId : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute String KeyId;
+};
+[NoInterfaceObject]
+interface org.automotive.Language : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute String Language;
+};
+
+[NoInterfaceObject]
+interface org.automotive.MeasurementSystem : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 0 = Metric, 1 = ImperialUS, 2 = ImperialUK
+	**/
+	readonly attribute UInt16 MeasurementSystem;
+};
+
+[NoInterfaceObject]
+interface org.automotive.MirrorSetting : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Pan;
+	readonly attribute UInt16 Tilt;
+};
+
+[NoInterfaceObject]
+interface org.automotive.SeatPosition : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Recline;
+
+		/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Slide;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 CushionHeight;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Headrest;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 BackCushion;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 SideCushion;
+};
+
+[NoInterfaceObject]
+interface org.automotive.SteeringWheelPosition : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Tilt;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Slide;
+};
+
+[NoInterfaceObject]
+interface org.automotive.DashboardIllumination : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 DashboardIllumination;
+};
+
+[NoInterfaceObject]
+interface org.automotive.GeneratedVehicleSoundMode : VehiclePropertyType {
+
+	/**
+	* \brief MUST return Sound Mode: 0 = Normal, 1 = Quiet, 2 = Sportive
+	**/
+	readonly attribute UInt16 GeneratedVehicleSoundMode;
+};
+
 };
 

@@ -34,9 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "maintenance.h"
 #include "parking.h"
 #include "drivingsafety.h"
-
-using namespace std;
-
+#include "personalization.h"
 
 std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(AbstractRoutingEngine *re, std::list<VehicleProperty::Property> implementedProperties)
 {
@@ -208,6 +206,9 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<SeatBeltStatusProperty>(iface->re, connection);
 	exportProperty<OccupantStatusProperty>(iface->re, connection);
 	exportProperty<ObstacleDistanceProperty>(iface->re, connection);
+	exportProperty<SeatPostionProperty>(iface->re, connection);
+	exportProperty<SteeringWheelPositionProperty>(iface->re, connection);
+	exportProperty<MirrorSettingProperty>(iface->re, connection);
 
 	iface->supportedChanged(iface->re->supported());
 }
