@@ -71,92 +71,107 @@ Core::~Core()
 	}
 }
 
+void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
+{
+    if(!source)
+        return;
+
+    for(auto itr = added.begin(); itr != added.end(); ++itr)
+    {
+        VehicleProperty::Property property = *itr;
+        mMasterPropertyList.emplace(source, property);// TODO: no check for duplicated properties from the same source - is it needed ?
+
+        // Subscribe to property in a new source if such property was subscribed. This catches newly supported properties in the process.
+        //
+        // TODO: is this sufficient to:
+        /// Iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
+        // which was originally located at the end of the setSupported and updateSupported functions? I think it is sufficient.
+        if( propertySinkMap.find(property) != propertySinkMap.end()){
+            source->subscribeToPropertyChanges(property);
+        }
+    }
+}
+
+void Core::handleRemoveSupported(const PropertyList& removed, AbstractSource* source)
+{
+    if(!source)
+        return;
+
+    auto range = mMasterPropertyList.equal_range(source);
+    for(auto itr = removed.begin(); itr != removed.end(); ++itr)
+    {
+        //
+        // TODO: We do not have enough info about source in propertySinkMap so we do not know if we can/should remove property from propertySinkMap,
+        // but I suppose this should be handled in AbstractSink::supportedChanged()
+
+        const VehicleProperty::Property property(*itr);
+
+        auto it = find_if(
+            range.first,    // the first property in source
+            range.second,   // one item right after the last property in source
+            [&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+        );
+
+        if (it != range.second)// property was found
+        {
+            mMasterPropertyList.erase(it);// References and iterators to the erased elements are invalidated. Other iterators and references are not invalidated.
+
+            // TODO: Do we need to unsubscribe here ???
+            // I added it here:
+            source->unsubscribeToPropertyChanges(*itr);
+        }
+    }
+}
 
 void Core::setSupported(PropertyList supported, AbstractSource* source)
 {
+    if(!source)
+        return;
 
-	if(!ListPlusPlus<AbstractSource*>(&mSources).contains(source))
-		mSources.push_back(source);
+	mSources[source->uuid()] = source;
 		
-	for(PropertyList::iterator itr = supported.begin(); itr != supported.end(); itr++)
-	{
-		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains((*itr)))
-		{
-			DebugOut()<<__FUNCTION__<<"() adding support for property "<<(*itr)<<endl;
-			mMasterPropertyList.push_back((*itr));
-		}
-	}
+	handleAddSupported(supported, source);
 
 	/// tell all new sinks about the newly supported properties.
 
-	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
+    for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
 		AbstractSink* s = (*itr);
-		s->supportedChanged(mMasterPropertyList);
+		s->supportedChanged(this->supported());
 	}
 
-	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
+}
 
-	for(auto itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
+void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSource* source)
+{
+    if(!source || mSources.find(source->uuid()) == mSources.end())
+        return;
+
+	/// add the newly supported to master list
+
+    handleAddSupported(added, source);
+	
+	/// removed no longer supported properties from master list.
+
+	handleRemoveSupported(removed, source);
+	
+	/// tell all new sinks about the newly supported properties.
+
+    for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
 	{
-		VehicleProperty::Property  property = (*itr).first;
-
-		for(SourceList::iterator source = mSources.begin(); source != mSources.end(); source++)
-		{
-			PropertyList properties = (*source)->supported();
-
-			if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
-			{
-				(*source)->subscribeToPropertyChanges(property);
-			}
-		}
+		(*itr)->supportedChanged(supported());
 	}
 }
 
-
-void Core::updateSupported(PropertyList added, PropertyList removed)
+PropertyList Core::supported()
 {
-	
-	/// add the newly supported to master list
-	
-	for(PropertyList::iterator itr = added.begin(); itr != added.end(); itr++)
-	{
-		if(!ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).contains(*itr))
-		{
-			mMasterPropertyList.push_back(*itr);
-		}
-	}
-	
-	/// removed no longer supported properties from master list.
-	
-	for(PropertyList::iterator itr = removed.begin(); itr != removed.end(); itr++)
-	{
-		ListPlusPlus<VehicleProperty::Property>(&mMasterPropertyList).removeOne(*itr);
-	}
-	
-	/// tell all new sinks about the newly supported properties.
-	
-	for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
-	{
-		(*itr)->supportedChanged(mMasterPropertyList);
-	}
-	
-	/// iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
-	
-	for(auto itr = propertySinkMap.begin(); itr != propertySinkMap.end(); itr++)
-	{
-		VehicleProperty::Property  property = (*itr).first;
-		
-		for(SourceList::iterator source = mSources.begin(); source != mSources.end(); source++)
-		{
-			PropertyList properties = (*source)->supported();
-			
-			if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
-			{
-				(*source)->subscribeToPropertyChanges(property);
-			}
-		}
-	}
+    PropertyList supportedProperties;
+    // TODO: should we care here about duplicates (check if multiple sources supports the same property)???
+    transform(mMasterPropertyList.begin(), mMasterPropertyList.end(), back_inserter(supportedProperties),
+        [](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& itr) { return itr.second; }
+    );
+
+    return supportedProperties;
 }
 
 void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
@@ -215,41 +230,56 @@ void Core::unregisterSink(AbstractSink *self)
 	removeOne(&mSinks, self);
 }
 
+AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& property, const std::string& sourceUuidFilter) const
+{
+    auto it = mMasterPropertyList.end();
+    if(sourceUuidFilter.empty()){
+        it = std::find_if(mMasterPropertyList.begin(), mMasterPropertyList.end(),
+            [&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+        );
+    }
+    else{
+        auto itSource = mSources.find(sourceUuidFilter);
+        if(itSource != mSources.end())
+            it = mMasterPropertyList.find(itSource->second);
+    }
+
+    if(it == mMasterPropertyList.end())
+        return nullptr;
+    else
+        return it->first;
+}
 
 AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 {
-	AsyncPropertyReply * reply = new AsyncPropertyReply(request);
+    AbstractSource* source = sourceForProperty(request.property, request.sourceUuidFilter);
 
-	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
-	{
-		AbstractSource* src = (*itr);
-		PropertyList properties = src->supported();
-		int supportedOps = src->supportedOperations();
+    AsyncPropertyReply* reply = new AsyncPropertyReply(request);
 
-		bool supportsGet = supportedOps & AbstractSource::Get;
+    if(!source || ((source->supportedOperations() & AbstractSource::Get) != AbstractSource::Get)) { // not found or doesn't support AbstractSource::Get
+        // Don't wait until timer expire, complete with error here.
+        reply->error = AsyncPropertyReply::InvalidOperation;
+        if(request.completed)
+            request.completed(reply);
+    }
+    else{
+        source->getPropertyAsync(reply);
 
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && supportsGet && (request.sourceUuidFilter == "" || request.sourceUuidFilter == src->uuid()))
-		{
+    }
 
-			src->getPropertyAsync(reply);
-
-			/** right now the owner of the reply becomes the requestor that called this method.
-			 *  reply will become invalid after the first reply. */
-			return reply;
-		}
-	}
-
-	return reply;
+    /** right now the owner of the reply becomes the requestor that called this method.
+     *  reply will become invalid after the first reply. */
+    return reply;
 }
 
-AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest request)
+AsyncRangePropertyReply * Core::getRangePropertyAsync(AsyncRangePropertyRequest request)
 {
-	AsyncRangePropertyReply * reply = new AsyncRangePropertyReply(request);
+    AsyncRangePropertyReply * reply = new AsyncRangePropertyReply(request);
 
-	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
+	for(auto itr = mSources.begin(); itr != mSources.end(); ++itr)
 	{
-		AbstractSource* src = (*itr);
-		if((src->supportedOperations() & AbstractSource::GetRanged)
+		AbstractSource* src = itr->second;
+		if(((src->supportedOperations() & AbstractSource::GetRanged) == AbstractSource::GetRanged)
 				&& (request.sourceUuid == "" || request.sourceUuid == src->uuid()))
 		{
 			src->getRangePropertyAsync(reply);
@@ -261,15 +291,10 @@ AsyncRangePropertyReply *Core::getRangePropertyAsync(AsyncRangePropertyRequest r
 
 AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 {
-	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
-	{
-		AbstractSource* src = (*itr);
-		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(request.property) && src->supportedOperations() & AbstractSource::Set)
-		{
-			return src->setProperty(request);
-		}
-	}
+    AbstractSource* src = sourceForProperty(request.property, request.sourceUuidFilter);
+
+    if(src && ((src->supportedOperations() & AbstractSource::Set) == AbstractSource::Set))
+        return src->setProperty(request);
 
 	DebugOut(0)<<"Error: setProperty opration failed"<<endl;
 	return NULL;
@@ -279,28 +304,21 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 {
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 
-	if(propertySinkMap.find(property) == propertySinkMap.end())
+    SinkList& list = propertySinkMap[property];
+
+    if(!contains(list, self))
 	{
-		propertySinkMap[property] = SinkList();
+		list.push_back(self);
 	}
 
-	SinkList list = propertySinkMap[property];
+    decltype(mMasterPropertyList) temp;
+    std::remove_copy_if(mMasterPropertyList.begin(), mMasterPropertyList.end(), std::inserter(temp, temp.begin()),
+        [&property](const typename decltype(mMasterPropertyList)::value_type& value) { return value.second != property ? true : false; }
+    );
 
-	if(!contains(list, self))
-	{
-		propertySinkMap[property].push_back(self);
-	}
-
-	for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
-	{
-		AbstractSource* src = (*itr);
-		PropertyList properties = src->supported();
-		if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
-		{
-			src->subscribeToPropertyChanges(property);
-		}
-	}
-
+    std::for_each(temp.begin(), temp.end(),
+        [&property](const typename decltype(mMasterPropertyList)::value_type& value) { return value.first->subscribeToPropertyChanges(property); }
+    );
 }
 
 void Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
@@ -316,7 +334,9 @@ void Core::subscribeToProperty(VehicleProperty::Property property, string source
 		filteredSourceSinkMap[sink][property] = sourceUuidFilter;
 	}
 
-	subscribeToProperty(property,sink);
+	AbstractSource* src = sourceForProperty(property, sourceUuidFilter);
+	if(src)
+	    src->subscribeToPropertyChanges(property);
 }
 
 void Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self)
@@ -343,24 +363,21 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 	/// Now we check to see if this is the last subscriber
 	if(propertySinkMap.find(property) == propertySinkMap.end())
 	{
-		for(SourceList::iterator itr = mSources.begin(); itr != mSources.end(); itr++)
-		{
-			AbstractSource* src = (*itr);
-			PropertyList properties = src->supported();
-
-			if(ListPlusPlus<VehicleProperty::Property>(&properties).contains(property))
-			{
-				src->unsubscribeToPropertyChanges(property);
-			}
-		}
-	}
+	    decltype(mMasterPropertyList) temp;
+        std::remove_copy_if(mMasterPropertyList.begin(), mMasterPropertyList.end(), std::inserter(temp, temp.begin()),
+            [&property](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.second != property; }
+        );
+        std::for_each(temp.begin(), temp.end(),
+            [&property](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.first->unsubscribeToPropertyChanges(property); }
+        );
+    }
 }
 
 PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
 {
 	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
 	{
-		AbstractSource* src = *itr;
+		AbstractSource* src = itr->second;
 
 		if(src->uuid() == sourceUuid)
 		{
@@ -374,18 +391,24 @@ PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string so
 std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
 {
 	std::list<std::string> list;
+	decltype(mMasterPropertyList) temp;
+	std::remove_copy_if(mMasterPropertyList.begin(), mMasterPropertyList.end(), std::inserter(temp, temp.begin()),
+        [property](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.second != property; }
+	);
+	std::transform( temp.begin(), temp.end(), back_inserter(list),
+        [](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.first->uuid(); }
+	);
 
-	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
+	std::list<std::string> list2;
+	for(auto itr = mMasterPropertyList.begin(); itr != mMasterPropertyList.end(); ++itr)
 	{
-		AbstractSource* src = *itr;
-
-		PropertyList supportedProperties = src->supported();
-
-		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(property))
-		{
-			list.push_back(src->uuid());
+		if(itr->second == property) {
+		    list2.push_back(itr->first->uuid());
+		    itr = mMasterPropertyList.upper_bound(itr->first);
+		    --itr;
 		}
 	}
+	assert(list != list2);
 
 	return list;
 }

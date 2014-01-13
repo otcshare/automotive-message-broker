@@ -36,7 +36,7 @@ public:
 	/// sources:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
-	void updateSupported(PropertyList added, PropertyList removed);
+	void updateSupported(PropertyList added, PropertyList removed, AbstractSource* source);
 	void updateProperty(AbstractPropertyType* value, const std::string &uuid);
 	
 	/// sinks:
@@ -50,7 +50,7 @@ public:
 	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self);
 	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
 	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-	PropertyList supported() { return mMasterPropertyList; }
+	PropertyList supported();
 
 	PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid);
 	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
@@ -62,9 +62,15 @@ public:
 	};
 
 private:
-	PropertyList mMasterPropertyList;
+
+	void handleAddSupported(const PropertyList& added, AbstractSource* source);
+	void handleRemoveSupported(const PropertyList& removed, AbstractSource* source);
+	AbstractSource* sourceForProperty(const VehicleProperty::Property& property, const std::string& sourceUuidFilter = "") const;
+
+private:
+	std::multimap<AbstractSource*, VehicleProperty::Property> mMasterPropertyList;
 	
-	SourceList mSources;
+	std::map<std::string, AbstractSource*> mSources;
 	SinkList mSinks;
 
 	Performance performance;

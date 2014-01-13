@@ -59,7 +59,7 @@ bool TestPlugin::testCoreUpdateSupported()
 	PropertyList toAdd;
 	toAdd.push_back(VehicleProperty::ClutchStatus);
 
-	routingEngine->updateSupported(toAdd,PropertyList());
+	routingEngine->updateSupported(toAdd,PropertyList(), this);
 
 	PropertyList supported = routingEngine->supported();
 
@@ -67,7 +67,7 @@ bool TestPlugin::testCoreUpdateSupported()
 
 	PropertyList toRemove = toAdd;
 
-	routingEngine->updateSupported(PropertyList(),toRemove);
+	routingEngine->updateSupported(PropertyList(),toRemove, this);
 
 	supported = routingEngine->supported();
 
@@ -78,7 +78,7 @@ bool TestPlugin::testCoreUpdateSupported()
 
 void TestPlugin::setSupported(PropertyList list)
 {
-	m_re->updateSupported(list,PropertyList());
+	m_re->updateSupported(list,PropertyList(), this);
 }
 void TestPlugin::setConfiguration(map<string, string> config)
 {
@@ -88,6 +88,8 @@ void TestPlugin::setConfiguration(map<string, string> config)
 TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	: AbstractSource(re, config)
 {
+
+  re->setSupported(PropertyList(), this);
   DebugOut() << "Testing MapPropertyType... " << endl;
   MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmap("something");
   MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmaptwo("something");
