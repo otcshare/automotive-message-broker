@@ -95,12 +95,6 @@ public:
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property) = 0;
 
 	/*!
-	 * \brief supported is called by the routingEngine (@see AbstractRoutingEngine) to understand what properties this source supports
-	 * \return returns a list of supported properties.  If the the supported properties changed, the source should call AbstractRoutingEngine::setSupported.
-	 */
-	virtual PropertyList supported() = 0;
-
-	/*!
 	 * \brief supportedOperations
 	 * \return returns the supported operations.  @see Operations
 	 */
