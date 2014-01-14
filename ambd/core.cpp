@@ -58,17 +58,11 @@ Core::Core()
 
 Core::~Core()
 {
-	std::vector<AbstractSink*> toDelete;
-	for(auto itr = mSinks.begin(); itr != mSinks.end(); itr++)
+	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
-		AbstractSink* sink = *itr;
-		toDelete.push_back(sink);
+		delete *itr;
 	}
-
-	for(int i=0; i<toDelete.size(); i++)
-	{
-		delete toDelete[i];
-	}
+	mSinks.clear();
 }
 
 void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
@@ -101,8 +95,10 @@ void Core::handleRemoveSupported(const PropertyList& removed, AbstractSource* so
     for(auto itr = removed.begin(); itr != removed.end(); ++itr)
     {
         //
-        // TODO: We do not have enough info about source in propertySinkMap so we do not know if we can/should remove property from propertySinkMap,
-        // but I suppose this should be handled in AbstractSink::supportedChanged()
+        // TODO: We do not have info about sources in
+        // std::unordered_map<VehicleProperty::Property, std::set<AbstractSink*> > propertySinkMap
+        // so we do not know if we can/should remove property from propertySinkMap,
+        // but I suppose this should be handled by each AbstractSink implementation in a callback AbstractSink::supportedChanged().
 
         const VehicleProperty::Property property(*itr);
 
@@ -118,7 +114,7 @@ void Core::handleRemoveSupported(const PropertyList& removed, AbstractSource* so
 
             // TODO: Do we need to unsubscribe here ???
             // I added it here:
-            source->unsubscribeToPropertyChanges(*itr);
+            source->unsubscribeToPropertyChanges(property);
         }
     }
 }
@@ -134,7 +130,7 @@ void Core::setSupported(PropertyList supported, AbstractSource* source)
 
 	/// tell all new sinks about the newly supported properties.
 
-    for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); ++itr)
+    for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
 		AbstractSink* s = (*itr);
 		s->supportedChanged(this->supported());
@@ -157,7 +153,7 @@ void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSou
 	
 	/// tell all new sinks about the newly supported properties.
 
-    for(SinkList::iterator itr = mSinks.begin(); itr != mSinks.end(); itr++)
+    for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
 		(*itr)->supportedChanged(supported());
 	}
@@ -166,10 +162,17 @@ void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSou
 PropertyList Core::supported()
 {
     PropertyList supportedProperties;
-    // TODO: should we care here about duplicates (check if multiple sources supports the same property)???
+    // TODO: should we care here about duplicates ?
+    // (if multiple sources supports the same property ==> Property will be more than once in PropertyList)
     transform(mMasterPropertyList.begin(), mMasterPropertyList.end(), back_inserter(supportedProperties),
         [](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& itr) { return itr.second; }
     );
+    // remove duplicates:
+    supportedProperties.sort();
+    supportedProperties.unique();
+
+    DebugOut(1)<<__FUNCTION__<<"supported list: " << endl;
+    for_each(supportedProperties.begin(), supportedProperties.end(), [](const std::string& str){ DebugOut(1)<<__FUNCTION__<< str << endl; });
 
     return supportedProperties;
 }
@@ -178,18 +181,25 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 {
 	VehicleProperty::Property property = value->name;
 
-	SinkList list = propertySinkMap[property];
-
-	DebugOut()<<__FUNCTION__<<"() there are "<<list.size()<<" sinks connected to property: "<<property<<endl;
-
 	performance.propertiesPerSecond++;
 
-	if(list.size())
+	//auto sinks = propertySinkMap[property]; !!! this will insert empty std::set<AbstractSink*> into propertySinkMap !!!
+	auto sinksIt =  propertySinkMap.find(property);
+	if(sinksIt == propertySinkMap.end()){
+	    DebugOut()<<__FUNCTION__<<"() there are no sinks connected to property: "<<property<<endl;
+	    return;
+	}
+
+	const std::set<AbstractSink*>& sinks = sinksIt->second;
+
+	DebugOut()<<__FUNCTION__<<"() there are "<<sinks.size()<<" sinks connected to property: "<<property<<endl;
+
+    if(sinks.size())// is this check redundant ?
 	{
 		performance.firedPropertiesPerSecond++;
 	}
 
-	for(SinkList::iterator itr = list.begin(); itr != list.end(); itr++)
+	for(auto itr = sinks.begin(); itr != sinks.end(); ++itr)
 	{
 		AbstractSink* sink = *itr;
 
@@ -219,15 +229,12 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 
 void Core::registerSink(AbstractSink *self)
 {
-	if(!contains(mSinks,self))
-	{
-		mSinks.push_back(self);
-	}
+	mSinks.insert(self);
 }
 
 void Core::unregisterSink(AbstractSink *self)
 {
-	removeOne(&mSinks, self);
+	mSinks.erase(self);
 }
 
 AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& property, const std::string& sourceUuidFilter) const
@@ -304,25 +311,29 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 {
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 
-    SinkList& list = propertySinkMap[property];
+    propertySinkMap[property].insert(self);
 
-    if(!contains(list, self))
-	{
-		list.push_back(self);
-	}
-
-    decltype(mMasterPropertyList) temp;
-    std::remove_copy_if(mMasterPropertyList.begin(), mMasterPropertyList.end(), std::inserter(temp, temp.begin()),
-        [&property](const typename decltype(mMasterPropertyList)::value_type& value) { return value.second != property ? true : false; }
-    );
-
-    std::for_each(temp.begin(), temp.end(),
-        [&property](const typename decltype(mMasterPropertyList)::value_type& value) { return value.first->subscribeToPropertyChanges(property); }
-    );
+    auto itr = mMasterPropertyList.begin();
+    while(itr != mMasterPropertyList.end())
+    {
+        if(itr->second == property) {
+            AbstractSource* src = itr->first;
+            src->subscribeToPropertyChanges(property);
+            // Move to next source. It will skip all the remaining properties in this source.
+            itr = mMasterPropertyList.upper_bound(src);
+        }
+        else{
+            ++itr;
+        }
+    }
 }
 
 void Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
 {
+    DebugOut(1)<<"Subscribing to: "<<property<<endl;
+
+    propertySinkMap[property].insert(sink);
+
 	if(filteredSourceSinkMap.find(sink) == filteredSourceSinkMap.end() && sourceUuidFilter != "")
 	{
 		std::map<VehicleProperty::Property, std::string> propertyFilter;
@@ -347,68 +358,65 @@ void Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilte
 
 void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
 {
-	if(propertySinkMap.find(property) == propertySinkMap.end())
+    auto sinksIt = propertySinkMap.find(property);
+	if(sinksIt == propertySinkMap.end())
 	{
 		DebugOut(1)<<__FUNCTION__<<" property not subscribed to: "<<property<<endl;
 		return; 
 	}
-		
-	removeOne(&propertySinkMap[property],self);
 
-	if( filteredSourceSinkMap.find(self) != filteredSourceSinkMap.end())
-	{
-		filteredSourceSinkMap.erase(self);
-	}
+	sinksIt->second.erase(self);
+
+	filteredSourceSinkMap.erase(self);
 
 	/// Now we check to see if this is the last subscriber
-	if(propertySinkMap.find(property) == propertySinkMap.end())
+	if(sinksIt->second.empty())
 	{
-	    decltype(mMasterPropertyList) temp;
-        std::remove_copy_if(mMasterPropertyList.begin(), mMasterPropertyList.end(), std::inserter(temp, temp.begin()),
-            [&property](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.second != property; }
-        );
-        std::for_each(temp.begin(), temp.end(),
-            [&property](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.first->unsubscribeToPropertyChanges(property); }
-        );
+	    propertySinkMap.erase(sinksIt);
+	    auto itr = mMasterPropertyList.begin();
+	    while(itr != mMasterPropertyList.end())
+	    {
+	        if(itr->second == property) {
+	            AbstractSource* src = itr->first;
+	            src->unsubscribeToPropertyChanges(property);
+	            // Move to next source. It will skip all the remaining properties in this source.
+	            itr = mMasterPropertyList.upper_bound(src);
+	        }
+	        else{
+	            ++itr;
+	        }
+	    }
     }
 }
 
 PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
 {
-	for(auto itr = mSources.begin(); itr != mSources.end(); itr++)
-	{
-		AbstractSource* src = itr->second;
+    auto srcIt = mSources.find(sourceUuid);
+    if(srcIt == mSources.end())
+        return PropertyInfo::invalid();
 
-		if(src->uuid() == sourceUuid)
-		{
-			return src->getPropertyInfo(property);
-		}
-	}
-
-	return PropertyInfo::invalid();
+	return srcIt->second->getPropertyInfo(property);
 }
 
 std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
 {
 	std::list<std::string> list;
-	decltype(mMasterPropertyList) temp;
-	std::remove_copy_if(mMasterPropertyList.begin(), mMasterPropertyList.end(), std::inserter(temp, temp.begin()),
-        [property](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.second != property; }
-	);
-	std::transform( temp.begin(), temp.end(), back_inserter(list),
-        [](const typename decltype(mMasterPropertyList)::value_type& itr) { return itr.first->uuid(); }
-	);
 
-	std::list<std::string> list2;
-	for(auto itr = mMasterPropertyList.begin(); itr != mMasterPropertyList.end(); ++itr)
+	auto itr = mMasterPropertyList.begin();
+	while(itr != mMasterPropertyList.end())
 	{
 		if(itr->second == property) {
-		    list2.push_back(itr->first->uuid());
-		    itr = mMasterPropertyList.upper_bound(itr->first);
-		    --itr;
+		    AbstractSource* src = itr->first;
+		    list.push_back(src->uuid());
+		    itr = mMasterPropertyList.upper_bound(src);
+		}
+		else{
+		    ++itr;
 		}
 	}
-	assert(list != list2);
+
+	DebugOut(1)<<__FUNCTION__<<"sources list: " << endl;
+	for_each(list.begin(), list.end(), [](const std::string& str){ DebugOut(1)<<__FUNCTION__<< str << endl; });
 
 	return list;
 }

@@ -70,17 +70,17 @@ private:
 private:
 	std::multimap<AbstractSource*, VehicleProperty::Property> mMasterPropertyList;
 	
+	// K = AbstractSource::uuid(), T = AbstractSource*
 	std::map<std::string, AbstractSource*> mSources;
-	SinkList mSinks;
+	std::set<AbstractSink*> mSinks;
 
 	Performance performance;
 	
-	std::unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
+	std::unordered_map<VehicleProperty::Property, std::set<AbstractSink*> > propertySinkMap;
 
+	// std::string here is AbstractSource::uuid()
 	std::map<AbstractSink*, std::map<VehicleProperty::Property, std::string> > filteredSourceSinkMap;
 
-	std::map<VehicleProperty::Property, std::string> previousValueMap;
-    
 };
 
 #endif // CORE_H
