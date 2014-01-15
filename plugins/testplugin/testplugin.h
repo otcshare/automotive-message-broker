@@ -52,15 +52,27 @@ public:
 
 	int supportedOperations();
 
-	void setSupported(PropertyList list);
 	void supportedChanged(PropertyList) {}
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
 
+	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
+	void propertyChanged(AbstractPropertyType *value);
+
 private:
+	bool testCoreSetSupported();
 	bool testCoreUpdateSupported();
+	bool testSetAndGet();
+	bool testSubscription();
+
 	PropertyList m_supportedProperties;
+	int subscriptionsToSupportedCounter;
+	int subscriptionsToUnsupportedCounter;
+	int unsubscriptionsToSupportedCounter;
+	int unsubscriptionsToUnsupportedCounter;
+	int propertyChanges;
+	int supportedPropertyChanges;
 };
 
 #endif // OBD2SOURCE_H

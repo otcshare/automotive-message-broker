@@ -65,60 +65,6 @@ Core::~Core()
 	mSinks.clear();
 }
 
-void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
-{
-	if(!source)
-		return;
-
-	for(auto itr = added.begin(); itr != added.end(); ++itr)
-	{
-		VehicleProperty::Property property = *itr;
-		mMasterPropertyList.emplace(source, property);// TODO: no check for duplicated properties from the same source - is it needed ?
-
-		// Subscribe to property in a new source if such property was subscribed. This catches newly supported properties in the process.
-		//
-		// TODO: is this sufficient to:
-		/// Iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
-		// which was originally located at the end of the setSupported and updateSupported functions? I think it is sufficient.
-		if( propertySinkMap.find(property) != propertySinkMap.end()){
-			source->subscribeToPropertyChanges(property);
-		}
-	}
-}
-
-void Core::handleRemoveSupported(const PropertyList& removed, AbstractSource* source)
-{
-	if(!source)
-		return;
-
-	auto range = mMasterPropertyList.equal_range(source);
-	for(auto itr = removed.begin(); itr != removed.end(); ++itr)
-	{
-		//
-		// TODO: We do not have info about sources in
-		// std::unordered_map<VehicleProperty::Property, std::set<AbstractSink*> > propertySinkMap
-		// so we do not know if we can/should remove property from propertySinkMap,
-		// but I suppose this should be handled by each AbstractSink implementation in a callback AbstractSink::supportedChanged().
-
-		const VehicleProperty::Property property(*itr);
-
-		auto it = find_if(
-			range.first,	// the first property in source
-			range.second,   // one item right after the last property in source
-			[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
-		);
-
-		if (it != range.second)// property was found
-		{
-			mMasterPropertyList.erase(it);// References and iterators to the erased elements are invalidated. Other iterators and references are not invalidated.
-
-			// TODO: Do we need to unsubscribe here ???
-			// I added it here:
-			source->unsubscribeToPropertyChanges(property);
-		}
-	}
-}
-
 void Core::setSupported(PropertyList supported, AbstractSource* source)
 {
 	if(!source)
@@ -184,35 +130,31 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 	performance.propertiesPerSecond++;
 
 	//auto sinks = propertySinkMap[property]; !!! this will insert empty std::set<AbstractSink*> into propertySinkMap !!!
-	auto sinksIt =  propertySinkMap.find(property);
-	if(sinksIt == propertySinkMap.end()){
+	auto filteredSourceSinkMapIt =  propertySinkMap.find(property);
+	if(filteredSourceSinkMapIt == propertySinkMap.end()){
 		DebugOut()<<__FUNCTION__<<"() there are no sinks connected to property: "<<property<<endl;
 		return;
 	}
 
-	const std::set<AbstractSink*>& sinks = sinksIt->second;
+	const FilteredSourceSinkMap filteredSourceSinks = filteredSourceSinkMapIt->second;
 
-	DebugOut()<<__FUNCTION__<<"() there are "<<sinks.size()<<" sinks connected to property: "<<property<<endl;
+	DebugOut()<<__FUNCTION__<<"() there are "<<filteredSourceSinks.size()<<" sinks connected to property: "<<property<<endl;
 
-	if(sinks.size())// is this check redundant ?
+	performance.firedPropertiesPerSecond++;
+
+	for(auto itr = filteredSourceSinks.begin(); itr != filteredSourceSinks.end(); ++itr)
 	{
-		performance.firedPropertiesPerSecond++;
-	}
+		AbstractSink* sink = itr->first;
+		const std::string& sourceUuid = itr->second;
 
-	for(auto itr = sinks.begin(); itr != sinks.end(); ++itr)
-	{
-		AbstractSink* sink = *itr;
+		bool isFiltered = !sourceUuid.empty();
 
-		auto isFiltered = filteredSourceSinkMap.find(sink);
-
-		if(isFiltered != filteredSourceSinkMap.end() )
+		if(isFiltered)
 		{
-
-			std::string u = filteredSourceSinkMap[sink][property];
-			DebugOut()<<"Property ("<<property<<") for sink is filtered for source: "<<u<<endl;
+			DebugOut()<<"Property ("<<property<<") for sink is filtered for source: "<<sourceUuid<<endl;
 		}
 
-		if( (isFiltered != filteredSourceSinkMap.end() && filteredSourceSinkMap[sink][property] == uuid) || isFiltered == filteredSourceSinkMap.end())
+		if( !isFiltered || sourceUuid == uuid)
 		{
 			/// FIXME: Set this here just in case a source neglects to:
 
@@ -235,35 +177,6 @@ void Core::registerSink(AbstractSink *self)
 void Core::unregisterSink(AbstractSink *self)
 {
 	mSinks.erase(self);
-}
-
-AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& property, const std::string& sourceUuidFilter) const
-{
-	auto it = mMasterPropertyList.end();
-	if(sourceUuidFilter.empty()){
-		it = std::find_if(mMasterPropertyList.begin(), mMasterPropertyList.end(),
-			[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
-		);
-	}
-	else{
-		auto itSource = mSources.find(sourceUuidFilter);
-		if(itSource != mSources.end()){
-			auto range = mMasterPropertyList.equal_range(itSource->second);
-			auto temp = find_if(
-				range.first,	// the first property in source
-				range.second,   // one item right after the last property in source
-				[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
-			);
-
-			if (temp != range.second)// property was found
-				it = temp;
-		}
-	}
-
-	if(it == mMasterPropertyList.end())
-		return nullptr;
-	else
-		return it->first;
 }
 
 AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
@@ -316,8 +229,15 @@ AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 	return NULL;
 }
 
-void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
+bool Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* sink)
 {
+	auto sinksIt = propertySinkMap.find(property);
+	if(sinksIt != propertySinkMap.end() && sinksIt->second.find(sink) != sinksIt->second.end())
+	{
+		DebugOut(1)<<__FUNCTION__<<" property " << property << " has already been subscribed." << endl;
+		return false;
+	}
+
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 
 	bool subscribed(false);
@@ -337,51 +257,49 @@ void Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 	}
 
 	if(subscribed)
-		propertySinkMap[property].insert(self);
+		propertySinkMap[property].emplace(sink, std::string(""));
+
+	return subscribed;
 }
 
-void Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
+bool Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
 {
+	auto sinksIt = propertySinkMap.find(property);
+	if(sinksIt != propertySinkMap.end() && sinksIt->second.find(sink) != sinksIt->second.end())
+	{
+		DebugOut(1)<<__FUNCTION__<<" property " << property << " has already been subscribed." << endl;
+		return false;
+	}
+
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 
 	AbstractSource* src = sourceForProperty(property, sourceUuidFilter);
 	if(!src)
-		return;
+		return false;
+
+	propertySinkMap[property].emplace(sink, sourceUuidFilter);
 
 	src->subscribeToPropertyChanges(property);
 
-	propertySinkMap[property].insert(sink);
-
-	if(filteredSourceSinkMap.find(sink) == filteredSourceSinkMap.end() && sourceUuidFilter != "")
-	{
-		std::map<VehicleProperty::Property, std::string> propertyFilter;
-		propertyFilter[property] = sourceUuidFilter;
-		filteredSourceSinkMap[sink] = propertyFilter;
-	}
-	else if(sourceUuidFilter != "")
-	{
-		filteredSourceSinkMap[sink][property] = sourceUuidFilter;
-	}
+	return true;
 }
 
-void Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self)
+bool Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *sink)
 {
 	/// TODO: implement
 	throw std::runtime_error("Not implemented");
 }
 
-void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* self)
+bool Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* sink)
 {
 	auto sinksIt = propertySinkMap.find(property);
 	if(sinksIt == propertySinkMap.end())
 	{
 		DebugOut(1)<<__FUNCTION__<<" property not subscribed to: "<<property<<endl;
-		return; 
+		return false;
 	}
 
-	sinksIt->second.erase(self);
-
-	filteredSourceSinkMap.erase(self);
+	sinksIt->second.erase(sink);
 
 	/// Now we check to see if this is the last subscriber
 	if(sinksIt->second.empty())
@@ -401,6 +319,8 @@ void Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 			}
 		}
 	}
+
+	return true;
 }
 
 PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
@@ -435,3 +355,83 @@ std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
 	return list;
 }
 
+void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
+{
+	if(!source)
+		return;
+
+	for(auto itr = added.begin(); itr != added.end(); ++itr)
+	{
+		VehicleProperty::Property property = *itr;
+		mMasterPropertyList.emplace(source, property);// TODO: no check for duplicated properties from the same source - is it needed ?
+
+		// Subscribe to property in a new source if such property was subscribed. This catches newly supported properties in the process.
+		//
+		// TODO: is this sufficient to:
+		/// Iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
+		// which was originally located at the end of the setSupported and updateSupported functions? I think it is sufficient.
+		if( propertySinkMap.find(property) != propertySinkMap.end()){
+			source->subscribeToPropertyChanges(property);
+		}
+	}
+}
+
+void Core::handleRemoveSupported(const PropertyList& removed, AbstractSource* source)
+{
+	if(!source)
+		return;
+
+	auto range = mMasterPropertyList.equal_range(source);
+	for(auto itr = removed.begin(); itr != removed.end(); ++itr)
+	{
+		//
+		// TODO: We do not have info about all subscribed sources in
+		// std::unordered_map<VehicleProperty::Property, std::map<AbstractSink*, std::string> > propertySinkMap
+		// so we do not know if we can/should remove property from propertySinkMap,
+		// but I suppose this should be handled by each AbstractSink implementation in a callback AbstractSink::supportedChanged().
+
+		const VehicleProperty::Property property(*itr);
+
+		auto it = find_if(
+			range.first,	// the first property in source
+			range.second,   // one item right after the last property in source
+			[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+		);
+
+		if (it != range.second)// property was found
+		{
+			mMasterPropertyList.erase(it);// References and iterators to the erased elements are invalidated. Other iterators and references are not invalidated.
+
+			// TODO: Do we need to unsubscribe here ???
+		}
+	}
+}
+
+AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& property, const std::string& sourceUuidFilter) const
+{
+	auto it = mMasterPropertyList.end();
+	if(sourceUuidFilter.empty()){
+		it = std::find_if(mMasterPropertyList.begin(), mMasterPropertyList.end(),
+			[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+		);
+	}
+	else{
+		auto itSource = mSources.find(sourceUuidFilter);
+		if(itSource != mSources.end()){
+			auto range = mMasterPropertyList.equal_range(itSource->second);
+			auto temp = find_if(
+				range.first,	// the first property in source
+				range.second,   // one item right after the last property in source
+				[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+			);
+
+			if (temp != range.second)// property was found
+				it = temp;
+		}
+	}
+
+	if(it == mMasterPropertyList.end())
+		return nullptr;
+	else
+		return it->first;
+}
