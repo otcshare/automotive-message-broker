@@ -465,7 +465,7 @@ void WebSocketSource::setSupported(PropertyList list)
 {
 	DebugOut() <<__SMALLFILE__ << ":" << __LINE__ <<"SET SUPPORTED"<<endl;
 	m_supportedProperties = list;
-	m_re->updateSupported(list,PropertyList());
+	m_re->updateSupported(list,PropertyList(),this);
 }
 
 WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)

@@ -528,7 +528,7 @@ void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPrope
 void OBD2Source::setSupported(PropertyList list)
 {
 	m_supportedProperties = list;
-	m_re->updateSupported(list,PropertyList());
+	m_re->updateSupported(list,PropertyList(),this);
 }
 /*void OBD2Source::propertySignal(VehicleProperty::Property property,boost::any value)
 {
