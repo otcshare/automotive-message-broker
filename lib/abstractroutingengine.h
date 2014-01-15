@@ -308,7 +308,8 @@ public:
 	virtual ~AbstractRoutingEngine();
 
 	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
-	virtual void updateSupported(PropertyList added, PropertyList removed) = 0;
+	virtual void updateSupported(PropertyList added, PropertyList removed, AbstractSource* source) = 0;
+
 
 	/// Deprecated:
 	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
@@ -406,7 +407,7 @@ public:
 	 *   }
 	 * }
 	 */
-	virtual void subscribeToProperty(VehicleProperty::Property propertyName, AbstractSink* self) = 0;
+	virtual bool subscribeToProperty(VehicleProperty::Property propertyName, AbstractSink* self) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
@@ -414,7 +415,7 @@ public:
 	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
 	 * \param self pointer to the sink who is subscribing.
 	 */
-	virtual void subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, AbstractSink *self) = 0;
+	virtual bool subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, AbstractSink *self) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
@@ -423,9 +424,9 @@ public:
 	 * \param zoneFilter zone to filter.  Only updates from this zone will be passed to the sink.
 	 * \param self pointer to the sink who is subscribing.
 	 */
-	virtual void subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
+	virtual bool subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
 
-	virtual void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
+	virtual bool unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
 
 	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid) = 0;
 };

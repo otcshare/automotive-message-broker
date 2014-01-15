@@ -36,7 +36,7 @@ public:
 	/// sources:
 
 	void setSupported(PropertyList supported, AbstractSource* source);
-	void updateSupported(PropertyList added, PropertyList removed);
+	void updateSupported(PropertyList added, PropertyList removed, AbstractSource* source);
 	void updateProperty(AbstractPropertyType* value, const std::string &uuid);
 	
 	/// sinks:
@@ -46,11 +46,11 @@ public:
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
 	AsyncRangePropertyReply* getRangePropertyAsync(AsyncRangePropertyRequest request);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
-	void subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self);
-	void subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
-	void unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-	PropertyList supported() { return mMasterPropertyList; }
+	bool subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
+	bool subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self);
+	bool subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
+	bool unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
+	PropertyList supported();
 
 	PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid);
 	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
@@ -62,19 +62,29 @@ public:
 	};
 
 private:
-	PropertyList mMasterPropertyList;
+
+	void handleAddSupported(const PropertyList& added, AbstractSource* source);
+	void handleRemoveSupported(const PropertyList& removed, AbstractSource* source);
+	AbstractSource* sourceForProperty(const VehicleProperty::Property& property, const std::string& sourceUuidFilter = "") const;
+
+private:
 	
-	SourceList mSources;
-	SinkList mSinks;
+	//typedef std::map< Zone::Type, AbstractPropertyType> ZonePropertyType;
+
+	// to support zone filtering replace VehicleProperty::Property with ZonePropertyType
+	std::multimap<AbstractSource*, VehicleProperty::Property> mMasterPropertyList;
+
+	// K = AbstractSource::uuid(), T = AbstractSource*
+	std::unordered_map<std::string, AbstractSource*> mSources;
+	std::set<AbstractSink*> mSinks;
 
 	Performance performance;
 	
-	std::unordered_map<VehicleProperty::Property, SinkList> propertySinkMap;
+	// std::string here is AbstractSource::uuid()
+	typedef std::map<AbstractSink*, std::string> FilteredSourceSinkMap;
 
-	std::map<AbstractSink*, std::map<VehicleProperty::Property, std::string> > filteredSourceSinkMap;
-
-	std::map<VehicleProperty::Property, std::string> previousValueMap;
-    
+	// to support zone filtering replace VehicleProperty::Property with ZonePropertyType
+	std::unordered_map<VehicleProperty::Property, FilteredSourceSinkMap > propertySinkMap;
 };
 
 #endif // CORE_H
