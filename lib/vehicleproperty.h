@@ -144,6 +144,11 @@ enum Type
 	SUV,
 	Truck
 };
+enum SoundMode {
+	Normal = 0,
+	Quiet = 1,
+	Sportive = 2
+};
 }
 
 namespace Security {
@@ -230,6 +235,16 @@ enum Mode
 {
 	None = 0,
 	Driving
+};
+}
+
+namespace Measurement
+{
+enum Type
+{
+	Metric = 0,
+	ImperialUS = 1,
+	ImperialUK = 2
 };
 }
 
@@ -445,26 +460,12 @@ public:
 	//class WMIType: public StringPropertyType { public: WMIType(std::string val):StringPropertyType(WMI,val){} };
 
 	/**< Tire pressure in kPa */
-	static const Property TirePressureLeftFront;
-	PROPERTYTYPE(TirePressureLeftFront, TirePressureLeftFrontType, BasicPropertyType<double>, double)
-	static const Property TirePressureRightFront;
-	PROPERTYTYPE(TirePressureRightFront, TirePressureRightFrontType, BasicPropertyType<double>, double)
-	static const Property TirePressureLeftRear;
-	PROPERTYTYPE(TirePressureLeftRear, TirePressureLeftRearType, BasicPropertyType<double>, double)
-	static const Property TirePressureRightRear;
-	PROPERTYTYPE(TirePressureRightRear, TirePressureRightRearType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> TirePressureType;
+	static const Property TirePressure;
+	PROPERTYTYPEBASIC(TirePressure, double)
 
 	/**< Tire temperature in degrees C */
-	static const Property TireTemperatureLeftFront;
-	PROPERTYTYPE(TireTemperatureLeftFront, TireTemperatureLeftFrontType, BasicPropertyType<double>, double)
-	static const Property TireTemperatureRightFront;
-	PROPERTYTYPE(TireTemperatureRightFront, TireTemperatureRightFrontType, BasicPropertyType<double>, double)
-	static const Property TireTemperatureLeftRear;
-	PROPERTYTYPE(TireTemperatureLeftRear, TireTemperatureLeftRearType, BasicPropertyType<double>, double)
-	static const Property TireTemperatureRightRear;
-	PROPERTYTYPE(TireTemperatureRightRear, TireTemperatureRightRearType, BasicPropertyType<double>, double)
-	//typedef BasicPropertyType<double> TireTemperatureType;
+	static const Property TireTemperature;
+	PROPERTYTYPEBASIC(TireTemperature, double)
 	
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes
@@ -755,6 +756,48 @@ public:
 	static const Property DrivingMode;
 	PROPERTYTYPEBASIC(DrivingMode, Driving::Mode)
 
+	static const Property KeyId;
+	PROPERTYTYPE(KeyId, KeyIdType, StringPropertyType, std::string)
+
+	static const Property Language;
+	PROPERTYTYPE(Language, LanguageType, StringPropertyType, std::string)
+
+	static const Property MeasurementSystem;
+	PROPERTYTYPEBASIC(MeasurementSystem, Measurement::Type)
+
+	static const Property MirrorSettingPan;
+	static const Property MirrorSettingTilt;
+
+	PROPERTYTYPEBASIC(MirrorSettingPan, uint16_t)
+	PROPERTYTYPEBASIC(MirrorSettingTilt, uint16_t)
+
+	static const Property SteeringWheelPositionSlide;
+	static const Property SteeringWheelPositionTilt;
+
+	PROPERTYTYPEBASIC(SteeringWheelPositionSlide, uint16_t)
+	PROPERTYTYPEBASIC(SteeringWheelPositionTilt, uint16_t)
+
+	static const Property SeatPositionRecline;
+	static const Property SeatPositionSlide;
+	static const Property SeatPositionCushionHeight;
+	static const Property SeatPositionHeadrest;
+	static const Property SeatPositionBackCushion;
+	static const Property SeatPositionSideCushion;
+
+	PROPERTYTYPEBASIC(SeatPositionRecline, uint16_t)
+	PROPERTYTYPEBASIC(SeatPositionSlide, uint16_t)
+	PROPERTYTYPEBASIC(SeatPositionCushionHeight, uint16_t)
+	PROPERTYTYPEBASIC(SeatPositionHeadrest, uint16_t)
+	PROPERTYTYPEBASIC(SeatPositionBackCushion, uint16_t)
+	PROPERTYTYPEBASIC(SeatPositionSideCushion, uint16_t)
+
+	static const Property DashboardIllumination;
+	PROPERTYTYPEBASIC(DashboardIllumination, uint16_t)
+
+	static const Property GeneratedVehicleSoundMode;
+	PROPERTYTYPEBASIC(GeneratedVehicleSoundMode, Vehicle::SoundMode)
+
+
 	/** END PROPERTIES **/
 
 
@@ -816,3 +859,4 @@ typedef std::list<VehicleProperty::Property> PropertyList;
 typedef std::set<VehicleProperty::Property> PropertySet;
 
 #endif // VEHICLEPROPERTY_H
+

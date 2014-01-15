@@ -182,6 +182,16 @@ interface org.automotive.Transmission : VehiclePropertyType  {
 	 **/
 	readonly attribute octet GearPosition;
 
+	const UInt16 TRANSMISSIONGEARTYPE_AUTO=0;
+	const UInt16 TRANSMISSIONGEARTYPE_MANUAL=1;
+	const UInt16 TRANSMISSIONGEARTYPE_CV=2;
+
+	/**  TransmissionGearType
+	 *   \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV). 
+	 *   See TRANSMISSIONGEARTYPE
+	 **/
+	readonly attribute octet Type;
+
 	/**  Mode
 	 *   \brief  Must return transmission Mode (see 
 	 **/
@@ -576,18 +586,6 @@ interface org.automotive.Doors : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface org.automotive.TransmissionGearType : VehiclePropertyType  {
-	const UInt16 TRANSMISSIONGEARTYPE_AUTO=0;
-	const UInt16 TRANSMISSIONGEARTYPE_MANUAL=1;
-	const UInt16 TRANSMISSIONGEARTYPE_CV=2;
-
-	/**  TransmissionGearType
-	 *   \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV).  See 
-	 **/
-	readonly attribute UInt16 TransmissionGearType;
-};
-
-[NoInterfaceObject]
 interface org.automotive.WheelInformation : VehiclePropertyType  {
 
 	/**  FrontWheelRadius
@@ -654,51 +652,17 @@ interface org.automotive.Battery : VehiclePropertyType  {
 };
 
 [NoInterfaceObject]
-interface org.automotive.TirePressure : VehiclePropertyType  {
+interface org.automotive.Tire : VehiclePropertyType  {
 
-	/**  LeftFront
-	 *   \brief MUST return left front tire pressure in kPa.    
+	/**  Pressure
+	 *   \brief MUST return tire pressure in kPa.    
 	 **/
-	readonly attribute Double LeftFront;
+	readonly attribute Double Pressure;
 
-	/**  RightFront
-	 *   \brief MUST return right front tire pressure in kPa.    
-	 **/
-	readonly attribute Double RightFront;
-
-	/**  LeftRear
-	 *   \brief MUST return left rear tire pressure in kPa.    
-	 **/
-	readonly attribute Double LeftRear;
-
-	/**  RightRear
-	 *   \brief MUST return right rear tire pressure in kPa.    
-	 **/
-	readonly attribute Double RightRear;
-};
-
-[NoInterfaceObject]
-interface org.automotive.TireTemperature : VehiclePropertyType  {
-
-	/**  LeftFront
+	/**  Temperature
 	 *   \brief MUST return left front tire temperature in Celcius.    
 	 **/
-	readonly attribute Double LeftFront;
-
-	/**  RightFront
-	 *   \brief MUST return right front tire temperature in Celcius.    
-	 **/
-	readonly attribute Double RightFront;
-
-	/**  LeftRear
-	 *   \brief MUST return left rear tire temperature in Celcius.    
-	 **/
-	readonly attribute Double LeftRear;
-
-	/**  RightRear
-	 *   \brief MUST return right rear tire temperature in Celcius.    
-	 **/
-	readonly attribute Double RightRear;
+	readonly attribute Double Temperature;
 };
 
 [NoInterfaceObject]
@@ -845,6 +809,108 @@ interface org.automotive.DrivingMode : VehiclePropertyType {
 	* \brief MUST return whether or not the system is in DrivingMode or not.  1 = Driving, 0 = Not Driving
 	**/
 	readonly attribute UInt16 DrivingMode;
+};
+
+[NoInterfaceObject]
+interface org.automotive.KeyId : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute String KeyId;
+};
+[NoInterfaceObject]
+interface org.automotive.Language : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute String Language;
+};
+
+[NoInterfaceObject]
+interface org.automotive.MeasurementSystem : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 0 = Metric, 1 = ImperialUS, 2 = ImperialUK
+	**/
+	readonly attribute UInt16 MeasurementSystem;
+};
+
+[NoInterfaceObject]
+interface org.automotive.MirrorSetting : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Pan;
+	readonly attribute UInt16 Tilt;
+};
+
+[NoInterfaceObject]
+interface org.automotive.SeatPosition : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Recline;
+
+		/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Slide;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 CushionHeight;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Headrest;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 BackCushion;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 SideCushion;
+};
+
+[NoInterfaceObject]
+interface org.automotive.SteeringWheelPosition : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Tilt;
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 Slide;
+};
+
+[NoInterfaceObject]
+interface org.automotive.DashboardIllumination : VehiclePropertyType {
+
+	/**
+	* \brief MUST return 
+	**/
+	readonly attribute UInt16 DashboardIllumination;
+};
+
+[NoInterfaceObject]
+interface org.automotive.GeneratedVehicleSoundMode : VehiclePropertyType {
+
+	/**
+	* \brief MUST return Sound Mode: 0 = Normal, 1 = Quiet, 2 = Sportive
+	**/
+	readonly attribute UInt16 GeneratedVehicleSoundMode;
 };
 
 };

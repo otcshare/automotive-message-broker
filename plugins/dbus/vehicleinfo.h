@@ -152,30 +152,6 @@ public:
 	}
 };
 
-/** @interface TransmissionGearType : VehiclePropertyType **/
-class TransmissionInfoProperty: public DBusSink
-{
-public:
-	TransmissionInfoProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("TransmissionGearType", re, connection, map<string, string>())
-	{
-		/**
-		 * @enum const unsigned short TRANSMISSIONGEARTYPE_AUTO=0;
-		 * @enum const unsigned short TRANSMISSIONGEARTYPE_MANUAL=1;
-		 * @enum const unsigned short TRANSMISSIONGEARTYPE_CV=2;
-		 **/
-
-		/** @attributeName TransmissionGearType
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return transmission gear type of either Automatic, Manual or Constant Variable (CV).  See TRANSMISSIONGEARTYPE_*.
-		 **/
-		wantPropertyVariant(VehicleProperty::TransmissionGearType, "TransmissionGearType", "y", AbstractProperty::Read);
-
-		
-	}
-};
-
 /** @interface WheelInformation : VehiclePropertyType **/
 class WheelInformationProperty: public DBusSink
 {

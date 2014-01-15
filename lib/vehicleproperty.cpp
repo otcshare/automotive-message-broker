@@ -64,14 +64,8 @@ const VehicleProperty::Property VehicleProperty::ExteriorTemperature = "Exterior
 const VehicleProperty::Property VehicleProperty::EngineOilTemperature = "EngineOilTemperature";
 const VehicleProperty::Property VehicleProperty::VIN = "VIN";
 const VehicleProperty::Property VehicleProperty::WMI = "WMI";
-const VehicleProperty::Property VehicleProperty::TirePressureLeftFront = "TirePressureLeftFront";
-const VehicleProperty::Property VehicleProperty::TirePressureRightFront = "TirePressureRightFront";
-const VehicleProperty::Property VehicleProperty::TirePressureLeftRear = "TirePressureLeftRear";
-const VehicleProperty::Property VehicleProperty::TirePressureRightRear = "TirePressureRightRear";
-const VehicleProperty::Property VehicleProperty::TireTemperatureLeftFront = "TireTemperatureLeftFront";
-const VehicleProperty::Property VehicleProperty::TireTemperatureRightFront = "TireTemperatureRightFront";
-const VehicleProperty::Property VehicleProperty::TireTemperatureLeftRear = "TireTemperatureLeftRear";
-const VehicleProperty::Property VehicleProperty::TireTemperatureRightRear = "TireTemperatureRightRear";
+const VehicleProperty::Property VehicleProperty::TirePressure = "TirePressure";
+const VehicleProperty::Property VehicleProperty::TireTemperature = "TireTemperature";
 const VehicleProperty::Property VehicleProperty::VehiclePowerMode = "VehiclePowerMode";
 const VehicleProperty::Property VehicleProperty::TripMeters = "TripMeters";
 const VehicleProperty::Property VehicleProperty::CruiseControlActive = "CruiseControlActive";
@@ -149,6 +143,21 @@ const VehicleProperty::Property VehicleProperty::SunroofTilt = "SunroofTilt";
 const VehicleProperty::Property VehicleProperty::ConvertibleRoof = "ConvertibleRoof";
 const VehicleProperty::Property VehicleProperty::NightMode = "NightMode";
 const VehicleProperty::Property VehicleProperty::DrivingMode = "DrivingMode";
+const VehicleProperty::Property VehicleProperty::KeyId = "KeyId";
+const VehicleProperty::Property VehicleProperty::Language = "Language";
+const VehicleProperty::Property VehicleProperty::MeasurementSystem = "MeasurementSystem";
+const VehicleProperty::Property VehicleProperty::MirrorSettingPan = "MirrorPanSetting";
+const VehicleProperty::Property VehicleProperty::MirrorSettingTilt= "MirrorTiltSetting";
+const VehicleProperty::Property VehicleProperty::SteeringWheelPositionSlide = "SteeringWheelPositionSlide";
+const VehicleProperty::Property VehicleProperty::SteeringWheelPositionTilt = "SteeringWheelPositionTilt";
+const VehicleProperty::Property VehicleProperty::SeatPositionRecline = "SeatPositionRecline";
+const VehicleProperty::Property VehicleProperty::SeatPositionSlide = "SeatPositionSlide";
+const VehicleProperty::Property VehicleProperty::SeatPositionCushionHeight = "SeatPositionCushionHeight";
+const VehicleProperty::Property VehicleProperty::SeatPositionHeadrest = "SeatPositionHeadrest";
+const VehicleProperty::Property VehicleProperty::SeatPositionBackCushion = "SeatPositionBackCushion";
+const VehicleProperty::Property VehicleProperty::SeatPositionSideCushion = "SeatPositionSideCushion";
+const VehicleProperty::Property VehicleProperty::DashboardIllumination = "DashboardIllumination";
+const VehicleProperty::Property VehicleProperty::GeneratedVehicleSoundMode = "GeneratedVehicleSoundMode";
 
 std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
 std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
@@ -183,14 +192,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ExteriorTemperature,0);
 	REGISTERPROPERTY(VIN, "");
 	REGISTERPROPERTY(WMI, "");
-	REGISTERPROPERTY(TirePressureLeftFront, 0);
-	REGISTERPROPERTY(TirePressureRightFront, 0);
-	REGISTERPROPERTY(TirePressureLeftRear, 0);
-	REGISTERPROPERTY(TirePressureRightRear, 0);
-	REGISTERPROPERTY(TireTemperatureLeftFront,0);
-	REGISTERPROPERTY(TireTemperatureRightFront,0);
-	REGISTERPROPERTY(TireTemperatureLeftRear,0);
-	REGISTERPROPERTY(TireTemperatureRightRear,0);
+	REGISTERPROPERTY(TirePressure, 0);
+	REGISTERPROPERTY(TireTemperature,0);
 	REGISTERPROPERTY( VehiclePowerMode,Power::Off);
 	registerPropertyPriv(TripMeters,[](){
 		TripMetersType* t = new TripMetersType();
@@ -279,6 +282,21 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ConvertibleRoof,false);
 	REGISTERPROPERTY(NightMode,false);
 	REGISTERPROPERTY(DrivingMode,Driving::None);
+	REGISTERPROPERTY(KeyId,"");
+	REGISTERPROPERTY(Language,"");
+	REGISTERPROPERTY(MeasurementSystem,Measurement::Metric);
+	REGISTERPROPERTY(MirrorSettingPan,0);
+	REGISTERPROPERTY(MirrorSettingTilt,0);
+	REGISTERPROPERTY(SteeringWheelPositionSlide,0);
+	REGISTERPROPERTY(SteeringWheelPositionTilt,0);
+	REGISTERPROPERTY(SeatPositionRecline,0);
+	REGISTERPROPERTY(SeatPositionSlide,0);
+	REGISTERPROPERTY(SeatPositionCushionHeight,0);
+	REGISTERPROPERTY(SeatPositionHeadrest,0);
+	REGISTERPROPERTY(SeatPositionBackCushion,0);
+	REGISTERPROPERTY(SeatPositionSideCushion,0);
+	REGISTERPROPERTY(DashboardIllumination,0);
+	REGISTERPROPERTY(GeneratedVehicleSoundMode, Vehicle::Normal);
 
 }
 

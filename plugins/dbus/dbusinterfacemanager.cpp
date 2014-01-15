@@ -34,9 +34,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "maintenance.h"
 #include "parking.h"
 #include "drivingsafety.h"
-
-using namespace std;
-
+#include "personalization.h"
 
 std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(AbstractRoutingEngine *re, std::list<VehicleProperty::Property> implementedProperties)
 {
@@ -167,12 +165,11 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	/// properties:
 	exportProperty<AccelerationProperty>(iface->re,connection);
 	exportProperty<VehicleSpeedProperty>(iface->re, connection);
-	exportProperty<TirePressureProperty>(iface->re, connection);
+	exportProperty<TireProperty>(iface->re, connection);
 	exportProperty<EngineSpeedProperty>(iface->re, connection);
 	exportProperty<VehiclePowerModeProperty>(iface->re, connection);
 	exportProperty<TripMeterProperty>(iface->re, connection);
 	exportProperty<TransmissionProperty>(iface->re, connection);
-	exportProperty<TireTemperatureProperty>(iface->re, connection);
 	exportProperty<CruiseControlProperty>(iface->re, connection);
 	exportProperty<WheelBrakeProperty>(iface->re, connection);
 	exportProperty<LightStatusProperty>(iface->re, connection);
@@ -188,7 +185,6 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<Sunroof>(iface->re, connection);
 	exportProperty<ConvertibleRoof>(iface->re, connection);
 	exportProperty<VehicleId>(iface->re, connection);
-	exportProperty<TransmissionInfoProperty>(iface->re, connection);
 	exportProperty<VehicleTypeProperty>(iface->re, connection);
 	exportProperty<FuelInfoProperty>(iface->re, connection);
 	exportProperty<SizeProperty>(iface->re, connection);
@@ -210,6 +206,9 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<SeatBeltStatusProperty>(iface->re, connection);
 	exportProperty<OccupantStatusProperty>(iface->re, connection);
 	exportProperty<ObstacleDistanceProperty>(iface->re, connection);
+	exportProperty<SeatPostionProperty>(iface->re, connection);
+	exportProperty<SteeringWheelPositionProperty>(iface->re, connection);
+	exportProperty<MirrorSettingProperty>(iface->re, connection);
 
 	iface->supportedChanged(iface->re->supported());
 }
