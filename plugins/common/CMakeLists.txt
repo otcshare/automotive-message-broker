@@ -1,5 +1,5 @@
-set(plugins_common_sources abstractio.hpp serialport.hpp bluetoothadapterproxy.c bluetooth.hpp bluetoothmanagerproxy.c bluetoothserialproxy.c)
-set(plugins_common_headers_install abstractio.hpp serialport.hpp bluetooth.hpp bluetoothadapterproxy.h bluetoothmanagerproxy.h bluetoothserialproxy.h)
+set(plugins_common_sources abstractio.hpp serialport.hpp bluetoothadapterproxy.c bluetooth.hpp bluetoothmanagerproxy.c bluetoothserialproxy.c bluetooth5.cpp)
+set(plugins_common_headers_install abstractio.hpp serialport.hpp bluetooth.hpp bluetoothadapterproxy.h bluetoothmanagerproxy.h bluetoothserialproxy.h bluetooth5.h)
 
 add_library(amb-plugins-common SHARED ${plugins_common_sources})
 

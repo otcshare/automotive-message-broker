@@ -11,7 +11,7 @@ class BluetoothDevice
 {
 public:
 
-	std::string getDeviceForAddress( std::string address,std::string adapterAddy = "")
+	std::string getDeviceForAddress(std::string address, std::string adapterAddy = "")
 	{
 		GError* error = NULL;
 		OrgBluezManager* manager = org_bluez_manager_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
