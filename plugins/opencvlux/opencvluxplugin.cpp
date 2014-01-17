@@ -20,8 +20,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "timestamp.h"
 
 #include <iostream>
-#include <boost/assert.hpp>
-#include <boost/thread/future.hpp>
 
 #ifdef OPENCL
 #include <opencv2/ocl/ocl.hpp>
@@ -109,22 +107,34 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 #ifdef OPENCL
 	if(shared->useOpenCl)
 	{
-		std::vector<cv::ocl::Info> info;
-		cv::ocl::getDevice(info);
+		cv::ocl::PlatformsInfo platforms;
+		cv::ocl::getOpenCLPlatforms(platforms);
 
-		DebugOut()<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
+		for(auto p : platforms)
+		{
+			DebugOut(1)<<"platform: "<<p->platformName<<" vendor: "<<p->platformVendor<<endl;
+		}
+
+		cv::ocl::DevicesInfo info;
+		cv::ocl::getOpenCLDevices(info, cv::ocl::CVCL_DEVICE_TYPE_ALL);
+
+		DebugOut(1)<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
 
 		if(!info.size())
 		{
-			DebugOut()<<"No CL devices.  Disabling OpenCL"<<endl;
+			DebugOut(1)<<"No CL devices.  Disabling OpenCL"<<endl;
 			shared->useOpenCl = false;
 		}
-
-		for(cv::ocl::Info i : info)
+		else
 		{
-			for(auto name : i.DeviceName)
+			cv::ocl::setDevice(info[0]);
+		}
+
+		for(auto i : info)
+		{
+			for(auto name : i->deviceName)
 			{
-				DebugOut()<<"DeviceName: "<<name<<endl;
+				DebugOut(1)<<"OpenCLDeviceName: "<<name<<endl;
 			}
 		}
 	}
@@ -248,8 +258,7 @@ static int grabImage(void *data)
 
 	/*if(shared->threaded)
 	{
-		auto luxFuture = boost::async([m_image, &shared](){ return evalImage(m_image,shared); });
-		luxFuture.then([&shared](boost::shared_future<uint> f) { shared->parent->updateProperty(f.get()); });
+
 	}
 	else*/
 	{

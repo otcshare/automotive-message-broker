@@ -8,9 +8,7 @@ else(OpenCV_LIBS)
 	 message(FATAL_ERROR "opencv missing.  please install opencv")
 endif(OpenCV_LIBS)
 
-#find opencv ocl headers:
-INCLUDE (CheckLibraryExists)
-CHECK_LIBRARY_EXISTS(cl clCreateImage /usr/lib/beignet ocl)
+option(ocl "enable opencl" OFF)
 
 if(ocl)
 	message(STATUS "found opencv ocl headers. enabling opencl support. ${ocl}")
@@ -19,13 +17,14 @@ else(ocl)
 	message(STATUS "no opencl support")
 endif(ocl)
 
-find_path(cuda gpu.hpp PATH_SUFFIXES opencv/gpu opencv2/gpu DOC "opencv cuda headers")
+option(cuda "enable cuda" OFF)
 
 if(cuda)
 	message(STATUS "found opencv cuda headers.  enabling cuda support. ${cuda}")
 	add_definitions(-DCUDA)
 else(cuda)
 	message(STATUS "no opencv cuda headers found.  no cuda support")
+	remove_definitions(-DCUDA)
 endif(cuda)
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
