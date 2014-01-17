@@ -23,7 +23,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <iostream>
 #include <boost/assert.hpp>
-#include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
 #include <time.h>
 
@@ -43,19 +42,6 @@ inline T2 lexical_cast(const std::string &in) {
 	ss >> out;
 	return out;
 }
-
-std::string gprmcRegEx = "[\\$]?GPRMC,([0-1][0-9]|2[0-3])([0-5][0-9])([0-5][0-9])," /** time hh mm ss **/
-		"([AV])," /** Status A= Active, V= Void **/
-		"([0-8][0-9]|90)([0-5][0-9]\\.[0-9]{4})," /** latitude **/
-		"([NS])," /** lat North or South **/
-		"(180|0[0-9]{2}|1[0-7][0-9])([0-5][0-9]\\.[0-9]{4})," /** longitude **/
-		"([EW])," /** lon E or W **/
-		"([0-9]{3}\\.[0-9])," /** Speed in knots **/
-		"(3[0-5][0-9]|[0-2][0-9]{2}\\.[0-9])," /** Direction **/
-		"(3[0-1]|[1-2][0-9]|0[1-9])(0[1-9]|1[0-2])([0-9]{2})," /** Date stamp **/
-		"(180|[1][0-7][0-9]|[0][0-9]{2}\\.[0-9])," /** Magnetic variation **/
-		"([EW])" /** Magnetic Direction **/
-		"\\*([0-9,A-F]{2})";
 
 class Location
 {
@@ -131,7 +117,6 @@ private:
 	VehicleProperty::VehicleSpeedType mSpeed;
 	BasicPropertyType<double> mGpsTime;
 
-	boost::regex regularExpression;
 	bool isActive;
 
 	std::string mUuid;
@@ -156,39 +141,31 @@ void Location::parse(string nmea)
 	{
 		parseGpgga(nmea);
 	}
+	else
+	{
+		DebugOut(DebugOut::Warning)<<"unknown/unhandled message: "<<nmea<<endl;
+	}
 }
 
 void Location::parseGprmc(string gprmc)
 {
 	DebugOut(7)<<"parsing gprmc message"<<endl;
 
-	regularExpression.assign(gprmcRegEx);
+	std::vector<std::string> tokens;
+	boost::split(tokens, gprmc, boost::is_any_of(","));
 
-	boost::smatch tokens;
-
-	if (boost::regex_match (gprmc, tokens, regularExpression) )
+	if(tokens[2] == "A")
 	{
-
-
-		if(tokens[4] == "A")
-		{
-			isActive = true;
-		}
-
-		int i=0;
-		for(auto tok : tokens)
-		{
-			DebugOut(0)<<i++<<":"<<tok<<endl;
-
-		}
-
-		parseTime(tokens[1],tokens[2],tokens[3],tokens[13],tokens[14],tokens[15]);
-
-		parseLatitude(tokens[5], tokens[6], tokens[7]);
-		parseLongitude(tokens[8], tokens[9], tokens[10]);
-		parseSpeed(tokens[11]);
-		parseDirection(tokens[12]);
+		isActive = true;
 	}
+
+	parseTime(tokens[1].substr(0,2),tokens[1].substr(2,2),tokens[1].substr(4,2),tokens[9].substr(0,2),tokens[9].substr(2,2),tokens[9].substr(4,2));
+
+	parseLatitude(tokens[3], "", tokens[4]);
+	parseLongitude(tokens[5], "", tokens[6]);
+	parseSpeed(tokens[7]);
+	parseDirection(tokens[8]);
+
 }
 
 void Location::parseGpgga(string gpgga)
@@ -304,13 +281,19 @@ void Location::parseSpeed(string spd)
 
 void Location::parseDirection(string dir)
 {
-	uint16_t d = boost::lexical_cast<double>(dir);
+	try {
+		uint16_t d = boost::lexical_cast<double>(dir);
 
-	VehicleProperty::DirectionType temp(d);
-	if(mDirection != temp)
+		VehicleProperty::DirectionType temp(d);
+		if(mDirection != temp)
+		{
+			mDirection = temp;
+			routingEngine->updateProperty(&mDirection, mUuid);
+		}
+	}
+	catch(...)
 	{
-		mDirection = temp;
-		routingEngine->updateProperty(&mDirection, mUuid);
+		DebugOut(DebugOut::Warning)<<"Failed to parse direction: "<<dir<<endl;
 	}
 }
 
@@ -396,17 +379,21 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		Location location(routingEngine, mUuid);
 		location.parse("GPRMC,061211,A,2351.9605,S,15112.5239,E,000.0,053.4,170303,009.9,E*6E");
 
-		DebugOut()<<"lat: "<<location.latitude().toString()<<endl;
+		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
 
 		g_assert(location.latitude().toString() == "-23.86600833");
 		g_assert(location.gpsTime().toString() == "1050585131");
 
 		location.parse("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47");
 
-		DebugOut()<<"alt: "<<location.altitude().toString()<<endl;
-		DebugOut()<<"lat: "<<location.latitude().toString()<<endl;
+		DebugOut(0)<<"alt: "<<location.altitude().toString()<<endl;
+		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
 		g_assert(location.altitude().toString() == "545.4");
 		g_assert(location.latitude().toString() == "48.1173");
+
+		location.parse("GPRMC,060136.00,A,3101.40475,N,12126.87095,E,0.760,,160114,,,A*74");
+		DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
+		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
 	}
 
 	std::string btaddapter = config["bluetoothAdapter"];

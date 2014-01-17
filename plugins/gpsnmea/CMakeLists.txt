@@ -7,7 +7,7 @@ include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} 
 
 add_library(gpsnmea MODULE ${gpsnmea_sources})
 set_target_properties(gpsnmea PROPERTIES PREFIX "")
-target_link_libraries(gpsnmea amb -L${CMAKE_CURRENT_BINARY_DIR}/lib  amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} boost_regex ${gio_LIBRARIES})
+target_link_libraries(gpsnmea amb -L${CMAKE_CURRENT_BINARY_DIR}/lib  amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} ${gio_LIBRARIES})
 
 install(TARGETS gpsnmea LIBRARY DESTINATION lib/automotive-message-broker)
 
