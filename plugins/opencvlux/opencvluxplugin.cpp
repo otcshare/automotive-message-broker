@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "timestamp.h"
 
 #include <iostream>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #ifdef OPENCL
 #include <opencv2/ocl/ocl.hpp>
@@ -263,6 +264,7 @@ static int grabImage(void *data)
 	else*/
 	{
 		int lux = evalImage(m_image,shared);
+		detectLight(m_image,shared);
 		shared->parent->updateProperty(lux);
 	}
 
@@ -286,7 +288,8 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 	{
 #ifdef OPENCL
 		cv::Scalar stdDev;
-		cv::ocl::oclMat src(qImg);
+		cv::ocl::oclMat src(qImg), gray;
+		cv::ocl::cvtColor(src, gray, CV_BGR2GRAY);
 		cv::ocl::meanStdDev(src, avgPixelIntensity, stdDev);
 #endif
 	}
@@ -305,7 +308,6 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 		{
 			DebugOut(DebugOut::Error)<<"CUDA pixel intensity calculation failed."<<endl;
 		}
-
 #endif
 	}
 	else
@@ -346,8 +348,6 @@ bool OpenCvLuxPlugin::init()
 		return false;
 	}
 
-
-
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
 	DebugOut()<<"camera frame height: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT)<<endl;
 	DebugOut()<<"camera frame fps: "<<shared->m_capture->get(CV_CAP_PROP_FPS)<<endl;
@@ -378,9 +378,82 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 	if(lux != lastLux && shared->mRequests.size())
 	{
 		lastLux = lux;
-		routingEngine->updateProperty(VehicleProperty::ExteriorBrightness,&l, uuid());
+		routingEngine->updateProperty(&l, uuid());
 	}
 
 
 }
 
+
+
+TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
+{
+
+	cv::Mat gray;
+
+	if(shared->useOpenCl)
+	{
+#ifdef OPENCL
+		cv::ocl::oclMat src(img), gray2;
+		cv::ocl::cvtColor(src, gray2, CV_BGR2GRAY);
+		cv::ocl::GaussianBlur(gray2, gray2, cv::Size(9,9), 2, 2);
+
+		gray = gray2;
+#endif
+	}
+	else
+	{
+		cv::cvtColor(img, gray, CV_BGR2GRAY);
+		cv::GaussianBlur(gray, gray, cv::Size(9,9), 2, 2);
+	}
+
+	std::vector<cv::Vec3f> circles;
+
+	//cv::HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 1, gray.rows/8, 200, 100, 0, 0);
+
+	cv::HoughCircles( gray, circles, CV_HOUGH_GRADIENT, 2, 30, 231, 50, 0, 0 );
+
+	for(auto i = 0; i < circles.size(); i++)
+	{
+		cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+		int radius = cvRound(circles[i][2]);
+
+		cv::Rect rect(center.x - radius / 2, center.y - radius / 2, radius, radius);
+
+		try {
+
+			cv::Mat light(img, rect);
+
+			cv::circle( img, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
+
+			cv::rectangle(img, rect,cv::Scalar(255,0,0));
+
+			cv::Scalar avgPixel = cv::mean(light);
+
+			if(avgPixel[2] > 128 && avgPixel[0] < 128 && avgPixel[1] < 128)
+			{
+				DebugOut(1)<<"Red Light!!!"<<endl;
+				return TrafficLight::Red;
+			}
+			else if(avgPixel[1] > 128 && avgPixel[0] < 128 && avgPixel[2] < 128)
+			{
+				DebugOut(1)<<"Green Light!!!"<<endl;
+				return TrafficLight::Green;
+			}
+			else if(avgPixel[0] > 128 && avgPixel[1] < 128 && avgPixel[2] < 128)
+			{
+				DebugOut(1)<<"Bluel Light!!!"<<endl;
+			}
+		}
+		catch(...)
+		{
+
+		}
+
+	}
+
+	cv::namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
+	cv::imshow( "Hough Circle Transform Demo", img );
+
+
+}

@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 
 #include <opencv/cv.h>
-#include <opencv/highgui.h>
+#include <opencv2/highgui/highgui.hpp>
 
 using namespace std;
 
@@ -80,5 +80,17 @@ private:
 static int grabImage(void *data);
 static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared);
 
+namespace TrafficLight
+{
+enum Color
+{
+	Unknown = -1,
+	Red = 0,
+	Yellow,
+	Green
+};
+}
+
+TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared* shared);
 
 #endif // EXAMPLEPLUGIN_H
