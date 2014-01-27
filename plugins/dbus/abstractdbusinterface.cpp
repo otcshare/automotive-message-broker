@@ -271,8 +271,11 @@ void AbstractDBusInterface::registerObject()
 		throw -1;
 	}
 
-	introspectionXml += "</interface>";
-	introspectionXml += "</node>";
+	if(!boost::algorithm::ends_with(introspectionXml,"</node>"))
+	{
+		introspectionXml += "</interface>";
+		introspectionXml += "</node>";
+	}
 	
 	GError* error=NULL;
 
@@ -281,10 +284,10 @@ void AbstractDBusInterface::registerObject()
 	if(!introspection || error)
 	{
 
-		DebugOut(0)<<"Error in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<endl;
-		DebugOut(0)<<error->message<<endl;
-		DebugOut(0)<<"probably bad xml:"<<endl;
-		DebugOut(0)<<introspectionXml<<endl;
+		DebugOut(DebugOut::Error)<<"Error in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<endl;
+		DebugOut(DebugOut::Error)<<error->message<<endl;
+		DebugOut(DebugOut::Error)<<"probably bad xml:"<<endl;
+		DebugOut(DebugOut::Error)<<introspectionXml<<endl;
 
 		g_error_free(error);
 
