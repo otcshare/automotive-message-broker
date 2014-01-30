@@ -29,33 +29,10 @@
 #include <unistd.h>
 #include <sstream>
 #include "debugout.h"
+#include "common.h"
 
 #include <QJsonDocument>
 #include <QVariantMap>
-
-bool WebSocketSink::doBinary = false;
-
-// libwebsocket_write helper function
-static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
-{
-	int retval = -1;
-
-	if(WebSocketSink::doBinary)
-	{
-		retval = libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
-	}
-	else
-	{
-		std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
-		char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
-		strcpy(buf, strToWrite);
-
-		retval = libwebsocket_write(lws, (unsigned char*)buf, len, LWS_WRITE_TEXT);
-	}
-
-	return retval;
-}
-
 
 WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty) : AbstractSink(re,map<string, string> ())
 {
@@ -88,10 +65,13 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 	reply["transactionid"]=m_uuid.c_str();
 
 	QByteArray replystr;
-	if(WebSocketSink::doBinary)
+	if(doBinary)
 		replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 	else
+	{
 		replystr = QJsonDocument::fromVariant(reply).toJson();
+		cleanJson(replystr);
+	}
 
 	lwsWrite(m_wsi, replystr.data(),replystr.length());
 }

@@ -24,18 +24,18 @@ pkg_check_modules(websockets REQUIRED libwebsockets)
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${QT_INCLUDE_DIRS})
 
-set(websocketsinkplugin_headers websocketsink.h websocketmanager.h)
-set(websocketsinkplugin_sources websocketsinkmanager.cpp websocketsink.cpp)
-add_library(websocketsink MODULE ${websocketsinkplugin_sources})
+set(websocketsink_headers websocketsink.h websocketmanager.h common.h)
+set(websocketsink_sources websocketsinkmanager.cpp websocketsink.cpp common.cpp)
+add_library(websocketsink MODULE ${websocketsink_sources})
 set_target_properties(websocketsink PROPERTIES PREFIX "")
 target_link_libraries(websocketsink amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES})
 
 install(TARGETS websocketsink LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
 
-set(websocketsourceplugin_headers websocketsource.h)
-set(websocketsourceplugin_sources websocketsource.cpp)
-add_library(websocketsource MODULE ${websocketsourceplugin_sources})
+set(websocketsource_headers websocketsource.h common.h)
+set(websocketsource_sources websocketsource.cpp common.cpp)
+add_library(websocketsource MODULE ${websocketsource_sources})
 set_target_properties(websocketsource PROPERTIES PREFIX "")
 target_link_libraries(websocketsource amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES})
 

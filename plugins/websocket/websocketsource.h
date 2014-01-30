@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <abstractsource.h>
 #include <string>
 #include <libwebsockets.h>
+#include <QByteArray>
 
 
 class WebSocketSource : public AbstractSource
@@ -59,6 +60,10 @@ public:
 	std::map<std::string,double> uuidTimeoutMap;
 	std::map<std::string,AsyncRangePropertyReply*> uuidRangedReplyMap;
 	
+	int partialMessageIndex;
+	QByteArray incompleteMessage;
+	int expectedMessageFrames;
+
 	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 
 private:

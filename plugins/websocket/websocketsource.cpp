@@ -32,6 +32,8 @@
 #include <QStringList>
 
 #include "debugout.h"
+#include "common.h"
+
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 libwebsocket_context *context = NULL;
 WebSocketSource *source;
@@ -41,28 +43,6 @@ double oldTimestamp=0;
 double totalTime=0;
 double numUpdates=0;
 double averageLatency=0;
-
-static bool doBinary = false;
-
-static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
-{
-	int retval = -1;
-
-	if(doBinary)
-	{
-		retval = libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
-	}
-	else
-	{
-		std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
-		char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
-		strcpy(buf, strToWrite);
-
-		retval = libwebsocket_write(lws, (unsigned char*)buf, len, LWS_WRITE_TEXT);
-	}
-
-	return retval;
-}
 
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len);
 static struct libwebsocket_protocols protocols[] = {
@@ -105,7 +85,10 @@ void WebSocketSource::checkSubscriptions()
 		if(doBinary)
 			replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 		else
+		{
 			replystr = QJsonDocument::fromVariant(reply).toJson();
+			cleanJson(replystr);
+		}
 
 		lwsWrite(clientsocket, replystr.data(), replystr.length());
 	}
@@ -237,7 +220,7 @@ static int checkTimeouts(gpointer data)
 	return 0;
 }
 
-static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len)
+static int callback_http_only(libwebsocket_context *context, struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user, void *in, size_t len)
 {
 	unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + 4096 + LWS_SEND_BUFFER_POST_PADDING];
 	int l;
@@ -269,15 +252,33 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			if(doBinary)
 				replystr = QJsonDocument::fromVariant(toSend).toBinaryData();
 			else
+			{
 				replystr = QJsonDocument::fromVariant(toSend).toJson();
+				cleanJson(replystr);
+			}
 
-			lwsWrite(wsi,replystr.data(),replystr.length());
+			lwsWrite(wsi, replystr, replystr.length());
 
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
 			QByteArray d((char*)in,len);
+
+			WebSocketSource * manager = source;
+
+			if(manager->expectedMessageFrames && manager->partialMessageIndex < manager->expectedMessageFrames)
+			{
+				manager->incompleteMessage += d;
+				manager->partialMessageIndex++;
+				break;
+			}
+			else if(manager->expectedMessageFrames && manager->partialMessageIndex == manager->expectedMessageFrames)
+			{
+				d = manager->incompleteMessage + d;
+				manager->expectedMessageFrames = 0;
+			}
+
 			QJsonDocument doc;
 
 			if(doBinary)
@@ -301,7 +302,15 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 			string id = call["transactionid"].toString().toStdString();
 
 			list<pair<string,string> > pairdata;
-			if (type == "valuechanged")
+
+			if(type == "multiframe")
+			{
+				manager->expectedMessageFrames = call["frames"].toInt();
+				manager->partialMessageIndex = 1;
+				manager->incompleteMessage = "";
+
+			}
+			else if (type == "valuechanged")
 			{
 				QVariantMap data = call["data"].toMap();
 
@@ -323,7 +332,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 					 *  a property is about to be updated in AMB.  This includes libwebsockets parsing and the
 					 *  JSON parsing in this section.
 					 */
-					
+
 					DebugOut(2)<<"websocket network + parse latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
 					totalTime += (currenttime - oldTimestamp)*1000;
 					numUpdates ++;
@@ -468,7 +477,7 @@ void WebSocketSource::setSupported(PropertyList list)
 	m_re->updateSupported(list,PropertyList(),this);
 }
 
-WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
+WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config), partialMessageIndex(0),expectedMessageFrames(0)
 {
 	m_sslEnabled = false;
 	clientConnected = false;
@@ -477,10 +486,12 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	struct lws_context_creation_info info;
 	memset(&info, 0, sizeof info);
 	info.protocols = protocols;
-	info.extensions = libwebsocket_get_internal_extensions();
+	info.extensions = nullptr;
+	//info.extensions = libwebsocket_get_internal_extensions();
 	info.gid = -1;
 	info.uid = -1;
 	info.port = CONTEXT_PORT_NO_LISTEN;
+	info.user = this;
 	//std::string ssl_key_path = "/home/michael/.ssh/id_rsa";
 	//info.ssl_ca_filepath = ssl_key_path.c_str();
 		
@@ -552,7 +563,10 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	if(doBinary)
 		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 	else
+	{
 		replystr = QJsonDocument::fromVariant(replyvar).toJson();
+		cleanJson(replystr);
+	}
 
 	lwsWrite(clientsocket, replystr.data(), replystr.length());
 }
@@ -591,7 +605,10 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	if(doBinary)
 		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 	else
+	{
 		replystr = QJsonDocument::fromVariant(replyvar).toJson();
+		cleanJson(replystr);
+	}
 
 	lwsWrite(clientsocket, replystr.data(), replystr.length());
 }
@@ -617,7 +634,10 @@ AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest reque
 	if(doBinary)
 		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 	else
+	{
 		replystr = QJsonDocument::fromVariant(replyvar).toJson();
+		cleanJson(replystr);
+	}
 
 	lwsWrite(clientsocket, replystr.data(), replystr.length());
 
