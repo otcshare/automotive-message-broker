@@ -463,7 +463,7 @@ static int callback_http_only(libwebsocket_context *context,struct libwebsocket 
 }
 void WebSocketSource::setSupported(PropertyList list)
 {
-	DebugOut() <<__SMALLFILE__ << ":" << __LINE__ <<"SET SUPPORTED"<<endl;
+	DebugOut() <<__SMALLFILE__ << ":" << __LINE__ <<" "<< __FUNCTION__ <<endl;
 	m_supportedProperties = list;
 	m_re->updateSupported(list,PropertyList(),this);
 }

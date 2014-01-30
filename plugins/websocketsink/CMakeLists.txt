@@ -1,4 +1,4 @@
-if(websocketsink_plugin)
+if(websocketold_plugin)
 
 include(CheckIncludeFiles)
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
@@ -13,4 +13,4 @@ target_link_libraries(websocketsinkplugin amb ${websockets_LIBRARIES} -L${CMAKE_
 
 install(TARGETS websocketsinkplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
-endif(websocketsink_plugin)
+endif(websocketold_plugin)

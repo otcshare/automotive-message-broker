@@ -5,7 +5,7 @@
 			"path" : "/usr/lib/automotive-message-broker/websocketsource.so",
 			"port" : "23000",
 			"ssl" : "false",
-			"ip" : "127.0.0.1",
+			"ip" : "192.168.1.40",
 			"binaryProtocol" : "false"
 		}
 	],

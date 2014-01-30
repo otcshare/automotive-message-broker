@@ -244,7 +244,8 @@ bool Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 	auto itr = mMasterPropertyList.begin();
 	while(itr != mMasterPropertyList.end())
 	{
-		if(itr->second == property) {
+		VehicleProperty::Property prop = itr->second;
+		if(prop == property) {
 			AbstractSource* src = itr->first;
 			src->subscribeToPropertyChanges(property);
 			// Move to next source. It will skip all the remaining properties in this source.
@@ -256,8 +257,8 @@ bool Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 		}
 	}
 
-	if(subscribed)
-		propertySinkMap[property].emplace(sink, std::string(""));
+	//if(subscribed)
+	propertySinkMap[property].emplace(sink, std::string(""));
 
 	return subscribed;
 }
@@ -368,7 +369,7 @@ void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
 		// Subscribe to property in a new source if such property was subscribed. This catches newly supported properties in the process.
 		//
 		// TODO: is this sufficient to:
-		/// Iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
+		// Iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
 		// which was originally located at the end of the setSupported and updateSupported functions? I think it is sufficient.
 		if( propertySinkMap.find(property) != propertySinkMap.end()){
 			source->subscribeToPropertyChanges(property);
