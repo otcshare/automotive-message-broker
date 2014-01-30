@@ -87,7 +87,7 @@ void WebSocketSource::checkSubscriptions()
 	{
 		VehicleProperty::Property prop = queuedRequests.front();
 		queuedRequests.pop_front();
-		if (ListPlusPlus<VehicleProperty::Property>(&activeRequests).contains(prop))
+		if (contains(activeRequests,prop))
 		{
 			return;
 		}

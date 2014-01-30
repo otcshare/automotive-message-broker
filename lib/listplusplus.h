@@ -57,7 +57,7 @@ private:
 template <class T, class V>
 bool contains(T iteratable, V value)
 {
-	return (std::find(iteratable.begin(), iteratable.end(), value) != iteratable.end());
+	return iteratable.size() > 0 && (std::find(iteratable.begin(), iteratable.end(), value) != iteratable.end());
 }
 
 template <class T, class V>
