@@ -25,11 +25,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <opencv/cv.h>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <QObject>
+
 using namespace std;
 
-class OpenCvLuxPlugin: public AbstractSource
+class OpenCvLuxPlugin: public QObject, public AbstractSource
 {
-
+Q_OBJECT
 public:
 
 	struct Shared
@@ -63,7 +65,8 @@ public:
 	
 	void updateProperty(uint lux);
 
-
+public slots:
+	void imgProcResult();
 
 	
 private: /// methods:

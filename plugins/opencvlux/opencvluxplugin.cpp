@@ -22,6 +22,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
 
+#include <QFuture>
+#include <QFutureWatcher>
+#include <QtConcurrent/QtConcurrent>
+
 #ifdef OPENCL
 #include <opencv2/ocl/ocl.hpp>
 #endif
@@ -257,13 +261,17 @@ static int grabImage(void *data)
 		*(shared->m_capture) >> m_image;
 	}
 
-	/*if(shared->threaded)
+	if(shared->threaded)
 	{
+		QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>();
+		QObject::connect(watcher, &QFutureWatcher<uint>::finished, shared->parent, &OpenCvLuxPlugin::imgProcResult);
 
+		QFuture<uint> future = QtConcurrent::run( evalImage, m_image, shared);
+		watcher->setFuture(future);
 	}
-	else*/
+	else
 	{
-		int lux = evalImage(m_image,shared);
+		int lux = evalImage(m_image, shared);
 		detectLight(m_image,shared);
 		shared->parent->updateProperty(lux);
 	}
@@ -359,9 +367,8 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 {
 	VehicleProperty::ExteriorBrightnessType l(lux);
 
-	for(auto itr = replyQueue.begin(); itr != replyQueue.end(); itr++)
+	for(auto reply : replyQueue)
 	{
-		AsyncPropertyReply* reply = *itr;
 		reply->value = &l;
 		reply->success = true;
 		try{
@@ -384,7 +391,13 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 
 }
 
+void OpenCvLuxPlugin::imgProcResult()
+{
+	QFutureWatcher<uint> *watcher = dynamic_cast<QFutureWatcher<uint>* >(sender());
 
+	uint lux = watcher->result();
+	shared->parent->updateProperty(lux);
+}
 
 TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
 {

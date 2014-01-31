@@ -27,14 +27,31 @@ else(cuda)
 	remove_definitions(-DCUDA)
 endif(cuda)
 
-include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+find_package(Qt5Core REQUIRED)
+
+if(Qt5Core_FOUND)
+	message(STATUS "using Qt5")
+
+	set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} )
+	set(QT_LIBRARIES ${Qt5Core_LIBRARIES} )
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+	message(STATUS "size of void_p: ${CMAKE_SIZEOF_VOID_P}")
+	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=large")
+	endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
+	add_definitions(${Qt5Core_DEFINITIONS})
+
+endif(Qt5Core_FOUND)
+set(CMAKE_AUTOMOC ON)
+
+include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${QT_INCLUDE_DIRS})
 
 set(opencvluxplugin_headers opencvluxplugin.h)
 set(opencvluxplugin_sources opencvluxplugin.cpp)
 
-add_library(opencvluxplugin MODULE ${opencvluxplugin_sources} ${opencvluxplugin_headers_moc})
+add_library(opencvluxplugin MODULE ${opencvluxplugin_sources})
 set_target_properties(opencvluxplugin PROPERTIES PREFIX "")
-target_link_libraries(opencvluxplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${OpenCV_LIBS} ${Boost_LIBRARIES})
+target_link_libraries(opencvluxplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES})
 
 install(TARGETS opencvluxplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
 
