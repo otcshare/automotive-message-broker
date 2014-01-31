@@ -273,8 +273,8 @@ void AbstractDBusInterface::registerObject()
 
 	if(!boost::algorithm::ends_with(introspectionXml,"</node>"))
 	{
-		introspectionXml += "</interface>";
-		introspectionXml += "</node>";
+		introspectionXml += "</interface>"
+				"</node>";
 	}
 	
 	GError* error=NULL;
