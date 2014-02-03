@@ -225,7 +225,7 @@ AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 	if(src && ((src->supportedOperations() & AbstractSource::Set) == AbstractSource::Set))
 		return src->setProperty(request);
 
-	DebugOut(0)<<"Error: setProperty opration failed"<<endl;
+	DebugOut(DebugOut::Warning)<<"Error: setProperty opration failed.  Property may not be supported: "<<request.property<<endl;
 	return NULL;
 }
 
