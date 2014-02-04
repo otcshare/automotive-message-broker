@@ -85,6 +85,8 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	std::string ssl_key_path;
 	int options = 0;
 	bool ssl = false;
+	info.extensions = nullptr;
+
 	//Try to load config
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
@@ -117,11 +119,19 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 				ssl = false;
 			}
 		}
+		if ((*i).first == "useExtensions")
+		{
+			{
+				if((*i).second == "true")
+				{
+					info.extensions = libwebsocket_get_internal_extensions();
+				}
+				else info.extensions = nullptr;
+			}
+		}
 	}
 	info.iface = interface.c_str();
 	info.protocols = protocollist;
-	info.extensions = nullptr;
-	//info.extensions = libwebsocket_get_internal_extensions();
 	info.gid = -1;
 	info.uid = -1;
 	info.options = options;
@@ -342,7 +352,7 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 
 	lwsWrite(socket, replystr, replystr.length());
 
-	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property, doBinary);
+	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property);
 	m_sinkMap[property].push_back(sink);
 }
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)

@@ -487,16 +487,18 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	memset(&info, 0, sizeof info);
 	info.protocols = protocols;
 	info.extensions = nullptr;
-	//info.extensions = libwebsocket_get_internal_extensions();
+
+	if(config.find("useExtensions") != config.end() && config["useExtensions"] == "true")
+	{
+		info.extensions = libwebsocket_get_internal_extensions();
+	}
+
 	info.gid = -1;
 	info.uid = -1;
 	info.port = CONTEXT_PORT_NO_LISTEN;
 	info.user = this;
-	//std::string ssl_key_path = "/home/michael/.ssh/id_rsa";
-	//info.ssl_ca_filepath = ssl_key_path.c_str();
-		
+
 	context = libwebsocket_create_context(&info);
-	//context = libwebsocket_create_context(CONTEXT_PORT_NO_LISTEN, NULL,protocols, libwebsocket_internal_extensions,NULL, NULL, -1, -1, 0);
 
 	setConfiguration(config);
 	re->setSupported(supported(), this);

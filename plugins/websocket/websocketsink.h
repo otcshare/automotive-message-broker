@@ -29,7 +29,7 @@ class WebSocketSink : public AbstractSink
 {
 
 public:
-	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty, bool dB);
+	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty);
 	~WebSocketSink();
 	const string uuid() ;
 	void propertyChanged(AbstractPropertyType *value);
