@@ -24,11 +24,12 @@
 #include <abstractroutingengine.h>
 #include "abstractsink.h"
 #include <libwebsockets.h>
+
 class WebSocketSink : public AbstractSink
 {
 
 public:
-	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty);
+	WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty, bool dB);
 	~WebSocketSink();
 	const string uuid() ;
 	void propertyChanged(AbstractPropertyType *value);

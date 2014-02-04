@@ -125,7 +125,7 @@ PropertyList Core::supported()
 
 void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 {
-	VehicleProperty::Property property = value->name;
+	VehicleProperty::Property &property = value->name;
 
 	performance.propertiesPerSecond++;
 

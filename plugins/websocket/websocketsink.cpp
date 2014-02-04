@@ -34,8 +34,9 @@
 #include <QJsonDocument>
 #include <QVariantMap>
 
-WebSocketSink::WebSocketSink(AbstractRoutingEngine* re,libwebsocket *wsi,string uuid,VehicleProperty::Property property,std::string ambdproperty) : AbstractSink(re,map<string, string> ())
+WebSocketSink::WebSocketSink(AbstractRoutingEngine* re, libwebsocket *wsi, string uuid, VehicleProperty::Property property, std::string ambdproperty, bool dB) : AbstractSink(re,map<string, string> ())
 {
+	doBinary = dB;
 	m_amdbproperty = ambdproperty;
 	m_uuid = uuid;
 	m_wsi = wsi;
@@ -73,7 +74,7 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 		cleanJson(replystr);
 	}
 
-	lwsWrite(m_wsi, replystr.data(),replystr.length());
+	lwsWrite(m_wsi, replystr,replystr.length());
 }
 WebSocketSink::~WebSocketSink()
 {

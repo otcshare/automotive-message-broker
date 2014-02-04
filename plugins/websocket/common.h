@@ -54,21 +54,22 @@ static int lwsWrite(struct libwebsocket *lws, QByteArray d, int len)
 			range = framesize;
 		else range = temp.length();
 
-		const char* strToWrite = temp.mid(0,range).data();
+		QByteArray toWrite = temp.mid(0,range);
+		const char* strToWrite = toWrite.data();
 
 		temp = temp.mid(range);
 
 		if(doBinary)
 		{
-			retval = libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
+			retval = libwebsocket_write(lws, (unsigned char*)strToWrite, toWrite.length(), LWS_WRITE_BINARY);
 		}
 		else
 		{
 			std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
 			char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
-			strcpy(buf, strToWrite);
+			memcpy(buf, strToWrite, toWrite.length());
 
-			retval = libwebsocket_write(lws, (unsigned char*)buf, len, LWS_WRITE_TEXT);
+			retval = libwebsocket_write(lws, (unsigned char*)strToWrite, toWrite.length(), LWS_WRITE_TEXT);
 		}
 	}
 		return retval;

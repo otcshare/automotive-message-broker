@@ -185,7 +185,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 			cleanJson(replystr);
 		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 
 		delete reply;
 	};
@@ -233,7 +233,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 			cleanJson(replystr);
 		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 
 		delete reply;
 	};
@@ -270,7 +270,7 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 			cleanJson(replystr);
 		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 	}
 }
 void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Property property,string value,Zone::Type zone,string uuid)
@@ -304,7 +304,7 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 			cleanJson(replystr);
 		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 
 		delete reply;
 	};
@@ -340,9 +340,9 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 		cleanJson(replystr);
 	}
 
-	lwsWrite(socket, replystr.data(), replystr.length());
+	lwsWrite(socket, replystr, replystr.length());
 
-	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property);
+	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property, doBinary);
 	m_sinkMap[property].push_back(sink);
 }
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
@@ -593,7 +593,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 						cleanJson(replystr);
 					}
 
-					lwsWrite(wsi, replystr.data(), replystr.length());
+					lwsWrite(wsi, replystr, replystr.length());
 				}
 				else
 				{

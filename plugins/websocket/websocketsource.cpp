@@ -90,7 +90,7 @@ void WebSocketSource::checkSubscriptions()
 			cleanJson(replystr);
 		}
 
-		lwsWrite(clientsocket, replystr.data(), replystr.length());
+		lwsWrite(clientsocket, replystr, replystr.length());
 	}
 }
 void WebSocketSource::setConfiguration(map<string, string> config)
@@ -419,7 +419,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 						v->timestamp = timestamp;
 						v->sequence = sequence;
 
-						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
+						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end() && source->uuidReplyMap[id]->error != AsyncPropertyReply::Timeout)
 						{
 							source->uuidReplyMap[id]->value = v;
 							source->uuidReplyMap[id]->success = true;
@@ -568,7 +568,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 		cleanJson(replystr);
 	}
 
-	lwsWrite(clientsocket, replystr.data(), replystr.length());
+	lwsWrite(clientsocket, replystr, replystr.length());
 }
 
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -610,7 +610,7 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 		cleanJson(replystr);
 	}
 
-	lwsWrite(clientsocket, replystr.data(), replystr.length());
+	lwsWrite(clientsocket, replystr, replystr.length());
 }
 
 AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest request )
@@ -639,7 +639,7 @@ AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest reque
 		cleanJson(replystr);
 	}
 
-	lwsWrite(clientsocket, replystr.data(), replystr.length());
+	lwsWrite(clientsocket, replystr, replystr.length());
 
 	///TODO: we should actually wait for a response before we simply complete the call
 	reply->success = true;
