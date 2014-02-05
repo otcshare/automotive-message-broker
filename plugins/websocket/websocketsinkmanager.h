@@ -29,6 +29,7 @@
 #include <stdexcept>
 #include "sys/types.h"
 #include <stdlib.h>
+#include <QByteArray>
 
 class WebSocketSinkManager: public AbstractSinkManager
 {
@@ -46,11 +47,17 @@ public:
 	void setConfiguration(map<string, string> config);
 	void setValue(libwebsocket* socket,VehicleProperty::Property property,string value, Zone::Type zone, string uuid);
 	list<VehicleProperty::Property> getSupportedProperties();
+
+	int partialMessageIndex;
+	QByteArray incompleteMessage;
+	int expectedMessageFrames;
+
 private:
 	map<int,GIOChannel*> m_ioChannelMap;
 	map<int,guint> m_ioSourceMap;
 	AbstractRoutingEngine *m_engine;
 	struct libwebsocket_protocols protocollist[2];
+
 };
 
 #endif // WEBSOCKETSINKMANAGER_H

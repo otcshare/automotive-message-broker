@@ -342,9 +342,6 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
   testSubscription();
 
   testSetAndGet();
-
-  DebugOut() << "Exiting..." << endl;
-  exit(-1);
 }
 
 TestPlugin::~TestPlugin()

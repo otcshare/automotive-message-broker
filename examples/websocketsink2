@@ -3,7 +3,7 @@
 		{
 			"name" : "ExampleSouce",
 			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so",
-			"delay" : "1000"
+			"delay" : "6"
 		}
 	],
 	"sinks": [
@@ -13,7 +13,8 @@
 			"interface" : "eth1",
 			"ssl" : "false",
 			"port" : "23000",
-			"binaryProtocol" : "false"
+			"binaryProtocol" : "true",
+			"useExtensions" : "true"
 		} 
 	]
 }

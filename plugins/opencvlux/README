@@ -24,6 +24,8 @@ To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/
 	"device" : "0"
 }
 
+NOTE: some features require the qtmainloop to be running.  see the main README for details.
+
 Configuration Key Definitions:
 
 "name"
@@ -38,8 +40,8 @@ Camera to use.  The string "0" corrisponds to /dev/video0, "1" to /dev/video1, e
 Default: "0"
 
 "threaded"
-Compute pixel intensity in another thread.  Set to "true" or "false".  This feature has been disabled
-for now.
+Compute pixel intensity in another thread.  Set to "true" or "false".  You need to use the qtmainloop in
+order for this feature to function.
 
 Default: "false"
 

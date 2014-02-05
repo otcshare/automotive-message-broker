@@ -19,10 +19,12 @@
 
 #ifndef WEBSOCKETSINK_H
 #define WEBSOCKETSINK_H
+
 #include <glib.h>
 #include <abstractroutingengine.h>
 #include "abstractsink.h"
 #include <libwebsockets.h>
+
 class WebSocketSink : public AbstractSink
 {
 
@@ -34,8 +36,6 @@ public:
 	void supportedChanged(PropertyList supportedProperties);
 	PropertyList subscriptions();
 	libwebsocket *socket() { return m_wsi; }
-
-	static bool doBinary;
 
 private:
 	char *webSocketBuffer;

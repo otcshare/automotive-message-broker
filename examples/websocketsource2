@@ -6,7 +6,8 @@
 			"port" : "23000",
 			"ssl" : "false",
 			"ip" : "192.168.1.40",
-			"binaryProtocol" : "false"
+			"binaryProtocol" : "true",
+			"useExtensions" : "true"
 		}
 	],
 	"sinks": [

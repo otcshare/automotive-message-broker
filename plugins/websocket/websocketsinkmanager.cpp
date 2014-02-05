@@ -19,6 +19,8 @@
 
 #include "websocketsinkmanager.h"
 #include "websocketsink.h"
+#include "common.h"
+
 #include <sstream>
 #include <json/json.h>
 #include <json/json_object.h>
@@ -41,30 +43,8 @@ WebSocketSinkManager *sinkManager;
 static int websocket_callback(struct libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user,void *in, size_t len);
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data);
 
-static bool doBinary = false;
-
-// libwebsocket_write helper function
-static int lwsWrite(struct libwebsocket *lws, const char* strToWrite, int len)
-{
-	int retval = -1;
-
-	if(doBinary)
-	{
-		retval = libwebsocket_write(lws, (unsigned char*)strToWrite, len, LWS_WRITE_BINARY);
-	}
-	else
-	{
-		std::unique_ptr<char[]> buffer(new char[LWS_SEND_BUFFER_PRE_PADDING + len + LWS_SEND_BUFFER_POST_PADDING]);
-		char *buf = buffer.get() + LWS_SEND_BUFFER_PRE_PADDING;
-		strcpy(buf, strToWrite);
-
-		retval = libwebsocket_write(lws, (unsigned char*)buf, len, LWS_WRITE_TEXT);
-	}
-
-	return retval;
-}
-
-WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config):AbstractSinkManager(engine, config)
+WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
+	:AbstractSinkManager(engine, config), partialMessageIndex(0), expectedMessageFrames(0)
 {
 	m_engine = engine;
 
@@ -72,7 +52,6 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<st
 	if(config.find("binaryProtocol") != config.end())
 	{
 		doBinary = config["binaryProtocol"] == "true";
-		WebSocketSink::doBinary = doBinary;
 	}
 
 	//Create a listening socket on port 23000 on localhost.
@@ -106,6 +85,8 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 	std::string ssl_key_path;
 	int options = 0;
 	bool ssl = false;
+	info.extensions = nullptr;
+
 	//Try to load config
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
 	{
@@ -138,14 +119,24 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 				ssl = false;
 			}
 		}
+		if ((*i).first == "useExtensions")
+		{
+			{
+				if((*i).second == "true")
+				{
+					info.extensions = libwebsocket_get_internal_extensions();
+				}
+				else info.extensions = nullptr;
+			}
+		}
 	}
 	info.iface = interface.c_str();
 	info.protocols = protocollist;
-	info.extensions = libwebsocket_get_internal_extensions();
 	info.gid = -1;
 	info.uid = -1;
 	info.options = options;
 	info.port = port;
+	info.user = this;
 	if (ssl)
 	{
 		info.ssl_cert_filepath = ssl_cert_path.c_str();
@@ -199,9 +190,12 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		if(doBinary)
 			replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 		else
+		{
 			replystr = QJsonDocument::fromVariant(replyvar).toJson();
+			cleanJson(replystr);
+		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 
 		delete reply;
 	};
@@ -244,9 +238,12 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 		if(doBinary)
 			replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 		else
+		{
 			replystr = QJsonDocument::fromVariant(replyvar).toJson();
+			cleanJson(replystr);
+		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 
 		delete reply;
 	};
@@ -278,9 +275,12 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		if(doBinary)
 			replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 		else
+		{
 			replystr = QJsonDocument::fromVariant(reply).toJson();
+			cleanJson(replystr);
+		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 	}
 }
 void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Property property,string value,Zone::Type zone,string uuid)
@@ -309,9 +309,12 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 		if(doBinary)
 			replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
 		else
+		{
 			replystr = QJsonDocument::fromVariant(replyvar).toJson();
+			cleanJson(replystr);
+		}
 
-		lwsWrite(socket, replystr.data(), replystr.length());
+		lwsWrite(socket, replystr, replystr.length());
 
 		delete reply;
 	};
@@ -342,9 +345,12 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	if(doBinary)
 		replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 	else
+	{
 		replystr = QJsonDocument::fromVariant(reply).toJson();
+		cleanJson(replystr);
+	}
 
-	lwsWrite(socket, replystr.data(), replystr.length());
+	lwsWrite(socket, replystr, replystr.length());
 
 	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property);
 	m_sinkMap[property].push_back(sink);
@@ -471,6 +477,20 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 
 			QByteArray d((char*)in,len);
 
+			WebSocketSinkManager * manager = sinkManager;
+
+			if(manager->expectedMessageFrames && manager->partialMessageIndex < manager->expectedMessageFrames)
+			{
+				manager->incompleteMessage += d;
+				manager->partialMessageIndex++;
+				break;
+			}
+			else if(manager->expectedMessageFrames && manager->partialMessageIndex == manager->expectedMessageFrames)
+			{
+				d = manager->incompleteMessage + d;
+				manager->expectedMessageFrames = 0;
+			}
+
 			QJsonDocument doc;
 			if(doBinary)
 				doc = QJsonDocument::fromBinaryData(d);
@@ -489,7 +509,14 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			string name = call["name"].toString().toStdString();
 			string id = call["transactionid"].toString().toStdString();
 
-			if (type == "method")
+			if (type == "multiframe")
+			{
+
+				manager->expectedMessageFrames = call["frames"].toInt();
+				manager->partialMessageIndex = 1;
+				manager->incompleteMessage = "";
+			}
+			else if (type == "method")
 			{
 				if(name == "getRanged")
 				{
@@ -571,9 +598,12 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					if(doBinary)
 						replystr = QJsonDocument::fromVariant(reply).toBinaryData();
 					else
+					{
 						replystr = QJsonDocument::fromVariant(reply).toJson();
+						cleanJson(replystr);
+					}
 
-					lwsWrite(wsi, replystr.data(), replystr.length());
+					lwsWrite(wsi, replystr, replystr.length());
 				}
 				else
 				{

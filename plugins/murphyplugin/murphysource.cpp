@@ -28,11 +28,12 @@
 
 #include <murphy/common.h>
 
-#ifdef USE_QT_CORE
+/*#ifdef USE_QT_CORE
 #include <murphy/qt/qt-glue.h>
-#else
+#else*/
+
 #include <murphy/glib/glib-glue.h>
-#endif
+//#endif
 
 // #include <vehicleproperty.h>
 // #include <abstractpropertytype.h>
@@ -281,14 +282,14 @@ MurphySource::MurphySource(AbstractRoutingEngine *re, map<string, string> config
 
     // main loop integration
 
-#ifdef USE_QT_CORE
+/*#ifdef USE_QT_CORE
     m_ml = mrp_mainloop_qt_get();
     debugOut("Murphy plugin initialized using QT mainloop!");
-#else
+#else*/
     GMainLoop *g_ml = g_main_loop_new(NULL, TRUE);
     m_ml = mrp_mainloop_glib_get(g_ml);
     debugOut("Murphy plugin initialized using glib mainloop!");
-#endif
+//#endif
 
     setConfiguration(config);
 }

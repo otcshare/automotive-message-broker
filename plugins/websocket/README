@@ -1,0 +1,71 @@
+websocket plugins
+
+The websocket sink and source plugins are designed to relay data between devices and 
+potentially to web pages.
+
+To enable the websocket plugins, run cmake and enable the websocket_plugin option:
+
+cmake -Dwebsocket_plugin=On ..
+
+
+To use the websocket sink plugin, add the following to the "sinks" array in /etc/ambd/config:
+
+{
+	"name" : "websocket sink",
+	"path" : "/usr/lib/automotive-message-broker/websocketsink.so",
+	"interface" : "lo",
+	"useExtensions" : "true",
+	"binaryProtocol" : "false",
+	"ssl" : "false".
+	"cert" : "libwebsockets-test-server.pem",
+	"key" : "libwebsockets-test-server.key.pem"
+}
+
+To use the websocket source plugin, add the following to the "sources" array in /etc/ambd/config:
+
+{
+	"name" : "WebsocketSource",
+	"path" : "/usr/lib/automotive-message-broker/websocketsource.so",
+	"port" : "23000",
+	"ssl" : "false",
+	"ip" : "192.168.1.40",
+	"binaryProtocol" : "true",
+	"useExtensions" : "true"
+}
+
+Configuration Key Definitions:
+
+"name"
+name of plugin.  This key is not used by the plugin at this moment.
+
+"path"
+path to plugin on the filesystem.
+
+"interface" (sink only)
+interface device.  Usually "lo" for loopback or "eth0".
+
+default: lo
+
+"useExtensions"
+Use built in libwebsocket extensions like zlib compression of frames
+
+default: false
+
+"binaryProtocol"
+Use fast and efficient binary protocol instead of JSON.
+
+default: false
+
+"ssl"
+Use ssl secure socket
+
+default: false
+
+"cert" (sink only)
+
+path to ssl certificate
+
+"key" (sink only)
+
+path to ssl key
+
