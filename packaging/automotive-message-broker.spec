@@ -28,6 +28,7 @@ BuildRequires:  murphy-glib-devel
 BuildRequires:  murphy-glib
 BuildRequires:  dbus-devel
 BuildRequires:  qt5-qtcore-devel
+BuildRequires:  qt5-qtconcurrent-devel
 
 %description
 Automotive Message Broker is a vehicle network abstraction system.
@@ -65,6 +66,15 @@ Requires: %{name} = %{version}-%{release}
 
 %description plugins-common
 library containing a kitchen-sink of common utility functions
+
+%package plugins-qtmainloop
+Summary:    qt5 mainloop plugin
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   qt5-qtcore
+
+%description plugins-qtmainloop
+Qt mainloop plugin enables qt-based source and sink plugins to run using qt mainloop
 
 %package plugins-obd2
 Summary:    OBD-II plugin
@@ -189,6 +199,11 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %manifest packaging.in/amb.manifest.plugins
 %defattr(-,root,root,-)
 %{_libdir}/libamb-plugins-common.so
+
+%files plugins-qtmainloop
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/qtmainloopplugin.so
 
 %files plugins-wheel
 %defattr(-,root,root,-)
