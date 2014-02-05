@@ -65,7 +65,7 @@ public:
 	
 	void updateProperty(uint lux);
 
-public slots:
+public Q_SLOTS:
 	void imgProcResult();
 
 	
