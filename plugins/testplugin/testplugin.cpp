@@ -294,54 +294,61 @@ bool TestPlugin::testCoreUpdateSupported()
 
 void TestPlugin::setConfiguration(map<string, string> config)
 {
-// 	//Config has been passed, let's start stuff up.
+	// 	//Config has been passed, let's start stuff up.
 }
 
 TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	: AbstractSource(re, config),
-	m_supportedProperties({TestProptertyName1, TestProptertyName2}),
-	subscriptionsToSupportedCounter(0),
-	subscriptionsToUnsupportedCounter(0),
-	unsubscriptionsToSupportedCounter(0),
-	unsubscriptionsToUnsupportedCounter(0),
-	propertyChanges(0),
-	supportedPropertyChanges(0)
+	  m_supportedProperties({TestProptertyName1, TestProptertyName2}),
+	  subscriptionsToSupportedCounter(0),
+	  subscriptionsToUnsupportedCounter(0),
+	  unsubscriptionsToSupportedCounter(0),
+	  unsubscriptionsToUnsupportedCounter(0),
+	  propertyChanges(0),
+	  supportedPropertyChanges(0)
 {
 
-  DebugOut() << "Testing Core::setSupported... " << endl;
-  testCoreSetSupported();
+	cout<<"Capabilities: "<<endl;
 
-  DebugOut() << "Testing MapPropertyType... " << endl;
-  MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmap("something");
-  MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmaptwo("something");
-  propmap.append(Zone::RearLeft,Door::Ajar);
-  GVariant *var = propmap.toVariant();
-  gsize dictsize = g_variant_n_children(var);
-  //DebugOut() << var << endl;
-  propmaptwo.fromVariant(var);
+	for(auto prop : VehicleProperty::capabilities())
+	{
+		cout<<prop<<endl;
+	}
 
-  g_assert(propmaptwo.toString() == propmap.toString());
+	DebugOut() << "Testing Core::setSupported... " << endl;
+	testCoreSetSupported();
 
-  DebugOut() << "Testing ListPropertyType... " << endl;
-  VehicleProperty::TripMetersType* tfirst = new VehicleProperty::TripMetersType();
-  VehicleProperty::TripMetersType* tsecond = new VehicleProperty::TripMetersType();
-  BasicPropertyType<uint16_t> v1(0);
-  BasicPropertyType<uint16_t> v2(5);
-  BasicPropertyType<uint16_t> v3(10);
-  tfirst->append(&v1);
-  tfirst->append(&v2);
-  tfirst->append(&v3);
-  tsecond->fromVariant(tfirst->toVariant());
+	DebugOut() << "Testing MapPropertyType... " << endl;
+	MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmap("something");
+	MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmaptwo("something");
+	propmap.append(Zone::RearLeft,Door::Ajar);
+	GVariant *var = propmap.toVariant();
+	gsize dictsize = g_variant_n_children(var);
+	//DebugOut() << var << endl;
+	propmaptwo.fromVariant(var);
 
-  g_assert (tfirst->toString() == tsecond->toString());
+	g_assert(propmaptwo.toString() == propmap.toString());
 
-  testBooleanToStringFromString();
+	DebugOut() << "Testing ListPropertyType... " << endl;
+	VehicleProperty::TripMetersType* tfirst = new VehicleProperty::TripMetersType();
+	VehicleProperty::TripMetersType* tsecond = new VehicleProperty::TripMetersType();
+	BasicPropertyType<uint16_t> v1(0);
+	BasicPropertyType<uint16_t> v2(5);
+	BasicPropertyType<uint16_t> v3(10);
+	tfirst->append(&v1);
+	tfirst->append(&v2);
+	tfirst->append(&v3);
+	tsecond->fromVariant(tfirst->toVariant());
 
-  g_assert (testCoreUpdateSupported());
+	g_assert (tfirst->toString() == tsecond->toString());
 
-  testSubscription();
+	testBooleanToStringFromString();
 
-  testSetAndGet();
+	g_assert (testCoreUpdateSupported());
+
+	testSubscription();
+
+	testSetAndGet();
 }
 
 TestPlugin::~TestPlugin()
