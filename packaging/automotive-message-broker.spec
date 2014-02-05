@@ -134,7 +134,7 @@ Plugin that provides location data from nmea devices including bluetooth
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=OFF -Dgpsnmea_plugin=ON
+%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=OFF -Dgpsnmea_plugin=ON
 
 make %{?jobs:-j%jobs}
 
