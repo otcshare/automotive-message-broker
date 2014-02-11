@@ -1,14 +1,8 @@
 /**
-
-
 Details. 
 
-\def-api-feature http://tizen.org/api/vehicle 
 \brief Allows access to the vehicle API 
-
-
-
-*/
+**/
 
 module Vehicle {
 
@@ -82,7 +76,11 @@ interface org.automotive.Manager  {
 	String FindObjectForZone(String objectName, Zone zone);
 	
 	/**  
-	 *  \brief find the DBus object path matching the given "objectName"
+	 *  \brief find the DBus object path matching the given "objectName".
+	 *
+         *  If the object path does not exist, it will be created.  The object path will be removed
+         *  when the last proccess that calls Find* disconnects from DBus.
+         *
 	 *  \arg String objectName to find
 	 *  \returns list of object paths that provide the given object Name.
 	**/
@@ -90,6 +88,10 @@ interface org.automotive.Manager  {
         
 	/**  
 	 *  \brief get a list of zones for a given objectName.
+	 *
+	 *  If the object path does not exist, it will be created.  The object path will be removed
+	 *  when the last proccess that calls Find* disconnects from DBus.
+	 *
 	 *  \arg String objectName object name.
 	 *  \returns list of zones for the given objectName (@see Zone)
 	**/

@@ -102,6 +102,10 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 	propertyInfoMap[VehicleProperty::AirConditioning] = acInfo;
 
 	re->setSupported(supported(), this);
+
+	PropertyList testSupported = re->supported();
+
+	g_assert(contains(testSupported,VehicleProperty::MachineGunTurretStatus));
 }
 
 
