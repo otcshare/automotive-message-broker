@@ -16,11 +16,6 @@ propertyToSet = args.property
 value = args.value
 valueType = args.valueType
 
-print objectName
-print propertyToSet
-print value
-print valueType
-
 realValue = 0
 if valueType == "boolean":
 	realValue = bool(value)
@@ -36,3 +31,4 @@ object = managerInterface.FindObjectForZone(objectName, 0)
 
 propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.freedesktop.DBus.Properties")
 print propertiesInterface.Set("org.automotive."+objectName, propertyToSet, realValue)
+print "Success!"
