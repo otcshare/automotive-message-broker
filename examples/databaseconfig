@@ -12,7 +12,8 @@
 			"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
 			"databaseFile" : "/tmp/storage",
 			"startOnLoad" : "true",
-			"bufferLength" : "1"
+			"bufferLength" : "1",
+			"frequency" : "1"
 		},
 		{
 			"name" : "Example Sink",

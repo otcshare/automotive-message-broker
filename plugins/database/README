@@ -17,7 +17,8 @@ To use the Database plugin, add the following to the "sources" array in /etc/amb
 	"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
 	"startOnLoad" : "false",
 	"playbackOnLoad" : "false",
-	"playbackMultiplier" : "1"
+	"playbackMultiplier" : "1",
+	"frequency" : "1"
 }
 
 Configuration Key Definitions:
@@ -60,6 +61,12 @@ etc.
 
 Default: 1
 
+"frequency"
+Frequency in Hz in which the database will write contents.  Only the newest values
+will be written.  Other values are discarded.  If bufferLength is not full,the 
+database will not be written to until it is.
+
+Default: 1
 
 AMB Properties:
 
