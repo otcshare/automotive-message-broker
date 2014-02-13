@@ -113,6 +113,8 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 		request.properties = propertyList;
 		request.timeBegin = beginTime;
 		request.timeEnd = endTime;
+		request.zone = iface->zone();
+		request.sourceUuid = iface->source();
 
 		request.completed = [&invocation,&ifaceName](AsyncRangePropertyReply* reply)
 		{

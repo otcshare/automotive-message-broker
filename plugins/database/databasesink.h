@@ -94,10 +94,11 @@ private:
 
 class DBObject {
 public:
-	DBObject(): time(0), sequence(0), quit(false) {}
+	DBObject(): zone(0), time(0), sequence(0), quit(false) {}
 	std::string key;
 	std::string value;
 	std::string source;
+	int32_t zone;
 	double time;
 	int32_t sequence;
 	bool quit;
