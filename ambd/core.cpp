@@ -208,8 +208,7 @@ AsyncRangePropertyReply * Core::getRangePropertyAsync(AsyncRangePropertyRequest 
 	for(auto itr = mSources.begin(); itr != mSources.end(); ++itr)
 	{
 		AbstractSource* src = itr->second;
-		if(((src->supportedOperations() & AbstractSource::GetRanged) == AbstractSource::GetRanged)
-				&& (request.sourceUuid == "" || request.sourceUuid == src->uuid()))
+		if(((src->supportedOperations() & AbstractSource::GetRanged) == AbstractSource::GetRanged))
 		{
 			src->getRangePropertyAsync(reply);
 		}

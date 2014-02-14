@@ -1,8 +1,14 @@
 Release notes for release 0.12
 
 New features:
+- Added "frequency" option to database plugin.  Now periodic data can be written to the db.
+  this is useful for high speed data that you don't want to flood the database.
+- New test tools: amb-get, amb-set and amb-get-history
 
 Changes:
 - Deprecated and removed the "FooChanged" (where "Foo" is a property like "VehicleSpeed") signal
+- DBus Object paths do not appear until FindObject* is called.  The object path disappears with
+  the last pid that called FindObject* disconnects from DBus (or closes).
 
 Fixes:
+- database plugin updated to use zones

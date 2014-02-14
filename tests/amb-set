@@ -9,12 +9,15 @@ parser.add_argument("set", help="{objectName}")
 parser.add_argument("property", help="{propertyToSet}")
 parser.add_argument("value", help="{value}")
 parser.add_argument("valueType", help="{valueType}")
+parser.add_argument("zone", help="{zone}")
+
 args = parser.parse_args()
 
 objectName = args.set
 propertyToSet = args.property
 value = args.value
 valueType = args.valueType
+zone = int(args.zone)
 
 realValue = 0
 if valueType == "boolean":
@@ -27,8 +30,8 @@ bus = dbus.SystemBus()
 managerObject = bus.get_object("org.automotive.message.broker", "/");
 managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
 
-object = managerInterface.FindObjectForZone(objectName, 0)
+object = managerInterface.FindObjectForZone(objectName, zone)
 
 propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.freedesktop.DBus.Properties")
-print propertiesInterface.Set("org.automotive."+objectName, propertyToSet, realValue)
+propertiesInterface.Set("org.automotive."+objectName, propertyToSet, realValue)
 print "Success!"

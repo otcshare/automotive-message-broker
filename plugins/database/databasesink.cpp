@@ -3,6 +3,7 @@
 #include "listplusplus.h"
 
 int bufferLength = 100;
+int timeout=1000;
 
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -22,25 +23,28 @@ void * cbFunc(gpointer data)
 
 	while(1)
 	{
-		DBObject* obj = shared->queue.pop();
+		usleep(timeout*1000);
 
-		if( obj->quit )
+		DBObject obj = shared->queue.pop();
+
+		if( obj.quit )
 		{
-			delete obj;
 			break;
 		}
 
 		DictionaryList<string> dict;
 
-		NameValuePair<string> one("key", obj->key);
-		NameValuePair<string> two("value", obj->value);
-		NameValuePair<string> three("source", obj->source);
-		NameValuePair<string> four("time", boost::lexical_cast<string>(obj->time));
-		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj->sequence));
+		NameValuePair<string> one("key", obj.key);
+		NameValuePair<string> two("value", obj.value);
+		NameValuePair<string> three("source", obj.source);
+		NameValuePair<string> zone("zone", boost::lexical_cast<string>(obj.zone));
+		NameValuePair<string> four("time", boost::lexical_cast<string>(obj.time));
+		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj.sequence));
 
 		dict.push_back(one);
 		dict.push_back(two);
 		dict.push_back(three);
+		dict.push_back(zone);
 		dict.push_back(four);
 		dict.push_back(five);
 
@@ -57,7 +61,7 @@ void * cbFunc(gpointer data)
 			shared->db->exec("END TRANSACTION");
 			insertList.clear();
 		}
-		delete obj;
+		//delete obj;
 	}
 
 	/// final flush of whatever is still in the queue:
@@ -90,21 +94,23 @@ int getNextEvent(gpointer data)
 		return 0;
 	}
 
-	DBObject* obj = *itr;
+	DBObject obj = *itr;
 
-	AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(obj->key,obj->value);
+	AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(obj.key,obj.value);
 
 	if(value)
 	{
 		pbshared->routingEngine->updateProperty(value, pbshared->uuid);
-		value->timestamp = obj->time;
-		//value->sequence = obj->sequence;
+		value->timestamp = obj.time;
+		value->sequence = obj.sequence;
+		value->sourceUuid = obj.source;
+		value->zone = obj.zone;
 	}
 
 	if(++itr != pbshared->playbackQueue.end())
 	{
-		DBObject *o2 = *itr;
-		double t = o2->time - obj->time;
+		DBObject o2 = *itr;
+		double t = o2.time - obj.time;
 
 		if(t > 0)
 			g_timeout_add((t*1000) / pbshared->playBackMultiplier, getNextEvent, pbshared);
@@ -114,7 +120,7 @@ int getNextEvent(gpointer data)
 
 	pbshared->playbackQueue.remove(obj);
 	DebugOut()<<"playback Queue size: "<<pbshared->playbackQueue.size()<<endl;
-	delete obj;
+	//delete obj;
 
 	return 0;
 }
@@ -124,7 +130,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 {
 	databaseName = "storage";
 	tablename = "data";
-	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, time REAL, sequence REAL)";
+	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, zone REAL, time REAL, sequence REAL)";
 
 	if(config.find("databaseFile") != config.end())
 	{
@@ -134,6 +140,20 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	if(config.find("bufferLength") != config.end())
 	{
 		bufferLength = atoi(config["bufferLength"].c_str());
+	}
+
+	if(config.find("frequency") != config.end())
+	{
+		try
+		{
+			int t = boost::lexical_cast<int>(config["frequency"]);
+			timeout = 1000 / t;
+		}catch(...)
+		{
+			DebugOut(DebugOut::Error)<<"Failed to parse frequency: Invalid value "<<config["frequency"]<<endl;
+		}
+
+
 	}
 
 	if(config.find("properties") != config.end())
@@ -174,14 +194,7 @@ DatabaseSink::~DatabaseSink()
 {
 	if(shared)
 	{
-		DBObject* obj = new DBObject();
-		obj->quit = true;
-
-		shared->queue.append(obj);
-
-		g_thread_join(thread);
-//		g_thread_unref(thread);
-		delete shared;
+		stopDb();
 	}
 
 	if(playbackShared)
@@ -249,8 +262,8 @@ void DatabaseSink::stopDb()
 	if(!shared)
 		return;
 
-	DBObject *obj = new DBObject();
-	obj->quit = true;
+	DBObject obj;
+	obj.quit = true;
 	shared->queue.append(obj);
 
 	g_thread_join(thread);
@@ -309,12 +322,12 @@ void DatabaseSink::startPlayback()
 			throw std::runtime_error("column mismatch in query");
 		}
 
-		DBObject* obj = new DBObject();
+		DBObject obj;
 
-		obj->key = results[i][0];
-		obj->value = results[i][1];
-		obj->source = results[i][2];
-		obj->time = boost::lexical_cast<double>(results[i][3]);
+		obj.key = results[i][0];
+		obj.value = results[i][1];
+		obj.source = results[i][2];
+		obj.time = boost::lexical_cast<double>(results[i][3]);
 
 		/// TODO: figure out why sequence is broken:
 
@@ -387,12 +400,13 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 		routingEngine->setSupported(mSupported, this);
 	}
 
-	DBObject* obj = new DBObject;
-	obj->key = property;
-	obj->value = value->toString();
-	obj->source = value->sourceUuid;
-	obj->time = value->timestamp;
-	obj->sequence = value->sequence;
+	DBObject obj;
+	obj.key = property;
+	obj.value = value->toString();
+	obj.source = value->sourceUuid;
+	obj.time = value->timestamp;
+	obj.sequence = value->sequence;
+	obj.zone = value->zone;
 
 	shared->queue.append(obj);
 }
@@ -471,21 +485,27 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 		query<<" AND sequence BETWEEN "<<reply->sequenceBegin<<" AND "<<reply->sequenceEnd;
 	}
 
+	if(reply->sourceUuid != "")
+		query<<" AND source='"<<reply->sourceUuid<<"'";
+
+	query<<" AND zone="<<reply->zone;
+
 	std::vector<std::vector<string>> data = db->select(query.str());
 
 	DebugOut()<<"Dataset size "<<data.size()<<endl;
 
 	for(auto i=0;i<data.size();i++)
 	{
-		if(data[i].size() != 5)
+		if(data[i].size() != 6)
 			continue;
 
 		DBObject dbobj;
 		dbobj.key = data[i][0];
 		dbobj.value = data[i][1];
 		dbobj.source = data[i][2];
-		dbobj.time = boost::lexical_cast<double>(data[i][3]);
-		dbobj.sequence = boost::lexical_cast<double>(data[i][4]);
+		dbobj.zone = boost::lexical_cast<double>(data[i][3]);
+		dbobj.time = boost::lexical_cast<double>(data[i][4]);
+		dbobj.sequence = boost::lexical_cast<double>(data[i][5]);
 
 		AbstractPropertyType* property = VehicleProperty::getPropertyTypeForPropertyNameValue(dbobj.key, dbobj.value);
 		if(property)

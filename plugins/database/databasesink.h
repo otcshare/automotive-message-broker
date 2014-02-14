@@ -23,10 +23,12 @@
 #include "abstractsink.h"
 #include "abstractsource.h"
 #include "basedb.hpp"
+#include "listplusplus.h"
 
 #include <glib.h>
 
 #include <functional>
+#include <unordered_map>
 
 const std::string DatabaseLogging = "DatabaseLogging";
 const std::string DatabasePlayback = "DatabasePlayback";
@@ -92,15 +94,91 @@ private:
 	std::vector<T> mQueue;
 };
 
+template <typename T>
+class UniqueQueue
+{
+public:
+	UniqueQueue()
+	{
+		g_mutex_init(&mutex);
+		g_cond_init(&cond);
+	}
+	~UniqueQueue()
+	{
+
+	}
+
+	int count()
+	{
+		g_mutex_lock(&mutex);
+		int ret = mQueue.count();
+		g_mutex_unlock(&mutex);
+
+		return ret;
+	}
+
+	T pop()
+	{
+		g_mutex_lock(&mutex);
+
+		while(!mQueue.size())
+		{
+			g_cond_wait(&cond, &mutex);
+		}
+
+		auto itr = mQueue.begin();
+
+		T item = (*itr);
+
+		mQueue.erase(itr);
+
+		g_mutex_unlock(&mutex);
+
+		return item;
+	}
+
+	void append(T item)
+	{
+		g_mutex_lock(&mutex);
+
+		g_cond_signal(&cond);
+
+		if(contains(mQueue, item))
+		{
+			/// remove old one.  We only want the freshest of values
+			mQueue.erase(std::find(mQueue.begin(), mQueue.end(), item));
+		}
+		mQueue.push_back(item);
+
+		g_mutex_unlock(&mutex);
+	}
+
+private:
+	GMutex mutex;
+	GCond cond;
+	std::vector<T> mQueue;
+};
+
 class DBObject {
 public:
-	DBObject(): time(0), sequence(0), quit(false) {}
+	DBObject(): zone(0), time(0), sequence(0), quit(false) {}
 	std::string key;
 	std::string value;
 	std::string source;
+	int32_t zone;
 	double time;
 	int32_t sequence;
 	bool quit;
+
+	bool operator ==(const DBObject & other)
+	{
+		return (key == other.key && source == other.source && zone == other.zone);
+	}
+
+	bool operator != (const DBObject & other)
+	{
+		return (*this == other) == false;
+	}
 };
 
 class Shared
@@ -116,7 +194,7 @@ public:
 	}
 
 	BaseDB * db;
-	Queue<DBObject*> queue;
+	UniqueQueue<DBObject> queue;
 };
 
 class PlaybackShared
@@ -128,16 +206,14 @@ public:
 	{
 		for(auto itr = playbackQueue.begin(); itr != playbackQueue.end(); itr++)
 		{
-			DBObject* obj = *itr;
-
-			delete obj;
+			DBObject obj = *itr;
 		}
 
 		playbackQueue.clear();
 	}
 
 	AbstractRoutingEngine* routingEngine;
-	std::list<DBObject*> playbackQueue;
+	std::list<DBObject> playbackQueue;
 	uint playBackMultiplier;
 	std::string uuid;
 	bool stop;

@@ -203,7 +203,7 @@ class AsyncRangePropertyRequest
 {
 public:
 	AsyncRangePropertyRequest()
-		:timeBegin(0), timeEnd(0), sequenceBegin(-1), sequenceEnd(-1)
+		:zone(Zone::None), timeBegin(0), timeEnd(0), sequenceBegin(-1), sequenceEnd(-1)
 	{
 
 	}
@@ -217,6 +217,7 @@ public:
 		this->sequenceBegin = request.sequenceBegin;
 		this->sequenceEnd = request.sequenceEnd;
 		this->sourceUuid = request.sourceUuid;
+		this->zone = request.zone;
 	}
 
 	virtual ~AsyncRangePropertyRequest() {}
@@ -230,6 +231,11 @@ public:
 	 * \brief sourceUuid if the sink wishes to request a specific source, this should be set to the uuid of the source.
 	 */
 	std::string sourceUuid;
+
+	/*!
+	 * \brief zone if the sink wishes to request a specific zone, this should be set to the desired zone .
+	 */
+	Zone::Type zone;
 
 	/*!
 	 * \brief completed callback that is called when the ranged request is complete. The reply from this request is passed
