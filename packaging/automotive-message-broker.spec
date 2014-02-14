@@ -1,6 +1,6 @@
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.11.803
+Version:    0.11.804
 Release:    1
 Group:      Automotive/Service
 License:    LGPL-2.1
@@ -178,6 +178,7 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %{_prefix}/lib/systemd/system/network.target.wants/ambd.service
 %{_prefix}/lib/systemd/system/multi-user.target.wants/ambd.service
 %{_bindir}/amb-get
+%{_bindir}/amb-get-history
 %{_bindir}/amb-set
 
 %files devel
