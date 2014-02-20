@@ -335,7 +335,7 @@ void AbstractDBusInterface::updateValue(AbstractProperty *property)
 	}
 
 	if(isRegistered())
-		signaller->fireSignal(mConnection, mObjectPath, "org.freedesktop.DBus.Properties", "PropertiesChanged", property);
+		signaller->fireSignal(mConnection, mObjectPath, mInterfaceName, "PropertiesChanged", property);
 }
 
 std::list<AbstractDBusInterface *> AbstractDBusInterface::getObjectsForProperty(string object)
