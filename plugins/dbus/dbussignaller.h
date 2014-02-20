@@ -73,7 +73,7 @@ private:
 				g_variant_builder_add(&builder, "{sv}", std::string(property->name() + "Sequence").c_str(), g_variant_new("i", property->sequence()));
 				g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("d", property->timestamp()) );
 
-				g_dbus_connection_emit_signal(signal.connection, NULL, signal.objectPath.c_str(), signal.interface.c_str(), signal.signalName.c_str(), g_variant_new("(sa{sv}as)",
+				g_dbus_connection_emit_signal(signal.connection, NULL, signal.objectPath.c_str(), "org.freedesktop.DBus.Properties", signal.signalName.c_str(), g_variant_new("(sa{sv}as)",
 																																									 signal.interface.c_str(),
 																																									 &builder, NULL), &error);
 
