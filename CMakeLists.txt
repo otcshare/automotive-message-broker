@@ -69,9 +69,9 @@ find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
 
 if(libtool_LIBRARY)
-     message(STATUS "libtool found")
+     message(STATUS "libltdl / libtool found")
 else(libtool_LIBRARY)
-     message(FATAL_ERROR "libtool missing.  please install libtool")
+     message(FATAL_ERROR "libltdl / libtool missing.  please install libltdl / libtool")
 endif(libtool_LIBRARY)
 
 find_package(Boost REQUIRED)
