@@ -69,9 +69,9 @@ find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
 find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
 
 if(libtool_LIBRARY)
-     message(STATUS "libtool found")
+     message(STATUS "libltdl / libtool found")
 else(libtool_LIBRARY)
-     message(FATAL_ERROR "libtool missing.  please install libtool")
+     message(FATAL_ERROR "libltdl / libtool missing.  please install libltdl / libtool")
 endif(libtool_LIBRARY)
 
 find_package(Boost REQUIRED)
@@ -80,8 +80,7 @@ find_package(Boost REQUIRED)
 pkg_check_modules(glib REQUIRED glib-2.0 gobject-2.0)
 pkg_check_modules(json REQUIRED json)
 
-
-add_definitions(-std=c++11)
+list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
 set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
