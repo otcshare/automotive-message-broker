@@ -7,7 +7,8 @@
        <label name="AMB::machinegun" />
      </provide>
      <request>
-       <smack request="_" type="l" />
+       <smack request="_" type="rwxatl" />
+       <smack request="User" type="w" />
        <smack request="System" type="wx" />
        <smack request="System::Run" type="rwxat" />
        <smack request="System::Shared" type="rx" />
