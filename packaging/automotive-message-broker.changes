@@ -1,5 +1,6 @@
-* Thu Feb 20 2014 - <kevron.m.rees@intel.com>
+* Thu Feb 24 2014 - <kevron.m.rees@intel.com>
 - 0.11.805 release
+- updated smack rules to allow murphy socket connection
 
 * Fri Feb 14 2014 - <kevron.m.rees@intel.com>
 - 0.11.804 release
