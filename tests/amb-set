@@ -24,6 +24,10 @@ if valueType == "boolean":
 	realValue = value == "true"
 elif valueType == "integer":
 	realValue = int(value)
+elif valueType == "string":
+	realValue = value
+elif valueType == "double":
+	realValue = double(value)
 
 bus = dbus.SystemBus()
 managerObject = bus.get_object("org.automotive.message.broker", "/");
