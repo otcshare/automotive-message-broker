@@ -298,6 +298,7 @@ void ExampleSourcePlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 AsyncPropertyReply *ExampleSourcePlugin::setProperty(AsyncSetPropertyRequest request )
 {
 	AsyncPropertyReply *reply = new AsyncPropertyReply(request);
+	reply->success = false;
 
 	if(reply->property == VehicleProperty::AirConditioning)
 	{
@@ -319,7 +320,13 @@ AsyncPropertyReply *ExampleSourcePlugin::setProperty(AsyncSetPropertyRequest req
 			reply->completed(reply);
 
 		}
+
+		return reply;
 	}
+
+	reply->error = AsyncPropertyReply::InvalidOperation;
+	reply->completed(reply);
+	return reply;
 }
 
 void ExampleSourcePlugin::subscribeToPropertyChanges(VehicleProperty::Property property)

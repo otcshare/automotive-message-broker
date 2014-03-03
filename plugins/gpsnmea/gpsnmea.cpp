@@ -507,6 +507,7 @@ void GpsNmeaSource::canHasData()
 		if(checksum(buffer))
 		{
 			/// we have a complete message.  parse it!
+			DebugOut(7)<<"Complete message: "<<buffer<<endl;
 			location->parse(buffer);
 		}
 
