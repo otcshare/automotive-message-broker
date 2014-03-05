@@ -1,6 +1,6 @@
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.11.805
+Version:    0.11.806
 Release:    1
 Group:      Automotive/Service
 License:    LGPL-2.1
@@ -140,11 +140,19 @@ Requires: libboost_regex
 %description plugins-gpsnmea
 Plugin that provides location data from nmea devices including bluetooth
 
+%package plugins-test
+Summary:   Plugin that tests AMB code
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-test
+Plugin that tests some internal AMB code and plugin functionality.  This plugin will assert if something is wrong.
+
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=OFF -Dgpsnmea_plugin=ON
+%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=ON -Dgpsnmea_plugin=ON
 
 make %{?jobs:-j%jobs}
 
@@ -180,6 +188,7 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %{_bindir}/amb-get
 %{_bindir}/amb-get-history
 %{_bindir}/amb-set
+%{_bindir}/amb-listen
 
 %files devel
 %defattr(-,root,root,-)
@@ -247,3 +256,8 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %doc %{_docdir}/%{name}/*.txt
+
+%files plugins-test
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/testplugin.so

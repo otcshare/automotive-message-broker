@@ -1,3 +1,13 @@
+* Wed Mar 05 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140224.190956@6425ef6
+- Merge branch '0.12' into tizen
+- Remove performance from dbusconfig. fix crasher in varianttype.
+- added more debug to gpsnmea. example source default return for set operations.
+- added support for string and double in amb-set
+- make startOnLoad and playbackOnLoad work with 'true' or 'false'
+- fixed amb-set
+- amb-listen works. zone attribute included in all signals.
+- updated chlog
+
 * Thu Feb 24 2014 - <kevron.m.rees@intel.com>
 - 0.11.805 release
 - updated smack rules to allow murphy socket connection
