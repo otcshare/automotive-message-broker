@@ -345,12 +345,14 @@ static void signalCallback( GDBusConnection *connection,
 				{
 					DebugOut()<<"unreferencing "<<n<<" from the subscription of "<<iface->objectPath()<<endl;
 					manager->subscribedProcesses[iface].remove(n);
+					DebugOut()<<"new ref count: "<<manager->subscribedProcesses[iface].size()<<endl;
 				}
 			}
 
 			if(manager->subscribedProcesses[iface].empty())
 			{
-				DebugOut()<<"No more subscribers.  Unregistering."<<endl;
+				DebugOut()<<"No more subscribers.  Unregistering: "<<iface->objectPath()<<endl;
+				manager->subscribedProcesses.erase(iface);
 				iface->unregisterObject();
 			}
 		}
