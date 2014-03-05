@@ -174,7 +174,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("startOnLoad")!= config.end())
 	{
-		setLogging(true);
+		setLogging(config["startOnLoad"] == "true");
 	}
 
 	if(config.find("playbackMultiplier")!= config.end())
@@ -184,7 +184,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("playbackOnLoad")!= config.end())
 	{
-		setPlayback(true);
+		setPlayback(config["playbackOnLoad"] == "true");
 	}
 
 

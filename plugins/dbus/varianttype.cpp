@@ -66,9 +66,10 @@ void VariantType::fromGVariant(GVariant *val)
 		/// TODO: throw dbus exception
 		if(!reply->success)
 		{
-			DebugOut(DebugOut::Error)<<"setProperty fail: "<<reply->error<<endl;
+			DebugOut(DebugOut::Error)<<"SetProperty fail: "<<reply->error<<endl;
 		}
-		delete v;
+		///TODO: we segfault here.
+		///if(v) delete v;
 		delete reply;
 	};
 
