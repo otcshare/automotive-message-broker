@@ -76,7 +76,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
     char *property_name;
 
-    // debugOut("Received a message from Murphy!");
+	DebugOut()<<"Received a message from Murphy!"<<endl;
 
     if (!mrp_msg_iterate(msg, &cursor, &tag, &type, &value, &size))
         return;
@@ -92,7 +92,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
     if (tag != 2)
         return;
 
-    // std::cout << "Property '" << property_name << "' with value ";
+	DebugOut() << "Property '" << property_name << "' with value " ;
 
     switch (type) {
         case MRP_MSG_FIELD_STRING:
@@ -104,7 +104,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 						[dstr](){return new StringPropertyType(dstr,"");});
             }
 
-            // std::cout << "string:" << value.str << std::endl;
+			DebugOut() << "string:" << value.str << std::endl;
             s->processValue(property_name, prop);
             break;
         }
@@ -118,7 +118,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 						[dstr](){return new BasicPropertyType<double>(dstr,0);});
             }
 
-            // std::cout << "double:" << value.dbl << std::endl;
+			DebugOut() << "double:" << value.dbl << std::endl;
             s->processValue(property_name, prop);
             break;
         }
@@ -132,7 +132,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 						[dstr](){return new BasicPropertyType<bool>(dstr,FALSE);});
             }
 
-            // std::cout << "boolean:" << value.bln << std::endl;
+			DebugOut() << "boolean:" << value.bln << std::endl;
             s->processValue(property_name, prop);
             break;
         }
@@ -146,7 +146,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 						[dstr](){return new BasicPropertyType<uint32_t>(dstr,0);});
             }
 
-            // std::cout << "uint32:" << value.u32 << std::endl;
+			DebugOut() << "uint32:" << value.u32 << std::endl;
             s->processValue(property_name, prop);
             break;
         }
@@ -160,7 +160,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 						[dstr](){return new BasicPropertyType<uint16_t>(dstr,0);});
             }
 
-            // std::cout << "uint16:" << value.u16 << std::endl;
+			DebugOut() << "uint16:" << value.u16 << std::endl;
             s->processValue(property_name, prop);
             break;
         }
@@ -174,7 +174,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 						[dstr](){return new BasicPropertyType<int32_t>(dstr,0);});
             }
 
-            // std::cout << "int32:" << value.s32 << std::endl;
+			DebugOut() << "int32:" << value.s32 << std::endl;
             s->processValue(property_name, prop);
             break;
         }
@@ -188,7 +188,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 						[dstr](){return new BasicPropertyType<int16_t>(dstr, 0);});
             }
 
-            // std::cout << "int16:" << value.s16 << std::endl;
+			DebugOut() << "int16:" << value.s16 << std::endl;
             s->processValue(property_name, prop);
             break;
         }
@@ -203,7 +203,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
         }
 #endif
         default:
-            debugOut("Unknown type");
+			DebugOut()<<"Unknown type"<<endl;
     }
 }
 
@@ -333,7 +333,7 @@ static void murphy_watch(const char *id, mrp_process_state_t state, void *user_d
 
     if (state == MRP_PROCESS_STATE_NOT_READY &&
             s->getState() == MRP_PROCESS_STATE_READY) {
-        debugOut("lost connection to murphyd");
+		DebugOut()<<"lost connection to murphyd"<<endl;
     }
 
     else if (state == MRP_PROCESS_STATE_READY) {
@@ -349,7 +349,7 @@ void MurphySource::readyToConnect(mrp_mainloop_t *ml)
     /* set a watch to follow Murphy status */
 
     if (mrp_process_set_watch("murphy-amb", ml, murphy_watch, this) < 0) {
-        debugOut("failed to set a murphy process watch");
+		DebugOut()<<"failed to set a murphy process watch"<<endl;
         return;
     }
 
@@ -404,7 +404,8 @@ PropertyList MurphySource::supported()
 int MurphySource::supportedOperations()
 {
     // debugOut("> supportedOperations");
-    return Get | Set;
+	return Get; // | Set;
+	//we really don't support Set
 }
 
 
