@@ -92,7 +92,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
     if (tag != 2)
         return;
 
-	DebugOut() << "Property '" << property_name << "' with value " ;
+	DebugOut() << "Property '" << property_name << "' with value: " <<endl;
 
     switch (type) {
         case MRP_MSG_FIELD_STRING:
