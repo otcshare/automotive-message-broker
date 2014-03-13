@@ -329,18 +329,31 @@ static void signalCallback( GDBusConnection *connection,
 {
 	AutomotiveManager* manager = static_cast<AutomotiveManager*>(user_data);
 
+	if(!manager)
+	{
+		DebugOut(DebugOut::Error)<<"Bad user_data"<<endl;
+		return;
+	}
+
 	gchar* name=nullptr;
 	gchar* newOwner=nullptr;
 	gchar* oldOwner = nullptr;
 	g_variant_get(parameters,"(sss)",&name, &oldOwner, &newOwner);
 
+	std::list<AbstractDBusInterface*> toRemove;
+
 	if(std::string(newOwner) == "")
 	{
-		for(auto i : manager->subscribedProcesses)
+		for(auto &i : manager->subscribedProcesses)
 		{
 			AbstractDBusInterface* iface = i.first;
-			for(auto n : i.second)
+			std::list<std::string> theList = i.second;
+
+			DebugOut()<<"theList.count: "<<theList.size()<<endl;
+
+			for(auto &n : theList)
 			{
+				DebugOut()<<"n: "<<n<<endl;
 				if(n == name)
 				{
 					DebugOut()<<"unreferencing "<<n<<" from the subscription of "<<iface->objectPath()<<endl;
@@ -352,9 +365,15 @@ static void signalCallback( GDBusConnection *connection,
 			if(manager->subscribedProcesses[iface].empty())
 			{
 				DebugOut()<<"No more subscribers.  Unregistering: "<<iface->objectPath()<<endl;
-				manager->subscribedProcesses.erase(iface);
+				///Defer removal to not screw up the list
+				toRemove.push_back(iface);
 				iface->unregisterObject();
 			}
+		}
+
+		for(auto & i : toRemove)
+		{
+			manager->subscribedProcesses.erase(i);
 		}
 	}
 

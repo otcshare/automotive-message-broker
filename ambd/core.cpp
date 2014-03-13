@@ -61,6 +61,7 @@ Core::~Core()
 	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
 		delete *itr;
+		itr = mSinks.begin();
 	}
 	mSinks.clear();
 }
