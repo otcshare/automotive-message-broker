@@ -1,3 +1,8 @@
+* Thu Mar 13 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140305.213149@afb8a15
+- fixed random crash when process subscribes to an object interface
+- fixed debug output statement
+- added more debug output to murphy plugin
+
 * Wed Mar 05 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140224.190956@6425ef6
 - Merge branch '0.12' into tizen
 - Remove performance from dbusconfig. fix crasher in varianttype.
