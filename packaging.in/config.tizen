@@ -6,10 +6,10 @@
                         "address" : "unxs:/tmp/murphy/amb"
                 },
                 { 
-                        "name" : "ExampleSource",
-                        "path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so"
+                        "name" : "VehicleSource",
+                        "path" : "/usr/lib/automotive-message-broker/vehicleplugin.so",
+                        "configfile" : "/etc/ambd/AMBformat.conf"
                 }
-
 	],
 	"sinks": [
 		{
