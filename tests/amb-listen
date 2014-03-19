@@ -25,10 +25,10 @@ managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
 objects = managerInterface.FindObject(objectName);
 
 for o in objects:
-	propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", o),"org.freedesktop.DBus.Properties")
 	bus.add_signal_receiver(print_data,
 				dbus_interface="org.freedesktop.DBus.Properties",
-				signal_name="PropertiesChanged")
+				signal_name="PropertiesChanged",
+                                path=o)
 
 loop = gobject.MainLoop()
 loop.run()
