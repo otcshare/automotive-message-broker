@@ -276,8 +276,6 @@ void Location::parseSpeed(string spd)
 {
 	try
 	{
-
-
 		double s = boost::lexical_cast<double>(spd);
 
 		///to kph:

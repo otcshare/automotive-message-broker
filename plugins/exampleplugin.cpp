@@ -63,6 +63,7 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 	addPropertySupport(VehicleProperty::VehicleSpeed, Zone::None);
 	addPropertySupport(VehicleProperty::AccelerationX, Zone::None);
 	addPropertySupport(VehicleProperty::TransmissionShiftPosition, Zone::None);
+	addPropertySupport(VehicleProperty::TransmissionGearPosition, Zone::None);
 	addPropertySupport(VehicleProperty::SteeringWheelAngle, Zone::None);
 	addPropertySupport(VehicleProperty::ThrottlePosition, Zone::None);
 	addPropertySupport(VehicleProperty::EngineCoolantTemperature, Zone::None);
@@ -368,6 +369,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	VehicleProperty::AccelerationXType ac(accelerationX);
 	VehicleProperty::SteeringWheelAngleType swa(steeringWheelAngle);
 	VehicleProperty::TransmissionShiftPositionType tsp(transmissionShiftPostion);
+	VehicleProperty::TransmissionGearPositionType tgp(transmissionShiftPostion);
 	VehicleProperty::ThrottlePositionType tp(throttlePos);
 	VehicleProperty::EngineCoolantTemperatureType ec(engineCoolant);
 	VehicleProperty::MachineGunTurretStatusType mgt(machineGun);
@@ -381,6 +383,7 @@ void ExampleSourcePlugin::randomizeProperties()
 	routingEngine->updateProperty(&tsp, uuid());
 	routingEngine->updateProperty(&tp, uuid());
 	routingEngine->updateProperty(&ec, uuid());
+	routingEngine->updateProperty(&tgp, uuid());
 
 }
 
