@@ -347,17 +347,14 @@ static void signalCallback( GDBusConnection *connection,
 		for(auto &i : manager->subscribedProcesses)
 		{
 			AbstractDBusInterface* iface = i.first;
-			std::list<std::string> theList = i.second;
 
-			DebugOut()<<"theList.count: "<<theList.size()<<endl;
-
-			for(auto &n : theList)
+			for(auto itr = i.second.begin(); itr != i.second.end(); itr++)
 			{
-				DebugOut()<<"n: "<<n<<endl;
+				std::string n = *itr;
 				if(n == name)
 				{
 					DebugOut()<<"unreferencing "<<n<<" from the subscription of "<<iface->objectPath()<<endl;
-					manager->subscribedProcesses[iface].remove(n);
+					itr = manager->subscribedProcesses[iface].erase(itr);
 					DebugOut()<<"new ref count: "<<manager->subscribedProcesses[iface].size()<<endl;
 				}
 			}

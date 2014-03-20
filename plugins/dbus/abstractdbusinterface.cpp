@@ -322,7 +322,10 @@ void AbstractDBusInterface::registerObject()
 void AbstractDBusInterface::unregisterObject()
 {
 	if(regId)
+	{
+		DebugOut()<<__FUNCTION__<<endl;
 		g_dbus_connection_unregister_object(mConnection, regId);
+	}
 
 	regId=0;
 }
@@ -377,7 +380,7 @@ bool AbstractDBusInterface::implementsProperty(string property)
 
 void AbstractDBusInterface::startRegistration()
 {
-	unregisterObject();
+	//unregisterObject();
 	introspectionXml ="<node>" ;
 	introspectionXml +=
 			"<interface name='"+ mInterfaceName + "' >"
