@@ -274,15 +274,24 @@ void Location::parseLongitude(string d, string m, string ew)
 
 void Location::parseSpeed(string spd)
 {
-	double s = boost::lexical_cast<double>(spd);
-
-	///to kph:
-	s *= 1.852;
-	VehicleProperty::VehicleSpeedType temp(s);
-	if(mSpeed != temp)
+	try
 	{
-		mSpeed = temp;
-		routingEngine->updateProperty(&mSpeed, mUuid);
+
+
+		double s = boost::lexical_cast<double>(spd);
+
+		///to kph:
+		s *= 1.852;
+		VehicleProperty::VehicleSpeedType temp(s);
+		if(mSpeed != temp)
+		{
+			mSpeed = temp;
+			routingEngine->updateProperty(&mSpeed, mUuid);
+		}
+	}
+	catch(...)
+	{
+		DebugOut(DebugOut::Warning)<<"failed to parse speed"<<endl;
 	}
 }
 
