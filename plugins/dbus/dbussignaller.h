@@ -2,11 +2,54 @@
 #define _DBUSSIGNALLER_H_
 
 #include <gio/gio.h>
-#include <map>
+#include <unordered_set>
 #include <string>
 
 #include "debugout.h"
 #include "abstractproperty.h"
+
+class DBusSignal;
+
+namespace std {
+  template <>
+  struct hash<DBusSignal>
+  {
+	typedef DBusSignal   argument_type;
+	typedef std::size_t  result_type;
+
+	result_type operator()(const DBusSignal & t) const
+	{
+	  std::size_t val { 0 };
+	  return val;
+	}
+  };
+}
+
+class DBusSignal
+{
+public:
+	DBusSignal():connection(nullptr), property(nullptr){}
+	DBusSignal(GDBusConnection* conn, std::string objPath, std::string iface, std::string sigName, AbstractProperty* var)
+		: connection(conn), objectPath(objPath), interface(iface), signalName(sigName), property(var)
+	{
+
+	}
+
+	bool operator == (const DBusSignal &other) const
+	{
+		return connection == other.connection &&
+				objectPath == other.objectPath &&
+				interface == other.interface &&
+				signalName == other.signalName &&
+				property == other.property;
+	}
+
+	GDBusConnection* connection;
+	std::string objectPath;
+	std::string interface;
+	std::string signalName;
+	AbstractProperty* property;
+};
 
 class DBusSignaller
 {
@@ -23,25 +66,8 @@ public:
 	{
 		DBusSignal signal(conn, objPath, iface, sigName, prop);
 
-		queue[objPath] = signal;
+		queue.insert(signal);
 	}
-
-	class DBusSignal
-	{
-	public:
-		DBusSignal():connection(nullptr), property(nullptr){}
-		DBusSignal(GDBusConnection* conn, std::string objPath, std::string iface, std::string sigName, AbstractProperty* var)
-			: connection(conn), objectPath(objPath), interface(iface), signalName(sigName), property(var)
-		{
-
-		}
-
-		GDBusConnection* connection;
-		std::string objectPath;
-		std::string interface;
-		std::string signalName;
-		AbstractProperty* property;
-	};
 
 private:
 
@@ -51,12 +77,12 @@ private:
 	{
 		g_timeout_add(timeout,[](gpointer userData)
 		{
-			std::map<std::string, DBusSignal> *q = static_cast<std::map<std::string, DBusSignal>*>(userData);
-			std::map<std::string, DBusSignal> queue = *q;
+			std::unordered_set<DBusSignal> *q = static_cast<std::unordered_set< DBusSignal>*>(userData);
+			std::unordered_set<DBusSignal> queue = *q;
 
-			for(auto sig : queue)
+			for(auto s : queue)
 			{
-				DBusSignal signal = sig.second;
+				DBusSignal signal = s;
 
 				GError* error = nullptr;
 
@@ -76,14 +102,14 @@ private:
 
 				g_dbus_connection_emit_signal(signal.connection, NULL, signal.objectPath.c_str(), "org.freedesktop.DBus.Properties", signal.signalName.c_str(), g_variant_new("(sa{sv}as)",
 																																									 signal.interface.c_str(),
-																																									 &builder, NULL), &error);
+																																						 &builder, NULL), &error);
 
 				if(error)
 				{
 					DebugOut(DebugOut::Error)<<error->message<<std::endl;
 				}
 
-				queue.erase(signal.objectPath);
+				queue.erase(signal);
 
 			}
 
@@ -94,7 +120,7 @@ private:
 		},&queue);
 	}
 
-	std::map<std::string, DBusSignal> queue;
+	std::unordered_set<DBusSignal> queue;
 
 	static DBusSignaller * singleton;
 };
