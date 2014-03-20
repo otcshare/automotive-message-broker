@@ -37,6 +37,7 @@ public:
 	struct Shared
 	{
 		cv::VideoCapture *m_capture;
+		cv::VideoWriter *mWriter;
 		PropertyList mRequests;
 		OpenCvLuxPlugin* parent;
 
@@ -60,10 +61,14 @@ public:
 	PropertyList supported();
 
 	int supportedOperations();
+
+	void propertyChanged(AbstractPropertyType* value);
 	
 	void supportedChanged(PropertyList) {}
 	
 	void updateProperty(uint lux);
+
+	void writeVideoFrame(cv::Mat frame);
 
 public Q_SLOTS:
 	void imgProcResult();
@@ -72,7 +77,12 @@ public Q_SLOTS:
 private: /// methods:
 	bool init();
 
+
 private:	
+	uint speed;
+	uint latitude;
+	uint longitude;
+
 	uint lastLux;
 	std::string device;
 	std::list<AsyncPropertyReply*> replyQueue;

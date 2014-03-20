@@ -1,9 +1,15 @@
 #include "common.h"
+#include "debugout.h"
 
 bool doBinary = false;
 
 int lwsWrite(libwebsocket *lws, QByteArray d, int len)
 {
+	if(!lws)
+	{
+		DebugOut(DebugOut::Error)<<__FUNCTION__<<": libwebsockets is not valid.  Perhaps it has not been initialized?"<<endl;
+		return -1;
+	}
 
 	int retval = -1;
 

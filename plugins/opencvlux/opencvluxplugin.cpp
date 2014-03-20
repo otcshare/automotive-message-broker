@@ -39,14 +39,18 @@ using namespace std;
 #include "debugout.h"
 
 OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config)
-	:AbstractSource(re, config), lastLux(0)
+	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0)
 {
 	re->setSupported(supported(), this);
+	re->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
+	re->subscribeToProperty(VehicleProperty::Latitude,this);
+	re->subscribeToProperty(VehicleProperty::Longitude, this);
 
 	shared = new Shared;
 	shared->parent = this;
 
 	shared->m_capture = NULL;
+	shared->mWriter = nullptr;
 
 	shared->threaded = false;
 	shared->kinect = false;
@@ -245,6 +249,22 @@ int OpenCvLuxPlugin::supportedOperations()
 	return Get;
 }
 
+void OpenCvLuxPlugin::propertyChanged(AbstractPropertyType *value)
+{
+	if(value->name == VehicleProperty::VehicleSpeed)
+	{
+		speed = value->value<uint16_t>();
+	}
+	else if(value->name == VehicleProperty::Latitude)
+	{
+		latitude = value->value<double>();
+	}
+	else if(value->name == VehicleProperty::Longitude)
+	{
+		longitude = value->value<double>();
+	}
+}
+
 static int grabImage(void *data)
 {
 	OpenCvLuxPlugin::Shared* shared = static_cast<OpenCvLuxPlugin::Shared*>(data);
@@ -261,6 +281,8 @@ static int grabImage(void *data)
 		*(shared->m_capture) >> m_image;
 	}
 
+	shared->parent->writeVideoFrame( m_image );
+
 	if(shared->threaded)
 	{
 		QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>();
@@ -272,7 +294,7 @@ static int grabImage(void *data)
 	else
 	{
 		int lux = evalImage(m_image, shared);
-		detectLight(m_image,shared);
+		//detectLight(m_image,shared);
 		shared->parent->updateProperty(lux);
 	}
 
@@ -355,12 +377,24 @@ bool OpenCvLuxPlugin::init()
 		DebugOut()<<"we failed to open camera device ("<<device<<") or no camera found"<<endl;
 		return false;
 	}
+	cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
+					  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
+
+	shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('H','2','6','4'),30,s);
 
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
 	DebugOut()<<"camera frame height: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT)<<endl;
 	DebugOut()<<"camera frame fps: "<<shared->m_capture->get(CV_CAP_PROP_FPS)<<endl;
 
 	return true;
+}
+
+void OpenCvLuxPlugin::writeVideoFrame(cv::Mat frame)
+{
+	//if(speed > 0)
+	{
+		(*shared->mWriter)<<frame;
+	}
 }
 
 void OpenCvLuxPlugin::updateProperty(uint lux)

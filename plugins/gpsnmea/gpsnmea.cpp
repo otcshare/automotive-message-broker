@@ -401,6 +401,11 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		location.parse("GPRMC,060136.00,A,3101.40475,N,12126.87095,E,0.760,,160114,,,A*74");
 		DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
 		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+		
+		//Test incomplete message:
+		location.parse("GPRMC,023633.00,V,,,,,,,180314,,,N*75");
+		DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
+		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
 	}
 
 	std::string btaddapter = config["bluetoothAdapter"];
