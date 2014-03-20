@@ -1,3 +1,15 @@
+* Thu Mar 20 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140319.172635@8669b09
+- version bump 0.11.808
+- fixed issue with complex objects only firing the last property and dropping all others
+- fixed throw when trying to parse empty speed
+- do not crash if connection has not been established
+- version bump 0.11.807
+- only listen to specified paths
+- reenabled ico vehicle plugin
+- Added incomplete message to gpsnmea test
+- playing with videowriter in cv plugin
+- updated chlog and spec
+
 * Thu Mar 13 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140305.213149@afb8a15
 - fixed random crash when process subscribes to an object interface
 - fixed debug output statement
