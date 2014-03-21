@@ -2,10 +2,8 @@ if(obd2_plugin)
 
 include(CheckIncludeFiles)
 
-
 pkg_check_modules(gio REQUIRED gio-2.0)
 pkg_check_modules(gio-unix REQUIRED gio-unix-2.0)
-
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common)
 
