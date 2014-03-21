@@ -1,3 +1,7 @@
+* Fri Mar 21 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140320.231725@5748dc3
+- added cansim plugin
+- added cansim, cangen plugins
+
 * Thu Mar 20 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140319.172635@8669b09
 - version bump 0.11.808
 - fixed issue with complex objects only firing the last property and dropping all others

@@ -148,11 +148,27 @@ Requires:  %{name} = %{version}-%{release}
 %description plugins-test
 Plugin that tests some internal AMB code and plugin functionality.  This plugin will assert if something is wrong.
 
+%package plugins-cangen
+Summary:   Plugin that generates CAN data
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-cangen
+CAN frames generator plug-in for the AMB CAN Simulator.
+
+%package plugins-cansim
+Summary:   CAN frames listener plug-in for the AMB CAN Simulator.
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-cansim
+CAN frames listener plug-in for the AMB CAN Simulator.
+
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=ON -Dgpsnmea_plugin=ON
+%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=ON -Dgpsnmea_plugin=ON -Dcangen_plugin=ON -Dcansim_plugin=ON
 
 make %{?jobs:-j%jobs}
 
@@ -261,3 +277,14 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/testplugin.so
+
+%files plugins-cangen
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/cangenplugin.so
+
+%files plugins-cansim
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/cansimplugin.so
+
