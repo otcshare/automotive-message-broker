@@ -108,10 +108,9 @@ private:
 				{
 					DebugOut(DebugOut::Error)<<error->message<<std::endl;
 				}
-
-				queue.erase(signal);
-
 			}
+
+			queue.clear();
 
 			*q = queue;
 
