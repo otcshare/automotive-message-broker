@@ -151,6 +151,13 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		reply->success = true;
 		reply->completed(reply);
 	}
+	else if(reply->property == VehicleProperty::TransmissionGearPosition)
+	{
+		VehicleProperty::TransmissionGearPositionType temp(transmissionShiftPostion);
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
 	else if(reply->property == VehicleProperty::SteeringWheelAngle)
 	{
 		VehicleProperty::SteeringWheelAngleType temp(steeringWheelAngle);

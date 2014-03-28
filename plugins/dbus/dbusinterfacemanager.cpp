@@ -210,7 +210,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<SteeringWheelPositionProperty>(iface->re, connection);
 	exportProperty<MirrorSettingProperty>(iface->re, connection);
 
-	iface->supportedChanged(iface->re->supported());
+	iface->registerCustomTypes();
 }
 
 static void
@@ -257,10 +257,14 @@ void DBusInterfaceManager::supportedChanged(const PropertyList &supportedPropert
 	DebugOut()<<"supported Properties: "<<supportedProperties.size()<<endl;
 	if(!connection)
 	{
-		DebugOut(DebugOut::Warning)<<"supportedChanged called before we have a dbus connection"<<endl;
 		return;
 	}
 
+	registerCustomTypes();
+}
+
+void DBusInterfaceManager::registerCustomTypes()
+{
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();
 

@@ -41,8 +41,10 @@ public:
     
 	GDBusConnection * connection;
 
+	void registerCustomTypes();
+
 private:
-	
+
 	unsigned int ownerId;
 
 
