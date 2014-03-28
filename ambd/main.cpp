@@ -154,6 +154,8 @@ int main(int argc, char **argv)
 	Core routingEngine;
 
 	PluginLoader loader(config, &routingEngine , argc, argv);
+
+	routingEngine.inspectSupported();
 	
 	if(!loader.sources().size())
 	{

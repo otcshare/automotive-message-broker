@@ -64,7 +64,7 @@ public:
 
 	void propertyChanged(AbstractPropertyType* value);
 	
-	void supportedChanged(PropertyList) {}
+	void supportedChanged(PropertyList);
 	
 	void updateProperty(uint lux);
 
@@ -76,7 +76,6 @@ public Q_SLOTS:
 	
 private: /// methods:
 	bool init();
-
 
 private:	
 	uint speed;

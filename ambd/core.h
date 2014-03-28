@@ -35,7 +35,7 @@ public:
 	~Core();
 	/// sources:
 
-	void setSupported(PropertyList supported, AbstractSource* source);
+	void registerSource(AbstractSource *src);
 	void updateSupported(PropertyList added, PropertyList removed, AbstractSource* source);
 	void updateProperty(AbstractPropertyType* value, const std::string &uuid);
 	
@@ -61,6 +61,8 @@ public:
 		int firedPropertiesPerSecond;
 	};
 
+	void inspectSupported();
+
 private:
 
 	void handleAddSupported(const PropertyList& added, AbstractSource* source);
@@ -75,7 +77,7 @@ private:
 	std::multimap<AbstractSource*, VehicleProperty::Property> mMasterPropertyList;
 
 	// K = AbstractSource::uuid(), T = AbstractSource*
-	std::unordered_map<std::string, AbstractSource*> mSources;
+	std::set<AbstractSource*> mSources;
 	std::set<AbstractSink*> mSinks;
 
 	Performance performance;

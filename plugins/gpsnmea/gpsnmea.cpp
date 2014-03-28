@@ -442,8 +442,6 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		g_io_channel_set_close_on_unref(chan, true);
 		g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 	}
-
-	re->setSupported(supported(), this);
 }
 
 GpsNmeaSource::~GpsNmeaSource()

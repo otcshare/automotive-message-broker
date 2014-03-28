@@ -79,11 +79,11 @@ bool TestPlugin::testCoreSetSupported()
 	//
 	// CALL setSupported
 	//
-	routingEngine->setSupported(m_supportedProperties, nullptr);// invalid input
+	routingEngine->updateSupported(m_supportedProperties, PropertyList(), nullptr);// invalid input
 	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == false);
 
 	// valid call
-	routingEngine->setSupported(m_supportedProperties, this);// we are register as source from now
+	routingEngine->updateSupported(m_supportedProperties, PropertyList(), this);// we are register as source from now
 
 	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == true);
 	Zone::ZoneList zones(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).zones());
