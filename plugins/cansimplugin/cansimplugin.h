@@ -53,7 +53,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * \brief CAN frames listener plug-in for the AMB CAN Simulator.
  *
  *  Listens on AMB notification for changes in supported properties using supportedChanged() callback. \n
- *  On startup it registers property called 'MappingTable' and all properties needed for simulation in intelPoc12.Dashboard and intelPoc16.HVAC applications. \n
+ *  On startup it registers property called 'MappingTable' and all properties needed for simulation in html5UI.Dashboard and html5UI.HVAC applications. \n
  *  Immediately after it registers own properties it will get first notification supportedChanged().\n
  *  On every notification from supportedChanged() CANSimPlugin goes through all supported properties in AMB, exclude those properties for which there are known sources in the AMB,\n
  *  assigns to each single property and zone some unique CAN Id(builds 'mapping table') and this 'mapping table' stores as JSON string and updates it as a 'MappingTable' property in AMB.\n
