@@ -153,7 +153,7 @@ public:
     /*! supportedChanged() is called when the supported properties changes
      * \param supportedProperties the new list of supported properties.
      */
-    virtual void supportedChanged(PropertyList supportedProperties);
+	virtual void supportedChanged(const PropertyList & supportedProperties);
 
 
     // AmbPlugin's own methods
@@ -255,7 +255,7 @@ void AmbPlugin<T>::propertyChanged(AbstractPropertyType* value)
 }
 
 template<typename T>
-void AmbPlugin<T>::supportedChanged(PropertyList supportedProperties)
+void AmbPlugin<T>::supportedChanged(const PropertyList &supportedProperties)
 {
     if(d)
         d->supportedChanged(supportedProperties);

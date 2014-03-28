@@ -75,7 +75,6 @@ bool TestPlugin::testCoreSetSupported()
 	// if we were registered in Core, it will ask us and we will return it valid, but we haven't registered yet
 	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == false);
 
-
 	//
 	// CALL setSupported
 	//
@@ -100,14 +99,6 @@ bool TestPlugin::testCoreSetSupported()
 	TEST(routingEngine->getPropertyInfo(TestProptertyName2, uuid()).isValid() == true);
 	zones = routingEngine->getPropertyInfo(TestProptertyName2, uuid()).zones();
 	TEST(ListPlusPlus<Zone::Type>(&zones).contains(Zone::FrontSide) == true);
-
-	// we haven't put VehicleProperty::ClutchStatus to Core as supported,
-	// but our impl. returns valid Property for it if we will insert it into m_supportedProperties
-	m_supportedProperties.push_back(VehicleProperty::ClutchStatus);
-	TEST(routingEngine->getPropertyInfo(VehicleProperty::ClutchStatus, uuid()).isValid() == true);
-	zones = routingEngine->getPropertyInfo(VehicleProperty::ClutchStatus, uuid()).zones();
-	TEST(ListPlusPlus<Zone::Type>(&zones).contains(Zone::None) == true);
-	removeOne(&m_supportedProperties, VehicleProperty::ClutchStatus);
 
 	return true;
 }
@@ -183,7 +174,7 @@ bool TestPlugin::testSubscription()
 		TestSink(AbstractRoutingEngine* engine, map<string, string> config) : AbstractSink(engine, config) {}
 		virtual const string uuid() { return "other"; }
 		virtual void propertyChanged(AbstractPropertyType *value){ ++propertyChanges; }
-		virtual void supportedChanged(PropertyList supportedProperties){};
+		virtual void supportedChanged(const PropertyList & supportedProperties){};
 
 		int propertyChanges = 0;
 	};

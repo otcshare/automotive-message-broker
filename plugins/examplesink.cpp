@@ -47,11 +47,11 @@ PropertyList ExampleSink::subscriptions()
 
 }
 
-void ExampleSink::supportedChanged(PropertyList supportedProperties)
+void ExampleSink::supportedChanged(const PropertyList & supportedProperties)
 {
 	DebugOut()<<"Support changed!"<<endl;
 
-	if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(VehicleProperty::VehicleSpeed))
+	if(contains(supportedProperties, VehicleProperty::VehicleSpeed))
 	{
 		AsyncPropertyRequest velocityRequest;
 		velocityRequest.property = VehicleProperty::VehicleSpeed;
@@ -67,7 +67,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 		routingEngine->getPropertyAsync(velocityRequest);
 	}
 
-	if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(VehicleProperty::VIN))
+	if(contains(supportedProperties, VehicleProperty::VIN))
 	{
 		AsyncPropertyRequest vinRequest;
 		vinRequest.property = VehicleProperty::VIN;
@@ -82,7 +82,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 		routingEngine->getPropertyAsync(vinRequest);
 	}
-	if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(VehicleProperty::WMI))
+	if(contains(supportedProperties, VehicleProperty::WMI))
 	{
 		AsyncPropertyRequest wmiRequest;
 		wmiRequest.property = VehicleProperty::WMI;
@@ -97,7 +97,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 		routingEngine->getPropertyAsync(wmiRequest);
 	}
-	if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(VehicleProperty::BatteryVoltage))
+	if(contains(supportedProperties, VehicleProperty::BatteryVoltage))
 	{
 		AsyncPropertyRequest batteryVoltageRequest;
 		batteryVoltageRequest.property = VehicleProperty::BatteryVoltage;
@@ -112,7 +112,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 
 		routingEngine->getPropertyAsync(batteryVoltageRequest);
 	}
-	if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(VehicleProperty::DoorsPerRow))
+	if(contains(supportedProperties, VehicleProperty::DoorsPerRow))
 	{
 		AsyncPropertyRequest doorsPerRowRequest;
 		doorsPerRowRequest.property = VehicleProperty::DoorsPerRow;
@@ -128,7 +128,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 		routingEngine->getPropertyAsync(doorsPerRowRequest);
 	}
 
-	if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(VehicleProperty::AirbagStatus))
+	if(contains(supportedProperties,VehicleProperty::AirbagStatus))
 	{
 		AsyncPropertyRequest airbagStatus;
 		airbagStatus.property = VehicleProperty::AirbagStatus;
@@ -147,7 +147,7 @@ void ExampleSink::supportedChanged(PropertyList supportedProperties)
 		routingEngine->getPropertyAsync(airbagStatus);
 	}
 
-	if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(VehicleProperty::ExteriorBrightness))
+	if(contains(supportedProperties, VehicleProperty::ExteriorBrightness))
 	{
 		AsyncPropertyRequest exteriorBrightness;
 		exteriorBrightness.property = VehicleProperty::ExteriorBrightness;

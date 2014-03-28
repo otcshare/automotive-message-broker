@@ -62,7 +62,7 @@ public:
 	/*! supportedChanged() is called when the supported properties changes
 	 * @arg supportedProperties the new list of supported properties.
 	 */
-	virtual void supportedChanged(PropertyList supportedProperties) = 0;
+	virtual void supportedChanged(const PropertyList & supportedProperties) = 0;
 	
 protected:
 	/*!

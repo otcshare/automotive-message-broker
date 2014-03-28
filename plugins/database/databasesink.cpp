@@ -204,7 +204,7 @@ DatabaseSink::~DatabaseSink()
 }
 
 
-void DatabaseSink::supportedChanged(PropertyList supportedProperties)
+void DatabaseSink::supportedChanged(const PropertyList &supportedProperties)
 {
 
 }

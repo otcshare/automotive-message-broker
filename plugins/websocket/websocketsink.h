@@ -33,7 +33,7 @@ public:
 	~WebSocketSink();
 	const string uuid() ;
 	void propertyChanged(AbstractPropertyType *value);
-	void supportedChanged(PropertyList supportedProperties);
+	void supportedChanged(const PropertyList & supportedProperties);
 	PropertyList subscriptions();
 	libwebsocket *socket() { return m_wsi; }
 

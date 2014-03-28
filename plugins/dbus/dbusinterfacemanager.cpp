@@ -252,7 +252,7 @@ DBusInterfaceManager::~DBusInterfaceManager()
 	g_bus_unown_name(ownerId);
 }
 
-void DBusInterfaceManager::supportedChanged(PropertyList supportedProperties)
+void DBusInterfaceManager::supportedChanged(const PropertyList &supportedProperties)
 {
 	DebugOut()<<"supported Properties: "<<supportedProperties.size()<<endl;
 	if(!connection)

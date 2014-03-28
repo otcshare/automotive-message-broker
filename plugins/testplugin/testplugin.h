@@ -52,7 +52,7 @@ public:
 
 	int supportedOperations();
 
-	void supportedChanged(PropertyList) {}
+	void supportedChanged(const PropertyList &) {}
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
 	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);

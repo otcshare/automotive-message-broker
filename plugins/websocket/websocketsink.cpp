@@ -79,7 +79,7 @@ WebSocketSink::~WebSocketSink()
 {
 	m_re->unsubscribeToProperty(m_amdbproperty, this);
 }
-void WebSocketSink::supportedChanged(PropertyList supportedProperties)
+void WebSocketSink::supportedChanged(const PropertyList &supportedProperties)
 {
 }
 PropertyList WebSocketSink::subscriptions()

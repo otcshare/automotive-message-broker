@@ -64,7 +64,7 @@ public:
 
 	void propertyChanged(AbstractPropertyType* value);
 	
-	void supportedChanged(PropertyList);
+	void supportedChanged(const PropertyList &);
 	
 	void updateProperty(uint lux);
 

@@ -49,7 +49,7 @@ public:
 
     int supportedOperations();
 
-    void supportedChanged(PropertyList) {}
+	void supportedChanged(const PropertyList &) {}
 
     void processValue(string propertyName, AbstractPropertyType *value);
 

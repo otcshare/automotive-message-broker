@@ -313,15 +313,17 @@ PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string so
 	if(sourceUuid == "")
 		return PropertyInfo::invalid();
 
-	auto srcIt = find_if(mSources.begin(), mSources.end(),[&sourceUuid](const std::set<AbstractSource*>::value_type & itr)
+	auto srcs = sourcesForProperty(property);
+
+	if(!contains(srcs, sourceUuid))
+		return PropertyInfo::invalid();
+
+	auto theSource = find_if(mSources.begin(), mSources.end(),[&sourceUuid](const std::set<AbstractSource*>::value_type & itr)
 	{
 		return (itr)->uuid() == sourceUuid;
 	});
 
-	if(srcIt == mSources.end())
-		return PropertyInfo::invalid();
-
-	return (*srcIt)->getPropertyInfo(property);
+	return (*theSource)->getPropertyInfo(property);
 }
 
 std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)

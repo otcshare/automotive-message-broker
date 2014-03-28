@@ -264,7 +264,7 @@ void OpenCvLuxPlugin::propertyChanged(AbstractPropertyType *value)
 	}
 }
 
-void OpenCvLuxPlugin::supportedChanged(PropertyList)
+void OpenCvLuxPlugin::supportedChanged(const PropertyList &)
 {
 	DebugOut()<<"OpenCvLuxPlugin::supported changed."<<endl;
 }

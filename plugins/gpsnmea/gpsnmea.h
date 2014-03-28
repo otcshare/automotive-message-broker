@@ -45,7 +45,7 @@ public:
 
 	int supportedOperations();
 	
-	void supportedChanged(PropertyList) {}
+	void supportedChanged(const PropertyList &) {}
 	
 	PropertyInfo getPropertyInfo(VehicleProperty::Property property)
 	{
