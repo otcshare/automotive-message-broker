@@ -630,11 +630,8 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
 
 	m_supportedProperties.push_back(Obd2Connected);
 
-	re->setSupported(supported(), this);
-	/*if (openPort(std::string("/dev/pts/7"),115200))
-	{
-	  printf("Error opening OBD2 port\n");
-	}*/
+	re->updateSupported(supported(), PropertyList(), this);
+
 	statusQueue = g_async_queue_new();
 	commandQueue = g_async_queue_new();
 	subscriptionAddQueue = g_async_queue_new();

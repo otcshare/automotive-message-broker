@@ -186,9 +186,7 @@ AmbPlugin<T>::AmbPlugin(AbstractRoutingEngine* re, const std::map<std::string, s
     AbstractSource(re, config),
     d(new T(re, config, *this))
 {
-    AbstractSource* source = dynamic_cast<AbstractSource*>(this);
-    if(source && re)
-        re->setSupported(supported(), source);
+
 }
 
 template<typename T>

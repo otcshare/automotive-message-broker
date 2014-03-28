@@ -49,7 +49,7 @@ void MurphySource::processValue(string propertyName, AbstractPropertyType *prop)
     }
     else {
         murphyProperties[propertyName] = prop;
-        m_re->setSupported(supported(), this);
+		m_re->updateSupported(supported(), PropertyList(), this);
     }
 
     // cout << "updating property!" << endl;
@@ -378,7 +378,7 @@ void MurphySource::setConfiguration(map<string, string> config)
     }
 
     // TODO: read supported values from configuration?
-    m_re->setSupported(supported(), this);
+	m_re->updateSupported(supported(), PropertyList(), this);
 
     // set up the connection with Murphy
     if (!m_address.empty())
