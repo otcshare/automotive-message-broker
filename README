@@ -46,21 +46,21 @@ also see ambd -h
 
 Running on multiple machines
 
-ambd can run on multiple machines and share data across a network.  This is primarily done through the websocket
+AMB can run on multiple machines and share data across a network.  This is primarily done through the websocket
 sink and source plugins.  The server machine, the machine with physical access to data, runs the 
 websocket sink plugin and the client, the machine elsewhere on the network, runs the websocket source plugin.
 
-There are example configurations in the source called "configwebsocketsink" and "configwebsocketsource" that
-show how to configure ambd.  These are found in the examples folder.
+There are example configurations in the source called "websocketsink2" and "websocketsource2" that
+show how to configure ambd.  These are found in the examples folder.  Other documentation for these plugins can 
+be found in the plugins/websocket/README file.
 
 Here's an example on how to run:
 
 cd automotive-message-broker/examples
-ambd -c configwebsocketsink
+ambd -c websocketsink2
 
 (in another terminal)
-ambd -c configwebsocketsource
-
+ambd -c websocketsource2
 
 
 Running with other plugins
@@ -68,16 +68,12 @@ Running with other plugins
 To learn about running AMB with other plugins, please see the plugins/*/README.  
 
 
-
 Running with the Qt mainloop:
 
 Some source and sink plugins may want to use the Qt-based mainloop to take advantage of Qt features. To enable
 the Qt mainloop, run cmake with -Duse_qtcore=On:
 
-cmake .. -Duse_qtcore=On
-
-Alternatively, the Qt-based mainloop will be enabled if you enable an Qt-based
-source or sink plugin at compile time.
+cmake .. -Dqtmainloop=On
 
 You will also need to edit your config to enable the Qt-based mainloop:
 
