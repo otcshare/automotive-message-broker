@@ -12,6 +12,7 @@ To use the Database plugin, add the following to the "sources" array in /etc/amb
 	"name" : "gpsnmea",
 	"path" : "/usr/lib/automotive-message-broker/gpsnmea.so",
 	"device" : "/dev/ttyUSB0",
+	"baudrate" : "4800",
 	"bluetoothAdapter" : "00:00:00:00:00:00"
 }
 
@@ -25,6 +26,9 @@ path to plugin on the filesystem.
 
 "device"
 gps device.  This must be a serial device.  It can also be a bluetooth address.
+
+"baudrate"
+Baudrate for serial devices : 2400,4800,9600,19200 or 38400. Default is 9600.
 
 Default: none
 
