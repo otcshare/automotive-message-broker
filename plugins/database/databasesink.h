@@ -225,7 +225,7 @@ class DatabaseSink : public AbstractSource
 public:
 	DatabaseSink(AbstractRoutingEngine* engine, map<string, string> config);
 	~DatabaseSink();
-	virtual void supportedChanged(PropertyList supportedProperties);
+	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType *value);
 	const std::string uuid();
 

@@ -47,13 +47,13 @@ DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConn
 	setTimeout(timeout);
 }
 
-void DBusSink::supportedChanged(PropertyList supportedProperties)
+void DBusSink::supportedChanged(const PropertyList &supportedProperties)
 {
 	startRegistration();
 
 	for(PropertyDBusMap::iterator itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
 	{
-		if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains((*itr).first))
+		if(contains(supportedProperties, (*itr).first))
 		{
 			VariantType* prop = (*itr).second;
 			prop->setSourceFilter(mSourceFilter);

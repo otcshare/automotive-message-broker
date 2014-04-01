@@ -101,12 +101,6 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 
 	PropertyInfo acInfo(0,acZones);
 	propertyInfoMap[VehicleProperty::AirConditioning] = acInfo;
-
-	re->setSupported(supported(), this);
-
-	PropertyList testSupported = re->supported();
-
-	g_assert(contains(testSupported,VehicleProperty::MachineGunTurretStatus));
 }
 
 
@@ -153,6 +147,13 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	else if(reply->property == VehicleProperty::TransmissionShiftPosition)
 	{
 		VehicleProperty::TransmissionShiftPositionType temp(transmissionShiftPostion);
+		reply->value = &temp;
+		reply->success = true;
+		reply->completed(reply);
+	}
+	else if(reply->property == VehicleProperty::TransmissionGearPosition)
+	{
+		VehicleProperty::TransmissionGearPositionType temp(transmissionShiftPostion);
 		reply->value = &temp;
 		reply->success = true;
 		reply->completed(reply);

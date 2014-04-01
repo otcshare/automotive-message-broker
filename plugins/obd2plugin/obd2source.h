@@ -164,7 +164,7 @@ public:
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
 
-	void supportedChanged(PropertyList) {}
+	void supportedChanged(const PropertyList &) {}
 	GAsyncQueue* commandQueue;
 	GAsyncQueue* statusQueue;
 	GAsyncQueue* subscriptionAddQueue;

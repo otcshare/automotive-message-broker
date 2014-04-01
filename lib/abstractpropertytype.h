@@ -459,7 +459,7 @@ public:
 	StringPropertyType(std::string propertyName)
 		:AbstractPropertyType(propertyName)
 	{
-
+		setValue(std::string());
 	}
 
 	StringPropertyType(std::string propertyName, std::string val)

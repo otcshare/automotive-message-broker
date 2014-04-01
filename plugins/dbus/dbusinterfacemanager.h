@@ -37,12 +37,14 @@ public:
 	/// From AbstractSink:
 	virtual const string uuid(){ return "DBusInterfaceManager"; }
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) { }
-	virtual void supportedChanged(PropertyList supportedProperties);
+	virtual void supportedChanged(const PropertyList & supportedProperties);
     
 	GDBusConnection * connection;
 
+	void registerCustomTypes();
+
 private:
-	
+
 	unsigned int ownerId;
 
 

@@ -313,7 +313,7 @@ class AbstractRoutingEngine
 public:
 	virtual ~AbstractRoutingEngine();
 
-	virtual void setSupported(PropertyList supported, AbstractSource* source) = 0;
+	virtual void registerSource(AbstractSource* src) = 0;
 	virtual void updateSupported(PropertyList added, PropertyList removed, AbstractSource* source) = 0;
 
 

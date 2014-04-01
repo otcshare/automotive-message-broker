@@ -40,7 +40,7 @@ public:
 			delete itr->second;
 		}
 	}
-	virtual void supportedChanged(PropertyList supportedProperties);
+	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType *value);
 	virtual const std::string uuid();
 

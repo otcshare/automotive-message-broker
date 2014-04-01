@@ -1,0 +1,22 @@
+{
+	"sources" : [ 
+		{
+			"name" : "CANSimPlugin",
+			"path":"/usr/lib/automotive-message-broker/cansimplugin.so",
+			"interfaces" : ["vcan0", "vcan1"]
+        	},
+		{ 
+			"name" : "CANGenPlugin",
+			"path":"/usr/lib/automotive-message-broker/cangenplugin.so"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "DBusSink",
+			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so",
+			"frequency" : "60"
+		}
+
+	]
+}
+

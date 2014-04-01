@@ -413,6 +413,28 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		location.parse("GPRMC,023633.00,V,,,,,,,180314,,,N*75");
 		DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
 		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+
+		std::string testChecksuming = "GPRMC,195617.00,V,,,,,,,310314,,,N*74";
+
+		g_assert(checksum(testChecksuming));
+
+		std::string multimessage1 = "GA,235320.00,4532.48633,N,12257.";
+		std::string multimessage2 = "57383,W,";
+		std::string multimessage3 = "1,03,7.53,51.6,M,-21.3,M,,*55";
+		std::string multimessage4 = "GPGSA,A,";
+		std::string multimessage5 = "2,27,23,19,,,,,,,,,,7.60";
+		std::string multimessage6 = ",7.53,1.00*0E";
+		bool multimessageParse = false;
+
+		multimessageParse |= tryParse(multimessage1);
+		multimessageParse |= tryParse(multimessage2);
+		multimessageParse |= tryParse(multimessage3);
+		multimessageParse |= tryParse(multimessage4);
+		multimessageParse |= tryParse(multimessage5);
+		multimessageParse |= tryParse(multimessage6);
+
+		g_assert(multimessageParse);
+
 	}
 
 	std::string btaddapter = config["bluetoothAdapter"];
@@ -442,8 +464,6 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		g_io_channel_set_close_on_unref(chan, true);
 		g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 	}
-
-	re->setSupported(supported(), this);
 }
 
 GpsNmeaSource::~GpsNmeaSource()
@@ -508,19 +528,34 @@ void GpsNmeaSource::canHasData()
 {
 	std::string data = device->read();
 
+	tryParse(data);
+}
+
+bool GpsNmeaSource::tryParse(string data)
+{
 	std::vector<std::string> lines;
 
-	boost::split(lines,data,boost::is_any_of("$"));
+	boost::split(lines, data, boost::is_any_of("$"));
 
-	for(int i = 0; i < lines.size(); i++)
+	bool weFoundAMessage = false;
+
+	for(auto line : lines)
 	{
-		if(checksum(lines[i]))
+		if(checksum(line))
 		{
-			buffer = lines[i];
+			buffer = line;
 		}
 		else
 		{
-			buffer += lines[i];
+			buffer += line;
+		}
+
+		uint pos = buffer.find('G');
+
+		if(pos != std::string::npos && pos != 0)
+		{
+			///Throw the incomplete stuff away.  if it doesn't begin with "G" it'll never be complete
+			buffer = buffer.substr(pos);
 		}
 
 		if(checksum(buffer))
@@ -528,11 +563,26 @@ void GpsNmeaSource::canHasData()
 			/// we have a complete message.  parse it!
 			DebugOut(7)<<"Complete message: "<<buffer<<endl;
 			location->parse(buffer);
+			weFoundAMessage = true;
+			buffer = "";
+		}
+		else
+		{
+			if(pos == 0 )
+			{
+				uint cs = buffer.find('*');
+				if (cs != std::string::npos)
+				{
+					///This means we have a false flag somewhere.
+					buffer = buffer.substr(cs+3);
+				}
+			}
 		}
 
 		DebugOut(7)<<"buffer: "<<buffer<<endl;
-
 	}
+
+	return weFoundAMessage;
 }
 
 void GpsNmeaSource::unsubscribeToPropertyChanges(VehicleProperty::Property property)
@@ -570,7 +620,7 @@ bool GpsNmeaSource::checksum(std::string sentence)
 			checksum ^= i;
 	}
 
-	std::string sentenceCheckStr = sentence.substr(sentence.length()-4,2);
+	std::string sentenceCheckStr = sentence.substr(sentence.find('*')+1,2);
 
 	try
 	{
@@ -583,4 +633,6 @@ bool GpsNmeaSource::checksum(std::string sentence)
 	{
 		return false;
 	}
+
+	return false;
 }

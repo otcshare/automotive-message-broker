@@ -108,6 +108,11 @@ public:
 	 */
 	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 	
+	/*!
+	 * \brief supported
+	 * \return returns the supported properties.
+	 */
+	virtual PropertyList supported() = 0;
 
 protected:
 	/*!

@@ -41,11 +41,6 @@ using namespace std;
 OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config)
 	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0)
 {
-	re->setSupported(supported(), this);
-	re->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
-	re->subscribeToProperty(VehicleProperty::Latitude,this);
-	re->subscribeToProperty(VehicleProperty::Longitude, this);
-
 	shared = new Shared;
 	shared->parent = this;
 
@@ -171,6 +166,10 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	}
 #endif
 
+	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
+	routingEngine->subscribeToProperty(VehicleProperty::Latitude,this);
+	routingEngine->subscribeToProperty(VehicleProperty::Longitude, this);
+
 }
 
 
@@ -263,6 +262,11 @@ void OpenCvLuxPlugin::propertyChanged(AbstractPropertyType *value)
 	{
 		longitude = value->value<double>();
 	}
+}
+
+void OpenCvLuxPlugin::supportedChanged(const PropertyList &)
+{
+	DebugOut()<<"OpenCvLuxPlugin::supported changed."<<endl;
 }
 
 static int grabImage(void *data)
@@ -377,10 +381,13 @@ bool OpenCvLuxPlugin::init()
 		DebugOut()<<"we failed to open camera device ("<<device<<") or no camera found"<<endl;
 		return false;
 	}
-	cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
-					  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
+	if(!shared->mWriter || !shared->mWriter->isOpened())
+	{
+		cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
+							  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
 
-	shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('H','2','6','4'),30,s);
+		shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('H','2','6','4'),30,s);
+	}
 
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
 	DebugOut()<<"camera frame height: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT)<<endl;
@@ -388,6 +395,8 @@ bool OpenCvLuxPlugin::init()
 
 	return true;
 }
+
+
 
 void OpenCvLuxPlugin::writeVideoFrame(cv::Mat frame)
 {

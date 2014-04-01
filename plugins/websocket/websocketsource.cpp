@@ -501,7 +501,6 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 	context = libwebsocket_create_context(&info);
 
 	setConfiguration(config);
-	re->setSupported(supported(), this);
 
 	//printf("websocketsource loaded!!!\n");
 	g_timeout_add(1000,checkTimeouts,this); //Do this once per second, check for functions that have timed out and reply with success = false;

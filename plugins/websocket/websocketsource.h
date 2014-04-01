@@ -52,7 +52,7 @@ public:
 	PropertyList activeRequests;
 	PropertyList removeRequests;
 	void setSupported(PropertyList list);
-	void supportedChanged(PropertyList) {}
+	void supportedChanged(const PropertyList &) {}
 	void setConfiguration(std::map<std::string, std::string> config);
 	//map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
 	//map<VehicleProperty::Property,AsyncRangePropertyReply*> rangedPropertyReplyMap;

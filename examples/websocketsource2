@@ -6,7 +6,7 @@
 			"port" : "23000",
 			"ssl" : "false",
 			"ip" : "127.0.0.1",
-			"binaryProtocol" : "true",
+			"binaryProtocol" : "false",
 			"useExtensions" : "true"
 		}
 	],

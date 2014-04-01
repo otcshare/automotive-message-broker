@@ -140,7 +140,7 @@ PropertyList BluemonkeySink::subscriptions()
 
 }
 
-void BluemonkeySink::supportedChanged(PropertyList supportedProperties)
+void BluemonkeySink::supportedChanged(const PropertyList &supportedProperties)
 {
 	DebugOut()<<"supported changed"<<endl;
 }

@@ -350,10 +350,14 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 
 bool VehicleProperty::registerProperty(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
 {
+	if(!contains(mCustomProperties,name))
+	{
+		mCustomProperties.push_back(name);
 
-	mCustomProperties.push_back(name);
+		return registerPropertyPriv(name, factory);
+	}
 
-	return registerPropertyPriv(name, factory);
+	return false;
 }
 
 bool VehicleProperty::registerPropertyPriv(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)

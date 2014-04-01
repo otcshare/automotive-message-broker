@@ -54,6 +54,10 @@ CANGenPlugin::CANGenPlugin(AbstractRoutingEngine* re, const map<string, string>&
     AmbPluginImpl(re, config, parent),
     ws(new WebSockets(*this))
 {
+	addPropertySupport(Zone::None,[]()
+	{
+		return new SimCommand();
+	});
 }
 
 CANGenPlugin::~CANGenPlugin()
@@ -74,7 +78,19 @@ void CANGenPlugin::propertyChanged(AbstractPropertyType* value)
         return;
     if(!value->name.compare("MappingTable")) {
         parseMappingTable(value->toString());
-    }
+	}
+}
+
+AsyncPropertyReply *CANGenPlugin::setProperty(const AsyncSetPropertyRequest &request)
+{
+	if(request.property == "SimCommand")
+	{
+		std::string v = request.value->toString();
+
+		dataReceived(nullptr,v.c_str(),v.length());
+	}
+
+	return AmbPluginImpl::setProperty(request);
 }
 
 void CANGenPlugin::parseMappingTable(const std::string& table)
@@ -302,6 +318,12 @@ void CANGenPlugin::dataReceived(libwebsocket* socket, const char* data, size_t l
     json_object *typeobject = json_object_object_get(rootobject.get(),"type");
     json_object *nameobject = json_object_object_get(rootobject.get(),"name");
     json_object *transidobject = json_object_object_get(rootobject.get(),"transactionid");
+
+	if(!typeobject || !nameobject || !transidobject)
+	{
+		DebugOut(DebugOut::Warning)<<"Malformed json. aborting"<<endl;
+		return;
+	}
 
     string type = string(json_object_get_string(typeobject));
     string name = string(json_object_get_string(nameobject));

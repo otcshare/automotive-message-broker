@@ -47,7 +47,7 @@ public:
 	void setType(QString t);
 
 	virtual PropertyList subscriptions() { return PropertyList(); }
-	virtual void supportedChanged(PropertyList )
+	virtual void supportedChanged(const PropertyList &)
 	{
 		DebugOut()<<"Bluemonkey Property Supported Changed"<<endl;
 	}
@@ -76,7 +76,7 @@ Q_OBJECT
 public:
 	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config);
 	virtual PropertyList subscriptions();
-	virtual void supportedChanged(PropertyList supportedProperties);
+	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
 	virtual const std::string uuid();
 

@@ -45,7 +45,7 @@ public:
 
 	int supportedOperations();
 	
-	void supportedChanged(PropertyList) {}
+	void supportedChanged(const PropertyList &) {}
 	
 	PropertyInfo getPropertyInfo(VehicleProperty::Property property)
 	{
@@ -56,8 +56,10 @@ public:
 	}
 
 	void canHasData();
-	
+
 private:
+
+	bool tryParse(std::string data);
 
 	void addPropertySupport(VehicleProperty::Property property, Zone::Type zone);
 

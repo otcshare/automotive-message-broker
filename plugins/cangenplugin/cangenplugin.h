@@ -102,6 +102,8 @@ public:
       */
     void propertyChanged(AbstractPropertyType* value);
 
+	AsyncPropertyReply* setProperty(const AsyncSetPropertyRequest &request);
+
     // from CANObserver
 public:
     /*!
@@ -297,6 +299,13 @@ private:
      * \private
      */
     interprocess_recursive_mutex mutex;
+};
+
+class SimCommand: public StringPropertyType
+{
+public:
+	SimCommand(): StringPropertyType("SimCommand") { }
+	SimCommand(std::string val) : StringPropertyType("SimCommand",val) { }
 };
 
 #endif // _CANGENPLUGINIMPL_H_

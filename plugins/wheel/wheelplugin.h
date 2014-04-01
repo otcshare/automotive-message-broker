@@ -43,7 +43,7 @@ public:
 
 	int supportedOperations();
 	
-	void supportedChanged(PropertyList) {}
+	void supportedChanged(const PropertyList &) {}
 
 	map<string, string> getConfiguration() { return configuration; }
 

@@ -103,7 +103,6 @@ private:
 				g_dbus_connection_emit_signal(signal.connection, NULL, signal.objectPath.c_str(), "org.freedesktop.DBus.Properties", signal.signalName.c_str(), g_variant_new("(sa{sv}as)",
 																																									 signal.interface.c_str(),
 																																						 &builder, NULL), &error);
-
 				if(error)
 				{
 					DebugOut(DebugOut::Error)<<error->message<<std::endl;

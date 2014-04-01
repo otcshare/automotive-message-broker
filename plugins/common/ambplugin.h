@@ -153,7 +153,7 @@ public:
     /*! supportedChanged() is called when the supported properties changes
      * \param supportedProperties the new list of supported properties.
      */
-    virtual void supportedChanged(PropertyList supportedProperties);
+	virtual void supportedChanged(const PropertyList & supportedProperties);
 
 
     // AmbPlugin's own methods
@@ -186,9 +186,7 @@ AmbPlugin<T>::AmbPlugin(AbstractRoutingEngine* re, const std::map<std::string, s
     AbstractSource(re, config),
     d(new T(re, config, *this))
 {
-    AbstractSource* source = dynamic_cast<AbstractSource*>(this);
-    if(source && re)
-        re->setSupported(supported(), source);
+
 }
 
 template<typename T>
@@ -257,7 +255,7 @@ void AmbPlugin<T>::propertyChanged(AbstractPropertyType* value)
 }
 
 template<typename T>
-void AmbPlugin<T>::supportedChanged(PropertyList supportedProperties)
+void AmbPlugin<T>::supportedChanged(const PropertyList &supportedProperties)
 {
     if(d)
         d->supportedChanged(supportedProperties);

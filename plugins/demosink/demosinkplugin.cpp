@@ -116,7 +116,7 @@ void DemoSink::propertyChanged(AbstractPropertyType *value)
 
 }
 
-void DemoSink::supportedChanged(PropertyList list)
+void DemoSink::supportedChanged(const PropertyList & list)
 {
 	routingEngine->subscribeToProperty(VehicleProperty::ButtonEvent, this);
 	routingEngine->subscribeToProperty(VehicleProperty::TurnSignal, this);

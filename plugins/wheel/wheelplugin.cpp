@@ -110,7 +110,6 @@ private:
 WheelSourcePlugin::WheelSourcePlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSource(re, config)
 {
-	re->setSupported(supported(), this);
 	this->mWheel = new WheelPrivate(this, re);
 }
 

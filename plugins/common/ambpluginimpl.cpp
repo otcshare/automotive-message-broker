@@ -118,7 +118,7 @@ PropertyList AmbPluginImpl::supported() const
 
 int AmbPluginImpl::supportedOperations() const
 {
-    return AbstractSource::Get /*| AbstractSource::Set*/;
+	return AbstractSource::Get | AbstractSource::Set;
 }
 
 void AmbPluginImpl::unsubscribeToPropertyChanges(const VehicleProperty::Property& property)

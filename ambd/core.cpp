@@ -66,28 +66,14 @@ Core::~Core()
 	mSinks.clear();
 }
 
-void Core::setSupported(PropertyList supported, AbstractSource* source)
+void Core::registerSource(AbstractSource *source)
 {
-	if(!source)
-		return;
-
-	mSources[source->uuid()] = source;
-		
-	handleAddSupported(supported, source);
-
-	/// tell all new sinks about the newly supported properties.
-
-	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
-	{
-		AbstractSink* s = (*itr);
-		s->supportedChanged(this->supported());
-	}
-
+	mSources.insert(source);
 }
 
 void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSource* source)
 {
-	if(!source || mSources.find(source->uuid()) == mSources.end())
+	if(!source || mSources.find(source) == mSources.end())
 		return;
 
 	/// add the newly supported to master list
@@ -98,28 +84,26 @@ void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSou
 
 	handleRemoveSupported(removed, source);
 	
-	/// tell all new sinks about the newly supported properties.
+	/// tell all sinks about the newly supported properties.
 
 	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
-		(*itr)->supportedChanged(supported());
+		AbstractSink* sink = *itr;
+		sink->supportedChanged(supported());
 	}
 }
 
 PropertyList Core::supported()
 {
 	PropertyList supportedProperties;
-	// TODO: should we care here about duplicates ?
-	// (if multiple sources supports the same property ==> Property will be more than once in PropertyList)
+
 	transform(mMasterPropertyList.begin(), mMasterPropertyList.end(), back_inserter(supportedProperties),
 		[](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& itr) { return itr.second; }
 	);
+
 	// remove duplicates:
 	supportedProperties.sort();
 	supportedProperties.unique();
-
-	//DebugOut(1)<<__FUNCTION__<<"supported list: " << endl;
-	//for_each(supportedProperties.begin(), supportedProperties.end(), [](const std::string& str){ DebugOut(1)<<__FUNCTION__<< str << endl; });
 
 	return supportedProperties;
 }
@@ -208,7 +192,7 @@ AsyncRangePropertyReply * Core::getRangePropertyAsync(AsyncRangePropertyRequest 
 
 	for(auto itr = mSources.begin(); itr != mSources.end(); ++itr)
 	{
-		AbstractSource* src = itr->second;
+		AbstractSource* src = *itr;
 		if(((src->supportedOperations() & AbstractSource::GetRanged) == AbstractSource::GetRanged))
 		{
 			src->getRangePropertyAsync(reply);
@@ -326,11 +310,20 @@ bool Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 
 PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
 {
-	auto srcIt = mSources.find(sourceUuid);
-	if(srcIt == mSources.end())
+	if(sourceUuid == "")
 		return PropertyInfo::invalid();
 
-	return srcIt->second->getPropertyInfo(property);
+	auto srcs = sourcesForProperty(property);
+
+	if(!contains(srcs, sourceUuid))
+		return PropertyInfo::invalid();
+
+	auto theSource = find_if(mSources.begin(), mSources.end(),[&sourceUuid](const std::set<AbstractSource*>::value_type & itr)
+	{
+		return (itr)->uuid() == sourceUuid;
+	});
+
+	return (*theSource)->getPropertyInfo(property);
 }
 
 std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
@@ -356,10 +349,18 @@ std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
 	return list;
 }
 
+void Core::inspectSupported()
+{
+	for(AbstractSource* src : mSources)
+	{
+		updateSupported(src->supported(), PropertyList(), src);
+	}
+}
+
 void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
 {
 	if(!source)
-		return;
+		throw std::runtime_error("Core::handleAddSupported passed a null source");
 
 	for(auto itr = added.begin(); itr != added.end(); ++itr)
 	{
@@ -417,9 +418,12 @@ AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& propert
 		);
 	}
 	else{
-		auto itSource = mSources.find(sourceUuidFilter);
+		auto itSource = find_if(mSources.begin(),mSources.end(),[&sourceUuidFilter](const std::set<AbstractSource*>::value_type & it)
+		{
+			return (it)->uuid() == sourceUuidFilter;
+		});
 		if(itSource != mSources.end()){
-			auto range = mMasterPropertyList.equal_range(itSource->second);
+			auto range = mMasterPropertyList.equal_range(*itSource);
 			auto temp = find_if(
 				range.first,	// the first property in source
 				range.second,   // one item right after the last property in source

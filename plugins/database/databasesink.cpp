@@ -170,7 +170,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	mSupported.push_back(DatabaseLogging);
 	mSupported.push_back(DatabasePlayback);
 
-	routingEngine->setSupported(supported(), this);
+	routingEngine->updateSupported(supported(), PropertyList(), this);
 
 	if(config.find("startOnLoad")!= config.end())
 	{
@@ -204,7 +204,7 @@ DatabaseSink::~DatabaseSink()
 }
 
 
-void DatabaseSink::supportedChanged(PropertyList supportedProperties)
+void DatabaseSink::supportedChanged(const PropertyList &supportedProperties)
 {
 
 }
@@ -384,7 +384,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 	delete shared;
 	shared = NULL;
 
-	routingEngine->setSupported(mSupported, this);
+	routingEngine->updateSupported(mSupported, PropertyList(), this);
 }
 
 void DatabaseSink::propertyChanged(AbstractPropertyType *value)
@@ -397,7 +397,7 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 	if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(property))
 	{
 		mSupported.push_back(property);
-		routingEngine->setSupported(mSupported, this);
+		routingEngine->updateSupported(mSupported, PropertyList(), this);
 	}
 
 	DBObject obj;
