@@ -82,7 +82,8 @@ find_package(Boost REQUIRED)
 pkg_check_modules(glib REQUIRED glib-2.0 gobject-2.0)
 pkg_check_modules(json REQUIRED json)
 
-list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+#list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
 set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
