@@ -56,8 +56,10 @@ public:
 	}
 
 	void canHasData();
-	
+
 private:
+
+	bool tryParse(std::string data);
 
 	void addPropertySupport(VehicleProperty::Property property, Zone::Type zone);
 
