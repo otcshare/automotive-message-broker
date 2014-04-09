@@ -2,17 +2,13 @@
 
 #include <time.h>
 #include <iostream>
+#include <chrono>
 
 double amb::currentTime()
 {
-	struct timespec tm;
+	auto tm = std::chrono::high_resolution_clock::now();
 
-	clock_gettime(CLOCK_REALTIME, &tm);
-
-	double ns = double(tm.tv_nsec) / 1000000000;
-
-
-	double time = double(tm.tv_sec) + ns;
+	double time = std::chrono::duration_cast<std::chrono::milliseconds>(tm.time_since_epoch()).count() / 1000.00;
 
 	return time;
 }

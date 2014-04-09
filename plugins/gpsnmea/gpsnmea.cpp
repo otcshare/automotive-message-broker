@@ -562,7 +562,7 @@ bool GpsNmeaSource::tryParse(string data)
 			buffer += line;
 		}
 
-		uint pos = buffer.find('G');
+		std::string::size_type pos = buffer.find('G');
 
 		if(pos != std::string::npos && pos != 0)
 		{

@@ -39,7 +39,7 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The program to use to edit the cache.
-CMAKE_EDIT_COMMAND = /usr/bin/cmake-gui
+CMAKE_EDIT_COMMAND = /usr/bin/ccmake
 
 # The top-level source directory on which CMake was run.
 CMAKE_SOURCE_DIR = /home/tripzero/src/automotive-message-broker
@@ -53,7 +53,7 @@ CMAKE_BINARY_DIR = /home/tripzero/src/automotive-message-broker/build
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
-	/usr/bin/cmake-gui -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+	/usr/bin/ccmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -162,51 +162,12 @@ depend:
 	cd /home/tripzero/src/automotive-message-broker/build && $(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-# Convenience name for target.
-plugins/cansimplugin/CMakeFiles/cansimplugin.dir/rule:
-	cd /home/tripzero/src/automotive-message-broker/build && $(MAKE) -f CMakeFiles/Makefile2 plugins/cansimplugin/CMakeFiles/cansimplugin.dir/rule
-.PHONY : plugins/cansimplugin/CMakeFiles/cansimplugin.dir/rule
-
-# Convenience name for target.
-cansimplugin: plugins/cansimplugin/CMakeFiles/cansimplugin.dir/rule
-.PHONY : cansimplugin
-
-# fast build rule for target.
-cansimplugin/fast:
-	cd /home/tripzero/src/automotive-message-broker/build && $(MAKE) -f plugins/cansimplugin/CMakeFiles/cansimplugin.dir/build.make plugins/cansimplugin/CMakeFiles/cansimplugin.dir/build
-.PHONY : cansimplugin/fast
-
-cansimplugin.o: cansimplugin.cpp.o
-.PHONY : cansimplugin.o
-
-# target to build an object file
-cansimplugin.cpp.o:
-	cd /home/tripzero/src/automotive-message-broker/build && $(MAKE) -f plugins/cansimplugin/CMakeFiles/cansimplugin.dir/build.make plugins/cansimplugin/CMakeFiles/cansimplugin.dir/cansimplugin.cpp.o
-.PHONY : cansimplugin.cpp.o
-
-cansimplugin.i: cansimplugin.cpp.i
-.PHONY : cansimplugin.i
-
-# target to preprocess a source file
-cansimplugin.cpp.i:
-	cd /home/tripzero/src/automotive-message-broker/build && $(MAKE) -f plugins/cansimplugin/CMakeFiles/cansimplugin.dir/build.make plugins/cansimplugin/CMakeFiles/cansimplugin.dir/cansimplugin.cpp.i
-.PHONY : cansimplugin.cpp.i
-
-cansimplugin.s: cansimplugin.cpp.s
-.PHONY : cansimplugin.s
-
-# target to generate assembly for a file
-cansimplugin.cpp.s:
-	cd /home/tripzero/src/automotive-message-broker/build && $(MAKE) -f plugins/cansimplugin/CMakeFiles/cansimplugin.dir/build.make plugins/cansimplugin/CMakeFiles/cansimplugin.dir/cansimplugin.cpp.s
-.PHONY : cansimplugin.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... cansimplugin"
 	@echo "... edit_cache"
 	@echo "... install"
 	@echo "... install/local"
@@ -215,9 +176,6 @@ help:
 	@echo "... package"
 	@echo "... package_source"
 	@echo "... rebuild_cache"
-	@echo "... cansimplugin.o"
-	@echo "... cansimplugin.i"
-	@echo "... cansimplugin.s"
 .PHONY : help
 
 

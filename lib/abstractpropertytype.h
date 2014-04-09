@@ -68,7 +68,7 @@ typedef std::list<Zone::Type> ZoneList;
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(std::string property): name(property), timestamp(-1), sequence(-1), zone(Zone::None)
+	AbstractPropertyType(std::string property): name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None)
 	{
 		void*(name);
 	}
