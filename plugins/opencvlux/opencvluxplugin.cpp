@@ -99,12 +99,17 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 	if(config.find("opencl") != config.end())
 	{
+#ifdef OPENCL
 		shared->useOpenCl = config["opencl"] == "true";
+#endif
+
 	}
 
 	if(config.find("cuda") != config.end())
 	{
+#ifdef CUDA
 		shared->useCuda = config["cuda"] == "true";
+#endif
 	}
 
 
@@ -170,6 +175,11 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	routingEngine->subscribeToProperty(VehicleProperty::Latitude,this);
 	routingEngine->subscribeToProperty(VehicleProperty::Longitude, this);
 
+}
+
+OpenCvLuxPlugin::~OpenCvLuxPlugin()
+{
+	delete shared->mWriter;
 }
 
 
@@ -285,7 +295,8 @@ static int grabImage(void *data)
 		*(shared->m_capture) >> m_image;
 	}
 
-	shared->parent->writeVideoFrame( m_image );
+	/// test:
+	//shared->parent->writeVideoFrame( m_image );
 
 	if(shared->threaded)
 	{
@@ -386,7 +397,8 @@ bool OpenCvLuxPlugin::init()
 		cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
 							  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
 
-		shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('H','2','6','4'),30,s);
+		//shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('H','2','6','4'),30,s);
+		shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('M','J','P','G'),30,s);
 	}
 
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
@@ -440,6 +452,8 @@ void OpenCvLuxPlugin::imgProcResult()
 
 	uint lux = watcher->result();
 	shared->parent->updateProperty(lux);
+
+	watcher->deleteLater();
 }
 
 TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
