@@ -8,7 +8,7 @@ CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop,
 {
 	PropertyList list = VehicleProperty::customProperties();
 
-	if(ListPlusPlus<VehicleProperty::Property>(&list).contains(prop))
+	if(contains(list,prop))
 	{
 		AbstractPropertyType* temp = VehicleProperty::getPropertyTypeForPropertyNameValue(prop);
 

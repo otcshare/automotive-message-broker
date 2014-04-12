@@ -18,6 +18,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "opencvluxplugin.h"
 #include "timestamp.h"
+#include <listplusplus.h>
 
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -25,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QtConcurrent/QtConcurrent>
+
 
 #ifdef OPENCL
 #include <opencv2/ocl/ocl.hpp>
@@ -242,7 +244,7 @@ void OpenCvLuxPlugin::subscribeToPropertyChanges(VehicleProperty::Property prope
 
 void OpenCvLuxPlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	shared->mRequests.remove(property);
+	removeOne(&shared->mRequests,property);
 }
 
 PropertyList OpenCvLuxPlugin::supported()

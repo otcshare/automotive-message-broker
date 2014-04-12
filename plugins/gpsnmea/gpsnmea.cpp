@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "timestamp.h"
 #include "serialport.hpp"
 #include "bluetooth.hpp"
+#include <listplusplus.h>
 
 #include <iostream>
 #include <boost/assert.hpp>
@@ -599,7 +600,7 @@ bool GpsNmeaSource::tryParse(string data)
 
 void GpsNmeaSource::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	mRequests.remove(property);
+	removeOne(&mRequests,property);
 }
 
 void GpsNmeaSource::addPropertySupport(VehicleProperty::Property property, Zone::Type zone)

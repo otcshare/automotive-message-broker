@@ -349,7 +349,7 @@ int ExampleSourcePlugin::supportedOperations()
 void ExampleSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	if(contains(mRequests,property))
-		mRequests.remove(property);
+		removeOne(&mRequests, property);
 }
 
 void ExampleSourcePlugin::randomizeProperties()

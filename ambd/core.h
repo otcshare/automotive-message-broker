@@ -25,6 +25,7 @@
 #include "abstractroutingengine.h"
 
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 
 class Core: public AbstractRoutingEngine
@@ -77,8 +78,8 @@ private:
 	std::multimap<AbstractSource*, VehicleProperty::Property> mMasterPropertyList;
 
 	// K = AbstractSource::uuid(), T = AbstractSource*
-	std::set<AbstractSource*> mSources;
-	std::set<AbstractSink*> mSinks;
+	std::unordered_set<AbstractSource*> mSources;
+	std::unordered_set<AbstractSink*> mSinks;
 
 	Performance performance;
 	

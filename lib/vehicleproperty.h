@@ -279,6 +279,12 @@ enum Type
 	public: propertyType(): baseClass(property) {} \
 	};
 
+class VehicleProperty;
+
+
+typedef std::vector<std::string> PropertyList;
+typedef std::set<std::string> PropertySet;
+
 class VehicleProperty
 {
 
@@ -806,13 +812,13 @@ public:
 	 * \return returns list of all registered properties
 	 * \see VehicleProperty::registerProperty
 	 */
-	static std::list<VehicleProperty::Property> capabilities();
+	static PropertyList capabilities();
 
 	/*!
 	 * \brief customProperties
 	 * \return returns list of custom properties defined by plugins using VehicleProperty::registerProperty
 	 */
-	static std::list<VehicleProperty::Property> customProperties();
+	static PropertyList customProperties();
 
 	/*! \brief getPropertyTypeForPropertyNameValue returns an AbstractPropertyType* for the property name
 	  * with the value specified by 'value'.  Ownership of the returned AbstractPropertyType* is
@@ -851,12 +857,9 @@ private:
 	static bool registerPropertyPriv(Property name, PropertyTypeFactoryCallback factory);
 
 	static std::map<Property, PropertyTypeFactoryCallback> registeredPropertyFactoryMap;
-	static std::list<VehicleProperty::Property> mCapabilities;
-	static std::list<VehicleProperty::Property> mCustomProperties;
+	static PropertyList mCapabilities;
+	static PropertyList mCustomProperties;
 };
-
-typedef std::list<VehicleProperty::Property> PropertyList;
-typedef std::set<VehicleProperty::Property> PropertySet;
 
 #endif // VEHICLEPROPERTY_H
 
