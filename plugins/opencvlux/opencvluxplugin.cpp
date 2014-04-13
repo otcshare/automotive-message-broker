@@ -414,8 +414,39 @@ bool OpenCvLuxPlugin::init()
 
 void OpenCvLuxPlugin::writeVideoFrame(cv::Mat frame)
 {
-	//if(speed > 0)
+	if(speed > 0)
 	{
+		std::stringstream str;
+		str<<"Speed: "<<speed<<" kph, lat/lon: "<<latitude<<"/"<<longitude<<endl;
+
+		std::string text = str.str();
+
+		int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
+		double fontScale = 2;
+		int thickness = 3;
+
+		int baseline=0;
+		cv::Size textSize = cv::getTextSize(text, fontFace,
+									fontScale, thickness, &baseline);
+		baseline += thickness;
+
+		// center the text
+		cv::Point textOrg((frame.cols - textSize.width)/2,
+					  (frame.rows + textSize.height)/2);
+
+		// draw the box
+		cv::rectangle(frame, textOrg + cv::Point(0, baseline),
+				  textOrg + cv::Point(textSize.width, -textSize.height),
+				  cv::Scalar(0,0,255));
+		// ... and the baseline first
+		cv::line(frame, textOrg + cv::Point(0, thickness),
+			 textOrg + cv::Point(textSize.width, thickness),
+			 cv::Scalar(0, 0, 255));
+
+		// then put the text itself
+		cv::putText(frame, text, textOrg, fontFace, fontScale,
+				cv::Scalar::all(255), thickness, 8);
+
 		(*shared->mWriter)<<frame;
 	}
 }
