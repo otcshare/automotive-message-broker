@@ -61,7 +61,7 @@ private: ///methods:
 		if(lt_dlinit())
 		{
 			mErrorString = lt_dlerror();
-			cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			DebugOut(DebugOut::Error)<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
 		
@@ -72,7 +72,7 @@ private: ///methods:
 		if(!handle)
 		{
 			mErrorString = lt_dlerror();
-			cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			DebugOut(DebugOut::Error)<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
 		
