@@ -1,3 +1,32 @@
+* Wed Apr 16 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140326.195506@13f13b0
+- use debugout for errors instead of cerr
+- use mjpg codec
+- enable usage of different routing engines via config
+- version bump 0.11.809
+- use monotonic clock
+- removed build files from src
+- use c++11 chrono for time
+- updated spec
+- minor tweak to readme
+- Merge pull request #16 from OlivierDelbeke/master
+- Merge branch '0.12' into tizen
+- fixed up gpsnmea to work with devices with very fragmented nmea messages
+- Added the possibility to specify the baudrate of the GPS NMEA device
+- fixed runtime errors and warnings with dbus plugin
+- Updated plugins to work without the now deprecated setSupported() call.
+- fixed compile errors in various plugins
+- Update README
+- Merge pull request #15 from e8johan/master
+- some core changes as well as additions to opencv plugin
+- added SimCommand backdoor to the gen plugin
+- added cangen example config
+- Merge branch '0.12' into tizen
+- fixed invalidating of iterator in ranged for looop
+- updated chlog
+- Fixed warning about enabling c++11 for C sources
+- Removed stray files.
+- Fixed error messages for libtool to indicate that it is libltdl that is missing.
+
 * Fri Mar 21 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140320.231725@5748dc3
 - added cansim plugin
 - added cansim, cangen plugins
