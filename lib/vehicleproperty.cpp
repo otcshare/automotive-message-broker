@@ -345,6 +345,8 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 		}
 	}
 
+	DebugOut(DebugOut::Error)<<"Property not found"<<endl;
+
 	return nullptr;
 }
 

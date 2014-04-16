@@ -374,6 +374,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> config)
 	:AbstractSource(re,config), mUuid("33d86462-1708-4f78-a001-99ea8d55422b")
 {
+	int baudrate = 0;
 	location =new Location(re, mUuid);
 
 	VehicleProperty::registerProperty(GPSTIME,[](){ return new BasicPropertyType<double>(GPSTIME,0); });
@@ -439,6 +440,11 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 
 	std::string btaddapter = config["bluetoothAdapter"];
 
+	if(config.find("baudrate")!= config.end())
+	{
+		baudrate = boost::lexical_cast<int>( config["baudrate"] );
+	}
+
 	if(config.find("device")!= config.end())
 	{
 		std::string dev = config["device"];
@@ -449,6 +455,12 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		}
 
 		device = new SerialPort(dev);
+
+		if(baudrate!=0)
+		{
+			if((static_cast<SerialPort*>(device))->setSpeed(baudrate))
+				DebugOut(DebugOut::Error)<<"Unsupported baudrate " << config["baudrate"] << endl;
+		}
 
 		if(!device->open())
 		{
@@ -550,7 +562,7 @@ bool GpsNmeaSource::tryParse(string data)
 			buffer += line;
 		}
 
-		uint pos = buffer.find('G');
+		std::string::size_type pos = buffer.find('G');
 
 		if(pos != std::string::npos && pos != 0)
 		{

@@ -51,6 +51,8 @@ public:
 	};
 
 	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
+
+	~OpenCvLuxPlugin();
 	
 	const string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);

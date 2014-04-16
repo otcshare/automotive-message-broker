@@ -44,7 +44,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #include "pluginloader.h"
-#include "core.h"
 #include <debugout.h>
 
 using namespace std;
@@ -151,11 +150,7 @@ int main(int argc, char **argv)
 
 	VehicleProperty::factory();
 	
-	Core routingEngine;
-
-	PluginLoader loader(config, &routingEngine , argc, argv);
-
-	routingEngine.inspectSupported();
+	PluginLoader loader(config, argc, argv);
 	
 	if(!loader.sources().size())
 	{

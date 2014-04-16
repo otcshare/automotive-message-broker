@@ -35,12 +35,13 @@ using namespace std;
 
 typedef void* create_t(AbstractRoutingEngine*, map<string, string> );
 typedef void* create_mainloop_t(int argc, char** argv);
+typedef void* createRoutingEngine(void);
 
 class PluginLoader
 {
 
 public:
-	PluginLoader(string configFile, AbstractRoutingEngine* routingEngine, int argc, char** argv);
+	PluginLoader(string configFile, int argc, char** argv);
 	~PluginLoader();
 
 	SourceList sources();
@@ -60,7 +61,7 @@ private: ///methods:
 		if(lt_dlinit())
 		{
 			mErrorString = lt_dlerror();
-			cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			DebugOut(DebugOut::Error)<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
 		
@@ -71,7 +72,7 @@ private: ///methods:
 		if(!handle)
 		{
 			mErrorString = lt_dlerror();
-			cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			DebugOut(DebugOut::Error)<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
 		
@@ -89,29 +90,53 @@ private: ///methods:
 	}
 
 	IMainLoop* loadMainLoop(string pluginName, int argc, char** argv)
+	{
+		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
+
+		lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
+
+		if(!handle)
 		{
-			DebugOut()<<"Loading plugin: "<<pluginName<<endl;
-
-			lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
-
-			if(!handle)
-			{
-				mErrorString = lt_dlerror();
-				cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-				return nullptr;
-			}
-			openHandles.push_back(handle);
-
-			m_create = (create_mainloop_t *)lt_dlsym(handle, "create");
-
-			if(m_create)
-			{
-				void* obj = m_create(argc, argv);
-				return static_cast<IMainLoop*>( obj );
-			}
-
+			mErrorString = lt_dlerror();
+			cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
+		openHandles.push_back(handle);
+
+		m_create = (create_mainloop_t *)lt_dlsym(handle, "create");
+
+		if(m_create)
+		{
+			void* obj = m_create(argc, argv);
+			return static_cast<IMainLoop*>( obj );
+		}
+
+		return nullptr;
+	}
+	AbstractRoutingEngine* loadRoutingEngine(string pluginName)
+	{
+		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
+
+		lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
+
+		if(!handle)
+		{
+			mErrorString = lt_dlerror();
+			cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
+			return nullptr;
+		}
+		openHandles.push_back(handle);
+
+		r_create = (createRoutingEngine *)lt_dlsym(handle, "create");
+
+		if(r_create)
+		{
+			void* obj = r_create();
+			return static_cast<AbstractRoutingEngine*>( obj );
+		}
+
+		return nullptr;
+	}
 	
 private:
 	
@@ -125,6 +150,7 @@ private:
 	
 	create_t * f_create;
 	create_mainloop_t * m_create;
+	createRoutingEngine * r_create;
 
 
 	IMainLoop* mMainLoop;

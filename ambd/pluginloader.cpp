@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "pluginloader.h"
 #include "glibmainloop.h"
+#include "core.h"
 #include <json.h>
 #include <iostream>
 #include <stdexcept>
@@ -34,24 +35,24 @@ using namespace std;
  * 	sources: [ path1, path2, path3 ]
  * 	sinks: [ path1, path2, path3 ]
  * }
- * 
+ *
 **********************************************/
 
 std::string get_file_contents(const char *filename)
 {
-  //FILE *in = fopen(filename,"r");
-  
-  std::ifstream in(filename, std::ios::in);
-  std::string output;
-  std::string line;
-  while(in.good())
-  {
-    getline(in,line);
-    output.append(line);
-  }
-  return output;
+	//FILE *in = fopen(filename,"r");
+
+	std::ifstream in(filename, std::ios::in);
+	std::string output;
+	std::string line;
+	while(in.good())
+	{
+		getline(in,line);
+		output.append(line);
+	}
+	return output;
 }
-PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int argc, char** argv): f_create(NULL), routingEngine(re), mMainLoop(nullptr)
+PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(NULL), routingEngine(nullptr), mMainLoop(nullptr)
 {
 	if(lt_dlinit())
 	{
@@ -84,7 +85,30 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 		// e.g. issue an error, parse another object from that point, etc...
 	}
 	
-	//DebugOut()<<"Config members: "<<json_reader_count_members(reader)<<endl;
+	json_object *coreobject = json_object_object_get(rootobject,"routingEngine");
+	if (coreobject)
+	{
+		/// there is a mainloop entry.  Load the plugin:
+
+		string restr = string(json_object_get_string(coreobject));
+
+		routingEngine = loadRoutingEngine(restr);
+
+		if(!routingEngine)
+		{
+			DebugOut(DebugOut::Warning)<<"Failed to load routing engine plugin: "<<restr<<endl;
+		}
+	}
+
+	if(!routingEngine)
+	{
+		/// there is no mainloop entry, use default glib
+		DebugOut()<<"No routing engine specified in config.  Using built-in 'core' routing engine by default."<<endl;
+		routingEngine = new Core();
+	}
+
+
+
 	json_object *mainloopobject = json_object_object_get(rootobject,"mainloop");
 	if (mainloopobject)
 	{
@@ -96,7 +120,7 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 
 		if(!mMainLoop)
 		{
-			DebugOut(0)<<"Failed to load main loop plugin."<<endl;
+			DebugOut(DebugOut::Warning)<<"Failed to load main loop plugin."<<endl;
 		}
 	}
 	else if(!mMainLoop)
@@ -121,8 +145,8 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 	array_list *sourceslist = json_object_get_array(sourcesobject);
 	if (!sourceslist)
 	{
-	  DebugOut() << "Error getting source list" << endl;
-	  throw std::runtime_error("Error getting sources list");
+		DebugOut() << "Error getting source list" << endl;
+		throw std::runtime_error("Error getting sources list");
 	}
 	
 	for(int i=0; i < array_list_length(sourceslist); i++)
@@ -154,19 +178,17 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 	
 	if (!sinksobject)
 	{
-	  DebugOut() << "Error getting sink object" << endl;
-	  throw std::runtime_error("Error getting sink object");
+		DebugOut() << "Error getting sink object" << endl;
+		throw std::runtime_error("Error getting sink object");
 	}
-	
-	
-	
+
 	array_list *sinkslist = json_object_get_array(sinksobject);
-	
-	
+
+
 	if (!sinkslist)
 	{
-	  DebugOut() << "Error getting sink list" << endl;
-	  throw std::runtime_error("Error getting sink list");
+		DebugOut() << "Error getting sink list" << endl;
+		throw std::runtime_error("Error getting sink list");
 	}
 	
 	
@@ -201,6 +223,12 @@ PluginLoader::PluginLoader(string configFile, AbstractRoutingEngine* re, int arg
 	//json_object_put(sinksobject);
 	json_object_put(rootobject);
 	json_tokener_free(tokener);
+
+	Core* core = static_cast<Core*>(routingEngine);
+	if( core != nullptr )
+	{
+		core->inspectSupported();
+	}
 }
 
 PluginLoader::~PluginLoader()
