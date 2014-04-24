@@ -25,6 +25,12 @@ AbstractRoutingEngine::~AbstractRoutingEngine()
 {
 }
 
+AsyncPropertyReply::AsyncPropertyReply()
+	:AsyncPropertyRequest(), value(nullptr), success(false), timeoutSource(nullptr)
+{
+	setTimeout();
+}
+
 AsyncPropertyReply::AsyncPropertyReply(const AsyncPropertyRequest &request)
 	:AsyncPropertyRequest(request), value(NULL), success(false), timeoutSource(nullptr)
 {

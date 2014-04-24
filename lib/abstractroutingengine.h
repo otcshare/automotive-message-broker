@@ -117,6 +117,8 @@ public:
 class AsyncPropertyReply: public AsyncPropertyRequest
 {
 public:
+	AsyncPropertyReply();
+
 	AsyncPropertyReply(const AsyncPropertyRequest &request);
 
 	AsyncPropertyReply(const AsyncSetPropertyRequest &request);

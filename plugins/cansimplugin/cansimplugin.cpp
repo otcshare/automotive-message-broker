@@ -162,7 +162,8 @@ void CANSimPlugin::init()
 
 void CANSimPlugin::supportedChanged(const PropertyList& supportedProperties)
 {
-    const_cast<PropertyList&>(supportedProperties).remove(MappingTable);// CANSimPlugin has own copy of the PropertyList from AmbPlugin
+	PropertyList s = const_cast<PropertyList&>(supportedProperties);
+	removeOne(&s, MappingTable);// CANSimPlugin has own copy of the PropertyList from AmbPlugin
     createMappingTable(supportedProperties);
 }
 
@@ -210,7 +211,8 @@ void CANSimPlugin::createMappingTable(const PropertyList& /*supported*/)
 
     //
     PropertyList allProperties(VehicleProperty::capabilities());
-    allProperties.remove(MappingTable);
+
+	removeOne(&allProperties, MappingTable);
 
     //
     // Create mapping table in JSON format
@@ -227,7 +229,7 @@ void CANSimPlugin::createMappingTable(const PropertyList& /*supported*/)
         std::list<std::string> sources(routingEngine->sourcesForProperty(propertyName));
         size_t size = sources.size();
 
-        bool IAmTheSource = ListPlusPlus<std::string>(&sources).contains(uuid());
+		bool IAmTheSource = contains(sources, uuid());
 
         if(size == 0 || size == 1 && IAmTheSource) {
             if( size == 0 ){

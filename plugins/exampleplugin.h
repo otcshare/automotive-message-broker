@@ -28,6 +28,7 @@ class ExampleSourcePlugin: public AbstractSource
 {
 
 public:
+	ExampleSourcePlugin(): AbstractSource(nullptr, map<string, string>()) {}
 	ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, string> config);
 	
 	const string uuid();

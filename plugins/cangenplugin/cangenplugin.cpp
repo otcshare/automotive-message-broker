@@ -215,7 +215,7 @@ void CANGenPlugin::getValue(libwebsocket* socket, const std::string& property, i
 {
     AsyncPropertyRequest request;
     PropertyList foo = VehicleProperty::capabilities();
-    if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+	if(contains(foo, property))
     {
         request.property = property;
     }
@@ -444,7 +444,7 @@ void CANGenPlugin::dataReceived(libwebsocket* socket, const char* data, size_t l
                 {
                     //Send what events a particular property supports
                     PropertyList foo(routingEngine->supported());
-                    if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(propertyNames.front()))
+					if (contains(foo,propertyNames.front()))
                     {
                         //sinkManager->addSingleShotSink(wsi,data.front(),id);
                         typessupported = "\"get\",\"getSupportedEventTypes\"";

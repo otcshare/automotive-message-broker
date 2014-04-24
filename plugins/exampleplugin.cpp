@@ -121,8 +121,6 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	DebugOut()<<"ExampleSource: getPropertyAsync called for property: "<<reply->property<<endl;
 
-
-
 	if(reply->property == VehicleProperty::VehicleSpeed)
 	{
 		VehicleProperty::VehicleSpeedType temp(velocity);
@@ -399,4 +397,24 @@ void ExampleSourcePlugin::addPropertySupport(VehicleProperty::Property property,
 	PropertyInfo info(0, zones);
 
 	propertyInfoMap[property] = info;
+}
+
+int main(int argc, char** argv)
+{
+	ExampleSourcePlugin plugin;
+
+	AsyncPropertyReply request;
+
+	request.property = VehicleProperty::VehicleSpeed;
+	request.completed = [](AsyncPropertyReply* reply)
+	{
+		g_assert(reply->success);
+	};
+
+	plugin.getPropertyAsync(&request);
+
+	GMainLoop* mainLoop = g_main_loop_new(NULL, false);
+
+	g_main_loop_run(mainLoop);
+	return 1;
 }
