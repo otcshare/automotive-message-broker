@@ -1,0 +1,204 @@
+#!/usr/bin/perl -w
+
+#	Copyright (C) 2014  Intel Corporation
+#
+#	This library is free software; you can redistribute it and/or
+#	modify it under the terms of the GNU Lesser General Public
+#	License as published by the Free Software Foundation; either
+#	version 2.1 of the License, or (at your option) any later version.
+#
+#	This library is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#	Lesser General Public License for more details.
+#
+#	You should have received a copy of the GNU Lesser General Public
+#	License along with this library; if not, write to the Free Software
+#	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+use strict;
+use warnings;
+
+use Intel::IviPoc::DbcGrammar;
+use Intel::IviPoc::AmbCommon;
+use File::Basename;
+use File::Spec;
+use Cwd;
+use JSON;
+
+
+=head1 NAME
+
+dbc2json - Vector CANdb++ to JSON file format converter.
+
+=head1 SYNOPSIS
+
+B<dbc2json> I<infile> [ I<outfile> ]
+
+=head1 DESCRIPTION
+
+Part of Automotive Message Broker Signal Mapper tool.
+
+B<dbc2json> converts file in Vector CANdb++ format to intermediate JSON file.
+
+Intermediate file is used to format and annotate raw data from CANDb++ file into format suitable for AMB plugin creation.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<infile>
+
+Input I<infile> file in Vector CANdb++ (*.dbc) format.
+
+=item [ I<outfile> ]
+
+Target output I<outfile> file converted to JSON, otherwise created in current directory.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=back
+
+=head1 REQUIRES
+
+Perl 5.006, Intel::IviPoc::DbcGrammar, File::Basename, File::Spec, Cwd, JSON
+
+=head1 SEE ALSO
+
+perl(1), json2amb(1)
+
+=cut
+
+local $/;
+
+# get total arg passed to this script
+my $total = $#ARGV + 1;
+
+if ( $total < 1 or $total > 2) {
+    # get script name and print usage
+    my $scriptname = $0;
+    &printUsage($scriptname);
+    exit;
+    }
+
+# First parameter is input file
+my $inputfilename = $ARGV[0];
+my $text = &readFileContent($inputfilename);
+
+# Second optional parameter is output file
+my $outputfilename = '';
+if ( $total == 1 ) {
+    my ($infilename, $indirectories, $insuffix) = fileparse($inputfilename, qr/\.[^.]*/);
+    my $targetDir = getcwd;
+    $outputfilename = File::Spec->catfile( ($targetDir), $infilename . '.json' );
+} else {
+    $outputfilename = $ARGV[1];
+}
+
+# We add one space if there is something like  ""ReceiverId to get "" ReceiverId
+$text =~ s/"(.*)"(\w*)/"$1" $2/g;
+
+#Create parser
+my $parser = new Intel::IviPoc::DbcGrammar;
+
+# Print wait info for user
+&printWait($inputfilename, $outputfilename);
+
+# Parse input file and generate json
+my $result;
+$result = $parser->DbcOutput($text);
+my %jsonroot = %{$result};
+
+# Get the filename without path and extension and set it as pluginName
+my ($outfilename, $outdirectories, $outsuffix) = fileparse($outputfilename, qr/\.[^.]*/);
+$jsonroot{'pluginName'} = $outfilename;
+
+# Now just spit the JSON out
+my $json = JSON->new;
+$json = $json->utf8;
+my $json_text = $json->pretty->encode( \%jsonroot  );
+
+open (my $fho, '>', $outputfilename)
+  or die "Can't create filehandle: $!";
+
+binmode($fho, ":utf8");
+
+print { $fho } $json_text;
+
+if ( $total == 1 or $total == 2 ) {
+    # close current output file
+    close($fho);
+}
+
+# Finnish
+exit;
+
+=head2 printWait
+
+Prints out wait information
+
+=cut
+
+sub printWait {
+    print STDERR ("\n");
+    print STDERR ("Processing input file:\n");
+    print STDERR ("    $_[0]\n");
+    print STDERR ("Generating output file:\n");
+    print STDERR ("    $_[1]\n");
+    print STDERR ("\n");
+    print STDERR ("This operation may take some while. Please wait...\n");
+    print STDERR ("\n");
+    print STDERR ("\n");
+}
+
+=head2 printUsage
+
+Prints out basic usage help
+
+=cut
+
+sub printUsage {
+    my $scriptname=$_[0];
+    print STDERR ("$scriptname\n");
+    print STDERR ("Usage: dbc2json infile [outfile]\n");
+    print STDERR ("  infile              Input dbc file\n");
+    print STDERR ("  outfile             File (optional) converted to json,\n");
+    print STDERR ("                      otherwise created in current directory.\n");
+    print STDERR ("\n");
+}
+
+=head1 AUTHOR
+
+IntelIVIPoc, C<< <ivipoc at intel.com> >>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc dbc2json
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2014  Intel Corporation
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut
