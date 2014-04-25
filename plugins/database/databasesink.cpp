@@ -377,7 +377,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 
 	for(int i=0; i < supportedStr.size(); i++)
 	{
-		if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(supportedStr[i][0]))
+		if(!contains(mSupported, supportedStr[i][0]))
 			mSupported.push_back(supportedStr[i][0]);
 	}
 
@@ -394,7 +394,7 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 	if(!shared)
 		return;
 
-	if(!ListPlusPlus<VehicleProperty::Property>(&mSupported).contains(property))
+	if(!contains(mSupported, property))
 	{
 		mSupported.push_back(property);
 		routingEngine->updateSupported(mSupported, PropertyList(), this);

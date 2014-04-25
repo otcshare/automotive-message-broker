@@ -59,7 +59,7 @@ void MurphySource::processValue(string propertyName, AbstractPropertyType *prop)
 bool MurphySource::hasProperty(string propertyName)
 {
     PropertyList props = supported();
-    return ListPlusPlus<VehicleProperty::Property>(&props).contains(propertyName);
+	return contains(props,propertyName);
 }
 
 static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
