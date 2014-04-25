@@ -464,7 +464,7 @@ static int updateProperties( gpointer data)
 
 				/// Remove support for this pid:
 				PropertyList list = src->supported();
-				list.remove(reply->property);
+				removeOne(&list, reply->property);
 				src->setSupported(list);
 			}
 			else
@@ -679,7 +679,7 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 	}
 	else
 	{
-		if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+		if(!contains(m_supportedProperties, property))
 		{
 			DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
 			return;
@@ -711,7 +711,7 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 void OBD2Source::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+	if(!contains(m_supportedProperties, property))
 	{
 		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
 		return;
@@ -729,7 +729,7 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 	VehicleProperty::Property property = reply->property;
 
 
-	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+	if(!contains(m_supportedProperties, property))
 	{
 		DebugOut(0)<<"obd plugin does not support: "<<property<<endl;
 		return;
