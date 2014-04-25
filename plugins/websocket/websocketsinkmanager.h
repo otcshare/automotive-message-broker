@@ -46,7 +46,7 @@ public:
 	map<std::string, list<WebSocketSink*> > m_sinkMap;
 	void setConfiguration(map<string, string> config);
 	void setValue(libwebsocket* socket,VehicleProperty::Property property,string value, Zone::Type zone, string uuid);
-	list<VehicleProperty::Property> getSupportedProperties();
+	PropertyList getSupportedProperties();
 
 	int partialMessageIndex;
 	QByteArray incompleteMessage;

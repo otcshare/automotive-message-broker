@@ -68,9 +68,9 @@ void TestPlugin::updateProperty(VehicleProperty::Property property,AbstractPrope
 bool TestPlugin::testCoreSetSupported()
 {
 	PropertyList supported(routingEngine->supported());
-	TEST(ListPlusPlus<VehicleProperty::Property>(&supported).contains(TestProptertyName1) == false);
+	TEST(contains(supported,TestProptertyName1) == false);
 	std::list<std::string> sources(routingEngine->sourcesForProperty(TestProptertyName1));
-	TEST(ListPlusPlus<std::string>(&sources).contains(uuid()) == false);
+	TEST(contains(sources,uuid()) == false);
 
 	// if we were registered in Core, it will ask us and we will return it valid, but we haven't registered yet
 	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == false);
@@ -86,19 +86,19 @@ bool TestPlugin::testCoreSetSupported()
 
 	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == true);
 	Zone::ZoneList zones(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).zones());
-	TEST(ListPlusPlus<Zone::Type>(&zones).contains(Zone::LeftSide) == true);
+	TEST(contains(zones, Zone::LeftSide) == true);
 
 	supported = routingEngine->supported();
-	TEST(ListPlusPlus<VehicleProperty::Property>(&supported).contains(TestProptertyName1) == true);
-	TEST(ListPlusPlus<VehicleProperty::Property>(&supported).contains(TestProptertyName2) == true);
-	TEST(ListPlusPlus<VehicleProperty::Property>(&supported).contains(VehicleProperty::ClutchStatus) == false);
+	TEST(contains(supported,TestProptertyName1) == true);
+	TEST(contains(supported,TestProptertyName2) == true);
+	TEST(contains(supported,VehicleProperty::ClutchStatus) == false);
 
 	sources = routingEngine->sourcesForProperty(TestProptertyName1);
-	TEST(ListPlusPlus<std::string>(&sources).contains(uuid()) == true);
+	TEST(contains(sources,uuid()) == true);
 
 	TEST(routingEngine->getPropertyInfo(TestProptertyName2, uuid()).isValid() == true);
 	zones = routingEngine->getPropertyInfo(TestProptertyName2, uuid()).zones();
-	TEST(ListPlusPlus<Zone::Type>(&zones).contains(Zone::FrontSide) == true);
+	TEST(contains(zones,Zone::FrontSide) == true);
 
 	return true;
 }
@@ -270,7 +270,7 @@ bool TestPlugin::testCoreUpdateSupported()
 
 	PropertyList supported = routingEngine->supported();
 
-	success = ListPlusPlus<VehicleProperty::Property>(&supported).contains(VehicleProperty::ClutchStatus);
+	success = contains(supported,VehicleProperty::ClutchStatus);
 
 	PropertyList toRemove = toAdd;
 
@@ -278,7 +278,7 @@ bool TestPlugin::testCoreUpdateSupported()
 
 	supported = routingEngine->supported();
 
-	success &= !ListPlusPlus<VehicleProperty::Property>(&supported).contains(VehicleProperty::ClutchStatus);
+	success &= !contains(supported,VehicleProperty::ClutchStatus);
 
 	return success;
 }
@@ -368,7 +368,7 @@ const string TestPlugin::uuid()
 }
 void TestPlugin::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	if(ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+	if(contains(m_supportedProperties, property))
 		++subscriptionsToSupportedCounter;
 	else
 		++subscriptionsToUnsupportedCounter;
@@ -377,7 +377,7 @@ void TestPlugin::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 void TestPlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-	if(ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+	if(contains(m_supportedProperties, property))
 		++unsubscriptionsToSupportedCounter;
 	else
 		++unsubscriptionsToUnsupportedCounter;
@@ -401,7 +401,7 @@ AsyncPropertyReply *TestPlugin::setProperty(AsyncSetPropertyRequest request )
 
 PropertyInfo TestPlugin::getPropertyInfo(VehicleProperty::Property property)
 {
-	if(!ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(property))
+	if(!contains(m_supportedProperties, property))
 		return PropertyInfo::invalid();
 
 	if(property == TestProptertyName1){
@@ -418,7 +418,7 @@ PropertyInfo TestPlugin::getPropertyInfo(VehicleProperty::Property property)
 void TestPlugin::propertyChanged(AbstractPropertyType *value)
 {
 	++propertyChanges;
-	if(value && ListPlusPlus<VehicleProperty::Property>(&m_supportedProperties).contains(value->name))
+	if(value && contains(m_supportedProperties, value->name))
 		supportedPropertyChanges++;
 
 }

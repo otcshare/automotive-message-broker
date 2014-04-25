@@ -67,7 +67,7 @@ void WebSocketSinkManager::init()
 
 	setConfiguration(configuration);
 }
-list< VehicleProperty::Property > WebSocketSinkManager::getSupportedProperties()
+PropertyList WebSocketSinkManager::getSupportedProperties()
 {
 	return m_engine->supported();
 }
@@ -150,7 +150,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 {
 	AsyncPropertyRequest request;
 	PropertyList foo = VehicleProperty::capabilities();
-	if (ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+	if (contains(foo,property))
 	{
 		request.property = property;
 	}
@@ -327,7 +327,7 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
 {
 	PropertyList foo = VehicleProperty::capabilities();
-	if (!ListPlusPlus<VehicleProperty::Property>(&foo).contains(property))
+	if (!contains(foo,property))
 	{
 		DebugOut(DebugOut::Warning)<<"Invalid property requested: "<<property<<endl;
 		return;
@@ -374,7 +374,7 @@ void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 			{
 				//This is the sink in question.
 				WebSocketSink* sink = (*sinkItr);
-				if(!ListPlusPlus<WebSocketSink*>(&toDeleteList).contains(sink))
+				if(!contains(toDeleteList, sink))
 				{
 					toDeleteList.push_back(sink);
 				}

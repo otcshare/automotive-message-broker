@@ -149,13 +149,13 @@ std::shared_ptr<AbstractPropertyType> AmbPluginImpl::addPropertySupport(Zone::Ty
     VehicleProperty::Property name(propertyType->name);
     PropertyList registeredProperties(VehicleProperty::capabilities());
     bool registeredType(false);
-    if(!ListPlusPlus<VehicleProperty::Property>(&registeredProperties).contains(name))
+	if(!contains(registeredProperties,name))
     {
         registeredType = VehicleProperty::registerProperty(name, typeFactory);
     }
     if(!registeredType){ // Property type wasn't registered by us. Is it predefined in AMB API or some other source plug-in has already registered it ???
         PropertyList supportedProperties(routingEngine->supported());// Is this property already supported by any other source plug-in ?
-        if(ListPlusPlus<VehicleProperty::Property>(&supportedProperties).contains(name)) {
+		if(contains(supportedProperties,name)) {
             return nullptr;// Some other source plug-in supports this property, we can't support it - AMB doesn't support more sources for one property :-)
         }
         std::shared_ptr<AbstractPropertyType> registeredPropertyType(VehicleProperty::getPropertyTypeForPropertyNameValue(name));

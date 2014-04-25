@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 static DBusSignaller* signaller = nullptr;
 
 unordered_map<string, AbstractDBusInterface*> AbstractDBusInterface::objectMap;
-list<string> AbstractDBusInterface::mimplementedProperties;
+PropertyList AbstractDBusInterface::mimplementedProperties;
 
 const uint getPid(const char *owner)
 {
@@ -97,7 +97,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 		auto propertyMap = iface->getProperties();
 
-		std::list<std::string> propertyList;
+		PropertyList propertyList;
 
 		for(auto itr = propertyMap.begin(); itr != propertyMap.end(); itr++)
 		{
@@ -203,7 +203,7 @@ AbstractDBusInterface::~AbstractDBusInterface()
 {
 	unregisterObject();
 
-	list<std::string> impl = implementedProperties();
+	PropertyList impl = implementedProperties();
 
 	for(auto itr = impl.begin(); itr != impl.end(); itr++)
 	{
@@ -253,7 +253,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 	
 	properties[property->name()] = property;
 
-	if(!ListPlusPlus<string>(&mimplementedProperties).contains(property->ambPropertyName()))
+	if(!contains(mimplementedProperties, property->ambPropertyName()))
 	{
 		std::string pname = property->ambPropertyName();
 		mimplementedProperties.push_back(pname);

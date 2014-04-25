@@ -1,0 +1,81 @@
+Automotive Message Broker testing
+
+Abstract:
+
+This document outlines steps that should be taken in order to test Automotive Message Broker (AMB) functionality.
+
+Contents:
+
+I. Internal testing
+II. DBus API testing
+III. Performance testing
+
+
+Internal testing
+
+AMB performs internal testing of core functionality via the "test" plugin[1].  This plugin tests AbstractRoutingEngine methods.  If a test failes, ambd will abort.  This plugins also prints out the total property capabilities of AMB.  This is useful for verifying the addition of core properties to AMB's capabilities.  To run the test plugin, simply run ambd with the following example configuration[2]: 
+
+ambd -c testsourceconfig -d5
+
+Debug level 5 is usually enough to get most debug or log information from ambd.
+
+References:
+[1] - Test plugin: https://github.com/otcshare/automotive-message-broker/blob/master/plugins/testplugin/README
+[2] - Test plugin config: https://github.com/otcshare/automotive-message-broker/blob/master/examples/testsourceconfig
+
+DBus API testing
+
+AMB exposes a complex API over DBus[1].  This document will only lightly touch on the organization of the API for testing purposes.  For a information, please refer to the AMB DBus API documentation.  The API has two general interfaces: "Manager", and "DataType".  DataType refers to a particular type of vehicle data such as "VehicleSpeed".  The easiest way to test the AMB DBus API is to run the example dbus config[3]:
+
+ambd -c dbusconfig -d5
+
+Manager testing
+
+The Manager interfaces[2] is located in "/" with the interface "org.automotive.Manager".  Manager is used to create and find DataTypes.  It has the following methods:
+
+List
+FindObject
+ZonesForObjectName
+FindObjectForSourceZone
+FindObjectForZone
+SourcesForObjectName
+
+Please refer to the Manager documentation for specific explaination on what these methods do.  
+
+To test these methods, dbus-send, which comes with most linux distros can be used.  The following is the general pattern:
+
+dbus-send --system --print-reply --dest=org.automotive.message.broker / org.automotive.Manager.{METHOD_NAME} ...
+
+To test the "List" method:
+
+dbus-send --system --print-reply --dest=org.automotive.message.broker / org.automotive.Manager.List
+
+This should return a list of supported DataTypes that can be used to create and find object paths representing that type.
+
+To test the "FindObject" method:
+
+dbus-send --system --print-reply --dest=org.automotive.message.broker / org.automotive.Manager.FindObject string:VehicleSpeed
+
+This should return a list of objects that provide the data type "VehicleSpeed"
+
+The other methods follow the same pattern.  See the documentation for the arguments and return values.
+
+Because of the dynamic nature of the API (objects may not exist until Manager creates them), simple tools like dbus-send, gdbus or qdbus will not suffice for most operations.  To compensate for these lack of tools, AMB includes several helper scripts:
+
+amb-get
+amb-set
+amb-get-history
+amb-listen
+
+These scripts can be used to get values of objects, set properties on objects, get historic/logged data and listen for changes to objects.  For usage, please see [command] -h.  For example: "amb-get -h".
+
+References:
+[1] - DBus API documentation: https://github.com/otcshare/automotive-message-broker/blob/master/docs/README
+[2] - Manager interface documentation: https://github.com/otcshare/automotive-message-broker/blob/master/docs/manager.txt
+[3] - DBus config: https://github.com/otcshare/automotive-message-broker/blob/master/examples/dbusconfig
+
+Performance Testing
+
+In addition to general profiling tools, AMB comes with a few ways you can measure performance.  When running ambd with the -d1 option, you can see how many property updates are being generated per second and how many are actually being fired because a plugin is subscribed to that property.  Coupling this with CPU usage measuring tools can help with measuring performance.
+
+

@@ -36,9 +36,12 @@ option(gpsnmea_plugin "gps NMEA location plugin" OFF)
 option(openxc_plugin "OpenXC plugin" OFF)
 option(obdlinkcan_plugin "ObdLink mx CAN plugin" OFF)
 option(cansim_plugin "Can simulator plugin" OFF)
-option(cangen_plugin "Can simulator plugin" OFF)
+option(cangen_plugin "Can generator plugin" OFF)
 option(enable_icecc "Enable icecc checking, for distributed compilation" ON)
 option(enable_docs "enable Doxygen doc generation" OFF)
+
+#turn on -fpic/-fpie:
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")

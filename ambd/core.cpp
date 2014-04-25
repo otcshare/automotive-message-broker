@@ -102,8 +102,8 @@ PropertyList Core::supported()
 	);
 
 	// remove duplicates:
-	supportedProperties.sort();
-	supportedProperties.unique();
+	std::sort(supportedProperties.begin(), supportedProperties.end());
+	std::unique(supportedProperties.begin(), supportedProperties.end());
 
 	return supportedProperties;
 }
@@ -141,11 +141,8 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 
 		if( !isFiltered || sourceUuid == uuid)
 		{
-			/// FIXME: Set this here just in case a source neglects to:
-
 			if(value->sourceUuid != uuid)
 			{
-				//DebugOut(DebugOut::Warning)<<"Source not setting uuid for property "<<value->name<<endl;
 				value->sourceUuid = uuid;
 			}
 
@@ -272,7 +269,6 @@ bool Core::subscribeToProperty(VehicleProperty::Property property, string source
 bool Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *sink)
 {
 	/// TODO: implement
-	throw std::runtime_error("Not implemented");
 }
 
 bool Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* sink)
@@ -362,9 +358,8 @@ void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
 	if(!source)
 		throw std::runtime_error("Core::handleAddSupported passed a null source");
 
-	for(auto itr = added.begin(); itr != added.end(); ++itr)
+	for(auto property : added)
 	{
-		VehicleProperty::Property property = *itr;
 		mMasterPropertyList.emplace(source, property);// TODO: no check for duplicated properties from the same source - is it needed ?
 
 		// Subscribe to property in a new source if such property was subscribed. This catches newly supported properties in the process.

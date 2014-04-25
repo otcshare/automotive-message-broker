@@ -23,37 +23,6 @@
 #include <list>
 #include <algorithm>
 
-template <class T>
-class ListPlusPlus
-{
-public:
-	
-	ListPlusPlus(std::list<T> *list)
-	:mList(list)
-	{
-		
-	}
-	
-	
-	void removeOne(T value)
-	{
-		typename std::list<T>::iterator itr = std::find(mList->begin(), mList->end(), value);
-		
-		if (itr != mList->end())
-		{
-			mList->erase(itr);
-		}
-	}
-	
-	bool contains(T value)
-	{
-		return (std::find(mList->begin(), mList->end(), value) != mList->end());
-	}
-	
-private:
-	std::list<T> *mList;
-};
-
 template <class T, class V>
 bool contains(T iteratable, V value)
 {

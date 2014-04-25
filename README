@@ -43,24 +43,8 @@ ambd -c /path/to/myconfig
 
 also see ambd -h
 
-
-Running on multiple machines
-
-AMB can run on multiple machines and share data across a network.  This is primarily done through the websocket
-sink and source plugins.  The server machine, the machine with physical access to data, runs the 
-websocket sink plugin and the client, the machine elsewhere on the network, runs the websocket source plugin.
-
-There are example configurations in the source called "websocketsink2" and "websocketsource2" that
-show how to configure ambd.  These are found in the examples folder.  Other documentation for these plugins can 
-be found in the plugins/websocket/README file.
-
-Here's an example on how to run:
-
-cd automotive-message-broker/examples
-ambd -c websocketsink2
-
-(in another terminal)
-ambd -c websocketsource2
+Typically, AMB will be used with the DBus plugin.  The DBus plugin automatically makes internal AMB properties 
+available over DBus.  See the DBus plugin documentation for more information (plugins/dbus/README).
 
 
 Running with other plugins

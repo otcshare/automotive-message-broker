@@ -159,8 +159,8 @@ const VehicleProperty::Property VehicleProperty::SeatPositionSideCushion = "Seat
 const VehicleProperty::Property VehicleProperty::DashboardIllumination = "DashboardIllumination";
 const VehicleProperty::Property VehicleProperty::GeneratedVehicleSoundMode = "GeneratedVehicleSoundMode";
 
-std::list<VehicleProperty::Property> VehicleProperty::mCapabilities;
-std::list<VehicleProperty::Property> VehicleProperty::mCustomProperties;
+PropertyList VehicleProperty::mCapabilities;
+PropertyList VehicleProperty::mCustomProperties;
 
 VehicleProperty::VehicleProperty()
 {
@@ -317,12 +317,12 @@ void VehicleProperty::shutdown()
     mCustomProperties.clear();
 }
 
-std::list<VehicleProperty::Property> VehicleProperty::capabilities()
+PropertyList VehicleProperty::capabilities()
 {
 	return mCapabilities;
 }
 
-std::list<VehicleProperty::Property> VehicleProperty::customProperties()
+PropertyList VehicleProperty::customProperties()
 {
 	return mCustomProperties;
 }
@@ -364,7 +364,7 @@ bool VehicleProperty::registerProperty(VehicleProperty::Property name, VehiclePr
 
 bool VehicleProperty::registerPropertyPriv(VehicleProperty::Property name, VehicleProperty::PropertyTypeFactoryCallback factory)
 {
-	if(ListPlusPlus<Property>(&mCapabilities).contains(name))
+	if(contains(mCapabilities,name))
 	{
 		DebugOut(0)<<__FUNCTION__<<" ERROR: property '"<<name<<"' already registered."<<endl;
 		return false;

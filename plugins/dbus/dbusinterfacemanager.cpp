@@ -272,7 +272,7 @@ void DBusInterfaceManager::registerCustomTypes()
 	{
 		VehicleProperty::Property prop = *itr;
 
-		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
+		if(!contains(implemented, prop))
 		{
 			exportProperty<CustomPropertyInterface>(prop, re, connection);
 		}
@@ -288,7 +288,7 @@ void DBusInterfaceManager::registerCustomTypes()
 	{
 		VehicleProperty::Property prop = *itr;
 
-		if(!ListPlusPlus<VehicleProperty::Property>(&implemented).contains(prop))
+		if(!contains(implemented, prop))
 		{
 			exportProperty<UncategorizedPropertyInterface>(prop, re, connection);
 		}

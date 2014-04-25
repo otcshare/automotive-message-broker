@@ -53,7 +53,7 @@ public:
 	void addProperty(AbstractProperty* property);
 	virtual void updateValue(AbstractProperty* property);
 	
-	static std::list<std::string> implementedProperties() { return mimplementedProperties; }
+	static PropertyList implementedProperties() { return mimplementedProperties; }
 
 	static std::list<AbstractDBusInterface *> getObjectsForProperty(std::string property);
 
@@ -129,7 +129,7 @@ private:
 	std::string introspectionXml;
 	GDBusConnection * mConnection;
 	static std::unordered_map<std::string, AbstractDBusInterface*> objectMap;
-	static std::list<std::string> mimplementedProperties;
+	static PropertyList mimplementedProperties;
 	guint regId;
 	int mTimeout;
 

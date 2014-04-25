@@ -66,7 +66,7 @@ void WebSocketSource::checkSubscriptions()
 	while (queuedRequests.size() > 0)
 	{
 		VehicleProperty::Property prop = queuedRequests.front();
-		queuedRequests.pop_front();
+		removeOne(&queuedRequests,prop);
 		if (contains(activeRequests,prop))
 		{
 			return;
