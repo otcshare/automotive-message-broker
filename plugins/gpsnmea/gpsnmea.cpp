@@ -425,7 +425,9 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		std::string multimessage3 = "1,03,7.53,51.6,M,-21.3,M,,*55";
 		std::string multimessage4 = "GPGSA,A,";
 		std::string multimessage5 = "2,27,23,19,,,,,,,,,,7.60";
-		std::string multimessage6 = ",7.53,1.00*0E";
+		std::string multimessage6 = ",7.53,1.00*";
+		std::string multimessage7 = "0E";
+
 		bool multimessageParse = false;
 
 		multimessageParse |= tryParse(multimessage1);
@@ -434,6 +436,7 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		multimessageParse |= tryParse(multimessage4);
 		multimessageParse |= tryParse(multimessage5);
 		multimessageParse |= tryParse(multimessage6);
+		multimessageParse |= tryParse(multimessage7);
 
 		g_assert(multimessageParse);
 
@@ -584,10 +587,10 @@ bool GpsNmeaSource::tryParse(string data)
 			if(pos == 0 )
 			{
 				uint cs = buffer.find('*');
-				if (cs != std::string::npos)
+				if (cs != std::string::npos && cs != buffer.length()-1)
 				{
 					///This means we have a false flag somewhere.
-					buffer = buffer.substr(cs+3);
+					buffer = buffer.substr(cs+(buffer.length() - cs));
 				}
 			}
 		}
