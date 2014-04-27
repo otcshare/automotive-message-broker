@@ -64,6 +64,16 @@ private:
 	PropertyList mSupported;
 	uint16_t velocity;
 	uint16_t engineSpeed;
+
+	VehicleProperty::VehicleSpeedType vel;
+	VehicleProperty::EngineSpeedType es;
+	VehicleProperty::AccelerationXType ac;
+	VehicleProperty::SteeringWheelAngleType swa;
+	VehicleProperty::TransmissionShiftPositionType tsp;
+	VehicleProperty::TransmissionGearPositionType tgp;
+	VehicleProperty::ThrottlePositionType tp;
+	VehicleProperty::EngineCoolantTemperatureType ec;
+	VehicleProperty::MachineGunTurretStatusType mgt;
 };
 
 #endif // EXAMPLEPLUGIN_H
