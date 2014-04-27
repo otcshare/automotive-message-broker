@@ -38,7 +38,18 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
+const std::string VideoLogging = "VideoLogging";
+
 #include "debugout.h"
+
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+{
+	VehicleProperty::registerProperty(VideoLogging, [](){
+		return new BasicPropertyType<bool>(VideoLogging,false);
+	});
+
+	return new OpenCvLuxPlugin(routingengine, config);
+}
 
 OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config)
 	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0)
@@ -53,6 +64,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	shared->kinect = false;
 	shared->useOpenCl = false;
 	shared->useCuda = false;
+	shared->loggingOn = false;
 
 	shared->fps=30;
 	device="0";
@@ -176,7 +188,6 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
 	routingEngine->subscribeToProperty(VehicleProperty::Latitude,this);
 	routingEngine->subscribeToProperty(VehicleProperty::Longitude, this);
-
 }
 
 OpenCvLuxPlugin::~OpenCvLuxPlugin()
@@ -184,19 +195,10 @@ OpenCvLuxPlugin::~OpenCvLuxPlugin()
 	delete shared->mWriter;
 }
 
-
-
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
-{
-	return new OpenCvLuxPlugin(routingengine, config);
-	
-}
-
 const string OpenCvLuxPlugin::uuid()
 {
 	return "3c7a1ea0-7d2e-11e2-9e96-0800200c9a66";
 }
-
 
 void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
@@ -211,6 +213,13 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	if(reply->property == VehicleProperty::ExteriorBrightness)
 	{
 		replyQueue.push_back(reply);
+	}
+	if(reply->property == VideoLogging)
+	{
+		BasicPropertyType<bool> tmp(VideoLogging, shared->loggingOn);
+		reply->value = &tmp;
+		reply->success = true;
+		reply->completed(reply);
 	}
 
 	else  ///We don't support what you are asking for.  Reply false
@@ -228,7 +237,21 @@ void OpenCvLuxPlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 AsyncPropertyReply *OpenCvLuxPlugin::setProperty(AsyncSetPropertyRequest request )
 {
-	throw std::runtime_error("OpenCVLuxPlugin does not support this operation.  We should never hit this method.");
+	AsyncPropertyReply *reply = new AsyncPropertyReply(request);
+
+	reply->success = false;
+	reply->error = AsyncPropertyReply::InvalidOperation;
+
+	if(request.property == VideoLogging)
+	{
+		shared->loggingOn = request.value->value<bool>();
+		reply->success = true;
+		reply->error = AsyncPropertyReply::NoError;
+	}
+
+	reply->completed(reply);
+
+	return reply;
 }
 
 void OpenCvLuxPlugin::subscribeToPropertyChanges(VehicleProperty::Property property)
@@ -251,17 +274,19 @@ PropertyList OpenCvLuxPlugin::supported()
 {
 	PropertyList props;
 	props.push_back(VehicleProperty::ExteriorBrightness);
+	props.push_back(VideoLogging);
 	
 	return props;
 }
 
 int OpenCvLuxPlugin::supportedOperations()
 {
-	return Get;
+	return Get | Set;
 }
 
 void OpenCvLuxPlugin::propertyChanged(AbstractPropertyType *value)
 {
+	QMutexLocker lock(&mutex);
 	if(value->name == VehicleProperty::VehicleSpeed)
 	{
 		speed = value->value<uint16_t>();
@@ -297,9 +322,6 @@ static int grabImage(void *data)
 		*(shared->m_capture) >> m_image;
 	}
 
-	/// test:
-	//shared->parent->writeVideoFrame( m_image );
-
 	if(shared->threaded)
 	{
 		QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>();
@@ -307,9 +329,12 @@ static int grabImage(void *data)
 
 		QFuture<uint> future = QtConcurrent::run( evalImage, m_image, shared);
 		watcher->setFuture(future);
+
+		QtConcurrent::run(shared->parent, &OpenCvLuxPlugin::writeVideoFrame,m_image);
 	}
 	else
 	{
+		shared->parent->writeVideoFrame(m_image);
 		int lux = evalImage(m_image, shared);
 		//detectLight(m_image,shared);
 		shared->parent->updateProperty(lux);
@@ -394,13 +419,28 @@ bool OpenCvLuxPlugin::init()
 		DebugOut()<<"we failed to open camera device ("<<device<<") or no camera found"<<endl;
 		return false;
 	}
-	if(!shared->mWriter || !shared->mWriter->isOpened())
+	if(configuration.find("logging") != configuration.end() && configuration["logging"] == "true" && !shared->mWriter || !shared->mWriter->isOpened())
 	{
 		cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
 							  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
 
-		//shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('H','2','6','4'),30,s);
-		shared->mWriter = new cv::VideoWriter("/tmp/video.avi",CV_FOURCC('M','J','P','G'),30,s);
+		std::string codec = configuration["codec"];
+
+		if(codec == "" || codec.size() != 4)
+		{
+			DebugOut(DebugOut::Warning)<<"Invalid codec.  Using default: MJPG"<<endl;
+			codec = "MJPG";
+		}
+
+		std::string filename = configuration["logfile"];
+
+		if(filename == "") filename = "/tmp/video.avi";
+
+		boost::algorithm::to_upper(codec);
+
+		if(shared->mWriter) delete shared->mWriter;
+
+		shared->mWriter = new cv::VideoWriter(filename,CV_FOURCC(codec.at(0),codec.at(1),codec.at(2),codec.at(3)),30,s);
 	}
 
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
@@ -412,41 +452,54 @@ bool OpenCvLuxPlugin::init()
 
 
 
-void OpenCvLuxPlugin::writeVideoFrame(cv::Mat frame)
+void OpenCvLuxPlugin::writeVideoFrame(cv::Mat f)
 {
-	if(speed > 0)
+	QMutexLocker locker(&mutex);
+
+	if(shared->loggingOn && speed > 0)
 	{
+
+
+		cv::Mat frame;
+		f.copyTo(frame);
+
 		std::stringstream str;
-		str<<"Speed: "<<speed<<" kph, lat/lon: "<<latitude<<"/"<<longitude<<endl;
+		str<<"Speed: "<<speed<<" kph, Lat/Lon: "<<latitude<<"/"<<longitude;
+
+		std::stringstream datestr;
+		datestr<<QDateTime::currentDateTime().toString().toStdString();
+
+		locker.unlock();
 
 		std::string text = str.str();
 
-		int fontFace = cv::FONT_HERSHEY_SCRIPT_SIMPLEX;
-		double fontScale = 2;
+		int fontFace = cv::FONT_HERSHEY_SIMPLEX;
+		double fontScale = 1;
 		int thickness = 3;
 
 		int baseline=0;
 		cv::Size textSize = cv::getTextSize(text, fontFace,
 									fontScale, thickness, &baseline);
+
+		cv::Size dateTextSize = cv::getTextSize(datestr.str(), fontFace,
+									fontScale, thickness, &baseline);
+
 		baseline += thickness;
 
 		// center the text
 		cv::Point textOrg((frame.cols - textSize.width)/2,
-					  (frame.rows + textSize.height)/2);
+					  (frame.rows - textSize.height));
 
-		// draw the box
-		cv::rectangle(frame, textOrg + cv::Point(0, baseline),
-				  textOrg + cv::Point(textSize.width, -textSize.height),
-				  cv::Scalar(0,0,255));
-		// ... and the baseline first
-		cv::line(frame, textOrg + cv::Point(0, thickness),
-			 textOrg + cv::Point(textSize.width, thickness),
-			 cv::Scalar(0, 0, 255));
+		cv::Point dateOrg((frame.cols - dateTextSize.width)/2, dateTextSize.height);
 
 		// then put the text itself
 		cv::putText(frame, text, textOrg, fontFace, fontScale,
 				cv::Scalar::all(255), thickness, 8);
 
+		cv::putText(frame, datestr.str(), dateOrg, fontFace, fontScale,
+				cv::Scalar::all(255), thickness, 8);
+
+		(*shared->mWriter)<<frame;
 		(*shared->mWriter)<<frame;
 	}
 }

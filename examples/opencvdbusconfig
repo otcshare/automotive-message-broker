@@ -9,7 +9,10 @@
 			"fps" : "30",
 			"pixelLowerBound" : "18",
 			"pixelUpperBound" : "255",
-			"device" : "0"
+			"device" : "0",
+			"codec" : "divx",
+			"logging" : "true",
+			"logfile" : "/tmp/video.avi"
 		},
 		{
 			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so"
