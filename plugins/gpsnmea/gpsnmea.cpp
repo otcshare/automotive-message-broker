@@ -144,7 +144,7 @@ void Location::parse(string nmea)
 	}
 	else
 	{
-		DebugOut(DebugOut::Warning)<<"unknown/unhandled message: "<<nmea<<endl;
+		DebugOut(7)<<"unknown/unhandled message: "<<nmea<<endl;
 	}
 }
 

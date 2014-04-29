@@ -254,8 +254,6 @@ SourceList PluginLoader::sources()
 	return mSources;
 }
 
-
-
 std::string PluginLoader::errorString()
 {
 	return mErrorString;
