@@ -155,6 +155,11 @@ void Location::parseGprmc(string gprmc)
 	std::vector<std::string> tokens;
 	boost::split(tokens, gprmc, boost::is_any_of(","));
 
+	if(!tokens.size())
+	{
+		return;
+	}
+
 	if(tokens[2] == "A")
 	{
 		isActive = true;
@@ -440,6 +445,10 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 
 		g_assert(multimessageParse);
 
+		//test false message:
+
+		g_assert(!checksum("GPRMC,172758.296,V"));
+
 	}
 
 	std::string btaddapter = config["bluetoothAdapter"];
@@ -621,7 +630,7 @@ void GpsNmeaSource::addPropertySupport(VehicleProperty::Property property, Zone:
 
 bool GpsNmeaSource::checksum(std::string sentence)
 {
-	if(sentence.empty() || sentence.length() < 4)
+	if(sentence.empty() || sentence.length() < 4 || sentence.find("*") == string::npos || sentence.find("*") >= sentence.length()-2)
 	{
 		return false;
 	}
