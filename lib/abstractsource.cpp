@@ -22,7 +22,8 @@
 AbstractSource::AbstractSource(AbstractRoutingEngine* engine, map<string, string> config)
 	: AbstractSink(engine,config), routingEngine(engine)
 {
-	engine->registerSource(this);
+	if(engine)
+		engine->registerSource(this);
 }
 
 AbstractSource::~AbstractSource()

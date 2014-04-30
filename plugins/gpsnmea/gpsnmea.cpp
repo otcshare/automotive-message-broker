@@ -216,12 +216,13 @@ void Location::parseTime(string h, string m, string s, string dd, string mm, str
 		if(mGpsTime != temp)
 		{
 			mGpsTime = temp;
-			routingEngine->updateProperty(&mGpsTime, mUuid);
+			if(routingEngine)
+				routingEngine->updateProperty(&mGpsTime, mUuid);
 		}
 	}
 	catch(...)
 	{
-		DebugOut(DebugOut::Warning)<<"Failed to parse time "<<endl;
+		DebugOut(5)<<"Failed to parse time "<<endl;
 	}
 }
 
@@ -242,13 +243,15 @@ void Location::parseLatitude(string d, string m, string ns)
 
 		if(mLatitude != temp)
 		{
-			mLatitude = temp;\
-			routingEngine->updateProperty(&mLatitude, mUuid);
+			mLatitude = temp;
+
+			if(routingEngine)
+				routingEngine->updateProperty(&mLatitude, mUuid);
 		}
 	}
 	catch(...)
 	{
-		DebugOut(DebugOut::Warning)<<"Failed to parse latitude"<<endl;
+		DebugOut(5)<<"Failed to parse latitude"<<endl;
 	}
 }
 
@@ -268,13 +271,15 @@ void Location::parseLongitude(string d, string m, string ew)
 
 		if(mLongitude != temp)
 		{
-			mLongitude = temp;\
-			routingEngine->updateProperty(&mLongitude, mUuid);
+			mLongitude = temp;
+
+			if(routingEngine)
+				routingEngine->updateProperty(&mLongitude, mUuid);
 		}
 	}
 	catch(...)
 	{
-		DebugOut(DebugOut::Warning)<<"failed to parse longitude"<<endl;
+		DebugOut(5)<<"failed to parse longitude: "<<d<<" "<<m<<" "<<ew<<endl;
 	}
 }
 
@@ -290,12 +295,14 @@ void Location::parseSpeed(string spd)
 		if(mSpeed != temp)
 		{
 			mSpeed = temp;
-			routingEngine->updateProperty(&mSpeed, mUuid);
+
+			if(routingEngine)
+				routingEngine->updateProperty(&mSpeed, mUuid);
 		}
 	}
 	catch(...)
 	{
-		DebugOut(DebugOut::Warning)<<"failed to parse speed"<<endl;
+		DebugOut(5)<<"failed to parse speed"<<endl;
 	}
 }
 
@@ -308,12 +315,13 @@ void Location::parseDirection(string dir)
 		if(mDirection != temp)
 		{
 			mDirection = temp;
-			routingEngine->updateProperty(&mDirection, mUuid);
+			if(routingEngine)
+				routingEngine->updateProperty(&mDirection, mUuid);
 		}
 	}
 	catch(...)
 	{
-		DebugOut(DebugOut::Warning)<<"Failed to parse direction: "<<dir<<endl;
+		DebugOut(5)<<"Failed to parse direction: "<<dir<<endl;
 	}
 }
 
@@ -329,14 +337,16 @@ void Location::parseAltitude(string alt)
 		if(mAltitude != temp)
 		{
 			mAltitude = temp;
-			routingEngine->updateProperty(&mAltitude, mUuid);
+
+			if(routingEngine)
+				routingEngine->updateProperty(&mAltitude, mUuid);
 		}
 
 		mAltitude = VehicleProperty::AltitudeType(a);
 	}
 	catch(...)
 	{
-		DebugOut(DebugOut::Warning)<<"failed to parse altitude"<<endl;
+		DebugOut(5)<<"failed to parse altitude"<<endl;
 	}
 }
 
@@ -378,7 +388,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 }
 
 GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> config)
-	:AbstractSource(re,config), mUuid("33d86462-1708-4f78-a001-99ea8d55422b")
+	:AbstractSource(re,config), mUuid("33d86462-1708-4f78-a001-99ea8d55422b"), device(nullptr)
 {
 	int baudrate = 0;
 	location =new Location(re, mUuid);
@@ -397,58 +407,7 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 
 	if(config.find("test") != config.end())
 	{
-		Location location(routingEngine, mUuid);
-		location.parse("GPRMC,061211,A,2351.9605,S,15112.5239,E,000.0,053.4,170303,009.9,E*6E");
-
-		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
-
-		g_assert(location.latitude().toString() == "-23.86600833");
-		g_assert(location.gpsTime().toString() == "1050585131");
-
-		location.parse("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47");
-
-		DebugOut(0)<<"alt: "<<location.altitude().toString()<<endl;
-		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
-		g_assert(location.altitude().toString() == "545.4");
-		g_assert(location.latitude().toString() == "48.1173");
-
-		location.parse("GPRMC,060136.00,A,3101.40475,N,12126.87095,E,0.760,,160114,,,A*74");
-		DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
-		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
-		
-		//Test incomplete message:
-		location.parse("GPRMC,023633.00,V,,,,,,,180314,,,N*75");
-		DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
-		DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
-
-		std::string testChecksuming = "GPRMC,195617.00,V,,,,,,,310314,,,N*74";
-
-		g_assert(checksum(testChecksuming));
-
-		std::string multimessage1 = "GA,235320.00,4532.48633,N,12257.";
-		std::string multimessage2 = "57383,W,";
-		std::string multimessage3 = "1,03,7.53,51.6,M,-21.3,M,,*55";
-		std::string multimessage4 = "GPGSA,A,";
-		std::string multimessage5 = "2,27,23,19,,,,,,,,,,7.60";
-		std::string multimessage6 = ",7.53,1.00*";
-		std::string multimessage7 = "0E";
-
-		bool multimessageParse = false;
-
-		multimessageParse |= tryParse(multimessage1);
-		multimessageParse |= tryParse(multimessage2);
-		multimessageParse |= tryParse(multimessage3);
-		multimessageParse |= tryParse(multimessage4);
-		multimessageParse |= tryParse(multimessage5);
-		multimessageParse |= tryParse(multimessage6);
-		multimessageParse |= tryParse(multimessage7);
-
-		g_assert(multimessageParse);
-
-		//test false message:
-
-		g_assert(!checksum("GPRMC,172758.296,V"));
-
+		test();
 	}
 
 	std::string btaddapter = config["bluetoothAdapter"];
@@ -493,7 +452,8 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 
 GpsNmeaSource::~GpsNmeaSource()
 {
-	device->close();
+	if(device && device->isOpen())
+		device->close();
 }
 
 const string GpsNmeaSource::uuid()
@@ -554,6 +514,61 @@ void GpsNmeaSource::canHasData()
 	std::string data = device->read();
 
 	tryParse(data);
+}
+
+void GpsNmeaSource::test()
+{
+	Location location(nullptr, "");
+	location.parse("GPRMC,061211,A,2351.9605,S,15112.5239,E,000.0,053.4,170303,009.9,E*6E");
+
+	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+
+	g_assert(location.latitude().toString() == "-23.86600833");
+	g_assert(location.gpsTime().toString() == "1050585131");
+
+	location.parse("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47");
+
+	DebugOut(0)<<"alt: "<<location.altitude().toString()<<endl;
+	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+	g_assert(location.altitude().toString() == "545.4");
+	g_assert(location.latitude().toString() == "48.1173");
+
+	location.parse("GPRMC,060136.00,A,3101.40475,N,12126.87095,E,0.760,,160114,,,A*74");
+	DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
+	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+
+	//Test incomplete message:
+	location.parse("GPRMC,023633.00,V,,,,,,,180314,,,N*75");
+	DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
+	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+
+	std::string testChecksuming = "GPRMC,195617.00,V,,,,,,,310314,,,N*74";
+
+	g_assert(checksum(testChecksuming));
+
+	std::string multimessage1 = "GA,235320.00,4532.48633,N,12257.";
+	std::string multimessage2 = "57383,W,";
+	std::string multimessage3 = "1,03,7.53,51.6,M,-21.3,M,,*55";
+	std::string multimessage4 = "GPGSA,A,";
+	std::string multimessage5 = "2,27,23,19,,,,,,,,,,7.60";
+	std::string multimessage6 = ",7.53,1.00*";
+	std::string multimessage7 = "0E";
+
+	bool multimessageParse = false;
+
+	multimessageParse |= tryParse(multimessage1);
+	multimessageParse |= tryParse(multimessage2);
+	multimessageParse |= tryParse(multimessage3);
+	multimessageParse |= tryParse(multimessage4);
+	multimessageParse |= tryParse(multimessage5);
+	multimessageParse |= tryParse(multimessage6);
+	multimessageParse |= tryParse(multimessage7);
+
+	g_assert(multimessageParse);
+
+	//test false message:
+
+	g_assert(!checksum("GPRMC,172758.296,V"));
 }
 
 bool GpsNmeaSource::tryParse(string data)
@@ -660,4 +675,14 @@ bool GpsNmeaSource::checksum(std::string sentence)
 	}
 
 	return false;
+}
+
+
+int main(int argc, char** argv)
+{
+	DebugOut::setDebugThreshhold(7);
+	GpsNmeaSource plugin(nullptr, std::map<std::string, std::string>());
+	plugin.test();
+
+	return 1;
 }

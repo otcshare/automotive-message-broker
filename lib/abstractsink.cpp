@@ -23,12 +23,14 @@
 AbstractSink::AbstractSink(AbstractRoutingEngine* engine, map<string, string> config)
 	:routingEngine(engine), configuration(config)
 {
-	routingEngine->registerSink(this);
+	if(routingEngine)
+		routingEngine->registerSink(this);
 }
 
 AbstractSink::~AbstractSink()
 {
-	routingEngine->unregisterSink(this);
+	if(routingEngine)
+		routingEngine->unregisterSink(this);
 }
 
 AbstractSinkManager::AbstractSinkManager(AbstractRoutingEngine* engine, map<string, string> config)

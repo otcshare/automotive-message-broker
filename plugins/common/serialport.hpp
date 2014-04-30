@@ -20,7 +20,7 @@ private:
 
 public:
 	SerialPort(std::string _tty)
-		:tty(_tty)
+		:tty(_tty), fd(0)
 	{
 		speed = B9600;
 	}
@@ -91,6 +91,11 @@ public:
 		fcntl(fd,F_SETFL,O_NONBLOCK);
 
 		return true;
+	}
+
+	bool isOpen()
+	{
+		return (fd > 0);
 	}
 
 	int fileDescriptor() { return fd; }
