@@ -69,6 +69,9 @@ void DBusSink::supportedChanged(const PropertyList &supportedProperties)
 
 void DBusSink::propertyChanged(AbstractPropertyType *value)
 {
+	if(!isRegistered())
+		return;
+
 	VehicleProperty::Property property = value->name;
 
 	if(propertyDBusMap.find(property) == propertyDBusMap.end() || value->zone != zoneFilter)

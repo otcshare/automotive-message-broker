@@ -33,8 +33,10 @@ uint16_t accelerationX = 0;
 Transmission::TransmissionPositions transmissionShiftPostion = Transmission::Neutral;
 uint16_t steeringWheelAngle=0;
 uint16_t throttlePos = 0;
-uint16_t engineCoolant = 40;
+int engineCoolant = 40;
 bool machineGun = false;
+
+const char* id = "6dd4268a-c605-4a06-9034-59c1e8344c8e";
 
 static gboolean timeoutCallback(gpointer data)
 {
@@ -113,7 +115,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 
 const string ExampleSourcePlugin::uuid()
 {
-	return "6dd4268a-c605-4a06-9034-59c1e8344c8e";
+	return id;
 }
 
 
@@ -363,15 +365,15 @@ void ExampleSourcePlugin::randomizeProperties()
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
 	
-	VehicleProperty::VehicleSpeedType vel(velocity);
-	VehicleProperty::EngineSpeedType es(engineSpeed);
-	VehicleProperty::AccelerationXType ac(accelerationX);
-	VehicleProperty::SteeringWheelAngleType swa(steeringWheelAngle);
-	VehicleProperty::TransmissionShiftPositionType tsp(transmissionShiftPostion);
-	VehicleProperty::TransmissionGearPositionType tgp(transmissionShiftPostion);
-	VehicleProperty::ThrottlePositionType tp(throttlePos);
-	VehicleProperty::EngineCoolantTemperatureType ec(engineCoolant);
-	VehicleProperty::MachineGunTurretStatusType mgt(machineGun);
+	vel.setValue(velocity);
+	es.setValue(engineSpeed);
+	ac.setValue(accelerationX);
+	swa.setValue(steeringWheelAngle);
+	tsp.setValue(transmissionShiftPostion);
+	tgp.setValue(transmissionShiftPostion);
+	tp.setValue(throttlePos);
+	ec.setValue(engineCoolant);
+	mgt.setValue(machineGun);
 
 	machineGun = !machineGun;
 

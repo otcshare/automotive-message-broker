@@ -57,7 +57,11 @@ public:
 
 	void canHasData();
 
+	void test();
+
 private:
+
+
 
 	bool tryParse(std::string data);
 

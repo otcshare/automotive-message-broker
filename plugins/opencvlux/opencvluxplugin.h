@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <opencv2/highgui/highgui.hpp>
 
 #include <QObject>
+#include <QMutex>
 
 using namespace std;
 
@@ -48,6 +49,7 @@ public:
         bool useCuda;
 		int pixelLowerBound;
 		int pixelUpperBound;
+		bool loggingOn;
 	};
 
 	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
@@ -89,6 +91,7 @@ private:
 	std::list<AsyncPropertyReply*> replyQueue;
 
 	Shared* shared;
+	QMutex mutex;
 };
 
 static int grabImage(void *data);
