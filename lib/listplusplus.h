@@ -60,4 +60,15 @@ bool contains(T iteratable, V value)
 	return (std::find(iteratable.begin(), iteratable.end(), value) != iteratable.end());
 }
 
+template <class T, class V>
+void removeOne(T * iteratable, V value)
+{
+	typename T::iterator itr = std::find(iteratable->begin(), iteratable->end(), value);
+
+	if (itr != iteratable->end())
+	{
+		iteratable->erase(itr);
+	}
+}
+
 #endif // LISTPLUSPLUS_H

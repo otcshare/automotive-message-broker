@@ -15,16 +15,45 @@
 
 class SerialPort: public AbstractIo
 {
+private:
+	speed_t speed;
+
 public:
 	SerialPort(std::string _tty)
-		:tty(_tty)
+		:tty(_tty), fd(0)
 	{
-
+		speed = B9600;
 	}
 
 	~SerialPort()
 	{
 		close();
+	}
+
+	int setSpeed(int newspeed)
+	{
+		int ret = 0;
+		switch(newspeed)
+		{
+			case 2400: 
+				speed = B2400;
+				break;
+			case 4800: 
+				speed = B4800;
+				break;
+			case 9600: 
+				speed = B9600;
+				break;
+			case 19200: 
+				speed = B19200;
+				break;
+			case 38400: 
+				speed = B38400;
+				break;
+			default:
+				ret = -EINVAL;
+		}
+		return ret;
 	}
 
 	bool open()
@@ -53,8 +82,8 @@ public:
 
 		//oldtio.c_cc[VEOL]     = '\r';
 
-		cfsetispeed(&oldtio, B9600);
-		cfsetospeed(&oldtio, B9600);
+		cfsetispeed(&oldtio, speed);
+		cfsetospeed(&oldtio, speed);
 
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &oldtio);
@@ -62,6 +91,11 @@ public:
 		fcntl(fd,F_SETFL,O_NONBLOCK);
 
 		return true;
+	}
+
+	bool isOpen()
+	{
+		return (fd > 0);
 	}
 
 	int fileDescriptor() { return fd; }
