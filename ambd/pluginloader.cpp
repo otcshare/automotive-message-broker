@@ -212,7 +212,14 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 
 		if(plugin == nullptr)
 		{
-			throw std::runtime_error("plugin is not a SinkManager");
+			DebugOut()<<"plugin is not a SinkManager"<<endl;
+
+			AbstractSink* sink = loadPlugin<AbstractSink*>(path, configurationMap);
+
+			if(!sink)
+			{
+				DebugOut(DebugOut::Warning)<<"plugin seems to be invalid: "<<path<<endl;
+			}
 		}
 		else
 		{
