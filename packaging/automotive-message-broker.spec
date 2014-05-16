@@ -29,6 +29,11 @@ BuildRequires:  murphy-glib
 BuildRequires:  dbus-devel
 BuildRequires:  qt5-qtcore-devel
 BuildRequires:  qt5-qtconcurrent-devel
+BuildRequires:  qt5-qtdbus-devel
+BuildRequires:  qt5-qtnetwork-devel
+BuildRequires:  qt5-plugin-bearer-generic
+BuildRequires:  qt5-plugin-bearer-connman
+BuildRequires:  qt5-plugin-bearer-nm
 
 %description
 Automotive Message Broker is a vehicle network abstraction system.
@@ -164,11 +169,19 @@ Requires:  %{name} = %{version}-%{release}
 %description plugins-cansim
 CAN frames listener plug-in for the AMB CAN Simulator.
 
+%package plugins-bluetooth
+Summary:   Interface to AMB over bluetooth
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-bluetooth
+Bluetooth SPP server interface
+
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=ON -Dgpsnmea_plugin=ON -Dcangen_plugin=ON -Dcansim_plugin=ON
+%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=ON -Dgpsnmea_plugin=ON -Dcangen_plugin=ON -Dcansim_plugin=ON -Dbluetooth_plugin=ON
 
 make %{?jobs:-j%jobs}
 
@@ -289,3 +302,8 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/cansimplugin.so
 
+
+%files plugins-bluetooth
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluetoothplugin.so
