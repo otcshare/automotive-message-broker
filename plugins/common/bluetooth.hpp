@@ -1,7 +1,9 @@
-#ifndef OBDBLUETOOTH
-#define OBDBLUETOOTH
+#ifndef BLUETOOTHWRAPPER
+#define BLUETOOTHWRAPPER
 
 #include <string>
+#include <debugout.h>
+
 #include "bluetoothmanagerproxy.h"
 #include "bluetoothadapterproxy.h"
 #include "bluetoothserialproxy.h"

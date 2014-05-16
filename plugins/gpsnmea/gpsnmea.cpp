@@ -402,7 +402,6 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 	addPropertySupport(VehicleProperty::Direction, Zone::None);
 	addPropertySupport(GPSTIME, Zone::None);
 
-
 	///test:
 
 	if(config.find("test") != config.end())
