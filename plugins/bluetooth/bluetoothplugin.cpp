@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <QDBusConnection>
 #include <QDBusInterface>
+#include <QDBusReply>
 
 using namespace std;
 
@@ -94,7 +95,12 @@ BtProfileAdaptor::BtProfileAdaptor(BluetoothSinkPlugin *parent)
 	options["Name"] = "spp";
 	options["Role"] = "server";
 
-	profileManagerIface.call("RegisterProfile", "/org/bluez/spp", "00001101-0000-1000-8000-00805F9B34FB", options);
+	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", "/org/bluez/spp", "00001101-0000-1000-8000-00805F9B34FB", options);
+
+	if(!reply.isValid())
+	{
+		DebugOut(DebugOut::Error)<<"RegisterProfile call failed: "<<reply.error().message().toStdString()<<endl;
+	}
 }
 
 void BtProfileAdaptor::Release()
