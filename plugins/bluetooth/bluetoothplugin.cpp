@@ -39,6 +39,19 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, 
 	new BtProfileAdaptor(this);
 
 	QDBusConnection::systemBus().registerObject("/org/bluez/spp", this);
+
+	QDBusInterface profileManagerIface("org.bluez", "/org/bluez", "org.bluez.ProfileManager1", QDBusConnection::systemBus());
+
+	QVariantMap options;
+	options["Name"] = "spp";
+	options["Role"] = "server";
+
+	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", qVariantFromValue(QDBusObjectPath("/org/bluez/spp")), "00001101-0000-1000-8000-00805F9B34FB", options);
+
+	if(!reply.isValid())
+	{
+		DebugOut(DebugOut::Error)<<"RegisterProfile call failed: "<<reply.error().message().toStdString()<<endl;
+	}
 }
 
 
@@ -89,18 +102,7 @@ void BluetoothSinkPlugin::canHasData()
 BtProfileAdaptor::BtProfileAdaptor(BluetoothSinkPlugin *parent)
 	:QDBusAbstractAdaptor(parent), mParent(parent)
 {
-	QDBusInterface profileManagerIface("org.bluez", "/org/bluez", "org.bluez.ProfileManager1", QDBusConnection::systemBus());
 
-	QVariantMap options;
-	options["Name"] = "spp";
-	options["Role"] = "server";
-
-	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", qVariantFromValue(QDBusObjectPath("/org/bluez/spp")), "00001101-0000-1000-8000-00805F9B34FB", options);
-
-	if(!reply.isValid())
-	{
-		DebugOut(DebugOut::Error)<<"RegisterProfile call failed: "<<reply.error().message().toStdString()<<endl;
-	}
 }
 
 void BtProfileAdaptor::Release()
