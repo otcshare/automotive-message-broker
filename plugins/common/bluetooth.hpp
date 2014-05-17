@@ -22,7 +22,7 @@ public:
 
 		if(!manager)
 		{
-			DebugOut(0)<<"Error getting bluetooth manager proxy: "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error getting bluetooth manager proxy: "<<error->message<<endl;
 			g_error_free(error);
 			return "";
 		}
@@ -35,7 +35,7 @@ public:
 		{
 			if(!org_bluez_manager_call_find_adapter_sync(manager,adapterAddy.c_str(), &adapterPath, NULL, &error))
 			{
-				DebugOut(0)<<"Error getting bluetooth adapter ("<<adapterAddy<<"): "<<error->message<<endl;
+				DebugOut(DebugOut::Warning)<<"Error getting bluetooth adapter ("<<adapterAddy<<"): "<<error->message<<endl;
 				g_error_free(error);
 				return "";
 			}
@@ -47,7 +47,7 @@ public:
 		{
 			if(!org_bluez_manager_call_default_adapter_sync(manager,&adapterPath, NULL, &error))
 			{
-				DebugOut(0)<<"Error getting bluetooth default adapter: "<<error->message<<endl;
+				DebugOut(DebugOut::Warning)<<"Error getting bluetooth default adapter: "<<error->message<<endl;
 				g_error_free(error);
 				return "";
 			}
@@ -60,7 +60,7 @@ public:
 																				 "org.bluez",adapterPath,NULL,&error);
 		if(!adapter)
 		{
-			DebugOut(0)<<"Error getting bluetooth adapter proxy: "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error getting bluetooth adapter proxy: "<<error->message<<endl;
 			g_error_free(error);
 			return "";
 		}
@@ -71,7 +71,7 @@ public:
 		if(!org_bluez_adapter_call_find_device_sync(adapter,address.c_str(),&devicePath,NULL,&error) ||
 				std::string(devicePath) == "")
 		{
-			DebugOut(0)<<"Error finding bluetooth device: "<<address<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error finding bluetooth device: "<<address<<error->message<<endl;
 			g_error_free(error);
 			return "";
 		}
@@ -84,7 +84,7 @@ public:
 
 		if(!serialDevice)
 		{
-			DebugOut(0)<<"Error getting bluetooth serial device proxy: "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error getting bluetooth serial device proxy: "<<error->message<<endl;
 			g_error_free(error);
 			return "";
 		}
@@ -92,7 +92,7 @@ public:
 		gchar* serialDeviceName;
 		if(!org_bluez_serial_call_connect_sync(serialDevice,"spp",&serialDeviceName,NULL,&error))
 		{
-			DebugOut(0)<<"Error connecting bluetooth serial device: "<<address<<" - "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error connecting bluetooth serial device: "<<address<<" - "<<error->message<<endl;
 			g_error_free(error);
 			return "";
 		}
@@ -109,7 +109,7 @@ public:
 
 		if(!manager)
 		{
-			DebugOut(0)<<"Error getting bluetooth manager proxy: "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error getting bluetooth manager proxy: "<<error->message<<endl;
 			g_error_free(error);
 			return ;
 		}
@@ -122,7 +122,7 @@ public:
 		{
 			if(!org_bluez_manager_call_find_adapter_sync(manager,adapterAddy.c_str(), &adapterPath, NULL, &error))
 			{
-				DebugOut(0)<<"Error getting bluetooth adapter ("<<adapterAddy<<"): "<<error->message<<endl;
+				DebugOut(DebugOut::Warning)<<"Error getting bluetooth adapter ("<<adapterAddy<<"): "<<error->message<<endl;
 				g_error_free(error);
 				return ;
 			}
@@ -134,7 +134,7 @@ public:
 		{
 			if(!org_bluez_manager_call_default_adapter_sync(manager,&adapterPath, NULL, &error))
 			{
-				DebugOut(0)<<"Error getting bluetooth default adapter: "<<error->message<<endl;
+				DebugOut(DebugOut::Warning)<<"Error getting bluetooth default adapter: "<<error->message<<endl;
 				g_error_free(error);
 				return ;
 			}
@@ -147,7 +147,7 @@ public:
 																				 "org.bluez",adapterPath,NULL,&error);
 		if(!adapter)
 		{
-			DebugOut(0)<<"Error getting bluetooth adapter proxy: "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error getting bluetooth adapter proxy: "<<error->message<<endl;
 			g_error_free(error);
 			return ;
 		}
@@ -158,7 +158,7 @@ public:
 		if(!org_bluez_adapter_call_find_device_sync(adapter,address.c_str(),&devicePath,NULL,&error) ||
 				std::string(devicePath) == "")
 		{
-			DebugOut(0)<<"Error finding bluetooth device: "<<address<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error finding bluetooth device: "<<address<<error->message<<endl;
 			g_error_free(error);
 			return ;
 		}
@@ -171,7 +171,7 @@ public:
 
 		if(!serialDevice)
 		{
-			DebugOut(0)<<"Error getting bluetooth serial device proxy: "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error getting bluetooth serial device proxy: "<<error->message<<endl;
 			g_error_free(error);
 			return ;
 		}
@@ -179,7 +179,7 @@ public:
 		gchar* serialDeviceName;
 		if(!org_bluez_serial_call_disconnect_sync(serialDevice,"spp",NULL,&error))
 		{
-			DebugOut(0)<<"Error disconnecting bluetooth serial device: "<<address<<" - "<<error->message<<endl;
+			DebugOut(DebugOut::Warning)<<"Error disconnecting bluetooth serial device: "<<address<<" - "<<error->message<<endl;
 			g_error_free(error);
 			return ;
 		}
