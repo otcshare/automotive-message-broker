@@ -307,3 +307,4 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/bluetoothplugin.so
+/etc/dbus-1/system.d/ambbt.conf
