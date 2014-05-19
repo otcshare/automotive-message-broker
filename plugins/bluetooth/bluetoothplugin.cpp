@@ -38,7 +38,11 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, 
 {
 	new BtProfileAdaptor(this);
 
-	QDBusConnection::systemBus().registerObject("/org/bluez/spp", this);
+	if(!QDBusConnection::systemBus().registerService("org.automotive.message.broker.bluetooth"))
+		DebugOut(DebugOut::Error)<<"Failed to register DBus service name: "<<QDBusConnection::systemBus().lastError().message().toStdString()<<endl;
+
+	if(!QDBusConnection::systemBus().registerObject("/org/bluez/spp", this))
+		DebugOut(DebugOut::Error)<<"Failed to register DBus object"<<endl;
 
 	QDBusInterface profileManagerIface("org.bluez", "/org/bluez", "org.bluez.ProfileManager1", QDBusConnection::systemBus());
 

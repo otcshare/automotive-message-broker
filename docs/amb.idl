@@ -758,14 +758,14 @@ interface org.automotive.DoorStatus : VehiclePropertyType  {
 	/**  DoorLockStatus
 	 *   \brief MUST returns Door status (bool locked = true, unlocked = false).
 	 **/
-	readonly attribute Boolean DoorLockStatus;
+	attribute Boolean DoorLockStatus;
 
 	/**  ChildLockStatus
 	 *   \brief MUST returns Child lock status of rear doors.  active = true, inactive = false.    
 	 *   Setting this to 'true' will prevent the rear doors from being opened    
 	 *   from the inside.    
 	 **/
-	readonly attribute Boolean ChildLockStatus;
+	attribute Boolean ChildLockStatus;
 };
 
 [NoInterfaceObject]
