@@ -141,7 +141,7 @@ class GVS<int>
 public:
 	static const char* signature() { return "i"; }
 
-	static char value(GVariant* v)
+	static int value(GVariant* v)
 	{
 		return g_variant_get_int32(v);
 	}

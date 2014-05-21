@@ -139,6 +139,8 @@ int main(int argc, char **argv)
 		DebugOut::setOutput(logfile);
 	}
 
+	printVersion();
+
 	if(getuid() == 0)
 	{
 		DebugOut(DebugOut::Error)<<"Running as root.  This is dangerous."<<endl;

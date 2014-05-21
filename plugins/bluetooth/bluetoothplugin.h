@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define BT_PLUGIN_H_
 
 #include <abstractsink.h>
+#include <serialport.hpp>
 #include <string>
 
 #include <QDBusAbstractAdaptor>
@@ -75,7 +76,7 @@ private Q_SLOTS:
 	void canHasData();
 
 private:
-	QTcpSocket socket;
+	 SerialPort socket;
 };
 
 
