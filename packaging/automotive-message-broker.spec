@@ -44,6 +44,7 @@ Summary:    Automotive Message Broker development files
 Group:      Automotive/API
 Requires:   %{name} = %{version}-%{release}
 Requires:   libuuid-devel
+Requires:   boost-devel
 
 %description devel
 Development files for the automotive-message-broker

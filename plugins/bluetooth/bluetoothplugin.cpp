@@ -73,7 +73,7 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, 
 	options["Name"] = "AMB spp server";
 	options["Role"] = "server";
 	options["ServiceRecord"] = SPP_RECORD;
-	options["Channel"] = 23;
+	options["Channel"] = qVariantFromValue(uint16_t(23));
 
 	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", qVariantFromValue(QDBusObjectPath("/org/bluez/spp")), "00001101-0000-1000-8000-00805F9B34FB", options);
 
