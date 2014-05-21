@@ -28,6 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDBusReply>
+#include <QSocketNotifier>
 
 using namespace std;
 
@@ -110,9 +111,11 @@ void BluetoothSinkPlugin::newConnection(string path, int fd, QVariantMap props)
 {
 	DebugOut()<<"new Connection! Path: "<<path<<endl;
 
-	socket.setSocketDescriptor(fd);
+	socket.setDescriptor(fd);
 
-	connect(&socket, &QTcpSocket::readyRead, this, &BluetoothSinkPlugin::canHasData);
+	QSocketNotifier *notifier = new QSocketNotifier(fd, QSocketNotifier::Read, this);
+
+	connect(notifier,&QSocketNotifier::activated,this, &BluetoothSinkPlugin::canHasData);
 }
 
 void BluetoothSinkPlugin::requestDisconnection(string path)
@@ -123,7 +126,7 @@ void BluetoothSinkPlugin::requestDisconnection(string path)
 
 void BluetoothSinkPlugin::canHasData()
 {
-	QByteArray data = socket.readAll();
+	QByteArray data = socket.read().c_str();
 
 	DebugOut()<<"data read: "<<data.constData()<<endl;
 }

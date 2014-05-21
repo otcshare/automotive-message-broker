@@ -19,6 +19,20 @@ private:
 	speed_t speed;
 
 public:
+	SerialPort()
+		:fd(0), speed(B9600)
+	{
+
+	}
+
+	SerialPort(int fileDesc)
+		:fd(fileDesc)
+	{
+		speed = B9600;
+
+		setDescriptor(fd);
+	}
+
 	SerialPort(std::string _tty)
 		:tty(_tty), fd(0)
 	{
@@ -60,37 +74,9 @@ public:
 	{
 		fd = ::open(tty.c_str(), O_RDWR, O_NOCTTY);
 
-		if(fd == -1)
-		{
-			DebugOut()<<"Cannot open serial device."<<endl;
-			return false;
-		}
-
-		struct termios oldtio;
-		tcgetattr(fd,&oldtio);
-
-		oldtio.c_cflag |= CS8 | CLOCAL | CREAD;
-
-		oldtio.c_iflag |= IGNPAR;
-		oldtio.c_iflag &= ~(ICRNL | IMAXBEL);
 
 
-		oldtio.c_oflag &= ~OPOST;
-
-		oldtio.c_lflag |= ECHOE | ECHOK | ECHOCTL | ECHOKE;
-		oldtio.c_lflag &= ~(ECHO | ICANON | ISIG);
-
-		//oldtio.c_cc[VEOL]     = '\r';
-
-		cfsetispeed(&oldtio, speed);
-		cfsetospeed(&oldtio, speed);
-
-		tcflush(fd, TCIFLUSH);
-		tcsetattr(fd, TCSANOW, &oldtio);
-
-		fcntl(fd,F_SETFL,O_NONBLOCK);
-
-		return true;
+		return setupDevice();
 	}
 
 	bool isOpen()
@@ -129,6 +115,49 @@ public:
 		{
 			DebugOut()<<"Unable to write"<<endl;
 		}
+	}
+
+	void setDescriptor(int d)
+	{
+		fd = d;
+		setupDevice();
+	}
+
+private: ///methods
+
+	bool setupDevice()
+	{
+		if(fd == -1)
+		{
+			DebugOut()<<"Cannot open serial device."<<endl;
+			return false;
+		}
+
+		struct termios oldtio;
+		tcgetattr(fd,&oldtio);
+
+		oldtio.c_cflag |= CS8 | CLOCAL | CREAD;
+
+		oldtio.c_iflag |= IGNPAR;
+		oldtio.c_iflag &= ~(ICRNL | IMAXBEL);
+
+
+		oldtio.c_oflag &= ~OPOST;
+
+		oldtio.c_lflag |= ECHOE | ECHOK | ECHOCTL | ECHOKE;
+		oldtio.c_lflag &= ~(ECHO | ICANON | ISIG);
+
+		//oldtio.c_cc[VEOL]     = '\r';
+
+		cfsetispeed(&oldtio, speed);
+		cfsetospeed(&oldtio, speed);
+
+		tcflush(fd, TCIFLUSH);
+		tcsetattr(fd, TCSANOW, &oldtio);
+
+		fcntl(fd,F_SETFL,O_NONBLOCK);
+
+		return true;
 	}
 
 private:
