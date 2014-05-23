@@ -5,7 +5,7 @@ import sys
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("set", help="{objectName}")
+parser.add_argument("objectName", help="{objectName}")
 parser.add_argument("property", help="{propertyToSet}")
 parser.add_argument("value", help="{value}")
 parser.add_argument("valueType", help="{valueType}")
@@ -13,7 +13,7 @@ parser.add_argument("zone", help="{zone}")
 
 args = parser.parse_args()
 
-objectName = args.set
+objectName = args.objectName
 propertyToSet = args.property
 value = args.value
 valueType = args.valueType

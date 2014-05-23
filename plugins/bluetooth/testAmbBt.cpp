@@ -1,9 +1,13 @@
 #include <bluetooth.hpp>
 #include <debugout.h>
-#include <QFile>
 #include <QCoreApplication>
 #include <QJsonDocument>
 #include <QStringList>
+#include <QSocketNotifier>
+
+#include "bluetooth5.h"
+#include <serialport.hpp>
+#include <QSocketNotifier>
 
 int main(int argc, char** argv)
 {
@@ -11,18 +15,22 @@ int main(int argc, char** argv)
 
 	QString addy = app.arguments().at(1);
 
-	BluetoothDevice dev;
-	std::string devPath = dev.getDeviceForAddress(addy.toStdString());
+	Bluetooth5 btdev;
+	btdev.getDeviceForAddress(addy.toStdString(),[](int fd){
+		DebugOut(0)<<"I am connected"<<endl;
 
-	QFile f(devPath.c_str());
-	f.open(QIODevice::ReadWrite);
+		SerialPort *s = new SerialPort();
+		s->setDescriptor(fd);
 
-	QObject::connect(&f, &QFile::readyRead, [&f](){
-		QByteArray d = f.readAll();
+		QSocketNotifier* sock = new QSocketNotifier(fd, QSocketNotifier::Read);
 
-		DebugOut(DebugOut::Warning)<<"Data read: "<<d.constData()<<endl;
+		QObject::connect(sock, &QSocketNotifier::activated, [&s](){
+			DebugOut(0)<<"data: "<<s->read()<<endl;
+		});
+
+
+
 	});
-
 
 	return app.exec();
 }

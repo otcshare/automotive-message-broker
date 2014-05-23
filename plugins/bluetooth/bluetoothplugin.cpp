@@ -34,29 +34,6 @@ using namespace std;
 
 #include "debugout.h"
 
-QString SPP_RECORD = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-														   "<record>"
-															 "<attribute id=\"0x0001\">"
-															   "<sequence>"
-																 "<uuid value=\"0x1101\"/>"
-															   "</sequence>"
-															 "</attribute>"
-															 "<attribute id=\"0x0004\">"
-															   "<sequence>"
-																 "<sequence>"
-																   "<uuid value=\"0x0100\"/>"
-																 "</sequence>"
-																 "<sequence>"
-																   "<uuid value=\"0x0003\"/>"
-																   "<uint8 value=\"23\" name=\"channel\"/>"
-																 "</sequence>"
-															   "</sequence>"
-															 "</attribute>"
-															 "<attribute id=\"0x0100\">"
-															   "<text value=\"COM5\" name=\"name\"/>"
-															 "</attribute>"
-														   "</record>";
-
 BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSink(re, config)
 {
@@ -73,7 +50,6 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, 
 	QVariantMap options;
 	options["Name"] = "AMB spp server";
 	options["Role"] = "server";
-	options["ServiceRecord"] = SPP_RECORD;
 	options["Channel"] = qVariantFromValue(uint16_t(23));
 
 	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", qVariantFromValue(QDBusObjectPath("/org/bluez/spp")), "00001101-0000-1000-8000-00805F9B34FB", options);
