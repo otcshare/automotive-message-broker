@@ -2,12 +2,22 @@
 #define BLUETOOOTH_5_H_
 
 #include <string>
+#include <functional>
+
+typedef std::function<void(int)> ConnectedCallback;
 
 class Bluetooth5
 {
 public:
-	std::string getDeviceForAddress(std::string address, std::string adapterAddy = "");
+	Bluetooth5();
+
+	void getDeviceForAddress(std::string address,  ConnectedCallback onnectedCallback);
 	void disconnect(std::string address, std::string adapterAddy = "");
+
+	void connected(int fd);
+
+private:
+	ConnectedCallback mConnected;
 };
 
 #endif

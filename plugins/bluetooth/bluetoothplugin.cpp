@@ -34,29 +34,6 @@ using namespace std;
 
 #include "debugout.h"
 
-QString SPP_RECORD = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-														   "<record>"
-															 "<attribute id=\"0x0001\">"
-															   "<sequence>"
-																 "<uuid value=\"0x1101\"/>"
-															   "</sequence>"
-															 "</attribute>"
-															 "<attribute id=\"0x0004\">"
-															   "<sequence>"
-																 "<sequence>"
-																   "<uuid value=\"0x0100\"/>"
-																 "</sequence>"
-																 "<sequence>"
-																   "<uuid value=\"0x0003\"/>"
-																   "<uint8 value=\"23\" name=\"channel\"/>"
-																 "</sequence>"
-															   "</sequence>"
-															 "</attribute>"
-															 "<attribute id=\"0x0100\">"
-															   "<text value=\"COM5\" name=\"name\"/>"
-															 "</attribute>"
-														   "</record>";
-
 BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSink(re, config)
 {
@@ -73,7 +50,6 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, 
 	QVariantMap options;
 	options["Name"] = "AMB spp server";
 	options["Role"] = "server";
-	options["ServiceRecord"] = SPP_RECORD;
 	options["Channel"] = qVariantFromValue(uint16_t(23));
 
 	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", qVariantFromValue(QDBusObjectPath("/org/bluez/spp")), "00001101-0000-1000-8000-00805F9B34FB", options);
@@ -107,13 +83,13 @@ void BluetoothSinkPlugin::release()
 	DebugOut()<<"release called."<<endl;
 }
 
-void BluetoothSinkPlugin::newConnection(string path, int fd, QVariantMap props)
+void BluetoothSinkPlugin::newConnection(string path, QDBusUnixFileDescriptor fd, QVariantMap props)
 {
 	DebugOut()<<"new Connection! Path: "<<path<<endl;
 
-	socket.setDescriptor(fd);
+	socket.setDescriptor(fd.fileDescriptor());
 
-	QSocketNotifier *notifier = new QSocketNotifier(fd, QSocketNotifier::Read, this);
+	QSocketNotifier *notifier = new QSocketNotifier(fd.fileDescriptor(), QSocketNotifier::Read, this);
 
 	connect(notifier,&QSocketNotifier::activated,this, &BluetoothSinkPlugin::canHasData);
 }
@@ -142,7 +118,7 @@ void BtProfileAdaptor::Release()
 	mParent->release();
 }
 
-void BtProfileAdaptor::NewConnection(QDBusObjectPath device, int fd, QVariantMap fd_properties)
+void BtProfileAdaptor::NewConnection(QDBusObjectPath device, QDBusUnixFileDescriptor fd, QVariantMap fd_properties)
 {
 	mParent->newConnection(device.path().toStdString(), fd, fd_properties);
 }
