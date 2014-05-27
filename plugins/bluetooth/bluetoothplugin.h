@@ -27,6 +27,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QDBusObjectPath>
 #include <QVariantMap>
 #include <QTcpSocket>
+#include <QDBusUnixFileDescriptor>
 
 class BluetoothSinkPlugin;
 
@@ -43,7 +44,7 @@ public Q_SLOTS:
 
 	void Release();
 
-	void NewConnection(QDBusObjectPath device, int fd, QVariantMap fd_properties);
+	void NewConnection(QDBusObjectPath device, QDBusUnixFileDescriptor fd, QVariantMap fd_properties);
 
 	void RequestDisconnection(QDBusObjectPath device);
 
@@ -68,7 +69,7 @@ public:
 
 	void release();
 
-	void newConnection(std::string path, int fd, QVariantMap props);
+	void newConnection(std::string path, QDBusUnixFileDescriptor fd, QVariantMap props);
 
 	void requestDisconnection(std::string path);
 

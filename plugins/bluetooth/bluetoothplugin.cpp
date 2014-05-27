@@ -83,13 +83,13 @@ void BluetoothSinkPlugin::release()
 	DebugOut()<<"release called."<<endl;
 }
 
-void BluetoothSinkPlugin::newConnection(string path, int fd, QVariantMap props)
+void BluetoothSinkPlugin::newConnection(string path, QDBusUnixFileDescriptor fd, QVariantMap props)
 {
 	DebugOut()<<"new Connection! Path: "<<path<<endl;
 
-	socket.setDescriptor(fd);
+	socket.setDescriptor(fd.fileDescriptor());
 
-	QSocketNotifier *notifier = new QSocketNotifier(fd, QSocketNotifier::Read, this);
+	QSocketNotifier *notifier = new QSocketNotifier(fd.fileDescriptor(), QSocketNotifier::Read, this);
 
 	connect(notifier,&QSocketNotifier::activated,this, &BluetoothSinkPlugin::canHasData);
 }
@@ -118,7 +118,7 @@ void BtProfileAdaptor::Release()
 	mParent->release();
 }
 
-void BtProfileAdaptor::NewConnection(QDBusObjectPath device, int fd, QVariantMap fd_properties)
+void BtProfileAdaptor::NewConnection(QDBusObjectPath device, QDBusUnixFileDescriptor fd, QVariantMap fd_properties)
 {
 	mParent->newConnection(device.path().toStdString(), fd, fd_properties);
 }

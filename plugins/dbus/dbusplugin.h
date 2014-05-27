@@ -27,7 +27,7 @@
 #include <map>
 #include <type_traits>
 
-typedef std::map<VehicleProperty::Property, VariantType*> PropertyDBusMap;
+typedef std::unordered_map<VehicleProperty::Property, VariantType*> PropertyDBusMap;
 
 class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
