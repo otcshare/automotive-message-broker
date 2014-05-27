@@ -73,8 +73,8 @@ public:
 
 	void requestDisconnection(std::string path);
 
-private Q_SLOTS:
 	void canHasData();
+
 
 private:
 	 SerialPort socket;

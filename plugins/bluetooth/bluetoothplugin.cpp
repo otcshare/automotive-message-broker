@@ -34,6 +34,30 @@ using namespace std;
 
 #include "debugout.h"
 
+bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
+{
+//	DebugOut(5) << "Polling..." << condition << endl;
+
+	if(condition & G_IO_ERR)
+	{
+		DebugOut(DebugOut::Error)<<"GpsNmeaSource polling error."<<endl;
+	}
+
+	if (condition & G_IO_HUP)
+	{
+		//Hang up. Returning false closes out the GIOChannel.
+		//printf("Callback on G_IO_HUP\n");
+		DebugOut(DebugOut::Warning)<<"socket hangup event..."<<endl;
+		return false;
+	}
+
+	BluetoothSinkPlugin* p = static_cast<BluetoothSinkPlugin*>(data);
+
+	p->canHasData();
+
+	return true;
+}
+
 BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSink(re, config)
 {
@@ -89,9 +113,10 @@ void BluetoothSinkPlugin::newConnection(string path, QDBusUnixFileDescriptor fd,
 
 	socket.setDescriptor(fd.fileDescriptor());
 
-	QSocketNotifier *notifier = new QSocketNotifier(fd.fileDescriptor(), QSocketNotifier::Read, this);
-
-	connect(notifier,&QSocketNotifier::activated,this, &BluetoothSinkPlugin::canHasData);
+	GIOChannel *chan = g_io_channel_unix_new(socket.fileDescriptor());
+	g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
+	g_io_channel_set_close_on_unref(chan, true);
+	g_io_channel_unref(chan);
 }
 
 void BluetoothSinkPlugin::requestDisconnection(string path)
@@ -105,6 +130,9 @@ void BluetoothSinkPlugin::canHasData()
 	QByteArray data = socket.read().c_str();
 
 	DebugOut()<<"data read: "<<data.constData()<<endl;
+
+	if(data == "ping")
+		socket.write("pong");
 }
 
 BtProfileAdaptor::BtProfileAdaptor(BluetoothSinkPlugin *parent)

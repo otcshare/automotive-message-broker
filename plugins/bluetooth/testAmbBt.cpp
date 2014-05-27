@@ -7,7 +7,30 @@
 
 #include "bluetooth5.h"
 #include <serialport.hpp>
-#include <QSocketNotifier>
+
+SerialPort *s = new SerialPort();
+
+bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
+{
+//	DebugOut(5) << "Polling..." << condition << endl;
+
+	if(condition & G_IO_ERR)
+	{
+		DebugOut(DebugOut::Error)<<"GpsNmeaSource polling error."<<endl;
+	}
+
+	if (condition & G_IO_HUP)
+	{
+		//Hang up. Returning false closes out the GIOChannel.
+		//printf("Callback on G_IO_HUP\n");
+		DebugOut(DebugOut::Warning)<<"socket hangup event..."<<endl;
+		return false;
+	}
+
+	DebugOut(0)<<"Data: "<<s->read();
+
+	return true;
+}
 
 int main(int argc, char** argv)
 {
@@ -18,18 +41,14 @@ int main(int argc, char** argv)
 	Bluetooth5 btdev;
 	btdev.getDeviceForAddress(addy.toStdString(),[](int fd){
 		DebugOut(0)<<"I am connected"<<endl;
-
-		SerialPort *s = new SerialPort();
 		s->setDescriptor(fd);
 
-		QSocketNotifier* sock = new QSocketNotifier(fd, QSocketNotifier::Read);
+		GIOChannel *chan = g_io_channel_unix_new(s->fileDescriptor());
+		g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, nullptr);
+		g_io_channel_set_close_on_unref(chan, true);
+		g_io_channel_unref(chan);
 
-		QObject::connect(sock, &QSocketNotifier::activated, [&s](){
-			DebugOut(0)<<"data: "<<s->read()<<endl;
-		});
-
-
-
+		s->write("ping");
 	});
 
 	return app.exec();
