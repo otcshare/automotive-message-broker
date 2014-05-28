@@ -297,6 +297,7 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 		data["property"] = property.c_str();
 		data["zone"] = zone;
 		data["source"] = reply->value->sourceUuid.c_str();
+		data["success"] = reply->success;
 
 		QVariantMap replyvar;
 		replyvar["type"]="methodReply";

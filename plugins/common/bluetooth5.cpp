@@ -42,7 +42,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 		DebugOut()<<"NewConnection() called"<<endl;
 
 		gchar* device;
-		int fd;
+		gint32 fd;
 		GVariantIter* iter;
 
 		g_variant_get(parameters,"(oha{sv})", &device, &fd, &iter);
@@ -55,7 +55,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 	}
 	else
 	{
-		g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
+		g_dbus_method_invocation_return_error(invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
 	}
 
 	/// return nothing:
@@ -292,15 +292,26 @@ void Bluetooth5::getDeviceForAddress(std::string address, ConnectedCallback conn
 
 	GError* error = nullptr;
 
-	g_dbus_proxy_call_sync(deviceProxy,"Connect", nullptr/*g_variant_new("(s)", "00001101-0000-1000-8000-00805F9B34FB")*/,G_DBUS_CALL_FLAGS_NONE,-1, nullptr, &error);
-
-	if(error)
+	g_dbus_proxy_call(deviceProxy, "Connect", nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr,[](GObject *source_object,
+																							   GAsyncResult *res,
+																							   gpointer user_data)
 	{
-		DebugOut(DebugOut::Error)<<"error trying to connect profile: "<<error->message<<endl;
-		g_error_free(error);
+
+		GError* error = nullptr;
+		GDBusProxy *deviceProxy = (GDBusProxy*)user_data;
+
+		g_dbus_proxy_call_finish(G_DBUS_PROXY (source_object),res, &error);
+
+		if(error)
+		{
+			DebugOut(DebugOut::Error)<<"error trying to connect profile: "<<error->message<<endl;
+			g_error_free(error);
+		}
+
 		g_object_unref(deviceProxy);
-		return;
-	}
+	}, deviceProxy);
+
+
 
 
 

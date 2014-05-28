@@ -4,7 +4,7 @@ Property changed event:
 {"type":"valuechanged","name":"VehicleSpeed","data":{"value":"217","zone": 0, "timestamp":"1354521964.60253","sequence":"0"}, "transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66", }
 
 Get property request: 
-{"type":"method","name":"get","data":"VehicleSpeed","transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
+{"type":"method","name":"get","data": { "property" : "VehicleSpeed", "zone" : 0 }, "transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
 
 Get property reply:
 {"type":"methodReply","name":"get","data":{"property":"VehicleSpeed","value":"17", "timestamp" : "1354521964.24962", "sequence": "0" },"transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
@@ -19,7 +19,13 @@ Subscribe to data:
 {"type":"method","name":"subscribe","data": {"property":"EngineSpeed", "zone": 0},"transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
 
 Subscribe to data reply:
-{"type":"methodReply","name":"subscribe","data":["EngineSpeed"],"transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
+{"type":"methodReply","name":"subscribe","data":"EngineSpeed","transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
 
 Get History request:
 {"type":"method","name":"getRange","data": {"property":"VehicleSpeed", "timeBegin":"1368825008.35948","timeEnd":"1368825018.35948","sequenceBegin":"-1","sequenceEnd":"-1"},"transactionid":"b07589ba-417c-4604-80c6-01c0dcbd524d"}
+
+Set property request:
+{ "type" : "method", "name" : "set", "data" : { "property" : "MachineGunTurretStatus", "value" : "true", "zone" : 0 }, "transactionid" : "4123123123" }
+
+Set property reply:
+{ "type" : "methodReply", "name" : "set", "data" : { "property" : "MachineGunTurretStatus", "value" : "true", "zone" : 0, "success" : true }, "transactionid" : "4123123123" }

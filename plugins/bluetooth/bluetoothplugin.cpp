@@ -109,7 +109,7 @@ void BluetoothSinkPlugin::release()
 
 void BluetoothSinkPlugin::newConnection(string path, QDBusUnixFileDescriptor fd, QVariantMap props)
 {
-	DebugOut()<<"new Connection! Path: "<<path<<endl;
+	DebugOut()<<"new Connection! Path: "<<path<<" fd: "<<fd.fileDescriptor()<<endl;
 
 	socket.setDescriptor(fd.fileDescriptor());
 
