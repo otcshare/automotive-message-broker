@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <errno.h>
+#include <stdio.h>
 
 class SerialPort: public AbstractIo
 {
@@ -113,14 +114,15 @@ public:
 		int written = ::write(fd,data.c_str(),data.length());
 		if(written == -1)
 		{
-			DebugOut()<<"Unable to write"<<endl;
+			DebugOut(DebugOut::Warning)<<"Unable to write ("<<fd<<")"<<endl;
+			perror("write error: ");
 		}
 	}
 
 	void setDescriptor(int d)
 	{
 		fd = d;
-		setupDevice();
+		//setupDevice();
 	}
 
 private: ///methods

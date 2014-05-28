@@ -3,7 +3,7 @@
 #include <QCoreApplication>
 #include <QJsonDocument>
 #include <QStringList>
-#include <QSocketNotifier>
+#include <QDebug>
 
 #include "bluetooth5.h"
 #include <serialport.hpp>
@@ -38,9 +38,14 @@ int main(int argc, char** argv)
 
 	QString addy = app.arguments().at(1);
 
+	DebugOut::setDebugThreshhold(6);
+
+	qDebug()<<"connecting to: "<<addy;
+
 	Bluetooth5 btdev;
-	btdev.getDeviceForAddress(addy.toStdString(),[](int fd){
-		DebugOut(0)<<"I am connected"<<endl;
+	btdev.getDeviceForAddress(addy.toStdString(),[](int fd)
+	{
+		qDebug()<<"I am connected "<<fd;
 		s->setDescriptor(fd);
 
 		GIOChannel *chan = g_io_channel_unix_new(s->fileDescriptor());
@@ -48,8 +53,12 @@ int main(int argc, char** argv)
 		g_io_channel_set_close_on_unref(chan, true);
 		g_io_channel_unref(chan);
 
-		s->write("ping");
+		s->write("ping\r\n");
 	});
 
-	return app.exec();
+	app.exec();
+
+	s->close();
+
+	return 1;
 }
