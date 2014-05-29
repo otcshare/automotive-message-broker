@@ -4,11 +4,17 @@ New features:
 - Added "frequency" option to database plugin.  Now periodic data can be written to the db.
   this is useful for high speed data that you don't want to flood the database.
 - New test tools: amb-get, amb-set and amb-get-history
+- New bluetooth spp plugin
+- cangen and cansim plugins simulate a real CAN network.
 
 Changes:
 - Deprecated and removed the "FooChanged" (where "Foo" is a property like "VehicleSpeed") signal
 - DBus Object paths do not appear until FindObject* is called.  The object path disappears with
   the last pid that called FindObject* disconnects from DBus (or closes).
+- Many internal stl containers have been changed to use more efficient ones.
+- Some internal methods changed to const & references to avoid copies.
+- DBus plugin will no cache unsubscribed values.  Improves performance.
 
 Fixes:
 - database plugin updated to use zones
+- obd-II plugin updated to use bluez5 APIs
