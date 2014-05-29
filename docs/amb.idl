@@ -915,5 +915,14 @@ interface org.automotive.GeneratedVehicleSoundMode : VehiclePropertyType {
 	readonly attribute UInt16 GeneratedVehicleSoundMode;
 };
 
+[NoInterfaceObject]
+interface org.automotive.SteeringWheelAngle: VehiclePropertyType {
+
+	/**
+	* \brief MUST return angle of the steering wheel. 0-359 degrees.
+	**/
+	readonly attribute UInt16 SteeringWheelAngle
+};
+
 };
 
