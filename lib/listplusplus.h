@@ -24,7 +24,7 @@
 #include <algorithm>
 
 template <class T, class V>
-bool contains(T iteratable, V value)
+bool contains(const T & iteratable, V value)
 {
 	return iteratable.size() > 0 && (std::find(iteratable.begin(), iteratable.end(), value) != iteratable.end());
 }

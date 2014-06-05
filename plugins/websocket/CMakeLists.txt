@@ -1,5 +1,7 @@
 if(websocket_plugin)
 
+add_definitions(-Dwebsocket_plugin)
+
 include(CheckIncludeFiles)
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
 

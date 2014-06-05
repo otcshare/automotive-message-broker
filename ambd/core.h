@@ -47,10 +47,12 @@ public:
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
 	AsyncRangePropertyReply* getRangePropertyAsync(AsyncRangePropertyRequest request);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
+	uint subscribeToProperty(VehicleProperty::Property, AbstractRoutingEngine::PropertyChangedType, std::string pid="");
 	bool subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
 	bool subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self);
 	bool subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
 	bool unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
+	void unsubscribeToProperty(uint handle);
 	PropertyList supported();
 
 	PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid);
@@ -86,8 +88,15 @@ private:
 	// std::string here is AbstractSource::uuid()
 	typedef std::map<AbstractSink*, std::string> FilteredSourceSinkMap;
 
+	///uint cbHandle, std::string uuid
+	typedef std::unordered_map<uint, std::string> FilteredSourceCbMap;
+
 	// to support zone filtering replace VehicleProperty::Property with ZonePropertyType
 	std::unordered_map<VehicleProperty::Property, FilteredSourceSinkMap > propertySinkMap;
+	std::unordered_map<VehicleProperty::Property, FilteredSourceCbMap> propertyCbMap;
+	std::unordered_map<uint, AbstractRoutingEngine::PropertyChangedType> handleCbMap;
+
+	uint handleCount;
 };
 
 #endif // CORE_H

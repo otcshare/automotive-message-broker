@@ -170,7 +170,7 @@ public:
 	int32_t sequence;
 	bool quit;
 
-	bool operator ==(const DBObject & other)
+	bool operator ==(const DBObject & other) const
 	{
 		return (key == other.key && source == other.source && zone == other.zone);
 	}

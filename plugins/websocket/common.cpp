@@ -1,5 +1,6 @@
 #include "common.h"
 #include "debugout.h"
+#include <math.h>
 
 bool doBinary = false;
 
@@ -20,7 +21,7 @@ int lwsWrite(libwebsocket *lws, QByteArray d, int len)
 
 	if(d.length() > framesize)
 	{
-		numframes = qCeil((double)d.length() / 122.0);
+		numframes = ceil((double)d.length() / 122.0);
 		QVariantMap multiFrameMessage;
 		multiFrameMessage["type"] = "multiframe";
 		multiFrameMessage["frames"] = numframes;

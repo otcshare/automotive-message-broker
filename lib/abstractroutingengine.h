@@ -103,6 +103,11 @@ public:
 	 * default value is: 10000 ms
 	 */
 	uint timeout;
+
+	/*!
+	 * \brief pid requesting process id
+	 */
+	std::string pid;
 };
 
 /*!
@@ -268,6 +273,11 @@ public:
 	 * you don't want values within a sequence ranges.
 	 */
 	int32_t sequenceEnd;
+
+	/*!
+	 * \brief pid requesting process id
+	 */
+	std::string pid;
 };
 
 /*!
@@ -313,6 +323,7 @@ public:
 class AbstractRoutingEngine
 {
 public:
+	typedef std::function<void (AbstractPropertyType* value)> PropertyChangedType;
 	virtual ~AbstractRoutingEngine();
 
 	virtual void registerSource(AbstractSource* src) = 0;
@@ -397,6 +408,21 @@ public:
 	 * \example 
 	 */
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
+
+	/*!
+	 * \brief subscribeToProperty subscribes to propertyName.  Value changes will be passed to callback.
+	 * \param propertyName
+	 * \param callback
+	 * \param pid process id of the requesting application
+	 * \return subscription handle
+	 */
+	virtual uint subscribeToProperty(VehicleProperty::Property propertyName, PropertyChangedType callback, std::string pid="") = 0;
+
+	/*!
+	 * \brief unsubscribeToProperty
+	 * \param handle
+	 */
+	virtual void unsubscribeToProperty(uint handle) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.

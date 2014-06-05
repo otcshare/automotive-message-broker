@@ -51,7 +51,7 @@ static int PPSUpdate(void* data)
 	return 1;
 }
 
-Core::Core()
+Core::Core(): handleCount(0)
 {
 	g_timeout_add(1000,PPSUpdate,&performance);
 }
@@ -271,6 +271,30 @@ bool Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilte
 	/// TODO: implement
 }
 
+uint Core::subscribeToProperty(VehicleProperty::Property property, AbstractRoutingEngine::PropertyChangedType cb, std::string pid)
+{
+	DebugOut(1)<<"Subscribing to: "<<property<<endl;
+
+	auto itr = mMasterPropertyList.begin();
+	while(itr != mMasterPropertyList.end())
+	{
+		VehicleProperty::Property prop = itr->second;
+		if(prop == property) {
+			AbstractSource* src = itr->first;
+			src->subscribeToPropertyChanges(property);
+			// Move to next source. It will skip all the remaining properties in this source.
+			itr = mMasterPropertyList.upper_bound(src);
+		}
+		else{
+			++itr;
+		}
+	}
+
+	handleCbMap[++handleCount] = cb;
+	propertyCbMap[property].emplace(handleCount, std::string(""));
+	return handleCount;
+}
+
 bool Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* sink)
 {
 	auto sinksIt = propertySinkMap.find(property);
@@ -302,6 +326,12 @@ bool Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSin
 	}
 
 	return true;
+}
+
+void Core::unsubscribeToProperty(uint handle)
+{
+	handleCbMap.erase(handle);
+	/// TODO: unsubscribe from source
 }
 
 PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
@@ -435,3 +465,4 @@ AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& propert
 	else
 		return it->first;
 }
+

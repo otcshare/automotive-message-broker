@@ -62,10 +62,15 @@ public:
  */
 class WebSockets {
 public:
+	enum Type {
+		Server,
+		Client
+	};
+
     /*!
      * \param observer \link #WebSocketsObserver Observer \endlink to be called when any data are received.
      */
-    WebSockets(WebSocketsObserver& observer);
+	WebSockets(WebSocketsObserver& observer, Type t=Server, int port = 23001, std::string ip="");
 
     /*!
      * Copy constructor
