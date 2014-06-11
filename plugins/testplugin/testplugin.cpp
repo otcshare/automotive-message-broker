@@ -193,6 +193,25 @@ bool TestPlugin::testSubscription()
 	TEST(oldUnsubscriptionsToSupportedCounter == unsubscriptionsToSupportedCounter);
 	TEST(++oldUnsubscriptionsToUnsupportedCounter == unsubscriptionsToUnsupportedCounter);
 
+
+	/// test lamba subscription:
+
+	TEST (routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed,[](AbstractPropertyType* value)
+	{
+		DebugOut(0)<<"lamba subscriptions work!"<<endl;
+		TEST(value);
+	}) > 0);
+
+	/// change vehiclespeed to trigger subscribe above
+
+	PropertyList s;
+	s.push_back(VehicleProperty::VehicleSpeed);
+
+	routingEngine->updateSupported(s, PropertyList(), this);
+	VehicleProperty::VehicleSpeedType speed(10);
+	routingEngine->updateProperty(&speed,uuid());
+	routingEngine->updateSupported(PropertyList(), s, this);
+
 	delete value;
 
 	// unsubscription

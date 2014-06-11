@@ -116,38 +116,86 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 
 	//auto sinks = propertySinkMap[property]; !!! this will insert empty std::set<AbstractSink*> into propertySinkMap !!!
 	auto filteredSourceSinkMapIt =  propertySinkMap.find(property);
-	if(filteredSourceSinkMapIt == propertySinkMap.end()){
-		DebugOut()<<__FUNCTION__<<"() there are no sinks connected to property: "<<property<<endl;
-		return;
-	}
+	auto cbMapItr = propertyCbMap.find(property);
 
-	const FilteredSourceSinkMap filteredSourceSinks = filteredSourceSinkMapIt->second;
-
-	DebugOut()<<__FUNCTION__<<"() there are "<<filteredSourceSinks.size()<<" sinks connected to property: "<<property<<endl;
-
-	performance.firedPropertiesPerSecond++;
-
-	for(auto itr = filteredSourceSinks.begin(); itr != filteredSourceSinks.end(); ++itr)
+	if(filteredSourceSinkMapIt != propertySinkMap.end())
 	{
-		AbstractSink* sink = itr->first;
-		const std::string& sourceUuid = itr->second;
+		const FilteredSourceSinkMap filteredSourceSinks = filteredSourceSinkMapIt->second;
 
-		bool isFiltered = !sourceUuid.empty();
+		DebugOut()<<__FUNCTION__<<"() there are "<<filteredSourceSinks.size()<<" sinks connected to property: "<<property<<endl;
 
-		if(isFiltered)
+		performance.firedPropertiesPerSecond++;
+
+		for(auto itr = filteredSourceSinks.begin(); itr != filteredSourceSinks.end(); ++itr)
 		{
-			DebugOut()<<"Property ("<<property<<") for sink is filtered for source: "<<sourceUuid<<endl;
-		}
+			AbstractSink* sink = itr->first;
+			const std::string& sourceUuid = itr->second;
 
-		if( !isFiltered || sourceUuid == uuid)
-		{
-			if(value->sourceUuid != uuid)
+			bool isFiltered = !sourceUuid.empty();
+
+			if(isFiltered)
 			{
-				value->sourceUuid = uuid;
+				DebugOut()<<"Property ("<<property<<") for sink is filtered for source: "<<sourceUuid<<endl;
 			}
 
-			sink->propertyChanged(value);
+			if( !isFiltered || sourceUuid == uuid)
+			{
+				if(value->sourceUuid != uuid)
+				{
+					value->sourceUuid = uuid;
+				}
+
+				sink->propertyChanged(value);
+			}
 		}
+	}
+	else
+	{
+		DebugOut()<<__FUNCTION__<<"() there are no sinks connected to property: "<<property<<endl;
+	}
+
+	if(cbMapItr != propertyCbMap.end())
+	{
+		FilteredSourceCbMap cbs = (*cbMapItr).second;
+
+		for(auto itr : cbs)
+		{
+			uint handle = itr.first;
+			const std::string& sourceUuid = itr.second;
+
+			bool isFiltered = !sourceUuid.empty();
+
+			if(isFiltered)
+			{
+				DebugOut()<<"Property ("<<property<<") for cb is filtered for source: "<<sourceUuid<<endl;
+			}
+
+			if( !isFiltered || sourceUuid == uuid)
+			{
+				if(value->sourceUuid != uuid)
+				{
+					value->sourceUuid = uuid;
+				}
+
+				if(handleCbMap.count(handle))
+				{
+					auto cb = handleCbMap[handle];
+					try
+					{
+						cb(value);
+					}
+					catch(...)
+					{
+						DebugOut(DebugOut::Warning)<<"Failed to call callback subscribed to property: "<<property<<endl;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		DebugOut()<<__FUNCTION__<<"() there are no cb connected to property: "<<property<<endl;
+		return;
 	}
 }
 

@@ -38,6 +38,7 @@ option(cansim_plugin "Can simulator plugin" OFF)
 option(cangen_plugin "Can generator plugin" OFF)
 option(enable_icecc "Enable icecc checking, for distributed compilation" ON)
 option(enable_docs "enable Doxygen doc generation" OFF)
+option(usebluez5 "use bluez 5 API" OFF)
 
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -116,6 +117,11 @@ if(qtmainloop)
 	add_definitions(-DQT_NO_KEYWORDS)
 	add_definitions(-DUSE_QT_CORE)
 endif(qtmainloop)
+
+if(usebluez5)
+        add_definitions(-DUSE_BLUEZ5)
+
+endif(usebluez5)
 
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
 add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

@@ -803,6 +803,9 @@ public:
 	static const Property GeneratedVehicleSoundMode;
 	PROPERTYTYPEBASIC(GeneratedVehicleSoundMode, Vehicle::SoundMode)
 
+	static const Property DriverId;
+	PROPERTYTYPE(DriverId, DriverIdType, StringPropertyType, std::string)
+
 
 	/** END PROPERTIES **/
 
