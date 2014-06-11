@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "timestamp.h"
 #include "serialport.hpp"
 #include "bluetooth.hpp"
+#include "bluetooth5.h"
 #include <listplusplus.h>
 
 #include <iostream>
@@ -421,8 +422,40 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		std::string dev = config["device"];
 		if(dev.find(":") != string::npos)
 		{
+#ifdef USE_BLUEZ5
+			Bluetooth5 bt;
+			bt.getDeviceForAddress(dev,[this](int fd) {
+				device = new SerialPort(fd);
+				int baudrate=0;
+
+				if(baudrate!=0)
+				{
+					if((static_cast<SerialPort*>(device))->setSpeed(baudrate))
+						DebugOut(DebugOut::Error)<<"Unsupported baudrate " << configuration["baudrate"] << endl;
+				}
+
+				if(!device->open())
+				{
+					DebugOut(DebugOut::Error)<<"Failed to open gps tty: "<<configuration["device"]<<endl;
+					perror("Error");
+					return;
+				}
+
+				DebugOut()<<"read from device: "<<device->read()<<endl;
+
+				GIOChannel *chan = g_io_channel_unix_new(device->fileDescriptor());
+				g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
+				g_io_channel_set_close_on_unref(chan, true);
+				g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
+			});
+
+		}
+	}
+
+#else
 			BluetoothDevice bt;
 			dev = bt.getDeviceForAddress(dev, btaddapter);
+
 		}
 
 		device = new SerialPort(dev);
@@ -447,6 +480,7 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 		g_io_channel_set_close_on_unref(chan, true);
 		g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
 	}
+#endif
 }
 
 GpsNmeaSource::~GpsNmeaSource()

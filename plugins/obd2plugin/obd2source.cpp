@@ -63,15 +63,23 @@ bool beginsWith(std::string a, std::string b)
 	return (a.compare(0, b.length(), b) == 0);
 }
 
-bool connect(obdLib* obd, std::string device, std::string strbaud)
+bool connect(obdLib* obd, std::string device, std::string strbaud, int fd = -1)
 {
 	//printf("First: %s\nSecond: %s\n",req->arg.substr(0,req->arg.find(':')).c_str(),req->arg.substr(req->arg.find(':')+1).c_str());
 	std::string port = device;
 	DebugOut() << "Obd2Source::Connect()" << device << strbaud << endl;
 	int baud = boost::lexical_cast<int>(strbaud);
 
-	if(obd->openPort(port.c_str(),baud) == -1)
-		return false;
+	if(fd != -1)
+	{
+		if(obd->openPort(fd,baud) == -1)
+			return false;
+	}
+	else
+	{
+		if(obd->openPort(port.c_str(),baud) == -1)
+			return false;
+	}
 
 	ObdPid::ByteArray replyVector;
 	std::string reply;
@@ -179,6 +187,7 @@ void threadLoop(gpointer data)
 
 				if (source->m_isBluetooth)
 				{
+
 					BluetoothDevice bt;
 					std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
 					if(tempPort != "")

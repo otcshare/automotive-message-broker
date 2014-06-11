@@ -1,5 +1,7 @@
 if(bluetooth_plugin)
 
+add_definitions(-Dbluetooth_plugin)
+
 set(bluetooth_headers bluetoothplugin.h)
 set(bluetooth_sources bluetoothplugin.cpp )
 

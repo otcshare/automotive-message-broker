@@ -43,6 +43,75 @@ int obdLib::openPort(const char *portName)
 	return openPort(portName,-1);
 }
 
+int obdLib::openPort(const int fd, int baudrate)
+{
+	portHandle = fd;
+	if (portHandle < 0)
+	{
+		debug(obdLib::DEBUG_ERROR, "Error opening device %s", strerror( errno ));
+
+		return -1;
+	}
+
+	debug(obdLib::DEBUG_VERBOSE,"Com Port Opened %i",portHandle);
+	fcntl(portHandle, F_SETFL, 0); //Set it to blocking.
+	//struct termios oldtio;
+	struct termios newtio;
+	//bzero(&newtio,sizeof(newtio));
+	tcgetattr(portHandle,&newtio);
+	long BAUD = B9600;
+	switch (baudrate)
+	{
+		case 38400:
+			BAUD = B38400;
+			break;
+		case 115200:
+			BAUD  = B115200;
+			break;
+		case 19200:
+			BAUD  = B19200;
+			break;
+		case 9600:
+			BAUD  = B9600;
+			break;
+		case 4800:
+			BAUD  = B4800;
+			break;
+		default:
+			BAUD = B38400;
+			break;
+	}  //end of switch baud_rate
+
+	newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
+	newtio.c_cflag |= CLOCAL | CREAD;
+	newtio.c_cflag &= ~CRTSCTS;
+	newtio.c_cflag &= ~CSTOPB;
+	newtio.c_iflag=IGNBRK;
+	newtio.c_iflag &= ~(IXON|IXOFF|IXANY);
+	newtio.c_lflag=0;
+	newtio.c_oflag=0;
+	newtio.c_cc[VTIME]=1; //1/10th second timeout, reduces CPU usage but still allows for timeouts
+	newtio.c_cc[VMIN]=1; //We want a pure timer timeout
+
+	if (baudrate != -1)
+	{
+		if(cfsetispeed(&newtio, BAUD))
+		{
+			perror("cfsetispeed");
+		}
+
+		if(cfsetospeed(&newtio, BAUD))
+		{
+			perror("cfsetospeed");
+		}
+		debug(obdLib::DEBUG_VERBOSE,"Setting baud rate to %i\n",baudrate);
+	}
+	fcntl(portHandle, F_SETFL, 0); //Set to blocking
+	tcsetattr(portHandle,TCSANOW,&newtio);
+
+	return 0;
+}
+
 void obdLib::setDebugCallback(void (*callbackptr)(const char*,void*,obdLib::DebugLevel),void *usrdata)
 {
 	//printf("Calling setDebugCallback: %i\n",debugCallback);
@@ -77,142 +146,10 @@ void obdLib::commsDebug(const char *msg)
 
 int obdLib::openPort(const char *portName,int baudrate)
 {
-#ifdef WINVER
-	portHandle=CreateFileA(portName, GENERIC_READ|GENERIC_WRITE,0, NULL, OPEN_EXISTING, 0, NULL);
-	if (portHandle == INVALID_HANDLE_VALUE)
-	{
-		return -1;
-	}
-	COMMCONFIG Win_CommConfig;
-	COMMTIMEOUTS Win_CommTimeouts;
-	unsigned long confSize = sizeof(COMMCONFIG);
-	Win_CommConfig.dwSize = confSize;
-	GetCommConfig(portHandle, &Win_CommConfig, &confSize);
-	Win_CommConfig.dcb.Parity = 0;
-	Win_CommConfig.dcb.fRtsControl = RTS_CONTROL_DISABLE;
-	Win_CommConfig.dcb.fOutxCtsFlow = FALSE;
-	Win_CommConfig.dcb.fOutxDsrFlow = FALSE;
-	Win_CommConfig.dcb.fDtrControl = DTR_CONTROL_DISABLE;
-	Win_CommConfig.dcb.fDsrSensitivity = FALSE;
-	Win_CommConfig.dcb.fNull=FALSE;
-	Win_CommConfig.dcb.fTXContinueOnXoff = FALSE;
-	Win_CommConfig.dcb.fInX=FALSE;
-	Win_CommConfig.dcb.fOutX=FALSE;
-	Win_CommConfig.dcb.fBinary=TRUE;
-	Win_CommConfig.dcb.DCBlength = sizeof(DCB);
-	if (baudrate != -1)
-	{
-		Win_CommConfig.dcb.BaudRate = baudrate;
-	}
-	Win_CommConfig.dcb.ByteSize = 8;
-	Win_CommTimeouts.ReadIntervalTimeout = 50;
-	Win_CommTimeouts.ReadTotalTimeoutMultiplier = 0;
-	Win_CommTimeouts.ReadTotalTimeoutConstant = 110;
-	Win_CommTimeouts.WriteTotalTimeoutMultiplier = 0;
-	Win_CommTimeouts.WriteTotalTimeoutConstant = 110;
-	SetCommConfig(portHandle, &Win_CommConfig, sizeof(COMMCONFIG));
-	SetCommTimeouts(portHandle,&Win_CommTimeouts);
-	return 0;
-#else
-	//NEED TO USE BAUD RATE HERE!!!: baudrate
-	//printf("Attempting to open COM port\n");
 	debug(obdLib::DEBUG_VERBOSE,"Attempting to open com port %s",portName);
 	portHandle = open(portName,O_RDWR | O_NOCTTY | O_NDELAY);
-	if (portHandle < 0)
-	{
-		//printf("Error opening Com: %s\n",portName);
-		debug(obdLib::DEBUG_ERROR, "Error opening device %s - %s",portName, strerror( errno ));
 
-		return -1;
-	}
-	//printf("Com Port Opened %i\n",portHandle);
-	debug(obdLib::DEBUG_VERBOSE,"Com Port Opened %i",portHandle);
-	fcntl(portHandle, F_SETFL, 0); //Set it to blocking. This is required? Wtf?
-	//struct termios oldtio;
-	struct termios newtio;
-	//bzero(&newtio,sizeof(newtio));
-	tcgetattr(portHandle,&newtio);
-	long BAUD = B9600;
-	switch (baudrate)
-	{
-		case 38400:
-			BAUD = B38400;
-			break;
-		case 115200:
-			BAUD  = B115200;
-			break;
-		case 19200:
-			BAUD  = B19200;
-			break;
-		case 9600:
-			BAUD  = B9600;
-			break;
-		case 4800:
-			BAUD  = B4800;
-			break;
-		default:
-			BAUD = B38400;
-			break;
-	}  //end of switch baud_rate
-	if (strspn("/dev/pts",portName) >= 8)
-	{
-		debug(obdLib::DEBUG_WARN,"PTS Detected... disabling baud rate selection on: %s",portName);
-		//printf("PTS detected... disabling baud rate selection: %s\n",portName);
-		baudrate = -1;
-	}
-	else
-	{
-	}
-
-	newtio.c_cflag = (newtio.c_cflag & ~CSIZE) | CS8;
-	newtio.c_cflag |= CLOCAL | CREAD;
-	newtio.c_cflag &= ~CRTSCTS;
-	newtio.c_cflag &= ~CSTOPB;
-	newtio.c_iflag=IGNBRK;
-	newtio.c_iflag &= ~(IXON|IXOFF|IXANY);
-	newtio.c_lflag=0;
-	newtio.c_oflag=0;
-	newtio.c_cc[VTIME]=1; //1/10th second timeout, reduces CPU usage but still allows for timeouts
-	newtio.c_cc[VMIN]=1; //We want a pure timer timeout
-	
-	
-	/*newtio.c_cflag |= (CLOCAL | CREAD);
-	newtio.c_lflag &= !(ICANON | ECHO | ECHOE | ISIG);
-	newtio.c_oflag &= !(OPOST);
-	newtio.c_cc[VMIN] = 0;
-	newtio.c_cc[VTIME] = 100;*/
-/*
-	newtio.c_cflag &= ~CSIZE; //Disable byte size
-	newtio.c_cflag &= ~PARENB; //Disable parity
-	newtio.c_cflag &= ~CSTOPB; //Disable stop bits
-	newtio.c_cflag |= (CLOCAL | CREAD | CS8); //Set local mode, reader, and 8N1.
-
-	newtio.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG); //Disausleep(10000);ble CANON, echo, and signals
-
-	newtio.c_oflag &= ~(OPOST); //Disable post processing
-*/
-	if (baudrate != -1)
-	{
-		if(cfsetispeed(&newtio, BAUD))
-		{
-			perror("cfsetispeed");
-		}
-
-		if(cfsetospeed(&newtio, BAUD))
-		{
-			perror("cfsetospeed");
-		}
-		debug(obdLib::DEBUG_VERBOSE,"Setting baud rate to %i on port %s\n",baudrate,portName);
-	}
-	fcntl(portHandle, F_SETFL, 0); //Set to blocking
-	tcsetattr(portHandle,TCSANOW,&newtio);
-	//newtio.c_cc[VMIN] = 0; //Minimum number of bytes to read
-	//newtio.c_cc[VTIME] = 100; //Read Timeout (10.0 seconds)
-
-
-	//tcflush(portHandle,TCIFLUSH);
-	return 0;
-#endif
+	return openPort(portHandle, baudrate);
 }
 
 void obdLib::setPortHandle(HANDLE hdnl)

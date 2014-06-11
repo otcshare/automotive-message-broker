@@ -154,7 +154,7 @@ static bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer 
     return true;
 }
 
-WebSockets::WebSockets(WebSocketsObserver& observer) :
+WebSockets::WebSockets(WebSocketsObserver& observer, Type t, int port, string ip) :
     observer(observer),
     protocollist({ { "http-only", websocket_callback, 0 }, { NULL, NULL, 0 } }),
     context(nullptr, &libwebsocket_context_destroy)
@@ -171,10 +171,15 @@ WebSockets::WebSockets(WebSocketsObserver& observer) :
     info.gid = -1;
     info.uid = -1;
     info.options = 0;
-    info.port = 23001;
+	info.port = port;
     info.user = this;
     //context = libwebsocket_create_context(&info);
     context = lwsContextPtr(libwebsocket_create_context(&info), &libwebsocket_context_destroy);
+
+	if(t == WebSockets::Client)
+	{
+		libwebsocket_client_connect(context.get(), ip.c_str(), port, false, "/", "localhost", "websocket", protocollist[0].name, -1);
+	}
 }
 
 WebSockets::~WebSockets()

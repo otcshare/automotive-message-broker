@@ -4,7 +4,6 @@
 #include <libwebsockets.h>
 #include <QByteArray>
 #include <QVariantMap>
-#include <QtMath>
 #include <QJsonDocument>
 #include <memory>
 

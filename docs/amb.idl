@@ -101,10 +101,10 @@ interface org.automotive.Manager  {
 [NoInterfaceObject]
 interface org.automotive.VehicleSpeed : VehiclePropertyType  {
 
-	/**  VehicleSpeed
+	/**  Speed
 	 *   \brief  Must return Vehicle Speed in kilometers per hour.    
 	 **/
-	readonly attribute UInt16 VehicleSpeed;
+	readonly attribute UInt16 Speed;
 };
 
 [NoInterfaceObject]
@@ -113,7 +113,7 @@ interface org.automotive.EngineSpeed : VehiclePropertyType  {
 	/**  EngineSpeed
 	 *   \brief  Must return Engine Speed in rotations per minute.    
 	 **/
-	readonly attribute UInt16 EngineSpeed;
+	readonly attribute UInt16 Speed;
 };
 
 [NoInterfaceObject]
@@ -913,6 +913,48 @@ interface org.automotive.GeneratedVehicleSoundMode : VehiclePropertyType {
 	* \brief MUST return Sound Mode: 0 = Normal, 1 = Quiet, 2 = Sportive
 	**/
 	readonly attribute UInt16 GeneratedVehicleSoundMode;
+};
+
+[NoInterfaceObject]
+interface org.automotive.SteeringWheelAngle: VehiclePropertyType {
+
+	/**
+	* \brief MUST return angle of the steering wheel. 0-359 degrees.
+	**/
+	readonly attribute UInt16 SteeringWheelAngle
+};
+
+[NoInterfaceObject]
+interface org.automotive.ButtoneEvent: VehiclePropertyType {
+
+	/**
+	* \brief MUST return button event:
+	* NoButton =0 
+	* PlayButton = 1,
+	* SkipButton = 1 << 1,
+	* PrevButton = 1 << 2,
+	* PauseButton = 1 << 3,
+	* Preset1Button = 1 << 4,
+	* Preset2Button = 1 << 5,
+	* Preset3Button = 1 << 6,
+	* Preset4Button = 1 << 7,
+	* StopButton = 1 << 8,
+	* NavigateUpButton = 1 << 9,
+	* NavigateDownButton = 1 << 10,
+	* NavigateLeftButton = 1 << 11,
+	* NavigateRightButton = 1 << 12
+	**/
+	readonly attribute UInt32 ButtonEvent
+};
+
+[NoInterfaceObject]
+interface org.automotive.DriverId: VehiclePropertyType {
+	
+	/**
+	* \brief MUST return driver ID.  Driver Id is an abstract and can be determined
+	* from multiple sources including bluetooth, key, key fob, etc.
+	**/
+	readonly attribute String DriverId;
 };
 
 };

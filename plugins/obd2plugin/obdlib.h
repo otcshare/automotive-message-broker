@@ -101,6 +101,7 @@ public:
 	};
 	obdLib();
 	int openPort(const char *portName,int baudrate);
+	int openPort(const int fd, int baudrate);
 	int openPort(const char *portName);
 	void setPortHandle(HANDLE hdnl);
 	int initPort();

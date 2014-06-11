@@ -112,6 +112,7 @@ void BluetoothSinkPlugin::newConnection(string path, QDBusUnixFileDescriptor fd,
 	DebugOut()<<"new Connection! Path: "<<path<<" fd: "<<fd.fileDescriptor()<<endl;
 
 	socket.setDescriptor(fd.fileDescriptor());
+	socket.write("ping");
 
 	GIOChannel *chan = g_io_channel_unix_new(socket.fileDescriptor());
 	g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);

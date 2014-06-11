@@ -158,6 +158,7 @@ const VehicleProperty::Property VehicleProperty::SeatPositionBackCushion = "Seat
 const VehicleProperty::Property VehicleProperty::SeatPositionSideCushion = "SeatPositionSideCushion";
 const VehicleProperty::Property VehicleProperty::DashboardIllumination = "DashboardIllumination";
 const VehicleProperty::Property VehicleProperty::GeneratedVehicleSoundMode = "GeneratedVehicleSoundMode";
+const VehicleProperty::Property VehicleProperty::DriverId = "DriverId";
 
 PropertyList VehicleProperty::mCapabilities;
 PropertyList VehicleProperty::mCustomProperties;
@@ -297,6 +298,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(SeatPositionSideCushion,0);
 	REGISTERPROPERTY(DashboardIllumination,0);
 	REGISTERPROPERTY(GeneratedVehicleSoundMode, Vehicle::Normal);
+	REGISTERPROPERTY(DriverId, "");
 
 }
 
