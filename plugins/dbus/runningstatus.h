@@ -35,6 +35,9 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Vehicle Speed in kilometers per hour.
 		 **/
+		wantPropertyVariant(VehicleProperty::VehicleSpeed,"Speed", "i", AbstractProperty::Read);
+
+		/// Deprecated:
 		wantPropertyVariant(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
 
 	}
@@ -54,6 +57,9 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Engine Speed in rotations per minute.
 		 **/
+		wantPropertyVariant(VehicleProperty::EngineSpeed,"Speed", "i", AbstractProperty::Read);
+
+		/// Deprecated:
 		wantPropertyVariant(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
 
 	}
