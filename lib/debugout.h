@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
-void debugOut(string message);
+void debugOut(const string &message);
 
 class DebugOut 
 {
@@ -53,7 +53,7 @@ public:
 				out<<"WARNING ";
 		}
 	}
-	DebugOut const& operator << (string message) const
+	DebugOut const& operator << (const string &message) const
 	{
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 		{
