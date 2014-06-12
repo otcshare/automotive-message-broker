@@ -27,7 +27,8 @@
 #include <map>
 #include <type_traits>
 
-typedef std::unordered_map<VehicleProperty::Property, VariantType*> PropertyDBusMap;
+typedef std::vector<VariantType*> PropertyDBusMap;
+//typedef std::unordered_map<VehicleProperty::Property, VariantType*> PropertyDBusMap;
 
 class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
@@ -35,21 +36,21 @@ class DBusSink : public AbstractSink, public AbstractDBusInterface
 public:
 	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
 	virtual ~DBusSink() {
-		for(auto itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); ++itr)
+		for(auto i : propertyDBusMap)
 		{
-			delete itr->second;
+			delete i;
 		}
 	}
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType *value);
 	virtual const std::string uuid();
 
-	std::list<VehicleProperty::Property> wantsProperties()
+	PropertyList wantsProperties()
 	{
-		std::list<VehicleProperty::Property> l;
-		for(auto itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
+		PropertyList l;
+		for(auto i : propertyDBusMap)
 		{
-			l.push_back((*itr).first);
+			l.push_back(i->ambPropertyName());
 		}
 
 		return l;
@@ -69,18 +70,21 @@ protected:
 	template <typename T>
 	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
+		//propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
+		propertyDBusMap.push_back( new VariantType(routingEngine, signature, property, propertyName, access));
 	}
 
 
 	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
+		//propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
+		propertyDBusMap.push_back( new VariantType(routingEngine, signature, property, propertyName, access));
 	}
 
 	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
-		propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
+		//propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
+		propertyDBusMap.push_back(new VariantType(routingEngine, signature, ambProperty, propertyName, access));
 	}
 
 	PropertyDBusMap propertyDBusMap;

@@ -36,7 +36,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "drivingsafety.h"
 #include "personalization.h"
 
-std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(AbstractRoutingEngine *re, std::list<VehicleProperty::Property> implementedProperties)
+std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(AbstractRoutingEngine *re, PropertyList implementedProperties)
 {
 	std::map<std::string, std::map<Zone::Type, bool>> uniqueSourcesList;
 
@@ -84,7 +84,7 @@ void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
 
 	/// check if we need more than one instance:
 
-	std::list<VehicleProperty::Property> implementedProperties = t->wantsProperties();
+	PropertyList implementedProperties = t->wantsProperties();
 
 	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
 
@@ -122,7 +122,7 @@ void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, G
 
 	/// check if we need more than one instance:
 
-	std::list<VehicleProperty::Property> implementedProperties = t->wantsProperties();
+	PropertyList implementedProperties = t->wantsProperties();
 
 	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
 
