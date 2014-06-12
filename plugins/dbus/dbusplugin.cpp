@@ -51,15 +51,15 @@ void DBusSink::supportedChanged(const PropertyList &supportedProperties)
 {
 	startRegistration();
 
-	for(PropertyDBusMap::iterator itr = propertyDBusMap.begin(); itr != propertyDBusMap.end(); itr++)
+	for(auto itr : propertyDBusMap)
 	{
-		if(contains(supportedProperties, (*itr).first))
+		if(contains(supportedProperties, itr->ambPropertyName()))
 		{
-			VariantType* prop = (*itr).second;
+			VariantType* prop = itr;
 			prop->setSourceFilter(mSourceFilter);
 			prop->setZoneFilter(zoneFilter);
 			prop->initialize();
-			VehicleProperty::Property p = (*itr).first;
+			VehicleProperty::Property p = itr->ambPropertyName();
 			routingEngine->subscribeToProperty(p, mSourceFilter, this);
 			addProperty(prop);
 			supported = true;
@@ -74,13 +74,19 @@ void DBusSink::propertyChanged(AbstractPropertyType *value)
 
 	VehicleProperty::Property property = value->name;
 
-	if(propertyDBusMap.find(property) == propertyDBusMap.end() || value->zone != zoneFilter)
+	if( value->zone != zoneFilter)
 		return;
 
-	AbstractProperty* prop = propertyDBusMap[property];
-	mTime = value->timestamp;
-	prop->updateValue(value->copy());
-	updateValue(prop);
+	for(auto i : propertyDBusMap)
+	{
+		if(i->ambPropertyName() == property)
+		{
+			AbstractProperty* prop = i;
+			mTime = value->timestamp;
+			prop->updateValue(value->copy());
+			updateValue(prop);
+		}
+	}
 }
 
 const string DBusSink::uuid()
