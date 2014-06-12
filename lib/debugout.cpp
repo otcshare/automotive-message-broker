@@ -28,7 +28,7 @@ bool DebugOut::throwWarn = false;
 const int DebugOut::Error = 1 << 16;
 const int DebugOut::Warning = 1 << 24;
 
-void debugOut(string message)
+void debugOut(const string &message)
 {
 	DebugOut()<<"DEBUG: "<<message.c_str()<<endl;
 }
