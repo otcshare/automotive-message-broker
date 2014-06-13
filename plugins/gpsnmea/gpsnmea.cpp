@@ -166,6 +166,11 @@ void Location::parseGprmc(string gprmc)
 		isActive = true;
 	}
 
+	if(tokens[1].empty() || tokens[9].empty() || tokens[3].empty() || tokens[4].empty() || tokens[5].empty() || tokens[6].empty() || tokens[7].empty() || tokens[8].empty())
+	{
+		return;
+	}
+
 	parseTime(tokens[1].substr(0,2),tokens[1].substr(2,2),tokens[1].substr(4,2),tokens[9].substr(0,2),tokens[9].substr(2,2),tokens[9].substr(4,2));
 
 	parseLatitude(tokens[3], "", tokens[4]);
@@ -598,6 +603,9 @@ void GpsNmeaSource::test()
 	multimessageParse |= tryParse(multimessage7);
 
 	g_assert(multimessageParse);
+
+	//Test meaningingless message:
+	location.parse("GPRMC,,V,,,,,,,,,,N*53");
 
 	//test false message:
 
