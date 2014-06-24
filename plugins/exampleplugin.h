@@ -45,7 +45,7 @@ public:
 	
 	void randomizeProperties();
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property property)
+	PropertyInfo getPropertyInfo(const VehicleProperty::Property & property)
 	{
 		if(propertyInfoMap.find(property) != propertyInfoMap.end())
 			return propertyInfoMap[property];

@@ -106,11 +106,17 @@ public:
 
 		if(mValue) delete mValue;
 
-		PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);
-
 		mValue = val;
-		if(info.isValid())
-			mUpdateFrequency = info.updateFrequency();
+
+		if(mUpdateFrequency == 0)
+		{
+			PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);
+
+			if(info.isValid())
+				mUpdateFrequency = info.updateFrequency();
+			else
+				mUpdateFrequency = -1;
+		}
 	}
 
 	virtual void updateValue(AbstractPropertyType* val)

@@ -47,15 +47,15 @@ public:
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
 	AsyncRangePropertyReply* getRangePropertyAsync(AsyncRangePropertyRequest request);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
-	uint subscribeToProperty(VehicleProperty::Property, AbstractRoutingEngine::PropertyChangedType, std::string pid="");
-	bool subscribeToProperty(VehicleProperty::Property, AbstractSink* self);
-	bool subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, AbstractSink *self);
-	bool subscribeToProperty(VehicleProperty::Property, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
-	bool unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self);
+	uint subscribeToProperty(const VehicleProperty::Property &, AbstractRoutingEngine::PropertyChangedType, std::string pid="");
+	bool subscribeToProperty(const VehicleProperty::Property &, AbstractSink* self);
+	bool subscribeToProperty(const VehicleProperty::Property &, const std::string & sourceUuidFilter, AbstractSink *self);
+	bool subscribeToProperty(const VehicleProperty::Property &, const std::string & sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self);
+	bool unsubscribeToProperty(const VehicleProperty::Property &, AbstractSink* self);
 	void unsubscribeToProperty(uint handle);
 	PropertyList supported();
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid);
+	PropertyInfo getPropertyInfo(const VehicleProperty::Property &,const std::string &sourceUuid);
 	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
 	
 	struct Performance {
