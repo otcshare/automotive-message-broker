@@ -2,34 +2,37 @@
 #define _DBUSSIGNALLER_H_
 
 #include <gio/gio.h>
-#include <unordered_set>
+
+#include <vector>
 #include <string>
+#include <memory>
 
 #include "debugout.h"
 #include "abstractproperty.h"
+#include "superptr.hpp"
 
 class DBusSignal;
 
-namespace std {
+/*namespace std {
   template <>
-  struct hash<DBusSignal>
+  struct hash<DBusSignal*>
   {
-	typedef DBusSignal   argument_type;
-	typedef std::size_t  result_type;
+  typedef DBusSignal*   argument_type;
+  typedef std::size_t  result_type;
 
-	result_type operator()(const DBusSignal & t) const
-	{
-	  std::size_t val { 0 };
-	  return val;
-	}
+  result_type operator()(const DBusSignal & t) const
+  {
+	std::size_t val { 0 };
+	return val;
+  }
   };
-}
+}*/
 
 class DBusSignal
 {
 public:
 	DBusSignal():connection(nullptr), property(nullptr){}
-	DBusSignal(GDBusConnection* conn, std::string objPath, std::string iface, std::string sigName, AbstractProperty* var)
+	DBusSignal(GDBusConnection* conn, const std::string & objPath, const std::string & iface, const std::string & sigName, AbstractProperty* var)
 		: connection(conn), objectPath(objPath), interface(iface), signalName(sigName), property(var)
 	{
 
@@ -62,11 +65,22 @@ public:
 		return singleton;
 	}
 
-	void fireSignal(GDBusConnection* conn, std::string objPath, std::string iface, std::string sigName, AbstractProperty* prop)
+	void fireSignal(GDBusConnection* conn, const std::string & objPath, const std::string & iface, const std::string & sigName, AbstractProperty* prop)
 	{
-		DBusSignal signal(conn, objPath, iface, sigName, prop);
+		DBusSignal * signal = new DBusSignal(conn, objPath, iface, sigName, prop);
 
-		queue.insert(signal);
+		bool isFound = false;
+		for(auto i : queue)
+		{
+			if(*i == *signal)
+			{
+				isFound = true;
+				break;
+			}
+		}
+
+		if(!isFound)
+			queue.push_back(signal);
 	}
 
 private:
@@ -77,16 +91,16 @@ private:
 	{
 		g_timeout_add(timeout,[](gpointer userData)
 		{
-			std::unordered_set<DBusSignal> *q = static_cast<std::unordered_set< DBusSignal>*>(userData);
-			std::unordered_set<DBusSignal> queue = *q;
+			std::vector<DBusSignal*> *q = static_cast<std::vector< DBusSignal*>*>(userData);
+			std::vector<DBusSignal*> queue = *q;
 
 			for(auto s : queue)
 			{
-				DBusSignal signal = s;
+				std::unique_ptr<DBusSignal> signal(s);
 
 				GError* error = nullptr;
 
-				AbstractProperty* property = signal.property;
+				AbstractProperty* property = signal->property;
 
 				GVariant* val = g_variant_ref(property->toGVariant());
 
@@ -100,25 +114,28 @@ private:
 				g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("d", property->timestamp()) );
 				g_variant_builder_add(&builder, "{sv}", "Zone", g_variant_new("i", property->value()->zone) );
 
-				g_dbus_connection_emit_signal(signal.connection, NULL, signal.objectPath.c_str(), "org.freedesktop.DBus.Properties", signal.signalName.c_str(), g_variant_new("(sa{sv}as)",
-																																									 signal.interface.c_str(),
-																																						 &builder, NULL), &error);
-				if(error)
+				g_dbus_connection_emit_signal(signal->connection, NULL, signal->objectPath.c_str(),
+											  "org.freedesktop.DBus.Properties",
+											  signal->signalName.c_str(),
+											  g_variant_new("(sa{sv}as)", signal->interface.c_str(), &builder, NULL),
+											  &error);
+
+				auto errorPtr = amb::make_super(error);
+
+				if(errorPtr)
 				{
-					DebugOut(DebugOut::Error)<<error->message<<std::endl;
+					DebugOut(DebugOut::Error)<<errorPtr->message<<std::endl;
 				}
 			}
 
-			queue.clear();
-
-			*q = queue;
+			q->clear();
 
 			return 1;
 
 		},&queue);
 	}
 
-	std::unordered_set<DBusSignal> queue;
+	std::vector<DBusSignal*> queue;
 
 	static DBusSignaller * singleton;
 };

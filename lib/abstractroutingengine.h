@@ -416,7 +416,7 @@ public:
 	 * \param pid process id of the requesting application
 	 * \return subscription handle
 	 */
-	virtual uint subscribeToProperty(VehicleProperty::Property propertyName, PropertyChangedType callback, std::string pid="") = 0;
+	virtual uint subscribeToProperty(const VehicleProperty::Property & propertyName, PropertyChangedType callback, std::string pid="") = 0;
 
 	/*!
 	 * \brief unsubscribeToProperty
@@ -441,7 +441,7 @@ public:
 	 *   }
 	 * }
 	 */
-	virtual bool subscribeToProperty(VehicleProperty::Property propertyName, AbstractSink* self) = 0;
+	virtual bool subscribeToProperty(const VehicleProperty::Property & propertyName, AbstractSink* self) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
@@ -449,7 +449,7 @@ public:
 	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
 	 * \param self pointer to the sink who is subscribing.
 	 */
-	virtual bool subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, AbstractSink *self) = 0;
+	virtual bool subscribeToProperty(const VehicleProperty::Property & propertyName, const std::string & sourceUuidFilter, AbstractSink *self) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
@@ -458,11 +458,11 @@ public:
 	 * \param zoneFilter zone to filter.  Only updates from this zone will be passed to the sink.
 	 * \param self pointer to the sink who is subscribing.
 	 */
-	virtual bool subscribeToProperty(VehicleProperty::Property propertyName, std::string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
+	virtual bool subscribeToProperty(const VehicleProperty::Property & propertyName, const std::string & sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
 
-	virtual bool unsubscribeToProperty(VehicleProperty::Property, AbstractSink* self) = 0;
+	virtual bool unsubscribeToProperty(const VehicleProperty::Property &, AbstractSink* self) = 0;
 
-	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property, std::string sourceUuid) = 0;
+	virtual PropertyInfo getPropertyInfo(const VehicleProperty::Property &, const std::string & sourceUuid) = 0;
 };
 
 #endif // ABSTRACTROUTINGENGINE_H

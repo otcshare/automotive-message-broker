@@ -31,7 +31,7 @@ AbstractSource::~AbstractSource()
 
 }
 
-PropertyInfo AbstractSource::getPropertyInfo(VehicleProperty::Property property)
+PropertyInfo AbstractSource::getPropertyInfo(const VehicleProperty::Property & property)
 {
 	return PropertyInfo::invalid();
 }

@@ -106,7 +106,7 @@ public:
 	 * \param property the property to get info for.
 	 * \return a PropertyInfo object.
 	 */
-	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
+	virtual PropertyInfo getPropertyInfo(const VehicleProperty::Property & property);
 	
 	/*!
 	 * \brief supported

@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -79,11 +79,11 @@ void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSou
 	/// add the newly supported to master list
 
 	handleAddSupported(added, source);
-	
+
 	/// removed no longer supported properties from master list.
 
 	handleRemoveSupported(removed, source);
-	
+
 	/// tell all sinks about the newly supported properties.
 
 	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
@@ -98,7 +98,7 @@ PropertyList Core::supported()
 	PropertyList supportedProperties;
 
 	transform(mMasterPropertyList.begin(), mMasterPropertyList.end(), back_inserter(supportedProperties),
-		[](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& itr) { return itr.second; }
+			  [](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& itr) { return itr.second; }
 	);
 
 	// remove duplicates:
@@ -108,9 +108,9 @@ PropertyList Core::supported()
 	return supportedProperties;
 }
 
-void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
+void Core::updateProperty(AbstractPropertyType * value, const string & uuid)
 {
-	VehicleProperty::Property &property = value->name;
+	VehicleProperty::Property & property = value->name;
 
 	performance.propertiesPerSecond++;
 
@@ -120,7 +120,7 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 
 	if(filteredSourceSinkMapIt != propertySinkMap.end())
 	{
-		const FilteredSourceSinkMap filteredSourceSinks = filteredSourceSinkMapIt->second;
+		const FilteredSourceSinkMap & filteredSourceSinks = filteredSourceSinkMapIt->second;
 
 		DebugOut()<<__FUNCTION__<<"() there are "<<filteredSourceSinks.size()<<" sinks connected to property: "<<property<<endl;
 
@@ -129,7 +129,7 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 		for(auto itr = filteredSourceSinks.begin(); itr != filteredSourceSinks.end(); ++itr)
 		{
 			AbstractSink* sink = itr->first;
-			const std::string& sourceUuid = itr->second;
+			const std::string & sourceUuid = itr->second;
 
 			bool isFiltered = !sourceUuid.empty();
 
@@ -227,7 +227,7 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 	}
 
 	/** right now the owner of the reply becomes the requestor that called this method.
-	 *  reply will become invalid after the first reply. */
+   *  reply will become invalid after the first reply. */
 	return reply;
 }
 
@@ -258,7 +258,7 @@ AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)
 	return NULL;
 }
 
-bool Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink* sink)
+bool Core::subscribeToProperty(const VehicleProperty::Property &property, AbstractSink* sink)
 {
 	auto sinksIt = propertySinkMap.find(property);
 	if(sinksIt != propertySinkMap.end() && sinksIt->second.find(sink) != sinksIt->second.end())
@@ -292,7 +292,7 @@ bool Core::subscribeToProperty(VehicleProperty::Property property, AbstractSink*
 	return subscribed;
 }
 
-bool Core::subscribeToProperty(VehicleProperty::Property property, string sourceUuidFilter, AbstractSink *sink)
+bool Core::subscribeToProperty(const VehicleProperty::Property &property, const string &sourceUuidFilter, AbstractSink *sink)
 {
 	auto sinksIt = propertySinkMap.find(property);
 	if(sinksIt != propertySinkMap.end() && sinksIt->second.find(sink) != sinksIt->second.end())
@@ -314,12 +314,13 @@ bool Core::subscribeToProperty(VehicleProperty::Property property, string source
 	return true;
 }
 
-bool Core::subscribeToProperty(VehicleProperty::Property, string sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *sink)
+bool Core::subscribeToProperty(const VehicleProperty::Property &, const string & sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *sink)
 {
 	/// TODO: implement
+	throw std::runtime_error("Not implemented");
 }
 
-uint Core::subscribeToProperty(VehicleProperty::Property property, AbstractRoutingEngine::PropertyChangedType cb, std::string pid)
+uint Core::subscribeToProperty(const VehicleProperty::Property &property, AbstractRoutingEngine::PropertyChangedType cb, std::string pid)
 {
 	DebugOut(1)<<"Subscribing to: "<<property<<endl;
 
@@ -343,7 +344,7 @@ uint Core::subscribeToProperty(VehicleProperty::Property property, AbstractRouti
 	return handleCount;
 }
 
-bool Core::unsubscribeToProperty(VehicleProperty::Property property, AbstractSink* sink)
+bool Core::unsubscribeToProperty(const VehicleProperty::Property & property, AbstractSink* sink)
 {
 	auto sinksIt = propertySinkMap.find(property);
 	if(sinksIt == propertySinkMap.end())
@@ -382,7 +383,7 @@ void Core::unsubscribeToProperty(uint handle)
 	/// TODO: unsubscribe from source
 }
 
-PropertyInfo Core::getPropertyInfo(VehicleProperty::Property property, string sourceUuid)
+PropertyInfo Core::getPropertyInfo(const VehicleProperty::Property &property, const string &sourceUuid)
 {
 	if(sourceUuid == "")
 		return PropertyInfo::invalid();
@@ -468,9 +469,9 @@ void Core::handleRemoveSupported(const PropertyList& removed, AbstractSource* so
 		const VehicleProperty::Property property(*itr);
 
 		auto it = find_if(
-			range.first,	// the first property in source
-			range.second,   // one item right after the last property in source
-			[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+					range.first,	// the first property in source
+					range.second,   // one item right after the last property in source
+					[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
 		);
 
 		if (it != range.second)// property was found
@@ -487,7 +488,7 @@ AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& propert
 	auto it = mMasterPropertyList.end();
 	if(sourceUuidFilter.empty()){
 		it = std::find_if(mMasterPropertyList.begin(), mMasterPropertyList.end(),
-			[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+						  [&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
 		);
 	}
 	else{
@@ -498,9 +499,9 @@ AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& propert
 		if(itSource != mSources.end()){
 			auto range = mMasterPropertyList.equal_range(*itSource);
 			auto temp = find_if(
-				range.first,	// the first property in source
-				range.second,   // one item right after the last property in source
-				[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+						range.first,	// the first property in source
+						range.second,   // one item right after the last property in source
+						[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
 			);
 
 			if (temp != range.second)// property was found
