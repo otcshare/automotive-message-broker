@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -43,7 +43,7 @@ public:
 		g_mutex_init(&mutex);
 		g_cond_init(&cond);
 	}
-	~Queue()
+	virtual ~Queue()
 	{
 
 	}
@@ -77,7 +77,7 @@ public:
 		return item;
 	}
 
-	void append(T item)
+	virtual void append(T item)
 	{
 		g_mutex_lock(&mutex);
 
@@ -88,7 +88,7 @@ public:
 		g_mutex_unlock(&mutex);
 	}
 
-private:
+protected:
 	GMutex mutex;
 	GCond cond;
 	std::vector<T> mQueue;
@@ -103,7 +103,7 @@ public:
 		g_mutex_init(&mutex);
 		g_cond_init(&cond);
 	}
-	~UniqueQueue()
+	virtual ~UniqueQueue()
 	{
 
 	}

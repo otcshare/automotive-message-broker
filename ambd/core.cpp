@@ -54,10 +54,20 @@ static int PPSUpdate(void* data)
 Core::Core(): handleCount(0)
 {
 	g_timeout_add(1000,PPSUpdate,&performance);
+
+	watcherPtr = new amb::AsyncQueueWatcher<AbstractPropertyType*>(&updatePropertyQueue,[this](amb::Queue<AbstractPropertyType*>* q){
+		while(q->count())
+		{
+			AbstractPropertyType* value = q->pop();
+			updateProperty(value);
+		}
+	});
 }
 
 Core::~Core()
 {
+	delete watcherPtr;
+
 	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
 		delete *itr;
@@ -108,9 +118,20 @@ PropertyList Core::supported()
 	return supportedProperties;
 }
 
-void Core::updateProperty(AbstractPropertyType * value, const string & uuid)
+void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
+{
+	if(value->sourceUuid != uuid)
+	{
+		value->sourceUuid = uuid;
+	}
+
+	updatePropertyQueue.append(value);
+}
+
+void Core::updateProperty(AbstractPropertyType * value)
 {
 	VehicleProperty::Property & property = value->name;
+	const string & uuid = value->sourceUuid;
 
 	performance.propertiesPerSecond++;
 
@@ -140,11 +161,6 @@ void Core::updateProperty(AbstractPropertyType * value, const string & uuid)
 
 			if( !isFiltered || sourceUuid == uuid)
 			{
-				if(value->sourceUuid != uuid)
-				{
-					value->sourceUuid = uuid;
-				}
-
 				sink->propertyChanged(value);
 			}
 		}
@@ -172,11 +188,6 @@ void Core::updateProperty(AbstractPropertyType * value, const string & uuid)
 
 			if( !isFiltered || sourceUuid == uuid)
 			{
-				if(value->sourceUuid != uuid)
-				{
-					value->sourceUuid = uuid;
-				}
-
 				if(handleCbMap.count(handle))
 				{
 					auto cb = handleCbMap[handle];
