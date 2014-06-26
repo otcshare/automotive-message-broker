@@ -3,8 +3,10 @@ Automotive Message Broker DBus API Documentation
 
 AMB organizes the API into two general interfaces.  First a Manager interface (see manager.txt)
 which includes tools for using the other interfaces.  Second is a series of interfaces that
-represent vehicle data.  The later follows the schema of "org.automotive.DataType" and are
-contained in verious DBus paths.
+represent vehicle data.  The latter follows the schema of "org.automotive.DataType" and are
+contained in verious DBus paths.  The DBus paths are generally organized by 
+/{source}/{zone}/DataType.  "source" refers to the AMB source that produces the data.  "zone"
+refers to the zone in which the data type is located in the vehicle or "0" for no zone.
 
 The data types are documented in the various *.txt files in this document folder.  The manager
 interface is documented in the manager.txt document.
@@ -18,11 +20,14 @@ DBus paths in the various documents are examples of paths and are not gauranteed
 
 Here is a pseudo-code example of how the api is to be used:
 
-\example Array<ObjectPath> vehicleSpeedObjects = manager.FindObject("VehicleSpeed");
+\example
+var manager = dbus.interface("org.automotive.Manager", "/");
 
-/// interact with the 'VehicleSpeed' property on the vehicleSpeed object
+var speedObjectPaths = manager.FindObject("VehicleSpeed");
 
-log(vehicleSpeedObjects[0].VehicleSpeed);
+var speedObject = dbus.interface("org.automotive.VehicleSpeed", speedObjectPaths[0]);
+
+console.log("Vehicle Speed: " + speedObject.Speed);
 
 \brief AMB DBus API describes the API to access vehicle information over DBus
 **/
@@ -144,7 +149,7 @@ interface org.automotive.Manager  {
       String objectName
     }
     out {
-      UInt16[] zones
+      UInt32[] zones
     }
   }
 
