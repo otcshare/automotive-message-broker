@@ -1,0 +1,18 @@
+\hypertarget{index_intro}{}\section{Instroduction}\label{index_intro}
+A\-M\-B organizes the A\-P\-I into two general interfaces. First a Manager interface (see manager.\-txt) which includes tools for using the other interfaces. Second is a series of interfaces that represent vehicle data. The latter follows the schema of \char`\"{}org.\-automotive.\-Data\-Type\char`\"{} and are contained in verious D\-Bus paths. The D\-Bus paths are generally organized by /\{source\}/\{zone\}/\-Data\-Type. \char`\"{}source\char`\"{} refers to the A\-M\-B source that produces the data. \char`\"{}zone\char`\"{} refers to the zone in which the data type is located in the vehicle or \char`\"{}0\char`\"{} for no zone.
+
+The data types are documented in the various $\ast$.txt files in this document folder. The manager interface is documented in the manager.\-txt document.\hypertarget{index_basic_usage}{}\section{Basic Recommended Usage}\label{index_basic_usage}
+It is recomended that the Manager interface be used to find the D\-Bus Object that contains the data type you need. This is done through the Find\-Object() call. It is expected that D\-Bus Object Paths may change and so it is not appropriate to hard code D\-Bus Object Paths. The D\-Bus paths in the various documents are examples of paths and are not gauranteed.\hypertarget{index_example}{}\section{Usage Example}\label{index_example}
+Here is a pseudo-\/code example of how the api is to be used\-:
+
+
+\begin{DoxyCode}
+var manager = dbus.interface(\textcolor{stringliteral}{"org.automotive.Manager"}, \textcolor{stringliteral}{"/"});
+
+var speedObjectPaths = manager.FindObject(\textcolor{stringliteral}{"VehicleSpeed"});
+
+var speedObject = dbus.interface(\textcolor{stringliteral}{"org.automotive.VehicleSpeed"}, speedObjectPaths[0]);
+
+console.log(\textcolor{stringliteral}{"Vehicle Speed: "} + speedObject.Speed);
+\end{DoxyCode}
+ 

@@ -1,26 +1,9 @@
-Automotive Message Broker DBus API Documentation
+The Documentation for AMB is generated using Doxygen from amb.fidl.
+To enable doxygen generation of documents, pass -Denable_docs=ON to cmake:
 
-AMB organizes the API into two general interfaces.  First a Manager interface (see manager.txt)
-which includes tools for using the other interfaces.  Second is a series of interfaces that 
-represent vehicle data.  The later follows the schema of "org.automotive.DataType" and are 
-contained in verious DBus paths.
+cmake -Denable_docs=ON ..
 
-The data types are documented in the various *.txt files in this document folder.  The manager
-interface is documented in the manager.txt document.
-
-Basic Recommended Usage
-
-It is recomended that the Manager interface be used to find the DBus Object that contains the
-data type you need.  This is done through the FindObject() call.  It is expected that DBus 
-Object Paths may change and so it is not appropriate to hard code DBus Object Paths.  The
-DBus paths in the various documents are examples of paths and are not gauranteed.
-
-Here is a pseudo-code example of how the api is to be used:
-
-Array<ObjectPath> vehicleSpeedObjects = manager.FindObject("VehicleSpeed");
-
-/// interact with the 'VehicleSpeed' property on the vehicleSpeed object
-
-log(vehicleSpeedObjects[0].VehicleSpeed);
+The internal AMB class and interface documentation is generated in the docs/amb folder.
+DBus API documentation is generated in the docs/dbus folder.
 
 

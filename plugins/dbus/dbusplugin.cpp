@@ -83,7 +83,7 @@ void DBusSink::propertyChanged(AbstractPropertyType *value)
 		{
 			AbstractProperty* prop = i;
 			mTime = value->timestamp;
-			prop->updateValue(value->copy());
+			prop->updateValue(value);
 			updateValue(prop);
 		}
 	}
