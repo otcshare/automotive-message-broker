@@ -48,12 +48,12 @@ public:
 
 	AbstractProperty(string propertyName, Access access);
 	virtual ~AbstractProperty();
-	
+
 	virtual void setSetterFunction(SetterFunc setterFunc)
 	{
 		mSetterFunc = setterFunc;
 	}
-	
+
 	virtual const string signature()
 	{
 		GVariant* var = toGVariant();
@@ -63,8 +63,8 @@ public:
 		g_variant_unref(var);
 		return s;
 	}
-	
-	virtual string name() 
+
+	virtual string name()
 	{
 		return mPropertyName;
 	}
@@ -81,7 +81,7 @@ public:
 
 	void setSourceFilter(std::string filter) { mSourceFilter = filter; }
 	void setZoneFilter(Zone::Type zone) { mZoneFilter = zone; }
-	
+
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
 
@@ -104,13 +104,18 @@ public:
 		if(!val)
 			return;
 
-		if(mValue) delete mValue;
-
-		mValue = val;
+		if(!mValue)
+		{
+			mValue = val->copy();
+		}
+		else
+		{
+			mValue->quickCopy(val);
+		}
 
 		if(mUpdateFrequency == 0)
 		{
-			PropertyInfo info = routingEngine->getPropertyInfo(val->name, val->sourceUuid);
+			PropertyInfo info = routingEngine->getPropertyInfo(mValue->name, mValue->sourceUuid);
 
 			if(info.isValid())
 				mUpdateFrequency = info.updateFrequency();
@@ -133,16 +138,16 @@ public:
 	{
 		return mValue;
 	}
-	
+
 protected: ///methods:
 
 	std::string mSourceFilter;
 	Zone::Type mZoneFilter;
 	int mUpdateFrequency;
 	AbstractRoutingEngine* routingEngine;
-	
+
 protected:
-	
+
 	string mPropertyName;
 	VehicleProperty::Property mAmbPropertyName;
 	SetterFunc mSetterFunc;

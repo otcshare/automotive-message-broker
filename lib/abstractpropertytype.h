@@ -85,11 +85,26 @@ public:
 
 	virtual AbstractPropertyType* copy() = 0;
 
+	/**
+	 * @brief quickCopy is intended as a way to quickly copy the often changing bits from one abstract property to another
+	 * It assumes that the properties are almost identical in name, source, and zone.
+	 * @param other the property to copy from
+	 */
+	virtual void quickCopy(AbstractPropertyType* other)
+	{
+		sequence = other->sequence;
+		mValue = other->anyValue();
+		timestamp = other->timestamp;
+	}
+
 	bool operator == (AbstractPropertyType &other)
 	{
 		std::string one = toString();
 		std::string two = other.toString();
-		return one == two;
+		return one == two
+				&& zone == other.zone
+				&& sourceUuid == other.sourceUuid
+				&& name == other.name;
 	}
 
 	bool operator != (AbstractPropertyType &other)
@@ -647,7 +662,7 @@ public:
 			GVariant *var = t->toVariant();
 			GVariant *newvar = g_variant_new("v",var);
 			g_variant_builder_add_value(&params, newvar);
-			
+
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);

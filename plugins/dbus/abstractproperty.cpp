@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "abstractdbusinterface.h"
 
 AbstractProperty::AbstractProperty(string pn, Access access)
-	: mPropertyName(pn), mAccess(access), mValue(NULL), mZoneFilter(Zone::None), mUpdateFrequency(0)
+	: mPropertyName(pn), mAccess(access), mValue(nullptr), mZoneFilter(Zone::None), mUpdateFrequency(0)
 {
 
 }
