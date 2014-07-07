@@ -324,6 +324,8 @@ class AbstractRoutingEngine
 {
 public:
 	typedef std::function<void (AbstractPropertyType* value)> PropertyChangedType;
+
+	AbstractRoutingEngine(std::map<std::string, std::string> configuration):mConfig(configuration) {}
 	virtual ~AbstractRoutingEngine();
 
 	virtual void registerSource(AbstractSource* src) = 0;
@@ -463,6 +465,9 @@ public:
 	virtual bool unsubscribeToProperty(const VehicleProperty::Property &, AbstractSink* self) = 0;
 
 	virtual PropertyInfo getPropertyInfo(const VehicleProperty::Property &, const std::string & sourceUuid) = 0;
+
+protected:
+	std::map<std::string, std::string> mConfig;
 };
 
 #endif // ABSTRACTROUTINGENGINE_H

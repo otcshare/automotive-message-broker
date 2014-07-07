@@ -68,7 +68,19 @@ typedef std::list<Zone::Type> ZoneList;
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(std::string property): name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None)
+
+	/*!
+	 * \brief The Priority enum describes prority of the property type.
+	 */
+	enum Priority
+	{
+		Normal = 0,
+		Low,
+		High,
+		Instant
+	};
+
+	AbstractPropertyType(std::string property): name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None), priority(Normal)
 	{
 		void*(name);
 	}
@@ -123,6 +135,14 @@ public:
 	std::string sourceUuid;
 
 	Zone::Type zone;
+
+	/*!
+	 * \brief priority is used to tell the routing engine how to prioritize routing the value to plugins.
+	 * setting this value to AbstractPropertyType::Instant will tell the routing engine to immedietly
+	 * route the value without any reliance on the mainloop.  Instant priority is NOT thread safe.
+	 * Default priority is AbstractPropertyType::Normal.
+	 */
+	Priority priority;
 
 	void setValue(boost::any val)
 	{

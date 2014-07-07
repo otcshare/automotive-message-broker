@@ -29,11 +29,32 @@
 #include <unordered_set>
 #include <map>
 
+namespace amb
+{
+
+struct PropertyCompare
+{
+	bool operator()(AbstractPropertyType* const & lhs, AbstractPropertyType* & rhs) const
+	{
+		if (lhs->name == rhs->name
+				&& lhs->sourceUuid == rhs->sourceUuid
+				&& lhs->zone == rhs->zone)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+};
+
+}
+
 class Core: public AbstractRoutingEngine
 {
 
 public:
-	Core();
+	Core(std::map<std::string, std::string> config);
 	~Core();
 	/// sources:
 
@@ -98,8 +119,12 @@ private:
 	std::unordered_map<VehicleProperty::Property, FilteredSourceCbMap> propertyCbMap;
 	std::unordered_map<uint, AbstractRoutingEngine::PropertyChangedType> handleCbMap;
 
-	amb::Queue<AbstractPropertyType*> updatePropertyQueue;
-	amb::AsyncQueueWatcher<AbstractPropertyType*>* watcherPtr;
+	amb::Queue<AbstractPropertyType*, amb::PropertyCompare> updatePropertyQueue;
+	amb::Queue<AbstractPropertyType*, amb::PropertyCompare> updatePropertyQueueHigh;
+	amb::Queue<AbstractPropertyType*, amb::PropertyCompare> updatePropertyQueueLow;
+	amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>* watcherPtr;
+	amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>* watcherPtrHigh;
+	amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>* watcherPtrLow;
 
 	uint handleCount;
 };

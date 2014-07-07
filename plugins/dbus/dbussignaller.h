@@ -11,23 +11,6 @@
 #include "abstractproperty.h"
 #include "superptr.hpp"
 
-class DBusSignal;
-
-/*namespace std {
-  template <>
-  struct hash<DBusSignal*>
-  {
-  typedef DBusSignal*   argument_type;
-  typedef std::size_t  result_type;
-
-  result_type operator()(const DBusSignal & t) const
-  {
-	std::size_t val { 0 };
-	return val;
-  }
-  };
-}*/
-
 class DBusSignal
 {
 public:
@@ -65,7 +48,8 @@ public:
 		return singleton;
 	}
 
-	void fireSignal(GDBusConnection* conn, const std::string & objPath, const std::string & iface, const std::string & sigName, AbstractProperty* prop)
+	void fireSignal(GDBusConnection* conn, const std::string & objPath, const std::string & iface,
+					const std::string & sigName, AbstractProperty* prop)
 	{
 		DBusSignal * signal = new DBusSignal(conn, objPath, iface, sigName, prop);
 
