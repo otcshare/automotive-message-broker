@@ -18,12 +18,15 @@
 
 #include <glib.h>
 
+#include <abstractpropertytype.h>
+
 #include <mutex>
+#include <unordered_set>
 
 namespace amb
 {
 
-template <typename T>
+template <typename T, class Pred = std::equal_to<T> >
 class Queue
 {
 public:
@@ -60,37 +63,47 @@ public:
 	{
 		std::lock_guard<std::mutex> lock(mutex);
 
-		mQueue.push_back(item);
+		mQueue.insert(item);
 	}
 
 protected:
 	std::mutex mutex;
-	std::vector<T> mQueue;
+	std::unordered_set<T,std::hash<T>, Pred> mQueue;
 };
 
-template <typename T>
+template <typename T, class Pred = std::equal_to<T> >
 struct AsyncQueueSource{
 	GSource source;
-	Queue<T>* queue;
+	Queue<T, Pred>* queue;
+	int minQueueSize;
 };
 
-template <typename T>
+template <typename T, class Pred = std::equal_to<T> >
 class AsyncQueueWatcher
 {
 public:
-	typedef function<void (Queue<T> *)> AsyncQueueWatcherCallback;
-	AsyncQueueWatcher(Queue<T> * queue, AsyncQueueWatcherCallback cb)
-		: callback(cb)
+	typedef function<void (Queue<T, Pred> *)> AsyncQueueWatcherCallback;
+	AsyncQueueWatcher(Queue<T, Pred> * queue, AsyncQueueWatcherCallback cb, int queueSize = 0, AbstractPropertyType::Priority priority = AbstractPropertyType::Normal)
+		: callback(cb), mMaxQueueSize(queueSize)
 	{
 
 		static GSourceFuncs funcs = {prepare, check, dispatch, finalize};
-		GSource* source = (GSource *) g_source_new(&funcs, sizeof(AsyncQueueSource<T>));
-		//GSource* source = (GSource *) g_source_new(&funcs, sizeof(GSource));
+		GSource* source = (GSource *) g_source_new(&funcs, sizeof(AsyncQueueSource<T, Pred>));
 
-		AsyncQueueSource<T>* watch = (AsyncQueueSource<T>*)source;
+		AsyncQueueSource<T, Pred>* watch = (AsyncQueueSource<T, Pred>*)source;
 		watch->queue = queue;
+		watch->minQueueSize = queueSize;
 
-		g_source_set_priority(source,G_PRIORITY_DEFAULT);
+		gint p = G_PRIORITY_DEFAULT;
+
+		if(priority == AbstractPropertyType::Normal)
+			p = G_PRIORITY_DEFAULT;
+		else if(priority == AbstractPropertyType::High)
+			p = G_PRIORITY_HIGH;
+		else if(priority == AbstractPropertyType::Low)
+			p = G_PRIORITY_LOW;
+
+		g_source_set_priority(source, p);
 		g_source_set_callback(source, nullptr, this, nullptr);
 
 		g_source_attach(source, nullptr);
@@ -103,37 +116,39 @@ public:
 protected:
 	AsyncQueueWatcher(){}
 
+	int mMaxQueueSize;
+
 private:
 
 	static gboolean prepare(GSource *source, gint *timeout)
 	{
-		AsyncQueueSource<T>* s = (AsyncQueueSource<T>*)source;
+		AsyncQueueSource<T, Pred>* s = (AsyncQueueSource<T, Pred>*)source;
 		*timeout = -1;
 
 		if (!s)
 			return false;
 
-		return s->queue->count() > 0;
+		return s->queue->count() > s->minQueueSize;
 	}
 
 	static gboolean check(GSource *source)
 	{
-		AsyncQueueSource<T>* s = (AsyncQueueSource<T>*)source;
+		AsyncQueueSource<T, Pred>* s = (AsyncQueueSource<T, Pred>*)source;
 
 		if (!s)
 			return false;
 
-		return s->queue->count() > 0;
+		return s->queue->count() > s->minQueueSize;
 	}
 
 	static gboolean dispatch(GSource *source, GSourceFunc callback, gpointer userData)
 	{
-		AsyncQueueSource<T>* s = (AsyncQueueSource<T>*)source;
+		AsyncQueueSource<T, Pred>* s = (AsyncQueueSource<T, Pred>*)source;
 
 		if (!s)
 			return false;
 
-		AsyncQueueWatcher* watcher = static_cast<AsyncQueueWatcher*>(userData);
+		AsyncQueueWatcher<T, Pred>* watcher = static_cast<AsyncQueueWatcher<T, Pred>*>(userData);
 
 		watcher->callback(s->queue);
 		return true;

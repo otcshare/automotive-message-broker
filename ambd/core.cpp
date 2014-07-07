@@ -51,17 +51,46 @@ static int PPSUpdate(void* data)
 	return 1;
 }
 
-Core::Core(): handleCount(0)
+Core::Core(std::map<string, string> config): AbstractRoutingEngine(config), handleCount(0)
 {
 	g_timeout_add(1000,PPSUpdate,&performance);
 
-	watcherPtr = new amb::AsyncQueueWatcher<AbstractPropertyType*>(&updatePropertyQueue,[this](amb::Queue<AbstractPropertyType*>* q){
+	auto simpleCb = [this](amb::Queue<AbstractPropertyType*, amb::PropertyCompare>* q)
+	{
 		while(q->count())
 		{
 			AbstractPropertyType* value = q->pop();
 			updateProperty(value);
 		}
-	});
+	};
+
+	int hpqs = 0;
+	int lpqs = 0;
+	int npqs = 0;
+
+	if(config.find("highPriorityQueueSize") != config.end())
+	{
+		hpqs = boost::lexical_cast<int, std::string>(config["highPriorityQueueSize"]);
+	}
+
+	if(config.find("normalPriorityQueueSize") != config.end())
+	{
+		npqs = boost::lexical_cast<int, std::string>(config["normalPriorityQueueSize"]);
+	}
+
+	if(config.find("lowPriorityQueueSize") != config.end())
+	{
+		lpqs = boost::lexical_cast<int, std::string>(config["lowPriorityQueueSize"]);
+	}
+
+	watcherPtr = new amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>(&updatePropertyQueue, simpleCb, npqs);
+	watcherPtrLow = new amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>(&updatePropertyQueueLow,
+																	  simpleCb, lpqs,
+																	  AbstractPropertyType::Low);
+	watcherPtrHigh = new amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>(&updatePropertyQueueHigh,
+																	   simpleCb, hpqs,
+																	   AbstractPropertyType::High);
+
 }
 
 Core::~Core()
@@ -125,7 +154,14 @@ void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
 		value->sourceUuid = uuid;
 	}
 
-	updatePropertyQueue.append(value);
+	if(value->priority == AbstractPropertyType::Instant)
+		updateProperty(value);
+	else if(value->priority == AbstractPropertyType::High)
+		updatePropertyQueueHigh.append(value);
+	else if(value->priority == AbstractPropertyType::Normal)
+		updatePropertyQueue.append(value);
+	else if(value->priority == AbstractPropertyType::Low)
+		updatePropertyQueueLow.append(value);
 }
 
 void Core::updateProperty(AbstractPropertyType * value)

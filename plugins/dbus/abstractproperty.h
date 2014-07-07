@@ -49,6 +49,14 @@ public:
 	AbstractProperty(string propertyName, Access access);
 	virtual ~AbstractProperty();
 
+	bool operator == (AbstractProperty & other)
+	{
+		return (other.name() == name()
+				&& other.ambPropertyName() == ambPropertyName()
+				&& other.sourceFilter() == sourceFilter()
+				&& other.zoneFilter() == zoneFilter());
+	}
+
 	virtual void setSetterFunction(SetterFunc setterFunc)
 	{
 		mSetterFunc = setterFunc;
@@ -81,6 +89,9 @@ public:
 
 	void setSourceFilter(std::string filter) { mSourceFilter = filter; }
 	void setZoneFilter(Zone::Type zone) { mZoneFilter = zone; }
+
+	std::string sourceFilter() { return mSourceFilter; }
+	Zone::Type zoneFilter() { return mZoneFilter; }
 
 	virtual GVariant* toGVariant() = 0;
 	virtual void fromGVariant(GVariant *value) = 0;
