@@ -6,6 +6,7 @@ New features:
 - New test tools: amb-get, amb-set and amb-get-history
 - New bluetooth spp plugin
 - cangen and cansim plugins simulate a real CAN network.
+- New priority queue option. properties are routed according to priority.
 
 Changes:
 - Deprecated and removed the "FooChanged" (where "Foo" is a property like "VehicleSpeed") signal
