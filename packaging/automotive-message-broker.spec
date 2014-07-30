@@ -1,7 +1,9 @@
+%bcond_with qt5
+
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
 Version:    0.11.810
-Release:    1
+Release:    0
 Group:      Automotive/Service
 License:    LGPL-2.1
 URL:        https://github.com/otcshare/automotive-message-broker
@@ -10,23 +12,21 @@ Requires: automotive-message-broker-plugins
 Requires: automotive-message-broker-plugins-murphy
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires:	libjson
-Requires:       libuuid
+
 Requires:       default-ac-domains
 BuildRequires:  cmake
 BuildRequires:  boost-devel
-BuildRequires:  libjson-devel
+BuildRequires:  pkgconfig(json)
 BuildRequires:  libtool-ltdl-devel
-BuildRequires:  libuuid-devel
-BuildRequires:  libwebsockets-devel
-BuildRequires:  libuuid-devel
-BuildRequires:  sqlite-devel
-BuildRequires:  glib2-devel
-BuildRequires:  opencv-devel
+BuildRequires:  pkgconfig(libwebsockets)
+BuildRequires:  pkgconfig(uuid)
+BuildRequires:  pkgconfig(sqlite3)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(opencv)
 BuildRequires:  murphy
-BuildRequires:  murphy-glib-devel
-BuildRequires:  murphy-glib
-BuildRequires:  dbus-devel
+BuildRequires:  pkgconfig(murphy-glib)
+BuildRequires:  pkgconfig(dbus-1)
+%if %{with qt5}
 BuildRequires:  qt5-qtcore-devel
 BuildRequires:  qt5-qtconcurrent-devel
 BuildRequires:  qt5-qtdbus-devel
@@ -34,6 +34,7 @@ BuildRequires:  qt5-qtnetwork-devel
 BuildRequires:  qt5-plugin-bearer-generic
 BuildRequires:  qt5-plugin-bearer-connman
 BuildRequires:  qt5-plugin-bearer-nm
+%endif
 
 %description
 Automotive Message Broker is a vehicle network abstraction system.
@@ -57,6 +58,44 @@ Requires:   %{name} = %{version}-%{release}
 %description doc
 Document files that describe the D-Bus API exposed by automotive-message-broker
 
+%if %{with qt5}
+%package plugins-qtmainloop
+Summary:    qt5 mainloop plugin
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   qt5-qtcore
+
+%description plugins-qtmainloop
+Qt mainloop plugin enables qt-based source and sink plugins to run using qt mainloop
+
+%package plugins-websocket
+Summary:    Websocket source and sink plugins
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   libwebsockets
+Requires:   qt5-qtcore
+
+%description plugins-websocket
+websocket source and sink plugins
+
+%package plugins-opencvlux
+Summary:    Plugin for simulating ExteriorBrightness using a common webcam
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   opencv
+
+%description plugins-opencvlux
+Plugin for simulating ExteriorBrightness using a common webcam
+
+%package plugins-bluetooth
+Summary:   Interface to AMB over bluetooth
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-bluetooth
+Bluetooth SPP server interface
+%endif
+
 %package plugins
 Summary:    Various plugins for automotive-message-broker
 Group:      Automotive/Libraries
@@ -73,15 +112,6 @@ Requires: %{name} = %{version}-%{release}
 %description plugins-common
 library containing a kitchen-sink of common utility functions
 
-%package plugins-qtmainloop
-Summary:    qt5 mainloop plugin
-Group:      Automotive/Libraries
-Requires:   %{name} = %{version}-%{release}
-Requires:   qt5-qtcore
-
-%description plugins-qtmainloop
-Qt mainloop plugin enables qt-based source and sink plugins to run using qt mainloop
-
 %package plugins-obd2
 Summary:    OBD-II plugin
 Group:      Automotive/Libraries
@@ -91,24 +121,13 @@ Requires:   %{name}-plugins-common = %{version}-%{release}
 %description plugins-obd2
 OBD-II plugin that uses ELM 327-compatible scantools to access vehicle data
 
-%package plugins-websocket
-Summary:    Websocket source and sink plugins
-Group:      Automotive/Libraries
-Requires:   %{name} = %{version}-%{release}
-Requires:   libwebsockets
-Requires:   qt5-qtcore
-
-%description plugins-websocket
-websocket source and sink plugins
-
 %package plugins-wheel
 Summary:    Source plugin for using the Logitech G27 racing wheel                                        
 Group:      Automotive/Libraries
 Requires:   %{name} = %{version}-%{release}
-Requires:   libwebsockets
 
 %description plugins-wheel
-source plugin for using the Logitech G27 racing wheel
+source plugin for using the Logitech G27 racing wheel package
 
 %package plugins-database
 Summary:    Database logging plugin for automotive-message-broker
@@ -117,16 +136,7 @@ Requires:   %{name} = %{version}-%{release}
 Requires:  sqlite
 
 %description plugins-database
-Database logging plugin for automotive-message-broker
-
-%package plugins-opencvlux
-Summary:    Plugin for simulating ExteriorBrightness using a common webcam
-Group:      Automotive/Libraries
-Requires:   %{name} = %{version}-%{release}
-Requires:   opencv
-
-%description plugins-opencvlux
-Plugin for simulating ExteriorBrightness using a common webcam
+Database logging plugin for automotive-message-broker package
 
 %package plugins-murphy
 Summary:   Plugin for integration with the murphy policy system
@@ -135,13 +145,12 @@ Requires:  %{name} = %{version}-%{release}
 Requires:  murphy
 
 %description plugins-murphy
-Plugin for integration with the murphy policy system
+Plugin for integration with the murphy policy system package
 
 %package plugins-gpsnmea
 Summary:   Plugin that provides gps data from nmea devices
 Group:     Automotive/Libraries
 Requires:  %{name} = %{version}-%{release}
-Requires: libboost_regex
 
 %description plugins-gpsnmea
 Plugin that provides location data from nmea devices including bluetooth
@@ -160,43 +169,47 @@ Group:     Automotive/Libraries
 Requires:  %{name} = %{version}-%{release}
 
 %description plugins-cangen
-CAN frames generator plug-in for the AMB CAN Simulator.
+CAN frames generator plug-in for the AMB CAN Simulator
 
 %package plugins-cansim
-Summary:   CAN frames listener plug-in for the AMB CAN Simulator.
+Summary:   CAN frames listener plug-in for the AMB CAN Simulator
 Group:     Automotive/Libraries
 Requires:  %{name} = %{version}-%{release}
 
 %description plugins-cansim
-CAN frames listener plug-in for the AMB CAN Simulator.
-
-%package plugins-bluetooth
-Summary:   Interface to AMB over bluetooth
-Group:     Automotive/Libraries
-Requires:  %{name} = %{version}-%{release}
-
-%description plugins-bluetooth
-Bluetooth SPP server interface
+CAN frames listener plug-in for the AMB CAN Simulator package
 
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
-%cmake -Dqtmainloop=ON -Ddatabase_plugin=ON -Dopencvlux_plugin=ON -Dmurphy_plugin=ON -Dwebsocket_plugin=ON -Dobd2_plugin=ON -Dtest_plugin=ON -Dgpsnmea_plugin=ON -Dcangen_plugin=ON -Dcansim_plugin=ON -Dbluetooth_plugin=ON
+%cmake \
+%if %{with qt5}
+       -Dqtmainloop=ON \
+       -Dopencvlux_plugin=ON \
+       -Dwebsocket_plugin=ON \
+       -Dbluetooth_plugin=ON \
+%endif
+       -Ddatabase_plugin=ON \
+       -Dmurphy_plugin=ON \
+       -Dobd2_plugin=ON \
+       -Dtest_plugin=ON \
+       -Dgpsnmea_plugin=ON \
+       -Dcangen_plugin=ON \
+       -Dcansim_plugin=ON
 
-make %{?jobs:-j%jobs}
+%__make %{?jobs:-j%jobs}
 
 %install
 rm -rf %{buildroot}
 %make_install
 
-mkdir -p %{buildroot}%{_prefix}/lib/systemd/system/network.target.wants
-cp packaging.in/ambd.service.systemd.tizen %{buildroot}%{_prefix}/lib/systemd/system/ambd.service
-ln -s ../ambd.service %{buildroot}%{_prefix}/lib/systemd/system/network.target.wants/ambd.service
+mkdir -p %{buildroot}%{_unitdir}/network.target.wants
+cp packaging.in/ambd.service.systemd.tizen %{buildroot}%{_unitdir}/ambd.service
+ln -s ../ambd.service %{buildroot}%{_unitdir}/network.target.wants/ambd.service
 %install_service multi-user.target.wants ambd.service
 
-cp packaging.in/config.tizen %{buildroot}/etc/ambd/
-
+cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig
@@ -212,9 +225,9 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %config %{_sysconfdir}/ambd/examples/*
 %{_bindir}/ambd
 %{_libdir}/libamb.so*
-%{_prefix}/lib/systemd/system/ambd.service
-%{_prefix}/lib/systemd/system/network.target.wants/ambd.service
-%{_prefix}/lib/systemd/system/multi-user.target.wants/ambd.service
+%{_unitdir}/ambd.service
+%{_unitdir}/network.target.wants/ambd.service
+%{_unitdir}/multi-user.target.wants/ambd.service
 %{_bindir}/amb-get
 %{_bindir}/amb-get-history
 %{_bindir}/amb-set
@@ -227,6 +240,30 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %{_includedir}/amb/*.hpp
 %{_libdir}/pkgconfig/*.pc
 
+%if %{with qt5}
+%files plugins-qtmainloop
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/qtmainloopplugin.so
+
+%files plugins-websocket
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/websocketsource.so
+%{_libdir}/%{name}/websocketsink.so
+
+%files plugins-opencvlux
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/opencvluxplugin.so
+
+%files plugins-bluetooth
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluetoothplugin.so
+%config %{_sysconfdir}/dbus-1/system.d/ambbt.conf
+%endif
+
 %files plugins
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
@@ -234,28 +271,17 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %{_libdir}/%{name}/examplesinkplugin.so
 %{_libdir}/%{name}/dbussinkplugin.so
 %{_libdir}/%{name}/demosinkplugin.so
-/etc/dbus-1/system.d/amb.conf
+%config %{_sysconfdir}/dbus-1/system.d/amb.conf
 
 %files plugins-common
 %manifest packaging.in/amb.manifest.plugins
 %defattr(-,root,root,-)
 %{_libdir}/libamb-plugins-common.so
 
-%files plugins-qtmainloop
-%defattr(-,root,root,-)
-%manifest packaging.in/amb.manifest.plugins
-%{_libdir}/%{name}/qtmainloopplugin.so
-
 %files plugins-wheel
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/wheelsourceplugin.so
-
-%files plugins-websocket
-%defattr(-,root,root,-)
-%manifest packaging.in/amb.manifest.plugins
-%{_libdir}/%{name}/websocketsource.so
-%{_libdir}/%{name}/websocketsink.so
 
 %files plugins-obd2
 %defattr(-,root,root,-)
@@ -266,11 +292,6 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/databasesinkplugin.so
-
-%files plugins-opencvlux
-%defattr(-,root,root,-)
-%manifest packaging.in/amb.manifest.plugins
-%{_libdir}/%{name}/opencvluxplugin.so
 
 %files plugins-murphy
 %defattr(-,root,root,-)
@@ -302,10 +323,3 @@ cp packaging.in/config.tizen %{buildroot}/etc/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/cansimplugin.so
-
-
-%files plugins-bluetooth
-%defattr(-,root,root,-)
-%manifest packaging.in/amb.manifest.plugins
-%{_libdir}/%{name}/bluetoothplugin.so
-/etc/dbus-1/system.d/ambbt.conf
