@@ -29,15 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
-/********************************************
- * Example JSON config:
- * {
- * 	sources: [ path1, path2, path3 ]
- * 	sinks: [ path1, path2, path3 ]
- * }
- *
-**********************************************/
-
 std::string get_file_contents(const char *filename)
 {
 	//FILE *in = fopen(filename,"r");
@@ -104,7 +95,38 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 	{
 		/// there is no mainloop entry, use default glib
 		DebugOut()<<"No routing engine specified in config.  Using built-in 'core' routing engine by default."<<endl;
-		routingEngine = new Core();
+
+		/// core wants some specific configuration settings:
+		std::map<std::string,std::string> settings;
+
+		json_object *lpq = json_object_object_get(rootobject,"lowPriorityQueueSize");
+		if (lpq)
+		{
+			/// there is a mainloop entry.  Load the plugin:
+
+			string restr = string(json_object_get_string(lpq));
+			settings["lowPriorityQueueSize"] = restr;
+		}
+
+		json_object *npq = json_object_object_get(rootobject,"normalPriorityQueueSize");
+		if (npq)
+		{
+			/// there is a mainloop entry.  Load the plugin:
+
+			string restr = string(json_object_get_string(npq));
+			settings["normalPriorityQueueSize"] = restr;
+		}
+
+		json_object *hpq = json_object_object_get(rootobject,"highPriorityQueueSize");
+		if (hpq)
+		{
+			/// there is a mainloop entry.  Load the plugin:
+
+			string restr = string(json_object_get_string(hpq));
+			settings["highPriorityQueueSize"] = restr;
+		}
+
+		routingEngine = new Core(settings);
 	}
 
 

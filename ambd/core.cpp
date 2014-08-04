@@ -51,13 +51,52 @@ static int PPSUpdate(void* data)
 	return 1;
 }
 
-Core::Core(): handleCount(0)
+Core::Core(std::map<string, string> config): AbstractRoutingEngine(config), handleCount(0)
 {
 	g_timeout_add(1000,PPSUpdate,&performance);
+
+	auto simpleCb = [this](amb::Queue<AbstractPropertyType*, amb::PropertyCompare>* q)
+	{
+		while(q->count())
+		{
+			AbstractPropertyType* value = q->pop();
+			updateProperty(value);
+		}
+	};
+
+	int hpqs = 0;
+	int lpqs = 0;
+	int npqs = 0;
+
+	if(config.find("highPriorityQueueSize") != config.end())
+	{
+		hpqs = boost::lexical_cast<int, std::string>(config["highPriorityQueueSize"]);
+	}
+
+	if(config.find("normalPriorityQueueSize") != config.end())
+	{
+		npqs = boost::lexical_cast<int, std::string>(config["normalPriorityQueueSize"]);
+	}
+
+	if(config.find("lowPriorityQueueSize") != config.end())
+	{
+		lpqs = boost::lexical_cast<int, std::string>(config["lowPriorityQueueSize"]);
+	}
+
+	watcherPtr = new amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>(&updatePropertyQueue, simpleCb, npqs);
+	watcherPtrLow = new amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>(&updatePropertyQueueLow,
+																	  simpleCb, lpqs,
+																	  AbstractPropertyType::Low);
+	watcherPtrHigh = new amb::AsyncQueueWatcher<AbstractPropertyType*, amb::PropertyCompare>(&updatePropertyQueueHigh,
+																	   simpleCb, hpqs,
+																	   AbstractPropertyType::High);
+
 }
 
 Core::~Core()
 {
+	delete watcherPtr;
+
 	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
 		delete *itr;
@@ -108,9 +147,27 @@ PropertyList Core::supported()
 	return supportedProperties;
 }
 
-void Core::updateProperty(AbstractPropertyType * value, const string & uuid)
+void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
+{
+	if(value->sourceUuid != uuid)
+	{
+		value->sourceUuid = uuid;
+	}
+
+	if(value->priority == AbstractPropertyType::Instant)
+		updateProperty(value);
+	else if(value->priority == AbstractPropertyType::High)
+		updatePropertyQueueHigh.append(value);
+	else if(value->priority == AbstractPropertyType::Normal)
+		updatePropertyQueue.append(value);
+	else if(value->priority == AbstractPropertyType::Low)
+		updatePropertyQueueLow.append(value);
+}
+
+void Core::updateProperty(AbstractPropertyType * value)
 {
 	VehicleProperty::Property & property = value->name;
+	const string & uuid = value->sourceUuid;
 
 	performance.propertiesPerSecond++;
 
@@ -140,11 +197,6 @@ void Core::updateProperty(AbstractPropertyType * value, const string & uuid)
 
 			if( !isFiltered || sourceUuid == uuid)
 			{
-				if(value->sourceUuid != uuid)
-				{
-					value->sourceUuid = uuid;
-				}
-
 				sink->propertyChanged(value);
 			}
 		}
@@ -172,11 +224,6 @@ void Core::updateProperty(AbstractPropertyType * value, const string & uuid)
 
 			if( !isFiltered || sourceUuid == uuid)
 			{
-				if(value->sourceUuid != uuid)
-				{
-					value->sourceUuid = uuid;
-				}
-
 				if(handleCbMap.count(handle))
 				{
 					auto cb = handleCbMap[handle];

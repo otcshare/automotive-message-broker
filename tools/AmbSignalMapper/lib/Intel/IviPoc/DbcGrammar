@@ -1,0 +1,218 @@
+#Copyright (C) 2014  Intel Corporation
+#
+#This library is free software; you can redistribute it and/or
+#modify it under the terms of the GNU Lesser General Public
+#License as published by the Free Software Foundation; either
+#version 2.1 of the License, or (at your option) any later version.
+#
+#This library is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#Lesser General Public License for more details.
+#
+#You should have received a copy of the GNU Lesser General Public
+#License along with this library; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+{
+    my @networks = ();
+    my @ecuList = ();
+    my %ecuMessages = ();
+    my %ecuValues = ();
+}
+
+DbcOutput: Line(s?) eofile
+    {
+        my @electronicControlUnits = ();
+        for my $ecui (0..scalar(@ecuList)-1) {
+            my %ecuField = ();
+            $ecuField{'canId'} = $ecuList[$ecui];
+
+            if ( exists( $ecuMessages{$ecuList[$ecui]} ) ) {
+                my $messagesRef = $ecuMessages{$ecuList[$ecui]};
+                my @messages = @{$messagesRef};
+
+                $ecuField{'messages'} = \@messages;
+                for my $msgi (0..scalar(@messages)-1) {
+                        my @signals = @{$messages[$msgi]{'signals'}};
+
+                        for my $si (0..scalar(@signals)-1) {
+                            my $signal = \%{$signals[$si]};
+                            my $msgid = $messages[$msgi]{'canId'};
+
+                            if ( exists( ${ecuValues{$msgid}} ) && defined ${$ecuValues{$msgid}{$signal->{'canId'}}} ) {
+                                my $valueListRef=${$ecuValues{$msgid}->{$signal->{'canId'}}};
+                                my @valueList = @$valueListRef;
+                                $signal->{'values'} = \@valueList;
+
+                                # Add AMBPropertyName prefix if valueName starts with number
+                                foreach my $vali (@{$signal->{'values'}}) {
+                                    if ( $vali->{'name'} =~ m/^[0-9]/ ) {
+                                        $vali->{'name'} = $signal->{'AMBPropertyName'} . '_' . $vali->{'name'};
+                                    }
+                                }
+                            }
+                            use Intel::IviPoc::AmbCommon;
+                            $signal->{'AMBPropertyType'} = &evaluateType($signal);
+                        }
+                    }
+                }
+                push (@electronicControlUnits, \%ecuField);
+            }
+
+        my %jsonroot = ();
+        $jsonroot{'pluginName'} = "pluginName";
+        $jsonroot{'electronicControlUnits'} = \@electronicControlUnits;
+
+        # Now return the whole internal json structure
+        return \%jsonroot;
+    }
+
+
+eofile: /^\Z/
+
+Line: CommentPrefix /.*\n/
+        # Not needed to output anything yet
+    | 'VERSION' DoubleQuotedId
+        # Not needed to output anything yet
+    | 'NS_' ':' NSList(s?) ...'BS_'
+        {
+            # We just read the list of NSs
+            @networks = @{$item[3]};
+        }
+    | 'BS_' /.*\n/
+        # Not needed to output anything yet
+    | 'BU_' ':' EcuList(s?) ...'BO_'
+        {
+            @ecuList = @{$item[3]};
+        }
+    | 'BO_' Number Identifier ':' Identifier Identifier Signal(s?)
+        {
+            my %msg = ();
+            $msg{'canId'} = $item[2];
+            $msg{'canName'} = $item[3];
+            $msg{'canDlc'} = $item[5];
+            $msg{'canMessageId'} = $item[6];
+            $msg{'signals'} = $item[7];
+
+            push ( @{$ecuMessages{$item[6]}}, \%msg );
+        }
+    | 'VAL_' Number Identifier ValuePair(s?) ';'
+        {
+            ${$ecuValues{$item[2]}->{$item[3]}} = $item[4];
+        }
+    | <error: Invalid dbc format at $thisline!>
+
+Signal: 'SG_' Identifier ':' DataPlacement FactorOffset Range DoubleQuotedId Receiver(s /,/)
+        {
+            my %signal;
+            $signal{'canId'} = $item[2];
+
+            my %placement = %{$item[4]};
+            $signal{'startbit'} = $placement{'startbit'};
+            $signal{'length'} = $placement{'length'};
+            $signal{'byteOrdering'} = $placement{'byteOrdering'};
+            $signal{'signedness'} = $placement{'signedness'};
+
+            my %fo=%{$item[5]};
+            $signal{'factor'} = $fo{'factor'};
+            $signal{'offset'} = $fo{'offset'};
+
+            my %range=%{$item[6]};
+            $signal{'minValue'} = $range{'minValue'};
+            $signal{'maxValue'} = $range{'maxValue'};
+
+            $signal{'unit'} = $item[7];
+
+            $signal{'receivers'} = $item[8];
+
+            my $ambPropertyName = $item[2];
+            $ambPropertyName =~ s/\_[HM]S$//;
+            $signal{'AMBPropertyName'} = $ambPropertyName;
+
+            $return=\%signal;
+        }
+
+EcuList: ...!'BO_' Identifier
+        {
+            $return = $item[2];
+        }
+
+NSList: ...!'BS_' Identifier
+        {
+            $return = $item[2];
+        }
+
+Receiver: Identifier
+        {
+            my %rx;
+            $rx{'name'} = $item[1];
+            $return = \%rx;
+        }
+
+ValuePair: Number DoubleQuotedId
+        {
+            my %valuepair;
+            $valuepair{'value'} = $item[1];
+            $valuepair{'description'} = $item[2];
+
+            my $s = $item[2];
+            $s =~ s!(^|\s)(\w)!$1\U$2!g;
+            $s =~ s/ |-/_/g;
+            $s =~ s/[^_a-zA-Z0-9]//g;
+            $s =~ s/_(?=[_]*$)//;
+            $s =~ s/(_)\1+/$1/g;
+            $s =~ s/^\_//;
+            $s =~ s/\_$//;
+            $valuepair{'name'} = $s;
+
+            $return=\%valuepair;
+        }
+
+DataPlacement: Number '|' Number '@' Number Sign
+        {
+            my %placement;
+            $placement{'startbit'} = $item[1];
+            $placement{'length'} = $item[3];
+            $placement{'byteOrdering'} = $item[5];
+            $placement{'signedness'} = $item[6];
+            $return=\%placement;
+        }
+
+FactorOffset: '(' RealNumber ',' RealNumber ')'
+        {
+            my %fo;
+            $fo{'factor'} = $item[2];
+            $fo{'offset'} = $item[4];
+            $return=\%fo;
+        }
+
+Range: '[' RealNumber '|' RealNumber ']'
+        {
+            my %range;
+            $range{'minValue'} = $item[2];
+            $range{'maxValue'} = $item[4];
+            $return=\%range;
+        }
+
+DoubleQuotedId: DoubleQuotation /[A-Za-z0-9°\!@#\$%\^&\*()\-_=\+\[\]\{\};:\'|,\.\/<>\?`~\ ]+/ DoubleQuotation
+        {
+            $return = $item[2];
+        }
+    | DoubleQuotation DoubleQuotation
+        {
+            $return = "";
+        }
+
+Identifier: /[A-Za-z0-9_\-]+/
+        {
+            $return = $item[1];
+        }
+
+Number: /[-+]?[0-9]*/
+RealNumber: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/
+Sign: /^[-+]?/
+
+CommentPrefix: /^\/\//
+
+DoubleQuotation: "\""

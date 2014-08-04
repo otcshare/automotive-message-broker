@@ -68,7 +68,19 @@ typedef std::list<Zone::Type> ZoneList;
 class AbstractPropertyType
 {
 public:
-	AbstractPropertyType(std::string property): name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None)
+
+	/*!
+	 * \brief The Priority enum describes prority of the property type.
+	 */
+	enum Priority
+	{
+		Normal = 0,
+		Low,
+		High,
+		Instant
+	};
+
+	AbstractPropertyType(std::string property): name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None), priority(Normal)
 	{
 		void*(name);
 	}
@@ -85,11 +97,26 @@ public:
 
 	virtual AbstractPropertyType* copy() = 0;
 
+	/**
+	 * @brief quickCopy is intended as a way to quickly copy the often changing bits from one abstract property to another
+	 * It assumes that the properties are almost identical in name, source, and zone.
+	 * @param other the property to copy from
+	 */
+	virtual void quickCopy(AbstractPropertyType* other)
+	{
+		sequence = other->sequence;
+		mValue = other->anyValue();
+		timestamp = other->timestamp;
+	}
+
 	bool operator == (AbstractPropertyType &other)
 	{
 		std::string one = toString();
 		std::string two = other.toString();
-		return one == two;
+		return one == two
+				&& zone == other.zone
+				&& sourceUuid == other.sourceUuid
+				&& name == other.name;
 	}
 
 	bool operator != (AbstractPropertyType &other)
@@ -108,6 +135,14 @@ public:
 	std::string sourceUuid;
 
 	Zone::Type zone;
+
+	/*!
+	 * \brief priority is used to tell the routing engine how to prioritize routing the value to plugins.
+	 * setting this value to AbstractPropertyType::Instant will tell the routing engine to immedietly
+	 * route the value without any reliance on the mainloop.  Instant priority is NOT thread safe.
+	 * Default priority is AbstractPropertyType::Normal.
+	 */
+	Priority priority;
 
 	void setValue(boost::any val)
 	{
@@ -647,7 +682,7 @@ public:
 			GVariant *var = t->toVariant();
 			GVariant *newvar = g_variant_new("v",var);
 			g_variant_builder_add_value(&params, newvar);
-			
+
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);

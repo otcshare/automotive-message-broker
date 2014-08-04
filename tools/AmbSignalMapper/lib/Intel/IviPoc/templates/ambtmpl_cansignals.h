@@ -1,5 +1,5 @@
-/*
-Copyright (C) 2012 Intel Corporation
+/*****************************************************************
+Copyright (C) 2014  Intel Corporation
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -14,22 +14,17 @@ Lesser General Public License for more details.
 You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-*/
+ *****************************************************************/
 
+#ifndef AMBTMPL_CANSIGNALS_H_
+#define AMBTMPL_CANSIGNALS_H_
 
-#include "abstractproperty.h"
-#include "abstractdbusinterface.h"
+#include "ambtmpl_plugin.h"
+#include "ambtmpl_cansignal.h"
 
-AbstractProperty::AbstractProperty(string pn, Access access)
-	: mPropertyName(pn), mAccess(access), mValue(nullptr), mZoneFilter(Zone::None), mUpdateFrequency(0)
-{
+#include <glib.h>
+#include <vehicleproperty.h>
 
-}
+/*GENERATED_CODE*/
 
-AbstractProperty::~AbstractProperty()
-{
-	if(mValue){
-		delete mValue;
-		mValue = nullptr;
-	}
-}
+#endif /* AMBTMPL_CANSIGNALS_H_ */

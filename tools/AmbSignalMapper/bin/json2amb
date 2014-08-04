@@ -1,0 +1,164 @@
+#!/usr/bin/perl -w
+
+#	Copyright (C) 2014  Intel Corporation
+#
+#	This library is free software; you can redistribute it and/or
+#	modify it under the terms of the GNU Lesser General Public
+#	License as published by the Free Software Foundation; either
+#	version 2.1 of the License, or (at your option) any later version.
+#
+#	This library is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#	Lesser General Public License for more details.
+#
+#	You should have received a copy of the GNU Lesser General Public
+#	License along with this library; if not, write to the Free Software
+#	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+use 5.006;
+use strict;
+use warnings FATAL => 'all';
+
+use Intel::IviPoc::AmbPluginGenerator qw(processPlugin);
+use Cwd;
+
+=head1 NAME
+
+json2amb - JSON to Automotive Message Broker plugin generator.
+
+=head1 SYNOPSIS
+
+B<json2amb> B<-e|-E> | B<-d|-D> I<infile> [ I<outdir> ]
+
+=head1 DESCRIPTION
+
+Part of Automotive Message Broker Signal Mapper tool.
+
+B<json2amb> converts intermediate JSON file to Automotive Message Broker plugin.
+
+B<json2amb> - The command line interface for Intel::IviPoc::AmbPluginGenerator.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-e|-E>
+
+Signal encryption enabled.
+
+=item B<-d|-D>
+
+Signal encryption disabled
+
+=item I<filename>
+
+Input json file.
+
+=item [ I<outdir> ]
+
+    This parameter is optional. Target directory where the plugin is generated to.
+    Otherwise current directory.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=back
+
+=head1 REQUIRES
+
+Perl 5.006, Cwd, Intel::IviPoc::AmbPluginGenerator, Intel::IviPoc::AmbCommon
+
+=head1 SEE ALSO
+
+perl(1), dbc2json(1)
+
+=cut
+
+local $/;
+
+# get total arg passed to this script
+my $total = $#ARGV + 1;
+my $scriptname = $0;
+if ( $total < 1) {
+    # get script name and print usage
+    &printUsage($scriptname);
+    exit;
+    }
+
+my $hashingAllowed = 'E';
+if ( $ARGV[0] eq '-e' or $ARGV[0] eq '-E' ) {
+    $hashingAllowed = 'E';
+} elsif ( $ARGV[0] eq '-d' or $ARGV[0] eq '-D' ) {
+    $hashingAllowed = 'D';
+} else {
+    print STDERR ("\nERROR: Invalid input option $ARGV[0]\n\n");
+    &printUsage($scriptname);
+    exit;
+}
+
+my $targetDir = ();
+if ($total == 2) {
+    $targetDir = getcwd;
+} else {
+    $targetDir = Cwd::abs_path($ARGV[2]);
+}
+
+# Generate the plaugin
+processPlugin ( $hashingAllowed, $ARGV[1], $targetDir );
+
+# Finnish
+exit;
+
+=head2 printUsage
+
+Prints out basic usage help
+
+=cut
+
+sub printUsage {
+    my $scriptname=$_[0];
+    print STDERR ("$scriptname\n");
+    print STDERR ("Usage: json2amb enc infile [outdir]\n");
+    print STDERR ("  enc:            mandatory signal encryption option\n");
+    print STDERR ("    -e                    Signal encryption enabled\n");
+    print STDERR ("    -d                    Signal encryption disabled\n");
+    print STDERR ("  infile              Input json file\n");
+    print STDERR ("  outdir              Target plugin directory (optional) generated to,\n");
+    print STDERR ("                      otherwise current directory.\n");
+}
+
+=head1 AUTHOR
+
+IntelIVIPoc, C<< <ivipoc at intel.com> >>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc json2amb
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2014  Intel Corporation
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut
