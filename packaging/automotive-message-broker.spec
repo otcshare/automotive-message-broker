@@ -2,7 +2,7 @@
 
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.11.810
+Version:    0.11.811
 Release:    0
 Group:      Automotive/Service
 License:    LGPL-2.1
@@ -196,7 +196,9 @@ CAN frames listener plug-in for the AMB CAN Simulator package
        -Dtest_plugin=ON \
        -Dgpsnmea_plugin=ON \
        -Dcangen_plugin=ON \
-       -Dcansim_plugin=ON
+       -Dcansim_plugin=ON \
+       -Denable_docs=ON
+
 
 %__make %{?jobs:-j%jobs}
 
@@ -306,7 +308,7 @@ cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %files doc
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
-%doc %{_docdir}/%{name}/*.txt
+%doc %{_docdir}/%{name}/*
 
 %files plugins-test
 %defattr(-,root,root,-)
