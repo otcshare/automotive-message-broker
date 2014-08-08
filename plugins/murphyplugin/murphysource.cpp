@@ -43,11 +43,13 @@
 
 void MurphySource::processValue(string propertyName, AbstractPropertyType *prop)
 {
-	if (murphyProperties.find(propertyName) != murphyProperties.end()) {
+	if (murphyProperties.find(propertyName) != murphyProperties.end())
+	{
 		delete murphyProperties[propertyName];
 		murphyProperties[propertyName] = prop;
 	}
-	else {
+	else
+	{
 		murphyProperties[propertyName] = prop;
 		m_re->updateSupported(supported(), PropertyList(), this);
 	}
@@ -94,116 +96,113 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 	DebugOut() << "Property '" << property_name << "' with value: " <<endl;
 
-	if(!contains(VehicleProperty::capabilities(), dstr))
+	bool hasProp = contains(VehicleProperty::capabilities(), dstr);
+
+	AbstractPropertyType* prop = VehicleProperty::getPropertyTypeForPropertyNameValue(dstr);
+
+	stringstream val;
+
+	switch (type)
 	{
-
-		switch (type) {
-			case MRP_MSG_FIELD_STRING:
+		case MRP_MSG_FIELD_STRING:
+		{
+			val << value.str;
+			if (!hasProp)
 			{
-				StringPropertyType *prop = new StringPropertyType(dstr, value.str);
-
-				if (!s->hasProperty(dstr)) {
-					VehicleProperty::registerProperty(dstr,
-													  [dstr](){return new StringPropertyType(dstr, "");});
-				}
-
-				DebugOut() << "string:" << value.str << std::endl;
-				s->processValue(property_name, prop);
-				break;
+				VehicleProperty::registerProperty(dstr,
+												  [dstr](){return new StringPropertyType(dstr, "");});
 			}
-			case MRP_MSG_FIELD_DOUBLE:
-			{
-				BasicPropertyType<double> *prop =
-						new BasicPropertyType<double>(dstr, value.dbl);
 
-				if (!s->hasProperty(dstr)) {
-					VehicleProperty::registerProperty(dstr,
-													  [dstr](){return new BasicPropertyType<double>(dstr, 0);});
-				}
-
-				DebugOut() << "double:" << value.dbl << std::endl;
-				s->processValue(property_name, prop);
-				break;
-			}
-			case MRP_MSG_FIELD_BOOL:
-			{
-				BasicPropertyType<bool> *prop =
-						new BasicPropertyType<bool>(dstr, value.bln);
-
-				if (!s->hasProperty(dstr)) {
-					VehicleProperty::registerProperty(dstr,
-													  [dstr](){return new BasicPropertyType<bool>(dstr, FALSE);});
-				}
-
-				DebugOut() << "boolean:" << value.bln << std::endl;
-				s->processValue(property_name, prop);
-				break;
-			}
-			case MRP_MSG_FIELD_UINT32:
-			{
-				BasicPropertyType<uint32_t> *prop =
-						new BasicPropertyType<uint32_t>(dstr, value.u32);
-
-				if (!s->hasProperty(dstr)) {
-					VehicleProperty::registerProperty(dstr,
-													  [dstr](){return new BasicPropertyType<uint32_t>(dstr, 0);});
-				}
-
-				DebugOut() << "uint32:" << value.u32 << std::endl;
-				s->processValue(property_name, prop);
-				break;
-			}
-			case MRP_MSG_FIELD_UINT16:
-			{
-				BasicPropertyType<uint16_t> *prop =
-						new BasicPropertyType<uint16_t>(dstr, value.u16);
-
-				if (!s->hasProperty(dstr)) {
-					VehicleProperty::registerProperty(dstr,
-													  [dstr](){return new BasicPropertyType<uint16_t>(dstr, 0);});
-				}
-
-				DebugOut() << "uint16:" << value.u16 << std::endl;
-				s->processValue(property_name, prop);
-				break;
-			}
-			case MRP_MSG_FIELD_INT32:
-			{
-				BasicPropertyType<int32_t> *prop =
-						new BasicPropertyType<int32_t>(dstr, value.s32);
-
-				if (!s->hasProperty(dstr)) {
-					VehicleProperty::registerProperty(dstr,
-													  [dstr](){return new BasicPropertyType<int32_t>(dstr, 0);});
-				}
-
-				DebugOut() << "int32:" << value.s32 << std::endl;
-				s->processValue(property_name, prop);
-				break;
-			}
-			case MRP_MSG_FIELD_INT16:
-			{
-				BasicPropertyType<int16_t> *prop =
-						new BasicPropertyType<int16_t>(dstr, value.s16);
-
-				if (!s->hasProperty(dstr)) {
-					VehicleProperty::registerProperty(dstr,
-													  [dstr](){return new BasicPropertyType<int16_t>(dstr, 0);});
-				}
-
-				DebugOut() << "int16:" << value.s16 << std::endl;
-				s->processValue(property_name, prop);
-				break;
-			}
-			default:
-				DebugOut()<<"Unknown type"<<endl;
+			DebugOut() << "string:" << value.str << std::endl;
+			break;
 		}
+		case MRP_MSG_FIELD_DOUBLE:
+		{
+			val << value.dbl;
+
+			if (!hasProp)
+			{
+				VehicleProperty::registerProperty(dstr,
+												  [dstr](){return new BasicPropertyType<double>(dstr, 0);});
+			}
+
+			DebugOut() << "double:" << value.dbl << std::endl;
+			break;
+		}
+		case MRP_MSG_FIELD_BOOL:
+		{
+			val << value.bln;
+
+			if (!hasProp)
+			{
+				VehicleProperty::registerProperty(dstr,
+												  [dstr](){return new BasicPropertyType<bool>(dstr, FALSE);});
+			}
+
+			DebugOut() << "boolean:" << value.bln << std::endl;
+			break;
+		}
+		case MRP_MSG_FIELD_UINT32:
+		{
+			val << value.u32;
+
+			if (!hasProp)
+			{
+				VehicleProperty::registerProperty(dstr,
+												  [dstr](){return new BasicPropertyType<uint32_t>(dstr, 0);});
+			}
+
+			DebugOut() << "uint32:" << value.u32 << std::endl;
+			break;
+		}
+		case MRP_MSG_FIELD_UINT16:
+		{
+			val << value.u16;
+
+			if (!hasProp)
+			{
+				VehicleProperty::registerProperty(dstr,
+												  [dstr](){return new BasicPropertyType<uint16_t>(dstr, 0);});
+			}
+
+			DebugOut() << "uint16:" << value.u16 << std::endl;
+
+			break;
+		}
+		case MRP_MSG_FIELD_INT32:
+		{
+			val << value.s32;
+
+			if (!hasProp)
+			{
+				VehicleProperty::registerProperty(dstr,
+												  [dstr](){return new BasicPropertyType<int32_t>(dstr, 0);});
+			}
+
+			DebugOut() << "int32:" << value.s32 << std::endl;
+			s->processValue(property_name, prop);
+			break;
+		}
+		case MRP_MSG_FIELD_INT16:
+		{
+			val << value.s16;
+
+			if (!hasProp)
+			{
+				VehicleProperty::registerProperty(dstr,
+												  [dstr](){return new BasicPropertyType<int16_t>(dstr, 0);});
+			}
+
+			DebugOut() << "int16:" << value.s16 << std::endl;
+			break;
+		}
+		default:
+			DebugOut()<<"Unknown type"<<endl;
 	}
-	else
-	{
-		AbstractPropertyType* prop = VehicleProperty::getPropertyTypeForPropertyNameValue(dstr);
-		s->processValue(property_name, prop);
-	}
+
+	prop->fromString(val.str());
+	s->processValue(property_name, prop);
+
 }
 
 static void recv_msg(mrp_transport_t *transp, mrp_msg_t *msg, void *user_data)
@@ -248,19 +247,22 @@ int MurphySource::connectToMurphy()
 
 	alen = mrp_transport_resolve(NULL, m_address.c_str(), &addr, sizeof(addr), &atype);
 
-	if (alen <= 0) {
+	if (alen <= 0)
+	{
 		debugOut("Failed to resolve address");
 		return -1;
 	}
 
 	m_tport = mrp_transport_create(m_ml, atype, &evt, this, flags);
 
-	if (!m_tport) {
+	if (!m_tport)
+	{
 		debugOut("Can't create a Murphy transport");
 		return -1;
 	}
 
-	if (mrp_transport_connect(m_tport, &addr, alen) == 0) {
+	if (mrp_transport_connect(m_tport, &addr, alen) == 0)
+	{
 		mrp_transport_destroy(m_tport);
 		m_tport = NULL;
 		debugOut("Failed to connect to Murphy");
@@ -301,7 +303,8 @@ MurphySource::~MurphySource()
 
 	map<string, AbstractPropertyType *>::iterator i;
 
-	for (i = murphyProperties.begin(); i != murphyProperties.end(); i++) {
+	for (i = murphyProperties.begin(); i != murphyProperties.end(); i++)
+	{
 		// TODO: unregister VehicleProperty (*i).first
 
 		delete (*i).second;
@@ -331,11 +334,13 @@ static void murphy_watch(const char *id, mrp_process_state_t state, void *user_d
 			state == MRP_PROCESS_STATE_READY ? "ready" : "not ready");
 
 	if (state == MRP_PROCESS_STATE_NOT_READY &&
-			s->getState() == MRP_PROCESS_STATE_READY) {
+			s->getState() == MRP_PROCESS_STATE_READY)
+	{
 		DebugOut()<<"lost connection to murphyd"<<endl;
 	}
 
-	else if (state == MRP_PROCESS_STATE_READY) {
+	else if (state == MRP_PROCESS_STATE_READY)
+	{
 		/* start connecting if needed */
 		s->connectToMurphy();
 	}
@@ -347,7 +352,8 @@ void MurphySource::readyToConnect(mrp_mainloop_t *ml)
 {
 	/* set a watch to follow Murphy status */
 
-	if (mrp_process_set_watch("murphy-amb", ml, murphy_watch, this) < 0) {
+	if (mrp_process_set_watch("murphy-amb", ml, murphy_watch, this) < 0)
+	{
 		DebugOut()<<"failed to set a murphy process watch"<<endl;
 		return;
 	}
@@ -366,8 +372,10 @@ void MurphySource::setConfiguration(map<string, string> config)
 {
 	string address;
 
-	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++) {
-		if ((*i).first == "address") {
+	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
+	{
+		if ((*i).first == "address")
+		{
 			address = (*i).second;
 			// cout << "address: " << address << endl;
 
@@ -392,7 +400,8 @@ PropertyList MurphySource::supported()
 	PropertyList properties;
 	map<string, AbstractPropertyType *>::iterator i;
 
-	for (i = murphyProperties.begin(); i != murphyProperties.end(); i++) {
+	for (i = murphyProperties.begin(); i != murphyProperties.end(); i++)
+	{
 		properties.push_back((*i).first);
 	}
 
@@ -424,7 +433,8 @@ void MurphySource::getPropertyAsync(AsyncPropertyReply *reply)
 {
 	// debugOut("> getPropertyAsync");
 
-	if (murphyProperties.find(reply->property) != murphyProperties.end()) {
+	if (murphyProperties.find(reply->property) != murphyProperties.end())
+	{
 		AbstractPropertyType *prop = murphyProperties[reply->property];
 		reply->value = prop;
 		reply->success = true;
