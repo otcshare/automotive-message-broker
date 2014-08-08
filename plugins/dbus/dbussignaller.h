@@ -10,6 +10,7 @@
 #include "debugout.h"
 #include "abstractproperty.h"
 #include "superptr.hpp"
+#include "listplusplus.h"
 
 class DBusSignal
 {
@@ -82,18 +83,44 @@ private:
 			{
 				std::unique_ptr<DBusSignal> signal(s);
 
+				/// Combine this with any other signals to be fired from the same object:
+				std::vector<AbstractProperty*> dupprops;
+				std::vector<DBusSignal*> toRemoveQueue;
+				for(auto s2 : queue)
+				{
+					if(s != s2 && s2->objectPath == s2->objectPath)
+					{
+						std::unique_ptr<DBusSignal> signal2(s2);
+						dupprops.push_back(signal2->property);
+						toRemoveQueue.push_back(signal2.get());
+					}
+				}
+
+				for(auto toRemove : toRemoveQueue)
+				{
+					removeOne(&queue, toRemove);
+				}
+
 				GError* error = nullptr;
 
 				AbstractProperty* property = signal->property;
 
-				GVariant* val = g_variant_ref(property->toGVariant());
+
+				auto val = amb::make_super(property->toGVariant());
 
 				/// Send PropertiesChanged signal
 
 				GVariantBuilder builder;
 				g_variant_builder_init(&builder, G_VARIANT_TYPE_DICTIONARY);
 
-				g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val);
+				g_variant_builder_add(&builder, "{sv}", property->name().c_str(), val.get());
+
+				for(auto v : dupprops)
+				{
+					auto var = amb::make_super(v->toGVariant());
+					g_variant_builder_add(&builder, "{sv}", v->name().c_str(), var.get());
+				}
+
 				g_variant_builder_add(&builder, "{sv}", std::string(property->name() + "Sequence").c_str(), g_variant_new("i", property->sequence()));
 				g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("d", property->timestamp()) );
 				g_variant_builder_add(&builder, "{sv}", "Zone", g_variant_new("i", property->value()->zone) );
