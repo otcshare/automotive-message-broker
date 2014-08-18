@@ -23,6 +23,11 @@ public:
 
 	}
 
+	~DBusSignal()
+	{
+
+	}
+
 	bool operator == (const DBusSignal &other) const
 	{
 		return connection == other.connection &&
@@ -94,7 +99,7 @@ private:
 				std::string interfaceName;
 				std::string signalName;
 
-				std::unordered_map<const char*, GVariant*> variantMap;
+				std::unordered_map<std::string, GVariant*> variantMap;
 
 				for(auto s : itr.second)
 				{
@@ -107,9 +112,10 @@ private:
 					AbstractProperty* property = signal->property;
 
 					auto val = g_variant_ref(property->toGVariant());
+					std::string sequenceName = property->name() + "Sequence";
 
-					variantMap[property->name().c_str()] = val;
-					variantMap[std::string(property->name() + "Sequence").c_str()] = g_variant_new("i", property->sequence());
+					variantMap[property->name()] = val;
+					variantMap[sequenceName] = g_variant_new("i", property->sequence());
 					variantMap["Time"] = g_variant_new("d", property->timestamp());
 					variantMap["Zone"] = g_variant_new("i", property->value()->zone);
 				}
@@ -120,11 +126,12 @@ private:
 				for(auto sv : variantMap)
 				{
 					/// Send PropertiesChanged signal
-					//auto key = amb::make_unique(sv.first);
 					auto key = sv.first;
-					auto value = amb::make_super(g_variant_ref(sv.second));
+					auto value = sv.second;
 
-					g_variant_builder_add(&builder, "{sv}", key, value.get());
+					DebugOut(0) << "key: " << key << endl;
+
+					g_variant_builder_add(&builder, "{sv}", key.c_str(), value);
 				}
 
 				GError* error = nullptr;
