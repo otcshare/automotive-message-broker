@@ -129,8 +129,6 @@ private:
 					auto key = sv.first;
 					auto value = sv.second;
 
-					DebugOut(0) << "key: " << key << endl;
-
 					g_variant_builder_add(&builder, "{sv}", key.c_str(), value);
 				}
 
