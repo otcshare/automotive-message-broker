@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -80,6 +80,7 @@ enum TransmissionPositions
 	Park = 255
 
 };
+/** TODO: deprecate in 0.13.  Replaced with Drive::Mode: **/
 enum Mode {
 	Normal=0,
 	Sports = 1,
@@ -94,6 +95,16 @@ enum Type {
 	Manual = 1,
 	CV = 2
 };
+
+namespace W3C
+{
+extern const char* Park;
+extern const char* Reverse;
+extern const char* Neutral;
+extern const char* Low;
+extern const char* Drive;
+extern const char* Overdrive;
+}
 }
 
 namespace Power {
@@ -238,6 +249,17 @@ enum Mode
 };
 }
 
+namespace Drive
+{
+enum Mode {
+	Normal=0,
+	Sports = 1,
+	Economy = 2,
+	OEMCustom1 = 3,
+	OEMCustom2 = 4
+};
+}
+
 namespace Measurement
 {
 enum Type
@@ -289,13 +311,13 @@ class VehicleProperty
 {
 
 public:
-	
+
 
 	/*!
 	 * \brief factory constructs a static instance of VehicleProperty.  This should be called once before VehicleProperty is used in the app
 	 */
 	static void factory();
-	
+
 	/*!
 	 *
 	 * \brief destroys static instance of VehicleProperty. This should be called at application shutdown
@@ -351,10 +373,17 @@ public:
 				 BasicPropertyType<Transmission::TransmissionPositions>, Transmission::TransmissionPositions)
 	//typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
 
+	/// TODO: deprecate in 0.13.  Replaced by Drive::Mode
 	static const Property TransmissionMode;
 	PROPERTYTYPE(TransmissionMode, TransmissionModeType,
 				 BasicPropertyType<Transmission::Mode>, Transmission::Mode)
 	//typedef BasicPropertyType<Transmission::Mode> TransmissionModeType;
+
+	/**< TransmissionModeW3C
+	 * see Transmission::W3C::Park, Transmission::W3C::Drive, etc
+	 */
+	static const Property TransmissionModeW3C;
+	PROPERTYTYPE(TransmissionModeW3C, TransmissionModeW3CType, StringPropertyType, std::string)
 
 	/**< Throttle position 0-100% */
 	static const Property ThrottlePosition;
@@ -472,7 +501,7 @@ public:
 	/**< Tire temperature in degrees C */
 	static const Property TireTemperature;
 	PROPERTYTYPEBASIC(TireTemperature, double)
-	
+
 	/**< Vehicle Power Mode.
 	 *@see Power::PowerModes
 	 */
@@ -556,7 +585,7 @@ public:
 	static const Property ExteriorBrightness;
 	PROPERTYTYPE(ExteriorBrightness, ExteriorBrightnessType, BasicPropertyType<uint16_t>, uint16_t)
 	//typedef BasicPropertyType<uint16_t> ExteriorBrightnessType;
-	
+
 	static const Property Latitude;
 	PROPERTYTYPE(Latitude, LatitudeType, BasicPropertyType<double>, double)
 	//typedef BasicPropertyType<double> LatitudeType;

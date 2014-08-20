@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -36,12 +36,20 @@ std::map<VehicleProperty::Property, VehicleProperty::PropertyTypeFactoryCallback
 
 VehicleProperty* VehicleProperty::thereCanOnlyBeOne = nullptr;
 
+const char* Transmission::W3C::Park = "park";
+const char* Transmission::W3C::Reverse = "reverse";
+const char* Transmission::W3C::Neutral = "neutral";
+const char* Transmission::W3C::Low = "low";
+const char* Transmission::W3C::Drive = "drive";
+const char* Transmission::W3C::Overdrive = "overdrive";
+
 const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
 const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
 const VehicleProperty::Property VehicleProperty::EngineSpeed = "EngineSpeed";
 const VehicleProperty::Property VehicleProperty::TransmissionShiftPosition = "TransmissionShiftPosition";
 const VehicleProperty::Property VehicleProperty::TransmissionGearPosition = "TransmissionGearPostion";
 const VehicleProperty::Property VehicleProperty::TransmissionMode = "TransmissionMode";
+const VehicleProperty::Property VehicleProperty::TransmissionModeW3C = "TransmissionModeW3C";
 const VehicleProperty::Property VehicleProperty::ThrottlePosition = "ThrottlePosition";
 const VehicleProperty::Property VehicleProperty::WheelBrake = "WheelBrake";
 const VehicleProperty::Property VehicleProperty::WheelBrakePressure = "WheelBrakePressure";
@@ -170,6 +178,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(TransmissionShiftPosition,Transmission::Neutral);
 	REGISTERPROPERTY(TransmissionGearPosition,Transmission::Neutral);
 	REGISTERPROPERTY(TransmissionMode,Transmission::Normal);
+	REGISTERPROPERTY(TransmissionModeW3C,"neutral");
 	REGISTERPROPERTY(ThrottlePosition, 0);
 	REGISTERPROPERTY(WheelBrake, false);
 	REGISTERPROPERTY(WheelBrakePressure,0);
@@ -310,13 +319,13 @@ void VehicleProperty::factory()
 
 void VehicleProperty::shutdown()
 {
-    if(thereCanOnlyBeOne){
-        delete thereCanOnlyBeOne;
-        thereCanOnlyBeOne = nullptr;
-    }
-    registeredPropertyFactoryMap.clear();
-    mCapabilities.clear();
-    mCustomProperties.clear();
+	if(thereCanOnlyBeOne){
+		delete thereCanOnlyBeOne;
+		thereCanOnlyBeOne = nullptr;
+	}
+	registeredPropertyFactoryMap.clear();
+	mCapabilities.clear();
+	mCustomProperties.clear();
 }
 
 PropertyList VehicleProperty::capabilities()

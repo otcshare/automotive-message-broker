@@ -154,6 +154,9 @@ public:
 		wantPropertyVariant(VehicleProperty::TransmissionGearPosition,
 														  "GearPosition", "y", AbstractProperty::Read);
 
+		wantPropertyVariant(VehicleProperty::TransmissionGearPosition,
+														  "Gear", "y", AbstractProperty::Read);
+
 		wantPropertyVariant(VehicleProperty::TransmissionMode,
 														  "Mode", "y", AbstractProperty::Read);
 
