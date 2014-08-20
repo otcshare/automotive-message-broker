@@ -1,3 +1,106 @@
+* Wed Aug 20 2014 tripzero <kevron.m.rees@intel.com> submit/tizen_ivi/20140612.200613@a721703
+- Merge branch '0.12' into tizen
+- Merge pull request #19 from tripzero/master
+- Merge branch '0.12' into tizen
+- version bump 0.11.811
+- removed docs
+- Update RELEASE
+- Version bump 0.11.811
+- added tools
+- priority queues
+- cleaned up documents. idl is the authority
+- added asyncqueue.  Made updateProperty() thread safe
+- updated docs
+- created franca idl doc
+- some performance tweaks to core and dbussignaller
+- add rule to only generate dbus docs from idl
+- fixed crash when gpsnmea gets blank gprmc messages
+- removed client library stubs
+- cleaned up debug output
+- fixed periodic crash when sending dbus signal
+- version bump 0.11.812
+- Some fixes and performance tweaks.
+- Fixed issue with Murphy plugin using wronge type for certain Properties.
+- DBus signaller will combine duplicate signals for same object path
+- Merge pull request #17 from tripzero/master
+- automotive-message-broker should not depend on qt
+- removed docs
+- Update RELEASE
+- Version bump 0.11.811
+- added tools
+- priority queues
+- cleaned up documents. idl is the authority
+- added asyncqueue.  Made updateProperty() thread safe
+- updated docs
+- created franca idl doc
+- some performance tweaks to core and dbussignaller
+- add rule to only generate dbus docs from idl
+- fixed crash when gpsnmea gets blank gprmc messages
+- removed client library stubs
+- Merge branch '0.12' into tizen
+- multiple dbus properties can support the same amb property
+- Merge branch '0.12' into tizen
+- fixed missing symbol
+- Merge branch '0.12' into tizen
+- use const string ref
+- Updated spec
+- Merge branch '0.12' into tizen
+- fix libamb label
+- added support for lambda subscriptions.  initial bluetooth5 support in obd2 plugin
+- updated docs to reflect change to vehicle and engine speed
+- updated Vehicle and EngineSpeed interfaces to match w3c vehicle data draft spec.  Old attributes exist for compatibility
+- version bump 0.11.810
+- added SteeringWheelAngle
+- added stub ambclient code
+- Merge branch '0.12' into tizen
+- added more debug to bluetooth
+- Merge branch '0.12' into tizen
+- use gio for watching fd
+- Merge branch '0.12' into tizen
+- updated method signature
+- got bluez5 client somewhat working
+- Merge branch '0.12' into tizen
+- updated spec
+- fixed a GVS error
+- Merge branch '0.12' into tizen
+- add ambbt service file
+- added service record for spp
+- Merge branch '0.12' into tizen
+- added dbus system config
+- door lock are not readonly
+- Merge branch '0.12' into tizen
+- registerProfile after registering the dbus object
+- Merge branch '0.12' into tizen
+- corrected signature call to RegisterProfile
+- Merge branch '0.12' into tizen
+- updated spec to install bluetooth plugin
+- load non-SinkManager plugins
+- Merge branch '0.12' into tizen
+- check if registerProfile is valid
+- initial bluetooth plugin
+- fix cmake file
+- manual merge
+- reworked tests in gpsnmea
+- deprecated gpsd plugin
+- fixed checksum()
+- make unhandled nmea messages level 7 to avoid spamming
+- change to example and dbus plugins
+- removed mcmodel compile option. added VideoLogging property to opencv plugin
+- Merge branch '0.12' into tizen
+- fixed crasher in gpsnmea
+- Merge branch '0.12' into tizen
+- fixed compile errors in database and murphy plugins
+- Merge branch '0.12' into tizen
+- fixed compile errors in obd2 plugin
+- Merge branch '0.12' into tizen
+- install canobserver header
+- fixed some compile errors
+- updated some docs and added testing document
+- Update README
+- updated changelog and spec
+- added velocity text to framewriter
+- use vector where possible
+
 * Wed Apr 16 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140326.195506@13f13b0
 - use debugout for errors instead of cerr
 - use mjpg codec
