@@ -147,7 +147,7 @@ PropertyList Core::supported()
 	return supportedProperties;
 }
 
-void Core::updateProperty(AbstractPropertyType *value, const string &uuid)
+void Core::updateProperty(AbstractPropertyType *value, const string & uuid)
 {
 	if(value->sourceUuid != uuid)
 	{
@@ -448,7 +448,7 @@ PropertyInfo Core::getPropertyInfo(const VehicleProperty::Property &property, co
 	return (*theSource)->getPropertyInfo(property);
 }
 
-std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
+std::list<string> Core::sourcesForProperty(const VehicleProperty::Property & property)
 {
 	std::list<std::string> list;
 
@@ -464,9 +464,6 @@ std::list<string> Core::sourcesForProperty(VehicleProperty::Property property)
 			++itr;
 		}
 	}
-
-	//DebugOut(1)<<__FUNCTION__<<"sources list: " << endl;
-	//for_each(list.begin(), list.end(), [](const std::string& str){ DebugOut(1)<<__FUNCTION__<< str << endl; });
 
 	return list;
 }
