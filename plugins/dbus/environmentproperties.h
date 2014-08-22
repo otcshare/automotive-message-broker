@@ -19,7 +19,7 @@ public:
 		 * @attributeComment \brief Must return the brightness outside the vehicle in lux.
 		 */
 		wantPropertyVariant(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "q", AbstractProperty::Read);
-		
+
 	}
 };
 
@@ -36,7 +36,9 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return the temperature of the interior of the vehicle in celcius.
 		 */
-		wantPropertyVariant(VehicleProperty::InteriorTemperature, "Interior", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::InteriorTemperature, "Interior", AbstractProperty::Read);
+
+		wantPropertyVariant(VehicleProperty::InteriorTemperature, "InteriorTemperature", AbstractProperty::Read);
 
 		/**
 		 * @attributeName Exterior
@@ -44,9 +46,11 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return the temperature of the exterior of the vehicle in celcius.
 		 */
-		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "Exterior", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "Exterior", AbstractProperty::Read);
 
-		
+		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "ExteriorTemperature", AbstractProperty::Read);
+
+
 	}
 };
 
@@ -64,7 +68,7 @@ public:
 		 * @attributeComment \brief Must return level of rain intensity 0: No Rain - 10: Heaviest Rain.
 		 */
 		wantPropertyVariant(VehicleProperty::RainSensor, "RainSensor", "q", AbstractProperty::Read);
-		
+
 	}
 };
 
@@ -89,7 +93,7 @@ public:
 		 * @attributeComment \brief Must return Level of windshield whiper speed (see WIPERSPEED_)
 		 */
 		wantPropertyVariant(VehicleProperty::RainSensor, "WindshieldWiper", "y", AbstractProperty::ReadWrite);
-		
+
 	}
 };
 
@@ -113,6 +117,7 @@ public:
 		 * @access readwrite
 		 * @attributeComment \brief Must return airflow direction.  See AIRFLOWDIRECTION_*.
 		 */
+		/// TODO: Deprecated.  Remove in 0.13
 		wantPropertyVariant(VehicleProperty::AirflowDirection, "AirflowDirection", "y", AbstractProperty::ReadWrite);
 
 		/**
@@ -179,7 +184,33 @@ public:
 		 */
 		wantPropertyVariant(VehicleProperty::SeatCooler, "SeatCooler", "b", AbstractProperty::ReadWrite);
 
-		
+
+	}
+};
+
+class ClimateControlProperty: public DBusSink
+{
+public:
+	ClimateControlProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("ClimateControl", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::AirflowDirectionW3C, "AirflowDirection", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeed", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::TargetTemperature, "TargetTemperature", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::AirConditioning, "AirConditioning", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::Heater, "Heater", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::SteeringWheelHeater, "SteeringWheelHeater", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::SeatHeater, "SeatHeater", AbstractProperty::ReadWrite);
+
+		wantPropertyVariant(VehicleProperty::SeatCooler, "SeatCooler", AbstractProperty::ReadWrite);
 	}
 };
 
@@ -190,9 +221,19 @@ public:
 	WindowStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindowStatus", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", "q", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", AbstractProperty::ReadWrite);
+	}
+};
 
-		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", "b", AbstractProperty::ReadWrite);
+class DefrostProperty: public DBusSink
+{
+public:
+	DefrostProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("Defrost", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::DefrostWindow,"DefrostWindow", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::DefrostMirror, "DefrostMirror", AbstractProperty::ReadWrite);
 	}
 };
 

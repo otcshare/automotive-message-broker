@@ -8,7 +8,7 @@ class VariantType: public AbstractProperty
 {
 public:
 
-	VariantType(AbstractRoutingEngine* re, string signature, VehicleProperty::Property ambPropertyName, string propertyName, Access access);
+	VariantType(AbstractRoutingEngine* re, VehicleProperty::Property ambPropertyName, string propertyName, Access access);
 
 	void initialize();
 
