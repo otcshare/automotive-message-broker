@@ -441,7 +441,7 @@ public:
 
 	/**< Engine coolant temperature in degrees celcius **/
 	static const Property EngineCoolantTemperature;
-	PROPERTYTYPE(EngineCoolantTemperature, EngineCoolantTemperatureType, BasicPropertyType<uint>, uint)
+	PROPERTYTYPE(EngineCoolantTemperature, EngineCoolantTemperatureType, BasicPropertyType<int>, int)
 	//typedef BasicPropertyType<int> EngineCoolantTemperatureType;
 
 	static const Property EngineCoolantLevel;
