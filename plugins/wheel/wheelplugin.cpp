@@ -49,7 +49,7 @@ double gearRatio[8] = {
 	1.0/0.69,	//Sixth
 	1.0/3.21	//Reverse
 };
-			
+
 
 class WheelPrivate
 {
@@ -90,20 +90,22 @@ private:
 	int *axis;
 	char *button;
 
-	uint16_t machineGuns;
-	TurnSignals::TurnSignalType turnSignal;
-	Transmission::TransmissionPositions currentGear;
-	uint16_t oilPSI;
-	uint16_t coolantTemp;
-	uint16_t steeringAngle;
-	uint16_t throttle;
-	bool clutch;
-	bool oldClutch;
-	bool brake;
-	bool oldBrake;
+	VehicleProperty::MachineGunTurretStatusType* machineGuns;
+	VehicleProperty::VehicleSpeedType *vehicleSpeed;
+	VehicleProperty::EngineSpeedType *engineSpeed;
+	VehicleProperty::TurnSignalType *turnSignal;
+	VehicleProperty::TransmissionShiftPositionType *shiftPosition;
+	VehicleProperty::TransmissionGearPositionType *gearPosition;
+	VehicleProperty::EngineOilPressureType *oilPSI;
+	VehicleProperty::EngineCoolantTemperatureType *coolantTemp;
+	VehicleProperty::SteeringWheelAngleType *steeringAngle;
+	VehicleProperty::ThrottlePositionType *throttle;
+	VehicleProperty::ClutchStatusType *clutch;
+	VehicleProperty::WheelBrakeType *brake;
+
 	AbstractSource* mParent;
 
-	VehicleProperty::ButtonEventType tempButton;
+	VehicleProperty::ButtonEventType *tempButton;
 };
 
 
@@ -132,16 +134,12 @@ const string WheelSourcePlugin::uuid()
 
 void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
-
-
 	reply->value = this->mWheel->getProperty(reply->property);
 
 	if(reply->value)
 		reply->success = true;
 
 	reply->completed(reply);
-
-	delete reply->value;
 }
 
 AsyncPropertyReply *WheelSourcePlugin::setProperty(AsyncSetPropertyRequest request )
@@ -161,7 +159,6 @@ PropertyList WheelSourcePlugin::supported()
 	props.push_back(VehicleProperty::VehicleSpeed);
 	props.push_back(VehicleProperty::TransmissionShiftPosition);
 	props.push_back(VehicleProperty::TransmissionGearPosition);
-	props.push_back(VehicleProperty::TransmissionMode);
 	props.push_back(VehicleProperty::ThrottlePosition);
 	props.push_back(VehicleProperty::WheelBrake);
 	props.push_back(VehicleProperty::SteeringWheelAngle);
@@ -200,10 +197,21 @@ void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData)
 }
 
 WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route)
-:re(route), gis(nullptr), axis(nullptr), button(nullptr),
-oilPSI(10), coolantTemp(100), turnSignal(TurnSignals::Off), throttle(0),
-machineGuns(false), currentGear(Transmission::Neutral), steeringAngle(0),
-  clutch(false), oldClutch(false), brake(false), oldBrake(false), mParent(parent)
+	:re(route), gis(nullptr), axis(nullptr), button(nullptr),
+	  oilPSI(new VehicleProperty::EngineOilPressureType(10)),
+	  coolantTemp(new VehicleProperty::EngineCoolantTemperatureType(100)),
+	  turnSignal(new VehicleProperty::TurnSignalType(TurnSignals::Off)),
+	  throttle(new VehicleProperty::ThrottlePositionType(0)),
+	  machineGuns(new VehicleProperty::MachineGunTurretStatusType(false)),
+	  gearPosition(new VehicleProperty::TransmissionGearPositionType(Transmission::Neutral)),
+	  shiftPosition(new VehicleProperty::TransmissionShiftPositionType(Transmission::Neutral)),
+	  engineSpeed(new VehicleProperty::EngineSpeedType(0)),
+	  vehicleSpeed(new VehicleProperty::VehicleSpeedType(0)),
+	  steeringAngle(new VehicleProperty::SteeringWheelAngleType(0)),
+	  clutch(new VehicleProperty::ClutchStatusType(false)),
+	  brake(new VehicleProperty::WheelBrakeType(false)),
+	  tempButton(new VehicleProperty::ButtonEventType(ButtonEvents::NoButton)),
+	  mParent(parent)
 {
 
 	unsigned char numAxes = 0;
@@ -222,7 +230,7 @@ machineGuns(false), currentGear(Transmission::Neutral), steeringAngle(0),
 		1, 0, 0, 0, 536854528, 536854528,
 		1, 0, 0, 0, 536854528, 536854528
 	};
-	
+
 
 	//FIXME: Support config file with joystick device mapping, button/axis mappings, etc.
 	std::string jsdev = parent->getConfiguration()["device"];
@@ -245,30 +253,30 @@ machineGuns(false), currentGear(Transmission::Neutral), steeringAngle(0),
 	for (i = 0; i < 6; i++) {
 		int k = 0;
 
-                cal[i].type = calData[(i*6)+k];
+				cal[i].type = calData[(i*6)+k];
 		k++;
-                cal[i].prec = calData[(i*6)+k];
+				cal[i].prec = calData[(i*6)+k];
 		k++;
 
-                for(j = 0; j < 4; j++) {
+				for(j = 0; j < 4; j++) {
 			cal[i].coef[j] = calData[(i*6)+k];
 			k++;
-                }
-        }
+				}
+		}
 	if (ioctl(fd, JSIOCSCORR, &cal) < 0) {
 		throw std::runtime_error("Could not set calibration data!");
 		return;
 	}
 
-	cout << "Driver version: " << (version >> 16) << "." << ((version >> 8) & 0xFF) << "." << (version & 0xFF) << endl;
-	cout << "JS Name: " << name << endl;
-	cout << "JS Axes/Buttons: " << (int)numAxes << "/" << (int)numButtons << endl;
-	cout << "Converting FD to GIO Input Stream..." << endl;
+	DebugOut() << "Driver version: " << (version >> 16) << "." << ((version >> 8) & 0xFF) << "." << (version & 0xFF) << endl;
+	DebugOut() << "JS Name: " << name << endl;
+	DebugOut() << "JS Axes/Buttons: " << (int)numAxes << "/" << (int)numButtons << endl;
+	DebugOut() << "Converting FD to GIO Input Stream..." << endl;
 	this->axis = (int *)calloc(numAxes, sizeof(int));
 	this->button = (char *)calloc(numButtons, sizeof(char));
 	this->gis = g_unix_input_stream_new(fd, TRUE);
 	g_input_stream_read_async(this->gis, &this->jsEvent, sizeof(struct js_event), G_PRIORITY_DEFAULT, nullptr, &readCallback, this);
-	
+
 }
 
 WheelPrivate::~WheelPrivate()
@@ -281,33 +289,37 @@ WheelPrivate::~WheelPrivate()
 AbstractPropertyType *WheelPrivate::getProperty(VehicleProperty::Property propType)
 {
 	if (propType == VehicleProperty::VehicleSpeed)
-		return new VehicleProperty::VehicleSpeedType(this->calcCarSpeed());
+	{
+		vehicleSpeed->setValue(this->calcCarSpeed());
+		return vehicleSpeed;
+	}
 	else if (propType == VehicleProperty::EngineSpeed)
-		return new VehicleProperty::EngineSpeedType(this->calcRPM());
+	{
+		engineSpeed->setValue(this->calcRPM());
+		return engineSpeed;
+	}
 	else if (propType == VehicleProperty::TransmissionShiftPosition)
-		return new VehicleProperty::TransmissionShiftPositionType(this->currentGear);
+		return this->shiftPosition;
 	else if (propType == VehicleProperty::TransmissionGearPosition)
-		return new VehicleProperty::TransmissionGearPositionType(this->currentGear);
-	else if (propType == VehicleProperty::TransmissionMode)
-		return new VehicleProperty::TransmissionModeType(Transmission::Sports);
+		return this->gearPosition;
 	else if (propType == VehicleProperty::ThrottlePosition)
-		return new VehicleProperty::ThrottlePositionType(this->throttle);
+		return this->throttle;
 	else if (propType == VehicleProperty::WheelBrake)
-		return new VehicleProperty::WheelBrakeType(this->brake);
+		return this->brake;
 	else if (propType == VehicleProperty::SteeringWheelAngle)
-		return new VehicleProperty::SteeringWheelAngleType(this->steeringAngle);
+		return this->steeringAngle;
 	else if (propType == VehicleProperty::TurnSignal)
-		return new VehicleProperty::TurnSignalType(this->turnSignal);
+		return this->turnSignal;
 	else if (propType == VehicleProperty::ClutchStatus)
-		return new VehicleProperty::ClutchStatusType(this->clutch);
+		return this->clutch;
 	else if (propType == VehicleProperty::EngineOilPressure)
-		return new VehicleProperty::EngineOilPressureType(this->oilPSI);
+		return this->oilPSI;
 	else if (propType == VehicleProperty::EngineCoolantTemperature)
-		return new VehicleProperty::EngineCoolantTemperatureType(this->coolantTemp);
+		return this->coolantTemp;
 	else if (propType == VehicleProperty::MachineGunTurretStatus)
-		return new VehicleProperty::MachineGunTurretStatusType(this->machineGuns);
+		return this->machineGuns;
 	else if (propType == VehicleProperty::ButtonEvent)
-		return new VehicleProperty::ButtonEventType(tempButton);
+		return tempButton;
 	else
 		cout << "Unhandled getProperty type: " << propType << endl;
 
@@ -342,15 +354,15 @@ void WheelPrivate::newButtonValue(char number, bool val)
 			checkButtonEvents();
 			break;
 		case 4:	//Right paddle shifter
-			if(val && this->currentGear < MAX_GEARS)
+			if(val && this->gearPosition->basicValue() < MAX_GEARS)
 			{
-				this->changeGear(Transmission::TransmissionPositions(this->currentGear+1));
+				this->changeGear(Transmission::TransmissionPositions(this->gearPosition->basicValue()+1));
 				changeMachineGuns(val);
 			}
 			break;
 		case 5:	//Left paddle shifter
-			if(val && this->currentGear > 0)
-				this->changeGear(Transmission::TransmissionPositions(this->currentGear-1));
+			if(val && this->gearPosition->basicValue() > 0)
+				this->changeGear(Transmission::TransmissionPositions(this->gearPosition->basicValue()-1));
 			break;
 		case 6:	//Right upper wheel button
 			this->changeTurnSignal(TurnSignals::Right, val);
@@ -376,7 +388,7 @@ void WheelPrivate::newButtonValue(char number, bool val)
 		case 21://Left lower wheel button
 			//Coolant temperature down
 			if (val)
-                this->changeCoolantTemp(false);
+				this->changeCoolantTemp(false);
 			break;
 		case 12://1st gear
 			this->changeGear((val ? 1 : 0));
@@ -474,10 +486,8 @@ void WheelPrivate::gotData(GAsyncResult *res)
 
 void WheelPrivate::changeMachineGuns(bool val)
 {
-	this->machineGuns = val;
-	VehicleProperty::MachineGunTurretStatusType temp(this->machineGuns);
-	temp.timestamp = amb::currentTime();
-	this->re->updateProperty(&temp, mParent->uuid());
+	*(this->machineGuns) = val;
+	this->re->updateProperty(this->machineGuns, mParent->uuid());
 }
 
 void WheelPrivate::changeTurnSignal(TurnSignals::TurnSignalType dir, bool val)
@@ -489,129 +499,113 @@ void WheelPrivate::changeTurnSignal(TurnSignals::TurnSignalType dir, bool val)
 		else
 			tsVal = TurnSignals::Right;
 	}
-	this->turnSignal = tsVal;
-	VehicleProperty::TurnSignalType temp(this->turnSignal);
-	temp.timestamp = amb::currentTime();
-	this->re->updateProperty(&temp, mParent->uuid());
+	*(this->turnSignal) = tsVal;
+	this->re->updateProperty(this->turnSignal, mParent->uuid());
 }
 
 void WheelPrivate::changeGear(int gear)
 {
-	this->currentGear = (Transmission::TransmissionPositions)gear;
-	VehicleProperty::TransmissionShiftPositionType tempTrans(this->currentGear);
-	VehicleProperty::TransmissionGearPositionType tempTransGear(this->currentGear);
-	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
+	gearPosition->setValue((Transmission::TransmissionPositions)gear);
+	shiftPosition->setValue((Transmission::TransmissionPositions)gear);
 
-	this->re->updateProperty(&tempTrans, mParent->uuid());
-	this->re->updateProperty(&tempTransGear, mParent->uuid());
-	this->re->updateProperty(&tempSpeed, mParent->uuid());
+	vehicleSpeed->setValue(this->calcCarSpeed());
+
+	this->re->updateProperty(gearPosition, mParent->uuid());
+	this->re->updateProperty(shiftPosition, mParent->uuid());
+	this->re->updateProperty(vehicleSpeed, mParent->uuid());
 }
 
 void WheelPrivate::changeOilPressure(bool increase)
 {
-	VehicleProperty::EngineOilPressureType temp(increase ? ++this->oilPSI : --this->oilPSI);
-	temp.timestamp = amb::currentTime();
-	this->re->updateProperty(&temp, mParent->uuid());
+	(increase ? *(oilPSI)++ : *(oilPSI)--);
+	this->re->updateProperty(oilPSI, mParent->uuid());
 }
 
 void WheelPrivate::changeCoolantTemp(bool increase)
 {
-	VehicleProperty::EngineCoolantTemperatureType temp(increase ? ++this->coolantTemp : --this->coolantTemp);
-	temp.timestamp = amb::currentTime();
-	this->re->updateProperty(&temp, mParent->uuid());
+	(increase ? ++(*coolantTemp) : --(*coolantTemp));
+
+	this->re->updateProperty(coolantTemp, mParent->uuid());
 }
 
 
 void WheelPrivate::changeSteeringAngle(int val)
 {
-	this->steeringAngle = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
-	VehicleProperty::SteeringWheelAngleType temp(this->steeringAngle);
-	temp.timestamp = amb::currentTime();
-	this->re->updateProperty(&temp, mParent->uuid());
+	*steeringAngle = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
+	this->re->updateProperty(steeringAngle, mParent->uuid());
 }
 
 void WheelPrivate::changeClutch(int val)
 {
-	this->oldClutch = this->clutch;
-	this->clutch = (val < 20000);
-	if (this->oldClutch != this->clutch)
-	{
-		VehicleProperty::ClutchStatusType temp(this->clutch);
-		temp.timestamp = amb::currentTime();
-		this->re->updateProperty(&temp, mParent->uuid());
-	}
+
+	*clutch = (val < 20000);
+	this->re->updateProperty(clutch, mParent->uuid());
+
 }
 
 void WheelPrivate::changeThrottle(int val)
 {
-	this->throttle = ((double)(val - 32767)/(double)-65534.0)*(double)100.0;
+	*throttle = ((double)(val - 32767)/(double)-65534.0)*(double)100.0;
+	*vehicleSpeed = calcCarSpeed();
+	*engineSpeed = calcRPM();
 
-	VehicleProperty::ThrottlePositionType tempThrottle(this->throttle);
-	VehicleProperty::EngineSpeedType tempRpm(this->calcRPM());
-	VehicleProperty::VehicleSpeedType tempSpeed(this->calcCarSpeed());
-
-	this->re->updateProperty(&tempThrottle, mParent->uuid());
-	this->re->updateProperty(&tempRpm, mParent->uuid());
-	this->re->updateProperty(&tempSpeed, mParent->uuid());
+	this->re->updateProperty(throttle, mParent->uuid());
+	this->re->updateProperty(engineSpeed, mParent->uuid());
+	this->re->updateProperty(vehicleSpeed, mParent->uuid());
 }
 
 void WheelPrivate::changeBrake(int val)
 {
-	this->oldBrake = this->brake;
-	this->brake = (val < 20000);
-	if (this->oldBrake != this->brake)
-	{
-		VehicleProperty::WheelBrakeType temp(this->brake);
-		this->re->updateProperty(&temp, mParent->uuid());
-	}
+	*brake = (val < 20000);
+	this->re->updateProperty(brake, mParent->uuid());
 }
 
 
 uint16_t WheelPrivate::calcCarSpeed()
 {
 //	cout << "Calc Car Speed, rpm: " << this->calcRPM() << ", gearRatio: " << gearRatio[this->currentGear == 128 ? 7 : this->currentGear] << " current gear: " << this->currentGear << endl;
-	return (this->calcRPM() * gearRatio[this->currentGear == 128 ? 7 : this->currentGear])/100;
+	return (this->calcRPM() * gearRatio[this->gearPosition->basicValue() == 128 ? 7 : this->gearPosition->basicValue()])/100;
 
 }
 
 uint16_t WheelPrivate::calcRPM()
 {
 //	cout << "Calc rpm, throttle: " << this->throttle << endl;
-	return this->throttle * 100;
+	return throttle->basicValue() * 100;
 }
 
 void WheelPrivate::checkButtonEvents()
 {
 	if (this->button[0]) {
 		//	cout << "Inside button 11!" << endl;
-		tempButton = ButtonEvents::StopButton;
+		*tempButton = ButtonEvents::StopButton;
 
 	}
 	if (this->button[1]) {
 		//	cout << "Inside button 11!" << endl;
-		tempButton = (ButtonEvents::PrevButton);
+		*tempButton = (ButtonEvents::PrevButton);
 	}
 	if (this->button[2]) {
-		tempButton = (ButtonEvents::SkipButton);
+		*tempButton = (ButtonEvents::SkipButton);
 
 	}
 	if (this->button[3]) {
-		tempButton = ButtonEvents::PlayButton;
+		*tempButton = ButtonEvents::PlayButton;
 
 	}
 	if (this->button[11]) {
-		tempButton = (ButtonEvents::Preset1Button);
+		*tempButton = (ButtonEvents::Preset1Button);
 	}
 	if (this->button[8]) {
-		tempButton = (ButtonEvents::Preset2Button);
+		*tempButton = (ButtonEvents::Preset2Button);
 	}
 	if (this->button[9]) {
-		tempButton = (ButtonEvents::Preset3Button);
+		*tempButton = (ButtonEvents::Preset3Button);
 
 	}
 	if (this->button[10]) {
-		tempButton = (ButtonEvents::Preset4Button);
+		*tempButton = (ButtonEvents::Preset4Button);
 	}
 
-	this->re->updateProperty(&tempButton, mParent->uuid());
+	this->re->updateProperty(tempButton, mParent->uuid());
 }

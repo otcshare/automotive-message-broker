@@ -290,6 +290,7 @@ enum Type
 	class propertyType : public baseClass { \
 	public: propertyType(): baseClass(property) {} \
 	propertyType(valueType val) : baseClass(property, val) {} \
+	using baseClass::operator=; \
 	};
 
 #define PROPERTYTYPE1(property, propertyType, baseClass, valueType) \
@@ -302,6 +303,7 @@ enum Type
 	class property ## Type : public BasicPropertyType<valueType> { \
 	public: property ## Type(): BasicPropertyType(property) {} \
 	property ## Type(valueType val) : BasicPropertyType(property, val) {} \
+	using BasicPropertyType<valueType>::operator=; \
 	};
 
 #define PROPERTYTYPEBASIC1(property, valueType) \
@@ -422,11 +424,11 @@ public:
 
 	/// TODO: Rename to "SteeringWheel" in 0.13
 	static const Property SteeringWheelAngleW3C;
-	PROPERTYTYPE(SteeringWheelAngleW3C, SteeringWheelAngleW3CType, BasicPropertyType<int16_t>, int16_t)
+	PROPERTYTYPEBASIC(SteeringWheelAngleW3C, int16_t)
 
 	/**< 0=off, 1=right, 2=left, 3=hazard */
 	static const Property TurnSignal;
-	PROPERTYTYPE(TurnSignal, TurnSignalType, BasicPropertyType<TurnSignals::TurnSignalType> ,TurnSignals::TurnSignalType)
+	PROPERTYTYPEBASIC(TurnSignal, TurnSignals::TurnSignalType)
 	//typedef BasicPropertyType<TurnSignals::TurnSignalType> TurnSignalType;
 
 	/**< Clutch pedal status 0=off, 1=on */
@@ -449,7 +451,7 @@ public:
 
 	/**< 0=off, 1=on */
 	static const Property MachineGunTurretStatus;
-	PROPERTYTYPE(MachineGunTurretStatus, MachineGunTurretStatusType, BasicPropertyType<bool>, bool)
+	PROPERTYTYPEBASIC(MachineGunTurretStatus, bool)
 	//typedef BasicPropertyType<bool> MachineGunTurretStatusType;
 
 	/**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */

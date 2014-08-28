@@ -441,7 +441,7 @@ public:
 	SteeringWheel(AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("SteeringWheel", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::SteeringWheelAngleW3C, "Angle", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::SteeringWheelAngleW3C, "Angle", AbstractProperty::Read);
 	}
 };
 
