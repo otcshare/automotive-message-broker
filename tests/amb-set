@@ -28,6 +28,8 @@ elif valueType == "string":
 	realValue = value
 elif valueType == "double":
 	realValue = double(value)
+elif valueType == "UInt16":
+	realValue = dbus.UInt16(int(value))
 
 bus = dbus.SystemBus()
 managerObject = bus.get_object("org.automotive.message.broker", "/");

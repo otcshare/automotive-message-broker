@@ -1,6 +1,7 @@
 #include "databasesink.h"
 #include "abstractroutingengine.h"
 #include "listplusplus.h"
+#include "superptr.hpp"
 
 int bufferLength = 100;
 int timeout=1000;
@@ -96,15 +97,16 @@ int getNextEvent(gpointer data)
 
 	DBObject obj = *itr;
 
-	AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(obj.key,obj.value);
+	auto value = amb::make_unique(VehicleProperty::getPropertyTypeForPropertyNameValue(obj.key, obj.value));
 
 	if(value)
 	{
-		pbshared->routingEngine->updateProperty(value, pbshared->uuid);
+		value->priority = AbstractPropertyType::Instant;
 		value->timestamp = obj.time;
 		value->sequence = obj.sequence;
 		value->sourceUuid = obj.source;
 		value->zone = obj.zone;
+		pbshared->routingEngine->updateProperty(value.get(), pbshared->uuid);
 	}
 
 	if(++itr != pbshared->playbackQueue.end())
@@ -237,14 +239,14 @@ void DatabaseSink::parseConfig()
 	{
 		//Should handle the extra data here sometime...
 	}
-	
+
 	json_object *propobject = json_object_object_get(rootobject,"properties");
-	
+
 	g_assert(json_object_get_type(propobject) == json_type_array);
 
 	array_list *proplist = json_object_get_array(propobject);
-	
- 	for(int i=0; i < array_list_length(proplist); i++)
+
+	for(int i=0; i < array_list_length(proplist); i++)
 	{
 		json_object *idxobj = (json_object*)array_list_get_idx(proplist,i);
 		std::string prop = json_object_get_string(idxobj);
@@ -274,7 +276,7 @@ void DatabaseSink::stopDb()
 
 void DatabaseSink::startDb()
 {
-	if(playback)
+	if(playback.basicValue())
 	{
 		DebugOut(0)<<"ERROR: tried to start logging during playback.  Only logging or playback can be used at one time"<<endl;
 		return;
@@ -293,7 +295,7 @@ void DatabaseSink::startDb()
 
 void DatabaseSink::startPlayback()
 {
-	if(playback)
+	if(playback.basicValue())
 		return;
 
 	playback = true;
@@ -344,7 +346,7 @@ void DatabaseSink::initDb()
 	if(shared) delete shared;
 
 	shared = new Shared;
-	shared->db->init(databaseName, tablename, tablecreate);
+	shared->db->init(databaseName.value<std::string>(), tablename, tablecreate);
 }
 
 void DatabaseSink::setPlayback(bool v)
@@ -358,13 +360,12 @@ void DatabaseSink::setPlayback(bool v)
 
 void DatabaseSink::setLogging(bool b)
 {
+	databaseLogging = b;
 	AsyncSetPropertyRequest request;
 	request.property = DatabaseLogging;
-	request.value = new DatabaseLoggingType(b);
+	request.value = &databaseLogging;
 
 	setProperty(request);
-
-	delete request.value;
 }
 
 void DatabaseSink::setDatabaseFileName(string filename)
@@ -433,9 +434,9 @@ void DatabaseSink::getPropertyAsync(AsyncPropertyReply *reply)
 	}
 	else if(reply->property == DatabaseLogging)
 	{
-		DatabaseLoggingType temp = shared;
+		databaseLogging = shared != nullptr;
 
-		reply->value = &temp;
+		reply->value = &databaseLogging;
 		reply->success = true;
 		reply->completed(reply);
 
@@ -458,7 +459,7 @@ void DatabaseSink::getPropertyAsync(AsyncPropertyReply *reply)
 void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
 	BaseDB * db = new BaseDB();
-	db->init(databaseName, tablename, tablecreate);
+	db->init(databaseName.value<std::string>(), tablename, tablecreate);
 
 	ostringstream query;
 	query.precision(15);
@@ -535,15 +536,15 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 			setPlayback(false);
 			startDb();
 			reply->success = true;
-			DatabaseLoggingType temp(true);
-			routingEngine->updateProperty(&temp,uuid());
+			databaseLogging = true;
+			routingEngine->updateProperty(&databaseLogging,uuid());
 		}
 		else
 		{
 			stopDb();
 			reply->success = true;
-			DatabaseLoggingType temp(false);
-			routingEngine->updateProperty(&temp,uuid());
+			databaseLogging = false;
+			routingEngine->updateProperty(&databaseLogging,uuid());
 		}
 	}
 
@@ -553,9 +554,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 
 		databaseName = fname;
 
-		DatabaseFileType temp(databaseName);
-
-		routingEngine->updateProperty(&temp,uuid());
+		routingEngine->updateProperty(&databaseName,uuid());
 
 		reply->success = true;
 	}
@@ -566,9 +565,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 			setLogging(false);
 			startPlayback();
 
-			DatabasePlaybackType temp(playback);
-
-			routingEngine->updateProperty(&temp,uuid());
+			routingEngine->updateProperty(&playback,uuid());
 		}
 		else
 		{
@@ -577,9 +574,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 
 			playback = false;
 
-			DatabasePlaybackType temp(playback);
-
-			routingEngine->updateProperty(&temp,uuid());
+			routingEngine->updateProperty(&playback,uuid());
 		}
 
 		reply->success = true;

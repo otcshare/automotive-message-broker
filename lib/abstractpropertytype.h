@@ -561,6 +561,12 @@ public:
 		return *this;
 	}
 
+	StringPropertyType & operator = (std::string const & other)
+	{
+		setValue(std::string(other));
+		return *this;
+	}
+
 	void fromString(std::string val)
 	{
 		setValue(val);

@@ -219,6 +219,10 @@ public:
 	bool stop;
 };
 
+PROPERTYTYPEBASIC(DatabaseLogging, bool)
+PROPERTYTYPEBASIC(DatabasePlayback, bool)
+PROPERTYTYPE(DatabaseFile, DatabaseFileType, StringPropertyType, std::string)
+
 class DatabaseSink : public AbstractSource
 {
 
@@ -255,19 +259,17 @@ private:
 	PropertyList mSubscriptions;
 	Shared *shared;
 	GThread* thread;
-	std::string databaseName;
+	//std::string databaseName;
 	std::string tablename;
 	std::string tablecreate;
 	std::list<VehicleProperty::Property> propertiesToSubscribeTo;
 	PropertyList mSupported;
-	bool playback;
 	PlaybackShared* playbackShared;
 	uint playbackMultiplier;
+	DatabasePlaybackType playback;
+	DatabaseFileType databaseName;
+	DatabaseLoggingType databaseLogging;
 };
-
-PROPERTYTYPEBASIC(DatabaseLogging, bool)
-PROPERTYTYPEBASIC(DatabasePlayback, bool)
-PROPERTYTYPE(DatabaseFile, DatabaseFileType, StringPropertyType, std::string)
 
 
 class DatabaseSinkManager: public AbstractSinkManager
