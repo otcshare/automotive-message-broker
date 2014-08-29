@@ -35,7 +35,8 @@ class DBusSink : public AbstractSink, public AbstractDBusInterface
 
 public:
 	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
-	virtual ~DBusSink() {
+	virtual ~DBusSink()
+	{
 		for(auto i : propertyDBusMap)
 		{
 			delete i;
@@ -44,6 +45,8 @@ public:
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType *value);
 	virtual const std::string uuid();
+
+	static std::map<std::string, std::string> dbusConfig;
 
 	PropertyList wantsProperties()
 	{

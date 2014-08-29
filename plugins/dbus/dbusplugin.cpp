@@ -29,17 +29,19 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DBusSinkManager(routingengine, config);
 }
 
+std::map<std::string, std::string> DBusSink::dbusConfig;
+
 DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
 	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
-	  AbstractSink(engine, config)
+	  AbstractSink(engine, dbusConfig)
 {
 	AbstractDBusInterface::re = engine;
 
 	int timeout = 60;
 
-	if(config.find("frequency") != config.end())
+	if(configuration.find("frequency") != configuration.end())
 	{
-		int t = boost::lexical_cast<int>(config["frequency"]);
+		int t = boost::lexical_cast<int>(configuration["frequency"]);
 
 		timeout = 1000 / t;
 	}

@@ -236,6 +236,7 @@ on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data
 DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine,std::map<std::string,std::string> config)
 	:AbstractSink(engine,config),re(engine), connection(nullptr)
 {
+	DBusSink::dbusConfig = config;
 	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
 					DBusServiceName,
 					G_BUS_NAME_OWNER_FLAGS_NONE,
