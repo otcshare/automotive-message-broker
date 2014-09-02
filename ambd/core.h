@@ -78,7 +78,7 @@ public:
 	PropertyList supported();
 
 	PropertyInfo getPropertyInfo(const VehicleProperty::Property &,const std::string &sourceUuid);
-	std::list<std::string> sourcesForProperty(VehicleProperty::Property property);
+	std::list<std::string> sourcesForProperty(const VehicleProperty::Property & property);
 
 	struct Performance {
 		Performance(): propertiesPerSecond(0), firedPropertiesPerSecond(0) {}

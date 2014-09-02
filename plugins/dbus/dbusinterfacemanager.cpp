@@ -172,6 +172,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<TransmissionProperty>(iface->re, connection);
 	exportProperty<CruiseControlProperty>(iface->re, connection);
 	exportProperty<WheelBrakeProperty>(iface->re, connection);
+	exportProperty<BrakeOperation>(iface->re, connection);
 	exportProperty<LightStatusProperty>(iface->re, connection);
 	exportProperty<HornProperty>(iface->re, connection);
 	exportProperty<FuelProperty>(iface->re, connection);
@@ -181,7 +182,9 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<RainSensor>(iface->re, connection);
 	exportProperty<WindshieldWiper>(iface->re, connection);
 	exportProperty<HVACProperty>(iface->re, connection);
+	exportProperty<ClimateControlProperty>(iface->re, connection);
 	exportProperty<WindowStatusProperty>(iface->re, connection);
+	exportProperty<DefrostProperty>(iface->re, connection);
 	exportProperty<Sunroof>(iface->re, connection);
 	exportProperty<ConvertibleRoof>(iface->re, connection);
 	exportProperty<VehicleId>(iface->re, connection);
@@ -193,6 +196,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<OdometerProperty>(iface->re, connection);
 	exportProperty<FluidProperty>(iface->re, connection);
 	exportProperty<BatteryProperty>(iface->re, connection);
+	exportProperty<BatteryStatusProperty>(iface->re, connection);
 	exportProperty<SecurityAlertProperty>(iface->re, connection);
 	exportProperty<ParkingBrakeProperty>(iface->re, connection);
 	exportProperty<ParkingLightProperty>(iface->re, connection);
@@ -208,7 +212,12 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<ObstacleDistanceProperty>(iface->re, connection);
 	exportProperty<SeatPostionProperty>(iface->re, connection);
 	exportProperty<SteeringWheelPositionProperty>(iface->re, connection);
+	exportProperty<SteeringWheel>(iface->re, connection);
 	exportProperty<MirrorSettingProperty>(iface->re, connection);
+	exportProperty<ThrottlePosition>(iface->re, connection);
+	exportProperty<EngineCoolant>(iface->re, connection);
+	exportProperty<NightMode>(iface->re, connection);
+	exportProperty<DrivingMode>(iface->re, connection);
 
 	iface->registerCustomTypes();
 }
@@ -236,6 +245,7 @@ on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data
 DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine,std::map<std::string,std::string> config)
 	:AbstractSink(engine,config),re(engine), connection(nullptr)
 {
+	DBusSink::dbusConfig = config;
 	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
 					DBusServiceName,
 					G_BUS_NAME_OWNER_FLAGS_NONE,

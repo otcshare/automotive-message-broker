@@ -41,9 +41,9 @@ const char* id = "6dd4268a-c605-4a06-9034-59c1e8344c8e";
 static gboolean timeoutCallback(gpointer data)
 {
 	ExampleSourcePlugin* src = (ExampleSourcePlugin*)data;
-	
+
 	src->randomizeProperties();
-	
+
 	return true;
 }
 
@@ -110,7 +110,7 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new ExampleSourcePlugin(routingengine, config);
-	
+
 }
 
 const string ExampleSourcePlugin::uuid()
@@ -361,10 +361,10 @@ void ExampleSourcePlugin::randomizeProperties()
 	steeringWheelAngle = 1 + (359.00 * (rand() / (RAND_MAX + 1.0)));
 	throttlePos = 1 + (100.00 * (rand() / (RAND_MAX + 1.0)));
 	engineCoolant = 1 + (40.00 * (rand() / (RAND_MAX + 140.0)));
-	
+
 	DebugOut()<<"setting velocity to: "<<velocity<<endl;
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
-	
+
 	vel.setValue(velocity);
 	vel.priority = AbstractPropertyType::High;
 	es.setValue(engineSpeed);

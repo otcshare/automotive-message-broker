@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -351,7 +351,7 @@ public:
 	 * /param property
 	 * /return list of source uuid's that support the "property"
 	 */
-	virtual std::list<std::string> sourcesForProperty(VehicleProperty::Property property) = 0;
+	virtual std::list<std::string> sourcesForProperty(const VehicleProperty::Property & property) = 0;
 
 	/**
 	 * /brief getPropertyAsync requests a property value from a source.  This call has a timeout and the callback specified in the request will always be called.
@@ -407,7 +407,7 @@ public:
 	 * \see AsyncPropertyReply
 	 * \param request the request containing the property and the value to set
 	 * \return a pointer to the reply which is owned by the caller of this method
-	 * \example 
+	 * \example
 	 */
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request) = 0;
 

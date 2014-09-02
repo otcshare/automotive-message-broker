@@ -35,7 +35,8 @@ class DBusSink : public AbstractSink, public AbstractDBusInterface
 
 public:
 	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
-	virtual ~DBusSink() {
+	virtual ~DBusSink()
+	{
 		for(auto i : propertyDBusMap)
 		{
 			delete i;
@@ -44,6 +45,8 @@ public:
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType *value);
 	virtual const std::string uuid();
+
+	static std::map<std::string, std::string> dbusConfig;
 
 	PropertyList wantsProperties()
 	{
@@ -71,20 +74,26 @@ protected:
 	void wantProperty(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		//propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
-		propertyDBusMap.push_back( new VariantType(routingEngine, signature, property, propertyName, access));
+		propertyDBusMap.push_back( new VariantType(routingEngine, property, propertyName, access));
 	}
 
 
 	void wantPropertyString(VehicleProperty::Property property, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		//propertyDBusMap[property] = new VariantType(routingEngine, signature, property, propertyName, access);
-		propertyDBusMap.push_back( new VariantType(routingEngine, signature, property, propertyName, access));
+		propertyDBusMap.push_back( new VariantType(routingEngine, property, propertyName, access));
 	}
 
 	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, std::string signature, AbstractProperty::Access access)
 	{
 		//propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
-		propertyDBusMap.push_back(new VariantType(routingEngine, signature, ambProperty, propertyName, access));
+		propertyDBusMap.push_back(new VariantType(routingEngine, ambProperty, propertyName, access));
+	}
+
+	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, AbstractProperty::Access access)
+	{
+		//propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
+		propertyDBusMap.push_back(new VariantType(routingEngine, ambProperty, propertyName, access));
 	}
 
 	PropertyDBusMap propertyDBusMap;

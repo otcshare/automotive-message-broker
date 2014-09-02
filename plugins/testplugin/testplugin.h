@@ -55,9 +55,9 @@ public:
 	void supportedChanged(const PropertyList &) {}
 	void setConfiguration(map<string, string> config);
 	//void randomizeProperties();
-	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
+	void updateProperty(VehicleProperty::Property property, AbstractPropertyType *value);
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
+	PropertyInfo getPropertyInfo(const VehicleProperty::Property & property);
 	void propertyChanged(AbstractPropertyType *value);
 
 private:

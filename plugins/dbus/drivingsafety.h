@@ -46,6 +46,7 @@ public:
 	}
 };
 
+/// TODO: deprecated. remove in 0.13
 class DoorStatusProperty: public DBusSink
 {
 public:
@@ -57,7 +58,22 @@ public:
 
 		wantPropertyVariant(VehicleProperty::DoorLockStatus, "DoorLockStatus", "b", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLockStatus", "b", AbstractProperty::Read);		
+		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLockStatus", "b", AbstractProperty::Read);
+	}
+};
+
+class DoorProperty: public DBusSink
+{
+public:
+	DoorProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("Door", re, connection, map<string, string>())
+	{
+
+		wantPropertyVariant(VehicleProperty::DoorStatusW3C, "Status", AbstractProperty::Read);
+
+		wantPropertyVariant(VehicleProperty::DoorLockStatus, "Lock", AbstractProperty::Read);
+
+		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLock", AbstractProperty::Read);
 	}
 };
 
