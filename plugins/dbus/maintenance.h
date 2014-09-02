@@ -18,9 +18,10 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Distance traveled in km
 		 **/
-		wantProperty<uint>(VehicleProperty::Odometer, "Odometer", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Odometer, "Odometer", AbstractProperty::Read);
 
-		
+		wantPropertyVariant(VehicleProperty::DistanceTotal, "DistanceTotal", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DistanceSinceStart, "DistanceSinceStart", AbstractProperty::Read);
 	}
 };
 
@@ -36,25 +37,26 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Transmission fluid level percentage. 0-100.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::TransmissionFluidLevel, "Transmission", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionFluidLevel, "Transmission", AbstractProperty::Read);
 
 		/** @attributeName Brake
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Brake fluid level percentage. 0-100.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::BrakeFluidLevel, "Brake", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::BrakeFluidLevel, "Brake", AbstractProperty::Read);
 
 		/** @attributeName Washer
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Washer fluid level percentage. 0-100.
 		 **/
-		wantProperty<uint16_t>(VehicleProperty::WasherFluidLevel, "Washer", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WasherFluidLevel, "Washer", AbstractProperty::Read);
 	}
 };
 
 /** @interface Battery : VehiclePropertyType **/
+/// TODO: deprecated.  remove in 0.13
 class BatteryProperty: public DBusSink
 {
 public:
@@ -66,15 +68,41 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return battery voltage.
 		 **/
-		wantProperty<double>(VehicleProperty::BatteryVoltage, "Voltage", "d", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::BatteryVoltage, "Voltage", "d", AbstractProperty::Read);
 
 		/** @attributeName Current
 		 *  @type double
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return battery current in Amperes
 		 **/
-		wantProperty<double>(VehicleProperty::BatteryCurrent, "Current", "d", AbstractProperty::Read);
-		
+		wantPropertyVariant(VehicleProperty::BatteryCurrent, "Current", "d", AbstractProperty::Read);
+
+	}
+};
+
+/** @interface Battery : VehiclePropertyType **/
+class BatteryStatusProperty: public DBusSink
+{
+public:
+	BatteryStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("BatteryStatus", re, connection, map<string, string>())
+	{
+		/** @attributeName Voltage
+		 *  @type double
+		 *  @access readonly
+		 *  @attributeComment \brief MUST return battery voltage.
+		 **/
+		wantPropertyVariant(VehicleProperty::BatteryVoltage, "Voltage", AbstractProperty::Read);
+
+		/** @attributeName Current
+		 *  @type double
+		 *  @access readonly
+		 *  @attributeComment \brief MUST return battery current in Amperes
+		 **/
+		wantPropertyVariant(VehicleProperty::BatteryCurrent, "Current", AbstractProperty::Read);
+
+		wantPropertyVariant(VehicleProperty::BatteryCurrent, "ChargeLevel", AbstractProperty::Read);
+
 	}
 };
 
@@ -85,8 +113,21 @@ public:
 	TireProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Tire", re, connection, map<string, string>())
 	{
-		wantProperty<double>(VehicleProperty::TirePressure, "Pressure", "d", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TireTemperature, "Temperature", "d", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TirePressure, "Pressure", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TirePressureLow, "PressureLow", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TireTemperature, "Temperature", AbstractProperty::Read);
+	}
+};
+
+
+class EngineCoolant: public DBusSink
+{
+public:
+	EngineCoolant(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("EngineCoolant", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::EngineCoolantLevel, "Level", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineCoolantTemperature, "Temperature", AbstractProperty::Read);
 	}
 };
 

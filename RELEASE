@@ -14,7 +14,10 @@ Changes:
   the last pid that called FindObject* disconnects from DBus (or closes).
 - Many internal stl containers have been changed to use more efficient ones.
 - Some internal methods changed to const & references to avoid copies.
-- DBus plugin will no cache unsubscribed values.  Improves performance.
+- DBus plugin will not cache unsubscribed values.  Improves performance.
+- Many DBus API changes.  See new docs/amb.idl. Several interfaces are deprecated and replaced with 
+  more w3c compliant interfaces.
+-- Fuel interface units changed
 
 Fixes:
 - database plugin updated to use zones

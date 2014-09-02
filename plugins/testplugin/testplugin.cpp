@@ -52,10 +52,6 @@ bool beginsWith(std::string a, std::string b)
 {
 	return (a.compare(0, b.length(), b) == 0);
 }
-void TestPlugin::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
-{
-
-}
 
 /**
  * Tests Core's methods:
@@ -148,6 +144,7 @@ bool TestPlugin::testSubscription()
 	int oldPropertyChanges = propertyChanges;
 
 	AbstractPropertyType* value = new BasicPropertyType<int>(TestProptertyName1, 22);
+	value->priority = AbstractPropertyType::Instant;
 	routingEngine->updateProperty(value, "");
 	TEST(oldSupportedPropertyChanges == supportedPropertyChanges);
 	TEST(oldPropertyChanges == propertyChanges);
@@ -157,6 +154,7 @@ bool TestPlugin::testSubscription()
 	delete value;
 
 	value = new BasicPropertyType<short>(TestProptertyName2, 255);
+	value->priority = AbstractPropertyType::Instant;
 	routingEngine->updateProperty(value, "");
 	TEST(oldSupportedPropertyChanges == supportedPropertyChanges);
 	TEST(oldPropertyChanges == propertyChanges);
@@ -166,6 +164,7 @@ bool TestPlugin::testSubscription()
 	delete value;
 
 	value = new BasicPropertyType<bool>(VehicleProperty::ClutchStatus, true);
+	value->priority = AbstractPropertyType::Instant;
 	routingEngine->updateSupported({VehicleProperty::ClutchStatus},PropertyList(), this);
 
 	class TestSink : public AbstractSink
@@ -209,6 +208,8 @@ bool TestPlugin::testSubscription()
 
 	routingEngine->updateSupported(s, PropertyList(), this);
 	VehicleProperty::VehicleSpeedType speed(10);
+	speed.priority = AbstractPropertyType::Instant;
+
 	routingEngine->updateProperty(&speed,uuid());
 	routingEngine->updateSupported(PropertyList(), s, this);
 
@@ -379,7 +380,7 @@ int TestPlugin::supportedOperations()
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new TestPlugin(routingengine, config);
-	
+
 }
 const string TestPlugin::uuid()
 {
@@ -405,7 +406,7 @@ void TestPlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property
 
 void TestPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
-	
+
 }
 
 AsyncPropertyReply *TestPlugin::setProperty(AsyncSetPropertyRequest request )
@@ -418,7 +419,7 @@ AsyncPropertyReply *TestPlugin::setProperty(AsyncSetPropertyRequest request )
 	return reply;
 }
 
-PropertyInfo TestPlugin::getPropertyInfo(VehicleProperty::Property property)
+PropertyInfo TestPlugin::getPropertyInfo(const VehicleProperty::Property &property)
 {
 	if(!contains(m_supportedProperties, property))
 		return PropertyInfo::invalid();

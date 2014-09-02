@@ -352,6 +352,36 @@ public:
 		return *this;
 	}
 
+	BasicPropertyType & operator = (T const & other)
+	{
+		setValue(other);
+		return *this;
+	}
+
+	BasicPropertyType & operator ++ ()
+	{
+		setValue(basicValue() + 1);
+	}
+
+	BasicPropertyType & operator -- ()
+	{
+		setValue(basicValue() - 1);
+	}
+
+	BasicPropertyType operator ++ (int)
+	{
+		BasicPropertyType<T> temp = *this;
+		temp.setValue(basicValue() + 1);
+		return temp;
+	}
+
+	BasicPropertyType operator -- (int)
+	{
+		BasicPropertyType<T> temp = *this;
+		temp.setValue(basicValue() - 1);
+		return temp;
+	}
+
 	bool operator < (const BasicPropertyType<T>& other) const
 	{
 		return value<T>() < other.value<T>();
@@ -430,6 +460,11 @@ public:
 	void fromVariant(GVariant *v)
 	{
 		setValue(deserializeVariant<T>(v));
+	}
+
+	T basicValue()
+	{
+		return value<T>();
 	}
 
 private:
@@ -523,6 +558,12 @@ public:
 		name = other.name;
 		zone = other.zone;
 
+		return *this;
+	}
+
+	StringPropertyType & operator = (std::string const & other)
+	{
+		setValue(std::string(other));
 		return *this;
 	}
 
