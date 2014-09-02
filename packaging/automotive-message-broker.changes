@@ -1,3 +1,19 @@
+* Tue Sep 02 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140820.174605-9-g7f1852a
+- DBus signaller will combine duplicate signals for same object path
+- Fixed issue with Murphy plugin using wronge type for certain Properties.
+- Some fixes and performance tweaks.
+- version bump 0.11.812
+- fixed periodic crash when sending dbus signal
+- cleaned up debug output
+- updated to upstream 0.11.812
+- fixed up test plugin
+- made some of the dbus API compliant with w3c auto-bg specification
+- enginecoolant should be signed
+- version bump 0.11.900.  We are now beta
+- fix for wheel plugin
+- fixed frequency option in dbus plugin
+- fixed up database plugin
+
 * Wed Aug 20 2014 tripzero <kevron.m.rees@intel.com> submit/tizen_ivi/20140612.200613@a721703
 - Merge branch '0.12' into tizen
 - Merge pull request #19 from tripzero/master
