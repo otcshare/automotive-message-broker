@@ -1,24 +1,25 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
 #include "bluemonkey.h"
 #include "abstractroutingengine.h"
+#include "ambplugin.h"
 #include "debugout.h"
 #include "irccoms.h"
 
@@ -33,9 +34,12 @@ Q_SCRIPT_DECLARE_QMETAOBJECT(QTimer, QObject*)
 
 #define foreach Q_FOREACH
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new BluemonkeySinkManager(routingengine, config);
+	auto plugin = new AmbPlugin<BluemonkeySink>(routingengine, config);
+	plugin->init();
+
+	return plugin;
 }
 
 QVariant gvariantToQVariant(GVariant *value)
@@ -89,7 +93,7 @@ QVariant gvariantToQVariant(GVariant *value)
 
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSource(e, config), agent(nullptr), engine(nullptr), mSilentMode(false)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent): QObject(0), AmbPluginImpl(e, config, parent), agent(nullptr), engine(nullptr), mSilentMode(false)
 {
 	irc = new IrcCommunication(config, this);
 
@@ -140,44 +144,19 @@ PropertyList BluemonkeySink::subscriptions()
 
 }
 
-void BluemonkeySink::supportedChanged(const PropertyList &supportedProperties)
+void BluemonkeySink::supportedChanged(const PropertyList & supportedProperties)
 {
 	DebugOut()<<"supported changed"<<endl;
 }
 
-void BluemonkeySink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
+void BluemonkeySink::propertyChanged(AbstractPropertyType * value)
 {
 
 }
 
-const string BluemonkeySink::uuid()
+const string BluemonkeySink::uuid() const
 {
 	return "bluemonkey";
-}
-
-void BluemonkeySink::getPropertyAsync(AsyncPropertyReply *reply)
-{
-}
-
-void BluemonkeySink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
-{
-}
-
-AsyncPropertyReply *BluemonkeySink::setProperty(AsyncSetPropertyRequest request)
-{
-}
-
-void BluemonkeySink::subscribeToPropertyChanges(VehicleProperty::Property property)
-{
-}
-
-void BluemonkeySink::unsubscribeToPropertyChanges(VehicleProperty::Property property)
-{
-}
-
-PropertyList BluemonkeySink::supported()
-{
-	return mSupported;
 }
 
 int BluemonkeySink::supportedOperations()
@@ -202,6 +181,18 @@ QStringList BluemonkeySink::sourcesForProperty(QString property)
 	for(auto itr = list.begin(); itr != list.end(); itr++)
 	{
 		strList<<(*itr).c_str();
+	}
+
+	return strList;
+}
+
+QStringList BluemonkeySink::supportedProperties()
+{
+	PropertyList props = routingEngine->supported();
+	QStringList strList;
+	for(auto p : props)
+	{
+		strList<<p.c_str();
 	}
 
 	return strList;
@@ -342,22 +333,23 @@ void BluemonkeySink::createCustomProperty(QString name, QScriptValue defaultValu
 				return nullptr;
 
 			if(var.type() == QVariant::UInt)
-				return new BasicPropertyType<uint>(name.toStdString(),var.toUInt());
+				return new BasicPropertyType<uint>(name.toStdString(), var.toUInt());
 			else if(var.type() == QVariant::Double)
 				return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
 			else if(var.type() == QVariant::Bool)
 				return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
 			else if(var.type() == QVariant::Int)
-				return new BasicPropertyType<int>(name.toStdString(),var.toInt());
+				return new BasicPropertyType<int>(name.toStdString(), var.toInt());
 			else if(var.type() == QVariant::String)
-				return new StringPropertyType(name.toStdString(),var.toString().toStdString());
+				return new StringPropertyType(name.toStdString(), var.toString().toStdString());
 
 
 			return nullptr;
 	};
 
-	VehicleProperty::registerProperty(name.toStdString(),create);
-	mSupported.push_back(name.toStdString());
+	addPropertySupport(Zone::None, create);
+
+	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
 
 
@@ -390,7 +382,7 @@ void Property::setValue(QVariant v)
 	{
 		if(reply->success)
 		{
-			propertyChanged(reply->property,reply->value,reply->value->sourceUuid);
+			propertyChanged(reply->property, reply->value, reply->value->sourceUuid);
 		}
 		delete reply;
 	};
