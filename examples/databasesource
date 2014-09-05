@@ -1,16 +1,16 @@
 {
-	"sources" : [ 
-		{
-			"name" : "Database Source",
-			"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
-			"playbackOnLoad" : "true",
-			"databaseFile" : "generated.db"
-		}
-	],
-	"sinks": [
-		{
-			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so"
-		}
-	]
+  "sources" : [
+    {
+      "name" : "Database Source",
+      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/databasesinkplugin.so",
+      "playbackOnLoad" : "true",
+      "databaseFile" : "generated.db"
+    }
+  ],
+  "sinks": [
+    {
+      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/dbussinkplugin.so"
+    }
+  ]
 }
 

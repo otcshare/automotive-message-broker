@@ -16,8 +16,8 @@ add_library(examplesinkplugin MODULE ${examplesinkplugin_sources})
 set_target_properties(examplesinkplugin PROPERTIES PREFIX "")
 target_link_libraries(examplesinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
-install(TARGETS examplesinkplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
-install(TARGETS examplesourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
+install(TARGETS examplesinkplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+install(TARGETS examplesourceplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 add_subdirectory(common)
 

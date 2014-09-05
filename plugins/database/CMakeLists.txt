@@ -12,6 +12,6 @@ add_library(databasesinkplugin MODULE ${databasesinkplugin_sources})
 set_target_properties(databasesinkplugin PROPERTIES PREFIX "")
 target_link_libraries(databasesinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${sqlite_LIBRARIES})
 
-install(TARGETS databasesinkplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
+install(TARGETS databasesinkplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 endif(database_plugin)

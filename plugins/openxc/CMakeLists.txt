@@ -14,6 +14,6 @@ add_library(openxcplugin MODULE ${openxcplugin_sources})
 set_target_properties(openxcplugin PROPERTIES PREFIX "")
 target_link_libraries(openxcplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} ${json_LIBRARIES})
 
-install(TARGETS openxcplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS openxcplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 endif(openxc_plugin)

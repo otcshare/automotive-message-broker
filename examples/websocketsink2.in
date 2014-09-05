@@ -2,14 +2,14 @@
   "sources" : [
     {
       "name" : "ExampleSouce",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesourceplugin.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so",
       "delay" : "6"
     }
   ],
   "sinks": [
     {
       "name" : "WebSocketSink",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/websocketsink.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/websocketsink.so",
       "interface" : "eth1",
       "ssl" : "false",
       "port" : "23000",

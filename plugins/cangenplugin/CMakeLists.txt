@@ -12,7 +12,7 @@ add_library(cangenplugin MODULE ${cangenplugin_sources} ${cangenplugin_headers})
 set_target_properties(cangenplugin PROPERTIES PREFIX "")
 target_link_libraries(cangenplugin amb amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} ${websockets_LIBRARIES} -lrt)
 
-install(TARGETS cangenplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS cangenplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 ############################################################################################################################################
 

@@ -24,7 +24,7 @@ add_library(bluetoothplugin MODULE ${bluetooth_sources})
 set_target_properties(bluetoothplugin PROPERTIES PREFIX "")
 target_link_libraries(bluetoothplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib  amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} ${gio_LIBRARIES} ${QT_LIBRARIES})
 
-install(TARGETS bluetoothplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS bluetoothplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/ambbt.conf DESTINATION /etc/dbus-1/system.d )
 
 add_executable(testAmbBt testAmbBt.cpp bluetoothplugin.cpp)
