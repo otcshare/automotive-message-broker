@@ -1,6 +1,9 @@
 #include "bluetooth5.h"
+#include "superptr.hpp"
+
 #include "debugout.h"
 #include <gio/gio.h>
+#include <gio/gunixfdlist.h>
 #include <string>
 
 static const gchar introspection_xml[] =
@@ -45,7 +48,39 @@ static void handleMethodCall(GDBusConnection       *connection,
 		gint32 fd;
 		GVariantIter* iter;
 
+		DebugOut() << "parameters signature: " << g_variant_get_type_string(parameters) << endl;
+
 		g_variant_get(parameters,"(oha{sv})", &device, &fd, &iter);
+
+		DebugOut() << "device: " << device << endl;
+
+		auto message = g_dbus_method_invocation_get_message(invocation);
+
+		auto fdList = g_dbus_message_get_unix_fd_list(message);
+
+		GError* error = nullptr;
+
+		fd = g_unix_fd_list_get(fdList, 0, &error);
+
+		auto errorPtr = amb::make_super(error);
+
+		if(errorPtr)
+		{
+			DebugOut(DebugOut::Error) << "Error trying to get fd: " << errorPtr->message << endl;
+			return;
+		}
+
+		char* propertyName;
+		GVariant* value;
+
+		DebugOut() << "trying to see what properties we got with this call" << endl;
+
+		while(g_variant_iter_next(iter,"{sv}", &propertyName, &value))
+		{
+			auto keyPtr = amb::make_super(propertyName);
+			auto valuePtr = amb::make_super(value);
+			DebugOut() << "key " << keyPtr.get() << "value signature: " << g_variant_get_type_string(valuePtr.get()) << endl;
+		}
 
 		manager->connected(fd);
 	}
@@ -81,106 +116,33 @@ static const GDBusInterfaceVTable interfaceVTable =
 	setProperty
 };
 
-
-std::string findAdapterPath(std::string adapterAddy)
-{
-	std::string adapterObjectPath;
-
-	GError * error = nullptr;
-	GDBusProxy * managerProxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, NULL,
-															  "org.bluez",
-															  "/",
-															  "org.freedesktop.DBus.ObjectManager",
-															  nullptr,&error);
-
-	if(error)
-	{
-		DebugOut(DebugOut::Error)<<"Could not create ObjectManager proxy for Bluez: "<<error->message<<endl;
-		g_error_free(error);
-		return "";
-	}
-
-	GVariant * objectMap = g_dbus_proxy_call_sync(managerProxy, "GetManagedObjects",nullptr, G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
-
-	if(error)
-	{
-		DebugOut(DebugOut::Error)<<"Failed call to GetManagedObjects: "<<error->message<<endl;
-		g_object_unref(managerProxy);
-		g_error_free(error);
-		return "";
-	}
-
-	GVariantIter* iter;
-	char* objPath;
-	GVariantIter* level2Dict;
-
-	g_variant_get(objectMap, "(a{oa{sa{sv}}})",&iter);
-
-	while(g_variant_iter_next(iter, "(oa{sa{sv}})",&objPath, &level2Dict))
-	{
-		char * interfaceName;
-		GVariantIter* innerDict;
-		while(g_variant_iter_next(level2Dict, "sa{sv}", &interfaceName, &innerDict))
-		{
-			if(std::string(interfaceName) == "org.bluez.Adapter1")
-			{
-				char* propertyName;
-				GVariant* value;
-
-				while(adapterObjectPath == "" && g_variant_iter_next(innerDict,"sv", &propertyName, &value))
-				{
-					if(std::string(propertyName) == "Address")
-					{
-						char* addy;
-						g_variant_get(value,"s",&addy);
-
-						if(adapterAddy == "" || addy && std::string(addy) == adapterAddy)
-						{
-							adapterObjectPath = objPath;
-						}
-
-						g_free(addy);
-					}
-					g_free(propertyName);
-					g_variant_unref(value);
-				}
-			}
-			g_free(interfaceName);
-			g_variant_iter_free(innerDict);
-		}
-		g_free(objPath);
-		g_variant_iter_free(level2Dict);
-	}
-	g_variant_iter_free(iter);
-
-	return adapterObjectPath;
-}
-
-std::string findDevice(std::string addy, std::string adapterPath="")
+std::string findDevice(std::string address, std::string adapterPath="")
 {
 	std::string objectPath;
 
-	GError * error = nullptr;
-	GDBusProxy * managerProxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, NULL,
+	GError * proxyError = nullptr;
+	auto managerProxy = amb::make_super(g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, NULL,
 															  "org.bluez",
 															  "/",
 															  "org.freedesktop.DBus.ObjectManager",
-															  nullptr,&error);
+															  nullptr, &proxyError));
 
-	if(error)
+	auto proxyErrorPtr = amb::make_super(proxyError);
+	if(proxyErrorPtr)
 	{
-		DebugOut(DebugOut::Error)<<"Could not create ObjectManager proxy for Bluez: "<<error->message<<endl;
-		g_error_free(error);
+		DebugOut(DebugOut::Error)<<"Could not create ObjectManager proxy for Bluez: "<<proxyErrorPtr->message<<endl;
 		return "";
 	}
 
-	GVariant * objectMap = g_dbus_proxy_call_sync(managerProxy, "GetManagedObjects",nullptr, G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error);
+	GError * getManagerObjectError = nullptr;
 
-	if(error)
+	auto objectMap = amb::make_super(g_dbus_proxy_call_sync(managerProxy.get(), "GetManagedObjects",nullptr, G_DBUS_CALL_FLAGS_NONE, -1, NULL, &getManagerObjectError));
+
+	auto getManagerObjectErrorPtr = amb::make_super(getManagerObjectError);
+
+	if(getManagerObjectErrorPtr)
 	{
-		DebugOut(DebugOut::Error)<<"Failed call to GetManagedObjects: "<<error->message<<endl;
-		g_object_unref(managerProxy);
-		g_error_free(error);
+		DebugOut(DebugOut::Error)<<"Failed call to GetManagedObjects: "<<getManagerObjectErrorPtr->message<<endl;
 		return "";
 	}
 
@@ -188,45 +150,49 @@ std::string findDevice(std::string addy, std::string adapterPath="")
 	char* objPath;
 	GVariantIter* level2Dict;
 
-	g_variant_get(objectMap, "(a{oa{sa{sv}}})",&iter);
+	g_variant_get(objectMap.get(), "(a{oa{sa{sv}}})",&iter);
+
+	auto iterPtr = amb::make_super(iter);
+
 
 	while(g_variant_iter_next(iter, "{oa{sa{sv}}}",&objPath, &level2Dict))
 	{
+		auto level2DictPtr = amb::make_super(level2Dict);
+		auto objPathPtr = amb::make_super(objPath);
+
 		char * interfaceName;
 		GVariantIter* innerDict;
-		while(g_variant_iter_next(level2Dict, "{sa{sv}}", &interfaceName, &innerDict))
+		while(g_variant_iter_next(level2DictPtr.get(), "{sa{sv}}", &interfaceName, &innerDict))
 		{
-			if(std::string(interfaceName) == "org.bluez.Device1")
+			auto interfaceNamePtr = amb::make_super(interfaceName);
+			auto innerDictPtr = amb::make_super(innerDict);
+			if(std::string(interfaceNamePtr.get()) == "org.bluez.Device1")
 			{
 				char* propertyName;
 				GVariant* value;
 
-				while(objectPath == "" && g_variant_iter_next(innerDict,"{sv}", &propertyName, &value))
+				while(objectPath == "" && g_variant_iter_next(innerDictPtr.get(),"{sv}", &propertyName, &value))
 				{
-					if(std::string(propertyName) == "Address")
+					auto propertyNamePtr = amb::make_super(propertyName);
+					auto valuePtr = amb::make_super(value);
+
+					if(std::string(propertyNamePtr.get()) == "Address")
 					{
 						char* addy;
-						g_variant_get(value,"s",&addy);
+						g_variant_get(valuePtr.get(),"s",&addy);
 
-						if(adapterPath == "" || addy && std::string(addy) == adapterPath)
+						auto addyPtr = amb::make_super(addy);
+
+						if(addyPtr && std::string(addyPtr.get()) == address)
 						{
-							objectPath = objPath;
+							objectPath = objPathPtr.get();
 						}
-
-						g_free(addy);
 					}
 					///TODO: filter only devices that have the specified adapter
-					g_free(propertyName);
-					g_variant_unref(value);
 				}
 			}
-			g_free(interfaceName);
-			g_variant_iter_free(innerDict);
 		}
-		g_free(objPath);
-		g_variant_iter_free(level2Dict);
 	}
-	g_variant_iter_free(iter);
 
 	return objectPath;
 }
@@ -271,8 +237,13 @@ Bluetooth5::Bluetooth5()
 	g_variant_builder_add(&builder, "{sv}", "Role", g_variant_new("s","client"));
 	g_variant_builder_add(&builder, "{sv}", "AutoConnect", g_variant_new("b",true));
 
-	g_dbus_connection_call_sync(mConnection, "org.bluez", "/org/bluez", "org.bluez.ProfileManager1", "RegisterProfile", g_variant_new("(osa{sv})", "/org/bluez/spp", "00001101-0000-1000-8000-00805F9B34FB",
-																																 &builder), nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &error);
+	g_dbus_connection_call_sync(mConnection,
+								"org.bluez",
+								"/org/bluez",
+								"org.bluez.ProfileManager1",
+								"RegisterProfile",
+								g_variant_new("(osa{sv})", "/org/bluez/spp", "00001101-0000-1000-8000-00805F9B34FB", &builder),
+								nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &error);
 
 	if(error)
 	{
@@ -287,44 +258,52 @@ void Bluetooth5::getDeviceForAddress(std::string address, ConnectedCallback conn
 
 	std::string devicePath = findDevice(address);
 
-	GDBusProxy * deviceProxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,G_DBUS_PROXY_FLAGS_NONE,NULL,
-															  "org.bluez", devicePath.c_str(), "org.bluez.Device1", nullptr, nullptr);
+	DebugOut() << "Bluetooth device path: " << devicePath << endl;
+
+	if(devicePath == "")
+	{
+		DebugOut(DebugOut::Error) << "device path not found.  Not paired? " << endl;
+	}
 
 	GError* error = nullptr;
 
-	g_dbus_proxy_call(deviceProxy, "Connect", nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr,[](GObject *source_object,
-																							   GAsyncResult *res,
-																							   gpointer user_data)
+	GDBusProxy * deviceProxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,G_DBUS_PROXY_FLAGS_NONE,NULL,
+															  "org.bluez", devicePath.c_str(), "org.bluez.Device1", nullptr, &error);
+
+	auto errorPtr = amb::make_super(error);
+
+	if(errorPtr)
+	{
+		DebugOut(DebugOut::Error) << "Error getting bluetooth device proxy " << errorPtr->message <<endl;
+		return;
+	}
+
+	g_dbus_proxy_call(deviceProxy, "Connect", nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr,
+					  [](GObject *source_object, GAsyncResult *res, gpointer user_data)
 	{
 
 		GError* error = nullptr;
-		GDBusProxy *deviceProxy = (GDBusProxy*)user_data;
 
 		g_dbus_proxy_call_finish(G_DBUS_PROXY (source_object),res, &error);
 
-		if(error)
+		auto errorPtr = amb::make_super(error);
+
+		if(errorPtr)
 		{
-			DebugOut(DebugOut::Error)<<"error trying to connect profile: "<<error->message<<endl;
-			g_error_free(error);
+			DebugOut(DebugOut::Error) << "error trying to connect profile: " << errorPtr->message << endl;
 		}
-
-		g_object_unref(deviceProxy);
-	}, deviceProxy);
-
-
-
-
-
+	},
+	this);
 }
 
 void Bluetooth5::connected(int fd)
 {
-	try
+	//try
 	{
 		mConnected(fd);
 	}
-	catch(...)
+	//catch(...)
 	{
-
+		//DebugOut(DebugOut::Error) << "Error calling connected callback" << endl;
 	}
 }

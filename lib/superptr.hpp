@@ -67,8 +67,8 @@ template<typename T> super_ptr<T> make_super(T* t) {
   return super_ptr<T>(t);
 }
 
-template<typename T> unique_ptr<T> make_unique(T* t) {
-  return unique_ptr<T>(t);
+template<typename T> ::std::unique_ptr<T> make_unique(T* t) {
+  return ::std::unique_ptr<T>(t);
 }
 
 }

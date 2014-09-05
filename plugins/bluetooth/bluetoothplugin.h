@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QTcpSocket>
 #include <QDBusUnixFileDescriptor>
 
-class BluetoothSinkPlugin;
+class AbstractBluetoothSerialProfile;
 
 class BtProfileAdaptor : public QDBusAbstractAdaptor
 {
@@ -38,7 +38,7 @@ class BtProfileAdaptor : public QDBusAbstractAdaptor
 
 public:
 
-	BtProfileAdaptor(BluetoothSinkPlugin* parent);
+	BtProfileAdaptor(AbstractBluetoothSerialProfile* parent);
 
 public Q_SLOTS:
 
@@ -50,34 +50,49 @@ public Q_SLOTS:
 
 private:
 
-	BluetoothSinkPlugin* mParent;
+	AbstractBluetoothSerialProfile* mParent;
 
 };
 
-class BluetoothSinkPlugin: public QObject, public AbstractSink
+class AbstractBluetoothSerialProfile: public QObject
 {
-Q_OBJECT
+	Q_OBJECT
+
+public:
+	AbstractBluetoothSerialProfile(QString role = "server");
+
+	virtual void release();
+
+	virtual void newConnection(std::string path, QDBusUnixFileDescriptor fd, QVariantMap props);
+
+	virtual void requestDisconnection(std::string path);
+
+	virtual void canHasData();
+
+protected:
+	virtual void dataReceived(QByteArray data) = 0;
+	SerialPort socket;
+
+private:
+	QString role;
+};
+
+class BluetoothSinkPlugin: public AbstractBluetoothSerialProfile, public AbstractSink
+{
+	Q_OBJECT
 
 public:
 	BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, string> config);
-	
+
 	const string uuid();
 
 	void supportedChanged(const PropertyList &) {}
 
 	void propertyChanged(AbstractPropertyType* value);
 
-	void release();
+protected:
+	virtual void dataReceived(QByteArray data);
 
-	void newConnection(std::string path, QDBusUnixFileDescriptor fd, QVariantMap props);
-
-	void requestDisconnection(std::string path);
-
-	void canHasData();
-
-
-private:
-	 SerialPort socket;
 };
 
 

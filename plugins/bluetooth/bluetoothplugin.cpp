@@ -61,35 +61,13 @@ bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
 BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSink(re, config)
 {
-	new BtProfileAdaptor(this);
 
-	if(!QDBusConnection::systemBus().registerService("org.automotive.message.broker.bluetooth"))
-		DebugOut(DebugOut::Error)<<"Failed to register DBus service name: "<<QDBusConnection::systemBus().lastError().message().toStdString()<<endl;
-
-	if(!QDBusConnection::systemBus().registerObject("/org/bluez/spp", this))
-		DebugOut(DebugOut::Error)<<"Failed to register DBus object"<<endl;
-
-	QDBusInterface profileManagerIface("org.bluez", "/org/bluez", "org.bluez.ProfileManager1", QDBusConnection::systemBus());
-
-	QVariantMap options;
-	options["Name"] = "AMB spp server";
-	options["Role"] = "server";
-	options["Channel"] = qVariantFromValue(uint16_t(23));
-
-	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", qVariantFromValue(QDBusObjectPath("/org/bluez/spp")), "00001101-0000-1000-8000-00805F9B34FB", options);
-
-	if(!reply.isValid())
-	{
-		DebugOut(DebugOut::Error)<<"RegisterProfile call failed: "<<reply.error().message().toStdString()<<endl;
-	}
 }
-
-
 
 extern "C" AbstractSink * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new BluetoothSinkPlugin(routingengine, config);
-	
+
 }
 
 const string BluetoothSinkPlugin::uuid()
@@ -102,12 +80,44 @@ void BluetoothSinkPlugin::propertyChanged(AbstractPropertyType *value)
 
 }
 
-void BluetoothSinkPlugin::release()
+void BluetoothSinkPlugin::dataReceived(QByteArray data)
+{
+
+}
+
+AbstractBluetoothSerialProfile::AbstractBluetoothSerialProfile(QString r)
+	:role(r)
+{
+	new BtProfileAdaptor(this);
+
+	if(!QDBusConnection::systemBus().registerService("org.automotive.message.broker.bluetooth"))
+		DebugOut(DebugOut::Error)<<"Failed to register DBus service name: "<<QDBusConnection::systemBus().lastError().message().toStdString()<<endl;
+
+	if(!QDBusConnection::systemBus().registerObject("/org/bluez/spp", this))
+		DebugOut(DebugOut::Error)<<"Failed to register DBus object"<<endl;
+
+	QDBusInterface profileManagerIface("org.bluez", "/org/bluez", "org.bluez.ProfileManager1", QDBusConnection::systemBus());
+
+	QVariantMap options;
+	options["Name"] = "AMB spp";
+	options["Role"] = role;
+	options["Channel"] = qVariantFromValue(uint16_t(23));
+	options["AutoConnect"] = true;
+
+	QDBusReply<void> reply = profileManagerIface.call("RegisterProfile", qVariantFromValue(QDBusObjectPath("/org/bluez/spp")), "00001101-0000-1000-8000-00805F9B34FB", options);
+
+	if(!reply.isValid())
+	{
+		DebugOut(DebugOut::Error)<<"RegisterProfile call failed: "<<reply.error().message().toStdString()<<endl;
+	}
+}
+
+void AbstractBluetoothSerialProfile::release()
 {
 	DebugOut()<<"release called."<<endl;
 }
 
-void BluetoothSinkPlugin::newConnection(string path, QDBusUnixFileDescriptor fd, QVariantMap props)
+void AbstractBluetoothSerialProfile::newConnection(string path, QDBusUnixFileDescriptor fd, QVariantMap props)
 {
 	DebugOut()<<"new Connection! Path: "<<path<<" fd: "<<fd.fileDescriptor()<<endl;
 
@@ -120,23 +130,22 @@ void BluetoothSinkPlugin::newConnection(string path, QDBusUnixFileDescriptor fd,
 	g_io_channel_unref(chan);
 }
 
-void BluetoothSinkPlugin::requestDisconnection(string path)
+void AbstractBluetoothSerialProfile::requestDisconnection(string path)
 {
 	DebugOut()<<"requestDisconnection called.  Path: "<<path<<endl;
 	socket.close();
 }
 
-void BluetoothSinkPlugin::canHasData()
+void AbstractBluetoothSerialProfile::canHasData()
 {
 	QByteArray data = socket.read().c_str();
 
 	DebugOut()<<"data read: "<<data.constData()<<endl;
 
-	if(data == "ping")
-		socket.write("pong");
+	dataReceived(data);
 }
 
-BtProfileAdaptor::BtProfileAdaptor(BluetoothSinkPlugin *parent)
+BtProfileAdaptor::BtProfileAdaptor(AbstractBluetoothSerialProfile *parent)
 	:QDBusAbstractAdaptor(parent), mParent(parent)
 {
 

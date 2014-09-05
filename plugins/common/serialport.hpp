@@ -50,19 +50,19 @@ public:
 		int ret = 0;
 		switch(newspeed)
 		{
-			case 2400: 
+			case 2400:
 				speed = B2400;
 				break;
-			case 4800: 
+			case 4800:
 				speed = B4800;
 				break;
-			case 9600: 
+			case 9600:
 				speed = B9600;
 				break;
-			case 19200: 
+			case 19200:
 				speed = B19200;
 				break;
-			case 38400: 
+			case 38400:
 				speed = B38400;
 				break;
 			default:
@@ -74,8 +74,6 @@ public:
 	bool open()
 	{
 		fd = ::open(tty.c_str(), O_RDWR, O_NOCTTY);
-
-
 
 		return setupDevice();
 	}
@@ -97,11 +95,10 @@ public:
 		char buff;
 		std::string result;
 		int bytesread = 0;
-		while( bytesread = ::read(fd,&buff,1) > 0 )
+		while( bytesread = ::read(fd, &buff, 1) > 0 )
 		{
 			result += buff;
 		}
-
 
 		if(bytesread == -1)
 			perror("Error while reading: ");
