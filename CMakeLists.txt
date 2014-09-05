@@ -17,6 +17,7 @@ add_definitions(-DPROJECT_QUALITY="${PROJECT_QUALITY}")
 
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" CACHE STRING "Directory where lib will install")
+set (PLUGIN_INSTALL_PATH "${LIB_INSTALL_DIR}/${PROJECT_NAME}")
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
 set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}" CACHE PATH "The directory the docs will be installed to")
 
@@ -30,7 +31,7 @@ option(qt_bindings "AMB Qt DBus bindings" OFF)
 option(opencvlux_plugin "OpenCV Lux plugin" OFF)
 option(murphy_plugin "murphy policy framework plugin" OFF)
 option(test_plugin "Test Plugin" ON)
-option(bluemonkey_plugin "bluemonkey irc plugin" OFF)
+option(bluemonkey_plugin "bluemonkey plugin" OFF)
 option(gpsnmea_plugin "gps NMEA location plugin" OFF)
 option(openxc_plugin "OpenXC plugin" OFF)
 option(bluetooth_plugin "bluetooth plugin" OFF)
@@ -151,6 +152,8 @@ SET(CPACK_DEBIAN_PACKAGE_DEPENDS "gpsd (>=2.0), libopencv, libjson0, libltdl7")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION})
 
 INCLUDE(CPack)
+
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/packaging.in/config.tizen.in ${CMAKE_CURRENT_BINARY_DIR}/packaging.in/config.tizen @ONLY)
 
 add_subdirectory(lib)
 add_subdirectory(ambd)

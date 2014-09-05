@@ -2,7 +2,7 @@
   "sources" : [
     {
       "name" : "OBD2Source",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/obd2sourceplugin.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/obd2sourceplugin.so",
       "device" : "/dev/pts/5",
       "baud" : "115200",
       "bluetoothAdapter" : ""
@@ -11,7 +11,7 @@
   "sinks": [
     {
        "name" : "ExampleSink",
-       "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesinkplugin.so"
+       "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
     }
   ]
 }

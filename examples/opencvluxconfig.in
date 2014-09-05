@@ -1,9 +1,9 @@
 {
-  "mainloop" : "/usr/lib/i386-linux-gnu/automotive-message-broker/qtmainloopplugin.so",
+  "mainloop" : "@PLUGIN_INSTALL_PATH@/qtmainloopplugin.so",
   "sources" : [
     {
       "name" : "OpenCV Lux plugin",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/opencvluxplugin.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
       "threaded" : "true",
       "kinect" : "false",
       "opencl" : "false",
@@ -17,7 +17,7 @@
   "sinks": [
     {
       "name" : "Example sink",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesinkplugin.so"
+      "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
     }
   ]
 }
