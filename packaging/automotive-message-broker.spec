@@ -197,7 +197,8 @@ CAN frames listener plug-in for the AMB CAN Simulator package
        -Dgpsnmea_plugin=ON \
        -Dcangen_plugin=ON \
        -Dcansim_plugin=ON \
-       -Denable_docs=ON
+       -Denable_docs=ON \
+       -Dusebluez5=ON
 
 
 %__make %{?jobs:-j%jobs}
