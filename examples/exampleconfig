@@ -2,14 +2,14 @@
   "sources" : [
     {
       "name" : "ExampleSouce",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesourceplugin.so",
+      "path" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/examplesourceplugin.so",
       "delay" : "1"
     }
   ],
   "sinks": [
     {
       "name" : "ExampleSink",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesinkplugin.so"
+      "path" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/examplesinkplugin.so"
     }
   ]
 }

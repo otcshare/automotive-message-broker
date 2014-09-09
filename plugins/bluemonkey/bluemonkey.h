@@ -23,6 +23,8 @@
 #include "abstractsource.h"
 #include "ambpluginimpl.h"
 
+#include <map>
+
 #include <QObject>
 #include <QVariant>
 #include <QJsonDocument>
@@ -33,8 +35,15 @@
 #include "authenticate.h"
 #include "agent.h"
 
-class IrcCommunication;
 class QScriptEngine;
+
+class ModuleInterface
+{
+public:
+	virtual std::map<std::string, QObject*> objects(std::map<string, string> config) = 0;
+};
+
+Q_DECLARE_INTERFACE(ModuleInterface, "org.automotive.bluemonkey.moduleinterface")
 
 class Property: public QObject, public AbstractSink
 {
@@ -105,6 +114,8 @@ public Q_SLOTS:
 
 	void loadConfig(QString str);
 
+	void loadModule(QString path);
+
 	void reloadEngine();
 
 	void writeProgram(QString program);
@@ -122,7 +133,6 @@ public Q_SLOTS:
 
 private:
 	QStringList configsToLoad;
-	IrcCommunication* irc;
 
 	Authenticate* auth;
 	BluemonkeyAgent* agent;

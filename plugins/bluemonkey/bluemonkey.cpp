@@ -21,7 +21,6 @@
 #include "abstractroutingengine.h"
 #include "ambplugin.h"
 #include "debugout.h"
-#include "irccoms.h"
 
 #include <QJsonDocument>
 #include <QScriptEngine>
@@ -95,13 +94,11 @@ QVariant gvariantToQVariant(GVariant *value)
 
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent): QObject(0), AmbPluginImpl(e, config, parent), agent(nullptr), engine(nullptr), mSilentMode(false)
 {
-	irc = new IrcCommunication(config, this);
-
 	QTimer::singleShot(1,this,SLOT(reloadEngine()));
 
 	auth = new Authenticate(config, this);
 
-	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
+/*	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
 
 		if(codes.startsWith("authenticate"))
 		{
@@ -135,7 +132,7 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 				irc->respond(sender, response);
 		}
 	});
-
+*/
 }
 
 
@@ -243,8 +240,8 @@ void BluemonkeySink::reloadEngine()
 	QScriptValue qtimerClass = engine->scriptValueFromQMetaObject<QTimer>();
 	engine->globalObject().setProperty("QTimer", qtimerClass);
 
-	QScriptValue ircValue = engine->newQObject(irc);
-	engine->globalObject().setProperty("irc", ircValue);
+//	QScriptValue ircValue = engine->newQObject(irc);
+//	engine->globalObject().setProperty("irc", ircValue);
 
 	loadConfig(configuration["config"].c_str());
 }

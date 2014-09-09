@@ -426,10 +426,9 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 	{
 		std::string dev = config["device"];
 
-#ifdef USE_BLUEZ5
 		if(dev.find(":") != string::npos)
 		{
-
+#ifdef USE_BLUEZ5
 			bt = new Bluetooth5();
 			bt->getDeviceForAddress(dev, [this](int fd) {
 				DebugOut() << "fd: " << fd << endl;

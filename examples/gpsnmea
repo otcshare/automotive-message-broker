@@ -2,14 +2,14 @@
   "sources" : [
     {
       "name" : "gps nmea plugin",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/gpsnmea.so",
+      "path" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/gpsnmea.so",
       "test" : "true",
       "device" : "/dev/ttyACM0"
     }
   ],
   "sinks": [
     {
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/dbussinkplugin.so"
+      "path" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/dbussinkplugin.so"
     }
   ]
 }

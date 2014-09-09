@@ -82,7 +82,7 @@ private:
 #ifdef USE_BLUEZ5
 	Bluetooth5 * bt;
 #else
-	BluetoothDevice *bt
+	BluetoothDevice *bt;
 #endif
 };
 
