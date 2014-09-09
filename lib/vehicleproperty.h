@@ -420,7 +420,6 @@ public:
 	*/
 	static const Property SteeringWheelAngle;
 	PROPERTYTYPE(SteeringWheelAngle, SteeringWheelAngleType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> SteeringWheelAngleType;
 
 	/// TODO: Rename to "SteeringWheel" in 0.13
 	static const Property SteeringWheelAngleW3C;
@@ -429,22 +428,18 @@ public:
 	/**< 0=off, 1=right, 2=left, 3=hazard */
 	static const Property TurnSignal;
 	PROPERTYTYPEBASIC(TurnSignal, TurnSignals::TurnSignalType)
-	//typedef BasicPropertyType<TurnSignals::TurnSignalType> TurnSignalType;
 
 	/**< Clutch pedal status 0=off, 1=on */
 	static const Property ClutchStatus;
 	PROPERTYTYPE(ClutchStatus, ClutchStatusType,BasicPropertyType<bool>,bool)
-	//typedef BasicPropertyType<bool> ClutchStatusType;
 
 	 /**< Oil pressure TODO: units */
 	static const Property EngineOilPressure;
-	PROPERTYTYPE(EngineOilPressure, EngineOilPressureType,BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> EngineOilPressureType;
+	PROPERTYTYPE(EngineOilPressure, EngineOilPressureType, BasicPropertyType<uint16_t>, uint16_t)
 
 	/**< Engine coolant temperature in degrees celcius **/
 	static const Property EngineCoolantTemperature;
 	PROPERTYTYPE(EngineCoolantTemperature, EngineCoolantTemperatureType, BasicPropertyType<int>, int)
-	//typedef BasicPropertyType<int> EngineCoolantTemperatureType;
 
 	static const Property EngineCoolantLevel;
 	PROPERTYTYPE(EngineCoolantLevel, EngineCoolantLevelType, BasicPropertyType<uint>, uint)
@@ -452,12 +447,10 @@ public:
 	/**< 0=off, 1=on */
 	static const Property MachineGunTurretStatus;
 	PROPERTYTYPEBASIC(MachineGunTurretStatus, bool)
-	//typedef BasicPropertyType<bool> MachineGunTurretStatusType;
 
 	/**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationX;
 	PROPERTYTYPE(AccelerationX, AccelerationXType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> AccelerationType;
 
 	/**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationY;

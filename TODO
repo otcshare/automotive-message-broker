@@ -1,10 +1,6 @@
-For 0.12
 
+- Refactor obd2 plugin with AsyncQueue.  Use thread safe-update property.
 - Rewrite websocket test html
-
-
-For 0.11
-
 - Implement all the DBus properties in the docs/ directory.
 - update json protocol to include getPropertyInfo calls
 - update json protocol to support rangerequests with PropertyList instead of a signel property (Verify)
@@ -15,17 +11,6 @@ For 0.11
 - create docs for all plugins (README)
 - handle badly formed messages properly (ie not crash) in websocketsink
 - GetHistory must filter on source
-
-Completed:
-
-- DBus support for time and sequece being an additional api call (ie, getVehicleSpeed()). - DONE
-- DBus support for objects with multiple sources and multiple 'zones' (/${sourceID}/[${zone}/]batteryVoltage) - DONE
-- Document changes to the DBus API in the IDL - DONE
-- add API to get number of sources per a given property (ie uint AbstractRoutingEngine::getSourcesForProperty(VehicleProperty::Property)) - DONE
-- per-source property filtering in routing engine - DONE
-
-
-Other:
 - grep all the TODOs in the code and do them
 - improve obd2source speed via Physical Addressing (see https://www.scantool.net/forum/index.php?topic=6661.msg25024#msg25024)
 - investigate and enable use of provisioning in ssl websockets

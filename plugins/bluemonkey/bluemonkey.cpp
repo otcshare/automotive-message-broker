@@ -382,7 +382,7 @@ void Property::setValue(QVariant v)
 	{
 		if(reply->success)
 		{
-			propertyChanged(reply->property, reply->value, reply->value->sourceUuid);
+			propertyChanged(reply->value);
 		}
 		delete reply;
 	};
@@ -444,9 +444,9 @@ QString Property::type()
 void Property::setType(QString t)
 {
 	if(mValue && type() != "")
-		routingEngine->unsubscribeToProperty(type().toStdString(),this);
+		routingEngine->unsubscribeToProperty(type().toStdString(), this);
 
-	routingEngine->subscribeToProperty(t.toStdString(),this);
+	routingEngine->subscribeToProperty(t.toStdString(), this);
 
 	mValue = VehicleProperty::getPropertyTypeForPropertyNameValue(t.toStdString());
 
@@ -458,7 +458,7 @@ void Property::setType(QString t)
 	request.completed = [this](AsyncPropertyReply* reply)
 	{
 		if(reply->success)
-			propertyChanged(reply->property, reply->value,uuid());
+			propertyChanged(reply->value);
 
 		delete reply;
 	};
@@ -466,7 +466,7 @@ void Property::setType(QString t)
 	routingEngine->getPropertyAsync(request);
 }
 
-void Property::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
+void Property::propertyChanged(AbstractPropertyType *value)
 {
 	if(mValue)
 	{

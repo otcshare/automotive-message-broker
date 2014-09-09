@@ -54,7 +54,7 @@ public:
 		DebugOut()<<"Bluemonkey Property Supported Changed"<<endl;
 	}
 
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
+	virtual void propertyChanged(AbstractPropertyType* value);
 
 	virtual const std::string uuid() { return mUuid; }
 
