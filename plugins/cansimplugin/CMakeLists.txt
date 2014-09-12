@@ -10,7 +10,7 @@ add_library(cansimplugin MODULE ${cansimplugin_sources} ${cansimplugin_headers})
 set_target_properties(cansimplugin PROPERTIES PREFIX "")
 target_link_libraries(cansimplugin amb amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${link_libraries} -lrt)
 
-install(TARGETS cansimplugin LIBRARY DESTINATION lib/automotive-message-broker)
+install(TARGETS cansimplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 ############################################################################################################################################
 

@@ -1,18 +1,18 @@
 {
-	"sources" : [ 
-		{
-			"name" : "ExampleSouce",
-			"path" : "/usr/lib/automotive-message-broker/examplesourceplugin.so",
-			"delay" : "6"
-		}
-	],
-	"sinks": [
-		{
-			"name" : "DBusSink",
-			"path" : "/usr/lib/automotive-message-broker/dbussinkplugin.so",
-			"frequency" : "30"
-		}
+  "sources" : [
+    {
+      "name" : "ExampleSouce",
+      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesourceplugin.so",
+      "delay" : "6"
+    }
+  ],
+  "sinks": [
+    {
+      "name" : "DBusSink",
+      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/dbussinkplugin.so",
+      "frequency" : "30"
+    }
 
-	]
+  ]
 }
 

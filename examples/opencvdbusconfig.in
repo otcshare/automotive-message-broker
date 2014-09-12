@@ -1,9 +1,9 @@
 {
-  "mainloop" : "/usr/lib/i386-linux-gnu/automotive-message-broker/qtmainloopplugin.so",
+  "mainloop" : "@PLUGIN_INSTALL_PATH@/qtmainloopplugin.so",
   "sources" : [
     {
       "name" : "OpenCV LUX",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/opencvluxplugin.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
       "threaded" : "true",
       "cuda" : "true",
       "fps" : "30",
@@ -15,12 +15,12 @@
       "logfile" : "/tmp/video.avi"
     },
     {
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesourceplugin.so"
+      "path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so"
     }
   ],
   "sinks": [
     {
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/dbussinkplugin.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so",
     },
   ]
 }

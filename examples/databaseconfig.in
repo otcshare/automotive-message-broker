@@ -2,13 +2,13 @@
   "sources" : [
     {
       "name" : "ExampleSouce",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesourceplugin.so"
+      "path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so"
     }
   ],
   "sinks": [
     {
       "name" : "Database",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/databasesinkplugin.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
       "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
       "databaseFile" : "/tmp/storage",
       "startOnLoad" : "true",
@@ -17,10 +17,10 @@
     },
     {
       "name" : "Example Sink",
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/examplesinkplugin.so"
+      "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
     },
     {
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/dbussinkplugin.so"
+      "path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
     }
 
   ]

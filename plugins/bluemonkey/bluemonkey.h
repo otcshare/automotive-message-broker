@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -21,6 +21,8 @@
 #define BluemonkeySink_H
 
 #include "abstractsource.h"
+#include "ambpluginimpl.h"
+
 #include <QObject>
 #include <QVariant>
 #include <QJsonDocument>
@@ -70,25 +72,17 @@ private:
 
 };
 
-class BluemonkeySink : public QObject, public AbstractSource
+class BluemonkeySink : public QObject, public AmbPluginImpl
 {
 Q_OBJECT
 public:
-	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config);
+	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config,  AbstractSource& parent);
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(const PropertyList & supportedProperties);
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
-	virtual const std::string uuid();
+	virtual void propertyChanged(AbstractPropertyType* value);
+	virtual const std::string uuid() const;
 
 	QScriptEngine* engine;
-
-	/// source methods:
-	virtual void getPropertyAsync(AsyncPropertyReply *reply);
-	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
-	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
-	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
-	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
-	virtual PropertyList supported();
 
 	virtual int supportedOperations();
 
@@ -104,6 +98,8 @@ public Q_SLOTS:
 	QObject* subscribeTo(QString str, QString srcFilter);
 
 	QStringList sourcesForProperty(QString property);
+
+	QStringList supportedProperties();
 
 	bool authenticate(QString pass);
 
@@ -133,14 +129,5 @@ private:
 	bool mSilentMode;
 };
 
-class BluemonkeySinkManager: public AbstractSinkManager
-{
-public:
-	BluemonkeySinkManager(AbstractRoutingEngine* engine, map<string, string> config)
-	:AbstractSinkManager(engine, config)
-	{
-		new BluemonkeySink(routingEngine, config);
-	}
-};
 
 #endif // BluemonkeySink_H

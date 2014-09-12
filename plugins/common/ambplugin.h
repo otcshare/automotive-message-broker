@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define _AMBPLUGIN_H_
 
 #include <abstractsource.h>
+#include "ambpluginimpl.h"
 #include <string>
 
 /*!
@@ -57,120 +58,120 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * \class AmbPlugin
  */
 
-class AmbPluginImpl;
+//class AmbPluginImpl;
 
 template<class T>
 class AmbPlugin : public AbstractSource {
 
-    /*!
-     * Compile time check
-     * \internal
-     */
-    static_assert(std::is_base_of<AmbPluginImpl, T>::value, "AmbPluginImpl has to be a base of T");
+	/*!
+	 * Compile time check
+	 * \internal
+	 */
+	static_assert(std::is_base_of<AmbPluginImpl, T>::value, "AmbPluginImpl has to be a base of T");
 
 public:
-    /*!
-     * \param re AbstractRoutingEngine
-     * \param config Map of the configuration string values loaded on startup from AMB configuration file
-     */
-    AmbPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config);
+	/*!
+	 * \param re AbstractRoutingEngine
+	 * \param config Map of the configuration string values loaded on startup from AMB configuration file
+	 */
+	AmbPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config);
 	virtual ~AmbPlugin() {}
 
-    // from AbstractSource:
+	// from AbstractSource:
 public:
 
-    /*!
-     * \brief getPropertyAsync is called when a sink requests the value for given property.
-     * This is only called if the source supports the Get operation.
-     * \param reply the reply variable.  @see AsyncPropertyReply
-     */
-    virtual void getPropertyAsync(AsyncPropertyReply *reply);
+	/*!
+	 * \brief getPropertyAsync is called when a sink requests the value for given property.
+	 * This is only called if the source supports the Get operation.
+	 * \param reply the reply variable.  @see AsyncPropertyReply
+	 */
+	virtual void getPropertyAsync(AsyncPropertyReply *reply);
 
-    /*!
-     * \brief getRangePropertyAsync is called when a sink requests a series of values for a given
-     * property within a specified time or sequencial range.  This will only be called if the source
-     * support the Ranged Operation.
-     * \param reply is the reply variable.  @see AsyncRangePropertyReply
-     */
-    virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
+	/*!
+	 * \brief getRangePropertyAsync is called when a sink requests a series of values for a given
+	 * property within a specified time or sequencial range.  This will only be called if the source
+	 * support the Ranged Operation.
+	 * \param reply is the reply variable.  @see AsyncRangePropertyReply
+	 */
+	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 
-    /*!
-     * \brief setProperty is called when a sink requests to set a value for a given property.
-     * This is only called if the source supports the Set Operation.
-     * \param request the requested property to set.
-     * \return returns a pointer to the new value for the property.
-     */
-    virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
+	/*!
+	 * \brief setProperty is called when a sink requests to set a value for a given property.
+	 * This is only called if the source supports the Set Operation.
+	 * \param request the requested property to set.
+	 * \return returns a pointer to the new value for the property.
+	 */
+	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 
-    /*!
-     * \brief subscribeToPropertyChanges is called when a sink requests a subscription. Source plugins
-     * can keep track of subscriptions and may wish to sleep if there are no subscriptions.
-     * \param property the property that is being subscribed.
-     */
-    virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
+	/*!
+	 * \brief subscribeToPropertyChanges is called when a sink requests a subscription. Source plugins
+	 * can keep track of subscriptions and may wish to sleep if there are no subscriptions.
+	 * \param property the property that is being subscribed.
+	 */
+	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
 
-    /*!
-     * \brief unsubscribeToPropertyChanges is called when a sink requests to unsubscribe from a given property's changes.
-     * \param property the property to unsubscribe to
-     */
-    virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
+	/*!
+	 * \brief unsubscribeToPropertyChanges is called when a sink requests to unsubscribe from a given property's changes.
+	 * \param property the property to unsubscribe to
+	 */
+	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 
-    /*!
-     * \brief supported is called by the routingEngine to understand what properties this source supports
-     * \return returns a list of supported properties. If the the supported properties changed, the source should call AbstractRoutingEngine::setSupported.
-     */
-    virtual PropertyList supported();
+	/*!
+	 * \brief supported is called by the routingEngine to understand what properties this source supports
+	 * \return returns a list of supported properties. If the the supported properties changed, the source should call AbstractRoutingEngine::setSupported.
+	 */
+	virtual PropertyList supported();
 
-    /*!
-     * \brief supportedOperations
-     * \return returns the supported operations.
-     */
-    virtual int supportedOperations();
+	/*!
+	 * \brief supportedOperations
+	 * \return returns the supported operations.
+	 */
+	virtual int supportedOperations();
 
-    /*!
-     * \brief getPropertyInfo used to return specific information about a property.
-     * The source should override this otherwise a PropertyInfo::invalid() will be returned for the property.
-     * \param property the property to get info for.
-     * \return a PropertyInfo object.
-     */
-    virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
+	/*!
+	 * \brief getPropertyInfo used to return specific information about a property.
+	 * The source should override this otherwise a PropertyInfo::invalid() will be returned for the property.
+	 * \param property the property to get info for.
+	 * \return a PropertyInfo object.
+	 */
+	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 
-    // from AbstractSink
+	// from AbstractSink
 public:
 
-    /*! uuid() is a unique identifier
-      * \return A guid-style unique identifier
-      */
-    virtual const string uuid();
+	/*! uuid() is a unique identifier
+	  * \return A guid-style unique identifier
+	  */
+	virtual const string uuid();
 
-    /*! propertyChanged is called when a subscribed to property changes.
-      * \param value value of the property that changed. this is a temporary pointer that will be destroyed.
-      * Do not destroy it.  If you need to store the value use value.anyValue(), value.value<T>() or
-      * value->copy() to copy.
-      */
-    virtual void propertyChanged(AbstractPropertyType* value);
+	/*! propertyChanged is called when a subscribed to property changes.
+	  * \param value value of the property that changed. this is a temporary pointer that will be destroyed.
+	  * Do not destroy it.  If you need to store the value use value.anyValue(), value.value<T>() or
+	  * value->copy() to copy.
+	  */
+	virtual void propertyChanged(AbstractPropertyType* value);
 
-    /*! supportedChanged() is called when the supported properties changes
-     * \param supportedProperties the new list of supported properties.
-     */
+	/*! supportedChanged() is called when the supported properties changes
+	 * \param supportedProperties the new list of supported properties.
+	 */
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 
 
-    // AmbPlugin's own methods
+	// AmbPlugin's own methods
 public:
 
-    /*!
-     * Second phase of the plugin initialization.
-     * \fn init
-     */
-    void init();
+	/*!
+	 * Second phase of the plugin initialization.
+	 * \fn init
+	 */
+	void init();
 
 private:
 
-    /**
-    * \brief AmbPlugin class private implementation
-    */
-    std::unique_ptr<T> d;
+	/**
+	* \brief AmbPlugin class private implementation
+	*/
+	std::unique_ptr<T> d;
 };
 
 //----------------------------------------------------------------------------
@@ -183,8 +184,8 @@ private:
 
 template<typename T>
 AmbPlugin<T>::AmbPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config) :
-    AbstractSource(re, config),
-    d(new T(re, config, *this))
+	AbstractSource(re, config),
+	d(new T(re, config, *this))
 {
 
 }
@@ -192,80 +193,80 @@ AmbPlugin<T>::AmbPlugin(AbstractRoutingEngine* re, const std::map<std::string, s
 template<typename T>
 void AmbPlugin<T>::getPropertyAsync(AsyncPropertyReply *reply)
 {
-    if(d)
-        d->getPropertyAsync(reply);
+	if(d)
+		d->getPropertyAsync(reply);
 }
 
 template<typename T>
 void AmbPlugin<T>::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
-    if(d)
-        d->getRangePropertyAsync(reply);
+	if(d)
+		d->getRangePropertyAsync(reply);
 }
 
 template<typename T>
 AsyncPropertyReply* AmbPlugin<T>::setProperty(AsyncSetPropertyRequest request)
 {
-    return d ? d->setProperty(request) : nullptr;
+	return d ? d->AmbPluginImpl::setProperty(request) : nullptr;
 }
 
 template<typename T>
 void AmbPlugin<T>::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
-    if(d)
-        d->subscribeToPropertyChanges(property);
+	if(d)
+		d->subscribeToPropertyChanges(property);
 }
 
 template<typename T>
 void AmbPlugin<T>::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
-    if(d)
-        return d->unsubscribeToPropertyChanges(property);
+	if(d)
+		return d->unsubscribeToPropertyChanges(property);
 }
 
 template<typename T>
 PropertyList AmbPlugin<T>::supported()
 {
-    return d ? d->supported() : PropertyList();
+	return d ? d->supported() : PropertyList();
 }
 
 template<typename T>
 int AmbPlugin<T>::supportedOperations()
 {
-    return d ? d->supportedOperations() : 0;
+	return d ? d->supportedOperations() : 0;
 }
 
 template<typename T>
 PropertyInfo AmbPlugin<T>::getPropertyInfo(VehicleProperty::Property property)
 {
-    return d ? d->getPropertyInfo(property) : PropertyInfo::invalid();
+	return d ? d->getPropertyInfo(property) : PropertyInfo::invalid();
 }
 
 template<typename T>
 const string AmbPlugin<T>::uuid()
 {
-    return d ? d->uuid() : "";
+	return d ? d->uuid() : "";
 }
 
 template<typename T>
 void AmbPlugin<T>::propertyChanged(AbstractPropertyType* value)
 {
-    if(d)
-        d->propertyChanged(value);
+	if(d)
+		d->propertyChanged(value);
 }
 
 template<typename T>
 void AmbPlugin<T>::supportedChanged(const PropertyList &supportedProperties)
 {
-    if(d)
-        d->supportedChanged(supportedProperties);
+	if(d)
+		d->supportedChanged(supportedProperties);
 }
 
 template<typename T>
 void AmbPlugin<T>::init()
 {
-    if(d)
-        d->init();
+	if(d)
+		d->init();
 }
 
 #endif // _AMBPLUGIN_H_

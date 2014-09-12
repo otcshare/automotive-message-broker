@@ -13,4 +13,4 @@ add_library(wheelsourceplugin MODULE ${wheelsourceplugin_sources})
 set_target_properties(wheelsourceplugin PROPERTIES PREFIX "")
 target_link_libraries(wheelsourceplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
-install(TARGETS wheelsourceplugin LIBRARY DESTINATION lib${LIB_SUFFIX}/automotive-message-broker)
+install(TARGETS wheelsourceplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
