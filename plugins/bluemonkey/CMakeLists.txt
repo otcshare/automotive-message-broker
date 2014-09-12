@@ -2,12 +2,12 @@ if(bluemonkey_plugin)
 
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
-find_package(Qt5Script REQUIRED)
+find_package(Qt5Qml REQUIRED)
 if(Qt5Core_FOUND)
   message(STATUS "using Qt5")
 
-  set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5Script_INCLUDE_DIRS})
-  set(QT_LIBRARIES ${Qt5Core_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Script_LIBRARIES})
+  set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5Qml_INCLUDE_DIRS})
+  set(QT_LIBRARIES ${Qt5Core_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Qml_LIBRARIES})
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
   add_definitions(${Qt5Core_DEFINITIONS})
 
@@ -20,8 +20,8 @@ set(CMAKE_AUTOMOC ON)
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${communi_INCLUDE_DIRS} ${QT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common)
 
-set(bluemonkeyplugin_headers bluemonkey.h authenticate.h agent.h)
-set(bluemonkeyplugin_sources bluemonkey.cpp authenticate.cpp agent.cpp)
+set(bluemonkeyplugin_headers bluemonkey.h authenticate.h)
+set(bluemonkeyplugin_sources bluemonkey.cpp authenticate.cpp)
 
 add_library(bluemonkeyplugin MODULE ${bluemonkeyplugin_sources})
 set_target_properties(bluemonkeyplugin PROPERTIES PREFIX "")

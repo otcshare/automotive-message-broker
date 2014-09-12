@@ -1,16 +1,18 @@
 #include "authenticate.h"
 #include <QSettings>
-#include <QtScript>
+#include <QJSEngine>
+#include <QFile>
+#include <QtDebug>
 
 Authenticate::Authenticate(std::map<std::string, std::string> config, QObject *parent) :
-    QObject(parent)
+	QObject(parent)
 {
 	QSettings settings;
 	authorized = settings.value("authorized").toStringList();
 
-	QScriptEngine engine;
+	QJSEngine engine;
 
-	QScriptValue eventEngineValue = engine.newQObject(this);
+	QJSValue eventEngineValue = engine.newQObject(this);
 	engine.globalObject().setProperty("auth", eventEngineValue);
 
 	QString str = config["authSettings"].c_str();

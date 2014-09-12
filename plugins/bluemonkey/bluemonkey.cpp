@@ -23,13 +23,12 @@
 #include "debugout.h"
 
 #include <QJsonDocument>
-#include <QScriptEngine>
+#include <QJSEngine>
 #include <QDateTime>
 #include <QString>
 #include <QFile>
 #include <QTimer>
-
-Q_SCRIPT_DECLARE_QMETAOBJECT(QTimer, QObject*)
+#include <QtQml>
 
 #define foreach Q_FOREACH
 
@@ -92,11 +91,13 @@ QVariant gvariantToQVariant(GVariant *value)
 
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent): QObject(0), AmbPluginImpl(e, config, parent), agent(nullptr), engine(nullptr), mSilentMode(false)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent): QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
 {
 	QTimer::singleShot(1,this,SLOT(reloadEngine()));
 
 	auth = new Authenticate(config, this);
+
+	qmlRegisterType<QTimer>("", 1, 0, "QTimer");
 
 /*	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
 
@@ -166,7 +167,7 @@ QObject *BluemonkeySink::subscribeTo(QString str)
 	return new Property(str.toStdString(), "", routingEngine, this);
 }
 
-QObject *BluemonkeySink::subscribeTo(QString str, QString srcFilter)
+QObject *BluemonkeySink::subscribeToSource(QString str, QString srcFilter)
 {
 	return new Property(str.toStdString(), srcFilter, routingEngine, this);
 }
@@ -216,7 +217,7 @@ void BluemonkeySink::loadConfig(QString str)
 
 	DebugOut()<<"evaluating script: "<<script.toStdString()<<endl;
 
-	QScriptValue val = engine->evaluate(script);
+	QJSValue val = engine->evaluate(script);
 
 	DebugOut()<<val.toString().toStdString()<<endl;
 }
@@ -226,32 +227,22 @@ void BluemonkeySink::reloadEngine()
 	if(engine)
 		engine->deleteLater();
 
-	engine = new QScriptEngine(this);
+	engine = new QJSEngine(this);
 
-	if(agent) delete agent;
-
-	agent = new BluemonkeyAgent(engine);
-
-	//engine->setAgent(agent);
-
-	QScriptValue value = engine->newQObject(this);
+	QJSValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
-
-	QScriptValue qtimerClass = engine->scriptValueFromQMetaObject<QTimer>();
-	engine->globalObject().setProperty("QTimer", qtimerClass);
-
-//	QScriptValue ircValue = engine->newQObject(irc);
-//	engine->globalObject().setProperty("irc", ircValue);
 
 	loadConfig(configuration["config"].c_str());
 }
 
 void BluemonkeySink::writeProgram(QString program)
 {
-	QScriptSyntaxCheckResult result = QScriptEngine::checkSyntax(program);
-	if(result.state() != QScriptSyntaxCheckResult::Valid)
+
+	QJSEngine temp;
+	QJSValue result = temp.evaluate(program);
+	if(result.isError())
 	{
-		DebugOut(DebugOut::Error)<<"Syntax error in program: "<<result.errorMessage().toStdString()<<endl;
+		DebugOut(DebugOut::Error)<<"Syntax error in program: "<<result.toString().toStdString()<<endl;
 		return;
 	}
 
@@ -274,7 +265,12 @@ void BluemonkeySink::log(QString str)
 	DebugOut()<<str.toStdString()<<endl;
 }
 
-void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction)
+QObject *BluemonkeySink::createTimer()
+{
+	return new QTimer(this);
+}
+
+void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction)
 {
 	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
 	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
@@ -298,7 +294,7 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 			return;
 		}
 
-		if(cbFunction.isFunction())
+		if(cbFunction.isCallable())
 		{
 			QVariantList list;
 
@@ -309,7 +305,9 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 				list.append(gvariantToQVariant(val->toVariant()));
 			}
 
-			cbFunction.call(QScriptValue(),cbFunction.engine()->newVariant(list));
+			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
+
+			cbFunction.call(QJSValueList()<<val);
 
 		}
 
@@ -319,7 +317,7 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 	routingEngine->getRangePropertyAsync(request);
 }
 
-void BluemonkeySink::createCustomProperty(QString name, QScriptValue defaultValue)
+void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
 {
 
 	auto create = [defaultValue, name]() -> AbstractPropertyType*
@@ -386,7 +384,7 @@ void Property::setValue(QVariant v)
 	routingEngine->setProperty(request);
 }
 
-void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunction)
+void Property::getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction)
 {
 	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
 	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
@@ -406,7 +404,7 @@ void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunctio
 			return;
 		}
 
-		if(cbFunction.isFunction())
+		if(cbFunction.isCallable())
 		{
 			QVariantList list;
 
@@ -416,8 +414,8 @@ void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunctio
 
 				list.append(gvariantToQVariant(val->toVariant()));
 			}
-
-			cbFunction.call(QScriptValue(),cbFunction.engine()->newVariant(list));
+			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
+			cbFunction.call(QJSValueList()<<val);
 
 		}
 

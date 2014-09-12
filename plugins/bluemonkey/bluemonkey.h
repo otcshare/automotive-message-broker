@@ -29,13 +29,12 @@
 #include <QVariant>
 #include <QJsonDocument>
 #include <QDateTime>
-#include <QScriptValue>
+#include <QJSValue>
 #include "uuidhelper.h"
 
 #include "authenticate.h"
-#include "agent.h"
 
-class QScriptEngine;
+class QJSEngine;
 
 class ModuleInterface
 {
@@ -70,7 +69,7 @@ public:
 	QVariant value();
 	void setValue(QVariant v);
 
-	void getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunction);
+	void getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction);
 Q_SIGNALS:
 
 	void changed(QVariant val);
@@ -91,7 +90,7 @@ public:
 	virtual void propertyChanged(AbstractPropertyType* value);
 	virtual const std::string uuid() const;
 
-	QScriptEngine* engine;
+	QJSEngine* engine;
 
 	virtual int supportedOperations();
 
@@ -104,7 +103,7 @@ private: //source privates
 public Q_SLOTS:
 
 	QObject* subscribeTo(QString str);
-	QObject* subscribeTo(QString str, QString srcFilter);
+	QObject* subscribeToSource(QString str, QString srcFilter);
 
 	QStringList sourcesForProperty(QString property);
 
@@ -122,20 +121,21 @@ public Q_SLOTS:
 
 	void log(QString str);
 
-	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction);
+	QObject* createTimer();
+
+	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction);
 
 	void setSilentMode(bool m)
 	{
 		mSilentMode = m;
 	}
 
-	void createCustomProperty(QString name, QScriptValue defaultValue);
+	void createCustomProperty(QString name, QJSValue defaultValue);
 
 private:
 	QStringList configsToLoad;
 
 	Authenticate* auth;
-	BluemonkeyAgent* agent;
 	bool mSilentMode;
 };
 
