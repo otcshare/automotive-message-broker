@@ -1,5 +1,7 @@
 %bcond_with qt5
 
+%define with_qt5 1
+
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
 Version:    0.11.900
@@ -179,6 +181,8 @@ Requires:  %{name} = %{version}-%{release}
 %description plugins-cansim
 CAN frames listener plug-in for the AMB CAN Simulator package
 
+%if %{with qt5}
+%endif
 %prep
 %setup -q -n %{name}-%{version}
 
@@ -189,6 +193,7 @@ CAN frames listener plug-in for the AMB CAN Simulator package
        -Dopencvlux_plugin=ON \
        -Dwebsocket_plugin=ON \
        -Dbluetooth_plugin=ON \
+%endif
 %endif
        -Ddatabase_plugin=ON \
        -Dmurphy_plugin=ON \
@@ -326,3 +331,7 @@ cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/cansimplugin.so
+
+
+%if %{with qt5}
+%endif
