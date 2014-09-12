@@ -1,4 +1,5 @@
 if(enable_docs)
   install (DIRECTORY amb DESTINATION ${DOC_INSTALL_DIR} COMPONENT Docs)
   install (DIRECTORY dbus DESTINATION ${DOC_INSTALL_DIR} COMPONENT Docs)
+  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/amb.idl DESTINATION ${DOC_INSTALL_DIR}/dbus COMPONENT Docs)
 endif(enable_docs)
