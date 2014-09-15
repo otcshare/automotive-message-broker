@@ -1,21 +1,18 @@
 {
-	"mainloop" : "/usr/lib/automotive-message-broker/qtmainloopplugin.so",
+  "mainloop" : "/usr/lib/i386-linux-gnu/automotive-message-broker/automotive-message-broker/qtmainloopplugin.so",
 
-	"sources" : [ 
-		{
-			"path" : "/usr/lib/automotive-message-broker/bluemonkeyplugin.so",
-			"authSettings" : "authSettings.js",
-			"ircSettings" : "ircSettings.js",
-			"config" : "config.js",
-			"customPrograms" : "customPrograms.js"
-		}
-	],
+  "sources" : [
+    {
+      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/automotive-message-broker/bluemonkeyplugin.so",
+      "config" : "/etc/ambd/bluemonkey/config.js"
+    }
+  ],
 
-	"sinks" : [
+  "sinks" : [
 
-		{
-			"path" : "/usr/lib/automotive-message-broker/examplesinkplugin.so"
-		}
-	]
+    {
+      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/automotive-message-broker/examplesinkplugin.so"
+    }
+  ]
 }
 
