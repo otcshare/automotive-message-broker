@@ -1,5 +1,6 @@
 if(enable_docs)
   install (DIRECTORY amb DESTINATION ${DOC_INSTALL_DIR} COMPONENT Docs)
   install (DIRECTORY dbus DESTINATION ${DOC_INSTALL_DIR} COMPONENT Docs)
-  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/amb.idl DESTINATION ${DOC_INSTALL_DIR}/dbus COMPONENT Docs)
+  install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/amb.idl DESTINATION ${DOC_INSTALL_DIR}/dbus/html COMPONENT Docs)
+  add_custom_target(doc_idl ALL cp amb.idl ${CMAKE_CURRENT_SOURCE_DIR}/dbus/html  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} COMMENT "Moving amb.idl" VERBATIM)
 endif(enable_docs)
