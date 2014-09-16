@@ -194,7 +194,6 @@ CAN frames listener plug-in for the AMB CAN Simulator package
        -Dwebsocket_plugin=ON \
        -Dbluetooth_plugin=ON \
 %endif
-%endif
        -Ddatabase_plugin=ON \
        -Dmurphy_plugin=ON \
        -Dobd2_plugin=ON \
