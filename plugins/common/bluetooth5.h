@@ -14,9 +14,9 @@ public:
 	bool setDevice(std::string address);
 	void getDeviceForAddress(std::string address,  ConnectedCallback onnectedCallback);
 
-	void connected(int fd);
+	void connected_(int fd);
 
-	void connect( ConnectedCallback onconnectedCallback);
+	void connect(ConnectedCallback onconnectedCallback);
 	void disconnect();
 
 

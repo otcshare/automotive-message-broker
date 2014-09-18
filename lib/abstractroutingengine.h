@@ -40,6 +40,7 @@ class AsyncSetPropertyRequest;
 
 typedef std::function<void (AsyncPropertyReply*)> GetPropertyCompletedSignal;
 typedef std::function<void (AsyncRangePropertyReply*)> GetRangedPropertyCompletedSignal;
+typedef std::function<void (AsyncPropertyReply*)> TimedOutCallback;
 
 /*!
  * \brief The AsyncPropertyRequest class is used by sinks to request property values.
@@ -128,14 +129,7 @@ public:
 
 	AsyncPropertyReply(const AsyncSetPropertyRequest &request);
 
-	virtual ~AsyncPropertyReply()
-	{
-		if(timeoutSource)
-		{
-			g_source_destroy(timeoutSource);
-			g_source_unref(timeoutSource);
-		}
-	}
+	virtual ~AsyncPropertyReply();
 
 	/*!
 	 * \brief The Error enum
@@ -158,6 +152,12 @@ public:
 	 * member should be set.
 	 */
 	bool success;
+
+	/*!
+	 * \brief timed out callback is called when the reply times out.  This is so sources can avoid using this reply which
+	 * may become invalid after it times out.
+	 */
+	TimedOutCallback timedout;
 
 	/*!
 	 * \brief error contains the error if the request was not successful.\
