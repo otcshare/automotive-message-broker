@@ -4,7 +4,7 @@
 
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.11.900
+Version:    0.11.901
 Release:    0
 Group:      Automotive/Service
 License:    LGPL-2.1
@@ -32,6 +32,7 @@ BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  qt5-qtcore-devel
 BuildRequires:  qt5-qtconcurrent-devel
 BuildRequires:  qt5-qtdbus-devel
+BuildRequires:  qt5-qtdeclarative-devel
 BuildRequires:  qt5-qtnetwork-devel
 BuildRequires:  qt5-plugin-bearer-generic
 BuildRequires:  qt5-plugin-bearer-connman
@@ -182,7 +183,16 @@ Requires:  %{name} = %{version}-%{release}
 CAN frames listener plug-in for the AMB CAN Simulator package
 
 %if %{with qt5}
+%package plugins-bluemonkey
+Summary:   javascript plugin engine
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires: qt5-qtdeclarative
+
+%description plugins-bluemonkey
+Engine for creating scriptable plugins for AMB
 %endif
+
 %prep
 %setup -q -n %{name}-%{version}
 
@@ -193,6 +203,7 @@ CAN frames listener plug-in for the AMB CAN Simulator package
        -Dopencvlux_plugin=ON \
        -Dwebsocket_plugin=ON \
        -Dbluetooth_plugin=ON \
+       -Dbluemonkey_plugin=ON \
 %endif
        -Ddatabase_plugin=ON \
        -Dmurphy_plugin=ON \
@@ -331,6 +342,10 @@ cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/cansimplugin.so
 
-
 %if %{with qt5}
+%files plugins-bluemonkey
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluemonkeyplugin.so
+%config %{_sysconfdir}/ambd/bluemonkey
 %endif
