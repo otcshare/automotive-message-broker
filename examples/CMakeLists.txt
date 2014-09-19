@@ -1,6 +1,6 @@
 set(amb_examples configwheel databaseconfig databasesource dbusconfig exampleconfig
         gpsnmea obdsourceconfig opencvluxconfig opencvdbusconfig qtmainloopconfig websocketsink2 websocketsource2
-        testsourceconfig)
+        testsourceconfig bluemonkey/bluemonkeyconfig)
 
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/configwheel.in ${CMAKE_CURRENT_SOURCE_DIR}/configwheel @ONLY)
@@ -16,6 +16,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/qtmainloopconfig.in ${CMAKE_CURRENT_
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/websocketsink2.in ${CMAKE_CURRENT_SOURCE_DIR}/websocketsink2 @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/websocketsource2.in ${CMAKE_CURRENT_SOURCE_DIR}/websocketsource2 @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/testsourceconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/testsourceconfig @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey/bluemonkeyconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey/bluemonkeyconfig @ONLY)
 
 install (FILES ${amb_examples} DESTINATION /etc/ambd/examples)
 

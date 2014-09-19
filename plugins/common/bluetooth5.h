@@ -11,13 +11,18 @@ class Bluetooth5
 public:
 	Bluetooth5();
 
+	bool setDevice(std::string address);
 	void getDeviceForAddress(std::string address,  ConnectedCallback onnectedCallback);
-	void disconnect(std::string address, std::string adapterAddy = "");
 
 	void connected(int fd);
 
+	void connect( ConnectedCallback onconnectedCallback);
+	void disconnect();
+
+
 private:
 	ConnectedCallback mConnected;
+	std::string mPath;
 };
 
 #endif

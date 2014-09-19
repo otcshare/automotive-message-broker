@@ -28,6 +28,12 @@
 #include "debugout.h"
 #include "bluetooth.hpp"
 #include "timestamp.h"
+#include "bluetooth5.h"
+#include "superptr.hpp"
+
+#ifdef USE_BLUEZ5
+Bluetooth5 bt;
+#endif
 
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
@@ -39,7 +45,7 @@ int calledPersecond = 0;
 
 bool sendElmCommand(obdLib *obd,std::string command)
 {
-  	std::vector<unsigned char> replyVector;
+	std::vector<unsigned char> replyVector;
 	std::string reply;
 	obd->sendObdRequestString(command.append("\r").c_str(),command.length()+1,&replyVector,10,3);
 	for (unsigned int i=0;i<replyVector.size();i++)
@@ -72,7 +78,7 @@ bool connect(obdLib* obd, std::string device, std::string strbaud, int fd = -1)
 
 	if(fd != -1)
 	{
-		if(obd->openPort(fd,baud) == -1)
+		if(obd->openPort(fd, baud) == -1)
 			return false;
 	}
 	else
@@ -123,7 +129,7 @@ bool connect(obdLib* obd, std::string device, std::string strbaud, int fd = -1)
 		DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Error turning off linefeeds"<<endl;
 		return false;
 	}
-	obd->sendObdRequestString("010C1\r",6,&replyVector,500,5);
+	obd->sendObdRequestString("010C1\r", 6, &replyVector, 500, 5);
 
 	return true;
 }
@@ -136,17 +142,16 @@ void threadLoop(gpointer data)
 	GAsyncQueue *privSubscriptionAddQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionAddQueue);
 	GAsyncQueue *privSubscriptionRemoveQueue = g_async_queue_ref(((OBD2Source*)data)->subscriptionRemoveQueue);
 	GAsyncQueue *privStatusQueue = g_async_queue_ref(((OBD2Source*)data)->statusQueue);
-	
+
 	obdLib *obd = new obdLib();
 	OBD2Source *source = (OBD2Source*)data;
 
 	obd->setCommsCallback([](const char* mssg, void* data) { DebugOut(6)<<mssg<<endl; },NULL);
 	obd->setDebugCallback([](const char* mssg, void* data, obdLib::DebugLevel debugLevel) { DebugOut(debugLevel)<<mssg<<endl; },NULL);
-	
+
 	std::list<ObdPid*> reqList;
 	std::list<ObdPid*> repeatReqList;
 	ObdPid::ByteArray replyVector;
-	std::string reply;
 	std::string port;
 	std::string baud;
 	bool connected=false;
@@ -154,14 +159,11 @@ void threadLoop(gpointer data)
 	int timeoutCount = 0;
 	while (source->m_threadLive)
 	{
-		//gpointer query = g_async_queue_pop(privCommandQueue);
-		
-		
 		gpointer query = g_async_queue_try_pop(privSingleShotQueue);
 		if (query != nullptr)
 		{
 			//printf("Got request!\n");
-			
+
 			ObdPid *req = (ObdPid*)query;
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got single shot request: " << req->pid.substr(0,req->pid.length()-1) << ":" << req->property <<endl;
 			repeatReqList.push_back(req);
@@ -182,74 +184,78 @@ void threadLoop(gpointer data)
 			//commandMap[req->req] = req->arg;
 			//printf("Command: %s\n",req->req.c_str());
 			DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Command:" << req->req << endl;
-			if (req->req == "connect" )
-			{
-
-				if (source->m_isBluetooth)
-				{
-
-					BluetoothDevice bt;
-					std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
-					if(tempPort != "")
-					{
-						DebugOut(3)<<"Using bluetooth device \""<<source->m_btDeviceAddress<<"\" bound to: "<<tempPort<<endl;
-						port = tempPort;
-					}
-				}
-				else
-				{
-					port = req->arglist[0];
-					baud = req->arglist[1];
-				}
-				connected = connect(obd,port,baud);
-
-				if(connected)
-				{
-					StatusMessage *statusreq = new StatusMessage();
-					statusreq->statusStr = "connected";
-					g_async_queue_push(privStatusQueue,statusreq);
-				}
-				else
-				{
-					StatusMessage *statusreq = new StatusMessage();
-					statusreq->statusStr = "disconnected";
-					g_async_queue_push(privStatusQueue,statusreq);
-				}
-				
-			}
-			else if (req->req == "connectifnot")
+			if (req->req == "connectifnot")
 			{
 				if (!connected)
 				{
 					if (source->m_isBluetooth)
 					{
+#ifdef USE_BLUEZ5
+						bt.getDeviceForAddress(source->m_btDeviceAddress, [&obd, baud, &privStatusQueue](int fd)
+						{
+							bool connected = connect(obd, "", baud, fd);
+
+							if(connected)
+							{
+								StatusMessage *statusreq = new StatusMessage();
+								statusreq->statusStr = "connected";
+								g_async_queue_push(privStatusQueue, statusreq);
+							}
+							else
+							{
+								StatusMessage *statusreq = new StatusMessage();
+								statusreq->statusStr = "disconnected";
+								g_async_queue_push(privStatusQueue, statusreq);
+							}
+						});
+#else
 						BluetoothDevice bt;
 						std::string tempPort = bt.getDeviceForAddress(source->m_btDeviceAddress, source->m_btAdapterAddress);
 						if(tempPort != "")
 						{
-							DebugOut(3)<<"Using bluetooth device \""<<source->m_btDeviceAddress<<"\" bound to: "<<tempPort<<endl;
+							DebugOut(3) << "Using bluetooth device \"" << source->m_btDeviceAddress << "\" bound to: " << tempPort << endl;
 							port = tempPort;
 						}
 						else
 						{
-							DebugOut(DebugOut::Error)<<"Error creating bluetooth device"<<endl;
+							DebugOut(DebugOut::Error) << "Error creating bluetooth device" << endl;
 							continue;
 						}
-					}
 
-					connected = connect(obd,port,baud);
+						connected = connect(obd, port, baud);
 
-					if(connected)
-					{
-						StatusMessage *statusreq = new StatusMessage();
-						statusreq->statusStr = "connected";
-						g_async_queue_push(privStatusQueue,statusreq);
+						if(connected)
+						{
+							StatusMessage *statusreq = new StatusMessage();
+							statusreq->statusStr = "connected";
+							g_async_queue_push(privStatusQueue, statusreq);
+						}
+						else
+						{
+							StatusMessage *statusreq = new StatusMessage();
+							statusreq->statusStr = "disconnected";
+							g_async_queue_push(privStatusQueue, statusreq);
+						}
+
+#endif
 					}
 					else
 					{
-						StatusMessage *statusreq = new StatusMessage();
-						statusreq->statusStr = "disconnected";
-						g_async_queue_push(privStatusQueue,statusreq);
+
+						connected = connect(obd, port, baud);
+
+						if(connected)
+						{
+							StatusMessage *statusreq = new StatusMessage();
+							statusreq->statusStr = "connected";
+							g_async_queue_push(privStatusQueue, statusreq);
+						}
+						else
+						{
+							StatusMessage *statusreq = new StatusMessage();
+							statusreq->statusStr = "disconnected";
+							g_async_queue_push(privStatusQueue, statusreq);
+						}
 					}
 				}
 			}
@@ -262,8 +268,12 @@ void threadLoop(gpointer data)
 			{
 				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Using queued disconnect" << (ulong)req << endl;
 				obd->closePort();
+#ifdef USE_BLUEZ5
+				bt.disconnect();
+#else
 				BluetoothDevice bt;
 				bt.disconnect(source->m_btDeviceAddress, source->m_btAdapterAddress);
+#endif
 				connected = false;
 				StatusMessage *statusreq = new StatusMessage();
 				statusreq->statusStr = "disconnected";
@@ -360,7 +370,7 @@ void threadLoop(gpointer data)
 						int count = (*source->m_blacklistPidCountMap.find((*i)->pid)).second;
 						if (count > 10)
 						{
-							
+
 						}
 						source->m_blacklistPidCountMap.erase(source->m_blacklistPidCountMap.find((*i)->pid));
 						source->m_blacklistPidCountMap.insert(pair<std::string,int>((*i)->pid,count));
@@ -391,7 +401,7 @@ void threadLoop(gpointer data)
 				{
 					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "OBD Other error:" << obd->lastError() << endl;
 				}
-				
+
 				CommandRequest *req = new CommandRequest();
 				DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Queuing up a disconnect" << (ulong)req << endl;
 				req->req = "disconnect";
@@ -436,7 +446,7 @@ void threadLoop(gpointer data)
 			//usleep(10000);
 		}
 		repeatReqList.clear();
-		
+
 	}
 	if (connected)
 	{
@@ -447,19 +457,20 @@ static int updateProperties( gpointer data)
 {
 
 	OBD2Source* src = (OBD2Source*)data;
-	
+
 	while (gpointer retval = g_async_queue_try_pop(src->statusQueue))
 	{
 		StatusMessage *reply = (StatusMessage*)retval;
 		if (reply->statusStr == "disconnected")
 		{
 			OBD2Source::Obd2ConnectType val(Obd2Connected,false);
-			src->updateProperty(Obd2Connected,&val);
+			src->updateProperty(&val);
 		}
 		else if (reply->statusStr == "connected")
 		{
 			OBD2Source::Obd2ConnectType val(Obd2Connected, true);
-			src->updateProperty(Obd2Connected,&val);
+			val.priority = OBD2Source::Obd2ConnectType::Instant;
+			src->updateProperty(&val);
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
 		{
@@ -487,20 +498,20 @@ static int updateProperties( gpointer data)
 	{
 		ObdPid *reply = (ObdPid*)retval;
 
-		
-		AbstractPropertyType* value = VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value);
-		src->updateProperty(reply->property, value);
-		delete value;
+		auto value = amb::make_unique(VehicleProperty::getPropertyTypeForPropertyNameValue(reply->property, reply->value));
+		value->priority = AbstractPropertyType::Instant;
+		src->updateProperty(value.get());
 	}
 
 	return true;
 }
 
-void OBD2Source::updateProperty(VehicleProperty::Property property,AbstractPropertyType* value)
+void OBD2Source::updateProperty(AbstractPropertyType* value)
 {
+	VehicleProperty::Property property = value->name;
 	if(property == Obd2Connected)
 		obd2Connected.setValue(value->anyValue());
-	
+
 	if (propertyReplyMap.find(property) != propertyReplyMap.end())
 	{
 		propertyReplyMap[property]->value = value;
@@ -549,13 +560,13 @@ void OBD2Source::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
 	configuration = config;
-	
+
 	//Default values
 	std::string port = "/dev/ttyUSB0";
 	std::string baud = "115200";
 	std::string btadapter = "";
 	m_isBluetooth = false;
-	
+
 	//Try to load config
 	//printf("OBD2Source::setConfiguration\n");
 	for (map<string,string>::iterator i=configuration.begin();i!=configuration.end();i++)
@@ -607,7 +618,7 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	req->arglist.push_back(port);
 	req->arglist.push_back(baud);
 	g_async_queue_push(commandQueue,req);
-	
+
 	m_port = port;
 	m_baud = baud;
 	m_gThread = g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
@@ -626,7 +637,7 @@ OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
 	}
 
 	clientConnected = false;
-	m_re = re;  
+	m_re = re;
 
 	m_threadLive = true;
 	Obd2Amb obd2amb;
@@ -670,7 +681,7 @@ int OBD2Source::supportedOperations()
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new OBD2Source(routingengine, config);
-	
+
 }
 const string OBD2Source::uuid()
 {
@@ -699,18 +710,19 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 
 		if(!pid)
 		{
+			DebugOut(DebugOut::Warning) << "We don't support this property: " << property <<endl;
 			return;
 		}
-		
+
 		//If the pid is currently in the blacklist map, erase it. This allows for applications
 		//to "un-blacklist" a pid by re-subscribing to it.
 		if (m_blacklistPidCountMap.find(pid->pid) != m_blacklistPidCountMap.end())
 		{
 			m_blacklistPidCountMap.erase(m_blacklistPidCountMap.find(pid->pid));
 		}
-					
-					
-		g_async_queue_push(subscriptionAddQueue,pid);
+
+
+		g_async_queue_push(subscriptionAddQueue, pid);
 		CommandRequest *req = new CommandRequest();
 		req->req = "connectifnot";
 		g_async_queue_push(commandQueue,req);

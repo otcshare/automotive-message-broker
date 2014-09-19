@@ -252,23 +252,52 @@ Bluetooth5::Bluetooth5()
 	}
 }
 
+bool Bluetooth5::setDevice(string address)
+{
+	mPath = findDevice(address);
+
+
+	if(mPath == "")
+	{
+		DebugOut(DebugOut::Error) << "device path not found.  Not paired? " << endl;
+		return false;
+	}
+
+	return true;
+}
+
 void Bluetooth5::getDeviceForAddress(std::string address, ConnectedCallback connectedCallback)
 {
 	mConnected = connectedCallback;
 
-	std::string devicePath = findDevice(address);
+	if(!setDevice(address))
+		return;
 
-	DebugOut() << "Bluetooth device path: " << devicePath << endl;
+	DebugOut() << "Bluetooth device path: " << mPath << endl;
 
-	if(devicePath == "")
+	connect(connectedCallback);
+}
+
+void Bluetooth5::connected(int fd)
+{
+	try
 	{
-		DebugOut(DebugOut::Error) << "device path not found.  Not paired? " << endl;
+		mConnected(fd);
 	}
+	catch(...)
+	{
+		DebugOut(DebugOut::Error) << "Error calling connected callback" << endl;
+	}
+}
+
+void Bluetooth5::connect(ConnectedCallback onconnectedCallback)
+{
+	mConnected = onconnectedCallback;
 
 	GError* error = nullptr;
 
-	GDBusProxy * deviceProxy = g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,G_DBUS_PROXY_FLAGS_NONE,NULL,
-															  "org.bluez", devicePath.c_str(), "org.bluez.Device1", nullptr, &error);
+	auto  deviceProxyPtr = amb::make_super(g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,G_DBUS_PROXY_FLAGS_NONE,NULL,
+															  "org.bluez", mPath.c_str(), "org.bluez.Device1", nullptr, &error));
 
 	auto errorPtr = amb::make_super(error);
 
@@ -278,13 +307,13 @@ void Bluetooth5::getDeviceForAddress(std::string address, ConnectedCallback conn
 		return;
 	}
 
-	g_dbus_proxy_call(deviceProxy, "Connect", nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr,
+	g_dbus_proxy_call(deviceProxyPtr.get(), "Connect", nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr,
 					  [](GObject *source_object, GAsyncResult *res, gpointer user_data)
 	{
 
 		GError* error = nullptr;
 
-		g_dbus_proxy_call_finish(G_DBUS_PROXY (source_object),res, &error);
+		g_dbus_proxy_call_finish(G_DBUS_PROXY (source_object), res, &error);
 
 		auto errorPtr = amb::make_super(error);
 
@@ -296,14 +325,32 @@ void Bluetooth5::getDeviceForAddress(std::string address, ConnectedCallback conn
 	this);
 }
 
-void Bluetooth5::connected(int fd)
+void Bluetooth5::disconnect()
 {
-	//try
+	GError* error = nullptr;
+
+	auto  deviceProxyPtr = amb::make_super(g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,G_DBUS_PROXY_FLAGS_NONE,NULL,
+															  "org.bluez", mPath.c_str(), "org.bluez.Device1", nullptr, &error));
+
+	auto errorPtr = amb::make_super(error);
+
+	if(errorPtr)
 	{
-		mConnected(fd);
+		DebugOut(DebugOut::Error) << "Error getting bluetooth device proxy " << errorPtr->message <<endl;
+		return;
 	}
-	//catch(...)
-	{
-		//DebugOut(DebugOut::Error) << "Error calling connected callback" << endl;
-	}
+
+	g_dbus_proxy_call(deviceProxyPtr.get(), "Disconnect", nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr,[](GObject *source_object,
+					  GAsyncResult *res, gpointer user_data){
+		GError* error = nullptr;
+
+		g_dbus_proxy_call_finish(G_DBUS_PROXY (source_object), res, &error);
+
+		auto errorPtr = amb::make_super(error);
+
+		if(errorPtr)
+		{
+			DebugOut(DebugOut::Error) << "error trying to disconnect: " << errorPtr->message << endl;
+		}
+	}, nullptr);
 }

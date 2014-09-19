@@ -23,18 +23,26 @@
 #include "abstractsource.h"
 #include "ambpluginimpl.h"
 
+#include <map>
+
 #include <QObject>
 #include <QVariant>
 #include <QJsonDocument>
 #include <QDateTime>
-#include <QScriptValue>
+#include <QJSValue>
 #include "uuidhelper.h"
 
 #include "authenticate.h"
-#include "agent.h"
 
-class IrcCommunication;
-class QScriptEngine;
+class QJSEngine;
+
+class ModuleInterface
+{
+public:
+	virtual std::map<std::string, QObject*> objects(std::map<string, string> config) = 0;
+};
+
+Q_DECLARE_INTERFACE(ModuleInterface, "org.automotive.bluemonkey.moduleinterface")
 
 class Property: public QObject, public AbstractSink
 {
@@ -54,14 +62,14 @@ public:
 		DebugOut()<<"Bluemonkey Property Supported Changed"<<endl;
 	}
 
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
+	virtual void propertyChanged(AbstractPropertyType* value);
 
 	virtual const std::string uuid() { return mUuid; }
 
 	QVariant value();
 	void setValue(QVariant v);
 
-	void getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunction);
+	void getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction);
 Q_SIGNALS:
 
 	void changed(QVariant val);
@@ -82,7 +90,7 @@ public:
 	virtual void propertyChanged(AbstractPropertyType* value);
 	virtual const std::string uuid() const;
 
-	QScriptEngine* engine;
+	QJSEngine* engine;
 
 	virtual int supportedOperations();
 
@@ -95,7 +103,7 @@ private: //source privates
 public Q_SLOTS:
 
 	QObject* subscribeTo(QString str);
-	QObject* subscribeTo(QString str, QString srcFilter);
+	QObject* subscribeToSource(QString str, QString srcFilter);
 
 	QStringList sourcesForProperty(QString property);
 
@@ -105,27 +113,29 @@ public Q_SLOTS:
 
 	void loadConfig(QString str);
 
+	void loadModule(QString path);
+
 	void reloadEngine();
 
 	void writeProgram(QString program);
 
 	void log(QString str);
 
-	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction);
+	QObject* createTimer();
+
+	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction);
 
 	void setSilentMode(bool m)
 	{
 		mSilentMode = m;
 	}
 
-	void createCustomProperty(QString name, QScriptValue defaultValue);
+	void createCustomProperty(QString name, QJSValue defaultValue);
 
 private:
 	QStringList configsToLoad;
-	IrcCommunication* irc;
 
 	Authenticate* auth;
-	BluemonkeyAgent* agent;
 	bool mSilentMode;
 };
 

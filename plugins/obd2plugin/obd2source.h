@@ -114,7 +114,7 @@ public:
 			{
 				continue;
 			}
-			
+
 			ObdPid* pid = (*itr)->create();
 			return pid;
 		}
@@ -181,7 +181,7 @@ public:
 	std::string m_btDeviceAddress;
 	std::string m_btAdapterAddress;
 	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
-	void updateProperty(VehicleProperty::Property property,AbstractPropertyType *value);
+	void updateProperty(AbstractPropertyType *value);
 	obdLib * obd;
 	bool m_threadLive;
 	GThread *m_gThread;
