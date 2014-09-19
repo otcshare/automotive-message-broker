@@ -1,3 +1,23 @@
+* Fri Sep 19 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140916.213438-15-g734500b
+- bump version
+- fixed up bluez5 support code
+- bluemonkey enhancements
+- multi-arch support
+- multi-arch support
+- add usebluez5 flag to cmake
+- fixes for bluemonkey and wheel
+- disabled irc in bluemonkey
+- removed generated files
+- point at franca docs for dbus
+- convert bluemonkey script to be qml based engine
+- version bump
+- fixed up bluemonkey configuration
+- manual merge
+- fixed crash in murphy plugin
+- fix to spec
+- fixed lib install dir for qtmainloop plugin
+- updated spec for 0.11.901
+
 * Tue Sep 02 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140820.174605-9-g7f1852a
 - DBus signaller will combine duplicate signals for same object path
 - Fixed issue with Murphy plugin using wronge type for certain Properties.
