@@ -319,11 +319,11 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	  supportedPropertyChanges(0)
 {
 
-	cout<<"Capabilities: "<<endl;
+	DebugOut(0) << "Capabilities: " << endl;
 
 	for(auto prop : VehicleProperty::capabilities())
 	{
-		cout<<prop<<endl;
+		DebugOut(0) << prop << endl;
 	}
 
 	DebugOut() << "Testing Core::setSupported... " << endl;

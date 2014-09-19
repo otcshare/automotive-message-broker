@@ -27,6 +27,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 using namespace std;
 
 class Location;
+class Bluetooth5;
+class BluetoothDevice;
 
 class GpsNmeaSource: public AbstractSource
 {
@@ -34,7 +36,7 @@ class GpsNmeaSource: public AbstractSource
 public:
 	GpsNmeaSource(AbstractRoutingEngine* re, map<string, string> config);
 	~GpsNmeaSource();
-	
+
 	const string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
@@ -44,9 +46,9 @@ public:
 	PropertyList supported();
 
 	int supportedOperations();
-	
+
 	void supportedChanged(const PropertyList &) {}
-	
+
 	PropertyInfo getPropertyInfo(VehicleProperty::Property property)
 	{
 		if(propertyInfoMap.find(property) != propertyInfoMap.end())
@@ -60,9 +62,6 @@ public:
 	void test();
 
 private:
-
-
-
 	bool tryParse(std::string data);
 
 	void addPropertySupport(VehicleProperty::Property property, Zone::Type zone);
@@ -80,6 +79,11 @@ private:
 	std::string mUuid;
 
 	std::string buffer;
+#ifdef USE_BLUEZ5
+	Bluetooth5 * bt;
+#else
+	BluetoothDevice *bt;
+#endif
 };
 
 #endif // EXAMPLEPLUGIN_H

@@ -76,7 +76,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 	mrp_msg_value_t value;
 	size_t size;
 
-	char *property_name;
+	std::string property_name;
 
 	DebugOut()<<"Received a message from Murphy!"<<endl;
 
@@ -86,8 +86,6 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 	if (tag == 1 && type == MRP_MSG_FIELD_STRING)
 		property_name = value.str;
 
-	string dstr(property_name);
-
 	if (!mrp_msg_iterate(msg, &cursor, &tag, &type, &value, &size))
 		return;
 
@@ -96,9 +94,7 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 	DebugOut() << "Property '" << property_name << "' with value: " <<endl;
 
-	bool hasProp = contains(VehicleProperty::capabilities(), dstr);
-
-	AbstractPropertyType* prop = VehicleProperty::getPropertyTypeForPropertyNameValue(dstr);
+	bool hasProp = contains(VehicleProperty::capabilities(), property_name);
 
 	stringstream val;
 
@@ -109,8 +105,8 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 			val << value.str;
 			if (!hasProp)
 			{
-				VehicleProperty::registerProperty(dstr,
-												  [dstr](){return new StringPropertyType(dstr, "");});
+				VehicleProperty::registerProperty(property_name,
+												  [property_name](){return new StringPropertyType(property_name, "");});
 			}
 
 			DebugOut() << "string:" << value.str << std::endl;
@@ -122,8 +118,8 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 			if (!hasProp)
 			{
-				VehicleProperty::registerProperty(dstr,
-												  [dstr](){return new BasicPropertyType<double>(dstr, 0);});
+				VehicleProperty::registerProperty(property_name,
+												  [property_name](){return new BasicPropertyType<double>(property_name, 0);});
 			}
 
 			DebugOut() << "double:" << value.dbl << std::endl;
@@ -135,8 +131,8 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 			if (!hasProp)
 			{
-				VehicleProperty::registerProperty(dstr,
-												  [dstr](){return new BasicPropertyType<bool>(dstr, FALSE);});
+				VehicleProperty::registerProperty(property_name,
+												  [property_name](){return new BasicPropertyType<bool>(property_name, FALSE);});
 			}
 
 			DebugOut() << "boolean:" << value.bln << std::endl;
@@ -148,8 +144,8 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 			if (!hasProp)
 			{
-				VehicleProperty::registerProperty(dstr,
-												  [dstr](){return new BasicPropertyType<uint32_t>(dstr, 0);});
+				VehicleProperty::registerProperty(property_name,
+												  [property_name](){return new BasicPropertyType<uint32_t>(property_name, 0);});
 			}
 
 			DebugOut() << "uint32:" << value.u32 << std::endl;
@@ -161,8 +157,8 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 			if (!hasProp)
 			{
-				VehicleProperty::registerProperty(dstr,
-												  [dstr](){return new BasicPropertyType<uint16_t>(dstr, 0);});
+				VehicleProperty::registerProperty(property_name,
+												  [property_name](){return new BasicPropertyType<uint16_t>(property_name, 0);});
 			}
 
 			DebugOut() << "uint16:" << value.u16 << std::endl;
@@ -175,12 +171,11 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 			if (!hasProp)
 			{
-				VehicleProperty::registerProperty(dstr,
-												  [dstr](){return new BasicPropertyType<int32_t>(dstr, 0);});
+				VehicleProperty::registerProperty(property_name,
+												  [property_name](){return new BasicPropertyType<int32_t>(property_name, 0);});
 			}
 
 			DebugOut() << "int32:" << value.s32 << std::endl;
-			s->processValue(property_name, prop);
 			break;
 		}
 		case MRP_MSG_FIELD_INT16:
@@ -189,8 +184,8 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 
 			if (!hasProp)
 			{
-				VehicleProperty::registerProperty(dstr,
-												  [dstr](){return new BasicPropertyType<int16_t>(dstr, 0);});
+				VehicleProperty::registerProperty(property_name,
+												  [property_name](){return new BasicPropertyType<int16_t>(property_name, 0);});
 			}
 
 			DebugOut() << "int16:" << value.s16 << std::endl;
@@ -200,9 +195,10 @@ static void recvfrom_msg(mrp_transport_t *transp, mrp_msg_t *msg,
 			DebugOut()<<"Unknown type"<<endl;
 	}
 
+	AbstractPropertyType* prop = VehicleProperty::getPropertyTypeForPropertyNameValue(property_name);
+
 	prop->fromString(val.str());
 	s->processValue(property_name, prop);
-
 }
 
 static void recv_msg(mrp_transport_t *transp, mrp_msg_t *msg, void *user_data)

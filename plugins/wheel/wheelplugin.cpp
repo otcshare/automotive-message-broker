@@ -517,7 +517,11 @@ void WheelPrivate::changeGear(int gear)
 
 void WheelPrivate::changeOilPressure(bool increase)
 {
-	(increase ? *(oilPSI)++ : *(oilPSI)--);
+	if(increase)
+		oilPSI->setValue(oilPSI->basicValue()+1);
+	else if(oilPSI->basicValue() > 0)
+		oilPSI->setValue(oilPSI->basicValue()-1);
+
 	this->re->updateProperty(oilPSI, mParent->uuid());
 }
 

@@ -1,19 +1,19 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -21,18 +21,28 @@
 #define BluemonkeySink_H
 
 #include "abstractsource.h"
+#include "ambpluginimpl.h"
+
+#include <map>
+
 #include <QObject>
 #include <QVariant>
 #include <QJsonDocument>
 #include <QDateTime>
-#include <QScriptValue>
+#include <QJSValue>
 #include "uuidhelper.h"
 
 #include "authenticate.h"
-#include "agent.h"
 
-class IrcCommunication;
-class QScriptEngine;
+class QJSEngine;
+
+class ModuleInterface
+{
+public:
+	virtual std::map<std::string, QObject*> objects(std::map<string, string> config) = 0;
+};
+
+Q_DECLARE_INTERFACE(ModuleInterface, "org.automotive.bluemonkey.moduleinterface")
 
 class Property: public QObject, public AbstractSink
 {
@@ -52,14 +62,14 @@ public:
 		DebugOut()<<"Bluemonkey Property Supported Changed"<<endl;
 	}
 
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
+	virtual void propertyChanged(AbstractPropertyType* value);
 
 	virtual const std::string uuid() { return mUuid; }
 
 	QVariant value();
 	void setValue(QVariant v);
 
-	void getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunction);
+	void getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction);
 Q_SIGNALS:
 
 	void changed(QVariant val);
@@ -70,25 +80,17 @@ private:
 
 };
 
-class BluemonkeySink : public QObject, public AbstractSource
+class BluemonkeySink : public QObject, public AmbPluginImpl
 {
 Q_OBJECT
 public:
-	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config);
+	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config,  AbstractSource& parent);
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(const PropertyList & supportedProperties);
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid);
-	virtual const std::string uuid();
+	virtual void propertyChanged(AbstractPropertyType* value);
+	virtual const std::string uuid() const;
 
-	QScriptEngine* engine;
-
-	/// source methods:
-	virtual void getPropertyAsync(AsyncPropertyReply *reply);
-	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
-	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
-	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
-	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
-	virtual PropertyList supported();
+	QJSEngine* engine;
 
 	virtual int supportedOperations();
 
@@ -101,13 +103,17 @@ private: //source privates
 public Q_SLOTS:
 
 	QObject* subscribeTo(QString str);
-	QObject* subscribeTo(QString str, QString srcFilter);
+	QObject* subscribeToSource(QString str, QString srcFilter);
 
 	QStringList sourcesForProperty(QString property);
+
+	QStringList supportedProperties();
 
 	bool authenticate(QString pass);
 
 	void loadConfig(QString str);
+
+	void loadModule(QString path);
 
 	void reloadEngine();
 
@@ -115,32 +121,23 @@ public Q_SLOTS:
 
 	void log(QString str);
 
-	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction);
+	QObject* createTimer();
+
+	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction);
 
 	void setSilentMode(bool m)
 	{
 		mSilentMode = m;
 	}
 
-	void createCustomProperty(QString name, QScriptValue defaultValue);
+	void createCustomProperty(QString name, QJSValue defaultValue);
 
 private:
 	QStringList configsToLoad;
-	IrcCommunication* irc;
 
 	Authenticate* auth;
-	BluemonkeyAgent* agent;
 	bool mSilentMode;
 };
 
-class BluemonkeySinkManager: public AbstractSinkManager
-{
-public:
-	BluemonkeySinkManager(AbstractRoutingEngine* engine, map<string, string> config)
-	:AbstractSinkManager(engine, config)
-	{
-		new BluemonkeySink(routingEngine, config);
-	}
-};
 
 #endif // BluemonkeySink_H

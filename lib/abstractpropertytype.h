@@ -368,20 +368,6 @@ public:
 		setValue(basicValue() - 1);
 	}
 
-	BasicPropertyType operator ++ (int)
-	{
-		BasicPropertyType<T> temp = *this;
-		temp.setValue(basicValue() + 1);
-		return temp;
-	}
-
-	BasicPropertyType operator -- (int)
-	{
-		BasicPropertyType<T> temp = *this;
-		temp.setValue(basicValue() - 1);
-		return temp;
-	}
-
 	bool operator < (const BasicPropertyType<T>& other) const
 	{
 		return value<T>() < other.value<T>();

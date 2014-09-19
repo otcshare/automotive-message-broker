@@ -390,11 +390,11 @@ bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	return new GpsNmeaSource(routingengine, config);
-	
+
 }
 
 GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> config)
-	:AbstractSource(re,config), mUuid("33d86462-1708-4f78-a001-99ea8d55422b"), device(nullptr)
+	:AbstractSource(re,config), mUuid("33d86462-1708-4f78-a001-99ea8d55422b"), device(nullptr), bt(nullptr)
 {
 	int baudrate = 0;
 	location =new Location(re, mUuid);
@@ -425,11 +425,13 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 	if(config.find("device")!= config.end())
 	{
 		std::string dev = config["device"];
+
 		if(dev.find(":") != string::npos)
 		{
 #ifdef USE_BLUEZ5
-			Bluetooth5 bt;
-			bt.getDeviceForAddress(dev,[this](int fd) {
+			bt = new Bluetooth5();
+			bt->getDeviceForAddress(dev, [this](int fd) {
+				DebugOut() << "fd: " << fd << endl;
 				device = new SerialPort(fd);
 				int baudrate=0;
 
@@ -439,59 +441,73 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 						DebugOut(DebugOut::Error)<<"Unsupported baudrate " << configuration["baudrate"] << endl;
 				}
 
-				if(!device->open())
-				{
-					DebugOut(DebugOut::Error)<<"Failed to open gps tty: "<<configuration["device"]<<endl;
-					perror("Error");
-					return;
-				}
-
 				DebugOut()<<"read from device: "<<device->read()<<endl;
 
 				GIOChannel *chan = g_io_channel_unix_new(device->fileDescriptor());
 				g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
 				g_io_channel_set_close_on_unref(chan, true);
-				g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
+				g_io_channel_unref(chan);
 			});
-
-		}
-	}
-
 #else
-			BluetoothDevice bt;
-			dev = bt.getDeviceForAddress(dev, btaddapter);
+			bt = new BluetoothDevice();
+			dev = bt->getDeviceForAddress(dev, btaddapter);
 
-		}
+			device = new SerialPort(dev);
 
-		device = new SerialPort(dev);
+			if(baudrate!=0)
+			{
+				if((static_cast<SerialPort*>(device))->setSpeed(baudrate))
+					DebugOut(DebugOut::Error)<<"Unsupported baudrate " << config["baudrate"] << endl;
+			}
 
-		if(baudrate!=0)
-		{
-			if((static_cast<SerialPort*>(device))->setSpeed(baudrate))
-				DebugOut(DebugOut::Error)<<"Unsupported baudrate " << config["baudrate"] << endl;
-		}
+			if(!device->open())
+			{
+				DebugOut(DebugOut::Error)<<"Failed to open gps tty: "<<config["device"]<<endl;
+				perror("Error");
+				return;
+			}
 
-		if(!device->open())
-		{
-			DebugOut(DebugOut::Error)<<"Failed to open gps tty: "<<config["device"]<<endl;
-			perror("Error");
-			return;
-		}
+			DebugOut()<<"read from device: "<<device->read()<<endl;
 
-		DebugOut()<<"read from device: "<<device->read()<<endl;
-
-		GIOChannel *chan = g_io_channel_unix_new(device->fileDescriptor());
-		g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
-		g_io_channel_set_close_on_unref(chan, true);
-		g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
-	}
+			GIOChannel *chan = g_io_channel_unix_new(device->fileDescriptor());
+			g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
+			g_io_channel_set_close_on_unref(chan, true);
+			g_io_channel_unref(chan);
 #endif
+		}
+		else
+		{
+			device = new SerialPort(dev);
+
+			if(baudrate!=0)
+			{
+				if((static_cast<SerialPort*>(device))->setSpeed(baudrate))
+					DebugOut(DebugOut::Error)<<"Unsupported baudrate " << config["baudrate"] << endl;
+			}
+
+			if(!device->open())
+			{
+				DebugOut(DebugOut::Error)<<"Failed to open gps tty: "<<config["device"]<<endl;
+				perror("Error");
+				return;
+			}
+
+			DebugOut()<<"read from device: "<<device->read()<<endl;
+
+			GIOChannel *chan = g_io_channel_unix_new(device->fileDescriptor());
+			g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR), (GIOFunc)readCallback, this);
+			g_io_channel_set_close_on_unref(chan, true);
+			g_io_channel_unref(chan);
+		}
+	}
 }
 
 GpsNmeaSource::~GpsNmeaSource()
 {
 	if(device && device->isOpen())
 		device->close();
+	if(bt)
+		delete bt;
 }
 
 const string GpsNmeaSource::uuid()

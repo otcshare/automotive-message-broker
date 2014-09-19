@@ -1,41 +1,43 @@
 /*
-    Copyright (C) 2012  Intel Corporation
+	Copyright (C) 2012  Intel Corporation
 
-    This library is free software; you can redistribute it and/or
-    modify it under the terms of the GNU Lesser General Public
-    License as published by the Free Software Foundation; either
-    version 2.1 of the License, or (at your option) any later version.
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-    This library is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-    Lesser General Public License for more details.
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public
-    License along with this library; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
 #include "bluemonkey.h"
 #include "abstractroutingengine.h"
+#include "ambplugin.h"
 #include "debugout.h"
-#include "irccoms.h"
 
 #include <QJsonDocument>
-#include <QScriptEngine>
+#include <QJSEngine>
 #include <QDateTime>
 #include <QString>
 #include <QFile>
 #include <QTimer>
-
-Q_SCRIPT_DECLARE_QMETAOBJECT(QTimer, QObject*)
+#include <QtQml>
 
 #define foreach Q_FOREACH
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new BluemonkeySinkManager(routingengine, config);
+	auto plugin = new AmbPlugin<BluemonkeySink>(routingengine, config);
+	plugin->init();
+
+	return plugin;
 }
 
 QVariant gvariantToQVariant(GVariant *value)
@@ -89,15 +91,15 @@ QVariant gvariantToQVariant(GVariant *value)
 
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config): QObject(0), AbstractSource(e, config), agent(nullptr), engine(nullptr), mSilentMode(false)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent): QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
 {
-	irc = new IrcCommunication(config, this);
-
 	QTimer::singleShot(1,this,SLOT(reloadEngine()));
 
 	auth = new Authenticate(config, this);
 
-	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
+	qmlRegisterType<QTimer>("", 1, 0, "QTimer");
+
+/*	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
 
 		if(codes.startsWith("authenticate"))
 		{
@@ -131,7 +133,7 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 				irc->respond(sender, response);
 		}
 	});
-
+*/
 }
 
 
@@ -140,44 +142,19 @@ PropertyList BluemonkeySink::subscriptions()
 
 }
 
-void BluemonkeySink::supportedChanged(const PropertyList &supportedProperties)
+void BluemonkeySink::supportedChanged(const PropertyList & supportedProperties)
 {
 	DebugOut()<<"supported changed"<<endl;
 }
 
-void BluemonkeySink::propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
+void BluemonkeySink::propertyChanged(AbstractPropertyType * value)
 {
 
 }
 
-const string BluemonkeySink::uuid()
+const string BluemonkeySink::uuid() const
 {
 	return "bluemonkey";
-}
-
-void BluemonkeySink::getPropertyAsync(AsyncPropertyReply *reply)
-{
-}
-
-void BluemonkeySink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
-{
-}
-
-AsyncPropertyReply *BluemonkeySink::setProperty(AsyncSetPropertyRequest request)
-{
-}
-
-void BluemonkeySink::subscribeToPropertyChanges(VehicleProperty::Property property)
-{
-}
-
-void BluemonkeySink::unsubscribeToPropertyChanges(VehicleProperty::Property property)
-{
-}
-
-PropertyList BluemonkeySink::supported()
-{
-	return mSupported;
 }
 
 int BluemonkeySink::supportedOperations()
@@ -190,7 +167,7 @@ QObject *BluemonkeySink::subscribeTo(QString str)
 	return new Property(str.toStdString(), "", routingEngine, this);
 }
 
-QObject *BluemonkeySink::subscribeTo(QString str, QString srcFilter)
+QObject *BluemonkeySink::subscribeToSource(QString str, QString srcFilter)
 {
 	return new Property(str.toStdString(), srcFilter, routingEngine, this);
 }
@@ -202,6 +179,18 @@ QStringList BluemonkeySink::sourcesForProperty(QString property)
 	for(auto itr = list.begin(); itr != list.end(); itr++)
 	{
 		strList<<(*itr).c_str();
+	}
+
+	return strList;
+}
+
+QStringList BluemonkeySink::supportedProperties()
+{
+	PropertyList props = routingEngine->supported();
+	QStringList strList;
+	for(auto p : props)
+	{
+		strList<<p.c_str();
 	}
 
 	return strList;
@@ -228,7 +217,7 @@ void BluemonkeySink::loadConfig(QString str)
 
 	DebugOut()<<"evaluating script: "<<script.toStdString()<<endl;
 
-	QScriptValue val = engine->evaluate(script);
+	QJSValue val = engine->evaluate(script);
 
 	DebugOut()<<val.toString().toStdString()<<endl;
 }
@@ -238,32 +227,22 @@ void BluemonkeySink::reloadEngine()
 	if(engine)
 		engine->deleteLater();
 
-	engine = new QScriptEngine(this);
+	engine = new QJSEngine(this);
 
-	if(agent) delete agent;
-
-	agent = new BluemonkeyAgent(engine);
-
-	//engine->setAgent(agent);
-
-	QScriptValue value = engine->newQObject(this);
+	QJSValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
-
-	QScriptValue qtimerClass = engine->scriptValueFromQMetaObject<QTimer>();
-	engine->globalObject().setProperty("QTimer", qtimerClass);
-
-	QScriptValue ircValue = engine->newQObject(irc);
-	engine->globalObject().setProperty("irc", ircValue);
 
 	loadConfig(configuration["config"].c_str());
 }
 
 void BluemonkeySink::writeProgram(QString program)
 {
-	QScriptSyntaxCheckResult result = QScriptEngine::checkSyntax(program);
-	if(result.state() != QScriptSyntaxCheckResult::Valid)
+
+	QJSEngine temp;
+	QJSValue result = temp.evaluate(program);
+	if(result.isError())
 	{
-		DebugOut(DebugOut::Error)<<"Syntax error in program: "<<result.errorMessage().toStdString()<<endl;
+		DebugOut(DebugOut::Error)<<"Syntax error in program: "<<result.toString().toStdString()<<endl;
 		return;
 	}
 
@@ -286,7 +265,12 @@ void BluemonkeySink::log(QString str)
 	DebugOut()<<str.toStdString()<<endl;
 }
 
-void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTime end, QScriptValue cbFunction)
+QObject *BluemonkeySink::createTimer()
+{
+	return new QTimer(this);
+}
+
+void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction)
 {
 	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
 	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
@@ -310,7 +294,7 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 			return;
 		}
 
-		if(cbFunction.isFunction())
+		if(cbFunction.isCallable())
 		{
 			QVariantList list;
 
@@ -321,7 +305,9 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 				list.append(gvariantToQVariant(val->toVariant()));
 			}
 
-			cbFunction.call(QScriptValue(),cbFunction.engine()->newVariant(list));
+			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
+
+			cbFunction.call(QJSValueList()<<val);
 
 		}
 
@@ -331,7 +317,7 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 	routingEngine->getRangePropertyAsync(request);
 }
 
-void BluemonkeySink::createCustomProperty(QString name, QScriptValue defaultValue)
+void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
 {
 
 	auto create = [defaultValue, name]() -> AbstractPropertyType*
@@ -342,22 +328,23 @@ void BluemonkeySink::createCustomProperty(QString name, QScriptValue defaultValu
 				return nullptr;
 
 			if(var.type() == QVariant::UInt)
-				return new BasicPropertyType<uint>(name.toStdString(),var.toUInt());
+				return new BasicPropertyType<uint>(name.toStdString(), var.toUInt());
 			else if(var.type() == QVariant::Double)
 				return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
 			else if(var.type() == QVariant::Bool)
 				return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
 			else if(var.type() == QVariant::Int)
-				return new BasicPropertyType<int>(name.toStdString(),var.toInt());
+				return new BasicPropertyType<int>(name.toStdString(), var.toInt());
 			else if(var.type() == QVariant::String)
-				return new StringPropertyType(name.toStdString(),var.toString().toStdString());
+				return new StringPropertyType(name.toStdString(), var.toString().toStdString());
 
 
 			return nullptr;
 	};
 
-	VehicleProperty::registerProperty(name.toStdString(),create);
-	mSupported.push_back(name.toStdString());
+	addPropertySupport(Zone::None, create);
+
+	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
 
 
@@ -390,14 +377,14 @@ void Property::setValue(QVariant v)
 	{
 		if(reply->success)
 		{
-			propertyChanged(reply->property,reply->value,reply->value->sourceUuid);
+			propertyChanged(reply->value);
 		}
 		delete reply;
 	};
 	routingEngine->setProperty(request);
 }
 
-void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunction)
+void Property::getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction)
 {
 	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
 	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
@@ -417,7 +404,7 @@ void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunctio
 			return;
 		}
 
-		if(cbFunction.isFunction())
+		if(cbFunction.isCallable())
 		{
 			QVariantList list;
 
@@ -427,8 +414,8 @@ void Property::getHistory(QDateTime begin, QDateTime end, QScriptValue cbFunctio
 
 				list.append(gvariantToQVariant(val->toVariant()));
 			}
-
-			cbFunction.call(QScriptValue(),cbFunction.engine()->newVariant(list));
+			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
+			cbFunction.call(QJSValueList()<<val);
 
 		}
 
@@ -452,9 +439,9 @@ QString Property::type()
 void Property::setType(QString t)
 {
 	if(mValue && type() != "")
-		routingEngine->unsubscribeToProperty(type().toStdString(),this);
+		routingEngine->unsubscribeToProperty(type().toStdString(), this);
 
-	routingEngine->subscribeToProperty(t.toStdString(),this);
+	routingEngine->subscribeToProperty(t.toStdString(), this);
 
 	mValue = VehicleProperty::getPropertyTypeForPropertyNameValue(t.toStdString());
 
@@ -466,7 +453,7 @@ void Property::setType(QString t)
 	request.completed = [this](AsyncPropertyReply* reply)
 	{
 		if(reply->success)
-			propertyChanged(reply->property, reply->value,uuid());
+			propertyChanged(reply->value);
 
 		delete reply;
 	};
@@ -474,7 +461,7 @@ void Property::setType(QString t)
 	routingEngine->getPropertyAsync(request);
 }
 
-void Property::propertyChanged(VehicleProperty::Property property, AbstractPropertyType *value, string uuid)
+void Property::propertyChanged(AbstractPropertyType *value)
 {
 	if(mValue)
 	{
