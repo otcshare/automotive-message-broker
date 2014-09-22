@@ -534,7 +534,7 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 
 void OpenCvLuxPlugin::imgProcResult()
 {
-	QFutureWatcher<uint> *watcher = dynamic_cast<QFutureWatcher<uint>* >(sender());
+	QFutureWatcher<uint> *watcher = dynamic_cast<QFutureWatcher<uint>*>(sender());
 
 	uint lux = watcher->result();
 	shared->parent->updateProperty(lux);
