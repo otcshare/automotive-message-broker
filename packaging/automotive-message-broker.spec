@@ -1,7 +1,5 @@
 %bcond_with qt5
 
-%define with_qt5 1
-
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
 Version:    0.12.802
