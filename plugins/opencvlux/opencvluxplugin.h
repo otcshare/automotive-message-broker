@@ -46,7 +46,7 @@ public:
 		bool threaded;
 		bool kinect;
 		bool useOpenCl;
-        bool useCuda;
+		bool useCuda;
 		int pixelLowerBound;
 		int pixelUpperBound;
 		bool loggingOn;
@@ -55,7 +55,7 @@ public:
 	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
 
 	~OpenCvLuxPlugin();
-	
+
 	const string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
@@ -67,9 +67,9 @@ public:
 	int supportedOperations();
 
 	void propertyChanged(AbstractPropertyType* value);
-	
+
 	void supportedChanged(const PropertyList &);
-	
+
 	void updateProperty(uint lux);
 
 	void writeVideoFrame(cv::Mat frame);
@@ -77,11 +77,11 @@ public:
 public Q_SLOTS:
 	void imgProcResult();
 
-	
+
 private: /// methods:
 	bool init();
 
-private:	
+private:
 	uint speed;
 	uint latitude;
 	uint longitude;
@@ -89,6 +89,8 @@ private:
 	uint lastLux;
 	std::string device;
 	std::list<AsyncPropertyReply*> replyQueue;
+
+	VehicleProperty::ExteriorBrightnessType* extBrightness;
 
 	Shared* shared;
 	QMutex mutex;

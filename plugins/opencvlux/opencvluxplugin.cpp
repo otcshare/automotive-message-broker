@@ -52,7 +52,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 }
 
 OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config)
-	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0)
+	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0), extBrightness(new VehicleProperty::ExteriorBrightnessType(0))
 {
 	shared = new Shared;
 	shared->parent = this;
@@ -275,7 +275,7 @@ PropertyList OpenCvLuxPlugin::supported()
 	PropertyList props;
 	props.push_back(VehicleProperty::ExteriorBrightness);
 	props.push_back(VideoLogging);
-	
+
 	return props;
 }
 
@@ -506,11 +506,11 @@ void OpenCvLuxPlugin::writeVideoFrame(cv::Mat f)
 
 void OpenCvLuxPlugin::updateProperty(uint lux)
 {
-	VehicleProperty::ExteriorBrightnessType l(lux);
+	 extBrightness->setValue(lux);
 
 	for(auto reply : replyQueue)
 	{
-		reply->value = &l;
+		reply->value = extBrightness;
 		reply->success = true;
 		try{
 			reply->completed(reply);
@@ -526,7 +526,7 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 	if(lux != lastLux && shared->mRequests.size())
 	{
 		lastLux = lux;
-		routingEngine->updateProperty(&l, uuid());
+		routingEngine->updateProperty(extBrightness, uuid());
 	}
 
 
