@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <abstractsource.h>
 #include <string>
+#include <memory>
 
 #include <opencv/cv.h>
 #include <opencv2/highgui/highgui.hpp>
@@ -90,7 +91,7 @@ private:
 	std::string device;
 	std::list<AsyncPropertyReply*> replyQueue;
 
-	VehicleProperty::ExteriorBrightnessType* extBrightness;
+	std::unique_ptr<VehicleProperty::ExteriorBrightnessType> extBrightness;
 
 	Shared* shared;
 	QMutex mutex;

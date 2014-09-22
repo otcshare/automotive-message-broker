@@ -510,7 +510,7 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 
 	for(auto reply : replyQueue)
 	{
-		reply->value = extBrightness;
+		reply->value = extBrightness.get();
 		reply->success = true;
 		try{
 			reply->completed(reply);
@@ -526,7 +526,7 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 	if(lux != lastLux && shared->mRequests.size())
 	{
 		lastLux = lux;
-		routingEngine->updateProperty(extBrightness, uuid());
+		routingEngine->updateProperty(extBrightness.get(), uuid());
 	}
 
 
