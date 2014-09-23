@@ -202,6 +202,10 @@ const string OpenCvLuxPlugin::uuid()
 
 void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
+	reply->timedout = [this](AsyncPropertyReply* reply) {
+		removeOne(&replyQueue, reply);
+	};
+
 	if(!shared->m_capture || !shared->m_capture->isOpened())
 	{
 		/// we want to turn on the camera for one shot to get an image and determine the intensity
@@ -214,18 +218,18 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	{
 		replyQueue.push_back(reply);
 	}
-	if(reply->property == VideoLogging)
+	else if(reply->property == VideoLogging)
 	{
 		BasicPropertyType<bool> tmp(VideoLogging, shared->loggingOn);
 		reply->value = &tmp;
 		reply->success = true;
 		reply->completed(reply);
 	}
-
 	else  ///We don't support what you are asking for.  Reply false
 	{
-		reply->value = NULL;
+		reply->value = nullptr;
 		reply->success = false;
+		reply->error = AsyncPropertyReply::InvalidOperation;
 		reply->completed(reply);
 	}
 }
@@ -426,7 +430,7 @@ bool OpenCvLuxPlugin::init()
 
 		std::string codec = configuration["codec"];
 
-		if(codec == "" || codec.size() != 4)
+		if(codec.empty() || codec.size() != 4)
 		{
 			DebugOut(DebugOut::Warning)<<"Invalid codec.  Using default: MJPG"<<endl;
 			codec = "MJPG";
@@ -434,13 +438,13 @@ bool OpenCvLuxPlugin::init()
 
 		std::string filename = configuration["logfile"];
 
-		if(filename == "") filename = "/tmp/video.avi";
+		if(filename.empty()) filename = "/tmp/video.avi";
 
 		boost::algorithm::to_upper(codec);
 
 		if(shared->mWriter) delete shared->mWriter;
 
-		shared->mWriter = new cv::VideoWriter(filename,CV_FOURCC(codec.at(0),codec.at(1),codec.at(2),codec.at(3)),30,s);
+		shared->mWriter = new cv::VideoWriter(filename, CV_FOURCC(codec.at(0), codec.at(1), codec.at(2), codec.at(3)),30,s);
 	}
 
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
@@ -513,7 +517,8 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 		reply->value = extBrightness.get();
 		reply->success = true;
 		try{
-			reply->completed(reply);
+			if(reply->completed)
+				reply->completed(reply);
 		}
 		catch(...)
 		{
