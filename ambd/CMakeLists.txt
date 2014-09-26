@@ -9,7 +9,7 @@ if(qtmainloop)
     set_target_properties(qtmainloopplugin PROPERTIES PREFIX "")
     target_link_libraries(qtmainloopplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries})
 
-    install(TARGETS qtmainloopplugin LIBRARY DESTINATION lib/automotive-message-broker)
+    install(TARGETS qtmainloopplugin LIBRARY DESTINATION ${LIB_INSTALL_DIR}/automotive-message-broker)
 endif(qtmainloop)
 
 add_executable(ambd ${ambd_sources})

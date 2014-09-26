@@ -180,7 +180,7 @@ public:
 	bool m_isBluetooth;
 	std::string m_btDeviceAddress;
 	std::string m_btAdapterAddress;
-	map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
+	std::vector<AsyncPropertyReply*> propertyReplyList;
 	void updateProperty(AbstractPropertyType *value);
 	obdLib * obd;
 	bool m_threadLive;
