@@ -144,7 +144,7 @@ public:
 	 */
 	Priority priority;
 
-	void setValue(boost::any val)
+	virtual void setValue(boost::any val)
 	{
 		mValue = val;
 		timestamp = amb::currentTime();
@@ -451,6 +451,16 @@ public:
 	T basicValue()
 	{
 		return value<T>();
+	}
+
+	void setValue(T val)
+	{
+		AbstractPropertyType::setValue(val);
+	}
+
+	void setValue(boost::any val)
+	{
+		AbstractPropertyType::setValue(val);
 	}
 
 private:

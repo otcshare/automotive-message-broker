@@ -331,10 +331,10 @@ static int grabImage(void *data)
 		QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>();
 		QObject::connect(watcher, &QFutureWatcher<uint>::finished, shared->parent, &OpenCvLuxPlugin::imgProcResult);
 
-		QFuture<uint> future = QtConcurrent::run( evalImage, m_image, shared);
+		QFuture<uint> future = QtConcurrent::run(evalImage, m_image, shared);
 		watcher->setFuture(future);
 
-		QtConcurrent::run(shared->parent, &OpenCvLuxPlugin::writeVideoFrame,m_image);
+		QtConcurrent::run(shared->parent, &OpenCvLuxPlugin::writeVideoFrame, m_image);
 	}
 	else
 	{
@@ -349,14 +349,17 @@ static int grabImage(void *data)
 		return true;
 	}
 
-	delete shared->m_capture;
-	shared->m_capture = NULL;
 	return false;
-
 }
 
 static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 {
+	if(qImg.empty())
+	{
+		DebugOut(DebugOut::Warning)<<"Empty image frame."<<endl;
+		return 0;
+	}
+
 	cv::Scalar avgPixelIntensity;
 
 
@@ -408,22 +411,27 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 
 bool OpenCvLuxPlugin::init()
 {
-	if(shared->m_capture) delete shared->m_capture;
-
-	if(shared->kinect)
+	if(!shared->m_capture && shared->kinect)
 	{
 		shared->m_capture = new cv::VideoCapture(CV_CAP_OPENNI);
 	}
-	else if(device == "")
-		shared->m_capture = new cv::VideoCapture(0);
-	else shared->m_capture = new cv::VideoCapture(atoi(device.c_str()));
+	else if(!shared->m_capture)
+	{
+		if(device == "")
+			shared->m_capture = new cv::VideoCapture(0);
+		else
+			shared->m_capture = new cv::VideoCapture(atoi(device.c_str()));
+	}
 
 	if(!shared->m_capture->isOpened())
 	{
 		DebugOut()<<"we failed to open camera device ("<<device<<") or no camera found"<<endl;
 		return false;
 	}
-	if(configuration.find("logging") != configuration.end() && configuration["logging"] == "true" && !shared->mWriter || !shared->mWriter->isOpened())
+
+	if(configuration.find("logging") != configuration.end() &&
+			configuration["logging"] == "true" &&
+			(!shared->mWriter || !shared->mWriter->isOpened()))
 	{
 		cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
 							  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
