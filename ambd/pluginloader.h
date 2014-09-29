@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 #include <functional>
 #include <ltdl.h>
+#include <dlfcn.h>
 #include <iostream>
 
 #include "abstractsource.h"
@@ -49,43 +50,43 @@ public:
 	IMainLoop* mainloop();
 
 	std::string errorString();
-        
-	
+
+
 private: ///methods:
-	
+
 	template<class T>
 	T loadPlugin(string pluginName, map<string, string> config)
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
-		
-		if(lt_dlinit())
+
+		/*if(lt_dlinit())
 		{
 			mErrorString = lt_dlerror();
 			DebugOut(DebugOut::Error)<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
-		
+
 		lt_dlerror();
-		
+
 		lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
-		
+*/
+		void* handle = dlopen(pluginName.c_str(), RTLD_LAZY);
+
 		if(!handle)
 		{
-			mErrorString = lt_dlerror();
+			mErrorString = dlerror();
 			DebugOut(DebugOut::Error)<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
-		
-		f_create = (create_t *)lt_dlsym(handle, "create");
-		
-		//mErrorString = lt_dlerror();
-		
-		if(f_create) 
+
+		f_create = (create_t *)dlsym(handle, "create");
+
+		if(f_create)
 		{
 			void* obj = f_create(routingEngine, config);
 			return static_cast<T>( obj );
 		}
-		
+
 		return nullptr;
 	}
 
@@ -93,7 +94,7 @@ private: ///methods:
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 
-		lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
+		lt_dlhandle handle = lt_dlopen(pluginName.c_str());
 
 		if(!handle)
 		{
@@ -137,17 +138,17 @@ private: ///methods:
 
 		return nullptr;
 	}
-	
+
 private:
-	
+
 	std::string mPluginPath;
 	std::string mErrorString;
-	
+
 	AbstractRoutingEngine* routingEngine;
-	
+
 	SourceList mSources;
 	list<AbstractSinkManager*> mSinkManagers;
-	
+
 	create_t * f_create;
 	create_mainloop_t * m_create;
 	createRoutingEngine * r_create;
