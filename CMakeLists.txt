@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.11.902")
+set(PROJECT_VERSION "0.11.903")
 set(PROJECT_CODENAME "veyron")
 set(PROJECT_QUALITY "beta")
 
