@@ -21,7 +21,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <string>
 #include <functional>
-#include <ltdl.h>
 #include <dlfcn.h>
 #include <iostream>
 
@@ -68,6 +67,8 @@ private: ///methods:
 			return nullptr;
 		}
 
+		openHandles.push_back(handle);
+
 		f_create = (create_t *)dlsym(handle, "create");
 
 		if(f_create)
@@ -83,17 +84,18 @@ private: ///methods:
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 
-		lt_dlhandle handle = lt_dlopen(pluginName.c_str());
+		void* handle = dlopen(pluginName.c_str(), RTLD_LAZY);
 
 		if(!handle)
 		{
-			mErrorString = lt_dlerror();
+			mErrorString = dlerror();
 			DebugOut(DebugOut::Error)<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
+
 		openHandles.push_back(handle);
 
-		m_create = (create_mainloop_t *)lt_dlsym(handle, "create");
+		m_create = (create_mainloop_t *)dlsym(handle, "create");
 
 		if(m_create)
 		{
@@ -107,17 +109,18 @@ private: ///methods:
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 
-		lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
+		void* handle = dlopen(pluginName.c_str(), RTLD_LAZY);
 
 		if(!handle)
 		{
-			mErrorString = lt_dlerror();
+			mErrorString = dlerror();
 			cerr<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
 			return nullptr;
 		}
+
 		openHandles.push_back(handle);
 
-		r_create = (createRoutingEngine *)lt_dlsym(handle, "create");
+		r_create = (createRoutingEngine *)dlsym(handle, "create");
 
 		if(r_create)
 		{
@@ -145,7 +148,7 @@ private:
 
 	IMainLoop* mMainLoop;
 
-	std::vector<lt_dlhandle> openHandles;
+	std::vector<void*> openHandles;
 };
 
 #endif // PLUGINLOADER_H
