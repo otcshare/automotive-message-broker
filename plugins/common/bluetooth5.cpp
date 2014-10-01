@@ -82,7 +82,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 			DebugOut() << "key " << keyPtr.get() << "value signature: " << g_variant_get_type_string(valuePtr.get()) << endl;
 		}
 
-		manager->connected(fd);
+		manager->connected_(fd);
 	}
 	else if(method == "RequestDisconnection")
 	{
@@ -278,7 +278,7 @@ void Bluetooth5::getDeviceForAddress(std::string address, ConnectedCallback conn
 	connect(connectedCallback);
 }
 
-void Bluetooth5::connected(int fd)
+void Bluetooth5::connected_(int fd)
 {
 	try
 	{

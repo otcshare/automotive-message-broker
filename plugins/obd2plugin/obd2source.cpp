@@ -1,19 +1,19 @@
 /*
-	Copyright (C) 2012  Intel Corporation
+  Copyright (C) 2012  Intel Corporation
 
-	This library is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -191,9 +191,9 @@ void threadLoop(gpointer data)
 					if (source->m_isBluetooth)
 					{
 #ifdef USE_BLUEZ5
-						bt.getDeviceForAddress(source->m_btDeviceAddress, [&obd, baud, &privStatusQueue](int fd)
+						bt.getDeviceForAddress(source->m_btDeviceAddress, [&obd, baud, &privStatusQueue, &connected](int fd)
 						{
-							bool connected = connect(obd, "", baud, fd);
+							connected = connect(obd, "", baud, fd);
 
 							if(connected)
 							{
@@ -305,11 +305,11 @@ void threadLoop(gpointer data)
 		if (reqList.size() > 0 && !connected)
 		{
 			/*CommandRequest *req = new CommandRequest();
-			req->req = "connect";
-			req->arglist.push_back(port);
-			req->arglist.push_back(baud);
-			g_async_queue_push(privCommandQueue,req);
-			continue;*/
+	  req->req = "connect";
+	  req->arglist.push_back(port);
+	  req->arglist.push_back(baud);
+	  g_async_queue_push(privCommandQueue,req);
+	  continue;*/
 		}
 		else if (reqList.size() == 0 && connected)
 		{
@@ -430,10 +430,10 @@ void threadLoop(gpointer data)
 				std::string repstr;
 				for (int i=0;i<replyVector.size();i++)
 				{
-				  if (replyVector[i] != 13)
-				  {
-				  repstr += (char)replyVector[i];
-				  }
+					if (replyVector[i] != 13)
+					{
+						repstr += (char)replyVector[i];
+					}
 					//DebugOut(11) << replyVector[i];
 				}
 				DebugOut(11) << "Reply:" << repstr << endl;
@@ -474,13 +474,24 @@ static int updateProperties( gpointer data)
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
 		{
-			if (src->propertyReplyMap.find(reply->property) != src->propertyReplyMap.end())
+			AsyncPropertyReply* srcReply = nullptr;
+
+			for(auto i : src->propertyReplyList)
+			{
+				if(i->property == reply->property)
+				{
+					srcReply = i;
+					break;
+				}
+			}
+
+			if (srcReply)
 			{
 				DebugOut(5) << __SMALLFILE__ <<":"<< __LINE__ << reply->statusStr << " on property:" << reply->property << endl;
-				src->propertyReplyMap[reply->property]->success = false;
-				src->propertyReplyMap[reply->property]->error = AsyncPropertyReply::InvalidOperation;
-				src->propertyReplyMap[reply->property]->completed(src->propertyReplyMap[reply->property]);
-				src->propertyReplyMap.erase(reply->property);
+				srcReply->success = false;
+				srcReply->error = AsyncPropertyReply::InvalidOperation;
+				srcReply->completed(srcReply);
+				removeOne(&src->propertyReplyList, srcReply);
 
 				/// Remove support for this pid:
 				PropertyList list = src->supported();
@@ -512,18 +523,30 @@ void OBD2Source::updateProperty(AbstractPropertyType* value)
 	if(property == Obd2Connected)
 		obd2Connected.setValue(value->anyValue());
 
-	if (propertyReplyMap.find(property) != propertyReplyMap.end())
+	AsyncPropertyReply* reply = nullptr;
+
+	for(auto i : propertyReplyList)
 	{
-		propertyReplyMap[property]->value = value;
-		propertyReplyMap[property]->success = true;
+		if(i->property == property)
+		{
+			reply = i;
+			break;
+		}
+	}
+
+	if (reply)
+	{
+
+		reply->value = value;
+		reply->success = true;
 		try {
-			propertyReplyMap[property]->completed(propertyReplyMap[property]);
+			reply->completed(reply);
 		}catch(...)
 		{
 			DebugOut(DebugOut::Error)<<"failed to call reply completed callback"<<endl;
 		}
 
-		propertyReplyMap.erase(property);
+		removeOne(&propertyReplyList, reply);
 	}
 	else
 	{
@@ -541,7 +564,7 @@ void OBD2Source::updateProperty(AbstractPropertyType* value)
 
 		oldValueMap[property] = value->copy();
 
-		m_re->updateProperty(value,uuid());
+		m_re->updateProperty(value, uuid());
 	}
 }
 
@@ -558,7 +581,7 @@ void OBD2Source::checkProperty()
 }*/
 void OBD2Source::setConfiguration(map<string, string> config)
 {
-// 	//Config has been passed, let's start stuff up.
+	// 	//Config has been passed, let's start stuff up.
 	configuration = config;
 
 	//Default values
@@ -596,20 +619,20 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		m_isBluetooth = true;
 		///TODO: bluetooth!!
 		/*DebugOut()<<"bluetooth device?"<<endl;
-		BluetoothDevice bt;
+	BluetoothDevice bt;
 
-		std::string tempPort = bt.getDeviceForAddress(port, btadapter);
-		if(tempPort != "")
-		{
-			DebugOut(3)<<"Using bluetooth device \""<<port<<"\" bound to: "<<tempPort<<endl;
-			port = tempPort;
-		}
-		else
-		{
-			DebugOut(0)<<"Device Error"<<endl;
-			///Don't throw here.
-			//throw std::runtime_error("Device Error");
-		}*/
+	std::string tempPort = bt.getDeviceForAddress(port, btadapter);
+	if(tempPort != "")
+	{
+	  DebugOut(3)<<"Using bluetooth device \""<<port<<"\" bound to: "<<tempPort<<endl;
+	  port = tempPort;
+	}
+	else
+	{
+	  DebugOut(0)<<"Device Error"<<endl;
+	  ///Don't throw here.
+	  //throw std::runtime_error("Device Error");
+	}*/
 	}
 
 	//connect(obd, port, baud);
@@ -764,7 +787,12 @@ void OBD2Source::getPropertyAsync(AsyncPropertyReply *reply)
 		return;
 	}
 
-	propertyReplyMap[reply->property] = reply;
+	propertyReplyList.push_back(reply);
+	reply->timedout = [this](AsyncPropertyReply* reply)
+	{
+		DebugOut() << "removing "<< reply->property << " from propertyReplyList" << endl;
+		removeOne(&propertyReplyList, reply);
+	};
 
 	ObdPid* requ = obd2AmbInstance->createPidforProperty(property);
 	g_async_queue_push(singleShotQueue,requ);
@@ -777,11 +805,9 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 {
 	AsyncPropertyReply* reply = new AsyncPropertyReply (request);
 
-
-
 	if(request.property == Obd2Connected)
 	{
-		propertyReplyMap[reply->property] = reply;
+		propertyReplyList.push_back(reply);
 		reply->success = true;
 
 		if(request.value->value<bool>() == true)
@@ -798,7 +824,6 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 		}
 
 	}
-
 	else
 	{
 		reply->success = false;
