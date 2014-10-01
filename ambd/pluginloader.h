@@ -59,17 +59,6 @@ private: ///methods:
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 
-		/*if(lt_dlinit())
-		{
-			mErrorString = lt_dlerror();
-			DebugOut(DebugOut::Error)<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-			return nullptr;
-		}
-
-		lt_dlerror();
-
-		lt_dlhandle handle = lt_dlopenext(pluginName.c_str());
-*/
 		void* handle = dlopen(pluginName.c_str(), RTLD_LAZY);
 
 		if(!handle)
