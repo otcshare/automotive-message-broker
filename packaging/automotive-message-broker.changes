@@ -1,3 +1,13 @@
+* Wed Oct 01 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140919.161146-9-g0e92e8f
+- fix lib install dir for qtmainloop plugin
+- reference amb.idl in dbus docs
+- fixed obd2 bluetooth for bluez5
+- updated chlog
+- fixed opencvlux plugin
+- version bump 0.11.902
+- use smart pointer in opencvlux
+- fixed install path for amb.idl
+
 * Fri Sep 19 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140916.213438-15-g734500b
 - bump version
 - fixed up bluez5 support code
