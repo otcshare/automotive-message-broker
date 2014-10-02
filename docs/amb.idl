@@ -968,7 +968,11 @@ interface org.automotive.AirbagStatus extends VehiclePropertyType  {
    attribute UInt16 AirbagStatus readonly
 }
 
-enumeration
+enumeration AirbagStatus {
+  inactive = 0,
+  active = 1,
+  deployed = 2
+}
 
 /*!
  * Deprecated.  Use "Door".  Remove in 0.13

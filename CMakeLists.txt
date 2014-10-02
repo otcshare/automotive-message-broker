@@ -43,7 +43,7 @@ option(usebluez5 "use bluez 5 API" OFF)
 
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-list(APPEND CMAKE_CXX_FLAGS "-fpie -pie -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++11")
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")
