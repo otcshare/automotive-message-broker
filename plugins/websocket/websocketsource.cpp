@@ -24,6 +24,7 @@
 #include <glib.h>
 #include <sstream>
 #include <listplusplus.h>
+#include <memory>
 #include <timestamp.h>
 #include "uuidhelper.h"
 
@@ -33,6 +34,7 @@
 
 #include "debugout.h"
 #include "common.h"
+#include "superptr.hpp"
 
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 libwebsocket_context *context = NULL;
@@ -43,6 +45,65 @@ double oldTimestamp=0;
 double totalTime=0;
 double numUpdates=0;
 double averageLatency=0;
+
+class UniquePropertyCache
+{
+public:
+	bool hasProperty(std::string name, std::string source, Zone::Type zone)
+	{
+		for(auto i : properties)
+		{
+			if(i->name == name &&
+					i->sourceUuid == source &&
+					i->zone == zone)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	std::shared_ptr<AbstractPropertyType> append(std::string name, std::string source, Zone::Type zone)
+	{
+		for(auto i : properties)
+		{
+			if(i->name == name &&
+					i->sourceUuid == source &&
+					i->zone == zone)
+			{
+				return i;
+			}
+		}
+
+		auto t = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
+		t->sourceUuid = source;
+		t->zone = zone;
+
+		properties.emplace_back(t);
+
+		return property(name, source, zone);
+	}
+
+	std::shared_ptr<AbstractPropertyType> property(std::string name, std::string source, Zone::Type zone)
+	{
+		for(auto i : properties)
+		{
+			if(i->name == name &&
+					i->sourceUuid == source &&
+					i->zone == zone)
+			{
+				return i;
+			}
+		}
+
+		return nullptr;
+	}
+
+private:
+	std::vector<std::shared_ptr<AbstractPropertyType>> properties;
+};
+
+UniquePropertyCache properties;
 
 static int callback_http_only(libwebsocket_context *context,struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason,void *user, void *in, size_t len);
 static struct libwebsocket_protocols protocols[] = {
@@ -126,7 +187,7 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 			else
 			{
 				m_sslEnabled = false;
-			} 	
+			}
 		}
 	}
 	//printf("Connecting to websocket server at %s port %i\n",ip.c_str(),port);
@@ -139,7 +200,7 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 	}
 
 	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, sslval,"/", "localhost", "websocket",protocols[0].name, -1);
-	
+
 
 }
 
@@ -223,7 +284,6 @@ static int checkTimeouts(gpointer data)
 static int callback_http_only(libwebsocket_context *context, struct libwebsocket *wsi,enum libwebsocket_callback_reasons reason, void *user, void *in, size_t len)
 {
 	unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + 4096 + LWS_SEND_BUFFER_POST_PADDING];
-	int l;
 	DebugOut() << __SMALLFILE__ << ":" << __LINE__ << reason << "callback_http_only" << endl;
 	switch (reason)
 	{
@@ -317,15 +377,24 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 				string value = data["value"].toString().toStdString();
 				double timestamp = data["timestamp"].toDouble();
 				int sequence = data["sequence"].toInt();
+				Zone::Type zone = data["zone"].toInt();
 
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << endl;
 
 				try
 				{
-					AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
+					auto type = properties.append(name, source->uuid(), zone);
+
+					if(!type)
+					{
+						throw std::runtime_error(name + "name is not a known type");
+					}
+
 					type->timestamp = timestamp;
 					type->sequence = sequence;
-					m_re->updateProperty(type, source->uuid());
+					type->fromString(value);
+
+					m_re->updateProperty(type.get(), source->uuid());
 					double currenttime = amb::currentTime();
 
 					/** This is now the latency between when something is available to read on the socket, until
@@ -339,8 +408,6 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 					averageLatency = totalTime / numUpdates;
 
 					DebugOut(2)<<"Average parse latency: "<<averageLatency<<endl;
-
-					delete type;
 				}
 				catch (exception ex)
 				{
@@ -404,7 +471,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 				}
 				else if (name == "get")
 				{
-					
+
 					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
 					if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
 					{
@@ -414,10 +481,12 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 						std::string value = obj["value"].toString().toStdString();
 						double timestamp = obj["timestamp"].toDouble();
 						int sequence = obj["sequence"].toInt();
-						
-						AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
+						Zone::Type zone = obj["zone"].toInt();
+
+						AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property, value);
 						v->timestamp = timestamp;
 						v->sequence = sequence;
+						v->zone = zone;
 
 						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end() && source->uuidReplyMap[id]->error != AsyncPropertyReply::Timeout)
 						{
@@ -438,7 +507,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 					{
 						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "GET Method Reply INVALID! Multiple properties detected, only single are supported!!!" << "\n";
 					}
-					
+
 					//data will contain a property/value map.
 				}
 
@@ -464,7 +533,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 			g_io_add_watch(chan,GIOCondition(G_IO_IN | G_IO_PRI | G_IO_ERR | G_IO_HUP),(GIOFunc)gioPollingFunc,0);
 			g_io_channel_set_close_on_unref(chan,true);
 			g_io_channel_unref(chan); //Pass ownership of the GIOChannel to the watch.
-			
+
 			break;
 		}
 		return 0;
