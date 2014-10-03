@@ -76,6 +76,12 @@ public:
 		}
 
 		auto t = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
+
+		if(!t)
+		{
+			throw std::runtime_error(name + "name is not a known type");
+		}
+
 		t->sourceUuid = source;
 		t->zone = zone;
 
@@ -384,11 +390,6 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 				try
 				{
 					auto type = properties.append(name, source->uuid(), zone);
-
-					if(!type)
-					{
-						throw std::runtime_error(name + "name is not a known type");
-					}
 
 					type->timestamp = timestamp;
 					type->sequence = sequence;

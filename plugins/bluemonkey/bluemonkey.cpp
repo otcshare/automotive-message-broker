@@ -30,7 +30,11 @@
 #include <QTimer>
 #include <QtQml>
 
+#include <dlfcn.h>
+
 #define foreach Q_FOREACH
+
+typedef std::map<std::string, QObject*> create_bluemonkey_module_t(std::map<std::string, std::string> config, QObject* parent);
 
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -98,42 +102,6 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 	auth = new Authenticate(config, this);
 
 	qmlRegisterType<QTimer>("", 1, 0, "QTimer");
-
-/*	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
-
-		if(codes.startsWith("authenticate"))
-		{
-
-			int i = codes.indexOf("authenticate");
-			QString pin = codes.mid(i+13);
-			pin = pin.trimmed();
-
-
-			if(!auth->authorize(prefix, pin))
-				irc->respond(sender,"failed");
-			qDebug()<<sender;
-
-		}
-		else if(codes.startsWith("bluemonkey"))
-		{
-			if(!auth->isAuthorized(prefix))
-			{
-				if(!mSilentMode)
-					irc->respond(sender, "denied");
-				return;
-			}
-
-			QString bm("bluemonkey");
-
-			codes = codes.mid(bm.length()+1);
-
-			QString response = engine->evaluate(codes).toString();
-
-			if(!mSilentMode || response != "undefined" )
-				irc->respond(sender, response);
-		}
-	});
-*/
 }
 
 
@@ -220,6 +188,37 @@ void BluemonkeySink::loadConfig(QString str)
 	QJSValue val = engine->evaluate(script);
 
 	DebugOut()<<val.toString().toStdString()<<endl;
+}
+
+bool BluemonkeySink::loadModule(QString path)
+{
+	void* handle = dlopen(path.toUtf8().data(), RTLD_LAZY);
+
+	if(!handle)
+	{
+		DebugOut(DebugOut::Warning) << "bluemonkey load module failed: " << dlerror() << endl;
+		return false;
+	}
+
+	void* c = dlsym(handle, "create");
+
+	if(!c)
+	{
+		DebugOut(DebugOut::Warning) << "bluemonkey load module failed: " << path.toStdString() << " " << dlerror() << endl;
+		return false;
+	}
+
+	create_bluemonkey_module_t* create = (create_bluemonkey_module_t*)(c);
+
+	std::map<std::string, QObject*> exports = create(configuration, this);
+
+	for(auto i : exports)
+	{
+		QJSValue val = engine->newQObject(i.second);
+		engine->globalObject().setProperty(i.first.c_str(), val);
+	}
+
+	return true;
 }
 
 void BluemonkeySink::reloadEngine()

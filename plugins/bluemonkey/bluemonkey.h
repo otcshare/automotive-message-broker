@@ -113,7 +113,7 @@ public Q_SLOTS:
 
 	void loadConfig(QString str);
 
-	void loadModule(QString path);
+	bool loadModule(QString path);
 
 	void reloadEngine();
 
