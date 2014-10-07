@@ -45,12 +45,6 @@ std::string get_file_contents(const char *filename)
 }
 PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(NULL), routingEngine(nullptr), mMainLoop(nullptr)
 {
-	if(lt_dlinit())
-	{
-		cerr<<"error initializing libtool: "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<lt_dlerror()<<endl;
-		throw std::runtime_error("Error initializing libtool. Aborting");
-	}
-
 	DebugOut()<<"Loading config file: "<<configFile<<endl;
 	json_object *rootobject;
 	json_tokener *tokener = json_tokener_new();
@@ -75,7 +69,7 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 		// Handle extra characters after parsed object as desired.
 		// e.g. issue an error, parse another object from that point, etc...
 	}
-	
+
 	json_object *coreobject = json_object_object_get(rootobject,"routingEngine");
 	if (coreobject)
 	{
@@ -151,7 +145,7 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 		DebugOut()<<"No mainloop specified in config.  Using glib by default."<<endl;
 		mMainLoop = new GlibMainLoop(argc,argv);
 	}
-	
+
 	json_object *sourcesobject = json_object_object_get(rootobject,"sources");
 
 	if(!sourcesobject)
@@ -159,22 +153,22 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 		DebugOut()<<"Error getting sources member: "<<endl;
 		throw std::runtime_error("Error getting sources member");
 	}
-	
+
 	//g_assert(json_reader_is_array(reader));
 	g_assert(json_object_get_type(sourcesobject)==json_type_array);
-	
-	
+
+
 	array_list *sourceslist = json_object_get_array(sourcesobject);
 	if (!sourceslist)
 	{
 		DebugOut() << "Error getting source list" << endl;
 		throw std::runtime_error("Error getting sources list");
 	}
-	
+
 	for(int i=0; i < array_list_length(sourceslist); i++)
 	{
 		json_object *obj = (json_object*)array_list_get_idx(sourceslist,i); //This is an object
-		
+
 		std::map<std::string, std::string> configurationMap;
 		json_object_object_foreach(obj, key, val)
 		{
@@ -186,7 +180,7 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 		string path = configurationMap["path"];
 
 		AbstractSource* plugin = loadPlugin<AbstractSource*>(path,configurationMap);
-		
+
 		if(plugin != nullptr)
 		{
 			mSources.push_back(plugin);
@@ -195,9 +189,9 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 
 	//json_object_put(sourcesobject);
 	///read the sinks:
-	
+
 	json_object *sinksobject = json_object_object_get(rootobject,"sinks");
-	
+
 	if (!sinksobject)
 	{
 		DebugOut() << "Error getting sink object" << endl;
@@ -212,8 +206,8 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 		DebugOut() << "Error getting sink list" << endl;
 		throw std::runtime_error("Error getting sink list");
 	}
-	
-	
+
+
 	for(int i=0; i < array_list_length(sinkslist); i++)
 	{
 		json_object *obj = (json_object*)array_list_get_idx(sinkslist,i);
@@ -227,7 +221,7 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 			configurationMap[key] = valstr;
 		}
 
-		
+
 		string path = configurationMap["path"];
 
 		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path, configurationMap);
@@ -262,15 +256,13 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 
 PluginLoader::~PluginLoader()
 {
-	for(auto itr = mSinkManagers.begin(); itr != mSinkManagers.end(); itr++)
+	for(auto i :mSinkManagers)
 	{
-		delete *itr;
+		delete i;
 	}
 
-	auto handle = openHandles.begin();
-	while(handle != openHandles.end())
-		lt_dlclose(*handle++);
-	lt_dlexit();
+	for(auto handle : openHandles)
+		dlclose(handle);
 }
 
 IMainLoop *PluginLoader::mainloop()
