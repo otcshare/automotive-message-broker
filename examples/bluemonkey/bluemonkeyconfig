@@ -1,9 +1,9 @@
 {
-  "mainloop" : "/usr/lib/i386-linux-gnu/automotive-message-broker/automotive-message-broker/qtmainloopplugin.so",
+  "mainloop" : "/usr/local/lib/x86_64-linux-gnu/automotive-message-broker/automotive-message-broker/qtmainloopplugin.so",
 
   "sources" : [
     {
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/automotive-message-broker/bluemonkeyplugin.so",
+      "path" : "/usr/local/lib/x86_64-linux-gnu/automotive-message-broker/automotive-message-broker/bluemonkeyplugin.so",
       "config" : "/etc/ambd/bluemonkey/config.js"
     }
   ],
@@ -11,7 +11,7 @@
   "sinks" : [
 
     {
-      "path" : "/usr/lib/i386-linux-gnu/automotive-message-broker/automotive-message-broker/examplesinkplugin.so"
+      "path" : "/usr/local/lib/x86_64-linux-gnu/automotive-message-broker/automotive-message-broker/examplesinkplugin.so"
     }
   ]
 }
