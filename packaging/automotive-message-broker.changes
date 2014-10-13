@@ -1,3 +1,15 @@
+* Mon Oct 13 2014 tripzero <kevron.m.rees@intel.com> submit/tizen_ivi/20141001.165128-11-g4c16abd
+- some opencvlux fixes
+- use pure dlopen to open source/sink plugins
+- additional fixes to opencv plugin
+- version bump 0.11.903
+- updated release notes
+- cleaned up unused code block
+- updated chlog and spec version
+- removed all libtool usage
+- use set instead of list in cmake for better compatibility
+- 0.11.903 bump
+
 * Wed Oct 01 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140919.161146-9-g0e92e8f
 - fix lib install dir for qtmainloop plugin
 - reference amb.idl in dbus docs
