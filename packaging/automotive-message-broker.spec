@@ -4,7 +4,7 @@
 
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.11.902
+Version:    0.11.903
 Release:    0
 Group:      Automotive/Service
 License:    LGPL-2.1
@@ -19,7 +19,6 @@ Requires:       default-ac-domains
 BuildRequires:  cmake
 BuildRequires:  boost-devel
 BuildRequires:  pkgconfig(json)
-BuildRequires:  libtool-ltdl-devel
 BuildRequires:  pkgconfig(libwebsockets)
 BuildRequires:  pkgconfig(uuid)
 BuildRequires:  pkgconfig(sqlite3)
