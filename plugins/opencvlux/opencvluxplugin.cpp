@@ -202,6 +202,10 @@ const string OpenCvLuxPlugin::uuid()
 
 void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 {
+	reply->timedout = [this](AsyncPropertyReply* reply) {
+		removeOne(&replyQueue, reply);
+	};
+
 	if(!shared->m_capture || !shared->m_capture->isOpened())
 	{
 		/// we want to turn on the camera for one shot to get an image and determine the intensity
@@ -214,18 +218,18 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	{
 		replyQueue.push_back(reply);
 	}
-	if(reply->property == VideoLogging)
+	else if(reply->property == VideoLogging)
 	{
 		BasicPropertyType<bool> tmp(VideoLogging, shared->loggingOn);
 		reply->value = &tmp;
 		reply->success = true;
 		reply->completed(reply);
 	}
-
 	else  ///We don't support what you are asking for.  Reply false
 	{
-		reply->value = NULL;
+		reply->value = nullptr;
 		reply->success = false;
+		reply->error = AsyncPropertyReply::InvalidOperation;
 		reply->completed(reply);
 	}
 }
@@ -327,10 +331,10 @@ static int grabImage(void *data)
 		QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>();
 		QObject::connect(watcher, &QFutureWatcher<uint>::finished, shared->parent, &OpenCvLuxPlugin::imgProcResult);
 
-		QFuture<uint> future = QtConcurrent::run( evalImage, m_image, shared);
+		QFuture<uint> future = QtConcurrent::run(evalImage, m_image, shared);
 		watcher->setFuture(future);
 
-		QtConcurrent::run(shared->parent, &OpenCvLuxPlugin::writeVideoFrame,m_image);
+		QtConcurrent::run(shared->parent, &OpenCvLuxPlugin::writeVideoFrame, m_image);
 	}
 	else
 	{
@@ -345,14 +349,17 @@ static int grabImage(void *data)
 		return true;
 	}
 
-	delete shared->m_capture;
-	shared->m_capture = NULL;
 	return false;
-
 }
 
 static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 {
+	if(qImg.empty())
+	{
+		DebugOut(DebugOut::Warning)<<"Empty image frame."<<endl;
+		return 0;
+	}
+
 	cv::Scalar avgPixelIntensity;
 
 
@@ -404,29 +411,34 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 
 bool OpenCvLuxPlugin::init()
 {
-	if(shared->m_capture) delete shared->m_capture;
-
-	if(shared->kinect)
+	if(!shared->m_capture && shared->kinect)
 	{
 		shared->m_capture = new cv::VideoCapture(CV_CAP_OPENNI);
 	}
-	else if(device == "")
-		shared->m_capture = new cv::VideoCapture(0);
-	else shared->m_capture = new cv::VideoCapture(atoi(device.c_str()));
+	else if(!shared->m_capture)
+	{
+		if(device == "")
+			shared->m_capture = new cv::VideoCapture(0);
+		else
+			shared->m_capture = new cv::VideoCapture(atoi(device.c_str()));
+	}
 
 	if(!shared->m_capture->isOpened())
 	{
 		DebugOut()<<"we failed to open camera device ("<<device<<") or no camera found"<<endl;
 		return false;
 	}
-	if(configuration.find("logging") != configuration.end() && configuration["logging"] == "true" && !shared->mWriter || !shared->mWriter->isOpened())
+
+	if(configuration.find("logging") != configuration.end() &&
+			configuration["logging"] == "true" &&
+			(!shared->mWriter || !shared->mWriter->isOpened()))
 	{
 		cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
 							  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
 
 		std::string codec = configuration["codec"];
 
-		if(codec == "" || codec.size() != 4)
+		if(codec.empty() || codec.size() != 4)
 		{
 			DebugOut(DebugOut::Warning)<<"Invalid codec.  Using default: MJPG"<<endl;
 			codec = "MJPG";
@@ -434,13 +446,13 @@ bool OpenCvLuxPlugin::init()
 
 		std::string filename = configuration["logfile"];
 
-		if(filename == "") filename = "/tmp/video.avi";
+		if(filename.empty()) filename = "/tmp/video.avi";
 
 		boost::algorithm::to_upper(codec);
 
 		if(shared->mWriter) delete shared->mWriter;
 
-		shared->mWriter = new cv::VideoWriter(filename,CV_FOURCC(codec.at(0),codec.at(1),codec.at(2),codec.at(3)),30,s);
+		shared->mWriter = new cv::VideoWriter(filename, CV_FOURCC(codec.at(0), codec.at(1), codec.at(2), codec.at(3)),30,s);
 	}
 
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
@@ -513,7 +525,8 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 		reply->value = extBrightness.get();
 		reply->success = true;
 		try{
-			reply->completed(reply);
+			if(reply->completed)
+				reply->completed(reply);
 		}
 		catch(...)
 		{

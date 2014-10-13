@@ -6,7 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.11.902")
+set(PROJECT_VERSION "0.11.903")
 set(PROJECT_CODENAME "veyron")
 set(PROJECT_QUALITY "beta")
 
@@ -43,7 +43,7 @@ option(usebluez5 "use bluez 5 API" OFF)
 
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIE -pie -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++11")
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")
@@ -74,15 +74,6 @@ if(DOXYGEN_FOUND)
 endif(DOXYGEN_FOUND)
 endif(enable_docs)
 
-find_library(libtool_LIBRARY ltdl DOC "Libtool libraries")
-find_path(libtool_INCLUDE_DIR ltdl.h DOC "Libtool headers")
-
-if(libtool_LIBRARY)
-     message(STATUS "libltdl / libtool found")
-else(libtool_LIBRARY)
-     message(FATAL_ERROR "libltdl / libtool missing.  please install libltdl / libtool")
-endif(libtool_LIBRARY)
-
 find_package(Boost REQUIRED)
 
 
@@ -93,7 +84,7 @@ pkg_check_modules(json REQUIRED json)
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
 set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
-set(link_libraries -lamb ${libtool_LIBRARY} ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
+set(link_libraries -lamb ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
 if(qtmainloop)
   message(STATUS "using Qt mainloop")
@@ -123,7 +114,7 @@ if(qtmainloop)
 endif(qtmainloop)
 
 if(usebluez5)
-        add_definitions(-DUSE_BLUEZ5)
+  add_definitions(-DUSE_BLUEZ5)
 
 endif(usebluez5)
 

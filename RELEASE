@@ -7,6 +7,7 @@ New features:
 - New bluetooth spp plugin
 - cangen and cansim plugins simulate a real CAN network.
 - New priority queue option. properties are routed according to priority.
+- OpenCV plugin video logging: record video with speed overlay
 
 Changes:
 - Deprecated and removed the "FooChanged" (where "Foo" is a property like "VehicleSpeed") signal
@@ -22,3 +23,4 @@ Changes:
 Fixes:
 - database plugin updated to use zones
 - obd-II plugin updated to use bluez5 APIs
+- openCV plugin fixed crashes
