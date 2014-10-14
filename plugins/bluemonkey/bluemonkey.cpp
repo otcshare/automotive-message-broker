@@ -132,13 +132,19 @@ int BluemonkeySink::supportedOperations()
 
 QObject *BluemonkeySink::subscribeTo(QString str)
 {
-	return new Property(str.toStdString(), "", routingEngine, this);
+	return new Property(str.toStdString(), "", routingEngine, Zone::None, this);
 }
 
 QObject *BluemonkeySink::subscribeToSource(QString str, QString srcFilter)
 {
-	return new Property(str.toStdString(), srcFilter, routingEngine, this);
+	return new Property(str.toStdString(), srcFilter, routingEngine, Zone::None, this);
 }
+
+QObject* BluemonkeySink::subscribeToZone(QString str, int zone)
+{
+	return new Property(str.toStdString(), "", routingEngine, zone, this);
+}
+
 
 QStringList BluemonkeySink::sourcesForProperty(QString property)
 {
@@ -316,7 +322,7 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 	routingEngine->getRangePropertyAsync(request);
 }
 
-void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
+void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, Zone::Type zone = Zone::None)
 {
 
 	auto create = [defaultValue, name]() -> AbstractPropertyType*
@@ -341,7 +347,7 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
 			return nullptr;
 	};
 
-	addPropertySupport(Zone::None, create);
+	addPropertySupport(zone, create);
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
@@ -424,8 +430,8 @@ void Property::getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction)
 	routingEngine->getRangePropertyAsync(request);
 }
 
-Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, QObject *parent)
-	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr), mUuid(amb::createUuid())
+Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, Zone::Type zone, QObject *parent)
+	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr), mUuid(amb::createUuid()), mZone(zone)
 {
 	setType(prop.c_str());
 }
@@ -462,6 +468,9 @@ void Property::setType(QString t)
 
 void Property::propertyChanged(AbstractPropertyType *value)
 {
+	if(value->zone != mZone)
+		return;
+
 	if(mValue)
 	{
 		delete mValue;
@@ -469,4 +478,19 @@ void Property::propertyChanged(AbstractPropertyType *value)
 	mValue = value->copy();
 
 	changed(gvariantToQVariant(mValue->toVariant()));
+}
+
+
+QVariant BluemonkeySink::zonesForProperty(QString prop, QString src)
+{
+	PropertyInfo info = routingEngine->getPropertyInfo(prop.toStdString(), src.toStdString());
+
+	QVariantList list;
+
+	for(auto i : info.zones())
+	{
+		list << i;
+	}
+
+	return list;
 }
