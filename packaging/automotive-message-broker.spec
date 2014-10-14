@@ -185,7 +185,8 @@ CAN frames listener plug-in for the AMB CAN Simulator package
 %package plugins-bluemonkey
 Summary:   javascript plugin engine
 Group:     Automotive/Libraries
-Requires:  %{name} = %{version}-%{release}
+Requires: %{name} = %{version}-%{release}
+Requires: automotive-message-broker-plugins-qtmainloop
 Requires: qt5-qtdeclarative
 
 %description plugins-bluemonkey
