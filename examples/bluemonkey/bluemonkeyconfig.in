@@ -1,9 +1,9 @@
 {
-  "mainloop" : "@PLUGIN_INSTALL_PATH@/automotive-message-broker/qtmainloopplugin.so",
+  "mainloop" : "@PLUGIN_INSTALL_PATH@/qtmainloopplugin.so",
 
   "sources" : [
     {
-      "path" : "@PLUGIN_INSTALL_PATH@/automotive-message-broker/bluemonkeyplugin.so",
+      "path" : "@PLUGIN_INSTALL_PATH@/bluemonkeyplugin.so",
       "config" : "/etc/ambd/bluemonkey/config.js"
     }
   ],
@@ -11,7 +11,7 @@
   "sinks" : [
 
     {
-      "path" : "@PLUGIN_INSTALL_PATH@/automotive-message-broker/examplesinkplugin.so"
+      "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
     }
   ]
 }
