@@ -196,7 +196,7 @@ public:
 	{
 		wantPropertyVariant(VehicleProperty::AirflowDirectionW3C, "AirflowDirection", AbstractProperty::ReadWrite);
 
-		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeed", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeedLevel", AbstractProperty::ReadWrite);
 
 		wantPropertyVariant(VehicleProperty::TargetTemperature, "TargetTemperature", AbstractProperty::ReadWrite);
 
