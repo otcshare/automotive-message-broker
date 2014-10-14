@@ -99,6 +99,7 @@ private:
 	VehicleProperty::EngineOilPressureType *oilPSI;
 	VehicleProperty::EngineCoolantTemperatureType *coolantTemp;
 	VehicleProperty::SteeringWheelAngleType *steeringAngle;
+	VehicleProperty::SteeringWheelAngleW3CType *steeringAngleW3C;
 	VehicleProperty::ThrottlePositionType *throttle;
 	VehicleProperty::ClutchStatusType *clutch;
 	VehicleProperty::WheelBrakeType *brake;
@@ -162,6 +163,7 @@ PropertyList WheelSourcePlugin::supported()
 	props.push_back(VehicleProperty::ThrottlePosition);
 	props.push_back(VehicleProperty::WheelBrake);
 	props.push_back(VehicleProperty::SteeringWheelAngle);
+	props.push_back(VehicleProperty::SteeringWheelAngleW3C);
 	props.push_back(VehicleProperty::TurnSignal);
 	props.push_back(VehicleProperty::ClutchStatus);
 	props.push_back(VehicleProperty::EngineOilPressure);
@@ -208,6 +210,7 @@ WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *rou
 	  engineSpeed(new VehicleProperty::EngineSpeedType(0)),
 	  vehicleSpeed(new VehicleProperty::VehicleSpeedType(0)),
 	  steeringAngle(new VehicleProperty::SteeringWheelAngleType(0)),
+	  steeringAngleW3C(new VehicleProperty::SteeringWheelAngleW3CType(0)),
 	  clutch(new VehicleProperty::ClutchStatusType(false)),
 	  brake(new VehicleProperty::WheelBrakeType(false)),
 	  tempButton(new VehicleProperty::ButtonEventType(ButtonEvents::NoButton)),
@@ -308,6 +311,8 @@ AbstractPropertyType *WheelPrivate::getProperty(VehicleProperty::Property propTy
 		return this->brake;
 	else if (propType == VehicleProperty::SteeringWheelAngle)
 		return this->steeringAngle;
+	else if (propType == VehicleProperty::SteeringWheelAngleW3C)
+		return this->steeringAngleW3C;
 	else if (propType == VehicleProperty::TurnSignal)
 		return this->turnSignal;
 	else if (propType == VehicleProperty::ClutchStatus)
@@ -536,7 +541,9 @@ void WheelPrivate::changeCoolantTemp(bool increase)
 void WheelPrivate::changeSteeringAngle(int val)
 {
 	*steeringAngle = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
+	*steeringAngleW3C = (((double)val/(double)32767.0) + (double)1.0) * (double)180.0;
 	this->re->updateProperty(steeringAngle, mParent->uuid());
+	this->re->updateProperty(steeringAngleW3C, mParent->uuid());
 }
 
 void WheelPrivate::changeClutch(int val)
