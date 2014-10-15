@@ -101,7 +101,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::BatteryCurrent, "Current", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::BatteryCurrent, "ChargeLevel", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::BatteryChargeLevel, "ChargeLevel", AbstractProperty::Read);
 
 	}
 };
