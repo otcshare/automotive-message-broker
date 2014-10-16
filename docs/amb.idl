@@ -110,7 +110,9 @@ interface org.automotive.Manager  {
    * except that it takes an addition zone argument and only returns the path for that zone.
    *  \arg String property is the requested property to be retrieved.
    *  \arg Zone zone is the zone which the object
-   *  \returns string representing the DBus Object path
+   *  \returns string representing the DBus Object path.  Possible errors:
+   * "org.automotive.Manager.InvalidZone"
+   * "org.automotive.Manager.ObjectNotFound"
   */
   method FindObjectForZone {
     in {
