@@ -90,6 +90,16 @@ VehicleSignalInterface.prototype.unsubscribe = function(handle) {
   }
 };
 
+VehicleSignalInterface.prototype.set = function (value, zone) {
+  var msg = {};
+  msg['method'] = 'set';
+  msg['name'] = this.attributeName;
+  msg['zone'] = zone;
+  msg['value'] = value;
+
+  return createPromise(msg);
+}
+
 function AsyncCall(resolve, reject) {
   this.resolve = resolve;
   this.reject = reject;
@@ -143,13 +153,16 @@ extension.setMessageListener(function(json) {
 
     switch (msg.method) {
       case 'get':
-        handleGetReply(msg);
+        handlePromiseReply(msg);
         break;
       case 'zones':
         handleZonesReply(msg);
         break;
       case 'subscribe':
         handleSubscribeReply(msg);
+        break;
+      case 'set':
+        handlePromiseReply(msg);
         break;
       default:
         break;
@@ -159,7 +172,7 @@ extension.setMessageListener(function(json) {
   }
 });
 
-function handleGetReply(msg) {
+function handlePromiseReply(msg) {
   var cbobj = async_calls[msg.asyncCallId];
 
   if (msg.error) {
@@ -167,10 +180,10 @@ function handleGetReply(msg) {
     error.error = msg.value;
     switch (msg.value) {
       case 'permission_denied':
-        error.message = 'Permission Denied';
+        error.message = 'Permission denied';
         break;
       case 'invalid_operation':
-        error.message = 'Invalid Operation';
+        error.message = 'Invalid operation';
         break;
       case 'timeout':
         error.message = 'Operation timed out';
@@ -186,8 +199,7 @@ function handleGetReply(msg) {
     }
 
     cbobj.reject(error);
-  }
-  else {
+  } else {
     cbobj.resolve(msg.value);
   }
 

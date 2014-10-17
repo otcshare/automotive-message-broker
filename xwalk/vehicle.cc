@@ -705,8 +705,10 @@ void Vehicle::Set(const std::string &object_name, picojson::object value, Zone::
 				DebugOut(DebugOut::Error) << "permission denied" << endl;
 				PostError(&callback, vehicle_error_permission_denied);
 			}
-
+			PostError(&callback, vehicle_error_unknown);
 			return;
 		}
 	}
+
+	PostReply(&callback, picojson::value());
 }
