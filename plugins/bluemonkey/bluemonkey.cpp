@@ -322,7 +322,7 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 	routingEngine->getRangePropertyAsync(request);
 }
 
-void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, Zone::Type zone = Zone::None)
+void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, int zone = Zone::None)
 {
 
 	auto create = [defaultValue, name]() -> AbstractPropertyType*

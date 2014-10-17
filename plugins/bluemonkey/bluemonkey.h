@@ -137,7 +137,7 @@ public Q_SLOTS:
 		mSilentMode = m;
 	}
 
-	void createCustomProperty(QString name, QJSValue defaultValue, Zone::Type zone);
+	void createCustomProperty(QString name, QJSValue defaultValue, int zone);
 
 private:
 	QStringList configsToLoad;
