@@ -21,13 +21,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef WEBSOCKETSOURCE_H
 #define WEBSOCKETSOURCE_H
 
-
-
 #include <abstractsource.h>
 #include <string>
 #include <libwebsockets.h>
 #include <QByteArray>
-
 
 class WebSocketSource : public AbstractSource
 {
@@ -58,8 +55,8 @@ public:
 	//map<VehicleProperty::Property,AsyncRangePropertyReply*> rangedPropertyReplyMap;
 	std::map<std::string,AsyncPropertyReply*> uuidReplyMap;
 	std::map<std::string,double> uuidTimeoutMap;
-	std::map<std::string,AsyncRangePropertyReply*> uuidRangedReplyMap;
-	
+	std::map<std::string, AsyncRangePropertyReply*> uuidRangedReplyMap;
+
 	int partialMessageIndex;
 	QByteArray incompleteMessage;
 	int expectedMessageFrames;
@@ -67,7 +64,7 @@ public:
 	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
 
 private:
-  	PropertyList m_supportedProperties;
+	PropertyList m_supportedProperties;
 
 };
 

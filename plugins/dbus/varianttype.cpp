@@ -36,7 +36,7 @@ void VariantType::initialize()
 	/// do not request if not supported:
 	PropertyList proplist = routingEngine->supported();
 
-	if(contains(proplist,mAmbPropertyName))
+	if(contains(proplist, mAmbPropertyName))
 		routingEngine->getPropertyAsync(request);
 }
 
@@ -55,7 +55,7 @@ GVariant *VariantType::toGVariant()
 void VariantType::fromGVariant(GVariant *val)
 {
 	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
-	v->fromVariant( val );
+	v->fromVariant(val);
 
 	AsyncSetPropertyRequest request;
 	request.property = mAmbPropertyName;

@@ -187,12 +187,13 @@ public:
 	GThread *m_gThread;
 
 	typedef BasicPropertyType<bool> Obd2ConnectType;
+	Obd2ConnectType obd2Connected;
 
 private:
 	PropertyList m_supportedProperties;
 	std::map<VehicleProperty::Property, AbstractPropertyType*> oldValueMap;
 	GMutex *threadQueueMutex;
-	Obd2ConnectType obd2Connected;
+
 
 };
 

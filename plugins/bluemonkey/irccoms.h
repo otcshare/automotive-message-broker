@@ -30,6 +30,8 @@ public Q_SLOTS:
 	void setIgnoreInvalidCert(bool ignore);
 	void join(QString channel);
 
+	void debugMessage(QString v) { qDebug()<<v; }
+
 	void reconnect();
 
 private Q_SLOTS:

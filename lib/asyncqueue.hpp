@@ -19,6 +19,7 @@
 #include <glib.h>
 
 #include <abstractpropertytype.h>
+#include "listplusplus.h"
 
 #include <mutex>
 #include <unordered_set>
@@ -66,9 +67,15 @@ public:
 		mQueue.insert(item);
 	}
 
+	void remove(T item)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		removeOne(&mQueue, item);
+	}
+
 protected:
 	std::mutex mutex;
-	std::unordered_set<T,std::hash<T>, Pred> mQueue;
+	std::unordered_set<T, std::hash<T>, Pred> mQueue;
 };
 
 template <typename T, class Pred = std::equal_to<T> >

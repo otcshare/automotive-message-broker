@@ -24,6 +24,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <memory>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
@@ -74,27 +75,55 @@ public:
 	 */
 	enum Priority
 	{
-		Normal = 0,
-		Low,
-		High,
-		Instant
+		Normal = 0, /*!< normal priority.  This is default */
+		Low, /*!< Low priority. */
+		High, /*!< High priority*/
+		Instant /*!< Instant.  Using this priority is not thread safe.  This is typically used for
+				 *    Properties that need to be deterministic.
+				 */
 	};
 
-	AbstractPropertyType(std::string property): name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None), priority(Normal)
+	AbstractPropertyType(std::string property)
+		: name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None), priority(Normal)
 	{
 		void*(name);
 	}
 
-	virtual ~AbstractPropertyType() { }
+	virtual ~AbstractPropertyType()
+	{
+		for(auto i : destroyed)
+		{
+			if(i) i(this);
+		}
+	}
 
+	/**
+	 * @brief toString
+	 * @return strigified value
+	 */
 	virtual std::string toString() const = 0;
 
+	/**
+	 * @brief fromString converts from string value
+	 */
 	virtual void fromString(std::string)= 0;
 
+	/**
+	 * @brief toVariant
+	 * @return GVariant representation of value. Caller must unref the returned GVariant
+	 */
 	virtual GVariant* toVariant() = 0;
 
+	/**
+	 * @brief fromVariant converts GVariant value into compatible native value.  Caller owns
+	 * GVariant argument.
+	 */
 	virtual void fromVariant(GVariant*) = 0;
 
+	/**
+	 * @brief copy
+	 * @return a copy of the AbstractPropertyType
+	 */
 	virtual AbstractPropertyType* copy() = 0;
 
 	/**
@@ -126,14 +155,33 @@ public:
 		return one != two;
 	}
 
+	/**
+	 * @brief name Property name. @see VehicleProperty for built-in supported property names
+	 */
 	std::string name;
 
+	/**
+	 * @brief timestamp.  Timestamp when the value was last updated by the system. This is updated automatically
+	 * any time setValue() is called
+	 * @see amb::currentTime()
+	 * @see setValue()
+	 */
 	double timestamp;
 
+	/**
+	 * @brief sequence internal counter.  Useful as a unique indentifier.  values is -1 if not used (default).
+	 */
 	int32_t sequence;
 
+	/**
+	 * @brief sourceUuid  uuid of the source that produced this property.  This is set by the routingengine
+	 * if left unmodified.
+	 */
 	std::string sourceUuid;
 
+	/**
+	 * @brief zone that the property is situated in.
+	 */
 	Zone::Type zone;
 
 	/*!
@@ -144,28 +192,67 @@ public:
 	 */
 	Priority priority;
 
+	/**
+	 * @brief setValue
+	 * @param val boost::any value.  NOTE: boost::any does not accept type coercion.  Types must match exactly
+	 * with native type. (ie, don't use "int" if the native type is "uint")
+	 */
 	virtual void setValue(boost::any val)
 	{
 		mValue = val;
 		timestamp = amb::currentTime();
 	}
 
+	/**
+	 * \brief value() native value.  Does not use type coercion.  Will throw if types do not match.
+	 */
 	template <typename T>
 	T value() const
 	{
 		return boost::any_cast<T>(mValue);
 	}
 
+	/**
+	 * @brief anyValue
+	 * @return boost::any value
+	 */
 	boost::any anyValue()
 	{
 		return mValue;
 	}
+
+	/**
+	 * @brief destroyed is called if this property is destroyed.
+	 */
+	std::vector<std::function<void(AbstractPropertyType*)>> destroyed;
 
 protected:
 
 	boost::any mValue;
 
 };
+
+namespace amb
+{
+
+struct PropertyCompare
+{
+	bool operator()(AbstractPropertyType* const & lhs, AbstractPropertyType* & rhs) const
+	{
+		if (lhs->name == rhs->name
+				&& lhs->sourceUuid == rhs->sourceUuid
+				&& lhs->zone == rhs->zone)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+};
+
+}
+
 
 template <typename T>
 class GVS;
@@ -319,7 +406,13 @@ public:
 	}
 };
 
-
+/**
+ * \brief BasicPropertyType is a typed property type.  Most internal types are derived from this class
+ * \example
+ * std::unique_ptr<BasicPropertyType<int>> boostPSI = new BasicPropertyType<int>("BoostPSI",5);
+ * boostPSI->priority = AbstractPropertyType::Instant; //set instant because we clean up right after.
+ * routingEngine->updateProperty(boostPSI.get(), sourceUuid());
+ */
 template <typename T>
 class BasicPropertyType: public AbstractPropertyType
 {
@@ -406,16 +499,6 @@ public:
 		mValue = T();
 	}
 
-	/*BasicPropertyType(std::string val)
-		:AbstractPropertyType("")
-	{
-		if(!val.empty() && val != "")
-		{
-			serialize<T>(val);
-		}
-		else setValue(T());
-	}*/
-
 	AbstractPropertyType* copy()
 	{
 		return new BasicPropertyType<T>(*this);
@@ -447,6 +530,11 @@ public:
 	{
 		setValue(deserializeVariant<T>(v));
 	}
+
+	/**
+	 * @brief basicValue
+	 * @return Typed version of value.  Slightly more useful than @see AbstractPropertyType::value()
+	 */
 
 	T basicValue()
 	{

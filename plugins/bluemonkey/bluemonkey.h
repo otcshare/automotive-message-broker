@@ -49,9 +49,10 @@ class Property: public QObject, public AbstractSink
 	Q_OBJECT
 	Q_PROPERTY(QString type READ type)
 	Q_PROPERTY(QVariant value READ value WRITE setValue)
+	Q_PROPERTY(int zone READ zone)
 
 public:
-	Property(VehicleProperty::Property, QString srcFilter, AbstractRoutingEngine* re, QObject *parent = 0);
+	Property(VehicleProperty::Property, QString srcFilter, AbstractRoutingEngine* re, Zone::Type zone = Zone::None, QObject *parent = 0);
 
 	QString type();
 	void setType(QString t);
@@ -70,6 +71,9 @@ public:
 	void setValue(QVariant v);
 
 	void getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction);
+
+	Zone::Type zone() { return mZone; }
+
 Q_SIGNALS:
 
 	void changed(QVariant val);
@@ -77,6 +81,7 @@ Q_SIGNALS:
 private:
 	AbstractPropertyType* mValue;
 	const std::string mUuid;
+	Zone::Type mZone;
 
 };
 
@@ -104,8 +109,10 @@ public Q_SLOTS:
 
 	QObject* subscribeTo(QString str);
 	QObject* subscribeToSource(QString str, QString srcFilter);
+	QObject* subscribeToZone(QString str, int zone);
 
 	QStringList sourcesForProperty(QString property);
+	QVariant zonesForProperty(QString property, QString src);
 
 	QStringList supportedProperties();
 
@@ -113,7 +120,7 @@ public Q_SLOTS:
 
 	void loadConfig(QString str);
 
-	void loadModule(QString path);
+	bool loadModule(QString path);
 
 	void reloadEngine();
 
@@ -130,7 +137,7 @@ public Q_SLOTS:
 		mSilentMode = m;
 	}
 
-	void createCustomProperty(QString name, QJSValue defaultValue);
+	void createCustomProperty(QString name, QJSValue defaultValue, Zone::Type zone);
 
 private:
 	QStringList configsToLoad;
