@@ -608,7 +608,8 @@ void Vehicle::Unsubscribe(const std::string& property, Zone::Type zone) {
 }
 
 
-void Vehicle::Set(const std::string &object_name, picojson::object value, Zone::Type zone, double ret_id)
+void Vehicle::Set(const std::string &object_name, picojson::object value,
+				  Zone::Type zone, double ret_id)
 {
 	std::string find_error;
 	std::string object_path = FindProperty(object_name, zone, find_error);
@@ -619,7 +620,8 @@ void Vehicle::Set(const std::string &object_name, picojson::object value, Zone::
 	callback.instance = instance_;
 
 	if (object_path.empty() || !find_error.empty()) {
-		DebugOut(DebugOut::Error) << "Object not found.  Check object Name and zone." << object_name << endl;
+		DebugOut(DebugOut::Error) << "Object not found.  Check object Name and zone."
+								  << object_name << std::endl;
 		PostError(&callback, find_error);
 		return;
 	}
@@ -639,7 +641,7 @@ void Vehicle::Set(const std::string &object_name, picojson::object value, Zone::
 	auto proxy_error_ptr = amb::make_super(proxy_error);
 
 	if (proxy_error_ptr) {
-		DebugOut(DebugOut::Error) << "Error creating property proxy for " << object_path << endl;
+		DebugOut(DebugOut::Error) << "Error creating property proxy for " << object_path << std::endl;
 		return;
 	}
 
@@ -648,6 +650,8 @@ void Vehicle::Set(const std::string &object_name, picojson::object value, Zone::
 	for (auto itr : value) {
 		GError* err = nullptr;
 		std::string attribute = itr.first;
+
+		std::transform(attribute.begin(), attribute.begin()+1, attribute.begin(), ::toupper);
 
 		auto var_value =
 				amb::make_super(g_dbus_proxy_call_sync(properties_proxy.get(),

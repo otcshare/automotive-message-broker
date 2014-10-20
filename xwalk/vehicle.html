@@ -41,7 +41,7 @@ function(error) {
 
 //test subscribe:
 var subReplies = 0;
-var handle = tizen.vehicle.vehicleSpeed.subscribe(function(data) {
+var handle = vehicle.vehicleSpeed.subscribe(function(data) {
   console.log("got subscribe callback");
   debug("Vehicle speed changed: " + data.speed);
   subReplies++;
