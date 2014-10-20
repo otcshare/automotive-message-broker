@@ -157,11 +157,29 @@ void Core::updateProperty(AbstractPropertyType *value, const string & uuid)
 	if(value->priority == AbstractPropertyType::Instant)
 		updateProperty(value);
 	else if(value->priority == AbstractPropertyType::High)
+	{
+		value->destroyed.push_back([this](AbstractPropertyType* v)
+		{
+			updatePropertyQueueHigh.remove(v);
+		});
 		updatePropertyQueueHigh.append(value);
+	}
 	else if(value->priority == AbstractPropertyType::Normal)
+	{
+		value->destroyed.push_back([this](AbstractPropertyType* v)
+		{
+			updatePropertyQueue.remove(v);
+		});
 		updatePropertyQueue.append(value);
+	}
 	else if(value->priority == AbstractPropertyType::Low)
+	{
+		value->destroyed.push_back([this](AbstractPropertyType* v)
+		{
+			updatePropertyQueueLow.remove(v);
+		});
 		updatePropertyQueueLow.append(value);
+	}
 }
 
 void Core::updateProperty(AbstractPropertyType * value)
