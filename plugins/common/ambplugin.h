@@ -207,7 +207,9 @@ void AmbPlugin<T>::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 template<typename T>
 AsyncPropertyReply* AmbPlugin<T>::setProperty(AsyncSetPropertyRequest request)
 {
-	return d ? d->AmbPluginImpl::setProperty(request) : nullptr;
+	if(d)
+		return d->setProperty(request);
+	return nullptr;
 }
 
 template<typename T>

@@ -16,6 +16,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/qtmainloopconfig.in ${CMAKE_CURRENT_
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/websocketsink2.in ${CMAKE_CURRENT_SOURCE_DIR}/websocketsink2 @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/websocketsource2.in ${CMAKE_CURRENT_SOURCE_DIR}/websocketsource2 @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/testsourceconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/testsourceconfig @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cangenconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/cangenconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey/bluemonkeyconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey/bluemonkeyconfig @ONLY)
 
 install (FILES ${amb_examples} DESTINATION /etc/ambd/examples)

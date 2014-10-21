@@ -88,7 +88,7 @@ AsyncPropertyReply *CANGenPlugin::setProperty(const AsyncSetPropertyRequest &req
 	{
 		std::string v = request.value->toString();
 
-		dataReceived(nullptr,v.c_str(),v.length());
+		dataReceived(nullptr, v.c_str(), v.length());
 	}
 
 	return AmbPluginImpl::setProperty(request);
@@ -408,13 +408,13 @@ void CANGenPlugin::dataReceived(libwebsocket* socket, const char* data, size_t l
 			}
 			else if (name == "set")
 			{
+				LOG_MESSAGE("set called");
 				if (!propertyNames.empty())
 				{
 					//Should not happen
 				}
 				else if (!propertyData.empty())
 				{
-					auto prop = propertyData.begin();
 					for (auto prop = propertyData.begin(); prop != propertyData.end(); ++prop)
 					{
 						LOG_MESSAGE("websocketsinkmanager setting " << std::get<1>(*prop) << " to " << std::get<2>(*prop) << " in zone " << std::get<3>(*prop));

@@ -88,7 +88,11 @@ private:
 class BluemonkeySink : public QObject, public AmbPluginImpl
 {
 Q_OBJECT
+
 public:
+	using AmbPluginImpl::setProperty;
+	using QObject::setProperty;
+
 	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config,  AbstractSource& parent);
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(const PropertyList & supportedProperties);
