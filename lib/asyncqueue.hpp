@@ -19,6 +19,7 @@
 #include <glib.h>
 
 #include <abstractpropertytype.h>
+#include "listplusplus.h"
 
 #include <mutex>
 #include <unordered_set>
@@ -64,6 +65,12 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 
 		mQueue.insert(item);
+	}
+
+	void remove(T item)
+	{
+		std::lock_guard<std::mutex> lock(mutex);
+		removeOne(&mQueue, item);
 	}
 
 protected:

@@ -463,14 +463,13 @@ static int updateProperties( gpointer data)
 		StatusMessage *reply = (StatusMessage*)retval;
 		if (reply->statusStr == "disconnected")
 		{
-			OBD2Source::Obd2ConnectType val(Obd2Connected,false);
-			src->updateProperty(&val);
+			src->obd2Connected.setValue(false);
+			src->updateProperty(&src->obd2Connected);
 		}
 		else if (reply->statusStr == "connected")
 		{
-			OBD2Source::Obd2ConnectType val(Obd2Connected, true);
-			val.priority = OBD2Source::Obd2ConnectType::Instant;
-			src->updateProperty(&val);
+			src->obd2Connected.setValue(false);
+			src->updateProperty(&src->obd2Connected);
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
 		{

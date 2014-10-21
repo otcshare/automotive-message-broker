@@ -28,7 +28,7 @@ class Temperature: public DBusSink
 {
 public:
 	Temperature(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("InteriorTemperature", re, connection, map<string, string>())
+		:DBusSink("Temperature", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName Interior
@@ -196,7 +196,7 @@ public:
 	{
 		wantPropertyVariant(VehicleProperty::AirflowDirectionW3C, "AirflowDirection", AbstractProperty::ReadWrite);
 
-		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeed", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeedLevel", AbstractProperty::ReadWrite);
 
 		wantPropertyVariant(VehicleProperty::TargetTemperature, "TargetTemperature", AbstractProperty::ReadWrite);
 
