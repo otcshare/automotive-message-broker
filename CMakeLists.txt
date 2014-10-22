@@ -7,7 +7,7 @@ include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_VERSION "0.12.800")
-set(PROJECT_CODENAME "")
+set(PROJECT_CODENAME "agera")
 set(PROJECT_QUALITY "alpha")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
