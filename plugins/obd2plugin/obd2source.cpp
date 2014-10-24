@@ -277,7 +277,7 @@ void threadLoop(gpointer data)
 				connected = false;
 				StatusMessage *statusreq = new StatusMessage();
 				statusreq->statusStr = "disconnected";
-				g_async_queue_push(privStatusQueue,statusreq);
+				g_async_queue_push(privStatusQueue, statusreq);
 			}
 			delete req;
 		}
@@ -468,7 +468,7 @@ static int updateProperties( gpointer data)
 		}
 		else if (reply->statusStr == "connected")
 		{
-			src->obd2Connected.setValue(false);
+			src->obd2Connected.setValue(true);
 			src->updateProperty(&src->obd2Connected);
 		}
 		else if (reply->statusStr == "error:nodata" || reply->statusStr == "error:timeout")
@@ -519,10 +519,9 @@ static int updateProperties( gpointer data)
 void OBD2Source::updateProperty(AbstractPropertyType* value)
 {
 	VehicleProperty::Property property = value->name;
-	if(property == Obd2Connected)
-		obd2Connected.setValue(value->anyValue());
-
 	AsyncPropertyReply* reply = nullptr;
+
+	DebugOut() << "updateProperty for: " << property << "value: " << value->toString() << endl;
 
 	for(auto i : propertyReplyList)
 	{
@@ -547,24 +546,28 @@ void OBD2Source::updateProperty(AbstractPropertyType* value)
 
 		removeOne(&propertyReplyList, reply);
 	}
-	else
+
+	if(oldValueMap.find(property) != oldValueMap.end())
 	{
-		if(oldValueMap.find(property) != oldValueMap.end())
+		AbstractPropertyType* old = oldValueMap[property];
+
+		if((*old) == (*value))
 		{
-			AbstractPropertyType* old = oldValueMap[property];
-
-			if((*old) == (*value))
-			{
-				return;
-			}
-
-			delete old;
+			DebugOut() << "old value is same as new for: " << value->name << endl;
+			return;
 		}
 
-		oldValueMap[property] = value->copy();
-
-		m_re->updateProperty(value, uuid());
+		delete old;
+		oldValueMap.erase(property);
 	}
+	else
+	{
+		oldValueMap[property] = value->copy();
+	}
+
+	DebugOut() << "updateProperty for: " << property << "value: " << value->toString() << endl;
+	m_re->updateProperty(value, uuid());
+
 }
 
 void OBD2Source::setSupported(PropertyList list)
@@ -616,22 +619,6 @@ void OBD2Source::setConfiguration(map<string, string> config)
 		m_btDeviceAddress = port;
 		m_btAdapterAddress = btadapter;
 		m_isBluetooth = true;
-		///TODO: bluetooth!!
-		/*DebugOut()<<"bluetooth device?"<<endl;
-	BluetoothDevice bt;
-
-	std::string tempPort = bt.getDeviceForAddress(port, btadapter);
-	if(tempPort != "")
-	{
-	  DebugOut(3)<<"Using bluetooth device \""<<port<<"\" bound to: "<<tempPort<<endl;
-	  port = tempPort;
-	}
-	else
-	{
-	  DebugOut(0)<<"Device Error"<<endl;
-	  ///Don't throw here.
-	  //throw std::runtime_error("Device Error");
-	}*/
 	}
 
 	//connect(obd, port, baud);
@@ -639,19 +626,18 @@ void OBD2Source::setConfiguration(map<string, string> config)
 	req->req = "setportandbaud";
 	req->arglist.push_back(port);
 	req->arglist.push_back(baud);
-	g_async_queue_push(commandQueue,req);
+	g_async_queue_push(commandQueue, req);
 
 	m_port = port;
 	m_baud = baud;
-	m_gThread = g_thread_new("mythread",(GThreadFunc)&threadLoop,this);
-	//g_idle_add(updateProperties, this);
-	g_timeout_add(5,updateProperties,this);
+	m_gThread = g_thread_new("mythread", (GThreadFunc)&threadLoop, this);
+	g_timeout_add(5, updateProperties, this);
 }
 
 OBD2Source::OBD2Source(AbstractRoutingEngine *re, map<string, string> config)
-	: AbstractSource(re, config),obd2Connected(Obd2Connected,false)
+	: AbstractSource(re, config), obd2Connected(Obd2Connected,false)
 {
-	bool success = VehicleProperty::registerProperty(Obd2Connected,[](){ return new Obd2ConnectType(Obd2Connected,false); });
+	bool success = VehicleProperty::registerProperty(Obd2Connected, [](){ return new Obd2ConnectType(Obd2Connected, false); });
 
 	if(!success)
 	{
