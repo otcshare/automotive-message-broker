@@ -60,6 +60,16 @@ struct traits<gchar> {
   };
 };
 
+template <>
+struct traits<GDBusConnection> {
+  struct delete_functor {
+	void operator()(GDBusConnection* p) const {
+	  if (p != nullptr)
+		g_dbus_connection_close_sync(p, nullptr, nullptr);
+	}
+  };
+};
+
 template<typename T> using super_ptr =
 	  ::std::unique_ptr<T, typename traits<T>::delete_functor>;
 

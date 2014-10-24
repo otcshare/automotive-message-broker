@@ -8,6 +8,7 @@
 #include <abstractpropertytype.h>
 #include <gio/gio.h>
 #include <glib.h>
+#include <superptr.hpp>
 
 #include <string>
 #include <thread> // NOLINT
@@ -80,6 +81,9 @@ class Vehicle {
   common::Instance* instance_;
 
   std::vector<ObjectZone*> amb_objects_;
+
+  amb::super_ptr<GDBusProxy> manager_proxy_;
+  amb::super_ptr<GDBusConnection> dbus_connection_;
 };
 
 #endif  // VEHICLE_VEHICLE_H_

@@ -181,7 +181,7 @@ void BluemonkeySink::loadConfig(QString str)
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		DebugOut()<<"failed to open config file: "<<str.toStdString()<<endl;
+		DebugOut(DebugOut::Error)<<"failed to open config file: "<<str.toStdString()<<endl;
 		return;
 	}
 

@@ -89,6 +89,8 @@ picojson::value GetBasic(GVariant* value) {
 		v = picojson::value(static_cast<double>(GVS<uint64_t>::value(value)));
 	} else if (type == "b") {
 		v = picojson::value(GVS<bool>::value(value));
+	} else if (type == "s") {
+		v = picojson::value(g_variant_get_string(value, nullptr));
 	}
 
 	return v;
@@ -409,44 +411,35 @@ void Vehicle::GetZones(const std::string& object_name, double ret_id) {
 }
 
 std::string Vehicle::FindProperty(const std::string& object_name, int zone, std::string& error_str) {
-	auto manager_proxy = amb::make_super(GetAutomotiveManager());
+	GDBusProxy* manager_proxy = GetAutomotiveManager();
 
 	if (!manager_proxy) {
-		error_str = vehicle_error_unknown;
-		return "";
+	  return "";
 	}
 
-	GError* error = nullptr;
+	GError* error(nullptr);
 
 	auto object_path_variant = amb::make_super(
-				g_dbus_proxy_call_sync(manager_proxy.get(),
-									   "FindObjectForZone",
-									   g_variant_new("(si)",
-													 object_name.c_str(),
-													 zone),
-									   G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error));
+		g_dbus_proxy_call_sync(manager_proxy,
+							   "FindObjectForZone",
+							   g_variant_new("(si)",
+											 object_name.c_str(),
+											 zone),
+							   G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error));
 
 	auto error_ptr = amb::make_super(error);
 
 	if (error_ptr) {
-		DebugOut() << "error calling FindObjectForZone: "
-				   << error_ptr->message << endl;
+	  DebugOut() << "error calling FindObjectForZone: "
+				 << error_ptr->message << endl;
 
-		DebugOut() << "Could not find object in zone: " << zone << endl;
-
-		if (std::string(g_dbus_error_get_remote_error(error_ptr.get())) == "org.automotive.Manager.ObjectNotFound") {
-			error_str = vehicle_error_invalid_operation;
-		} else if (std::string(g_dbus_error_get_remote_error(error_ptr.get())) == "org.automotive.Manager.InvalidZone") {
-				error_str = vehicle_error_invalid_zone;
-		}
-
-		return "";
+	  DebugOut() << "Could not find object in zone: " << zone << endl;
+	  return "";
 	}
 
 	if (!object_path_variant) {
-		DebugOut() << "Could not find object in zone: "  << zone << endl;
-		error_str = vehicle_error_invalid_zone;
-		return "";
+	  DebugOut() << "Could not find object in zone: "  << zone << endl;
+	  return "";
 	}
 
 	gchar* obj_path = nullptr;
@@ -461,24 +454,26 @@ std::string Vehicle::FindProperty(const std::string& object_name, int zone, std:
 }
 
 GDBusProxy* Vehicle::GetAutomotiveManager() {
+	if (manager_proxy_)
+	  return manager_proxy_.get();
+
 	GError* error = nullptr;
-	GDBusProxy* am =
-			g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
+	manager_proxy_ = amb::make_super(g_dbus_proxy_new_sync(dbus_connection_.get(),
 										  G_DBUS_PROXY_FLAGS_NONE, NULL,
 										  amb_service,
 										  "/",
 										  "org.automotive.Manager",
 										  NULL,
-										  &error);
+										  &error));
 
 	auto error_ptr = amb::make_super(error);
 
 	if (error_ptr) {
-		DebugOut() << "error calling GetAutomotiveManager: "
-				   << error_ptr->message << endl;
+	  DebugOut() << "error calling GetAutomotiveManager: "
+				 << error_ptr->message << endl;
 	}
 
-	return am;
+	return manager_proxy_.get();
 }
 
 void Vehicle::SetupMainloop(void* data) {
@@ -512,14 +507,14 @@ void Vehicle::Subscribe(const std::string& object_name, Zone::Type zone) {
 		GError* proxy_error = nullptr;
 
 		auto properties_proxy =
-				amb::make_super(g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
-															  G_DBUS_PROXY_FLAGS_NONE,
-															  NULL,
-															  amb_service,
-															  object_path.c_str(),
-															  prop_iface,
-															  NULL,
-															  &proxy_error));
+			amb::make_super(g_dbus_proxy_new_sync(dbus_connection_.get(),
+											  G_DBUS_PROXY_FLAGS_NONE,
+											  NULL,
+											  amb_service,
+											  object_path.c_str(),
+											  prop_iface,
+											  NULL,
+											  &proxy_error));
 
 		auto proxy_error_ptr = amb::make_super(proxy_error);
 
@@ -572,8 +567,7 @@ void Vehicle::Subscribe(const std::string& object_name, Zone::Type zone) {
 		}
 
 		object->handle =
-				g_dbus_connection_signal_subscribe(g_bus_get_sync(G_BUS_TYPE_SYSTEM,
-																  NULL, NULL),
+				g_dbus_connection_signal_subscribe(dbus_connection_.get(),
 												   amb_service,
 												   prop_iface,
 												   "PropertiesChanged",
@@ -594,8 +588,7 @@ void Vehicle::Unsubscribe(const std::string& property, Zone::Type zone) {
 
 	for (auto obj : amb_objects_) {
 		if (obj->name == property && obj->zone == zone) {
-			g_dbus_connection_signal_unsubscribe(g_bus_get_sync(G_BUS_TYPE_SYSTEM,
-																NULL, NULL),
+			g_dbus_connection_signal_unsubscribe(dbus_connection_.get(),
 												 obj->handle);
 			to_clean.push_back(obj);
 		}
@@ -629,14 +622,14 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 	GError* proxy_error = nullptr;
 
 	auto properties_proxy =
-			amb::make_super(g_dbus_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM,
-														  G_DBUS_PROXY_FLAGS_NONE,
-														  NULL,
-														  amb_service,
-														  object_path.c_str(),
-														  prop_iface,
-														  NULL,
-														  &proxy_error));
+			amb::make_super(g_dbus_proxy_new_sync(dbus_connection_.get(),
+												  G_DBUS_PROXY_FLAGS_NONE,
+												  NULL,
+												  amb_service,
+												  object_path.c_str(),
+												  prop_iface,
+												  NULL,
+												  &proxy_error));
 
 	auto proxy_error_ptr = amb::make_super(proxy_error);
 
