@@ -329,16 +329,14 @@ void DatabaseSink::startPlayback()
 		obj.key = results[i][0];
 		obj.value = results[i][1];
 		obj.source = results[i][2];
-		obj.time = boost::lexical_cast<double>(results[i][3]);
-
-		/// TODO: figure out why sequence is broken:
-
-//		obj->sequence = boost::lexical_cast<int>(results[i][4]);
+		obj.zone = boost::lexical_cast<double>(results[i][3]);
+		obj.time = boost::lexical_cast<double>(results[i][4]);
+		obj.sequence = boost::lexical_cast<double>(results[i][5]);
 
 		playbackShared->playbackQueue.push_back(obj);
 	}
 
-	g_timeout_add(0,getNextEvent,playbackShared);
+	g_timeout_add(0, getNextEvent, playbackShared);
 }
 
 void DatabaseSink::initDb()
