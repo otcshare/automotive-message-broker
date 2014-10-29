@@ -4,7 +4,7 @@
       "name" : "Database Source",
       "path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
       "playbackOnLoad" : "true",
-      "databaseFile" : "generated.db"
+      "databaseFile" : "/tmp/storage"
     }
   ],
   "sinks": [
