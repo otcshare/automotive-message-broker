@@ -291,6 +291,22 @@ public:
 };
 
 template <>
+class GVS<uint8_t>
+{
+public:
+	static const char* signature() { return "q"; }
+
+	static uint16_t value(GVariant* v)
+	{
+		return g_variant_get_uint16(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
+};
+
+template <>
 class GVS<uint16_t>
 {
 public:

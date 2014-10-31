@@ -15,6 +15,9 @@ add_custom_command(OUTPUT genjs2cc COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/ge
 add_custom_target(js3cc DEPENDS genjs2cc)
 add_dependencies(vehicle_extension js3cc)
 
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/vehicle_api.js ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_api.js @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/vehicle.html ${CMAKE_CURRENT_SOURCE_DIR}/vehicle.html @ONLY)
+
 install(TARGETS vehicle_extension  LIBRARY DESTINATION "${LIB_INSTALL_DIR}/${XWALK_EXTENSION_PATH}")
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/vehicle.html DESTINATION /usr/share/automotive-message-broker/xwalk/examples)
 endif(xwalk_vehicle_extension)

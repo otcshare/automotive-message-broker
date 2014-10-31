@@ -218,6 +218,12 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<EngineCoolant>(iface->re, connection);
 	exportProperty<NightMode>(iface->re, connection);
 	exportProperty<DrivingMode>(iface->re, connection);
+	exportProperty<PowertrainTorque>(iface->re, connection);
+	exportProperty<AcceleratorPedalPosition>(iface->re, connection);
+	exportProperty<Chime>(iface->re, connection);
+	exportProperty<WheelTick>(iface->re, connection);
+	exportProperty<IgnitionTime>(iface->re, connection);
+	exportProperty<YawRate>(iface->re, connection);
 
 	iface->registerCustomTypes();
 }

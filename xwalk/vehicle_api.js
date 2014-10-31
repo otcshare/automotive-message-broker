@@ -226,13 +226,28 @@ function handleSubscribeReply(msg) {
     }
   }
 }
-
+/// Runningstatus attributes:
 _defineVehicleSignalProperty(exports, 'vehicleSpeed');
 _defineVehicleSignalProperty(exports, 'engineSpeed');
-_defineVehicleSignalProperty(exports, 'transmission');
-_defineVehicleSignalProperty(exports, 'steeringWheel');
+_defineVehicleSignalProperty(exports, 'powertrainTorque');
+_defineVehicleSignalProperty(exports, 'acceleratorPedalPosition');
 _defineVehicleSignalProperty(exports, 'throttlePosition');
+_defineVehicleSignalProperty(exports, 'transmission');
+_defineVehicleSignalProperty(exports, 'cruiseControlStatus');
+_defineVehicleSignalProperty(exports, 'lightStatus');
+_defineVehicleSignalProperty(exports, 'horn');
+_defineVehicleSignalProperty(exports, 'chime');
+_defineVehicleSignalProperty(exports, 'fuel');
+_defineVehicleSignalProperty(exports, 'engineOil');
+_defineVehicleSignalProperty(exports, 'acceleration');
 _defineVehicleSignalProperty(exports, 'engineCoolant');
+_defineVehicleSignalProperty(exports, 'steeringWheel');
+_defineVehicleSignalProperty(exports, 'wheelTick');
+_defineVehicleSignalProperty(exports, 'ignitionTime');
+_defineVehicleSignalProperty(exports, 'yawRate');
+_defineVehicleSignalProperty(exports, 'brakeOperation');
+_defineVehicleSignalProperty(exports, 'buttonEvent');
+
 _defineVehicleSignalProperty(exports, 'nightMode');
 _defineVehicleSignalProperty(exports, 'drivingMode');
 _defineVehicleSignalProperty(exports, 'brakeOperation');
@@ -240,8 +255,10 @@ _defineVehicleSignalProperty(exports, 'tire');
 _defineVehicleSignalProperty(exports, 'door');
 _defineVehicleSignalProperty(exports, 'defrost');
 _defineVehicleSignalProperty(exports, 'climateControl');
-_defineVehicleSignalProperty(exports, 'lightStatus');
+
 _defineVehicleSignalProperty(exports, 'batteryStatus');
-_defineVehicleSignalProperty(exports, 'fuel');
+
 _defineVehicleSignalProperty(exports, 'temperature');
 _defineVehicleSignalProperty(exports, 'odometer');
+
+
