@@ -19,9 +19,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "opencvluxplugin.h"
 #include "timestamp.h"
 #include <listplusplus.h>
+#include <superptr.hpp>
 
 #include <iostream>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/objdetect/objdetect.hpp>
 
 #include <QFuture>
 #include <QFutureWatcher>
@@ -45,7 +47,11 @@ const std::string VideoLogging = "VideoLogging";
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	VehicleProperty::registerProperty(VideoLogging, [](){
-		return new BasicPropertyType<bool>(VideoLogging,false);
+		return new BasicPropertyType<bool>(VideoLogging, false);
+	});
+
+	VehicleProperty::registerProperty("DriverDrowsiness", [](){
+		return new OpenCvLuxPlugin::DriverDrowsinessType("DriverDrowsiness", false);
 	});
 
 	return new OpenCvLuxPlugin(routingengine, config);
@@ -54,6 +60,8 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config)
 	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0), extBrightness(new VehicleProperty::ExteriorBrightnessType(0))
 {
+	driverDrowsiness = amb::make_unique(new DriverDrowsinessType("DriverDrowsiness", false));
+
 	shared = new Shared;
 	shared->parent = this;
 
@@ -65,6 +73,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	shared->useOpenCl = false;
 	shared->useCuda = false;
 	shared->loggingOn = false;
+	shared->ddd = false;
 
 	shared->fps=30;
 	device="0";
@@ -115,6 +124,9 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	{
 #ifdef OPENCL
 		shared->useOpenCl = config["opencl"] == "true";
+#else
+		DebugOut(DebugOut::Warning) << "You really don't have openCL support.  Disabling." << endl;S
+		shared->useOpenCl = false;
 #endif
 
 	}
@@ -124,6 +136,16 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 #ifdef CUDA
 		shared->useCuda = config["cuda"] == "true";
 #endif
+	}
+
+	if(config.find("ddd") != config.end())
+	{
+		shared->ddd = config["ddd"] == "true";
+	}
+
+	if(config.find("logging") != config.end())
+	{
+		shared->loggingOn = config["logging"] == "true";
 	}
 
 
@@ -185,8 +207,36 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	}
 #endif
 
+	if(shared->ddd)
+	{
+#ifdef OPENCL
+		if(shared->useOpenCl)
+		{
+			faceCascade = new cv::ocl::OclCascadeClassifier();
+			eyeCascade = new cv::ocl::OclCascadeClassifier();
+		}
+		else
+#endif
+		{
+			faceCascade = new cv::CascadeClassifier();
+			eyeCascade = new cv::CascadeClassifier();
+		}
+
+		if(!faceCascade->load("/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml"))
+		{
+			DebugOut(DebugOut::Warning) << "Could not load face cascade.  Disabling ddd" << endl;
+			shared->ddd = false;
+		}
+		if(!eyeCascade->load("/usr/share/opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml"))
+		{
+			DebugOut(DebugOut::Warning) << "Could not load face cascade.  Disabling ddd" << endl;
+			shared->ddd = false;
+		}
+
+	}
+
 	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
-	routingEngine->subscribeToProperty(VehicleProperty::Latitude,this);
+	routingEngine->subscribeToProperty(VehicleProperty::Latitude, this);
 	routingEngine->subscribeToProperty(VehicleProperty::Longitude, this);
 }
 
@@ -325,6 +375,9 @@ static int grabImage(void *data)
 	{
 		*(shared->m_capture) >> m_image;
 	}
+
+	if(shared->ddd)
+		shared->parent->detectEyes(m_image);
 
 	if(shared->threaded)
 	{
@@ -470,8 +523,6 @@ void OpenCvLuxPlugin::writeVideoFrame(cv::Mat f)
 
 	if(shared->loggingOn && speed > 0)
 	{
-
-
 		cv::Mat frame;
 		f.copyTo(frame);
 
@@ -511,8 +562,8 @@ void OpenCvLuxPlugin::writeVideoFrame(cv::Mat f)
 		cv::putText(frame, datestr.str(), dateOrg, fontFace, fontScale,
 				cv::Scalar::all(255), thickness, 8);
 
-		(*shared->mWriter)<<frame;
-		(*shared->mWriter)<<frame;
+		(*shared->mWriter) << frame;
+		(*shared->mWriter) << frame;
 	}
 }
 
@@ -623,6 +674,57 @@ TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
 
 	cv::namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
 	cv::imshow( "Hough Circle Transform Demo", img );
+}
 
 
+void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
+{
+	bool hasEyes = false;
+	std::vector<cv::Rect> faces;
+	cv::Mat frameGray;
+	cv::ocl::oclMat gray2;
+
+	if(shared->useOpenCl)
+	{
+#ifdef OPENCL
+		cv::ocl::oclMat src(frame);
+		cv::ocl::cvtColor(src, gray2, CV_BGR2GRAY);
+		cv::ocl::equalizeHist(gray2, gray2);
+		faceCascade->detectMultiScale(gray2, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
+#endif
+	}
+	else
+	{
+		cv::cvtColor(frame, frameGray, CV_BGR2GRAY);
+		cv::equalizeHist(frameGray, frameGray);
+		faceCascade->detectMultiScale(frameGray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
+	}
+
+	for( size_t i = 0; i < faces.size(); i++ )
+	{
+		cv::Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
+		cv::ellipse( frame, center, cv::Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, cv::Scalar( 255, 0, 255 ), 4, 8, 0 );
+#ifdef OPENCL
+		cv::ocl::oclMat faceROI = gray2(faces[i]);
+#else
+		cv::Mat faceROI = frameGray(faces[i]);
+#endif
+		std::vector<cv::Rect> eyes;
+
+		//-- In each face, detect eyes
+		eyeCascade->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
+
+		if(eyes.size())
+		{
+			hasEyes = true;
+			DebugOut() << "Number of eyes: " << eyes.size() << endl;
+		}
+
+		for( size_t j = 0; j < eyes.size(); j++ )
+		{
+			cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
+			int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
+			cv::circle( frame, center, radius, cv::Scalar( 255, 0, 0 ), 4, 8, 0 );
+		}
+	}
 }

@@ -5,14 +5,16 @@
       "name" : "OpenCV LUX",
       "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
       "threaded" : "true",
-      "cuda" : "true",
+      "cuda" : "false",
+      "opencl" : "true",
       "fps" : "30",
       "pixelLowerBound" : "18",
       "pixelUpperBound" : "255",
       "device" : "0",
-      "codec" : "divx",
-      "logging" : "true",
-      "logfile" : "/tmp/video.avi"
+      "codec" : "h264",
+      "logging" : "false",
+      "logfile" : "/tmp/video.avi",
+      "ddd" : "true"
     },
     {
       "path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so"
