@@ -11,8 +11,8 @@
       "pixelLowerBound" : "18",
       "pixelUpperBound" : "255",
       "device" : "0",
-      "codec" : "h264",
-      "logging" : "false",
+      "codec" : "divx",
+      "logging" : "true",
       "logfile" : "/tmp/video.avi",
       "ddd" : "true"
     },

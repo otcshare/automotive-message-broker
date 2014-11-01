@@ -40,8 +40,8 @@ public:
 
 	struct Shared
 	{
-		cv::VideoCapture *m_capture;
-		cv::VideoWriter *mWriter;
+		std::unique_ptr<cv::VideoCapture> m_capture;
+		std::unique_ptr<cv::VideoWriter> mWriter;
 		PropertyList mRequests;
 		OpenCvLuxPlugin* parent;
 
@@ -100,11 +100,11 @@ private:
 
 	std::unique_ptr<VehicleProperty::ExteriorBrightnessType> extBrightness;
 
-	Shared* shared;
+	std::unique_ptr<Shared> shared;
 	QMutex mutex;
 
-	cv::CascadeClassifier *faceCascade;
-	cv::CascadeClassifier *eyeCascade;
+	std::unique_ptr<cv::CascadeClassifier> faceCascade;
+	std::unique_ptr<cv::CascadeClassifier> eyeCascade;
 
 	std::unique_ptr<DriverDrowsinessType> driverDrowsiness;
 };

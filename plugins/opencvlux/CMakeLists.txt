@@ -1,14 +1,18 @@
 if(opencvlux_plugin)
 
+set(qtmainloop "ON")
+
 find_package(OpenCV REQUIRED)
 
 if(OpenCV_LIBS)
-   message(STATUS "opencv found")
+   message(STATUS "opencv found: ${OpenCV_INCLUDE_DIRS}")
 else(OpenCV_LIBS)
    message(FATAL_ERROR "opencv missing.  please install opencv")
 endif(OpenCV_LIBS)
 
 option(ocl "enable opencl" OFF)
+
+add_definitions(-DCV_DATA="${OpenCV_CONFIG_PATH}")
 
 if(ocl)
   message(STATUS "found opencv ocl headers. enabling opencl support. ${ocl}")
@@ -37,6 +41,7 @@ if(Qt5Core_FOUND)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
   message(STATUS "size of void_p: ${CMAKE_SIZEOF_VOID_P}")
   add_definitions(${Qt5Core_DEFINITIONS})
+  add_definitions(-DQT_NO_KEYWORDS)
 
 endif(Qt5Core_FOUND)
 set(CMAKE_AUTOMOC ON)

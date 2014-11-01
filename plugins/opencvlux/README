@@ -69,11 +69,7 @@ Default: "255"
 
 "opencl" (experimental)
 Use a specialized CPU/GPU device to calculate the mean pixel intensity.  This will only work if OpenCV
-was compiled with OpenCL support.  This plugin looks for the OpenCV ocl headers and adds support at 
-compile time.
-
-NOTE: This option has not been tested because at implementation, OpenCL 1.2 was not available from devices
-on-hand.
+was compiled with OpenCL support.  To enable openCL, pass -Docl=ON to cmake.
 
 Default: "false"
 
@@ -85,3 +81,39 @@ NOTE: this does not appear to have a noticable impact on processing given the wa
 this does however make memory usage explode.
 
 Default: "false"
+
+"logging"
+Turn on video logging.
+
+Default: "false"
+
+"logfile"
+File to encode video to.
+
+Default: "/tmp/video.avi"
+
+"codec"
+Fourcc name of codec.  See http://www.fourcc.org/codecs.php
+
+Default: "mjpg"
+
+"ddd" (experimental)
+Driver Drowsiness Detection.  For a driver facing camera, detect whether or not eyes are
+open or closed.  If closed for a period of time, DriverDrowsiness will change to "true".
+
+Default: "false"
+
+
+AMB Properties:
+
+VideoLogging
+Turn on and off video logging
+
+Type: bool
+Access: readwrite
+
+DriverDrowsiness
+True if the driver has been detected drowsy.
+
+Type: bool
+Access: readonly

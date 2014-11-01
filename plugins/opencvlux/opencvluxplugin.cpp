@@ -41,6 +41,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 using namespace std;
 
 const std::string VideoLogging = "VideoLogging";
+const std::string DriverDrowsiness = "DriverDrowsiness";
 
 #include "debugout.h"
 
@@ -50,8 +51,8 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 		return new BasicPropertyType<bool>(VideoLogging, false);
 	});
 
-	VehicleProperty::registerProperty("DriverDrowsiness", [](){
-		return new OpenCvLuxPlugin::DriverDrowsinessType("DriverDrowsiness", false);
+	VehicleProperty::registerProperty(DriverDrowsiness, [](){
+		return new OpenCvLuxPlugin::DriverDrowsinessType(DriverDrowsiness, false);
 	});
 
 	return new OpenCvLuxPlugin(routingengine, config);
@@ -60,9 +61,9 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config)
 	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0), extBrightness(new VehicleProperty::ExteriorBrightnessType(0))
 {
-	driverDrowsiness = amb::make_unique(new DriverDrowsinessType("DriverDrowsiness", false));
+	driverDrowsiness = amb::make_unique(new DriverDrowsinessType(DriverDrowsiness, false));
 
-	shared = new Shared;
+	shared = amb::make_unique(new Shared);
 	shared->parent = this;
 
 	shared->m_capture = NULL;
@@ -125,7 +126,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 #ifdef OPENCL
 		shared->useOpenCl = config["opencl"] == "true";
 #else
-		DebugOut(DebugOut::Warning) << "You really don't have openCL support.  Disabling." << endl;S
+		DebugOut(DebugOut::Warning) << "You really don't have openCL support.  Disabling." << endl;
 		shared->useOpenCl = false;
 #endif
 
@@ -212,24 +213,28 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 #ifdef OPENCL
 		if(shared->useOpenCl)
 		{
-			faceCascade = new cv::ocl::OclCascadeClassifier();
-			eyeCascade = new cv::ocl::OclCascadeClassifier();
+			faceCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
+			eyeCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
 		}
 		else
 #endif
 		{
-			faceCascade = new cv::CascadeClassifier();
-			eyeCascade = new cv::CascadeClassifier();
+			faceCascade = amb::make_unique(new cv::CascadeClassifier());
+			eyeCascade = amb::make_unique(new cv::CascadeClassifier());
 		}
 
-		if(!faceCascade->load("/usr/share/opencv/haarcascades/haarcascade_frontalface_alt.xml"))
+		std::string faceFile = CV_DATA "/haarcascades/haarcascade_frontalface_alt.xml";
+		if(!faceCascade->load(faceFile))
 		{
-			DebugOut(DebugOut::Warning) << "Could not load face cascade.  Disabling ddd" << endl;
+			DebugOut(DebugOut::Warning) << "Could not load face cascade: " << faceFile <<". Disabling ddd" << endl;
 			shared->ddd = false;
 		}
-		if(!eyeCascade->load("/usr/share/opencv/haarcascades/haarcascade_eye_tree_eyeglasses.xml"))
+
+		std::string eyeFile = CV_DATA "/haarcascades/haarcascade_eye_tree_eyeglasses.xml";
+
+		if(!eyeCascade->load(eyeFile))
 		{
-			DebugOut(DebugOut::Warning) << "Could not load face cascade.  Disabling ddd" << endl;
+			DebugOut(DebugOut::Warning) << "Could not load eye cascade: " << eyeFile <<". Disabling ddd" << endl;
 			shared->ddd = false;
 		}
 
@@ -242,7 +247,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 OpenCvLuxPlugin::~OpenCvLuxPlugin()
 {
-	delete shared->mWriter;
+
 }
 
 const string OpenCvLuxPlugin::uuid()
@@ -261,7 +266,7 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		/// we want to turn on the camera for one shot to get an image and determine the intensity
 
 		if(init())
-			grabImage(shared);
+			grabImage(shared.get());
 	}
 
 	if(reply->property == VehicleProperty::ExteriorBrightness)
@@ -313,7 +318,7 @@ void OpenCvLuxPlugin::subscribeToPropertyChanges(VehicleProperty::Property prope
 	if(!shared->mRequests.size())
 	{
 		if(init())
-			g_timeout_add(1000 / shared->fps, grabImage, shared);
+			g_timeout_add(1000 / shared->fps, grabImage, shared.get());
 	}
 
 	shared->mRequests.push_back(property);
@@ -328,6 +333,7 @@ PropertyList OpenCvLuxPlugin::supported()
 {
 	PropertyList props;
 	props.push_back(VehicleProperty::ExteriorBrightness);
+	props.push_back(DriverDrowsiness);
 	props.push_back(VideoLogging);
 
 	return props;
@@ -373,7 +379,7 @@ static int grabImage(void *data)
 	}
 	else
 	{
-		*(shared->m_capture) >> m_image;
+		*(shared->m_capture.get()) >> m_image;
 	}
 
 	if(shared->ddd)
@@ -466,14 +472,14 @@ bool OpenCvLuxPlugin::init()
 {
 	if(!shared->m_capture && shared->kinect)
 	{
-		shared->m_capture = new cv::VideoCapture(CV_CAP_OPENNI);
+		shared->m_capture = amb::make_unique(new cv::VideoCapture(CV_CAP_OPENNI));
 	}
 	else if(!shared->m_capture)
 	{
 		if(device == "")
-			shared->m_capture = new cv::VideoCapture(0);
+			shared->m_capture = amb::make_unique(new cv::VideoCapture(0));
 		else
-			shared->m_capture = new cv::VideoCapture(atoi(device.c_str()));
+			shared->m_capture = amb::make_unique(new cv::VideoCapture(atoi(device.c_str())));
 	}
 
 	if(!shared->m_capture->isOpened())
@@ -503,9 +509,7 @@ bool OpenCvLuxPlugin::init()
 
 		boost::algorithm::to_upper(codec);
 
-		if(shared->mWriter) delete shared->mWriter;
-
-		shared->mWriter = new cv::VideoWriter(filename, CV_FOURCC(codec.at(0), codec.at(1), codec.at(2), codec.at(3)),30,s);
+		shared->mWriter = amb::make_unique(new cv::VideoWriter(filename, CV_FOURCC(codec.at(0), codec.at(1), codec.at(2), codec.at(3)),30,s));
 	}
 
 	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
@@ -679,10 +683,15 @@ TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
 
 void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 {
+	if(frame.empty())
+		return;
+
 	bool hasEyes = false;
 	std::vector<cv::Rect> faces;
 	cv::Mat frameGray;
+#ifdef OPENCL
 	cv::ocl::oclMat gray2;
+#endif
 
 	if(shared->useOpenCl)
 	{
@@ -690,7 +699,8 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 		cv::ocl::oclMat src(frame);
 		cv::ocl::cvtColor(src, gray2, CV_BGR2GRAY);
 		cv::ocl::equalizeHist(gray2, gray2);
-		faceCascade->detectMultiScale(gray2, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
+		cv::ocl::OclCascadeClassifier* fc = static_cast<cv::ocl::OclCascadeClassifier*>(faceCascade.get());
+		fc->detectMultiScale(gray2, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
 #endif
 	}
 	else
@@ -704,15 +714,22 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 	{
 		cv::Point center( faces[i].x + faces[i].width*0.5, faces[i].y + faces[i].height*0.5 );
 		cv::ellipse( frame, center, cv::Size( faces[i].width*0.5, faces[i].height*0.5), 0, 0, 360, cv::Scalar( 255, 0, 255 ), 4, 8, 0 );
-#ifdef OPENCL
-		cv::ocl::oclMat faceROI = gray2(faces[i]);
-#else
-		cv::Mat faceROI = frameGray(faces[i]);
-#endif
+
 		std::vector<cv::Rect> eyes;
 
-		//-- In each face, detect eyes
-		eyeCascade->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
+		if(shared->useOpenCl)
+		{
+#ifdef OPENCL
+			cv::ocl::oclMat faceROI = gray2(faces[i]);
+			cv::ocl::OclCascadeClassifier* ec = static_cast<cv::ocl::OclCascadeClassifier*>(eyeCascade.get());
+			ec->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
+#endif
+		}
+		else
+		{
+			cv::Mat faceROI = frameGray(faces[i]);
+			eyeCascade->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
+		}
 
 		if(eyes.size())
 		{
@@ -727,4 +744,6 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 			cv::circle( frame, center, radius, cv::Scalar( 255, 0, 0 ), 4, 8, 0 );
 		}
 	}
+
+	routingEngine->updateProperty(driverDrowsiness.get(),this->uuid());
 }
