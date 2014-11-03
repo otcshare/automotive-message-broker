@@ -4,7 +4,7 @@
     {
       "name" : "OpenCV LUX",
       "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
-      "threaded" : "true",
+      "threaded" : "false",
       "cuda" : "false",
       "opencl" : "true",
       "fps" : "30",

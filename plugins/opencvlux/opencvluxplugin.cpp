@@ -383,7 +383,16 @@ static int grabImage(void *data)
 	}
 
 	if(shared->ddd)
-		shared->parent->detectEyes(m_image);
+	{
+		try
+		{
+			shared->parent->detectEyes(m_image);
+		}
+		catch(...)
+		{
+			DebugOut(DebugOut::Warning) << "DDD detection exception: "<< endl;
+		}
+	}
 
 	if(shared->threaded)
 	{
@@ -398,9 +407,18 @@ static int grabImage(void *data)
 	else
 	{
 		shared->parent->writeVideoFrame(m_image);
-		int lux = evalImage(m_image, shared);
+		try
+		{
+			int lux = evalImage(m_image, shared);
+			shared->parent->updateProperty(lux);
+		}
+		catch(...)
+		{
+			DebugOut(DebugOut::Warning) << "Exception caught "<< __FUNCTION__ << endl;
+		}
+
 		//detectLight(m_image,shared);
-		shared->parent->updateProperty(lux);
+
 	}
 
 	if(shared->mRequests.size())
@@ -602,12 +620,19 @@ void OpenCvLuxPlugin::updateProperty(uint lux)
 
 void OpenCvLuxPlugin::imgProcResult()
 {
-	QFutureWatcher<uint> *watcher = dynamic_cast<QFutureWatcher<uint>*>(sender());
+	try
+	{
+		QFutureWatcher<uint> *watcher = dynamic_cast<QFutureWatcher<uint>*>(sender());
 
-	uint lux = watcher->result();
-	shared->parent->updateProperty(lux);
+		uint lux = watcher->result();
+		shared->parent->updateProperty(lux);
 
-	watcher->deleteLater();
+		watcher->deleteLater();
+	}
+	catch(...)
+	{
+		DebugOut(DebugOut::Warning) << "exception caught getting img processing result" << endl;
+	}
 }
 
 TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
