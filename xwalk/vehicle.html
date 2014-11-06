@@ -3,11 +3,8 @@
 
 <body>
 <pre id="console"></pre>
+<script src="js/js-test-pre.js"></script>
 <script>
-
-function debug(stuff) {
- console.log(stuff);
-}
 
 vehicle = navigator.vehicle;
 
@@ -57,5 +54,6 @@ vehicle.vehicleSpeed.get("invalidzone").then(function() { },
   function(error) { debug("Invalid zone: " + error.message); });
 
 </script>
+<script src="js/js-test-post.js"></script>
 </body>
 </html>
