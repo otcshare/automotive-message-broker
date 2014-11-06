@@ -433,4 +433,14 @@ public:
 	}
 };
 
+class ButtonEvent: public DBusSink
+{
+public:
+	ButtonEvent(AbstractRoutingEngine *re, GDBusConnection *connection)
+			:DBusSink("ButtonEvent", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::YawRate, "Value", AbstractProperty::Read);
+	}
+};
+
 #endif
