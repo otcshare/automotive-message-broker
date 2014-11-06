@@ -666,7 +666,8 @@ TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
 			}
 			else if(avgPixel[0] > 128 && avgPixel[1] < 128 && avgPixel[2] < 128)
 			{
-				DebugOut(1)<<"Bluel Light!!!"<<endl;
+				DebugOut(1)<<"Yellow Light!!!"<<endl;
+				return TrafficLight::Yellow;
 			}
 		}
 		catch(...)
