@@ -19,5 +19,5 @@ var searchData=
   ['asyncrangepropertyreply',['AsyncRangePropertyReply',['../classAsyncRangePropertyReply.html',1,'']]],
   ['asyncrangepropertyrequest',['AsyncRangePropertyRequest',['../classAsyncRangePropertyRequest.html',1,'']]],
   ['asyncsetpropertyrequest',['AsyncSetPropertyRequest',['../classAsyncSetPropertyRequest.html',1,'']]],
-  ['automotive_20message_20broker_20dbus_20api_20documentation',['Automotive Message Broker DBus API Documentation',['../index.html',1,'']]]
+  ['automotive_20message_20broker_20library_20documentation',['Automotive Message Broker Library Documentation',['../index.html',1,'']]]
 ];

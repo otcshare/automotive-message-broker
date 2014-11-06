@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.6"/>
-<title>automotive-message-broker: Automotive Message Broker DBus API Documentation</title>
+<title>automotive-message-broker: Automotive Message Broker Library Documentation</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -76,30 +76,27 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">Automotive Message Broker DBus API Documentation </div>  </div>
+<div class="title">Automotive Message Broker Library Documentation </div>  </div>
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><h1><a class="anchor" id="intro"></a>
 Introduction</h1>
-<p>AMB organizes the API into two general interface categories. First the Manager interface (see manager.txt) which includes tools for using the other interfaces. Second is a number of interfaces that represent vehicle data. The latter follows the schema of "org.automotive.DataType" and are contained in verious DBus paths. The DBus paths are generally organized by /{source}/{zone}/DataType. "source" refers to the AMB source that produces the data. "zone" refers to the zone in which the data type is located in the vehicle or "0" for no zone.</p>
-<p>The interfaces and data types are documented in <a href="amb.idl">amb.idl</a>. Franca IDL tools can be used to generate DBus introspection xml which can be used to generate bindings for your language of choice.</p>
-<h1><a class="anchor" id="basic_usage"></a>
-Basic Recommended Usage</h1>
-<p>It is recomended that the Manager interface be used to find the DBus Object that contains the data type you need. This is done through the FindObject() call. It is expected that DBus Object Paths may change and so it is not appropriate to hard code DBus Object Paths.</p>
-<h1><a class="anchor" id="example"></a>
-Usage Example</h1>
-<p>Here is a pseudo-code example of how the api is to be used:</p>
-<div class="fragment"><div class="line">var manager = dbus.interface(<span class="stringliteral">&quot;org.automotive.Manager&quot;</span>, <span class="stringliteral">&quot;/&quot;</span>);</div>
-<div class="line"></div>
-<div class="line">var speedObjectPaths = manager.FindObject(<span class="stringliteral">&quot;VehicleSpeed&quot;</span>);</div>
-<div class="line"></div>
-<div class="line">var speedObject = dbus.interface(<span class="stringliteral">&quot;org.automotive.VehicleSpeed&quot;</span>, speedObjectPaths[0]);</div>
-<div class="line"></div>
-<div class="line">console.log(<span class="stringliteral">&quot;Vehicle Speed: &quot;</span> + speedObject.Speed);</div>
-</div><!-- fragment --> </div></div><!-- contents -->
+<p>AMB Library documentation outlines the internal classes and structures for building plugins for AMB.</p>
+<h1><a class="anchor" id="architecture"></a>
+General Architecture</h1>
+<p>AMB has 3 main parts. Source plugins which provide data, a routing engine that routes data and sink plugins that consume the data.</p>
+<h1><a class="anchor" id="plugins"></a>
+Plugins</h1>
+<p>There are two types of plugins: plugins that provide data, called "sources" (<a class="el" href="classAbstractSource.html">AbstractSource</a>) and plugins that consume data, called "sinks" (<a class="el" href="classAbstractSink.html">AbstractSink</a>). A typical source would get data from the vehicle and then translate the raw data into AMB property types. Sinks then subscribe to the property types and do useful things with the data.</p>
+<p>Example plugins can be found in plugins/exampleplugin.{h,cpp} for an example source plugin and plugins/examplesink.{h,cpp} for an example sink plugin. There are also many different types of plugins useful for testing and development in the plugins/ directory.</p>
+<h1><a class="anchor" id="routing_engine"></a>
+Routing Engine Plugins</h1>
+<p>As of 0.12, the routing engine itself can be exchanged for a plugin. This allows users to swap in routing engines with different behaviors, additional security, and custom throttling and filtering features.</p>
+<p>The easiest way to get started creating a routing engine plugin would be to look at <a class="el" href="classAbstractRoutingEngine.html">AbstractRoutingEngine</a>, the base class for all routing engines and the default routing engine in ambd/core.cpp. </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Nov 6 2014 10:21:15 for automotive-message-broker by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Nov 6 2014 11:03:34 for automotive-message-broker by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.6
 </small></address>
