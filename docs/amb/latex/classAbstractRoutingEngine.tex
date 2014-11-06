@@ -1,0 +1,182 @@
+\hypertarget{classAbstractRoutingEngine}{\section{Abstract\-Routing\-Engine Class Reference}
+\label{classAbstractRoutingEngine}\index{Abstract\-Routing\-Engine@{Abstract\-Routing\-Engine}}
+}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAbstractRoutingEngine_aea584dbb4853b86a3020783bfe9e0608}{typedef std\-::function$<$ void(\hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} \\*
+$\ast$value)$>$ {\bfseries Property\-Changed\-Type}}\label{classAbstractRoutingEngine_aea584dbb4853b86a3020783bfe9e0608}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAbstractRoutingEngine_a60ef59d81671e74ecc1ba3e926157a7f}{{\bfseries Abstract\-Routing\-Engine} (std\-::map$<$ std\-::string, std\-::string $>$ configuration)}\label{classAbstractRoutingEngine_a60ef59d81671e74ecc1ba3e926157a7f}
+
+\item 
+\hypertarget{classAbstractRoutingEngine_ad88ea00def2bb5991f5b2b424acab6c8}{virtual void {\bfseries register\-Source} (\hyperlink{classAbstractSource}{Abstract\-Source} $\ast$src)=0}\label{classAbstractRoutingEngine_ad88ea00def2bb5991f5b2b424acab6c8}
+
+\item 
+\hypertarget{classAbstractRoutingEngine_a177588ad6d45f477f596eb025dcc8bed}{virtual void {\bfseries update\-Supported} (Property\-List added, Property\-List removed, \hyperlink{classAbstractSource}{Abstract\-Source} $\ast$source)=0}\label{classAbstractRoutingEngine_a177588ad6d45f477f596eb025dcc8bed}
+
+\item 
+\hypertarget{classAbstractRoutingEngine_adadf5f60f3895bdb90bb224d05ee97f0}{void \hyperlink{classAbstractRoutingEngine_adadf5f60f3895bdb90bb224d05ee97f0}{update\-Property} (Vehicle\-Property\-::\-Property property, \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$value, std\-::string uuid)}\label{classAbstractRoutingEngine_adadf5f60f3895bdb90bb224d05ee97f0}
+
+\begin{DoxyCompactList}\small\item\em Deprecated\-: \end{DoxyCompactList}\item 
+\hypertarget{classAbstractRoutingEngine_a2395e520ddfd532959706a5122998fbb}{virtual void {\bfseries update\-Property} (\hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$value, const std\-::string \&uuid)=0}\label{classAbstractRoutingEngine_a2395e520ddfd532959706a5122998fbb}
+
+\item 
+\hypertarget{classAbstractRoutingEngine_adcd80e2e3823af7101c5d1f7ff0c217c}{virtual Property\-List {\bfseries supported} ()=0}\label{classAbstractRoutingEngine_adcd80e2e3823af7101c5d1f7ff0c217c}
+
+\item 
+\hypertarget{classAbstractRoutingEngine_a179052d9ab3f70ddb4c91421f94c45a9}{virtual void \hyperlink{classAbstractRoutingEngine_a179052d9ab3f70ddb4c91421f94c45a9}{register\-Sink} (\hyperlink{classAbstractSink}{Abstract\-Sink} $\ast$self)=0}\label{classAbstractRoutingEngine_a179052d9ab3f70ddb4c91421f94c45a9}
+
+\begin{DoxyCompactList}\small\item\em sinks\-: \end{DoxyCompactList}\item 
+\hypertarget{classAbstractRoutingEngine_a0f0a96c938c395565d01e0f78cc3bea8}{virtual void {\bfseries unregister\-Sink} (\hyperlink{classAbstractSink}{Abstract\-Sink} $\ast$self)=0}\label{classAbstractRoutingEngine_a0f0a96c938c395565d01e0f78cc3bea8}
+
+\item 
+virtual std\-::list$<$ std\-::string $>$ \hyperlink{classAbstractRoutingEngine_ab45a376fc305fbf072c6cb7e98416895}{sources\-For\-Property} (const Vehicle\-Property\-::\-Property \&property)=0
+\item 
+virtual \hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} $\ast$ \hyperlink{classAbstractRoutingEngine_ad1cbda415f674be4a3ce49be05aa8ee8}{get\-Property\-Async} (\hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} request)=0
+\item 
+\hypertarget{classAbstractRoutingEngine_a335eaf3aea69c5b55b28819119156dd6}{virtual \hyperlink{classAsyncRangePropertyReply}{Async\-Range\-Property\-Reply} $\ast$ {\bfseries get\-Range\-Property\-Async} (\hyperlink{classAsyncRangePropertyRequest}{Async\-Range\-Property\-Request} request)=0}\label{classAbstractRoutingEngine_a335eaf3aea69c5b55b28819119156dd6}
+
+\item 
+\hypertarget{classAbstractRoutingEngine_a740b2c9bd8f842499cf250f660553651}{virtual \hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} $\ast$ {\bfseries set\-Property} (\hyperlink{classAsyncSetPropertyRequest}{Async\-Set\-Property\-Request} request)=0}\label{classAbstractRoutingEngine_a740b2c9bd8f842499cf250f660553651}
+
+\item 
+virtual uint \hyperlink{classAbstractRoutingEngine_a7a30b4c21f91ce6586e1575458238809}{subscribe\-To\-Property} (const Vehicle\-Property\-::\-Property \&property\-Name, Property\-Changed\-Type callback, std\-::string pid=\char`\"{}\char`\"{})=0
+\begin{DoxyCompactList}\small\item\em subscribe\-To\-Property subscribes to property\-Name. Value changes will be passed to callback. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classAbstractRoutingEngine_aa56c145aa682ece99791831bc7c420f7}{unsubscribe\-To\-Property} (uint handle)=0
+\begin{DoxyCompactList}\small\item\em unsubscribe\-To\-Property \end{DoxyCompactList}\item 
+\hypertarget{classAbstractRoutingEngine_a1714228e3ef96be7f5a50811b516c352}{virtual bool {\bfseries subscribe\-To\-Property} (const Vehicle\-Property\-::\-Property \&property\-Name, \hyperlink{classAbstractSink}{Abstract\-Sink} $\ast$self)=0}\label{classAbstractRoutingEngine_a1714228e3ef96be7f5a50811b516c352}
+
+\item 
+virtual bool \hyperlink{classAbstractRoutingEngine_aae6c5d27dc01b4773b6bf77331f86e9f}{subscribe\-To\-Property} (const Vehicle\-Property\-::\-Property \&property\-Name, const std\-::string \&source\-Uuid\-Filter, \hyperlink{classAbstractSink}{Abstract\-Sink} $\ast$self)=0
+\begin{DoxyCompactList}\small\item\em subscribe\-To\-Property subscribe to changes made to a property value. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{classAbstractRoutingEngine_ac64ad6ac6a1fcd6ce7ad190262176466}{subscribe\-To\-Property} (const Vehicle\-Property\-::\-Property \&property\-Name, const std\-::string \&source\-Uuid\-Filter, Zone\-::\-Type zone\-Filter, \hyperlink{classAbstractSink}{Abstract\-Sink} $\ast$self)=0
+\begin{DoxyCompactList}\small\item\em subscribe\-To\-Property subscribe to changes made to a property value. \end{DoxyCompactList}\item 
+\hypertarget{classAbstractRoutingEngine_a23c16d50214f36e08383cfec64e1f569}{virtual bool {\bfseries unsubscribe\-To\-Property} (const Vehicle\-Property\-::\-Property \&, \hyperlink{classAbstractSink}{Abstract\-Sink} $\ast$self)=0}\label{classAbstractRoutingEngine_a23c16d50214f36e08383cfec64e1f569}
+
+\item 
+\hypertarget{classAbstractRoutingEngine_aa54d896b08870c24ae503a347681a439}{virtual \hyperlink{classPropertyInfo}{Property\-Info} {\bfseries get\-Property\-Info} (const Vehicle\-Property\-::\-Property \&, const std\-::string \&source\-Uuid)=0}\label{classAbstractRoutingEngine_aa54d896b08870c24ae503a347681a439}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAbstractRoutingEngine_a84ecc2385f6cde8a0971a58ad6f7cd3f}{std\-::map$<$ std\-::string, \\*
+std\-::string $>$ {\bfseries m\-Config}}\label{classAbstractRoutingEngine_a84ecc2385f6cde8a0971a58ad6f7cd3f}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classAbstractRoutingEngine_ad1cbda415f674be4a3ce49be05aa8ee8}{\index{Abstract\-Routing\-Engine@{Abstract\-Routing\-Engine}!get\-Property\-Async@{get\-Property\-Async}}
+\index{get\-Property\-Async@{get\-Property\-Async}!AbstractRoutingEngine@{Abstract\-Routing\-Engine}}
+\subsubsection[{get\-Property\-Async}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf Async\-Property\-Reply}$\ast$ Abstract\-Routing\-Engine\-::get\-Property\-Async (
+\begin{DoxyParamCaption}
+\item[{{\bf Async\-Property\-Request}}]{request}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractRoutingEngine_ad1cbda415f674be4a3ce49be05aa8ee8}
+/brief get\-Property\-Async requests a property value from a source. This call has a timeout and the callback specified in the request will always be called. /see \hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} /see \hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply}. /param request requested property. /return \hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply}. The returned \hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} is owned by the caller of get\-Property\-Async. /example \hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} request; request.\-property = Vehicle\-Property\-::\-Vehicle\-Speed request.\-completed = \mbox{[}\mbox{]}(Async\-Property\-Reply$\ast$ reply) \{ //you own the reply delete reply; \}; routing\-Engine-\/$>$get\-Property\-Async(request); \hypertarget{classAbstractRoutingEngine_ab45a376fc305fbf072c6cb7e98416895}{\index{Abstract\-Routing\-Engine@{Abstract\-Routing\-Engine}!sources\-For\-Property@{sources\-For\-Property}}
+\index{sources\-For\-Property@{sources\-For\-Property}!AbstractRoutingEngine@{Abstract\-Routing\-Engine}}
+\subsubsection[{sources\-For\-Property}]{\setlength{\rightskip}{0pt plus 5cm}virtual std\-::list$<$std\-::string$>$ Abstract\-Routing\-Engine\-::sources\-For\-Property (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\-Property\-::\-Property \&}]{property}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractRoutingEngine_ab45a376fc305fbf072c6cb7e98416895}
+/brief sources\-For\-Property /param property /return list of source uuid's that support the \char`\"{}property\char`\"{} \hypertarget{classAbstractRoutingEngine_a7a30b4c21f91ce6586e1575458238809}{\index{Abstract\-Routing\-Engine@{Abstract\-Routing\-Engine}!subscribe\-To\-Property@{subscribe\-To\-Property}}
+\index{subscribe\-To\-Property@{subscribe\-To\-Property}!AbstractRoutingEngine@{Abstract\-Routing\-Engine}}
+\subsubsection[{subscribe\-To\-Property}]{\setlength{\rightskip}{0pt plus 5cm}virtual uint Abstract\-Routing\-Engine\-::subscribe\-To\-Property (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\-Property\-::\-Property \&}]{property\-Name, }
+\item[{Property\-Changed\-Type}]{callback, }
+\item[{std\-::string}]{pid = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractRoutingEngine_a7a30b4c21f91ce6586e1575458238809}
+
+
+subscribe\-To\-Property subscribes to property\-Name. Value changes will be passed to callback. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em property\-Name} & \\
+\hline
+{\em callback} & \\
+\hline
+{\em pid} & process id of the requesting application \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+subscription handle 
+\end{DoxyReturn}
+\hypertarget{classAbstractRoutingEngine_aae6c5d27dc01b4773b6bf77331f86e9f}{\index{Abstract\-Routing\-Engine@{Abstract\-Routing\-Engine}!subscribe\-To\-Property@{subscribe\-To\-Property}}
+\index{subscribe\-To\-Property@{subscribe\-To\-Property}!AbstractRoutingEngine@{Abstract\-Routing\-Engine}}
+\subsubsection[{subscribe\-To\-Property}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool Abstract\-Routing\-Engine\-::subscribe\-To\-Property (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\-Property\-::\-Property \&}]{property\-Name, }
+\item[{const std\-::string \&}]{source\-Uuid\-Filter, }
+\item[{{\bf Abstract\-Sink} $\ast$}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractRoutingEngine_aae6c5d27dc01b4773b6bf77331f86e9f}
+
+
+subscribe\-To\-Property subscribe to changes made to a property value. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em property\-Name} & name of the property to request a subscription for. \\
+\hline
+{\em source\-Uuid\-Filter} & source U\-U\-I\-D to filter. Only property updates from this source will be sent to the sink. \\
+\hline
+{\em self} & pointer to the sink who is subscribing. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAbstractRoutingEngine_ac64ad6ac6a1fcd6ce7ad190262176466}{\index{Abstract\-Routing\-Engine@{Abstract\-Routing\-Engine}!subscribe\-To\-Property@{subscribe\-To\-Property}}
+\index{subscribe\-To\-Property@{subscribe\-To\-Property}!AbstractRoutingEngine@{Abstract\-Routing\-Engine}}
+\subsubsection[{subscribe\-To\-Property}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool Abstract\-Routing\-Engine\-::subscribe\-To\-Property (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\-Property\-::\-Property \&}]{property\-Name, }
+\item[{const std\-::string \&}]{source\-Uuid\-Filter, }
+\item[{Zone\-::\-Type}]{zone\-Filter, }
+\item[{{\bf Abstract\-Sink} $\ast$}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractRoutingEngine_ac64ad6ac6a1fcd6ce7ad190262176466}
+
+
+subscribe\-To\-Property subscribe to changes made to a property value. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em property\-Name} & name of the property to request a subscription for. \\
+\hline
+{\em source\-Uuid\-Filter} & source U\-U\-I\-D to filter. Only property updates from this source will be sent to the sink. \\
+\hline
+{\em zone\-Filter} & zone to filter. Only updates from this zone will be passed to the sink. \\
+\hline
+{\em self} & pointer to the sink who is subscribing. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAbstractRoutingEngine_aa56c145aa682ece99791831bc7c420f7}{\index{Abstract\-Routing\-Engine@{Abstract\-Routing\-Engine}!unsubscribe\-To\-Property@{unsubscribe\-To\-Property}}
+\index{unsubscribe\-To\-Property@{unsubscribe\-To\-Property}!AbstractRoutingEngine@{Abstract\-Routing\-Engine}}
+\subsubsection[{unsubscribe\-To\-Property}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Abstract\-Routing\-Engine\-::unsubscribe\-To\-Property (
+\begin{DoxyParamCaption}
+\item[{uint}]{handle}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractRoutingEngine_aa56c145aa682ece99791831bc7c420f7}
+
+
+unsubscribe\-To\-Property 
+
+
+\begin{DoxyParams}{Parameters}
+{\em handle} & \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/abstractroutingengine.\-h\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/abstractroutingengine.\-cpp\end{DoxyCompactItemize}

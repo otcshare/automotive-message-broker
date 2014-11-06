@@ -1,0 +1,81 @@
+\hypertarget{classAbstractSink}{\section{Abstract\-Sink Class Reference}
+\label{classAbstractSink}\index{Abstract\-Sink@{Abstract\-Sink}}
+}
+Inheritance diagram for Abstract\-Sink\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classAbstractSink}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAbstractSink_a63f03d63fd091cd6f39a9888dd08ea6a}{{\bfseries Abstract\-Sink} (\hyperlink{classAbstractRoutingEngine}{Abstract\-Routing\-Engine} $\ast$engine, map$<$ string, string $>$ config)}\label{classAbstractSink_a63f03d63fd091cd6f39a9888dd08ea6a}
+
+\item 
+virtual const string \hyperlink{classAbstractSink_a965ae1d5218713c7823fbd95fa51b053}{uuid} ()=0
+\begin{DoxyCompactList}\small\item\em Pure virtual methods\-: \end{DoxyCompactList}\item 
+virtual void \hyperlink{classAbstractSink_afeb683c566a5a71303d05d2e12da2b28}{property\-Changed} (\hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$value)
+\begin{DoxyCompactList}\small\item\em property\-Changed is called when a subscribed to property changes. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classAbstractSink_aa9538a89536e8b6495551283116a588b}{supported\-Changed} (const Property\-List \&supported\-Properties)=0
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAbstractSink_a4d49a722e60cd9993c182a29fbf74591}{\hyperlink{classAbstractRoutingEngine}{Abstract\-Routing\-Engine} $\ast$ \hyperlink{classAbstractSink_a4d49a722e60cd9993c182a29fbf74591}{routing\-Engine}}\label{classAbstractSink_a4d49a722e60cd9993c182a29fbf74591}
+
+\begin{DoxyCompactList}\small\item\em routing\-Engine is the core of A\-M\-B. It is used to pass plugin and property information to other plugins \end{DoxyCompactList}\item 
+\hypertarget{classAbstractSink_a52581d514cad8b74a9fb42a026522f76}{map$<$ string, string $>$ {\bfseries configuration}}\label{classAbstractSink_a52581d514cad8b74a9fb42a026522f76}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classAbstractSink_afeb683c566a5a71303d05d2e12da2b28}{\index{Abstract\-Sink@{Abstract\-Sink}!property\-Changed@{property\-Changed}}
+\index{property\-Changed@{property\-Changed}!AbstractSink@{Abstract\-Sink}}
+\subsubsection[{property\-Changed}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Abstract\-Sink\-::property\-Changed (
+\begin{DoxyParamCaption}
+\item[{{\bf Abstract\-Property\-Type} $\ast$}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classAbstractSink_afeb683c566a5a71303d05d2e12da2b28}
+
+
+property\-Changed is called when a subscribed to property changes. 
+
+\begin{DoxySeeAlso}{See Also}
+Abstract\-Routing\-Engine\-::subscribe\-To\-Property\-Changes() 
+\end{DoxySeeAlso}
+
+\begin{DoxyParams}{Parameters}
+{\em value} & value of the property that changed. this is a temporary pointer that will be destroyed. Do not destroy it. If you need to store the value use value.\-any\-Value(), value.\-value$<$\-T$>$() or value-\/$>$copy() to copy. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAbstractSink_aa9538a89536e8b6495551283116a588b}{\index{Abstract\-Sink@{Abstract\-Sink}!supported\-Changed@{supported\-Changed}}
+\index{supported\-Changed@{supported\-Changed}!AbstractSink@{Abstract\-Sink}}
+\subsubsection[{supported\-Changed}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Abstract\-Sink\-::supported\-Changed (
+\begin{DoxyParamCaption}
+\item[{const Property\-List \&}]{supported\-Properties}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractSink_aa9538a89536e8b6495551283116a588b}
+\hyperlink{classAbstractSink_aa9538a89536e8b6495551283116a588b}{supported\-Changed()} is called when the supported properties changes \begin{DoxyItemize}
+\item supported\-Properties the new list of supported properties. \end{DoxyItemize}
+\hypertarget{classAbstractSink_a965ae1d5218713c7823fbd95fa51b053}{\index{Abstract\-Sink@{Abstract\-Sink}!uuid@{uuid}}
+\index{uuid@{uuid}!AbstractSink@{Abstract\-Sink}}
+\subsubsection[{uuid}]{\setlength{\rightskip}{0pt plus 5cm}virtual const string Abstract\-Sink\-::uuid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractSink_a965ae1d5218713c7823fbd95fa51b053}
+
+
+Pure virtual methods\-: 
+
+\hyperlink{classAbstractSink_a965ae1d5218713c7823fbd95fa51b053}{uuid()} is a unique identifier \begin{DoxyReturn}{Returns}
+a guid-\/style unique identifier 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/abstractsink.\-h\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/abstractsink.\-cpp\end{DoxyCompactItemize}

@@ -1,0 +1,127 @@
+\hypertarget{classListPropertyType}{\section{List\-Property\-Type$<$ T $>$ Class Template Reference}
+\label{classListPropertyType}\index{List\-Property\-Type$<$ T $>$@{List\-Property\-Type$<$ T $>$}}
+}
+Inheritance diagram for List\-Property\-Type$<$ T $>$\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classListPropertyType}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classListPropertyType_a5e6f35179b6e7c79cf7dd831db1f5ffd}{{\bfseries List\-Property\-Type} (std\-::string property\-Name)}\label{classListPropertyType_a5e6f35179b6e7c79cf7dd831db1f5ffd}
+
+\item 
+\hypertarget{classListPropertyType_a72d99362f99900b292e0a8e78e9d2d2f}{{\bfseries List\-Property\-Type} (std\-::string property\-Name, \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$\hyperlink{classAbstractPropertyType_ae723621925382263eba046fa1ca8e36d}{value})}\label{classListPropertyType_a72d99362f99900b292e0a8e78e9d2d2f}
+
+\item 
+\hypertarget{classListPropertyType_a97b74dbcac25f0ea6610bfea24916ef6}{{\bfseries List\-Property\-Type} (\hyperlink{classListPropertyType}{List\-Property\-Type} \&other)}\label{classListPropertyType_a97b74dbcac25f0ea6610bfea24916ef6}
+
+\item 
+void \hyperlink{classListPropertyType_a18501d9e46af59ee269c6c6473ff0c99}{append} (\hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$property)
+\item 
+\hypertarget{classListPropertyType_a03589ed61592cf3061542b73abf00c67}{uint {\bfseries count} ()}\label{classListPropertyType_a03589ed61592cf3061542b73abf00c67}
+
+\item 
+\hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$ \hyperlink{classListPropertyType_a2b4d928c8fa6c7317a31d4aa376908d1}{copy} ()
+\begin{DoxyCompactList}\small\item\em copy \end{DoxyCompactList}\item 
+std\-::string \hyperlink{classListPropertyType_a7c0f0a4ab1d1ceaf4d7abfbdade7f5ea}{to\-String} () const 
+\begin{DoxyCompactList}\small\item\em to\-String \end{DoxyCompactList}\item 
+\hypertarget{classListPropertyType_aa49d1bc6968d7201b4d836b5049133f0}{void \hyperlink{classListPropertyType_aa49d1bc6968d7201b4d836b5049133f0}{from\-String} (std\-::string str)}\label{classListPropertyType_aa49d1bc6968d7201b4d836b5049133f0}
+
+\begin{DoxyCompactList}\small\item\em from\-String converts from string value \end{DoxyCompactList}\item 
+G\-Variant $\ast$ \hyperlink{classListPropertyType_ab0a0e192757158cd9901becacbafdb41}{to\-Variant} ()
+\begin{DoxyCompactList}\small\item\em to\-Variant \end{DoxyCompactList}\item 
+void \hyperlink{classListPropertyType_aa76b2385816ce8a12982109d632b6b93}{from\-Variant} (G\-Variant $\ast$v)
+\begin{DoxyCompactList}\small\item\em from\-Variant converts G\-Variant value into compatible native value. Caller owns G\-Variant argument. \end{DoxyCompactList}\item 
+\hypertarget{classListPropertyType_a764a0d0ab730b7821514d7158e1df05b}{std\-::list$<$ \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$ $>$ {\bfseries list} ()}\label{classListPropertyType_a764a0d0ab730b7821514d7158e1df05b}
+
+\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classListPropertyType_a18501d9e46af59ee269c6c6473ff0c99}{\index{List\-Property\-Type@{List\-Property\-Type}!append@{append}}
+\index{append@{append}!ListPropertyType@{List\-Property\-Type}}
+\subsubsection[{append}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ void {\bf List\-Property\-Type}$<$ T $>$\-::append (
+\begin{DoxyParamCaption}
+\item[{{\bf Abstract\-Property\-Type} $\ast$}]{property}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classListPropertyType_a18501d9e46af59ee269c6c6473ff0c99}
+append -\/ appends a property to the list \begin{DoxyItemize}
+\item property -\/ property to be appended. Property will be copied and owned by \hyperlink{classListPropertyType}{List\-Property\-Type}. You are responsible for freeing property after append is called. \end{DoxyItemize}
+\hypertarget{classListPropertyType_a2b4d928c8fa6c7317a31d4aa376908d1}{\index{List\-Property\-Type@{List\-Property\-Type}!copy@{copy}}
+\index{copy@{copy}!ListPropertyType@{List\-Property\-Type}}
+\subsubsection[{copy}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ {\bf Abstract\-Property\-Type}$\ast$ {\bf List\-Property\-Type}$<$ T $>$\-::copy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classListPropertyType_a2b4d928c8fa6c7317a31d4aa376908d1}
+
+
+copy 
+
+\begin{DoxyReturn}{Returns}
+a copy of the \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classAbstractPropertyType_a8fedd4300acc7ba7ada94e964f2fd166}{Abstract\-Property\-Type}.
+
+\hypertarget{classListPropertyType_aa76b2385816ce8a12982109d632b6b93}{\index{List\-Property\-Type@{List\-Property\-Type}!from\-Variant@{from\-Variant}}
+\index{from\-Variant@{from\-Variant}!ListPropertyType@{List\-Property\-Type}}
+\subsubsection[{from\-Variant}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ void {\bf List\-Property\-Type}$<$ T $>$\-::from\-Variant (
+\begin{DoxyParamCaption}
+\item[{G\-Variant $\ast$}]{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classListPropertyType_aa76b2385816ce8a12982109d632b6b93}
+
+
+from\-Variant converts G\-Variant value into compatible native value. Caller owns G\-Variant argument. 
+
+T\-O\-D\-O\-: fill this in 
+
+Implements \hyperlink{classAbstractPropertyType_a3de5f842aa061f168438e67ca29c2685}{Abstract\-Property\-Type}.
+
+\hypertarget{classListPropertyType_a7c0f0a4ab1d1ceaf4d7abfbdade7f5ea}{\index{List\-Property\-Type@{List\-Property\-Type}!to\-String@{to\-String}}
+\index{to\-String@{to\-String}!ListPropertyType@{List\-Property\-Type}}
+\subsubsection[{to\-String}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ std\-::string {\bf List\-Property\-Type}$<$ T $>$\-::to\-String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classListPropertyType_a7c0f0a4ab1d1ceaf4d7abfbdade7f5ea}
+
+
+to\-String 
+
+\begin{DoxyReturn}{Returns}
+strigified value 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classAbstractPropertyType_a4c359b2e7c3b0ede21c64ba2c90567aa}{Abstract\-Property\-Type}.
+
+\hypertarget{classListPropertyType_ab0a0e192757158cd9901becacbafdb41}{\index{List\-Property\-Type@{List\-Property\-Type}!to\-Variant@{to\-Variant}}
+\index{to\-Variant@{to\-Variant}!ListPropertyType@{List\-Property\-Type}}
+\subsubsection[{to\-Variant}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ G\-Variant$\ast$ {\bf List\-Property\-Type}$<$ T $>$\-::to\-Variant (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classListPropertyType_ab0a0e192757158cd9901becacbafdb41}
+
+
+to\-Variant 
+
+\begin{DoxyReturn}{Returns}
+G\-Variant representation of value. Caller must unref the returned G\-Variant 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classAbstractPropertyType_ae4c8025e310eb06916a28e0341f3356d}{Abstract\-Property\-Type}.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/abstractpropertytype.\-h\end{DoxyCompactItemize}

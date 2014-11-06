@@ -1,0 +1,75 @@
+\hypertarget{classAsyncPropertyRequest}{\section{Async\-Property\-Request Class Reference}
+\label{classAsyncPropertyRequest}\index{Async\-Property\-Request@{Async\-Property\-Request}}
+}
+
+
+The \hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} class is used by sinks to request property values.  
+
+
+
+
+{\ttfamily \#include $<$abstractroutingengine.\-h$>$}
+
+Inheritance diagram for Async\-Property\-Request\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classAsyncPropertyRequest}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncPropertyRequest_ad46cfdd3411c11beaa00b70d1c6419d9}{{\bfseries Async\-Property\-Request} (const \hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} \&request)}\label{classAsyncPropertyRequest_ad46cfdd3411c11beaa00b70d1c6419d9}
+
+\item 
+\hypertarget{classAsyncPropertyRequest_ad1de0c87f190106cf70a996e5cba1088}{\hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} \& {\bfseries operator=} (const \hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} \&other)}\label{classAsyncPropertyRequest_ad1de0c87f190106cf70a996e5cba1088}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncPropertyRequest_a221de270e3fb828ddbe821aa484a553f}{Vehicle\-Property\-::\-Property \hyperlink{classAsyncPropertyRequest_a221de270e3fb828ddbe821aa484a553f}{property}}\label{classAsyncPropertyRequest_a221de270e3fb828ddbe821aa484a553f}
+
+\begin{DoxyCompactList}\small\item\em property property to request. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncPropertyRequest_a2250e8d29929dd879de141049ec78302}{std\-::string \hyperlink{classAsyncPropertyRequest_a2250e8d29929dd879de141049ec78302}{source\-Uuid\-Filter}}\label{classAsyncPropertyRequest_a2250e8d29929dd879de141049ec78302}
+
+\begin{DoxyCompactList}\small\item\em source\-Uuid\-Filter the requesting sink should use this to filter on a specific source or leave blank to use any source \end{DoxyCompactList}\item 
+\hypertarget{classAsyncPropertyRequest_a1a19d4677523d8934abe1ddfec5ba1b7}{Zone\-::\-Type \hyperlink{classAsyncPropertyRequest_a1a19d4677523d8934abe1ddfec5ba1b7}{zone\-Filter}}\label{classAsyncPropertyRequest_a1a19d4677523d8934abe1ddfec5ba1b7}
+
+\begin{DoxyCompactList}\small\item\em zone\-Filter the requesting sink should use this if he wants to filter on a specific zone \end{DoxyCompactList}\item 
+\hypertarget{classAsyncPropertyRequest_a12e1115b879ffc69a4d9bfd34df3e4be}{Get\-Property\-Completed\-Signal \hyperlink{classAsyncPropertyRequest_a12e1115b879ffc69a4d9bfd34df3e4be}{completed}}\label{classAsyncPropertyRequest_a12e1115b879ffc69a4d9bfd34df3e4be}
+
+\begin{DoxyCompactList}\small\item\em completed the callback when the request has been completed. \end{DoxyCompactList}\item 
+uint \hyperlink{classAsyncPropertyRequest_a449da60204ce7c13462be179f869105c}{timeout}
+\begin{DoxyCompactList}\small\item\em use to specify a timeout in ms for the request. When a timeout occurs, the 'completed' callback will be called with an error. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncPropertyRequest_abaa035426c3ac48fe53de273b1a60eba}{std\-::string \hyperlink{classAsyncPropertyRequest_abaa035426c3ac48fe53de273b1a60eba}{pid}}\label{classAsyncPropertyRequest_abaa035426c3ac48fe53de273b1a60eba}
+
+\begin{DoxyCompactList}\small\item\em pid requesting process id \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} class is used by sinks to request property values. 
+
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classAbstractRoutingEngine_ad1cbda415f674be4a3ce49be05aa8ee8}{Abstract\-Routing\-Engine\-::get\-Property\-Async} 
+
+\hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classAsyncPropertyRequest_a449da60204ce7c13462be179f869105c}{\index{Async\-Property\-Request@{Async\-Property\-Request}!timeout@{timeout}}
+\index{timeout@{timeout}!AsyncPropertyRequest@{Async\-Property\-Request}}
+\subsubsection[{timeout}]{\setlength{\rightskip}{0pt plus 5cm}uint Async\-Property\-Request\-::timeout}}\label{classAsyncPropertyRequest_a449da60204ce7c13462be179f869105c}
+
+
+use to specify a timeout in ms for the request. When a timeout occurs, the 'completed' callback will be called with an error. 
+
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} default value is\-: 10000 ms 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/tripzero/src/automotive-\/message-\/broker/lib/abstractroutingengine.\-h\end{DoxyCompactItemize}
