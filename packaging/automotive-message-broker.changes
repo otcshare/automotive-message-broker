@@ -1,3 +1,25 @@
+* Thu Nov 05 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20141029.180744-6-gfa57967
+- updated docs. added deleted callback
+- updated chlog
+- fixed obd2 disconnect bug
+- fixed bluemonkey config path
+- fixed spec to install qtmainloop with bluemonkey plugin
+- fixed FanSpeedLevel name
+- update cache of dbus properties even if not currently registered
+- fixed battery ChargeLevel type error
+- fixed Temperature interface name
+- updated spec
+- version bump 0.11.904
+- fixed regression in cangen plugin
+- fixed regression in cangen plugin
+- version bump 0.11.904
+- dbus plugin will cache. updating release notes
+- fixed Obd2Connected
+- fixed database playback
+- 0.12 final
+- added mainpage for lib documentation
+- disable dbus property rules
+
 * Mon Oct 13 2014 tripzero <kevron.m.rees@intel.com> submit/tizen_ivi/20141001.165128-11-g4c16abd
 - some opencvlux fixes
 - use pure dlopen to open source/sink plugins
