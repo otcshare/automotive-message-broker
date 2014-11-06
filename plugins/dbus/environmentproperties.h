@@ -28,7 +28,7 @@ class Temperature: public DBusSink
 {
 public:
 	Temperature(AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("InteriorTemperature", re, connection, map<string, string>())
+		:DBusSink("Temperature", re, connection, map<string, string>())
 	{
 		/**
 		 * @attributeName Interior

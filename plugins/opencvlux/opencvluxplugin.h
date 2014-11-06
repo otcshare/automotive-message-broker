@@ -36,10 +36,12 @@ class OpenCvLuxPlugin: public QObject, public AbstractSource
 Q_OBJECT
 public:
 
+	typedef BasicPropertyType<bool> DriverDrowsinessType;
+
 	struct Shared
 	{
-		cv::VideoCapture *m_capture;
-		cv::VideoWriter *mWriter;
+		std::unique_ptr<cv::VideoCapture> m_capture;
+		std::unique_ptr<cv::VideoWriter> mWriter;
 		PropertyList mRequests;
 		OpenCvLuxPlugin* parent;
 
@@ -51,6 +53,7 @@ public:
 		int pixelLowerBound;
 		int pixelUpperBound;
 		bool loggingOn;
+		bool ddd;
 	};
 
 	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
@@ -75,6 +78,8 @@ public:
 
 	void writeVideoFrame(cv::Mat frame);
 
+	void detectEyes(cv::Mat frame);
+
 public Q_SLOTS:
 	void imgProcResult();
 
@@ -83,6 +88,8 @@ private: /// methods:
 	bool init();
 
 private:
+
+
 	uint speed;
 	uint latitude;
 	uint longitude;
@@ -93,8 +100,13 @@ private:
 
 	std::unique_ptr<VehicleProperty::ExteriorBrightnessType> extBrightness;
 
-	Shared* shared;
+	std::unique_ptr<Shared> shared;
 	QMutex mutex;
+
+	std::unique_ptr<cv::CascadeClassifier> faceCascade;
+	std::unique_ptr<cv::CascadeClassifier> eyeCascade;
+
+	std::unique_ptr<DriverDrowsinessType> driverDrowsiness;
 };
 
 static int grabImage(void *data);
@@ -112,5 +124,6 @@ enum Color
 }
 
 TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared* shared);
+
 
 #endif // EXAMPLEPLUGIN_H

@@ -172,7 +172,8 @@ public:
 
 	bool operator ==(const DBObject & other) const
 	{
-		return (key == other.key && source == other.source && zone == other.zone);
+		return (key == other.key && source == other.source && zone == other.zone &&
+				value == other.value && sequence == other.sequence && time == other.time);
 	}
 
 	bool operator != (const DBObject & other)
