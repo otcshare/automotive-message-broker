@@ -29,27 +29,6 @@
 #include <unordered_set>
 #include <map>
 
-namespace amb
-{
-
-struct PropertyCompare
-{
-	bool operator()(AbstractPropertyType* const & lhs, AbstractPropertyType* & rhs) const
-	{
-		if (lhs->name == rhs->name
-				&& lhs->sourceUuid == rhs->sourceUuid
-				&& lhs->zone == rhs->zone)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-};
-
-}
-
 class Core: public AbstractRoutingEngine
 {
 

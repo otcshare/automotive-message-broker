@@ -30,7 +30,11 @@
 #include <QTimer>
 #include <QtQml>
 
+#include <dlfcn.h>
+
 #define foreach Q_FOREACH
+
+typedef std::map<std::string, QObject*> create_bluemonkey_module_t(std::map<std::string, std::string> config, QObject* parent);
 
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -98,42 +102,6 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 	auth = new Authenticate(config, this);
 
 	qmlRegisterType<QTimer>("", 1, 0, "QTimer");
-
-/*	connect(irc, &IrcCommunication::message, [&](QString sender, QString prefix, QString codes ) {
-
-		if(codes.startsWith("authenticate"))
-		{
-
-			int i = codes.indexOf("authenticate");
-			QString pin = codes.mid(i+13);
-			pin = pin.trimmed();
-
-
-			if(!auth->authorize(prefix, pin))
-				irc->respond(sender,"failed");
-			qDebug()<<sender;
-
-		}
-		else if(codes.startsWith("bluemonkey"))
-		{
-			if(!auth->isAuthorized(prefix))
-			{
-				if(!mSilentMode)
-					irc->respond(sender, "denied");
-				return;
-			}
-
-			QString bm("bluemonkey");
-
-			codes = codes.mid(bm.length()+1);
-
-			QString response = engine->evaluate(codes).toString();
-
-			if(!mSilentMode || response != "undefined" )
-				irc->respond(sender, response);
-		}
-	});
-*/
 }
 
 
@@ -164,13 +132,19 @@ int BluemonkeySink::supportedOperations()
 
 QObject *BluemonkeySink::subscribeTo(QString str)
 {
-	return new Property(str.toStdString(), "", routingEngine, this);
+	return new Property(str.toStdString(), "", routingEngine, Zone::None, this);
 }
 
 QObject *BluemonkeySink::subscribeToSource(QString str, QString srcFilter)
 {
-	return new Property(str.toStdString(), srcFilter, routingEngine, this);
+	return new Property(str.toStdString(), srcFilter, routingEngine, Zone::None, this);
 }
+
+QObject* BluemonkeySink::subscribeToZone(QString str, int zone)
+{
+	return new Property(str.toStdString(), "", routingEngine, zone, this);
+}
+
 
 QStringList BluemonkeySink::sourcesForProperty(QString property)
 {
@@ -207,7 +181,7 @@ void BluemonkeySink::loadConfig(QString str)
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		DebugOut()<<"failed to open config file: "<<str.toStdString()<<endl;
+		DebugOut(DebugOut::Error)<<"failed to open config file: "<<str.toStdString()<<endl;
 		return;
 	}
 
@@ -220,6 +194,37 @@ void BluemonkeySink::loadConfig(QString str)
 	QJSValue val = engine->evaluate(script);
 
 	DebugOut()<<val.toString().toStdString()<<endl;
+}
+
+bool BluemonkeySink::loadModule(QString path)
+{
+	void* handle = dlopen(path.toUtf8().data(), RTLD_LAZY);
+
+	if(!handle)
+	{
+		DebugOut(DebugOut::Warning) << "bluemonkey load module failed: " << dlerror() << endl;
+		return false;
+	}
+
+	void* c = dlsym(handle, "create");
+
+	if(!c)
+	{
+		DebugOut(DebugOut::Warning) << "bluemonkey load module failed: " << path.toStdString() << " " << dlerror() << endl;
+		return false;
+	}
+
+	create_bluemonkey_module_t* create = (create_bluemonkey_module_t*)(c);
+
+	std::map<std::string, QObject*> exports = create(configuration, this);
+
+	for(auto i : exports)
+	{
+		QJSValue val = engine->newQObject(i.second);
+		engine->globalObject().setProperty(i.first.c_str(), val);
+	}
+
+	return true;
 }
 
 void BluemonkeySink::reloadEngine()
@@ -317,7 +322,7 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 	routingEngine->getRangePropertyAsync(request);
 }
 
-void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
+void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, int zone = Zone::None)
 {
 
 	auto create = [defaultValue, name]() -> AbstractPropertyType*
@@ -342,7 +347,7 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
 			return nullptr;
 	};
 
-	addPropertySupport(Zone::None, create);
+	addPropertySupport(zone, create);
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
@@ -425,8 +430,8 @@ void Property::getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction)
 	routingEngine->getRangePropertyAsync(request);
 }
 
-Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, QObject *parent)
-	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr), mUuid(amb::createUuid())
+Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, Zone::Type zone, QObject *parent)
+	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr), mUuid(amb::createUuid()), mZone(zone)
 {
 	setType(prop.c_str());
 }
@@ -463,6 +468,9 @@ void Property::setType(QString t)
 
 void Property::propertyChanged(AbstractPropertyType *value)
 {
+	if(value->zone != mZone)
+		return;
+
 	if(mValue)
 	{
 		delete mValue;
@@ -470,4 +478,19 @@ void Property::propertyChanged(AbstractPropertyType *value)
 	mValue = value->copy();
 
 	changed(gvariantToQVariant(mValue->toVariant()));
+}
+
+
+QVariant BluemonkeySink::zonesForProperty(QString prop, QString src)
+{
+	PropertyInfo info = routingEngine->getPropertyInfo(prop.toStdString(), src.toStdString());
+
+	QVariantList list;
+
+	for(auto i : info.zones())
+	{
+		list << i;
+	}
+
+	return list;
 }

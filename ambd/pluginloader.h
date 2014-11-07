@@ -74,7 +74,7 @@ private: ///methods:
 		if(f_create)
 		{
 			void* obj = f_create(routingEngine, config);
-			return static_cast<T>( obj );
+			return static_cast<T>(obj);
 		}
 
 		return nullptr;

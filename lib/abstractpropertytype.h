@@ -232,6 +232,28 @@ protected:
 
 };
 
+namespace amb
+{
+
+struct PropertyCompare
+{
+	bool operator()(AbstractPropertyType* const & lhs, AbstractPropertyType* & rhs) const
+	{
+		if (lhs->name == rhs->name
+				&& lhs->sourceUuid == rhs->sourceUuid
+				&& lhs->zone == rhs->zone)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+};
+
+}
+
+
 template <typename T>
 class GVS;
 
@@ -261,6 +283,22 @@ public:
 	static double value(GVariant* v)
 	{
 		return g_variant_get_double(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
+};
+
+template <>
+class GVS<uint8_t>
+{
+public:
+	static const char* signature() { return "q"; }
+
+	static uint16_t value(GVariant* v)
+	{
+		return g_variant_get_uint16(v);
 	}
 	static std::string stringize(std::string v)
 	{

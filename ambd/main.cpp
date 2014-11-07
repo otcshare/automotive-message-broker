@@ -37,7 +37,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <QCoreApplication>
 
-#else 
+#else
 
 #include <glib.h>
 
@@ -54,7 +54,7 @@ void interrupt(int sign)
 {
 	signal(sign, SIG_IGN);
 	cout<<"Signal caught. Exiting gracefully.\n"<<endl;
-	
+
 	/// this will cause the application to terminate and clean up:
 	delete mainloop;
 }
@@ -83,7 +83,7 @@ void printVersion()
 	DebugOut(0)<<"Version: "<<PROJECT_VERSION<<" ( "<<PROJECT_CODENAME<<" "<<PROJECT_QUALITY<<" )"<<endl;
 }
 
-int main(int argc, char **argv) 
+int main(int argc, char **argv)
 {
 
 	bool isdeamonize=false;
@@ -100,7 +100,7 @@ int main(int argc, char **argv)
 			case 'D':
 				isdeamonize = true;
 				break;
-				
+
 			case 'v':
 				printVersion();
 				return (0);
@@ -129,10 +129,10 @@ int main(int argc, char **argv)
 				break;
 		}
 	}
-	
+
 	if(isdeamonize)
 		daemonize();
-	
+
 	if(!logfn.empty())
 	{
 		logfile.open(logfn, ios::out | ios::trunc);
@@ -151,14 +151,14 @@ int main(int argc, char **argv)
 #endif
 
 	VehicleProperty::factory();
-	
+
 	PluginLoader loader(config, argc, argv);
-	
+
 	if(!loader.sources().size())
 	{
 		throw std::runtime_error("No sources present. aborting");
 	}
-		
+
 	mainloop = loader.mainloop();
 
 	/* Register signal handler */
@@ -166,8 +166,6 @@ int main(int argc, char **argv)
 	signal(SIGTERM, interrupt);
 
 	mainloop->exec();
-	
-	VehicleProperty::shutdown();
 
 	if(logfile.is_open())
 		logfile.close();

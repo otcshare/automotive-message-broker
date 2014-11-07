@@ -75,7 +75,7 @@ public:
 
 protected:
 	std::mutex mutex;
-	std::unordered_set<T,std::hash<T>, Pred> mQueue;
+	std::unordered_set<T, std::hash<T>, Pred> mQueue;
 };
 
 template <typename T, class Pred = std::equal_to<T> >

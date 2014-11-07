@@ -48,6 +48,25 @@ enum ButtonEventType {
 	NavigateLeftButton = 1 << 11,
 	NavigateRightButton = 1 << 12
 };
+
+namespace W3C
+{
+extern const char* Home;
+extern const char* Back;
+extern const char* Search;
+extern const char* Call;
+extern const char* EndCall;
+extern const char* MediaPlay;
+extern const char* MediaNext;
+extern const char* MediaPrevious;
+extern const char* MediaPause;
+extern const char* VoiceRecognize;
+extern const char* Enter;
+extern const char* Left;
+extern const char* Right;
+extern const char* Up;
+extern const char* Down;
+}
 }
 
 namespace TurnSignals {
@@ -334,12 +353,6 @@ public:
 	 */
 	static void factory();
 
-	/*!
-	 *
-	 * \brief destroys static instance of VehicleProperty. This should be called at application shutdown
-	 */
-	static void shutdown();
-
 	typedef std::string Property;
 
 	/*!
@@ -439,7 +452,7 @@ public:
 
 	/**< Engine coolant temperature in degrees celcius **/
 	static const Property EngineCoolantTemperature;
-	PROPERTYTYPE(EngineCoolantTemperature, EngineCoolantTemperatureType, BasicPropertyType<int>, int)
+	PROPERTYTYPEBASIC(EngineCoolantTemperature, int16_t)
 
 	static const Property EngineCoolantLevel;
 	PROPERTYTYPE(EngineCoolantLevel, EngineCoolantLevelType, BasicPropertyType<uint>, uint)
@@ -448,17 +461,14 @@ public:
 	static const Property MachineGunTurretStatus;
 	PROPERTYTYPEBASIC(MachineGunTurretStatus, bool)
 
-	/**< Acceleration on the 'x' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationX;
-	PROPERTYTYPE(AccelerationX, AccelerationXType, BasicPropertyType<uint16_t>, uint16_t)
+	PROPERTYTYPEBASIC(AccelerationX, int16_t)
 
-	/**< Acceleration on the 'y' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationY;
-	PROPERTYTYPE(AccelerationY, AccelerationYType, BasicPropertyType<uint16_t>, uint16_t)
+	PROPERTYTYPEBASIC(AccelerationY, int16_t)
 
-	/**< Acceleration on the 'z' axis in 1/1000 gravitational acceleration "g-force" */
 	static const Property AccelerationZ;
-	PROPERTYTYPE(AccelerationZ, AccelerationZType, BasicPropertyType<uint16_t>, uint16_t)
+	PROPERTYTYPEBASIC(AccelerationZ, int16_t)
 
 	/**< Mass Air Flow.  grams/sec */
 	static const Property MassAirFlow;
@@ -466,9 +476,12 @@ public:
 	//typedef BasicPropertyType<uint16_t> MassAirFlowType;
 
 	/**< Button Event @see ButtonEvents::ButtonEventType */
+	///TODO: deprecated.  Use ButtonEventW3C. Remove in 0.14
 	static const Property ButtonEvent;
 	PROPERTYTYPE(ButtonEvent, ButtonEventType, BasicPropertyType<ButtonEvents::ButtonEventType>, ButtonEvents::ButtonEventType)
-	//typedef BasicPropertyType<ButtonEvents::ButtonEventType> ButtonEventType;
+
+	static const Property ButtonEventW3C;
+	PROPERTYTYPE(ButtonEventW3C, ButtonEventW3CType, StringPropertyType, std::string)
 
 	/**< Air intake temperature in degrees celcius */
 	static const Property AirIntakeTemperature;
@@ -496,14 +509,17 @@ public:
 	PROPERTYTYPE(ExteriorTemperature, ExteriorTemperatureType, BasicPropertyType<int>, int)
 	//typedef BasicPropertyType<int> ExteriorTemperatureType;
 
-	/**< Engine Oil Temperature in degrees celcius */
 	static const Property EngineOilTemperature;
-	PROPERTYTYPE(EngineOilTemperature, EngineOilTemperatureType, BasicPropertyType<int>, int)
-	//typedef BasicPropertyType<int> EngineOilTemperatureType;
+	PROPERTYTYPEBASIC(EngineOilTemperature, int)
 
 	static const Property EngineOilRemaining;
-	PROPERTYTYPE(EngineOilRemaining, EngineOilRemainingType,BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> EngineOilRemainingType;
+	PROPERTYTYPEBASIC(EngineOilRemaining, uint16_t)
+
+	static const Property EngineOilLifeRemaining;
+	PROPERTYTYPEBASIC(EngineOilLifeRemaining, uint8_t)
+
+	static const Property EngineOilChangeIndicator;
+	PROPERTYTYPEBASIC(EngineOilChangeIndicator, bool)
 
 	/**< Vehicle Identification Number (ISO 3779) 17 chars**/
 	static const Property VIN;
@@ -567,13 +583,18 @@ public:
 	static const Property LightDynamicHighBeam;
 	PROPERTYTYPEBASIC(LightDynamicHighBeam, bool)
 
-
+	///TODO: deprecated.  Use InteriorLightStatus which is zoned.  Remove in 0.14
 	static const Property InteriorLightDriver;
 	PROPERTYTYPE(InteriorLightDriver, InteriorLightDriverType, BasicPropertyType<bool>, bool)
+	///TODO: deprecated.  Use InteriorLightStatus which is zoned.  Remove in 0.14
 	static const Property InteriorLightCenter;
 	PROPERTYTYPE(InteriorLightCenter, InteriorLightCenterType, BasicPropertyType<bool>, bool)
+	///TODO: deprecated.  Use InteriorLightStatus which is zoned.  Remove in 0.14
 	static const Property InteriorLightPassenger;
 	PROPERTYTYPE(InteriorLightPassenger, InteriorLightPassengerType, BasicPropertyType<bool>, bool)
+
+	static const Property InteriorLightStatus;
+	PROPERTYTYPEBASIC(InteriorLightStatus, bool)
 
 	static const Property EngineLoad;
 	PROPERTYTYPE(EngineLoad, EngineLoadType, BasicPropertyType<uint16_t>, uint16_t)
@@ -879,6 +900,26 @@ public:
 	static const Property DriverId;
 	PROPERTYTYPE(DriverId, DriverIdType, StringPropertyType, std::string)
 
+	static const Property PowertrainTorque;
+	PROPERTYTYPEBASIC(PowertrainTorque, uint16_t)
+
+	static const Property AcceleratorPedalPosition;
+	PROPERTYTYPEBASIC(AcceleratorPedalPosition, uint8_t)
+
+	static const Property Chime;
+	PROPERTYTYPEBASIC(Chime, bool)
+
+	static const Property WheelTick;
+	PROPERTYTYPEBASIC(WheelTick, uint)
+
+	static const Property IgnitionTimeOn;
+	PROPERTYTYPEBASIC(IgnitionTimeOn, uint64_t)
+
+	static const Property IgnitionTimeOff;
+	PROPERTYTYPEBASIC(IgnitionTimeOff, uint64_t)
+
+	static const Property YawRate;
+	PROPERTYTYPEBASIC(YawRate, int16_t)
 
 	/** END PROPERTIES **/
 
@@ -928,7 +969,7 @@ private:
 
 	VehicleProperty();
 
-	static VehicleProperty* thereCanOnlyBeOne;
+	static std::unique_ptr<VehicleProperty> thereCanOnlyBeOne;
 
 	static bool registerPropertyPriv(Property name, PropertyTypeFactoryCallback factory);
 

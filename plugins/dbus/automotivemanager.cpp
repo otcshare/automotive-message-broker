@@ -124,7 +124,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		if(propertyToFind == "")
 		{
-			g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
+			g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR, G_DBUS_ERROR_INVALID_ARGS, "Invalid argument.");
 			return;
 		}
 
@@ -132,7 +132,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		if(!interfaces.size())
 		{
-			g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
+			g_dbus_method_invocation_return_dbus_error(invocation, "org.automotive.Manager.ObjectNotFound", "Property not found");
 			return;
 		}
 
@@ -160,7 +160,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 			}
 		}
 
-		g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
+		g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.InvalidZone", "zone not found");
 	}
 
 	else if (method == "ZonesForObjectName")
@@ -198,7 +198,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(ai)",&params));
 	}
-	
+
 	else if(method == "List")
 	{
 		std::list<AbstractDBusInterface*> list = AbstractDBusInterface::interfaces();

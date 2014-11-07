@@ -7,8 +7,17 @@
 #include <QFile>
 #include <QNetworkProxy>
 #include <QTimer>
-#include <QScriptEngine>
+#include <QJSEngine>
 #include <debugout.h>
+
+extern "C" std::map<std::string, QObject*> create(std::map<std::string, std::string> config, QObject* parent)
+{
+	std::map<std::string, QObject*> moduleInstances;
+
+	moduleInstances["irc"] = new IrcCommunication(config, parent);
+
+	return moduleInstances;
+}
 
 #define foreach Q_FOREACH
 
@@ -29,9 +38,9 @@ IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QO
 	QObject::connect(this,SIGNAL(socketError(QAbstractSocket::SocketError)),this,SLOT(socketError(QAbstractSocket::SocketError)));
 	QObject::connect(this,SIGNAL(messageReceived(IrcMessage*)),this,SLOT(onMessageReceived(IrcMessage*)));
 
-	QScriptEngine *engine = new QScriptEngine(this);
+	QJSEngine *engine = new QJSEngine(this);
 
-	QScriptValue eventEngineValue = engine->newQObject(this);
+	QJSValue eventEngineValue = engine->newQObject(this);
 	engine->globalObject().setProperty("irc", eventEngineValue);
 
 	QString str = config["ircSettings"].c_str();
@@ -47,7 +56,7 @@ IrcCommunication::IrcCommunication(std::map<std::string, std::string> config, QO
 
 	file.close();
 
-	QScriptValue response = engine->evaluate(script);
+	QJSValue response = engine->evaluate(script);
 
 	DebugOut()<<response.toString().toStdString()<<endl;
 

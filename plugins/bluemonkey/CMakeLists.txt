@@ -14,9 +14,21 @@ if(Qt5Core_FOUND)
 endif(Qt5Core_FOUND)
 
 set(CMAKE_AUTOMOC ON)
-#set(communi_INCLUDE_DIRS /usr/include/qt5/Communi)
-#set(communi_LIBRARIES -lCommuni)
-#add_definitions(-DCOMMUNI_SHARED)
+
+find_library(communi NAMES Communi)
+
+if(communi)
+  message(STATUS "enabling irc bluemonkey module")
+  set(communi_INCLUDE_DIRS /usr/include/qt5/Communi)
+  set(communi_LIBRARIES -lCommuni)
+  add_definitions(-DCOMMUNI_SHARED)
+
+  add_library(bluemonkeyIrcModule MODULE irccoms.cpp)
+  set_target_properties(bluemonkeyIrcModule PROPERTIES PREFIX "")
+  target_link_libraries(bluemonkeyIrcModule ${link_libraries} ${QT_LIBRARIES} ${communi_LIBRARIES})
+  install(TARGETS bluemonkeyIrcModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+endif(communi)
+
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${communi_INCLUDE_DIRS} ${QT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common)
 
@@ -25,7 +37,7 @@ set(bluemonkeyplugin_sources bluemonkey.cpp authenticate.cpp)
 
 add_library(bluemonkeyplugin MODULE ${bluemonkeyplugin_sources})
 set_target_properties(bluemonkeyplugin PROPERTIES PREFIX "")
-target_link_libraries(bluemonkeyplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES} ${communi_LIBRARIES} amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common)
+target_link_libraries(bluemonkeyplugin dl amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES} ${communi_LIBRARIES} amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common)
 
 set(config_files ${CMAKE_CURRENT_SOURCE_DIR}/config.js)
 

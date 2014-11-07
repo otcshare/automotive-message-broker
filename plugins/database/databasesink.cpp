@@ -122,7 +122,6 @@ int getNextEvent(gpointer data)
 
 	pbshared->playbackQueue.remove(obj);
 	DebugOut()<<"playback Queue size: "<<pbshared->playbackQueue.size()<<endl;
-	//delete obj;
 
 	return 0;
 }
