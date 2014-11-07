@@ -4,7 +4,7 @@
 
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.12
+Version:    0.12.800
 Release:    0
 Group:      Automotive/Service
 License:    LGPL-2.1
@@ -19,6 +19,7 @@ Requires:       default-ac-domains
 BuildRequires:  cmake
 BuildRequires:  boost-devel
 BuildRequires:  pkgconfig(json)
+BuildRequires:  libtool-ltdl-devel
 BuildRequires:  pkgconfig(libwebsockets)
 BuildRequires:  pkgconfig(uuid)
 BuildRequires:  pkgconfig(sqlite3)
@@ -31,8 +32,8 @@ BuildRequires:  pkgconfig(dbus-1)
 BuildRequires:  qt5-qtcore-devel
 BuildRequires:  qt5-qtconcurrent-devel
 BuildRequires:  qt5-qtdbus-devel
-BuildRequires:  qt5-qtdeclarative-devel
 BuildRequires:  qt5-qtnetwork-devel
+BuildRequires:  qt5-qtdeclarative-devel
 BuildRequires:  qt5-plugin-bearer-generic
 BuildRequires:  qt5-plugin-bearer-connman
 BuildRequires:  qt5-plugin-bearer-nm
@@ -185,19 +186,29 @@ CAN frames listener plug-in for the AMB CAN Simulator package
 %package plugins-bluemonkey
 Summary:   javascript plugin engine
 Group:     Automotive/Libraries
-Requires: %{name} = %{version}-%{release}
-Requires: automotive-message-broker-plugins-qtmainloop
+Requires:  %{name} = %{version}-%{release}
 Requires: qt5-qtdeclarative
 
 %description plugins-bluemonkey
 Engine for creating scriptable plugins for AMB
 %endif
 
+%package xwalk-vehicle-extension
+Summary:  crosswalk vehicle API extension
+Group:    Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires: crosswalk
+
+%description xwalk-vehicle-extension
+Crosswalk vehicle API extension based on the W3C Automotive Business Group Vehicle and Data API Specification
+
 %prep
 %setup -q -n %{name}-%{version}
 
 %build
 %cmake \
+       -Dxwalk_vehicle_extension=ON \
+       -DXWALK_EXTENSION_PATH=/tizen-extensions-crosswalk \
 %if %{with qt5}
        -Dqtmainloop=ON \
        -Dopencvlux_plugin=ON \
@@ -212,8 +223,7 @@ Engine for creating scriptable plugins for AMB
        -Dgpsnmea_plugin=ON \
        -Dcangen_plugin=ON \
        -Dcansim_plugin=ON \
-       -Denable_docs=ON \
-       -Dusebluez5=ON
+       -Denable_docs=ON
 
 
 %__make %{?jobs:-j%jobs}
@@ -342,6 +352,7 @@ cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/cansimplugin.so
 
+
 %if %{with qt5}
 %files plugins-bluemonkey
 %defattr(-,root,root,-)
@@ -349,3 +360,8 @@ cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %{_libdir}/%{name}/bluemonkeyplugin.so
 %config %{_sysconfdir}/ambd/bluemonkey
 %endif
+
+%files xwalk-vehicle-extension
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/tizen-extensions-crosswalk/*
+%{_datadir}/%{name}/xwalk/examples/*
