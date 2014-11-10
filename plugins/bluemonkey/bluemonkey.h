@@ -141,6 +141,11 @@ public Q_SLOTS:
 		mSilentMode = m;
 	}
 
+	void createCustomProperty(QString name, QJSValue defaultValue)
+	{
+		createCustomProperty(name, defaultValue, Zone::None);
+	}
+
 	void createCustomProperty(QString name, QJSValue defaultValue, int zone);
 
 private:
