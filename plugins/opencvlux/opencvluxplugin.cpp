@@ -42,6 +42,7 @@ using namespace std;
 
 const std::string VideoLogging = "VideoLogging";
 const std::string DriverDrowsiness = "DriverDrowsiness";
+const std::string OpenCL = "OpenCL";
 
 #include "debugout.h"
 
@@ -55,6 +56,10 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 		return new OpenCvLuxPlugin::DriverDrowsinessType(DriverDrowsiness, false);
 	});
 
+	VehicleProperty::registerProperty(OpenCL, [](){
+		return new BasicPropertyType<bool>(OpenCL, false);
+	});
+
 	return new OpenCvLuxPlugin(routingengine, config);
 }
 
@@ -62,6 +67,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0), extBrightness(new VehicleProperty::ExteriorBrightnessType(0))
 {
 	driverDrowsiness = amb::make_unique(new DriverDrowsinessType(DriverDrowsiness, false));
+	openCl = amb::make_unique(new BasicPropertyType<bool>(OpenCL, false));
 
 	shared = amb::make_unique(new Shared);
 	shared->parent = this;
@@ -112,7 +118,6 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 		}
 	}
 
-
 	if(config.find("pixelUpperBound") != config.end())
 	{
 		shared->pixelUpperBound = boost::lexical_cast<int>(config["pixelUpperBound"]);
@@ -125,6 +130,7 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	{
 #ifdef OPENCL
 		shared->useOpenCl = config["opencl"] == "true";
+		openCl->setValue(shared->useOpenCl);
 #else
 		DebugOut(DebugOut::Warning) << "You really don't have openCL support.  Disabling." << endl;
 		shared->useOpenCl = false;
@@ -151,39 +157,38 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 
 #ifdef OPENCL
-	if(shared->useOpenCl)
+
+	cv::ocl::PlatformsInfo platforms;
+	cv::ocl::getOpenCLPlatforms(platforms);
+
+	for(auto p : platforms)
 	{
-		cv::ocl::PlatformsInfo platforms;
-		cv::ocl::getOpenCLPlatforms(platforms);
+		DebugOut(1)<<"platform: "<<p->platformName<<" vendor: "<<p->platformVendor<<endl;
+	}
 
-		for(auto p : platforms)
+	cv::ocl::DevicesInfo info;
+	cv::ocl::getOpenCLDevices(info, cv::ocl::CVCL_DEVICE_TYPE_ALL);
+
+	DebugOut(1)<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
+
+	if(!info.size())
+	{
+		DebugOut(1)<<"No CL devices.  Disabling OpenCL"<<endl;
+		shared->useOpenCl = false;
+	}
+	else
+	{
+		cv::ocl::setDevice(info[0]);
+	}
+
+	for(auto i : info)
+	{
+		for(auto name : i->deviceName)
 		{
-			DebugOut(1)<<"platform: "<<p->platformName<<" vendor: "<<p->platformVendor<<endl;
-		}
-
-		cv::ocl::DevicesInfo info;
-		cv::ocl::getOpenCLDevices(info, cv::ocl::CVCL_DEVICE_TYPE_ALL);
-
-		DebugOut(1)<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
-
-		if(!info.size())
-		{
-			DebugOut(1)<<"No CL devices.  Disabling OpenCL"<<endl;
-			shared->useOpenCl = false;
-		}
-		else
-		{
-			cv::ocl::setDevice(info[0]);
-		}
-
-		for(auto i : info)
-		{
-			for(auto name : i->deviceName)
-			{
-				DebugOut(1)<<"OpenCLDeviceName: "<<name<<endl;
-			}
+			DebugOut(1)<<"OpenCLDeviceName: "<<name<<endl;
 		}
 	}
+
 #endif
 
 #ifdef CUDA
@@ -211,17 +216,12 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 	if(shared->ddd)
 	{
 #ifdef OPENCL
-		if(shared->useOpenCl)
-		{
-			faceCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
-			eyeCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
-		}
-		else
+		faceCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
+		eyeCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
+#else
+		faceCascade = amb::make_unique(new cv::CascadeClassifier());
+		eyeCascade = amb::make_unique(new cv::CascadeClassifier());
 #endif
-		{
-			faceCascade = amb::make_unique(new cv::CascadeClassifier());
-			eyeCascade = amb::make_unique(new cv::CascadeClassifier());
-		}
 
 		std::string faceFile = CV_DATA "/haarcascades/haarcascade_frontalface_alt.xml";
 		if(!faceCascade->load(faceFile))

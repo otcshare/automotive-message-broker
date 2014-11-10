@@ -22,6 +22,7 @@
 
 #include <list>
 #include <algorithm>
+#include <functional>
 
 template <class T, class V>
 bool contains(const T & iteratable, V value)

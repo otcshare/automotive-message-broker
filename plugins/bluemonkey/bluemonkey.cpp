@@ -1,19 +1,19 @@
 /*
-	Copyright (C) 2012  Intel Corporation
+  Copyright (C) 2012  Intel Corporation
 
-	This library is free software; you can redistribute it and/or
-	modify it under the terms of the GNU Lesser General Public
-	License as published by the Free Software Foundation; either
-	version 2.1 of the License, or (at your option) any later version.
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
 
-	This library is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-	Lesser General Public License for more details.
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public
-	License along with this library; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
@@ -327,24 +327,24 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, i
 
 	auto create = [defaultValue, name]() -> AbstractPropertyType*
 	{
-			QVariant var = defaultValue.toVariant();
+		QVariant var = defaultValue.toVariant();
 
-			if(!var.isValid())
-				return nullptr;
-
-			if(var.type() == QVariant::UInt)
-				return new BasicPropertyType<uint>(name.toStdString(), var.toUInt());
-			else if(var.type() == QVariant::Double)
-				return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
-			else if(var.type() == QVariant::Bool)
-				return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
-			else if(var.type() == QVariant::Int)
-				return new BasicPropertyType<int>(name.toStdString(), var.toInt());
-			else if(var.type() == QVariant::String)
-				return new StringPropertyType(name.toStdString(), var.toString().toStdString());
-
-
+		if(!var.isValid())
 			return nullptr;
+
+		if(var.type() == QVariant::UInt)
+			return new BasicPropertyType<uint>(name.toStdString(), var.toUInt());
+		else if(var.type() == QVariant::Double)
+			return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
+		else if(var.type() == QVariant::Bool)
+			return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
+		else if(var.type() == QVariant::Int)
+			return new BasicPropertyType<int>(name.toStdString(), var.toInt());
+		else if(var.type() == QVariant::String)
+			return new StringPropertyType(name.toStdString(), var.toString().toStdString());
+
+
+		return nullptr;
 	};
 
 	addPropertySupport(zone, create);
@@ -383,6 +383,10 @@ void Property::setValue(QVariant v)
 		if(reply->success)
 		{
 			propertyChanged(reply->value);
+		}
+		else
+		{
+			DebugOut(DebugOut::Warning) << "Error, trying to set value: " << reply->error << endl;
 		}
 		delete reply;
 	};

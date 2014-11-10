@@ -8,11 +8,24 @@
 
 vehicle = navigator.vehicle;
 
-debug('vehicle.vehicleSpeed ' + vehicle.vehicleSpeed);
+function get(objName) {
 
+  vehicle[objName].get().then(function(data) {
+   try {
+      debug("get " + objName + ": " + JSON.stringify(data));
+    } catch(error) {
+      debug("error " + error.message);
+   }
+  },
+  function(error) {
+    debug("There was an error");
+  });
+}
+
+debug("testing zones...");
 var zone = new Zone;
 
-console.log('Driver zone: ' + zone.driver.value);
+debug('Driver zone: ' + zone.driver.value);
 
 var zone1 = new Zone(["Front", "Left"]);
 var zone2 = new Zone(["Left", "Front"]);
@@ -24,19 +37,21 @@ debug("zone1 == zone3 ? " + zone1.equals(zone3));
 debug("zone1 == zone1 ? " + zone1.equals(zone1));
 debug("zone1 == empty zone ? " + zone1.equals(zone4));
 
+debug("testing get()");
 vehicle.vehicleSpeed.get().then(function(vehicleSpeed) {
   try {
     console.log("vehicle speed " + JSON.stringify(vehicleSpeed));
     debug("Vehicle speed: " + vehicleSpeed.speed);
   } catch(error) {
-    console.log("error " + error.message);
+    debug("error " + error.message);
  }
 },
 function(error) {
   debug("There was an error");
 });
 
-//test subscribe:
+debug("testing subscribe()");
+
 var subReplies = 0;
 var handle = vehicle.vehicleSpeed.subscribe(function(data) {
   console.log("got subscribe callback");
@@ -49,9 +64,66 @@ var handle = vehicle.vehicleSpeed.subscribe(function(data) {
   }
 });
 
-//test errors:
+debug("test invalid zone error");
 vehicle.vehicleSpeed.get("invalidzone").then(function() { },
   function(error) { debug("Invalid zone: " + error.message); });
+
+///test set()
+debug("testing set()");
+
+vehicle.lightStatus.set({"fog" : true}).then(function() {
+   debug("set success!");
+}, function(error) {
+   debug("set fail! " + error.message);
+});
+
+debug("testing running status api's");
+debug("vehicle.vehicleSpeed " + vehicle.vehicleSpeed);
+debug("vehicle.engineSpeed " + vehicle.engineSpeed);
+debug("vehicle.powertrainTorque " + vehicle.powertrainTorque);
+debug("vehicle.acceleratorPedalPosition " + vehicle.acceleratorPedalPosition);
+debug("vehicle.throttlePosition " + vehicle.throttlePosition);
+debug("vehicle.transmission " + vehicle.transmission);
+debug("vehicle.cruiseControlStatus " + vehicle.cruiseControlStatus);
+debug("vehicle.lightStatus " + vehicle.lightStatus);
+debug("vehicle.horn " + vehicle.horn);
+debug("vehicle.chime " + vehicle.chime);
+debug("vehicle.fuel " + vehicle.fuel);
+debug("vehicle.engineOil " + vehicle.engineOil);
+debug("vehicle.acceleration " + vehicle.acceleration);
+debug("vehicle.engineCoolant " + vehicle.engineCoolant);
+debug("vehicle.steeringWheel " + vehicle.steeringWheel);
+debug("vehicle.wheelTick " + vehicle.wheelTick);
+debug("vehicle.ignitionTime " + vehicle.ignitionTime);
+debug("vehicle.yawRate " + vehicle.yawRate);
+debug("vehicle.brakeOperation " + vehicle.brakeOperation);
+debug("vehicle.buttonEvent " + vehicle.buttonEvent);
+debug("vehicle.nightMode " + vehicle.nightMode);
+debug("vehicle.drivingMode " + vehicle.drivingMode);
+
+debug("getting data from running status attributes");
+
+get("vehicleSpeed");
+get("engineSpeed");
+get("powertrainTorque");
+get("acceleratorPedalPosition");
+get("throttlePosition");
+get("transmission");
+get("cruiseControlStatus");
+get("lightStatus");
+get("horn");
+get("chime");
+get("fuel");
+get("engineOil");
+get("acceleration");
+get("engineCoolant");
+get("steeringWheel");
+get("wheelTick");
+get("ignitionTime");
+get("yawRate");
+get("brakeOperation");
+get("nightMode");
+get("drivingMode");
 
 </script>
 <script src="js/js-test-post.js"></script>
