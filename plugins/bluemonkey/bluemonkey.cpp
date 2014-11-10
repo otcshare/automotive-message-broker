@@ -319,11 +319,10 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 
 void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
 {
+	QVariant var = defaultValue.toVariant();
 
-	auto create = [defaultValue, name]() -> AbstractPropertyType*
+	auto create = [defaultValue, name, var]() -> AbstractPropertyType*
 	{
-			QVariant var = defaultValue.toVariant();
-
 			if(!var.isValid())
 				return nullptr;
 
@@ -338,13 +337,18 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
 			else if(var.type() == QVariant::String)
 				return new StringPropertyType(name.toStdString(), var.toString().toStdString());
 
-
 			return nullptr;
 	};
 
 	addPropertySupport(Zone::None, create);
 
+	AsyncSetPropertyRequest request;
+	request.property = name.toStdString();
+	request.zoneFilter = zone;
+	request.value = VehicleProperty::getPropertyTypeForPropertyNameValue(name.toStdString(), var.toString().toStdString());
+
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
+	routingEngine->setProperty(request);
 }
 
 
