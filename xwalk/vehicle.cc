@@ -292,6 +292,18 @@ Vehicle::Vehicle(common::Instance* instance)
 	  instance_(instance) {
 	CallbackInfo::instance = instance_;
 	thread_.detach();
+
+	GError* error = nullptr;
+
+	dbus_connection_ = amb::make_super(g_bus_get_sync(G_BUS_TYPE_SYSTEM,
+													  nullptr,
+													  &error));
+
+	auto errorPtr = amb::make_super(error);
+	if (errorPtr) {
+		DebugOut() << "Error getting bus: "
+				   << errorPtr->message << std::endl;
+	}
 }
 
 Vehicle::~Vehicle() {

@@ -18,7 +18,7 @@ function get(objName) {
    }
   },
   function(error) {
-    debug("There was an error");
+    debug("There was an error: " + error.message);
   });
 }
 

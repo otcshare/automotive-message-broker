@@ -195,6 +195,7 @@ function handlePromiseReply(msg) {
         error.message = 'An unknown error occured';
         break;
       default:
+        error.message = 'Unknown';
         break;
     }
 
