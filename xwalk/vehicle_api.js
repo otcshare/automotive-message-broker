@@ -201,6 +201,9 @@ function handlePromiseReply(msg) {
 
     cbobj.reject(error);
   } else {
+    if (msg.value.zone) {
+      msg.value.zone = new Zone(msg.value.zone);
+    }
     cbobj.resolve(msg.value);
   }
 

@@ -18,7 +18,7 @@ function get(objName) {
    }
   },
   function(error) {
-    debug("There was an error: " + error.message);
+    debug("error getting " + objName ": " + error.message);
   });
 }
 
@@ -36,19 +36,6 @@ debug("zone1 == zone2 ? " + zone1.equals(zone2));
 debug("zone1 == zone3 ? " + zone1.equals(zone3));
 debug("zone1 == zone1 ? " + zone1.equals(zone1));
 debug("zone1 == empty zone ? " + zone1.equals(zone4));
-
-debug("testing get()");
-vehicle.vehicleSpeed.get().then(function(vehicleSpeed) {
-  try {
-    console.log("vehicle speed " + JSON.stringify(vehicleSpeed));
-    debug("Vehicle speed: " + vehicleSpeed.speed);
-  } catch(error) {
-    debug("error " + error.message);
- }
-},
-function(error) {
-  debug("There was an error");
-});
 
 debug("testing subscribe()");
 
