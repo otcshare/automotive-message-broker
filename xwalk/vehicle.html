@@ -18,7 +18,7 @@ function get(objName) {
    }
   },
   function(error) {
-    debug("error getting " + objName ": " + error.message);
+    debug("error getting " + objName + ": " + error.message);
   });
 }
 
@@ -58,7 +58,7 @@ vehicle.vehicleSpeed.get("invalidzone").then(function() { },
 ///test set()
 debug("testing set()");
 
-vehicle.lightStatus.set({"fog" : true}).then(function() {
+vehicle.lightStatus.set({"fog" : false}).then(function() {
    debug("set success!");
 }, function(error) {
    debug("set fail! " + error.message);

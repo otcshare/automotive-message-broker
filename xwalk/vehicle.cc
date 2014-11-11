@@ -629,6 +629,7 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 
 	if (proxy_error_ptr) {
 		DebugOut(DebugOut::Error) << "Error creating property proxy for " << object_path << std::endl;
+		PostError(&callback, vehicle_error_unknown);
 		return;
 	}
 
@@ -674,6 +675,7 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 		if (!v) {
 			DebugOut(DebugOut::Error) << "Error converting value to GVariant" << endl;
 			PostError(&callback, vehicle_error_unknown);
+			return;
 		}
 
 		GError* set_error = nullptr;
@@ -695,6 +697,7 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 			{
 				DebugOut(DebugOut::Error) << "permission denied" << endl;
 				PostError(&callback, vehicle_error_permission_denied);
+				return;
 			}
 			PostError(&callback, vehicle_error_unknown);
 			return;

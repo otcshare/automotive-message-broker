@@ -48,6 +48,9 @@ bluemonkey.createCustomProperty("AccelerationZ", 10);
 bluemonkey.createCustomProperty("SteeringWheelAngleW3C", 10);
 bluemonkey.createCustomProperty("WheelTick", 1000);
 
+bluemonkey.createCustomProperty("EngineCoolantLevel", 100);
+bluemonkey.createCustomProperty("EngineCoolantTemperature", 60);
+
 bluemonkey.createCustomProperty("IgnitionTimeOn", 5000);
 bluemonkey.createCustomProperty("IgnitionTimeOff", 5000);
 
