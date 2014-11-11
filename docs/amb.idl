@@ -1341,7 +1341,7 @@ interface org.automotive.BrakeOperation extends VehiclePropertyType {
    attribute Boolean BrakePedalDepressed readonly
 }
 
-enum VehicleButton {
+enum Button {
     home = "home",
     back = "back",
     search = "search",
@@ -1359,23 +1359,51 @@ enum VehicleButton {
     down = "down"
 }
 
-enum PressType {
+enum ButtonEventType {
     press = "press",
     long_press = "long_press",
     release = "release"
 };
 
+interface VehicleButton {
+    /*!
+    * \brief must return the button corresponding to the event.
+    */
+    attribute Button button readonly;
+
+    /*!
+    * \brief must return the type of event
+    */
+    attribute ButtonEventType state readonly;
+}
+
 interface org.automotive.ButtonEvent extends VehiclePropertyType {
 
   /*!
-   * \brief must return the button events tha occured. This supports multiple simultanious button events.
+   * \brief must return the button events that occured. This supports multiple simultanious button events.
    */
-   attribute array Button of VehicleButton readonly
+   attribute array Button of VehicleButton readonly;
+}
+
+interface org.automotive.TransmissionOil extends VehiclePropertyType {
 
   /*!
-   * \brief must return the type of event
+   * \brief must return current temperature of the transmission oil(Unit: celsius).
    */
-   attribute PressType State readonly
+   attribute Int8 Temperature readonly;
+
+  /*!
+   * \brief must return transmission oil wear (Unit: percentage, 0: no wear, 100: completely worn).
+   */
+   attribute UInt8 Wear readonly
+}
+
+interface org.automotive.TransmissionClutch extends VehiclePropertyType {
+
+  /*!
+   * \brief must return transmission clutch wear (Unit: percentage, 0: no wear, 100: completely worn).
+   */
+   attribute UInt8 Wear readonly
 }
 
 }

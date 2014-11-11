@@ -73,7 +73,6 @@ class Vehicle {
 
  private:
   std::string FindProperty(const std::string& object_name, int zone, string &error_str);
-  GDBusProxy* GetAutomotiveManager();
 
   static void SetupMainloop(void* data);
   GMainLoop* main_loop_;

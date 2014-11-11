@@ -44,9 +44,9 @@ public:
 			if(str.str() != "{")
 				str << ", ";
 
-			 auto t = *itr;
+			auto t = *itr;
 
-			 str <<"'"<< t.first.toString() <<"':'"<<t.second.toString()<<"'";
+			str <<"'"<< t.first.toString() <<"':'"<<t.second.toString()<<"'";
 		}
 
 		str << "}";
@@ -81,7 +81,7 @@ public:
 		{
 			T one("", key);
 			N two("", std::string(json_object_get_string(val)));
-			append(one,two);
+			append(one, two);
 
 		}
 		json_object_put(rootobject);
@@ -107,7 +107,6 @@ public:
 	void fromVariant(GVariant* variant)
 	{
 		clear();
-		/// TODO: fill this in
 		gsize dictsize = g_variant_n_children(variant);
 		for (int i=0;i<dictsize;i++)
 		{
@@ -125,7 +124,7 @@ public:
 				appendPriv(t,n);
 			}
 		}
-		
+
 	}
 
 	void setMap(std::map<T, N> m)

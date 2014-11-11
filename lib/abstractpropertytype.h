@@ -294,11 +294,27 @@ template <>
 class GVS<uint8_t>
 {
 public:
+	static const char* signature() { return "y"; }
+
+	static uint8_t value(GVariant* v)
+	{
+		return g_variant_get_byte(v);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
+};
+
+template <>
+class GVS<int8_t>
+{
+public:
 	static const char* signature() { return "q"; }
 
-	static uint16_t value(GVariant* v)
+	static int8_t value(GVariant* v)
 	{
-		return g_variant_get_uint16(v);
+		return g_variant_get_int16(v);
 	}
 	static std::string stringize(std::string v)
 	{
@@ -626,6 +642,14 @@ private:
 class StringPropertyType: public AbstractPropertyType
 {
 public:
+
+
+	StringPropertyType()
+		:AbstractPropertyType("")
+	{
+		setValue(std::string());
+	}
+
 	StringPropertyType(std::string propertyName)
 		:AbstractPropertyType(propertyName)
 	{
@@ -666,6 +690,12 @@ public:
 		setValue(std::string(other));
 		return *this;
 	}
+
+	bool operator < (const StringPropertyType& other) const
+	{
+		return value<std::string>() < other.value<std::string>();
+	}
+
 
 	void fromString(std::string val)
 	{
@@ -735,8 +765,9 @@ public:
 	}
 
 	/** append - appends a property to the list
-	 * @arg property - property to be appended.  Property will be copied and owned by ListPropertyType.
-	 * You are responsible for freeing property after append is called.
+	 * @arg property - property to be appended.
+	 * ListPropertyType makes a copy of the property.
+	 * You are responsible for freeing property.
 	 **/
 	void append(AbstractPropertyType* property)
 	{
@@ -842,7 +873,7 @@ public:
 		{
 			GVariant *childvariant = g_variant_get_child_value(v,i);
 			GVariant *innervariant = g_variant_get_variant(childvariant);
-			T *t = new T();
+			T *t = new T("");
 			t->fromVariant(innervariant);
 			appendPriv(t);
 		}

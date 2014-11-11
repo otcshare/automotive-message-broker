@@ -481,7 +481,15 @@ public:
 	PROPERTYTYPE(ButtonEvent, ButtonEventType, BasicPropertyType<ButtonEvents::ButtonEventType>, ButtonEvents::ButtonEventType)
 
 	static const Property ButtonEventW3C;
-	PROPERTYTYPE(ButtonEventW3C, ButtonEventW3CType, StringPropertyType, std::string)
+	class ButtonEventW3CType: public MapPropertyType<StringPropertyType, StringPropertyType>
+	{
+	public:
+		ButtonEventW3CType() : MapPropertyType(ButtonEventW3C) {}
+	};
+
+
+
+
 
 	/**< Air intake temperature in degrees celcius */
 	static const Property AirIntakeTemperature;
@@ -696,6 +704,15 @@ public:
 	static const Property TransmissionFluidLevel;
 	PROPERTYTYPEBASIC(TransmissionFluidLevel, uint16_t)
 	//typedef BasicPropertyType<uint16_t> TransmissionFluidLevelType;
+
+	static const Property TransmissionOilWear;
+	PROPERTYTYPEBASIC(TransmissionOilWear, uint8_t)
+
+	static const Property TransmissionOilTemperature;
+	PROPERTYTYPEBASIC(TransmissionOilTemperature, int8_t)
+
+	static const Property TransmissionClutchWear;
+	PROPERTYTYPEBASIC(TransmissionClutchWear, uint8_t)
 
 	/**< Brake Fluid Level 0-100%.
 	 **/

@@ -220,6 +220,9 @@ const VehicleProperty::Property VehicleProperty::IgnitionTimeOn = "IgnitionTimeO
 const VehicleProperty::Property VehicleProperty::IgnitionTimeOff = "IgnitionTimeOff";
 const VehicleProperty::Property VehicleProperty::YawRate = "YawRate";
 const VehicleProperty::Property VehicleProperty::ButtonEventW3C = "ButtonEventW3C";
+const VehicleProperty::Property VehicleProperty::TransmissionOilWear = "TransmissionOilWear";
+const VehicleProperty::Property VehicleProperty::TransmissionOilTemperature = "TransmissionOilTemperature";
+const VehicleProperty::Property VehicleProperty::TransmissionClutchWear = "TransmissionClutchWear";
 
 PropertyList VehicleProperty::mCapabilities;
 PropertyList VehicleProperty::mCustomProperties;
@@ -386,7 +389,16 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(IgnitionTimeOff, 0);
 	REGISTERPROPERTY(IgnitionTimeOn, 0);
 	REGISTERPROPERTY(YawRate, 0);
-	REGISTERPROPERTY(ButtonEventW3C, "");
+	registerPropertyPriv(ButtonEventW3C, [](){
+		ButtonEventW3CType* t = new ButtonEventW3CType();
+		StringPropertyType k, v;
+		t->append(k, v);
+		return t;
+	});
+
+	REGISTERPROPERTY(TransmissionOilWear, 0);
+	REGISTERPROPERTY(TransmissionOilTemperature, 0);
+	REGISTERPROPERTY(TransmissionClutchWear, 0);
 }
 
 void VehicleProperty::factory()
