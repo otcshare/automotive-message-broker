@@ -289,7 +289,8 @@ static void SignalCallback(GDBusConnection* connection,
 Vehicle::Vehicle(common::Instance* instance)
 	: main_loop_(g_main_loop_new(0, FALSE)),
 	  thread_(Vehicle::SetupMainloop, this),
-	  instance_(instance) {
+	  instance_(instance),
+	  manager_proxy_(nullptr){
 	CallbackInfo::instance = instance_;
 	thread_.detach();
 
@@ -426,32 +427,33 @@ std::string Vehicle::FindProperty(const std::string& object_name, int zone, std:
 	GDBusProxy* manager_proxy = GetAutomotiveManager();
 
 	if (!manager_proxy) {
-	  return "";
+		DebugOut(DebugOut::Error) << "Manager proxy is invalid" << endl;
+		return "";
 	}
 
 	GError* error(nullptr);
 
 	auto object_path_variant = amb::make_super(
-		g_dbus_proxy_call_sync(manager_proxy,
-							   "FindObjectForZone",
-							   g_variant_new("(si)",
-											 object_name.c_str(),
-											 zone),
-							   G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error));
+				g_dbus_proxy_call_sync(manager_proxy,
+									   "FindObjectForZone",
+									   g_variant_new("(si)",
+													 object_name.c_str(),
+													 zone),
+									   G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error));
 
 	auto error_ptr = amb::make_super(error);
 
 	if (error_ptr) {
-	  DebugOut() << "error calling FindObjectForZone: "
-				 << error_ptr->message << endl;
+		DebugOut() << "error calling FindObjectForZone: "
+				   << error_ptr->message << endl;
 
-	  DebugOut() << "Could not find object in zone: " << zone << endl;
-	  return "";
+		DebugOut() << "Could not find object in zone: " << zone << endl;
+		return "";
 	}
 
 	if (!object_path_variant) {
-	  DebugOut() << "Could not find object in zone: "  << zone << endl;
-	  return "";
+		DebugOut() << "Could not find object in zone: "  << zone << endl;
+		return "";
 	}
 
 	gchar* obj_path = nullptr;
@@ -467,22 +469,22 @@ std::string Vehicle::FindProperty(const std::string& object_name, int zone, std:
 
 GDBusProxy* Vehicle::GetAutomotiveManager() {
 	if (manager_proxy_)
-	  return manager_proxy_.get();
+		return manager_proxy_.get();
 
 	GError* error = nullptr;
 	manager_proxy_ = amb::make_super(g_dbus_proxy_new_sync(dbus_connection_.get(),
-										  G_DBUS_PROXY_FLAGS_NONE, NULL,
-										  amb_service,
-										  "/",
-										  "org.automotive.Manager",
-										  NULL,
-										  &error));
+														   G_DBUS_PROXY_FLAGS_NONE, NULL,
+														   amb_service,
+														   "/",
+														   "org.automotive.Manager",
+														   NULL,
+														   &error));
 
 	auto error_ptr = amb::make_super(error);
 
 	if (error_ptr) {
-	  DebugOut() << "error calling GetAutomotiveManager: "
-				 << error_ptr->message << endl;
+		DebugOut() << "error calling GetAutomotiveManager: "
+				   << error_ptr->message << endl;
 	}
 
 	return manager_proxy_.get();
@@ -519,14 +521,14 @@ void Vehicle::Subscribe(const std::string& object_name, Zone::Type zone) {
 		GError* proxy_error = nullptr;
 
 		auto properties_proxy =
-			amb::make_super(g_dbus_proxy_new_sync(dbus_connection_.get(),
-											  G_DBUS_PROXY_FLAGS_NONE,
-											  NULL,
-											  amb_service,
-											  object_path.c_str(),
-											  prop_iface,
-											  NULL,
-											  &proxy_error));
+				amb::make_super(g_dbus_proxy_new_sync(dbus_connection_.get(),
+													  G_DBUS_PROXY_FLAGS_NONE,
+													  NULL,
+													  amb_service,
+													  object_path.c_str(),
+													  prop_iface,
+													  NULL,
+													  &proxy_error));
 
 		auto proxy_error_ptr = amb::make_super(proxy_error);
 
