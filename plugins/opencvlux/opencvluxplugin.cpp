@@ -757,19 +757,30 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 			eyeCascade->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
 		}
 
-		if(eyes.size())
-		{
-			hasEyes = true;
-			DebugOut() << "Number of eyes: " << eyes.size() << endl;
-		}
-
 		for( size_t j = 0; j < eyes.size(); j++ )
 		{
 			cv::Point center( faces[i].x + eyes[j].x + eyes[j].width*0.5, faces[i].y + eyes[j].y + eyes[j].height*0.5 );
 			int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
 			cv::circle( frame, center, radius, cv::Scalar( 255, 0, 0 ), 4, 8, 0 );
 		}
+
+		if(eyes.size())
+		{
+			hasEyes = true;
+			DebugOut() << "Number of eyes: " << eyes.size() << endl;
+			if(!driverDrowsiness->basicValue() && shared->loggingOn)
+			{
+				cv::namedWindow("Eyes", CV_WINDOW_AUTOSIZE);
+				cv::imshow("Eyes", frame);
+			}
+
+			driverDrowsiness->setValue(true);
+		}
+		else
+		{
+			driverDrowsiness->setValue(false);
+		}
 	}
 
-	routingEngine->updateProperty(driverDrowsiness.get(),this->uuid());
+	routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
 }
