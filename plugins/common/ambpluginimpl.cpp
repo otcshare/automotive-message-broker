@@ -154,7 +154,8 @@ std::shared_ptr<AbstractPropertyType> AmbPluginImpl::addPropertySupport(Zone::Ty
 	{
 		registeredType = VehicleProperty::registerProperty(name, typeFactory);
 	}
-	if(!registeredType){ // Property type wasn't registered by us. Is it predefined in AMB API or some other source plug-in has already registered it ???
+	if(!registeredType)
+	{ // Property type wasn't registered by us. Is it predefined in AMB API or some other source plug-in has already registered it ???
 		std::shared_ptr<AbstractPropertyType> registeredPropertyType(VehicleProperty::getPropertyTypeForPropertyNameValue(name));
 		if(!registeredPropertyType)
 			return nullptr;

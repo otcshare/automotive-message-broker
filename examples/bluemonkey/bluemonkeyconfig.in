@@ -12,6 +12,9 @@
 
     {
       "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
+    },
+    {
+      "path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
     }
   ]
 }

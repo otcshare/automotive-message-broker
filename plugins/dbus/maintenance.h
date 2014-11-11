@@ -131,4 +131,25 @@ public:
 	}
 };
 
+class TransmissionOil: public DBusSink
+{
+public:
+	TransmissionOil(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("TransmissionOil", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::TransmissionOilWear, "Wear", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionOilTemperature, "Temperature", AbstractProperty::Read);
+	}
+};
+
+class TransmissionClutch: public DBusSink
+{
+public:
+	TransmissionClutch(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("TransmissionClutch", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::TransmissionClutchWear, "Wear", AbstractProperty::Read);
+	}
+};
+
 #endif

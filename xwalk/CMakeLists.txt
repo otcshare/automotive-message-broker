@@ -18,6 +18,11 @@ add_dependencies(vehicle_extension js3cc)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/vehicle_api.js ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_api.js @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/vehicle.html ${CMAKE_CURRENT_SOURCE_DIR}/vehicle.html @ONLY)
 
+set(html_files ${CMAKE_CURRENT_SOURCE_DIR}/vehicle.html)
+set(js_files ${CMAKE_CURRENT_SOURCE_DIR}/js/js-test-pre.js ${CMAKE_CURRENT_SOURCE_DIR}/js/js-test-post.js)
+
 install(TARGETS vehicle_extension  LIBRARY DESTINATION "${LIB_INSTALL_DIR}/${XWALK_EXTENSION_PATH}")
-install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/vehicle.html DESTINATION /usr/share/automotive-message-broker/xwalk/examples)
+install(FILES ${html_files} DESTINATION /usr/share/automotive-message-broker/xwalk/examples)
+install(FILES ${js_files} DESTINATION /usr/share/automotive-message-broker/xwalk/examples/js)
 endif(xwalk_vehicle_extension)
+

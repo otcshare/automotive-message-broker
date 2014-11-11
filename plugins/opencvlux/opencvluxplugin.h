@@ -107,6 +107,8 @@ private:
 	std::unique_ptr<cv::CascadeClassifier> eyeCascade;
 
 	std::unique_ptr<DriverDrowsinessType> driverDrowsiness;
+
+	std::unique_ptr<BasicPropertyType<bool>> openCl;
 };
 
 static int grabImage(void *data);

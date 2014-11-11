@@ -195,11 +195,15 @@ function handlePromiseReply(msg) {
         error.message = 'An unknown error occured';
         break;
       default:
+        error.message = 'Unknown';
         break;
     }
 
     cbobj.reject(error);
   } else {
+    if (msg.value.zone) {
+      msg.value.zone = new Zone(msg.value.zone);
+    }
     cbobj.resolve(msg.value);
   }
 
@@ -247,18 +251,20 @@ _defineVehicleSignalProperty(exports, 'ignitionTime');
 _defineVehicleSignalProperty(exports, 'yawRate');
 _defineVehicleSignalProperty(exports, 'brakeOperation');
 _defineVehicleSignalProperty(exports, 'buttonEvent');
-
 _defineVehicleSignalProperty(exports, 'nightMode');
 _defineVehicleSignalProperty(exports, 'drivingMode');
-_defineVehicleSignalProperty(exports, 'brakeOperation');
-_defineVehicleSignalProperty(exports, 'tire');
-_defineVehicleSignalProperty(exports, 'door');
-_defineVehicleSignalProperty(exports, 'defrost');
-_defineVehicleSignalProperty(exports, 'climateControl');
+
+/// Maintenance attributes:
+_defineVehicleSignalProperty(exports, 'odometer');
+_defineVehicleSignalProperty(exports, 'transmissionOil');
+_defineVehicleSignalProperty(exports, 'transmissionClutch');
 
 _defineVehicleSignalProperty(exports, 'batteryStatus');
+_defineVehicleSignalProperty(exports, 'tire');
 
+
+_defineVehicleSignalProperty(exports, 'door');
 _defineVehicleSignalProperty(exports, 'temperature');
-_defineVehicleSignalProperty(exports, 'odometer');
-
+_defineVehicleSignalProperty(exports, 'climateControl');
+_defineVehicleSignalProperty(exports, 'defrost');
 
