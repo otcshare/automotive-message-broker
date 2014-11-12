@@ -163,13 +163,13 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 	for(auto p : platforms)
 	{
-		DebugOut(1)<<"platform: "<<p->platformName<<" vendor: "<<p->platformVendor<<endl;
+		DebugOut(0)<<"platform: "<<p->platformName<<" vendor: "<<p->platformVendor<<endl;
 	}
 
 	cv::ocl::DevicesInfo info;
 	cv::ocl::getOpenCLDevices(info, cv::ocl::CVCL_DEVICE_TYPE_ALL);
 
-	DebugOut(1)<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
+	DebugOut(0)<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
 
 	if(!info.size())
 	{
@@ -446,7 +446,7 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 		cv::Scalar stdDev;
 		cv::ocl::oclMat src(qImg), gray;
 		cv::ocl::cvtColor(src, gray, CV_BGR2GRAY);
-		cv::ocl::meanStdDev(src, avgPixelIntensity, stdDev);
+		cv::ocl::meanStdDev(gray, avgPixelIntensity, stdDev);
 #endif
 	}
 	else if(shared->useCuda)
@@ -775,12 +775,15 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 			}
 
 			driverDrowsiness->setValue(true);
+			routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
 		}
 		else
 		{
+			DebugOut() << "No eyes!!!" << endl;
 			driverDrowsiness->setValue(false);
+			routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
 		}
 	}
 
-	routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
+
 }
