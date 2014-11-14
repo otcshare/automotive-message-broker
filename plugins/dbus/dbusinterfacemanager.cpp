@@ -224,6 +224,10 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 	exportProperty<WheelTick>(iface->re, connection);
 	exportProperty<IgnitionTime>(iface->re, connection);
 	exportProperty<YawRate>(iface->re, connection);
+	exportProperty<TransmissionClutch>(iface->re, connection);
+	exportProperty<TransmissionOil>(iface->re, connection);
+	exportProperty<BrakeMaintenance>(iface->re, connection);
+	exportProperty<WasherFluid>(iface->re, connection);
 
 	iface->registerCustomTypes();
 }

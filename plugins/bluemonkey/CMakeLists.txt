@@ -40,6 +40,7 @@ set_target_properties(bluemonkeyplugin PROPERTIES PREFIX "")
 target_link_libraries(bluemonkeyplugin dl amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES} ${communi_LIBRARIES} amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common)
 
 set(config_files ${CMAKE_CURRENT_SOURCE_DIR}/config.js)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.js ${CMAKE_CURRENT_BINARY_DIR}/config.js @ONLY)
 
 install(TARGETS bluemonkeyplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 install (FILES ${config_files} DESTINATION /etc/ambd/bluemonkey)
