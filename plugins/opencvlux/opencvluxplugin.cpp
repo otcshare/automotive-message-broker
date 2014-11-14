@@ -746,14 +746,15 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 		if(shared->useOpenCl)
 		{
 #ifdef OPENCL
-			cv::ocl::oclMat faceROI = gray2(faces[i]);
+			cv::ocl::oclMat faceROI(gray2(faces[i]));
+			DebugOut() << "oclMat.rows: " << faceROI.rows << endl;
 			cv::ocl::OclCascadeClassifier* ec = static_cast<cv::ocl::OclCascadeClassifier*>(eyeCascade.get());
 			ec->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
 #endif
 		}
 		else
 		{
-			cv::Mat faceROI = frameGray(faces[i]);
+			cv::Mat faceROI(frameGray(faces[i]));
 			eyeCascade->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
 		}
 

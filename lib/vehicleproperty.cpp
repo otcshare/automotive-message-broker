@@ -158,6 +158,7 @@ const VehicleProperty::Property VehicleProperty::DistanceSinceStart = "DistanceS
 const VehicleProperty::Property VehicleProperty::TransmissionFluidLevel = "TransmissionFluidLevel";
 const VehicleProperty::Property VehicleProperty::BrakeFluidLevel = "BrakeFluidLevel";
 const VehicleProperty::Property VehicleProperty::WasherFluidLevel = "WasherFluidLevel";
+const VehicleProperty::Property VehicleProperty::WasherFluidLevelLow = "WasherFluidLevelLow";
 const VehicleProperty::Property VehicleProperty::SecurityAlertStatus = "SecurityAlertStatus";
 const VehicleProperty::Property VehicleProperty::ParkingBrakeStatus = "ParkingBrakeStatus";
 const VehicleProperty::Property VehicleProperty::ParkingLightStatus = "ParkingLightStatus";
@@ -223,6 +224,9 @@ const VehicleProperty::Property VehicleProperty::ButtonEventW3C = "ButtonEventW3
 const VehicleProperty::Property VehicleProperty::TransmissionOilWear = "TransmissionOilWear";
 const VehicleProperty::Property VehicleProperty::TransmissionOilTemperature = "TransmissionOilTemperature";
 const VehicleProperty::Property VehicleProperty::TransmissionClutchWear = "TransmissionClutchWear";
+const VehicleProperty::Property VehicleProperty::BrakePadWear = "BrakePadWear";
+const VehicleProperty::Property VehicleProperty::BrakeFluidLevelLow = "BrakeFluidLevelLow";
+const VehicleProperty::Property VehicleProperty::MalfunctionIndicatorOn = "MalfunctionIndicatorOn";
 
 PropertyList VehicleProperty::mCapabilities;
 PropertyList VehicleProperty::mCustomProperties;
@@ -323,6 +327,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(TransmissionFluidLevel, 0);
 	REGISTERPROPERTY(BrakeFluidLevel, 0);
 	REGISTERPROPERTY(WasherFluidLevel, 0);
+	REGISTERPROPERTY(WasherFluidLevelLow, false);
 	REGISTERPROPERTY(SecurityAlertStatus, Security::Idle);
 	REGISTERPROPERTY(ParkingBrakeStatus, false);
 	REGISTERPROPERTY(ParkingLightStatus, false);
@@ -399,6 +404,9 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(TransmissionOilWear, 0);
 	REGISTERPROPERTY(TransmissionOilTemperature, 0);
 	REGISTERPROPERTY(TransmissionClutchWear, 0);
+	REGISTERPROPERTY(BrakePadWear, 0);
+	REGISTERPROPERTY(BrakeFluidLevelLow, false);
+	REGISTERPROPERTY(MalfunctionIndicatorOn, false)
 }
 
 void VehicleProperty::factory()

@@ -1,3 +1,18 @@
+var Zone = {
+  None: 0,
+  Front: 1,
+  Middle : 1 << 1,
+  Right : 1 << 2,
+  Left : 1 << 3,
+  Rear : 1 << 4,
+  Center : 1 << 5,
+  LeftSide : 1 << 6,
+  RightSide : 1 << 7,
+  FrontSide : 1 << 8,
+  BackSide : 1 << 9
+};
+
+
 bluemonkey.createCustomProperty("VehicleSpeed", 10);
 bluemonkey.createCustomProperty("EngineSpeed", 5000);
 bluemonkey.createCustomProperty("PowertrainTorque", 324);
@@ -56,6 +71,16 @@ bluemonkey.createCustomProperty("IgnitionTimeOff", 5000);
 
 bluemonkey.createCustomProperty("YawRate", 128);
 bluemonkey.createCustomProperty("WheelBrake", false);
+
+bluemonkey.createCustomProperty("BrakesWorn", false, Zone.Front | Zone.Right)
+bluemonkey.createCustomProperty("BrakeFluidLevel", 100, Zone.Front | Zone.Right)
+bluemonkey.createCustomProperty("BrakeFluidLevelLow", false, Zone.Front | Zone.Right)
+bluemonkey.createCustomProperty("BrakePadWear", 0, Zone.Front | Zone.Right)
+
+bluemonkey.createCustomProperty("WasherFluidLevel", 100);
+bluemonkey.createCustomProperty("WasherFluidLevelLow", false);
+
+bluemonkey.createCustomProperty("MalfunctionIndicatorOn", false);
 
 var speedProperty = bluemonkey.subscribeTo("VehicleSpeed");
 

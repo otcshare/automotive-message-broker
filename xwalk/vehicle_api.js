@@ -258,7 +258,9 @@ _defineVehicleSignalProperty(exports, 'drivingMode');
 _defineVehicleSignalProperty(exports, 'odometer');
 _defineVehicleSignalProperty(exports, 'transmissionOil');
 _defineVehicleSignalProperty(exports, 'transmissionClutch');
-
+_defineVehicleSignalProperty(exports, 'brakeMaintenance');
+_defineVehicleSignalProperty(exports, 'washerFluid');
+_defineVehicleSignalProperty(exports, 'malfunctionIndicator');
 _defineVehicleSignalProperty(exports, 'batteryStatus');
 _defineVehicleSignalProperty(exports, 'tire');
 

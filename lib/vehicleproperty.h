@@ -703,7 +703,6 @@ public:
 	 **/
 	static const Property TransmissionFluidLevel;
 	PROPERTYTYPEBASIC(TransmissionFluidLevel, uint16_t)
-	//typedef BasicPropertyType<uint16_t> TransmissionFluidLevelType;
 
 	static const Property TransmissionOilWear;
 	PROPERTYTYPEBASIC(TransmissionOilWear, uint8_t)
@@ -717,14 +716,15 @@ public:
 	/**< Brake Fluid Level 0-100%.
 	 **/
 	static const Property BrakeFluidLevel;
-	PROPERTYTYPEBASIC(BrakeFluidLevel, uint16_t)
-	//typedef BasicPropertyType<uint16_t> BrakeFluidLevelType;
+	PROPERTYTYPEBASIC(BrakeFluidLevel, uint8_t)
 
 	/**< Washer Fluid Level 0-100%.
 	 **/
 	static const Property WasherFluidLevel;
-	PROPERTYTYPEBASIC(WasherFluidLevel, uint16_t)
-	//typedef BasicPropertyType<uint16_t> WasherFluidLevelType;
+	PROPERTYTYPEBASIC(WasherFluidLevel, uint8_t)
+
+	static const Property WasherFluidLevelLow;
+	PROPERTYTYPEBASIC(WasherFluidLevelLow, bool)
 
 	/**< Securty Alert Status
 	 * status of security alert
@@ -732,21 +732,18 @@ public:
 	 */
 	static const Property SecurityAlertStatus;
 	PROPERTYTYPEBASIC(SecurityAlertStatus, Security::Status)
-	//typedef BasicPropertyType<Security::Status> SecurityAlertStatusType;
 
 	/**< Parking Brake Status
 	 * status of parking break active (true) or inactive (false)
 	 */
 	static const Property ParkingBrakeStatus;
 	PROPERTYTYPEBASIC(ParkingBrakeStatus, bool)
-	//typedef BasicPropertyType<bool> ParkingBrakeStatusType;
 
 	/**< Parking Light Status
 	 * status of parking lights active (true) or inactive (false)
 	 */
 	static const Property ParkingLightStatus;
 	PROPERTYTYPEBASIC(ParkingLightStatus,bool)
-	//typedef BasicPropertyType<bool> ParkingLightStatusType;
 
 	/**< Hazard Lights Status
 	 * status of parking lights active (true) or inactive (false)
@@ -937,6 +934,18 @@ public:
 
 	static const Property YawRate;
 	PROPERTYTYPEBASIC(YawRate, int16_t)
+
+	static const Property BrakePadWear;
+	PROPERTYTYPEBASIC(BrakePadWear, uint8_t)
+
+	static const Property BrakeFluidLevelLow;
+	PROPERTYTYPEBASIC(BrakeFluidLevelLow, bool)
+
+	static const Property BrakesWorn;
+	PROPERTYTYPEBASIC(BrakesWorn, bool)
+
+	static const Property MalfunctionIndicatorOn;
+	PROPERTYTYPEBASIC(MalfunctionIndicatorOn, bool)
 
 	/** END PROPERTIES **/
 
