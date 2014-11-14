@@ -70,6 +70,7 @@ class Vehicle {
   void Subscribe(const std::string& property, Zone::Type zone);
   void Unsubscribe(const std::string& property, Zone::Type zone);
   void Set(const std::string& property, picojson::object value, Zone::Type zone, double ret_id);
+  void Supported(const std::string& property, double ret_id);
 
  private:
   std::string FindProperty(const std::string& object_name, int zone, string &error_str);

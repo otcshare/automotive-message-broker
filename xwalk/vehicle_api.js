@@ -7,6 +7,12 @@ var async_calls = {};
 
 var subscriptions = [];
 
+function makeCall(call, msg) {
+    async_calls[next_async_call_id] = call;
+    msg.asyncCallId = next_async_call_id;
+    ++next_async_call_id;
+}
+
 function vehicleInterfaceCommonContructor(obj, attname) {
   obj.attributeName = attname;
 
@@ -20,13 +26,22 @@ function vehicleInterfaceCommonContructor(obj, attname) {
     obj._zones = data;
   });
 
-  async_calls[next_async_call_id] = call;
-  msg.asyncCallId = next_async_call_id;
-  ++next_async_call_id;
+  makeCall(call, msg);
 
   extension.postMessage(JSON.stringify(msg));
 
+  var supportedMessage = {};
+  supportedMessage['method'] = 'supported';
+  supportedMessage['name'] = obj.attributeName;
+
+  var supportedCall = new AsyncCall(function(data) {
+        obj._supported = data;
+  });
+
+  makeCall(supportedCall, supportedMessage);
+
   Object.defineProperty(obj, 'zones', { get: function() { return obj._zones } });
+  Object.defineProperty(obj, 'supported', { get: function() { return obj._supported; } });
 }
 
 function VehicleInterface(attname) {

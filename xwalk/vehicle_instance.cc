@@ -85,6 +85,14 @@ void VehicleInstance::HandleMessage(const char* message) {
 		picojson::object value = v.get("value").get<picojson::object>();
 
 		vehicle_->Set(attribute, value, amb_zone, callback_id);
+	} else if (method == "supported") {
+		std::string attribute = v.get("name").to_str();
+		int callback_id = v.get("asyncCallId").get<double>();
+		Zone::Type amb_zone = 0;
+
+		std::transform(attribute.begin(), attribute.begin() + 1, attribute.begin(),
+					   ::toupper);
+		vehicle_->Supported(attribute, callback_id);
 	}
 }
 
