@@ -97,6 +97,24 @@ void VehicleInstance::HandleMessage(const char* message) {
 }
 
 void VehicleInstance::HandleSyncMessage(const char* message) {
+
+	picojson::value v;
+
+	std::string err;
+	picojson::parse(v, message, message + strlen(message), &err);
+	if (!err.empty()) {
+		return;
+	}
+
+	std::string method = v.get("method").to_str();
+	std::string objectName = v.get("name").to_str();
+	std::string attName = v.get("attName").to_str();
+
+	if(method == "availableForRetrieval")
+	{
+		SendSyncReply(boost::lexical_cast<string>(vehicle_->AvailableForRetrieval(objectName, attName)).c_str());
+	}
+
 }
 
 int VehicleInstance::ZoneToAMBZone(picojson::array zones) {

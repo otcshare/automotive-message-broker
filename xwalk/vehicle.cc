@@ -742,3 +742,29 @@ void Vehicle::Supported(const string& object_name, double ret_id)
 
 	PostReply(&callback, picojson::value(true));
 }
+
+bool Vehicle::AvailableForRetrieval(const string &objectName, const string &attName)
+{
+	GError* error = nullptr;
+
+	auto supportedVariant = amb::make_super(
+				g_dbus_proxy_call_sync(manager_proxy_.get(),
+									   "SupportsProperty",
+									   g_variant_new("(ss)", objectName.c_str(), attName.c_str()),
+									   G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error));
+
+	auto error_ptr = amb::make_super(error);
+
+	if (error_ptr) {
+		DebugOut(DebugOut::Error) << "error calling SupportsProperty: "
+				   << error_ptr->message << endl;
+
+		DebugOut() << "Could not find object for: "  << objectName << endl;
+		return false;
+	}
+
+	bool supported = false;
+	g_variant_get(supportedVariant.get(), "(b)", &supported);
+
+	return supported;
+}
