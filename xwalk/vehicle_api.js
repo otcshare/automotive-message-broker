@@ -8,9 +8,11 @@ var async_calls = {};
 var subscriptions = [];
 
 function makeCall(call, msg) {
-    async_calls[next_async_call_id] = call;
-    msg.asyncCallId = next_async_call_id;
-    ++next_async_call_id;
+  async_calls[next_async_call_id] = call;
+  msg.asyncCallId = next_async_call_id;
+  ++next_async_call_id;
+
+  extension.postMessage(JSON.stringify(msg));
 }
 
 function vehicleInterfaceCommonContructor(obj, attname) {
@@ -27,8 +29,6 @@ function vehicleInterfaceCommonContructor(obj, attname) {
   });
 
   makeCall(call, msg);
-
-  extension.postMessage(JSON.stringify(msg));
 
   var supportedMessage = {};
   supportedMessage['method'] = 'supported';
@@ -56,6 +56,24 @@ VehicleInterface.prototype.get = function(zone) {
 
   return createPromise(msg);
 };
+
+VehicleInterface.prototype.availableForRetrieval = function(attName) {
+  return isAvailable(this, attName);
+}
+
+VehicleInterface.prototype.availabilityChangedListener = function(callback) {
+  if(this.changedListenerCount) {
+    this.changedListenerCount++;
+  }
+  else {
+    this.changedListenerCount = 0;
+  }
+  return this.changedListenerCount;
+}
+
+VehicleInterface.prototype.removeAvailabilityChangedListener = function(handle) {
+
+}
 
 function VehicleSignalInterface(attname) {
   vehicleInterfaceCommonContructor(this, attname);
@@ -113,6 +131,30 @@ VehicleSignalInterface.prototype.set = function (value, zone) {
   msg['value'] = value;
 
   return createPromise(msg);
+}
+
+VehicleSignalInterface.prototype.availableForSubscription = function(attName) {
+  return isAvailable(this, attName);
+}
+
+VehicleSignalInterface.prototype.availableForSetting = function(attName) {
+  return isAvailable(this, attName);
+}
+
+function isAvailable(obj, attName)
+{
+  var msg = {};
+  msg["method"] = 'availableForRetrieval';
+  msg["name"] = obj.attributeName;
+  msg["attName"] = attName;
+
+  var reply = extension.postSyncMessage(JSON.stringify(msg));
+
+  if (reply === "true") {
+    return "available";
+  } else {
+    return "not_supported";
+  }
 }
 
 function AsyncCall(resolve, reject) {
