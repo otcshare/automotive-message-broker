@@ -31,6 +31,11 @@ static const gchar introspection_xml[] =
   "      <arg type='s' name='searchstring' direction='in'/>"
   "      <arg type='as' name='response' direction='out'/>"
   "    </method>"
+  "    <method name='SupportsProperty'>"
+  "      <arg type='s' name='objectName' direction='in'/>"
+  "      <arg type='s' name='propertyName' direction='in'/>"
+  "      <arg type='b' name='response' direction='out'/>"
+  "    </method>"
   "  </interface>"
   "</node>";
 
@@ -313,6 +318,28 @@ static void handleMethodCall(GDBusConnection       *connection,
 
 		g_dbus_method_invocation_return_dbus_error(invocation,"org.automotive.Manager.ObjectNotFound", "Property not found");
 	}
+	else if(method == "SupportsProperty")
+	{
+		gchar* objectName;
+		gchar* propertyToFindStr;
+
+		g_variant_get(parameters,"(ss)",&objectName, &propertyToFindStr);
+
+		auto objectNamePtr = amb::make_super(objectName);
+		auto propertyToFindStrPtr = amb::make_super(propertyToFindStr);
+
+		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(objectNamePtr.get());
+
+		for(auto i : interfaces)
+		{
+			if(i->hasPropertyDBus(propertyToFindStrPtr.get()))
+			{
+				g_dbus_method_invocation_return_value(invocation,g_variant_new("(b)", true));
+				return;
+			}
+		}
+		g_dbus_method_invocation_return_value(invocation,g_variant_new("(b)", false));
+	}
 	else
 	{
 		g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
@@ -320,12 +347,12 @@ static void handleMethodCall(GDBusConnection       *connection,
 }
 
 static void signalCallback( GDBusConnection *connection,
-																												 const gchar *sender_name,
-																												 const gchar *object_path,
-																												 const gchar *interface_name,
-																												 const gchar *signal_name,
-																												 GVariant *parameters,
-																												 gpointer user_data)
+							const gchar *sender_name,
+							const gchar *object_path,
+							const gchar *interface_name,
+							const gchar *signal_name,
+							GVariant *parameters,
+							gpointer user_data)
 {
 	AutomotiveManager* manager = static_cast<AutomotiveManager*>(user_data);
 
