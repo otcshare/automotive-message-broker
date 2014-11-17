@@ -5,16 +5,17 @@
       "name" : "OpenCV LUX",
       "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
       "threaded" : "false",
-      "cuda" : "false",
       "opencl" : "true",
       "fps" : "30",
       "pixelLowerBound" : "18",
       "pixelUpperBound" : "255",
       "device" : "0",
-      "codec" : "divx",
+      "codec" : "h264",
       "logging" : "true",
       "logfile" : "/tmp/video.avi",
-      "ddd" : "true"
+      "ddd" : "true",
+      "faceCascade" : "/usr/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml",
+      "eyeCascade" : "/usr/share/OpenCV/haarcascades/haarcascade_eye_tree_eyeglasses.xml"
     },
     {
       "path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so"
