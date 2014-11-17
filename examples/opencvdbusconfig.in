@@ -11,7 +11,7 @@
       "pixelUpperBound" : "255",
       "device" : "0",
       "codec" : "h264",
-      "logging" : "true",
+      "logging" : "false",
       "logfile" : "/tmp/video.avi",
       "ddd" : "true",
       "faceCascade" : "/usr/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml",
