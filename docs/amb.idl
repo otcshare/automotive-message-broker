@@ -139,6 +139,21 @@ interface org.automotive.Manager  {
     }
   }
 
+  /*!
+   * SupportsProperty
+   * \brief check whether a Property exists.
+   * \arg propertyName name of property of Object
+   * \returns true if Property exists
+   */
+  method SupportsProperty {
+    in {
+      String propertyName
+    }
+    out {
+      Boolean supported
+    }
+  }
+
 }
 
 /*! org.automotive.VehicleSpeed
