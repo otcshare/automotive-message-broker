@@ -97,7 +97,7 @@ void VehicleInstance::HandleMessage(const char* message) {
 }
 
 void VehicleInstance::HandleSyncMessage(const char* message) {
-
+	DebugOut() << "VehicleInstance Sync message received " << message << endl;
 	picojson::value v;
 
 	std::string err;
@@ -110,9 +110,17 @@ void VehicleInstance::HandleSyncMessage(const char* message) {
 	std::string objectName = v.get("name").to_str();
 	std::string attName = v.get("attName").to_str();
 
+	std::transform(objectName.begin(), objectName.begin() + 1, objectName.begin(),
+				   ::toupper);
+
+	std::transform(attName.begin(), attName.begin() + 1, attName.begin(),
+				   ::toupper);
+
 	if(method == "availableForRetrieval")
 	{
-		SendSyncReply(boost::lexical_cast<string>(vehicle_->AvailableForRetrieval(objectName, attName)).c_str());
+		std::string reply = vehicle_->AvailableForRetrieval(objectName, attName) ? "true" : "false";
+		DebugOut() << "VehicleInstance reply: " << reply << endl;
+		SendSyncReply(reply.c_str());
 	}
 
 }

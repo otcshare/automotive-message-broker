@@ -328,16 +328,20 @@ static void handleMethodCall(GDBusConnection       *connection,
 		auto objectNamePtr = amb::make_super(objectName);
 		auto propertyToFindStrPtr = amb::make_super(propertyToFindStr);
 
+		DebugOut(6) << "Checking " << objectNamePtr.get() << " for member: " << propertyToFindStrPtr.get() << endl;
+
 		std::list<AbstractDBusInterface*> interfaces = AbstractDBusInterface::getObjectsForProperty(objectNamePtr.get());
 
 		for(auto i : interfaces)
 		{
 			if(i->hasPropertyDBus(propertyToFindStrPtr.get()))
 			{
-				g_dbus_method_invocation_return_value(invocation,g_variant_new("(b)", true));
+				DebugOut(6) << "member " << propertyToFindStrPtr.get() << " of " << objectNamePtr.get() << " was found!!" << endl;
+				g_dbus_method_invocation_return_value(invocation, g_variant_new("(b)", true));
 				return;
 			}
 		}
+		DebugOut(6) << "member " << propertyToFindStrPtr.get() << " of " << objectNamePtr.get() << " was not found." << endl;
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(b)", false));
 	}
 	else

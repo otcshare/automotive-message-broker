@@ -23,6 +23,7 @@ function vehicleInterfaceCommonContructor(obj, attname) {
   msg['name'] = obj.attributeName;
 
   obj._zones = new Zone;
+  obj._supported = false;
 
   var call = new AsyncCall(function(data) {
     obj._zones = data;
@@ -148,7 +149,9 @@ function isAvailable(obj, attName)
   msg["name"] = obj.attributeName;
   msg["attName"] = attName;
 
-  var reply = extension.postSyncMessage(JSON.stringify(msg));
+  var reply = extension.internal.sendSyncMessage(JSON.stringify(msg));
+
+
 
   if (reply === "true") {
     return "available";
@@ -221,11 +224,15 @@ extension.setMessageListener(function(json) {
       case 'set':
         handlePromiseReply(msg);
         break;
+      case 'supported':
+        handleSupportedReply(msg)
+        break;
       default:
         break;
     }
   } catch (error) {
     console.log('Error in message listener: ' + error);
+    console.log("msg: " + JSON.stringify(msg))
   }
 });
 
@@ -258,7 +265,7 @@ function handlePromiseReply(msg) {
 
     cbobj.reject(error);
   } else {
-    if (msg.value.zone) {
+    if (msg.value && msg.value.zone) {
       msg.value.zone = new Zone(msg.value.zone);
     }
     cbobj.resolve(msg.value);
@@ -272,6 +279,13 @@ function handleZonesReply(msg) {
 
   if (cbobj)
     cbobj.resolve(new Zone(msg.value));
+}
+
+function handleSupportedReply(msg) {
+  var cbobj = async_calls[msg.asyncCallId];
+
+  if (cbobj)
+    cbobj.resolve(msg.value);
 }
 
 function handleSubscribeReply(msg) {

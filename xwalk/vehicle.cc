@@ -418,7 +418,7 @@ void Vehicle::GetZones(const std::string& object_name, double ret_id) {
 		auto value_ptr = amb::make_super(value);
 		int v = 0;
 
-		g_variant_get(value_ptr.get(), "(i)", &v);
+		g_variant_get(value_ptr.get(), "i", &v);
 		zones_array.push_back(v);
 	}
 
@@ -451,11 +451,13 @@ std::string Vehicle::FindProperty(const std::string& object_name, int zone, std:
 				   << error_ptr->message << endl;
 
 		DebugOut() << "Could not find object in zone: " << zone << endl;
+		error_str = vehicle_error_invalid_operation;
 		return "";
 	}
 
 	if (!object_path_variant) {
 		DebugOut() << "Could not find object in zone: "  << zone << endl;
+		error_str = vehicle_error_invalid_operation;
 		return "";
 	}
 

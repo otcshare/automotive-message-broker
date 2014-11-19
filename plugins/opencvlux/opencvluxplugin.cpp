@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <thread>
 #include <opencv2/opencv.hpp>
+#include <opencv2/core/ocl.hpp>
 
 #include <QFuture>
 #include <QFutureWatcher>
