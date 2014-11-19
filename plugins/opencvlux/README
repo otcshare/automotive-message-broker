@@ -19,7 +19,6 @@ To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/
 	"pixelLowerBound" : "0",
 	"pixelUpperBound" : "255",
 	"fps" : "30",
-	"kinect" : "false",
 	"opencl" : "false",
 	"device" : "0"
 }
@@ -50,11 +49,6 @@ How many times per second to poll image data from the camera.
 
 Default: "30"
 
-"kinect"
-Set to "true" if you are using a kinect camera.
-
-Default: "false"
-
 "pixelLowerBound"
 Lowest calibration value for a camera.  This is the average pixel intensity value the camera reports when 
 it is completely covered.
@@ -70,15 +64,6 @@ Default: "255"
 "opencl" (experimental)
 Use a specialized CPU/GPU device to calculate the mean pixel intensity.  This will only work if OpenCV
 was compiled with OpenCL support.  To enable openCL, pass -Docl=ON to cmake.
-
-Default: "false"
-
-"cuda"
-Use nvidia cuda gpu processing to process image data.  This will only work if OpenCV was compiled with
-cuda support.
-
-NOTE: this does not appear to have a noticable impact on processing given the way we are using it.
-this does however make memory usage explode.
 
 Default: "false"
 
