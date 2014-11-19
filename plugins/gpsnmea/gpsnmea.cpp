@@ -22,6 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "bluetooth.hpp"
 #include "bluetooth5.h"
 #include <listplusplus.h>
+#include <superptr.hpp>
 
 #include <iostream>
 #include <boost/assert.hpp>
@@ -35,6 +36,7 @@ using namespace std;
 #include "abstractpropertytype.h"
 
 #define GPSTIME "GpsTime"
+#define GPSSPEED "GpsSpeed"
 
 template<typename T2>
 inline T2 lexical_cast(const std::string &in) {
@@ -52,46 +54,46 @@ public:
 
 	void parse(std::string gprmc);
 
-	VehicleProperty::LatitudeType latitude()
+	VehicleProperty::LatitudeType* latitude()
 	{
-		return mLatitude;
+		return mLatitude.get();
 	}
 
-	VehicleProperty::LongitudeType longitude()
+	VehicleProperty::LongitudeType* longitude()
 	{
-		return mLongitude;
+		return mLongitude.get();
 	}
 
-	VehicleProperty::AltitudeType altitude()
+	VehicleProperty::AltitudeType* altitude()
 	{
-		return mAltitude;
+		return mAltitude.get();
 	}
 
-	VehicleProperty::DirectionType direction()
+	VehicleProperty::DirectionType* direction()
 	{
-		return mDirection;
+		return mDirection.get();
 	}
 
-	VehicleProperty::VehicleSpeedType speed()
+	BasicPropertyType<uint16_t>* speed()
 	{
-		return mSpeed;
+		return mSpeed.get();
 	}
 
-	BasicPropertyType<double> gpsTime()
+	BasicPropertyType<double>* gpsTime()
 	{
-		return mGpsTime;
+		return mGpsTime.get();
 	}
 
 	std::list<AbstractPropertyType*> fix()
 	{
 		std::list<AbstractPropertyType*> l;
 
-		l.push_back(&mLatitude);
-		l.push_back(&mLongitude);
-		l.push_back(&mAltitude);
-		l.push_back(&mDirection);
-		l.push_back(&mSpeed);
-		l.push_back(&mGpsTime);
+		l.push_back(mLatitude.get());
+		l.push_back(mLongitude.get());
+		l.push_back(mAltitude.get());
+		l.push_back(mDirection.get());
+		l.push_back(mSpeed.get());
+		l.push_back(mGpsTime.get());
 
 		return l;
 	}
@@ -112,12 +114,12 @@ private: ///methods:
 
 private:
 
-	VehicleProperty::LatitudeType mLatitude;
-	VehicleProperty::LongitudeType mLongitude;
-	VehicleProperty::AltitudeType mAltitude;
-	VehicleProperty::DirectionType  mDirection;
-	VehicleProperty::VehicleSpeedType mSpeed;
-	BasicPropertyType<double> mGpsTime;
+	std::unique_ptr<VehicleProperty::LatitudeType> mLatitude;
+	std::unique_ptr<VehicleProperty::LongitudeType> mLongitude;
+	std::unique_ptr<VehicleProperty::AltitudeType> mAltitude;
+	std::unique_ptr<VehicleProperty::DirectionType>  mDirection;
+	std::unique_ptr<BasicPropertyType<uint16_t>> mSpeed;
+	std::unique_ptr<BasicPropertyType<double>> mGpsTime;
 
 	bool isActive;
 
@@ -128,9 +130,14 @@ private:
 };
 
 Location::Location(AbstractRoutingEngine* re, std::string uuid)
-	:mLatitude(0), mLongitude(0), mAltitude(0), mDirection(0), mSpeed(0), mGpsTime(GPSTIME,0), isActive(false), routingEngine(re), mUuid(uuid)
+	:isActive(false), routingEngine(re), mUuid(uuid)
 {
-
+	mLatitude = amb::make_unique(new VehicleProperty::LatitudeType(0));
+	mLongitude = amb::make_unique(new VehicleProperty::LongitudeType(0));
+	mAltitude = amb::make_unique(new VehicleProperty::AltitudeType(0));
+	mDirection = amb::make_unique(new VehicleProperty::DirectionType(0));
+	mSpeed = amb::make_unique(new BasicPropertyType<uint16_t>(GPSSPEED, 0));
+	mGpsTime = amb::make_unique(new BasicPropertyType<double>(GPSTIME, 0));
 }
 
 void Location::parse(string nmea)
@@ -217,13 +224,11 @@ void Location::parseTime(string h, string m, string s, string dd, string mm, str
 
 		time_t time = mktime(&t);
 
-		BasicPropertyType<double> temp(GPSTIME,(double)time);
-
-		if(mGpsTime != temp)
+		if(mGpsTime->basicValue() != (double(time)))
 		{
-			mGpsTime = temp;
+			mGpsTime->setValue(double(time));
 			if(routingEngine)
-				routingEngine->updateProperty(&mGpsTime, mUuid);
+				routingEngine->updateProperty(mGpsTime.get(), mUuid);
 		}
 	}
 	catch(...)
@@ -245,14 +250,12 @@ void Location::parseLatitude(string d, string m, string ns)
 		if(ns == "S")
 			dec *= -1;
 
-		VehicleProperty::LatitudeType temp(dec);
-
-		if(mLatitude != temp)
+		if(mLatitude->basicValue() != dec)
 		{
-			mLatitude = temp;
+			mLatitude->setValue(dec);
 
 			if(routingEngine)
-				routingEngine->updateProperty(&mLatitude, mUuid);
+				routingEngine->updateProperty(mLatitude.get(), mUuid);
 		}
 	}
 	catch(...)
@@ -273,14 +276,12 @@ void Location::parseLongitude(string d, string m, string ew)
 		if(ew == "W")
 			dec *= -1;
 
-		VehicleProperty::LongitudeType temp(dec);
-
-		if(mLongitude != temp)
+		if(mLongitude->basicValue() != dec)
 		{
-			mLongitude = temp;
+			mLongitude->setValue(dec);
 
 			if(routingEngine)
-				routingEngine->updateProperty(&mLongitude, mUuid);
+				routingEngine->updateProperty(mLongitude.get(), mUuid);
 		}
 	}
 	catch(...)
@@ -297,13 +298,15 @@ void Location::parseSpeed(string spd)
 
 		///to kph:
 		s *= 1.852;
-		VehicleProperty::VehicleSpeedType temp(s);
-		if(mSpeed != temp)
+
+		uint16_t speed = static_cast<uint16_t>(s);
+
+		if(mSpeed->basicValue() != speed)
 		{
-			mSpeed = temp;
+			mSpeed->setValue(speed);
 
 			if(routingEngine)
-				routingEngine->updateProperty(&mSpeed, mUuid);
+				routingEngine->updateProperty(mSpeed.get(), mUuid);
 		}
 	}
 	catch(...)
@@ -317,12 +320,12 @@ void Location::parseDirection(string dir)
 	try {
 		uint16_t d = boost::lexical_cast<double>(dir);
 
-		VehicleProperty::DirectionType temp(d);
-		if(mDirection != temp)
+		if(mDirection->basicValue() != d)
 		{
-			mDirection = temp;
+			mDirection->setValue(d);
+
 			if(routingEngine)
-				routingEngine->updateProperty(&mDirection, mUuid);
+				routingEngine->updateProperty(mDirection.get(), mUuid);
 		}
 	}
 	catch(...)
@@ -339,16 +342,13 @@ void Location::parseAltitude(string alt)
 
 		double a = boost::lexical_cast<double>(alt);
 
-		VehicleProperty::AltitudeType temp(a);
-		if(mAltitude != temp)
+		if(mAltitude->basicValue() != a)
 		{
-			mAltitude = temp;
+			mAltitude->setValue(a);
 
 			if(routingEngine)
-				routingEngine->updateProperty(&mAltitude, mUuid);
+				routingEngine->updateProperty(mAltitude.get(), mUuid);
 		}
-
-		mAltitude = VehicleProperty::AltitudeType(a);
 	}
 	catch(...)
 	{
@@ -399,12 +399,13 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 	int baudrate = 0;
 	location =new Location(re, mUuid);
 
-	VehicleProperty::registerProperty(GPSTIME,[](){ return new BasicPropertyType<double>(GPSTIME,0); });
+	VehicleProperty::registerProperty(GPSTIME,[](){ return new BasicPropertyType<double>(GPSTIME, 0); });
+	VehicleProperty::registerProperty(GPSSPEED,[](){ return new BasicPropertyType<uint16_t>(GPSSPEED, 0); });
 
 	addPropertySupport(VehicleProperty::Latitude, Zone::None);
 	addPropertySupport(VehicleProperty::Longitude, Zone::None);
 	addPropertySupport(VehicleProperty::Altitude, Zone::None);
-	addPropertySupport(VehicleProperty::VehicleSpeed, Zone::None);
+	addPropertySupport(GPSSPEED, Zone::None);
 	addPropertySupport(VehicleProperty::Direction, Zone::None);
 	addPropertySupport(GPSTIME, Zone::None);
 
@@ -575,26 +576,26 @@ void GpsNmeaSource::test()
 	Location location(nullptr, "");
 	location.parse("GPRMC,061211,A,2351.9605,S,15112.5239,E,000.0,053.4,170303,009.9,E*6E");
 
-	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+	DebugOut(0)<<"lat: "<<location.latitude()->toString()<<endl;
 
-	g_assert(location.latitude().toString() == "-23.86600833");
-	g_assert(location.gpsTime().toString() == "1050585131");
+	g_assert(location.latitude()->toString() == "-23.86600833");
+	g_assert(location.gpsTime()->toString() == "1050585131");
 
 	location.parse("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47");
 
-	DebugOut(0)<<"alt: "<<location.altitude().toString()<<endl;
-	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
-	g_assert(location.altitude().toString() == "545.4");
-	g_assert(location.latitude().toString() == "48.1173");
+	DebugOut(0)<<"alt: "<<location.altitude()->toString()<<endl;
+	DebugOut(0)<<"lat: "<<location.latitude()->toString()<<endl;
+	g_assert(location.altitude()->toString() == "545.4");
+	g_assert(location.latitude()->toString() == "48.1173");
 
 	location.parse("GPRMC,060136.00,A,3101.40475,N,12126.87095,E,0.760,,160114,,,A*74");
-	DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
-	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+	DebugOut(0)<<"lon: "<<location.longitude()->toString()<<endl;
+	DebugOut(0)<<"lat: "<<location.latitude()->toString()<<endl;
 
 	//Test incomplete message:
 	location.parse("GPRMC,023633.00,V,,,,,,,180314,,,N*75");
-	DebugOut(0)<<"lon: "<<location.longitude().toString()<<endl;
-	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+	DebugOut(0)<<"lon: "<<location.longitude()->toString()<<endl;
+	DebugOut(0)<<"lat: "<<location.latitude()->toString()<<endl;
 
 	std::string testChecksuming = "GPRMC,195617.00,V,,,,,,,310314,,,N*74";
 
