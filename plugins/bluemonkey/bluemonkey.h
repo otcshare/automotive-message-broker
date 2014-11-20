@@ -99,8 +99,6 @@ public:
 	virtual void propertyChanged(AbstractPropertyType* value);
 	virtual const std::string uuid() const;
 
-	QJSEngine* engine;
-
 	virtual int supportedOperations();
 
 private: //source privates
@@ -133,6 +131,7 @@ public Q_SLOTS:
 	void log(QString str);
 
 	QObject* createTimer();
+	QObject* createQObject();
 
 	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction);
 
@@ -149,6 +148,7 @@ public Q_SLOTS:
 	void createCustomProperty(QString name, QJSValue defaultValue, int zone);
 
 private:
+	QJSEngine* engine;
 	QStringList configsToLoad;
 
 	Authenticate* auth;
