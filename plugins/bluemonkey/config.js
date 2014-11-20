@@ -12,6 +12,7 @@ var Zone = {
   BackSide : 1 << 9
 };
 
+bluemonkey.loadModule("");
 
 bluemonkey.createCustomProperty("VehicleSpeed", 10);
 bluemonkey.createCustomProperty("EngineSpeed", 5000);
