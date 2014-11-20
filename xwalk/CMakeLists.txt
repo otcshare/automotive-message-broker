@@ -6,10 +6,7 @@ set(vehicle_api_headers vehicle.h vehicle_instance.h vehicle_extension.h common/
     common/XW_Extension_EntryPoints.h common/XW_Extension.h common/XW_Permissions.h common/XW_Extension_Runtime.h common/XW_Extension_SyncMessage.h)
 set(vehicle_api_sources vehicle.cc vehicle_extension.cc vehicle_instance.cc common/extension.cc)
 
-
-
 include_directories(${include_dirs} ${CMAKE_CURRENT_SOURCE_DIR}/)
-
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vehicle_api.cc
                    COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_api.py ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_api.js kSource_vehicle_api ${CMAKE_CURRENT_BINARY_DIR}/vehicle_api.cc )
