@@ -244,24 +244,15 @@ Vehicle.prototype.getSupportedEventTypes = function(type, writeable, successCB, 
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.get = function(namelist, zone, successCB, errorCB)
+Vehicle.prototype.get = function(name, zone, successCB, errorCB)
 {
-    if(namelist.length <= 0)
-    {
-        return;
-    }
-
-	var properties = [];
-
-    for(var i = 0; i < namelist.length; i++)
-    {
-        properties[i] = {"property" : namelist[i], "zone" : zone};
-    }
+    property = {"property" : name, "zone" : zone};
+    
     var obj = {
         "type" : "method",
         "name": "get",
         "transactionid" : this.generateTransactionId(),
-        "data" : properties
+        "data" : property
     };
     this.send(obj, successCB, errorCB);
 }
@@ -279,50 +270,39 @@ Vehicle.prototype.getHistory = function(event, startTime, endTime, successCB, er
 
 }
 
-Vehicle.prototype.set = function(namelist, valuelist, zoneList, successCB, errorCB)
+Vehicle.prototype.set = function(name, value, zone, successCB, errorCB)
 {
-    if((namelist.length != valuelist.length)||(namelist.length <= 0))
-    {
-        return;
-    }
-
     var obj = {
         "type" : "method",
         "name": "set",
         "transactionid" : this.generateTransactionId(),
-        "data" : []
+        "data" : { "property" : name, "value" : value, "zone" : zone }
     };
-    var list = [];
-    for(var i = 0; i < namelist.length; i++)
-    {
-        var val = {"property" : namelist[i], "value" : valuelist[i],"zone" : zoneList[i]};
-        list[list.length] = val;
-    }
-    obj.data = list;
+
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.subscribe = function(namelist, zoneList, successCB, errorCB)
+Vehicle.prototype.subscribe = function(name, zone, successCB, errorCB)
 {
     var obj = {
         "type" : "method",
         "name": "subscribe",
         "transactionid" : this.generateTransactionId(),
-        "data" : namelist,
-        "zone" : zoneList
+        "data" : {"property" : name, "zone" : zone }
     };
+
     this.send(obj, successCB, errorCB);
 }
 
-Vehicle.prototype.unsubscribe = function(namelist, zoneList, successCB, errorCB)
+Vehicle.prototype.unsubscribe = function(name, zone, successCB, errorCB)
 {
     var obj = {
         "type" : "method",
         "name": "unsubscribe",
         "transactionid" : this.generateTransactionId(),
-        "data" : namelist,
-        "zone" : zoneList
+        "data" : {"property" : name, "zone" : zone }
     };
+
     this.send(obj, successCB, errorCB);
 }
 
