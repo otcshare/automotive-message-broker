@@ -344,7 +344,6 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue)
 
 	AsyncSetPropertyRequest request;
 	request.property = name.toStdString();
-	request.zoneFilter = zone;
 	request.value = VehicleProperty::getPropertyTypeForPropertyNameValue(name.toStdString(), var.toString().toStdString());
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
