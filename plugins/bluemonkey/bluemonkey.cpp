@@ -105,6 +105,14 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 	qmlRegisterType<QObject>("", 1, 0, "QObject");
 }
 
+BluemonkeySink::~BluemonkeySink()
+{
+	Q_FOREACH(void* module, modules)
+	{
+		dlclose(module);
+	}
+}
+
 
 PropertyList BluemonkeySink::subscriptions()
 {
@@ -207,6 +215,11 @@ bool BluemonkeySink::loadModule(QString path)
 		return false;
 	}
 
+	if(modules.contains(handle))
+		return false;
+
+	modules.push_back(handle);
+
 	void* c = dlsym(handle, "create");
 
 	if(!c)
@@ -221,8 +234,12 @@ bool BluemonkeySink::loadModule(QString path)
 
 	for(auto i : exports)
 	{
-		QJSValue val = engine->newQObject(i.second);
-		engine->globalObject().setProperty(i.first.c_str(), val);
+		std::string obj = i.first;
+		if(!engine->globalObject().hasProperty(obj.c_str()))
+		{
+			QJSValue val = engine->newQObject(i.second);
+			engine->globalObject().setProperty(obj.c_str(), val);
+		}
 	}
 
 	return true;
