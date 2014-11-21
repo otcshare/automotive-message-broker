@@ -34,14 +34,16 @@
 #include <QJsonDocument>
 #include <QVariantMap>
 
-WebSocketSink::WebSocketSink(AbstractRoutingEngine* re, libwebsocket *wsi, string uuid, VehicleProperty::Property property, std::string ambdproperty) : AbstractSink(re,map<string, string> ())
+WebSocketSink::WebSocketSink(AbstractRoutingEngine* re, libwebsocket *wsi, string uuid, VehicleProperty::Property property, std::string ambdproperty, Zone::Type zone)
+	: AbstractSink(re,map<string, string> ())
 {
 	m_amdbproperty = ambdproperty;
 	m_uuid = uuid;
 	m_wsi = wsi;
 	m_property = property;
+	mZone = zone;
 	m_re = re;
-	re->subscribeToProperty(ambdproperty,this);
+	re->subscribeToProperty(ambdproperty, this);
 }
 const string WebSocketSink::uuid()
 {
@@ -50,6 +52,9 @@ const string WebSocketSink::uuid()
 void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
+
+	if(value->zone != mZone)
+		return;
 
 	QVariantMap data;
 	QVariantMap reply;
@@ -85,7 +90,7 @@ void WebSocketSink::supportedChanged(const PropertyList &supportedProperties)
 PropertyList WebSocketSink::subscriptions()
 {
 	return PropertyList();
-} 
+}
 
 /// 6% and 4% cpu with json
 /// 5% and 4% with binary
