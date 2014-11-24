@@ -35,7 +35,7 @@ if(Qt5Sql_FOUND)
   message(STATUS "enabling database bluemonkey module")
   add_library(bluemonkeyDbModule MODULE db.cpp)
   set_target_properties(bluemonkeyDbModule PROPERTIES PREFIX "")
-  target_link_libraries(bluemonkeyDbModule ${link_libraries} ${QT_LIBRARIES} ${Qt5Sql_LIBRARIES})
+  target_link_libraries(bluemonkeyDbModule ${link_libraries} amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${QT_LIBRARIES} ${Qt5Sql_LIBRARIES})
   install(TARGETS bluemonkeyDbModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 endif()
 

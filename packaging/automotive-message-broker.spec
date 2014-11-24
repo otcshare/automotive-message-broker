@@ -36,6 +36,7 @@ BuildRequires:  qt5-qtdeclarative-devel
 BuildRequires:  qt5-plugin-bearer-generic
 BuildRequires:  qt5-plugin-bearer-connman
 BuildRequires:  qt5-plugin-bearer-nm
+BuildRequires:  qt5-plugin-sqldriver-sqlite
 %endif
 
 %description
@@ -190,6 +191,16 @@ Requires: qt5-qtdeclarative
 
 %description plugins-bluemonkey
 Engine for creating scriptable plugins for AMB
+
+%package -n bluemonkey-modules-db
+Summary:   javascript plugin engine db module
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires: qt5-plugin-sqldriver-sqlite
+
+%description -n bluemonkey-modules-db
+Engine for creating scriptable plugins for AMB
+
 %endif
 
 %package xwalk-vehicle-extension
@@ -353,11 +364,17 @@ cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 
 
 %if %{with qt5}
+
 %files plugins-bluemonkey
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/bluemonkeyplugin.so
 %config %{_sysconfdir}/ambd/bluemonkey
+
+%files -n bluemonkey-modules-db
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluemonkeyDbModule.so
+
 %endif
 
 %files xwalk-vehicle-extension
