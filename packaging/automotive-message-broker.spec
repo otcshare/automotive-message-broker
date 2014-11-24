@@ -2,7 +2,7 @@
 
 Name:       automotive-message-broker
 Summary:    Automotive Message Broker is a vehicle network abstraction system
-Version:    0.12.802
+Version:    0.12.803
 Release:    0
 Group:      Automotive/Service
 License:    LGPL-2.1
