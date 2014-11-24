@@ -85,10 +85,44 @@ void VehicleInstance::HandleMessage(const char* message) {
 		picojson::object value = v.get("value").get<picojson::object>();
 
 		vehicle_->Set(attribute, value, amb_zone, callback_id);
+	} else if (method == "supported") {
+		std::string attribute = v.get("name").to_str();
+		int callback_id = v.get("asyncCallId").get<double>();
+		Zone::Type amb_zone = 0;
+
+		std::transform(attribute.begin(), attribute.begin() + 1, attribute.begin(),
+					   ::toupper);
+		vehicle_->Supported(attribute, callback_id);
 	}
 }
 
 void VehicleInstance::HandleSyncMessage(const char* message) {
+	DebugOut() << "VehicleInstance Sync message received " << message << endl;
+	picojson::value v;
+
+	std::string err;
+	picojson::parse(v, message, message + strlen(message), &err);
+	if (!err.empty()) {
+		return;
+	}
+
+	std::string method = v.get("method").to_str();
+	std::string objectName = v.get("name").to_str();
+	std::string attName = v.get("attName").to_str();
+
+	std::transform(objectName.begin(), objectName.begin() + 1, objectName.begin(),
+				   ::toupper);
+
+	std::transform(attName.begin(), attName.begin() + 1, attName.begin(),
+				   ::toupper);
+
+	if(method == "availableForRetrieval")
+	{
+		std::string reply = vehicle_->AvailableForRetrieval(objectName, attName) ? "true" : "false";
+		DebugOut() << "VehicleInstance reply: " << reply << endl;
+		SendSyncReply(reply.c_str());
+	}
+
 }
 
 int VehicleInstance::ZoneToAMBZone(picojson::array zones) {

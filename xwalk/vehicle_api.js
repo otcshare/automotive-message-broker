@@ -7,6 +7,14 @@ var async_calls = {};
 
 var subscriptions = [];
 
+function makeCall(call, msg) {
+  async_calls[next_async_call_id] = call;
+  msg.asyncCallId = next_async_call_id;
+  ++next_async_call_id;
+
+  extension.postMessage(JSON.stringify(msg));
+}
+
 function vehicleInterfaceCommonContructor(obj, attname) {
   obj.attributeName = attname;
 
@@ -15,18 +23,26 @@ function vehicleInterfaceCommonContructor(obj, attname) {
   msg['name'] = obj.attributeName;
 
   obj._zones = new Zone;
+  obj._supported = false;
 
   var call = new AsyncCall(function(data) {
     obj._zones = data;
   });
 
-  async_calls[next_async_call_id] = call;
-  msg.asyncCallId = next_async_call_id;
-  ++next_async_call_id;
+  makeCall(call, msg);
 
-  extension.postMessage(JSON.stringify(msg));
+  var supportedMessage = {};
+  supportedMessage['method'] = 'supported';
+  supportedMessage['name'] = obj.attributeName;
+
+  var supportedCall = new AsyncCall(function(data) {
+        obj._supported = data;
+  });
+
+  makeCall(supportedCall, supportedMessage);
 
   Object.defineProperty(obj, 'zones', { get: function() { return obj._zones } });
+  Object.defineProperty(obj, 'supported', { get: function() { return obj._supported; } });
 }
 
 function VehicleInterface(attname) {
@@ -41,6 +57,24 @@ VehicleInterface.prototype.get = function(zone) {
 
   return createPromise(msg);
 };
+
+VehicleInterface.prototype.availableForRetrieval = function(attName) {
+  return isAvailable(this, attName);
+}
+
+VehicleInterface.prototype.availabilityChangedListener = function(callback) {
+  if(this.changedListenerCount) {
+    this.changedListenerCount++;
+  }
+  else {
+    this.changedListenerCount = 0;
+  }
+  return this.changedListenerCount;
+}
+
+VehicleInterface.prototype.removeAvailabilityChangedListener = function(handle) {
+
+}
 
 function VehicleSignalInterface(attname) {
   vehicleInterfaceCommonContructor(this, attname);
@@ -98,6 +132,32 @@ VehicleSignalInterface.prototype.set = function (value, zone) {
   msg['value'] = value;
 
   return createPromise(msg);
+}
+
+VehicleSignalInterface.prototype.availableForSubscription = function(attName) {
+  return isAvailable(this, attName);
+}
+
+VehicleSignalInterface.prototype.availableForSetting = function(attName) {
+  return isAvailable(this, attName);
+}
+
+function isAvailable(obj, attName)
+{
+  var msg = {};
+  msg["method"] = 'availableForRetrieval';
+  msg["name"] = obj.attributeName;
+  msg["attName"] = attName;
+
+  var reply = extension.internal.sendSyncMessage(JSON.stringify(msg));
+
+
+
+  if (reply === "true") {
+    return "available";
+  } else {
+    return "not_supported";
+  }
 }
 
 function AsyncCall(resolve, reject) {
@@ -164,11 +224,15 @@ extension.setMessageListener(function(json) {
       case 'set':
         handlePromiseReply(msg);
         break;
+      case 'supported':
+        handleSupportedReply(msg)
+        break;
       default:
         break;
     }
   } catch (error) {
     console.log('Error in message listener: ' + error);
+    console.log("msg: " + JSON.stringify(msg))
   }
 });
 
@@ -201,7 +265,7 @@ function handlePromiseReply(msg) {
 
     cbobj.reject(error);
   } else {
-    if (msg.value.zone) {
+    if (msg.value && msg.value.zone) {
       msg.value.zone = new Zone(msg.value.zone);
     }
     cbobj.resolve(msg.value);
@@ -215,6 +279,13 @@ function handleZonesReply(msg) {
 
   if (cbobj)
     cbobj.resolve(new Zone(msg.value));
+}
+
+function handleSupportedReply(msg) {
+  var cbobj = async_calls[msg.asyncCallId];
+
+  if (cbobj)
+    cbobj.resolve(msg.value);
 }
 
 function handleSubscribeReply(msg) {
@@ -258,7 +329,9 @@ _defineVehicleSignalProperty(exports, 'drivingMode');
 _defineVehicleSignalProperty(exports, 'odometer');
 _defineVehicleSignalProperty(exports, 'transmissionOil');
 _defineVehicleSignalProperty(exports, 'transmissionClutch');
-
+_defineVehicleSignalProperty(exports, 'brakeMaintenance');
+_defineVehicleSignalProperty(exports, 'washerFluid');
+_defineVehicleSignalProperty(exports, 'malfunctionIndicator');
 _defineVehicleSignalProperty(exports, 'batteryStatus');
 _defineVehicleSignalProperty(exports, 'tire');
 

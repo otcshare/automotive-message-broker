@@ -26,6 +26,7 @@ public:
 };
 
 /** @interface Fluid : VehiclePropertyType **/
+
 class FluidProperty : public DBusSink
 {
 public:
@@ -44,6 +45,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Brake fluid level percentage. 0-100.
 		 **/
+		///TODO: deprecated in 0.14
 		wantPropertyVariant(VehicleProperty::BrakeFluidLevel, "Brake", AbstractProperty::Read);
 
 		/** @attributeName Washer
@@ -51,6 +53,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Washer fluid level percentage. 0-100.
 		 **/
+		///TODO: Deprecated in 0.14
 		wantPropertyVariant(VehicleProperty::WasherFluidLevel, "Washer", AbstractProperty::Read);
 	}
 };
@@ -149,6 +152,39 @@ public:
 		:DBusSink("TransmissionClutch", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::TransmissionClutchWear, "Wear", AbstractProperty::Read);
+	}
+};
+
+class BrakeMaintenance: public DBusSink
+{
+public:
+	BrakeMaintenance(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("BrakeMaintenance", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::BrakePadWear, "PadWear", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::BrakeFluidLevel, "FluidLevel", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::BrakeFluidLevelLow, "FluidLevelLow", AbstractProperty::Read);
+	}
+};
+
+class WasherFluid: public DBusSink
+{
+public:
+	WasherFluid(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("WasherFluid", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::WasherFluidLevel, "Level", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WasherFluidLevelLow, "LevelLow", AbstractProperty::Read);
+	}
+};
+
+class MalfunctionIndicator: public DBusSink
+{
+public:
+	MalfunctionIndicator(AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("MalfunctionIndicator", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::MalfunctionIndicatorOn, "On", AbstractProperty::Read);
 	}
 };
 

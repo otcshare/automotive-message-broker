@@ -28,11 +28,14 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <nullptr.h>
 #include "abstractpropertytype.h"
 #include <abstractroutingengine.h>
+#include "varianttype.h"
 #include "dbussignaller.h"
 
 class AbstractProperty;
 
 const uint getPid(const char *owner);
+
+typedef std::vector<VariantType*> PropertyDBusMap;
 
 class AbstractDBusInterface
 {
@@ -41,7 +44,7 @@ public:
 	AbstractDBusInterface(std::string interfaceName, std::string objectName, GDBusConnection* connection);
 
 	virtual ~AbstractDBusInterface();
-	
+
 	void setDBusConnection(GDBusConnection* connection)
 	{
 		mConnection = connection;
@@ -49,10 +52,10 @@ public:
 
 	void registerObject();
 	void unregisterObject();
-	
+
 	void addProperty(AbstractProperty* property);
 	virtual void updateValue(AbstractProperty* property);
-	
+
 	static PropertyList implementedProperties() { return mimplementedProperties; }
 
 	static std::list<AbstractDBusInterface *> getObjectsForProperty(std::string property);
@@ -62,6 +65,25 @@ public:
 	std::string interfaceName() { return mInterfaceName; }
 
 	bool implementsProperty(std::string property);
+
+	/*!
+	 * \brief hasPropertyDBus
+	 * \param attributeName, name of DBus property
+	 * \return true if attributeName is supported by this interface
+	 */
+	bool hasPropertyDBus(std::string attributeName)
+	{
+
+		for(auto i : propertyDBusMap)
+		{
+			if(i->name() == attributeName)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	std::string objectPath() { return mObjectPath; }
 
@@ -100,23 +122,24 @@ public:
 protected:
 
 	void startRegistration();
-	
+
 	static GVariant *getProperty(GDBusConnection * connection, const gchar * sender, const gchar *objectPath,
 								 const gchar *interfaceName, const gchar * propertyName, GError** error,
 								 gpointer userData);
 	static gboolean setProperty(GDBusConnection * connection, const gchar * sender, const gchar *objectPath,
 								const gchar *interfaceName, const gchar * propertyName, GVariant *value,
 								GError** error, gpointer userData);
-    
+
 	virtual void setProperty(std::string propertyName, GVariant * value);
 	virtual GVariant * getProperty(std::string propertyName);
 
 	void setTimeout(int timeout);
-	
+
 	std::unordered_map<std::string, AbstractProperty*> properties;
 
 	Zone::Type zoneFilter;
 
+	PropertyDBusMap propertyDBusMap;
 
 	bool supported;
 	double mTime;

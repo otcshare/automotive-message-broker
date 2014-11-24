@@ -139,6 +139,21 @@ interface org.automotive.Manager  {
     }
   }
 
+  /*!
+   * SupportsProperty
+   * \brief check whether a Property exists.
+   * \arg propertyName name of property of Object
+   * \returns true if Property exists
+   */
+  method SupportsProperty {
+    in {
+      String propertyName
+    }
+    out {
+      Boolean supported
+    }
+  }
+
 }
 
 /*! org.automotive.VehicleSpeed
@@ -850,7 +865,6 @@ interface org.automotive.Odometer extends VehiclePropertyType  {
 
 }
 
-
 interface org.automotive.Fluid extends VehiclePropertyType  {
 
   /*!  Transmission
@@ -860,16 +874,18 @@ interface org.automotive.Fluid extends VehiclePropertyType  {
 
   /*!  Brake
    *   \brief MUST return Brake fluid level percentage. 0-100.
+   *   TODO: Deprecated.  use BrakeMaintenance::FluidLevel  Remove in 0.14
    */
    attribute UInt16 Brake readonly
 
   /*!  Washer
    *   \brief MUST return Washer fluid level percentage. 0-100.
+   *   TODO: Deprecated. use WasherFluid::Level.  Remove in 0.14
    */
    attribute UInt16 Washer readonly
 }
 
-/// Deprecated.  Use BatteryStatus.  Remove in 0.14
+///TODO: Deprecated.  Use BatteryStatus.  Remove in 0.14
 interface org.automotive.Battery extends VehiclePropertyType  {
 
   /*!  Voltage
@@ -1395,7 +1411,7 @@ interface org.automotive.TransmissionOil extends VehiclePropertyType {
   /*!
    * \brief must return transmission oil wear (Unit: percentage, 0: no wear, 100: completely worn).
    */
-   attribute UInt8 Wear readonly
+   attribute UInt8 Wear readonly;
 }
 
 interface org.automotive.TransmissionClutch extends VehiclePropertyType {
@@ -1403,7 +1419,51 @@ interface org.automotive.TransmissionClutch extends VehiclePropertyType {
   /*!
    * \brief must return transmission clutch wear (Unit: percentage, 0: no wear, 100: completely worn).
    */
-   attribute UInt8 Wear readonly
+   attribute UInt8 Wear readonly;
+}
+
+interface org.automotive.BrakeMaintenance extends VehiclePropertyType {
+
+  /*!
+   * \brief must return brake pad wear (Unit: percentage, 0%: no wear, 100%: completely worn).
+   */
+   attribute UInt8 PadWear readonly;
+
+  /*!
+   * \brief must return brake fluid level (Unit: percentage, 0%: empty, 100%: full).
+   */
+   attribute UInt8 FluidLevel readonly;
+
+  /*!
+   * \brief must return true if brake fluid level: low (true), not low (false)
+   */
+   attribute Boolean FluidLevelLow readonly;
+
+  /*!
+   * \brief must return true if brakes are worn: worn (true), not worn (false)
+   */
+   attribute Boolean BrakesWorn readonly;
+}
+
+interface org.automotive.WasherFluid extends VehiclePropertyType {
+
+  /*!
+   * \brief must return washer fluid level (Unit: percentage, 0%: empty, 100%: full).
+   */
+   attribute UInt8 Level readonly;
+
+  /*!
+   * \brief must return true if washer fluid level is low: low (true), not low: (false)
+   */
+   attribute Boolean LevelLow readonly;
+}
+
+interface org.automotive.MalfunctionIndicator extends VehiclePropertyType {
+
+  /*!
+   * \brief must return true if washer fluid level is low: low (true), not low: (false)
+   */
+   attribute Boolean On readonly;
 }
 
 }

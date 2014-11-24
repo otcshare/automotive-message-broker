@@ -27,9 +27,6 @@
 #include <map>
 #include <type_traits>
 
-typedef std::vector<VariantType*> PropertyDBusMap;
-//typedef std::unordered_map<VehicleProperty::Property, VariantType*> PropertyDBusMap;
-
 class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
 
@@ -95,10 +92,6 @@ protected:
 		//propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
 		propertyDBusMap.push_back(new VariantType(routingEngine, ambProperty, propertyName, access));
 	}
-
-	PropertyDBusMap propertyDBusMap;
-
-
 
 };
 

@@ -102,6 +102,7 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 	auth = new Authenticate(config, this);
 
 	qmlRegisterType<QTimer>("", 1, 0, "QTimer");
+	qmlRegisterType<QObject>("", 1, 0, "QObject");
 }
 
 
@@ -273,6 +274,11 @@ void BluemonkeySink::log(QString str)
 QObject *BluemonkeySink::createTimer()
 {
 	return new QTimer(this);
+}
+
+QObject *BluemonkeySink::createQObject()
+{
+	return new QObject(this);
 }
 
 void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction)

@@ -29,6 +29,15 @@ if(communi)
   install(TARGETS bluemonkeyIrcModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 endif(communi)
 
+find_package(Qt5Sql)
+
+if(Qt5Sql_FOUND)
+  message(STATUS "enabling database bluemonkey module")
+  add_library(bluemonkeyDbModule MODULE db.cpp)
+  set_target_properties(bluemonkeyDbModule PROPERTIES PREFIX "")
+  target_link_libraries(bluemonkeyDbModule ${link_libraries} ${QT_LIBRARIES} ${Qt5Sql_LIBRARIES})
+  install(TARGETS bluemonkeyDbModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${communi_INCLUDE_DIRS} ${QT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common)
 
@@ -40,6 +49,7 @@ set_target_properties(bluemonkeyplugin PROPERTIES PREFIX "")
 target_link_libraries(bluemonkeyplugin dl amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES} ${communi_LIBRARIES} amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common)
 
 set(config_files ${CMAKE_CURRENT_SOURCE_DIR}/config.js)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.js ${CMAKE_CURRENT_BINARY_DIR}/config.js @ONLY)
 
 install(TARGETS bluemonkeyplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 install (FILES ${config_files} DESTINATION /etc/ambd/bluemonkey)

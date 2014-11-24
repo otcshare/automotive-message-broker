@@ -22,8 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <superptr.hpp>
 
 #include <iostream>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/objdetect/objdetect.hpp>
+#include <thread>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/ocl.hpp>
 
 #include <QFuture>
 #include <QFutureWatcher>
@@ -31,11 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 #ifdef OPENCL
-#include <opencv2/ocl/ocl.hpp>
-#endif
-
-#ifdef CUDA
-#include <opencv2/gpu/gpu.hpp>
+#include <opencv2/core/ocl.hpp>
 #endif
 
 using namespace std;
@@ -77,7 +74,6 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 	shared->threaded = false;
 	shared->kinect = false;
-	shared->useOpenCl = false;
 	shared->useCuda = false;
 	shared->loggingOn = false;
 	shared->ddd = false;
@@ -128,21 +124,14 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 	if(config.find("opencl") != config.end())
 	{
-#ifdef OPENCL
-		shared->useOpenCl = config["opencl"] == "true";
-		openCl->setValue(shared->useOpenCl);
-#else
-		DebugOut(DebugOut::Warning) << "You really don't have openCL support.  Disabling." << endl;
-		shared->useOpenCl = false;
-#endif
-
-	}
-
-	if(config.find("cuda") != config.end())
-	{
-#ifdef CUDA
-		shared->useCuda = config["cuda"] == "true";
-#endif
+		if(cv::ocl::haveOpenCL())
+		{
+			bool useOcl = config["opencl"] == "true";
+			cv::ocl::setUseOpenCL(useOcl);
+			openCl->setValue(cv::ocl::useOpenCL());
+		}
+		else
+			DebugOut(DebugOut::Warning) << "You really don't have openCL support." << endl;
 	}
 
 	if(config.find("ddd") != config.end())
@@ -155,82 +144,20 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 		shared->loggingOn = config["logging"] == "true";
 	}
 
-
-#ifdef OPENCL
-
-	cv::ocl::PlatformsInfo platforms;
-	cv::ocl::getOpenCLPlatforms(platforms);
-
-	for(auto p : platforms)
-	{
-		DebugOut(1)<<"platform: "<<p->platformName<<" vendor: "<<p->platformVendor<<endl;
-	}
-
-	cv::ocl::DevicesInfo info;
-	cv::ocl::getOpenCLDevices(info, cv::ocl::CVCL_DEVICE_TYPE_ALL);
-
-	DebugOut(1)<<"There are "<<info.size()<<" OpenCL devices on this system"<<endl;
-
-	if(!info.size())
-	{
-		DebugOut(1)<<"No CL devices.  Disabling OpenCL"<<endl;
-		shared->useOpenCl = false;
-	}
-	else
-	{
-		cv::ocl::setDevice(info[0]);
-	}
-
-	for(auto i : info)
-	{
-		for(auto name : i->deviceName)
-		{
-			DebugOut(1)<<"OpenCLDeviceName: "<<name<<endl;
-		}
-	}
-
-#endif
-
-#ifdef CUDA
-	if(shared->useCuda)
-	{
-		int devices = cv::gpu::getCudaEnabledDeviceCount();
-		DebugOut()<<"There are "<<devices<<" CUDA devices on this system"<<endl;
-		if(devices)
-		{
-			DebugOut()<<"We will use 0 as the default device"<<endl;
-			cv::gpu::DeviceInfo info(0);
-			DebugOut()<<"Cuda Device Name: "<<info.name()<<endl;
-			DebugOut()<<"Version: "<<info.majorVersion()<<"major"<<info.minorVersion()<<"minor"<<endl;
-			DebugOut()<<"Streaming processor count: "<<info.multiProcessorCount()<<endl;
-			cv::gpu::setDevice(0);
-		}
-		else
-		{
-			DebugOut(DebugOut::Warning)<<"No CUDA device found.  Disabling CUDA."<<endl;
-			shared->useCuda = false;
-		}
-	}
-#endif
-
 	if(shared->ddd)
 	{
-#ifdef OPENCL
-		faceCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
-		eyeCascade = amb::make_unique(new cv::ocl::OclCascadeClassifier());
-#else
 		faceCascade = amb::make_unique(new cv::CascadeClassifier());
 		eyeCascade = amb::make_unique(new cv::CascadeClassifier());
-#endif
 
-		std::string faceFile = CV_DATA "/haarcascades/haarcascade_frontalface_alt.xml";
+		std::string faceFile = config["faceCascade"];
+
 		if(!faceCascade->load(faceFile))
 		{
 			DebugOut(DebugOut::Warning) << "Could not load face cascade: " << faceFile <<". Disabling ddd" << endl;
 			shared->ddd = false;
 		}
 
-		std::string eyeFile = CV_DATA "/haarcascades/haarcascade_eye_tree_eyeglasses.xml";
+		std::string eyeFile = config["eyeCascade"];
 
 		if(!eyeCascade->load(eyeFile))
 		{
@@ -370,17 +297,22 @@ static int grabImage(void *data)
 {
 	OpenCvLuxPlugin::Shared* shared = static_cast<OpenCvLuxPlugin::Shared*>(data);
 
-	cv::Mat m_image;
+	shared->frameCount++;
 
-	if(shared->kinect)
+	if(shared->frameCount >= shared->fps)
+		shared->frameCount = 0;
+
+	if(shared->frameCount % 4 != 0)
 	{
-		shared->m_capture->grab();
-		shared->m_capture->retrieve( m_image, CV_CAP_OPENNI_GRAY_IMAGE );
+		return true;
 	}
-	else
-	{
-		*(shared->m_capture.get()) >> m_image;
-	}
+
+	if(!shared->m_capture->isOpened())
+		return false;
+
+	cv::UMat m_image;
+
+	*(shared->m_capture.get()) >> m_image;
 
 	if(shared->ddd)
 	{
@@ -394,7 +326,7 @@ static int grabImage(void *data)
 		}
 	}
 
-	if(shared->threaded)
+	/*if(shared->threaded)
 	{
 		QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>();
 		QObject::connect(watcher, &QFutureWatcher<uint>::finished, shared->parent, &OpenCvLuxPlugin::imgProcResult);
@@ -418,8 +350,7 @@ static int grabImage(void *data)
 		}
 
 		//detectLight(m_image,shared);
-
-	}
+	}*/
 
 	if(shared->mRequests.size())
 	{
@@ -429,7 +360,7 @@ static int grabImage(void *data)
 	return false;
 }
 
-static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
+static uint evalImage(cv::UMat qImg, OpenCvLuxPlugin::Shared *shared)
 {
 	if(qImg.empty())
 	{
@@ -439,38 +370,7 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 
 	cv::Scalar avgPixelIntensity;
 
-
-	if(shared->useOpenCl)
-	{
-#ifdef OPENCL
-		cv::Scalar stdDev;
-		cv::ocl::oclMat src(qImg), gray;
-		cv::ocl::cvtColor(src, gray, CV_BGR2GRAY);
-		cv::ocl::meanStdDev(src, avgPixelIntensity, stdDev);
-#endif
-	}
-	else if(shared->useCuda)
-	{
-#ifdef CUDA
-		cv::gpu::GpuMat src(qImg), dest;
-		cv::gpu::cvtColor(src, dest, CV_BGR2GRAY);
-		cv::Scalar stdDev;
-		try
-		{
-
-			cv::gpu::meanStdDev(dest, avgPixelIntensity, stdDev);
-		}
-		catch(...)
-		{
-			DebugOut(DebugOut::Error)<<"CUDA pixel intensity calculation failed."<<endl;
-		}
-#endif
-	}
-	else
-	{
-		avgPixelIntensity = cv::mean(qImg);
-	}
-
+	avgPixelIntensity = cv::mean(qImg);
 
 	double val = avgPixelIntensity.val[0];
 
@@ -488,11 +388,7 @@ static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared)
 
 bool OpenCvLuxPlugin::init()
 {
-	if(!shared->m_capture && shared->kinect)
-	{
-		shared->m_capture = amb::make_unique(new cv::VideoCapture(CV_CAP_OPENNI));
-	}
-	else if(!shared->m_capture)
+	if(!shared->m_capture)
 	{
 		if(device == "")
 			shared->m_capture = amb::make_unique(new cv::VideoCapture(0));
@@ -510,8 +406,8 @@ bool OpenCvLuxPlugin::init()
 			configuration["logging"] == "true" &&
 			(!shared->mWriter || !shared->mWriter->isOpened()))
 	{
-		cv::Size s = cv::Size((int) shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH),
-							  (int) shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT));
+		cv::Size s = cv::Size((int) shared->m_capture->get(cv::CAP_PROP_FRAME_WIDTH),
+							  (int) shared->m_capture->get(cv::CAP_PROP_FRAME_HEIGHT));
 
 		std::string codec = configuration["codec"];
 
@@ -527,19 +423,19 @@ bool OpenCvLuxPlugin::init()
 
 		boost::algorithm::to_upper(codec);
 
-		shared->mWriter = amb::make_unique(new cv::VideoWriter(filename, CV_FOURCC(codec.at(0), codec.at(1), codec.at(2), codec.at(3)),30,s));
+		shared->mWriter = amb::make_unique(new cv::VideoWriter(filename, cv::VideoWriter::fourcc(codec.at(0), codec.at(1), codec.at(2), codec.at(3)),30,s));
 	}
 
-	DebugOut()<<"camera frame width: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_WIDTH)<<endl;
-	DebugOut()<<"camera frame height: "<<shared->m_capture->get(CV_CAP_PROP_FRAME_HEIGHT)<<endl;
-	DebugOut()<<"camera frame fps: "<<shared->m_capture->get(CV_CAP_PROP_FPS)<<endl;
+	DebugOut()<<"camera frame width: "<<shared->m_capture->get(cv::CAP_PROP_FRAME_WIDTH)<<endl;
+	DebugOut()<<"camera frame height: "<<shared->m_capture->get(cv::CAP_PROP_FRAME_HEIGHT)<<endl;
+	DebugOut()<<"camera frame fps: "<<shared->m_capture->get(cv::CAP_PROP_FPS)<<endl;
 
 	return true;
 }
 
 
 
-void OpenCvLuxPlugin::writeVideoFrame(cv::Mat f)
+void OpenCvLuxPlugin::writeVideoFrame(cv::UMat f)
 {
 	QMutexLocker locker(&mutex);
 
@@ -640,27 +536,14 @@ TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
 
 	cv::Mat gray;
 
-	if(shared->useOpenCl)
-	{
-#ifdef OPENCL
-		cv::ocl::oclMat src(img), gray2;
-		cv::ocl::cvtColor(src, gray2, CV_BGR2GRAY);
-		cv::ocl::GaussianBlur(gray2, gray2, cv::Size(9,9), 2, 2);
-
-		gray = gray2;
-#endif
-	}
-	else
-	{
-		cv::cvtColor(img, gray, CV_BGR2GRAY);
-		cv::GaussianBlur(gray, gray, cv::Size(9,9), 2, 2);
-	}
+	cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
+	cv::GaussianBlur(gray, gray, cv::Size(9,9), 2, 2);
 
 	std::vector<cv::Vec3f> circles;
 
 	//cv::HoughCircles(gray, circles, CV_HOUGH_GRADIENT, 1, gray.rows/8, 200, 100, 0, 0);
 
-	cv::HoughCircles( gray, circles, CV_HOUGH_GRADIENT, 2, 30, 231, 50, 0, 0 );
+	cv::HoughCircles( gray, circles, cv::HOUGH_GRADIENT, 2, 30, 231, 50, 0, 0 );
 
 	for(auto i = 0; i < circles.size(); i++)
 	{
@@ -701,40 +584,22 @@ TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
 		}
 
 	}
-
-	cv::namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
-	cv::imshow( "Hough Circle Transform Demo", img );
 }
 
 
-void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
+void OpenCvLuxPlugin::detectEyes(cv::UMat frame)
 {
 	if(frame.empty())
 		return;
 
 	bool hasEyes = false;
 	std::vector<cv::Rect> faces;
-	cv::Mat frameGray;
-#ifdef OPENCL
-	cv::ocl::oclMat gray2;
-#endif
+	cv::UMat frameGray;
 
-	if(shared->useOpenCl)
-	{
-#ifdef OPENCL
-		cv::ocl::oclMat src(frame);
-		cv::ocl::cvtColor(src, gray2, CV_BGR2GRAY);
-		cv::ocl::equalizeHist(gray2, gray2);
-		cv::ocl::OclCascadeClassifier* fc = static_cast<cv::ocl::OclCascadeClassifier*>(faceCascade.get());
-		fc->detectMultiScale(gray2, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
-#endif
-	}
-	else
-	{
-		cv::cvtColor(frame, frameGray, CV_BGR2GRAY);
-		cv::equalizeHist(frameGray, frameGray);
-		faceCascade->detectMultiScale(frameGray, faces, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30));
-	}
+
+	cv::cvtColor(frame, frameGray, cv::COLOR_BGR2GRAY);
+	cv::equalizeHist(frameGray, frameGray);
+	faceCascade->detectMultiScale(frameGray, faces, 1.1, 2, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
 
 	for( size_t i = 0; i < faces.size(); i++ )
 	{
@@ -743,25 +608,9 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 
 		std::vector<cv::Rect> eyes;
 
-		if(shared->useOpenCl)
-		{
-#ifdef OPENCL
-			cv::ocl::oclMat faceROI = gray2(faces[i]);
-			cv::ocl::OclCascadeClassifier* ec = static_cast<cv::ocl::OclCascadeClassifier*>(eyeCascade.get());
-			ec->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
-#endif
-		}
-		else
-		{
-			cv::Mat faceROI = frameGray(faces[i]);
-			eyeCascade->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | CV_HAAR_SCALE_IMAGE, cv::Size(30, 30) );
-		}
 
-		if(eyes.size())
-		{
-			hasEyes = true;
-			DebugOut() << "Number of eyes: " << eyes.size() << endl;
-		}
+		cv::UMat faceROI(frameGray(faces[i]));
+		eyeCascade->detectMultiScale( faceROI, eyes, 1.1, 2, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30) );
 
 		for( size_t j = 0; j < eyes.size(); j++ )
 		{
@@ -769,7 +618,20 @@ void OpenCvLuxPlugin::detectEyes(cv::Mat frame)
 			int radius = cvRound( (eyes[j].width + eyes[j].height)*0.25 );
 			cv::circle( frame, center, radius, cv::Scalar( 255, 0, 0 ), 4, 8, 0 );
 		}
-	}
 
-	routingEngine->updateProperty(driverDrowsiness.get(),this->uuid());
+		if(eyes.size())
+		{
+			hasEyes = true;
+			DebugOut() << "Number of eyes: " << eyes.size() << endl;
+
+			driverDrowsiness->setValue(false);
+			routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
+		}
+		else
+		{
+			DebugOut() << "No eyes!!!" << endl;
+			driverDrowsiness->setValue(true);
+			routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
+		}
+	}
 }

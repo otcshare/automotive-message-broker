@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 #include <memory>
 
-#include <opencv/cv.h>
+#include <opencv2/objdetect.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 #include <QObject>
@@ -40,20 +40,21 @@ public:
 
 	struct Shared
 	{
+		Shared(): frameCount(0) { }
 		std::unique_ptr<cv::VideoCapture> m_capture;
 		std::unique_ptr<cv::VideoWriter> mWriter;
 		PropertyList mRequests;
 		OpenCvLuxPlugin* parent;
 
-		double fps;
+		int fps;
 		bool threaded;
 		bool kinect;
-		bool useOpenCl;
 		bool useCuda;
 		int pixelLowerBound;
 		int pixelUpperBound;
 		bool loggingOn;
 		bool ddd;
+		int frameCount;
 	};
 
 	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
@@ -76,9 +77,9 @@ public:
 
 	void updateProperty(uint lux);
 
-	void writeVideoFrame(cv::Mat frame);
+	void writeVideoFrame(cv::UMat frame);
 
-	void detectEyes(cv::Mat frame);
+	void detectEyes(cv::UMat frame);
 
 public Q_SLOTS:
 	void imgProcResult();

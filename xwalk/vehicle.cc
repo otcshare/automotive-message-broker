@@ -418,7 +418,7 @@ void Vehicle::GetZones(const std::string& object_name, double ret_id) {
 		auto value_ptr = amb::make_super(value);
 		int v = 0;
 
-		g_variant_get(value_ptr.get(), "(i)", &v);
+		g_variant_get(value_ptr.get(), "i", &v);
 		zones_array.push_back(v);
 	}
 
@@ -447,15 +447,17 @@ std::string Vehicle::FindProperty(const std::string& object_name, int zone, std:
 	auto error_ptr = amb::make_super(error);
 
 	if (error_ptr) {
-		DebugOut() << "error calling FindObjectForZone: "
+		DebugOut(DebugOut::Error) << "error calling FindObjectForZone: "
 				   << error_ptr->message << endl;
 
 		DebugOut() << "Could not find object in zone: " << zone << endl;
+		error_str = vehicle_error_invalid_operation;
 		return "";
 	}
 
 	if (!object_path_variant) {
 		DebugOut() << "Could not find object in zone: "  << zone << endl;
+		error_str = vehicle_error_invalid_operation;
 		return "";
 	}
 
@@ -693,7 +695,8 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 		if (set_error_ptr) {
 			DebugOut(DebugOut::Error) << "error setting property:" << set_error_ptr->message << endl;
 
-			if(set_error_ptr->code == G_IO_ERROR_PERMISSION_DENIED || std::string(g_dbus_error_get_remote_error(set_error_ptr.get())) == "org.freedesktop.DBus.Error.AccessDenied")
+			if(set_error_ptr->code == G_IO_ERROR_PERMISSION_DENIED
+					|| std::string(g_dbus_error_get_remote_error(set_error_ptr.get())) == "org.freedesktop.DBus.Error.AccessDenied")
 			{
 				DebugOut(DebugOut::Error) << "permission denied" << endl;
 				PostError(&callback, vehicle_error_permission_denied);
@@ -705,4 +708,65 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 	}
 
 	PostReply(&callback, picojson::value());
+}
+
+void Vehicle::Supported(const string& object_name, double ret_id)
+{
+	Vehicle::CallbackInfo callback;
+	callback.callback_id = ret_id;
+	callback.method = "supported";
+	callback.instance = instance_;
+
+	GError* error(nullptr);
+
+	auto object_path_variant = amb::make_super(
+				g_dbus_proxy_call_sync(manager_proxy_.get(),
+									   "FindObject",
+									   g_variant_new("(s)", object_name.c_str()),
+									   G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error));
+
+	auto error_ptr = amb::make_super(error);
+
+	if (error_ptr) {
+		DebugOut(DebugOut::Error) << "error calling FindObjectForZone: "
+				   << error_ptr->message << endl;
+
+		DebugOut() << "Could not find object for: "  << object_name << endl;
+		PostReply(&callback, picojson::value(false));
+		return;
+	}
+
+	if (!object_path_variant) {
+		DebugOut() << "Could not find object for: "  << object_name << endl;
+		PostReply(&callback, picojson::value(false));
+		return;
+	}
+
+	PostReply(&callback, picojson::value(true));
+}
+
+bool Vehicle::AvailableForRetrieval(const string &objectName, const string &attName)
+{
+	GError* error = nullptr;
+
+	auto supportedVariant = amb::make_super(
+				g_dbus_proxy_call_sync(manager_proxy_.get(),
+									   "SupportsProperty",
+									   g_variant_new("(ss)", objectName.c_str(), attName.c_str()),
+									   G_DBUS_CALL_FLAGS_NONE, -1, NULL, &error));
+
+	auto error_ptr = amb::make_super(error);
+
+	if (error_ptr) {
+		DebugOut(DebugOut::Error) << "error calling SupportsProperty: "
+				   << error_ptr->message << endl;
+
+		DebugOut() << "Could not find object for: "  << objectName << endl;
+		return false;
+	}
+
+	bool supported = false;
+	g_variant_get(supportedVariant.get(), "(b)", &supported);
+
+	return supported;
 }
