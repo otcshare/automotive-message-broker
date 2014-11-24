@@ -233,6 +233,7 @@ Crosswalk vehicle API extension based on the W3C Automotive Business Group Vehic
        -Dgpsnmea_plugin=ON \
        -Dcangen_plugin=ON \
        -Dcansim_plugin=ON \
+       -Dusebluez5=ON \
        -Denable_docs=ON
 
 
