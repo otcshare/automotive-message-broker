@@ -27,7 +27,7 @@
 class VehicleSpeedProperty: public DBusSink
 {
 public:
-	VehicleSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	VehicleSpeedProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehicleSpeed", re, connection, map<string, string>())
 	{
 		/** @attributeName VehicleSpeed
@@ -49,7 +49,7 @@ public:
 class EngineSpeedProperty: public DBusSink
 {
 public:
-	EngineSpeedProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	EngineSpeedProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("EngineSpeed", re, connection, map<string, string>())
 	{
 		/** @attributeName EngineSpeed
@@ -71,7 +71,7 @@ public:
 class VehiclePowerModeProperty: public DBusSink
 {
 public:
-	VehiclePowerModeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	VehiclePowerModeProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehiclePowerMode", re, connection, map<string, string>())
 	{
 		/**
@@ -96,7 +96,7 @@ public:
 class TripMeterProperty: public DBusSink
 {
 public:
-	TripMeterProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	TripMeterProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("TripMeter", re, connection, map<string, string>())
 	{
 		/** @attributeName TripMeters
@@ -113,7 +113,7 @@ public:
 class AccelerationProperty: public DBusSink
 {
 public:
-	AccelerationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	AccelerationProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("Acceleration", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::AccelerationX, "X", AbstractProperty::Read);
@@ -127,7 +127,7 @@ public:
 class TransmissionProperty: public DBusSink
 {
 public:
-	TransmissionProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	TransmissionProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("Transmission", re, connection, map<string, string>())
 	{
 
@@ -151,7 +151,7 @@ public:
 class CruiseControlProperty: public DBusSink
 {
 public:
-	CruiseControlProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	CruiseControlProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("CruiseControlStatus", re, connection, map<string, string>())
 	{
 		///TODO: deprecate Activated.  Remove in 0.14
@@ -166,7 +166,7 @@ public:
 class WheelBrakeProperty: public DBusSink
 {
 public:
-	WheelBrakeProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	WheelBrakeProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("WheelBrake", re, connection, map<string, string>())
 	{
 		/** @attributeName Engaged
@@ -183,7 +183,7 @@ public:
 class BrakeOperation: public DBusSink
 {
 public:
-	BrakeOperation(AbstractRoutingEngine *re, GDBusConnection *connection)
+	BrakeOperation(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("BrakeOperation", re, connection, map<string, string>())
 	{
 		/** @attributeName Engaged
@@ -200,7 +200,7 @@ public:
 class LightStatusProperty: public DBusSink
 {
 public:
-	LightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	LightStatusProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("LightStatus", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::LightHead, "Head", "b", AbstractProperty::ReadWrite);
@@ -220,7 +220,7 @@ public:
 class InteriorLightStatusProperty: public DBusSink
 {
 public:
-	InteriorLightStatusProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	InteriorLightStatusProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("InteriorLightStatus", re, connection, map<string, string>())
 	{
 		/// TODO: deprecated remove in 0.14
@@ -238,7 +238,7 @@ public:
 class HornProperty: public DBusSink
 {
 public:
-	HornProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	HornProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("Horn", re, connection, map<string, string>())
 	{
 		/// TODO: deprecated remove in 0.14
@@ -252,7 +252,7 @@ public:
 class FuelProperty: public DBusSink
 {
 public:
-	FuelProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	FuelProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("Fuel", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::FuelLevel,"Level", AbstractProperty::Read);
@@ -278,7 +278,7 @@ public:
 class EngineOilProperty: public DBusSink
 {
 public:
-	EngineOilProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	EngineOilProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("EngineOil", re, connection, map<string, string>())
 	{
 		///TODO depricated.  Use Level.  Remove in 0.14
@@ -296,7 +296,7 @@ public:
 class LocationProperty: public DBusSink
 {
 public:
-	LocationProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+	LocationProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("Location", re, connection, map<string, string>())
 	{
 		/** @attributeName Latitude
@@ -333,7 +333,7 @@ public:
 class SteeringWheel: public DBusSink
 {
 public:
-	SteeringWheel(AbstractRoutingEngine *re, GDBusConnection *connection)
+	SteeringWheel(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("SteeringWheel", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::SteeringWheelAngleW3C, "Angle", AbstractProperty::Read);
@@ -343,7 +343,7 @@ public:
 class ThrottlePosition: public DBusSink
 {
 public:
-	ThrottlePosition(AbstractRoutingEngine *re, GDBusConnection *connection)
+	ThrottlePosition(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("ThrottlePosition", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::ThrottlePosition, "Value", AbstractProperty::Read);
@@ -353,7 +353,7 @@ public:
 class NightMode: public DBusSink
 {
 public:
-	NightMode(AbstractRoutingEngine *re, GDBusConnection *connection)
+	NightMode(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("NightMode", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::NightMode, "NightMode", "b", AbstractProperty::Read);
@@ -364,7 +364,7 @@ public:
 class DrivingMode: public DBusSink
 {
 public:
-	DrivingMode(AbstractRoutingEngine *re, GDBusConnection *connection)
+	DrivingMode(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("DrivingMode", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::DrivingMode, "DrivingMode", "i", AbstractProperty::Read);
@@ -375,7 +375,7 @@ public:
 class PowertrainTorque: public DBusSink
 {
 public:
-	PowertrainTorque(AbstractRoutingEngine *re, GDBusConnection *connection)
+	PowertrainTorque(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("PowertrainTorque", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::PowertrainTorque, "Value", AbstractProperty::Read);
@@ -385,7 +385,7 @@ public:
 class AcceleratorPedalPosition: public DBusSink
 {
 public:
-	AcceleratorPedalPosition(AbstractRoutingEngine *re, GDBusConnection *connection)
+	AcceleratorPedalPosition(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("AcceleratorPedalPosition", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::AcceleratorPedalPosition, "Value", AbstractProperty::Read);
@@ -395,7 +395,7 @@ public:
 class Chime: public DBusSink
 {
 public:
-	Chime(AbstractRoutingEngine *re, GDBusConnection *connection)
+	Chime(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("Chime", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::Chime, "Status", AbstractProperty::Read);
@@ -405,7 +405,7 @@ public:
 class WheelTick: public DBusSink
 {
 public:
-	WheelTick(AbstractRoutingEngine *re, GDBusConnection *connection)
+	WheelTick(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("WheelTick", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::WheelTick, "Value", AbstractProperty::Read);
@@ -415,7 +415,7 @@ public:
 class IgnitionTime: public DBusSink
 {
 public:
-	IgnitionTime(AbstractRoutingEngine *re, GDBusConnection *connection)
+	IgnitionTime(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("IgnitionTime", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::IgnitionTimeOn, "IgnitionTimeOn", AbstractProperty::Read);
@@ -426,7 +426,7 @@ public:
 class YawRate: public DBusSink
 {
 public:
-	YawRate(AbstractRoutingEngine *re, GDBusConnection *connection)
+	YawRate(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("YawRate", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::YawRate, "Value", AbstractProperty::Read);
@@ -436,7 +436,7 @@ public:
 class ButtonEvent: public DBusSink
 {
 public:
-	ButtonEvent(AbstractRoutingEngine *re, GDBusConnection *connection)
+	ButtonEvent(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("ButtonEvent", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::YawRate, "Value", AbstractProperty::Read);

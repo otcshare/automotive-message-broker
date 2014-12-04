@@ -83,6 +83,16 @@ void printVersion()
 	DebugOut(0)<<"Version: "<<PROJECT_VERSION<<" ( "<<PROJECT_CODENAME<<" "<<PROJECT_QUALITY<<" )"<<endl;
 }
 
+static void glibLogHandler(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)
+{
+	if(log_level == G_LOG_LEVEL_CRITICAL)
+		DebugOut(DebugOut::Error) << message << endl;
+	else if(log_level == G_LOG_LEVEL_WARNING)
+		DebugOut(DebugOut::Warning) << message << endl;
+	else
+		DebugOut() << message << endl;
+}
+
 int main(int argc, char **argv)
 {
 
@@ -92,6 +102,8 @@ int main(int argc, char **argv)
 	string config="/etc/ambd/config";
 	ofstream logfile;
 	string logfn;
+
+	g_log_set_handler(G_LOG_DOMAIN, GLogLevelFlags(G_LOG_LEVEL_WARNING | G_LOG_LEVEL_CRITICAL), glibLogHandler, nullptr);
 
 	while ((optc = getopt_long (argc, argv, shortopts, longopts, NULL)) != -1)
 	{

@@ -227,7 +227,7 @@ void CANSimPlugin::createMappingTable(const PropertyList& /*supported*/)
 	{
 		VehicleProperty::Property propertyName(*propIt);
 
-		std::list<std::string> sources(routingEngine->sourcesForProperty(propertyName));
+		std::vector<std::string> sources(routingEngine->sourcesForProperty(propertyName));
 		size_t size = sources.size();
 
 		bool IAmTheSource = contains(sources, uuid());

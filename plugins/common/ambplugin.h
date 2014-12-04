@@ -134,7 +134,7 @@ public:
 	 * \param property the property to get info for.
 	 * \return a PropertyInfo object.
 	 */
-	virtual PropertyInfo getPropertyInfo(VehicleProperty::Property property);
+	virtual PropertyInfo getPropertyInfo(const VehicleProperty::Property & property);
 
 	// from AbstractSink
 public:
@@ -239,7 +239,7 @@ int AmbPlugin<T>::supportedOperations()
 }
 
 template<typename T>
-PropertyInfo AmbPlugin<T>::getPropertyInfo(VehicleProperty::Property property)
+PropertyInfo AmbPlugin<T>::getPropertyInfo(const VehicleProperty::Property &property)
 {
 	return d ? d->getPropertyInfo(property) : PropertyInfo::invalid();
 }

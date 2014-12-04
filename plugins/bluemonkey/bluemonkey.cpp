@@ -100,9 +100,6 @@ BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> con
 	QTimer::singleShot(1,this,SLOT(reloadEngine()));
 
 	auth = new Authenticate(config, this);
-
-	qmlRegisterType<QTimer>("", 1, 0, "QTimer");
-	qmlRegisterType<QObject>("", 1, 0, "QObject");
 }
 
 BluemonkeySink::~BluemonkeySink()
@@ -157,11 +154,11 @@ QObject* BluemonkeySink::subscribeToZone(QString str, int zone)
 
 QStringList BluemonkeySink::sourcesForProperty(QString property)
 {
-	std::list<std::string> list = routingEngine->sourcesForProperty(property.toStdString());
+	std::vector<std::string> list = routingEngine->sourcesForProperty(property.toStdString());
 	QStringList strList;
-	for(auto itr = list.begin(); itr != list.end(); itr++)
+	for(auto itr : list)
 	{
-		strList<<(*itr).c_str();
+		strList<<itr.c_str();
 	}
 
 	return strList;

@@ -8,7 +8,7 @@
 class AntilockBrakingSystemProperty: public DBusSink
 {
 public:
-	AntilockBrakingSystemProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	AntilockBrakingSystemProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("AntilockBrakingSystem", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
@@ -18,7 +18,7 @@ public:
 class TractionControlSystemProperty: public DBusSink
 {
 public:
-	TractionControlSystemProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	TractionControlSystemProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("TractionControlSystem", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::TractionControlSystem, "TractionControlSystem", "b", AbstractProperty::Read);
@@ -29,7 +29,7 @@ public:
 class VehicleTopSpeedLimitProperty: public DBusSink
 {
 public:
-	VehicleTopSpeedLimitProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	VehicleTopSpeedLimitProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehicleTopSpeedLimit", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::VehicleTopSpeedLimit, "VehicleTopSpeedLimit", "q", AbstractProperty::Read);
@@ -39,7 +39,7 @@ public:
 class AirbagStatusProperty: public DBusSink
 {
 public:
-	AirbagStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	AirbagStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("AirbagStatus", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", "y", AbstractProperty::Read);
@@ -50,7 +50,7 @@ public:
 class DoorStatusProperty: public DBusSink
 {
 public:
-	DoorStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	DoorStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("DoorStatus", re, connection, map<string, string>())
 	{
 
@@ -65,7 +65,7 @@ public:
 class DoorProperty: public DBusSink
 {
 public:
-	DoorProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	DoorProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Door", re, connection, map<string, string>())
 	{
 
@@ -80,7 +80,7 @@ public:
 class SeatBeltStatusProperty: public DBusSink
 {
 public:
-	SeatBeltStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	SeatBeltStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SeatBelt", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "Status", "b", AbstractProperty::Read);
@@ -90,7 +90,7 @@ public:
 class OccupantStatusProperty: public DBusSink
 {
 public:
-	OccupantStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	OccupantStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("OccupantStatus", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", "i", AbstractProperty::Read);
@@ -100,7 +100,7 @@ public:
 class ObstacleDistanceProperty: public DBusSink
 {
 public:
-	ObstacleDistanceProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ObstacleDistanceProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ObstacleDistance", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", "d", AbstractProperty::Read);

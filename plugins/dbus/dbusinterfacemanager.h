@@ -41,7 +41,7 @@ public:
     
 	GDBusConnection * connection;
 
-	void registerCustomTypes();
+	void registerTypes();
 
 private:
 

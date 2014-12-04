@@ -83,6 +83,38 @@ bluemonkey.createCustomProperty("WasherFluidLevelLow", false);
 
 bluemonkey.createCustomProperty("MalfunctionIndicatorOn", false);
 
+bluemonkey.createCustomProperty("AccumulatedEngineRuntime", 0);
+bluemonkey.createCustomProperty("DistanceWithMILOn", 0);
+bluemonkey.createCustomProperty("DistanceSinceCodeCleared", 0);
+bluemonkey.createCustomProperty("TimeRunMILOn", 0);
+bluemonkey.createCustomProperty("TimeTroubleCodeClear", 0);
+
+bluemonkey.createCustomProperty("BatteryVoltage", 13);
+bluemonkey.createCustomProperty("BatteryCurrent", 1);
+bluemonkey.createCustomProperty("BatteryChargeLevel", 100);
+
+bluemonkey.createCustomProperty("TirePressure", 200);
+bluemonkey.createCustomProperty("TirePressureLow", false);
+bluemonkey.createCustomProperty("TireTemperature", 20);
+
+bluemonkey.createCustomProperty("ActiveNoiseControlMode", false);
+bluemonkey.createCustomProperty("AvailableSounds", [""]);
+bluemonkey.createCustomProperty("EngineSoundEnhancementMode", "");
+
+bluemonkey.createCustomProperty("SeatPositionBackCushion", 0);
+bluemonkey.createCustomProperty("SeatPositionRecline", 0);
+bluemonkey.createCustomProperty("SeatPositionSlide", 0);
+bluemonkey.createCustomProperty("SeatPositionCushionHeight", 0);
+bluemonkey.createCustomProperty("SeatPositionHeadrest", 0);
+bluemonkey.createCustomProperty("SeatPositionSideCushion", 0);
+
+bluemonkey.createCustomProperty("VehicleDriveMode", "auto");
+
+bluemonkey.createCustomProperty("MirrorSettingPan", 0);
+bluemonkey.createCustomProperty("MirrorSettingTilt", 0);
+
+bluemonkey.createCustomProperty("DashboardIllumination", 5);
+
 var speedProperty = bluemonkey.subscribeTo("VehicleSpeed");
 
 var testTimer = bluemonkey.createTimer();

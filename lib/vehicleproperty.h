@@ -291,6 +291,17 @@ enum Mode {
 	OEMCustom1 = 3,
 	OEMCustom2 = 4
 };
+
+namespace W3C
+{
+extern const char* Comfort;
+extern const char* Auto;
+extern const char* Sport;
+extern const char* Eco;
+extern const char* Manual;
+extern const char* Winter;
+}
+
 }
 
 namespace Measurement
@@ -524,7 +535,7 @@ public:
 	PROPERTYTYPEBASIC(EngineOilRemaining, uint16_t)
 
 	static const Property EngineOilLifeRemaining;
-	PROPERTYTYPEBASIC(EngineOilLifeRemaining, uint8_t)
+	PROPERTYTYPEBASIC(EngineOilLifeRemaining, uint16_t)
 
 	static const Property EngineOilChangeIndicator;
 	PROPERTYTYPEBASIC(EngineOilChangeIndicator, bool)
@@ -559,7 +570,7 @@ public:
 	//typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
 	static const Property TripMeters;
-	PROPERTYTYPE(TripMeters, TripMetersType, ListPropertyType<BasicPropertyType<uint16_t> >, AbstractPropertyType*)
+	PROPERTYTYPE(TripMeters, TripMetersType, ListPropertyType<BasicPropertyType<uint16_t> >, uint16_t)
 	//typedef ListPropertyType<BasicPropertyType<uint16_t> > TripMetersType;
 
 	static const Property CruiseControlActive;
@@ -661,33 +672,26 @@ public:
 	PROPERTYTYPE(VehicleHeight, VehicleHeightType, BasicPropertyType<uint>, uint)
 	static const Property VehicleLength;
 	PROPERTYTYPE(VehicleLength, VehicleLengthType, BasicPropertyType<uint>, uint)
-	//typedef BasicPropertyType<uint> VehicleSizeType;
 
 	static const Property VehicleType;
 	PROPERTYTYPE(VehicleType, VehicleTypeType, BasicPropertyType<Vehicle::Type>, Vehicle::Type)
-	//typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
 
 	static const Property DoorsPerRow;
-	PROPERTYTYPE(DoorsPerRow, DoorsPerRowType, ListPropertyType<BasicPropertyType<uint16_t> >, AbstractPropertyType*)
-	//typedef ListPropertyType<BasicPropertyType<uint16_t> > DoorsPerRowType;
+	PROPERTYTYPE(DoorsPerRow, DoorsPerRowType, ListPropertyType<BasicPropertyType<uint16_t> >, uint16_t)
 
 	static const Property TransmissionGearType;
 	PROPERTYTYPE(TransmissionGearType, TransmissionGearTypeType, BasicPropertyType<Transmission::Type>, Transmission::Type)
-	//typedef BasicPropertyType<Transmission::Type> TransmissionGearTypeType;
 
 	static const Property FrontWheelRadius;
 	PROPERTYTYPE(FrontWheelRadius, FrontWheelRadiusType, BasicPropertyType<uint16_t>, uint16_t)
 	static const Property RearWheelRadius;
 	PROPERTYTYPE(RearWheelRadius, RearWheelRadiusType, BasicPropertyType<uint16_t>, uint16_t)
-//	/typedef BasicPropertyType<uint16_t> WheelRadiusType;
 
 	static const Property WheelTrack;
 	PROPERTYTYPE(WheelTrack, WheelTrackType, BasicPropertyType<uint>, uint)
-//	typedef BasicPropertyType<uint> WheelTrackType;
 
 	static const Property BrakePressure;
 	PROPERTYTYPEBASIC(BrakePressure, uint16_t)
-	//typedef BasicPropertyType<uint16_t> BrakePressureType;
 
 	/// TODO: deprecated.  remove in 0.13.  Use DistanceTotal
 	static const Property Odometer;
@@ -705,23 +709,23 @@ public:
 	PROPERTYTYPEBASIC(TransmissionFluidLevel, uint16_t)
 
 	static const Property TransmissionOilWear;
-	PROPERTYTYPEBASIC(TransmissionOilWear, uint8_t)
+	PROPERTYTYPEBASIC(TransmissionOilWear, uint16_t)
 
 	static const Property TransmissionOilTemperature;
-	PROPERTYTYPEBASIC(TransmissionOilTemperature, int8_t)
+	PROPERTYTYPEBASIC(TransmissionOilTemperature, int16_t)
 
 	static const Property TransmissionClutchWear;
-	PROPERTYTYPEBASIC(TransmissionClutchWear, uint8_t)
+	PROPERTYTYPEBASIC(TransmissionClutchWear, uint16_t)
 
 	/**< Brake Fluid Level 0-100%.
 	 **/
 	static const Property BrakeFluidLevel;
-	PROPERTYTYPEBASIC(BrakeFluidLevel, uint8_t)
+	PROPERTYTYPEBASIC(BrakeFluidLevel, uint16_t)
 
 	/**< Washer Fluid Level 0-100%.
 	 **/
 	static const Property WasherFluidLevel;
-	PROPERTYTYPEBASIC(WasherFluidLevel, uint8_t)
+	PROPERTYTYPEBASIC(WasherFluidLevel, uint16_t)
 
 	static const Property WasherFluidLevelLow;
 	PROPERTYTYPEBASIC(WasherFluidLevelLow, bool)
@@ -918,7 +922,7 @@ public:
 	PROPERTYTYPEBASIC(PowertrainTorque, uint16_t)
 
 	static const Property AcceleratorPedalPosition;
-	PROPERTYTYPEBASIC(AcceleratorPedalPosition, uint8_t)
+	PROPERTYTYPEBASIC(AcceleratorPedalPosition, uint16_t)
 
 	static const Property Chime;
 	PROPERTYTYPEBASIC(Chime, bool)
@@ -936,7 +940,7 @@ public:
 	PROPERTYTYPEBASIC(YawRate, int16_t)
 
 	static const Property BrakePadWear;
-	PROPERTYTYPEBASIC(BrakePadWear, uint8_t)
+	PROPERTYTYPEBASIC(BrakePadWear, uint16_t)
 
 	static const Property BrakeFluidLevelLow;
 	PROPERTYTYPEBASIC(BrakeFluidLevelLow, bool)
@@ -947,8 +951,34 @@ public:
 	static const Property MalfunctionIndicatorOn;
 	PROPERTYTYPEBASIC(MalfunctionIndicatorOn, bool)
 
-	/** END PROPERTIES **/
+	static const Property AccumulatedEngineRuntime;
+	PROPERTYTYPEBASIC(AccumulatedEngineRuntime, uint32_t)
 
+	static const Property DistanceSinceCodeCleared;
+	PROPERTYTYPEBASIC(DistanceSinceCodeCleared, uint32_t)
+
+	static const Property DistanceWithMILOn;
+	PROPERTYTYPEBASIC(DistanceWithMILOn, uint32_t)
+
+	static const Property TimeRunMILOn;
+	PROPERTYTYPEBASIC(TimeRunMILOn, uint32_t)
+
+	static const Property TimeTroubleCodeClear;
+	PROPERTYTYPEBASIC(TimeTroubleCodeClear, uint32_t)
+
+	static const Property VehicleDriveMode;
+	PROPERTYTYPE(VehicleDriveMode, VehicleDriveModeType, StringPropertyType, std::string)
+
+	static const Property ActiveNoiseControlMode;
+	PROPERTYTYPEBASIC(ActiveNoiseControlMode, bool)
+
+	static const Property AvailableSounds;
+	PROPERTYTYPE(AvailableSounds, AvailableSoundsType, ListPropertyType<StringPropertyType>, StringPropertyType)
+
+	static const Property EngineSoundEnhancementMode;
+	PROPERTYTYPE(EngineSoundEnhancementMode, EngineSoundEnhancementModeType, StringPropertyType, std::string)
+
+	/** END PROPERTIES **/
 
 	/*!
 	 * \brief capabilities

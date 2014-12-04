@@ -10,7 +10,7 @@
 class SecurityAlertProperty: public DBusSink
 {
 public:
-	SecurityAlertProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	SecurityAlertProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SecurityAlert", re, connection, map<string, string>())
 	{
 
@@ -21,7 +21,7 @@ public:
 		 **/
 		wantProperty<Security::Status>(VehicleProperty::SecurityAlertStatus,"SecurityAlert", "i", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -29,7 +29,7 @@ public:
 class ParkingBrakeProperty: public DBusSink
 {
 public:
-	ParkingBrakeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ParkingBrakeProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ParkingBrake", re, connection, map<string, string>())
 	{
 		/** @attributeName ParkingBrake
@@ -39,7 +39,7 @@ public:
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingBrakeStatus,"ParkingBrake", "b", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -47,7 +47,7 @@ public:
 class ParkingLightProperty: public DBusSink
 {
 public:
-	ParkingLightProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ParkingLightProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ParkingLight", re, connection, map<string, string>())
 	{
 		/** @attributeName ParkingLight
@@ -57,7 +57,7 @@ public:
 		 **/
 		wantProperty<bool>(VehicleProperty::ParkingLightStatus,"ParkingLight", "b", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -65,7 +65,7 @@ public:
 class HazardLightProperty: public DBusSink
 {
 public:
-	HazardLightProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	HazardLightProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("HazardLight", re, connection, map<string, string>())
 	{
 		/** @attributeName HazardLight
@@ -74,8 +74,6 @@ public:
 		 *  @attributeComment must return status of hazard light:  Engaged = true, Disengaged = false.
 		 **/
 		wantProperty<bool>(VehicleProperty::HazardLightStatus,"HazardLight", "b", AbstractProperty::ReadWrite);
-
-		
 	}
 };
 

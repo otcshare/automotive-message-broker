@@ -204,7 +204,7 @@ interface org.automotive.TripMeter extends VehiclePropertyType  {
   /*!  TripMeters
    *   \brief  Must return trip meters.  Changing any items in the array will reset the item's value to '0'.
    */
-   attribute UInt16[] TripMeters
+   attribute array TripMeters of UInt16;
 }
 
 /*! org.automotive.Acceleration
@@ -817,7 +817,7 @@ interface org.automotive.Doors extends VehiclePropertyType  {
    *   Example a common mini-van may have Doors[0] = 2 doors,
    *   Doors[1] = 1 (side door), Doors[2] = 1 (trunk).
    */
-   attribute Array<UInt16> DoorsPerRow readonly
+   attribute array DoorsPerRow of UInt16 readonly
 }
 
 
@@ -1155,16 +1155,18 @@ interface org.automotive.MeasurementSystem extends VehiclePropertyType {
 }
 
 
+///TODO Deprecated.  Use org.automotive.Mirror.  Remove in 0.14
 interface org.automotive.MirrorSetting extends VehiclePropertyType {
 
   /*!
   * \brief MUST return
   */
-   attribute UInt16 Pan readonly
-   attribute UInt16 Tilt readonly
+   attribute UInt8 Pan readonly
+   attribute UInt8 Tilt readonly
 }
 
 
+///TODO Deprecated.  Use org.automotive.SeadAdjustment.  Remove in 0.14
 interface org.automotive.SeatPosition extends VehiclePropertyType {
 
   /*!
@@ -1221,7 +1223,7 @@ interface org.automotive.DashboardIllumination extends VehiclePropertyType {
    attribute UInt16 DashboardIllumination readonly
 }
 
-
+///TODO Deprecated.  Use org.automotive.VehicleSound. Remove in 0.14
 interface org.automotive.GeneratedVehicleSoundMode extends VehiclePropertyType {
 
   /*!
@@ -1464,6 +1466,120 @@ interface org.automotive.MalfunctionIndicator extends VehiclePropertyType {
    * \brief must return true if washer fluid level is low: low (true), not low: (false)
    */
    attribute Boolean On readonly;
+}
+
+interface org.automotive.Diagnostic extends VehiclePropertyType {
+
+  /*!
+   * \brief must return engine runtime (Unit: seconds)
+   */
+   attribute UInt32 AccumulatedEngineRuntime readonly;
+
+   /*!
+    * \brief must return distance travelled since the codes were last cleared (Unit: meters)
+    */
+   attribute UInt32 DistanceSinceCodeCleared readonly;
+
+   /*!
+    * \brief must return distance travelled with the malfunction indicator light on (Unit: meters)
+    */
+   attribute UInt32 DistanceWithMILOn readonly;
+
+   /*!
+    * \brief must return time elapsed with the malfunction indicator light on (Unit: seconds)
+    */
+   attribute UInt32 TimeRunMILOn readonly;
+
+   /*!
+    * \brief must return time elapsed since the trouble codes were last cleared (Unit: seconds)
+    */
+   attribute UInt32 TimeTroubleCodeClear readonly;
+}
+
+interface org.automotive.Mirror extends VehiclePropertyType {
+
+  /*!
+   * \brief must return mirror pan position in percentage distance travelled, from left to right position (Unit: percentage, %0: center position, -100%: fully left, 100%: fully right)
+   */
+   attribute UInt8 MirrorPan;
+
+  /*!
+   * \brief must return mirror tilt position in percentage distance travelled, from downward-facing to upward-facing position (Unit: percentage, 0%:center position, -100%:fully downward, 100%:full upward)
+   */
+   attribute UInt8 MirrorTilt;
+}
+
+interface org.automotive.SeatAdjustment extends VehiclePropertyType {
+
+  /*!
+  * \brief MUST return seat back recline position as percent to completely reclined (Unit: percentage, 0%: fully forward, 100%: fully reclined)
+  */
+   attribute UInt8 ReclineSeatBack;
+
+  /*!
+  * \brief MUST return seat slide position as percentage of distance travelled away from forwardmost position (Unit: percentage, 0%: farthest forward, 100%: farthest back)
+  */
+   attribute UInt8 SeatSlide;
+
+  /*!
+  * \brief MUST return seat cushion height position as a percentage of upward distance travelled (Unit: percentage, 0%:lowest. 100%:highest)
+  */
+   attribute UInt8 SeatCushionHeight;
+
+  /*!
+  * \brief MUST return headrest position as a percentage of upward distance travelled (Unit: percentage, 0%: lowest, 100%: highest)
+  */
+   attribute UInt8 SeatHeadrest;
+
+  /*!
+  * \brief MUST return back cushion position as a percentage of lumbar curvature (Unit: percentage, 0%: flat, 100%: maximum curvature)
+  */
+   attribute UInt8 SeatBackCushion;
+
+  /*!
+  * \brief MUST return sides of back cushion position as a percentage of curvature (Unit: percentage, 0%: flat, 100%: maximum curvature)
+  */
+   attribute UInt8 SeatSideCushion;
+}
+
+enum DriveModeType {
+  comfort = "comfort",
+  auto = "auto",
+  sport = "sport",
+  eco = "eco",
+  manual = "manual",
+  winter = "winter"
+};
+
+interface org.automotive.DriveMode extends VehiclePropertyType {
+  /*!
+  * \brief MUST return vehicle drive mode. See http://w3c.github.io/automotive-bg/data_spec.html#idl-def-DriveModeEnum
+  */
+  attribute DriveModeType DriveMode;
+}
+
+interface org.automotive.DashboardIllumination extends VehiclePropertyType {
+  /*!
+  * \brief MUST return illumination of dashboard as a percentage (Unit: percentage, 0%: none, 100%: maximum illumination)
+  */
+  attribute UInt8 DashboardIllumination;
+}
+
+interface org.automotive.VehicleSound extends VehiclePropertyType {
+  /*!
+  * \brief MUST return active noise control status: not-activated (false), activated (true)
+  */
+  attribute Boolean ActiveNoiseControlMode;
+
+  /*!
+  * \brief MUST return active noise control status: not-activated (false), activated (true)
+  */
+  attribute Boolean EngineSoundEnhancementMode;
+
+  /*!
+  * \brief MUST return array of available sounds. See EngineSoundEnhancementMode
+  */
+  attribute array EngineSoundEnhancementMode of String readonly;
 }
 
 }

@@ -20,16 +20,20 @@ valueType = args.valueType
 zone = int(args.zone)
 
 realValue = 0
+
+print "valueType: " + valueType
+
 if valueType == "boolean":
-	realValue = value == "true"
+  realValue = value == "true"
 elif valueType == "integer":
-	realValue = int(value)
+  realValue = int(value)
 elif valueType == "string":
-	realValue = value
+  realValue = value
 elif valueType == "double":
-	realValue = double(value)
+  realValue = double(value)
 elif valueType == "UInt16":
-	realValue = dbus.UInt16(int(value))
+  print "can has UInt16!!!"
+  realValue = dbus.UInt16(value)
 
 bus = dbus.SystemBus()
 managerObject = bus.get_object("org.automotive.message.broker", "/");

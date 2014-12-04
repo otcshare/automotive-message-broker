@@ -34,6 +34,7 @@
 #include "timestamp.h"
 #include <debugout.h>
 #include <boost/algorithm/string.hpp>
+#include <superptr.hpp>
 
 class Zone {
 
@@ -291,38 +292,6 @@ public:
 };
 
 template <>
-class GVS<uint8_t>
-{
-public:
-	static const char* signature() { return "y"; }
-
-	static uint8_t value(GVariant* v)
-	{
-		return g_variant_get_byte(v);
-	}
-	static std::string stringize(std::string v)
-	{
-		return v;
-	}
-};
-
-template <>
-class GVS<int8_t>
-{
-public:
-	static const char* signature() { return "q"; }
-
-	static int8_t value(GVariant* v)
-	{
-		return g_variant_get_int16(v);
-	}
-	static std::string stringize(std::string v)
-	{
-		return v;
-	}
-};
-
-template <>
 class GVS<uint16_t>
 {
 public:
@@ -453,7 +422,8 @@ public:
 	{
 		mValue = T();
 	}
-	BasicPropertyType(BasicPropertyType const &other)
+
+	BasicPropertyType(BasicPropertyType const & other)
 		:AbstractPropertyType(other.name)
 	{
 		setValue(other.value<T>());
@@ -737,19 +707,19 @@ public:
 
 	}
 
-	ListPropertyType(std::string propertyName, AbstractPropertyType *value)
+	ListPropertyType(std::string propertyName, T value)
 		: AbstractPropertyType(propertyName), initialized(false)
 	{
-		appendPriv(value->copy());
+		appendPriv(value);
 	}
 
 	ListPropertyType(ListPropertyType & other)
 		:AbstractPropertyType(other.name),initialized(false)
 	{
-		std::list<AbstractPropertyType*> l = other.list();
-		for(auto itr = l.begin(); itr != l.end(); itr++)
+		std::vector<T> l = other.list();
+		for(auto i : l)
 		{
-			append(*itr);
+			append(i);
 		}
 
 		timestamp = other.timestamp;
@@ -764,25 +734,18 @@ public:
 		clear();
 	}
 
-	/** append - appends a property to the list
+	/** \brief append - appends a property to the list
 	 * @arg property - property to be appended.
-	 * ListPropertyType makes a copy of the property.
-	 * You are responsible for freeing property.
 	 **/
-	void append(AbstractPropertyType* property)
+	void append(T property)
 	{
 		if(!initialized)
 		{
-			for(auto itr = mList.begin(); itr != mList.end(); itr++)
-			{
-				AbstractPropertyType *p = *itr;
-				delete p;
-			}
 			mList.clear();
 			initialized = true;
 		}
 
-		appendPriv(property->copy());
+		appendPriv(property);
 	}
 
 	uint count()
@@ -804,9 +767,9 @@ public:
 			if(str != "[")
 				str += ",";
 
-			AbstractPropertyType* t = *itr;
+			T t = *itr;
 
-			str += t->toString();
+			str += t.toString();
 		}
 
 		str += "]";
@@ -837,7 +800,7 @@ public:
 		while(std::getline(f,element,','))
 		{
 			T foo("", element);
-			append (&foo);
+			append (foo);
 		}
 	}
 
@@ -850,11 +813,10 @@ public:
 
 		for(auto itr = mList.begin(); itr != mList.end(); itr++)
 		{
-			AbstractPropertyType* t = *itr;
-			GVariant *var = t->toVariant();
-			GVariant *newvar = g_variant_new("v",var);
+			T t = *itr;
+			auto var = t.toVariant();
+			GVariant *newvar = g_variant_new("v", var);
 			g_variant_builder_add_value(&params, newvar);
-
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -873,33 +835,29 @@ public:
 		{
 			GVariant *childvariant = g_variant_get_child_value(v,i);
 			GVariant *innervariant = g_variant_get_variant(childvariant);
-			T *t = new T("");
-			t->fromVariant(innervariant);
+			T t;
+			t.fromVariant(innervariant);
 			appendPriv(t);
 		}
 	}
 
-	std::list<AbstractPropertyType*> list() { return mList; }
+	std::vector<T> list() { return mList; }
 
 private:
 
 	void clear()
 	{
-		for(auto itr = mList.begin(); itr != mList.end(); itr++)
-		{
-			delete *itr;
-		}
 		mList.clear();
 	}
 
-	void appendPriv(AbstractPropertyType* i)
+	void appendPriv(T i)
 	{
 		mList.push_back(i);
 	}
 
 	bool initialized;
 
-	std::list<AbstractPropertyType*> mList;
+	std::vector<T> mList;
 };
 
 #endif

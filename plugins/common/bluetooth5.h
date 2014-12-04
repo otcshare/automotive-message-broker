@@ -3,6 +3,7 @@
 
 #include <string>
 #include <functional>
+#include <superptr.hpp>
 
 typedef std::function<void(int)> ConnectedCallback;
 
@@ -22,6 +23,7 @@ public:
 
 private:
 	ConnectedCallback mConnected;
+	amb::super_ptr<GDBusConnection> mConnection;
 	std::string mPath;
 };
 

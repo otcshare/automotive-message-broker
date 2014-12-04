@@ -9,7 +9,7 @@
 class ExteriorBrightnessProperty: public DBusSink
 {
 public:
-	ExteriorBrightnessProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ExteriorBrightnessProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ExteriorBrightness", re, connection, map<string, string>())
 	{
 		/**
@@ -27,7 +27,7 @@ public:
 class Temperature: public DBusSink
 {
 public:
-	Temperature(AbstractRoutingEngine* re, GDBusConnection* connection)
+	Temperature(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Temperature", re, connection, map<string, string>())
 	{
 		/**
@@ -58,7 +58,7 @@ public:
 class RainSensor: public DBusSink
 {
 public:
-	RainSensor(AbstractRoutingEngine* re, GDBusConnection* connection)
+	RainSensor(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("RainSensor", re, connection, map<string, string>())
 	{
 		/**
@@ -76,7 +76,7 @@ public:
 class WindshieldWiper: public DBusSink
 {
 public:
-	WindshieldWiper(AbstractRoutingEngine* re, GDBusConnection* connection)
+	WindshieldWiper(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindshieldWiper", re, connection, map<string, string>())
 	{
 		/**
@@ -101,7 +101,7 @@ public:
 class HVACProperty: public DBusSink
 {
 public:
-	HVACProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	HVACProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("HVAC", re, connection, map<string, string>())
 	{
 		/**
@@ -191,7 +191,7 @@ public:
 class ClimateControlProperty: public DBusSink
 {
 public:
-	ClimateControlProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ClimateControlProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ClimateControl", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::AirflowDirectionW3C, "AirflowDirection", AbstractProperty::ReadWrite);
@@ -218,7 +218,7 @@ public:
 class WindowStatusProperty: public DBusSink
 {
 public:
-	WindowStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	WindowStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindowStatus", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", AbstractProperty::ReadWrite);
@@ -229,7 +229,7 @@ public:
 class DefrostProperty: public DBusSink
 {
 public:
-	DefrostProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	DefrostProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Defrost", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::DefrostWindow,"DefrostWindow", AbstractProperty::ReadWrite);
@@ -241,7 +241,7 @@ public:
 class Sunroof: public DBusSink
 {
 public:
-	Sunroof(AbstractRoutingEngine* re, GDBusConnection* connection)
+	Sunroof(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Sunroof", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::Sunroof, "Openness", "y", AbstractProperty::ReadWrite);
@@ -255,7 +255,7 @@ public:
 class ConvertibleRoof: public DBusSink
 {
 public:
-	ConvertibleRoof(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ConvertibleRoof(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ConvertibleRoof", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::ConvertibleRoof, "Openness", "y", AbstractProperty::ReadWrite);

@@ -335,6 +335,12 @@ _defineVehicleSignalProperty(exports, 'malfunctionIndicator');
 _defineVehicleSignalProperty(exports, 'batteryStatus');
 _defineVehicleSignalProperty(exports, 'tire');
 
+/// Personalization attributes:
+_defineVehicleSignalProperty(exports, 'mirror');
+_defineVehicleSignalProperty(exports, 'seatAdjustment');
+_defineVehicleSignalProperty(exports, 'driveMode');
+_defineVehicleSignalProperty(exports, 'dashboardIllumination');
+
 
 _defineVehicleSignalProperty(exports, 'door');
 _defineVehicleSignalProperty(exports, 'temperature');

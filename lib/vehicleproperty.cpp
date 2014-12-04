@@ -69,6 +69,14 @@ const char* HVAC::W3C::FloorDuct = "floorduct";
 const char* HVAC::W3C::Bilevel = "bilevel";
 const char* HVAC::W3C::DefrostFloor = "defrostfloor";
 
+const char* Drive::W3C::Auto = "auto";
+const char* Drive::W3C::Comfort = "comfort";
+const char* Drive::W3C::Sport = "sport";
+const char* Drive::W3C::Eco = "eco";
+const char* Drive::W3C::Manual = "manual";
+const char* Drive::W3C::Winter = "winter";
+
+
 const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
 const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
 const VehicleProperty::Property VehicleProperty::EngineSpeed = "EngineSpeed";
@@ -200,8 +208,8 @@ const VehicleProperty::Property VehicleProperty::DrivingModeW3C = "DrivingModeW3
 const VehicleProperty::Property VehicleProperty::KeyId = "KeyId";
 const VehicleProperty::Property VehicleProperty::Language = "Language";
 const VehicleProperty::Property VehicleProperty::MeasurementSystem = "MeasurementSystem";
-const VehicleProperty::Property VehicleProperty::MirrorSettingPan = "MirrorPanSetting";
-const VehicleProperty::Property VehicleProperty::MirrorSettingTilt= "MirrorTiltSetting";
+const VehicleProperty::Property VehicleProperty::MirrorSettingPan = "MirrorSettingPan";
+const VehicleProperty::Property VehicleProperty::MirrorSettingTilt= "MirrorSettingTilt";
 const VehicleProperty::Property VehicleProperty::SteeringWheelPositionSlide = "SteeringWheelPositionSlide";
 const VehicleProperty::Property VehicleProperty::SteeringWheelPositionTilt = "SteeringWheelPositionTilt";
 const VehicleProperty::Property VehicleProperty::SeatPositionRecline = "SeatPositionRecline";
@@ -227,6 +235,15 @@ const VehicleProperty::Property VehicleProperty::TransmissionClutchWear = "Trans
 const VehicleProperty::Property VehicleProperty::BrakePadWear = "BrakePadWear";
 const VehicleProperty::Property VehicleProperty::BrakeFluidLevelLow = "BrakeFluidLevelLow";
 const VehicleProperty::Property VehicleProperty::MalfunctionIndicatorOn = "MalfunctionIndicatorOn";
+const VehicleProperty::Property VehicleProperty::AccumulatedEngineRuntime = "AccumulatedEngineRuntime";
+const VehicleProperty::Property VehicleProperty::DistanceSinceCodeCleared = "DistanceSinceCodeCleared";
+const VehicleProperty::Property VehicleProperty::DistanceWithMILOn = "DistanceWithMILOn";
+const VehicleProperty::Property VehicleProperty::TimeRunMILOn = "TimeRunMILOn";
+const VehicleProperty::Property VehicleProperty::TimeTroubleCodeClear = "TimeTroubleCodeClear";
+const VehicleProperty::Property VehicleProperty::VehicleDriveMode = "VehicleDriveMode";
+const VehicleProperty::Property VehicleProperty::ActiveNoiseControlMode = "ActiveNoiseControlMode";
+const VehicleProperty::Property VehicleProperty::AvailableSounds = "AvailableSounds";
+const VehicleProperty::Property VehicleProperty::EngineSoundEnhancementMode = "EngineSoundEnhancementMode";
 
 PropertyList VehicleProperty::mCapabilities;
 PropertyList VehicleProperty::mCustomProperties;
@@ -274,7 +291,7 @@ VehicleProperty::VehicleProperty()
 	registerPropertyPriv(TripMeters, [](){
 		TripMetersType* t = new TripMetersType();
 		BasicPropertyType<uint16_t> v(0);
-		t->append(&v);
+		t->append(v);
 		return t;
 	});
 
@@ -315,7 +332,12 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Altitude, 0);
 	REGISTERPROPERTY(Direction, 0);
 	REGISTERPROPERTY(VehicleType, Vehicle::Unknown);
-	registerPropertyPriv(DoorsPerRow, []() { BasicPropertyType<uint16_t> d(0); return new DoorsPerRowType(&d); });
+	registerPropertyPriv(DoorsPerRow, []() {
+		BasicPropertyType<uint16_t> d(0);
+		DoorsPerRowType* doors = new DoorsPerRowType();
+		doors->append(d);
+		return doors;
+	});
 	REGISTERPROPERTY(TransmissionGearType, Transmission::Unknown);
 	REGISTERPROPERTY(FrontWheelRadius, 0);
 	REGISTERPROPERTY(RearWheelRadius, 0);
@@ -400,13 +422,26 @@ VehicleProperty::VehicleProperty()
 		t->append(k, v);
 		return t;
 	});
-
 	REGISTERPROPERTY(TransmissionOilWear, 0);
 	REGISTERPROPERTY(TransmissionOilTemperature, 0);
 	REGISTERPROPERTY(TransmissionClutchWear, 0);
 	REGISTERPROPERTY(BrakePadWear, 0);
 	REGISTERPROPERTY(BrakeFluidLevelLow, false);
-	REGISTERPROPERTY(MalfunctionIndicatorOn, false)
+	REGISTERPROPERTY(MalfunctionIndicatorOn, false);
+	REGISTERPROPERTY(AccumulatedEngineRuntime, 0);
+	REGISTERPROPERTY(DistanceSinceCodeCleared, 0);
+	REGISTERPROPERTY(DistanceWithMILOn, 0);
+	REGISTERPROPERTY(TimeRunMILOn, 0);
+	REGISTERPROPERTY(TimeTroubleCodeClear, 0);
+	REGISTERPROPERTY(VehicleDriveMode, "");
+	REGISTERPROPERTY(ActiveNoiseControlMode, false);
+	registerPropertyPriv(AvailableSounds, [](){
+		AvailableSoundsType* t = new AvailableSoundsType();
+		StringPropertyType v;
+		t->append(v);
+		return t;
+	});
+	REGISTERPROPERTY(EngineSoundEnhancementMode, "");
 }
 
 void VehicleProperty::factory()

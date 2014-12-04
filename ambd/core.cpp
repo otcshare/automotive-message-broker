@@ -117,18 +117,23 @@ void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSou
 
 	/// add the newly supported to master list
 
-	handleAddSupported(added, source);
+	if(added.size())
+		handleAddSupported(added, source);
 
 	/// removed no longer supported properties from master list.
-
-	handleRemoveSupported(removed, source);
+	if(removed.size())
+		handleRemoveSupported(removed, source);
 
 	/// tell all sinks about the newly supported properties.
+
+	PropertyList s = supported();
+
+	if(!s.size()) return;
 
 	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
 	{
 		AbstractSink* sink = *itr;
-		sink->supportedChanged(supported());
+		sink->supportedChanged(s);
 	}
 }
 
@@ -136,13 +141,17 @@ PropertyList Core::supported()
 {
 	PropertyList supportedProperties;
 
-	transform(mMasterPropertyList.begin(), mMasterPropertyList.end(), back_inserter(supportedProperties),
-			  [](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& itr) { return itr.second; }
-	);
+	std::transform(mMasterPropertyList.begin(), mMasterPropertyList.end(), std::back_inserter(supportedProperties),
+			  [](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& itr)
+	{
+		return itr.second;
+	});
 
 	// remove duplicates:
 	std::sort(supportedProperties.begin(), supportedProperties.end());
-	std::unique(supportedProperties.begin(), supportedProperties.end());
+	auto itr = std::unique(supportedProperties.begin(), supportedProperties.end());
+
+	supportedProperties.erase(itr,supportedProperties.end());
 
 	return supportedProperties;
 }
@@ -466,21 +475,14 @@ PropertyInfo Core::getPropertyInfo(const VehicleProperty::Property &property, co
 	return (*theSource)->getPropertyInfo(property);
 }
 
-std::list<string> Core::sourcesForProperty(const VehicleProperty::Property & property)
+std::vector<string> Core::sourcesForProperty(const VehicleProperty::Property & property)
 {
-	std::list<std::string> list;
+	std::vector<std::string> list;
 
-	auto itr = mMasterPropertyList.begin();
-	while(itr != mMasterPropertyList.end())
+	for(auto src : mSources)
 	{
-		if(itr->second == property) {
-			AbstractSource* src = itr->first;
+		if(contains(src->supported(), property))
 			list.push_back(src->uuid());
-			itr = mMasterPropertyList.upper_bound(src);
-		}
-		else{
-			++itr;
-		}
 	}
 
 	return list;
@@ -501,13 +503,10 @@ void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
 
 	for(auto property : added)
 	{
-		mMasterPropertyList.emplace(source, property);// TODO: no check for duplicated properties from the same source - is it needed ?
+		if(!sourceForProperty(property, source->uuid()))
+			mMasterPropertyList.emplace(source, property);
 
 		// Subscribe to property in a new source if such property was subscribed. This catches newly supported properties in the process.
-		//
-		// TODO: is this sufficient to:
-		// Iterate through subscribed properties and resubscribe.  This catches newly supported properties in the process.
-		// which was originally located at the end of the setSupported and updateSupported functions? I think it is sufficient.
 		if( propertySinkMap.find(property) != propertySinkMap.end()){
 			source->subscribeToPropertyChanges(property);
 		}
@@ -563,7 +562,9 @@ AbstractSource* Core::sourceForProperty(const VehicleProperty::Property& propert
 			auto temp = find_if(
 						range.first,	// the first property in source
 						range.second,   // one item right after the last property in source
-						[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it) { return it.second == property; }
+						[&property](const std::multimap<AbstractSource*, VehicleProperty::Property>::value_type& it)
+			{
+				return it.second == property; }
 			);
 
 			if (temp != range.second)// property was found

@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "listplusplus.h"
 #include "automotivemanager.h"
+#include <unordered_set>
 
 ///properties:
 #include "runningstatus.h"
@@ -36,24 +37,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "drivingsafety.h"
 #include "personalization.h"
 
-std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(AbstractRoutingEngine *re, PropertyList implementedProperties)
+
+std::unordered_map<std::string, std::unordered_set<Zone::Type>> getUniqueSourcesList(AbstractRoutingEngine *re, PropertyList implementedProperties)
 {
-	std::map<std::string, std::map<Zone::Type, bool>> uniqueSourcesList;
+	std::unordered_map<std::string, std::unordered_set<Zone::Type>> uniqueSourcesList;
 
 	for(auto itr = implementedProperties.begin(); itr != implementedProperties.end(); itr++)
 	{
 		VehicleProperty::Property property = *itr;
-		std::list<std::string> sources = re->sourcesForProperty(property);
+		std::vector<std::string> sources = re->sourcesForProperty(property);
 
 		for(auto itr2 = sources.begin(); itr2 != sources.end(); itr2++)
 		{
 			std::string source = *itr2;
 
-			PropertyInfo info = re->getPropertyInfo(property,source);
+			PropertyInfo info = re->getPropertyInfo(property, source);
 
-			std::map<Zone::Type, bool> uniqueZoneList;
+			std::unordered_set<Zone::Type> uniqueZoneList;
 
-			if(uniqueSourcesList.find(source) != uniqueSourcesList.end())
+			if(uniqueSourcesList.count(source))
 			{
 				uniqueZoneList = uniqueSourcesList[source];
 			}
@@ -62,12 +64,12 @@ std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(Abstract
 
 			if(!zoneList.size())
 			{
-				uniqueZoneList[Zone::None] = true;
+				uniqueZoneList.emplace(Zone::None);
 			}
 
-			for(auto zoneItr = zoneList.begin(); zoneItr != zoneList.end(); zoneItr++)
+			for(auto zoneItr : zoneList)
 			{
-				uniqueZoneList[*zoneItr] = true;
+				uniqueZoneList.emplace(zoneItr);
 			}
 
 			uniqueSourcesList[source] = uniqueZoneList;
@@ -78,79 +80,50 @@ std::map<std::string, std::map<Zone::Type, bool> > getUniqueSourcesList(Abstract
 }
 
 template <typename T>
-void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-{
-	T* t = new T(re, connection);
-
-	/// check if we need more than one instance:
-
-	PropertyList implementedProperties = t->wantsProperties();
-
-	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
-
-	delete t;
-
-	for(auto itr = uniqueSourcesList.begin(); itr != uniqueSourcesList.end(); itr++)
-	{
-		std::map<Zone::Type, bool> zones = (*itr).second;
-
-		std::string source = (*itr).first;
-
-		std::string objectPath = "/" + source;
-
-		boost::algorithm::erase_all(objectPath, "-");
-
-		for(auto zoneItr = zones.begin(); zoneItr != zones.end(); zoneItr++)
-		{
-			Zone::Type zone = (*zoneItr).first;
-			T* t = new T(re, connection);
-			std::stringstream fullobjectPath;
-			fullobjectPath<< objectPath << "/" << zone << "/" <<t->objectName();
-			t->setObjectPath(fullobjectPath.str());
-			t->setSourceFilter(source);
-			t->setZoneFilter(zone);
-			t->supportedChanged(re->supported());
-		}
-
-	}
-}
-
-template <typename T>
 void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, GDBusConnection *connection)
 {
 	T* t = new T(prop, re, connection);
 
+	prop = t->objectName();
+
 	/// check if we need more than one instance:
 
 	PropertyList implementedProperties = t->wantsProperties();
 
-	std::map<std::string, std::map<Zone::Type, bool> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
+	std::unordered_map<std::string, std::unordered_set<Zone::Type> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
 
 	delete t;
 
-	for(auto itr = uniqueSourcesList.begin(); itr != uniqueSourcesList.end(); itr++)
-	{
-		std::map<Zone::Type, bool> zones = (*itr).second;
+	PropertyList supported = re->supported();
 
-		std::string source = (*itr).first;
+	for(auto itr : uniqueSourcesList)
+	{
+		std::unordered_set<Zone::Type> zones = itr.second;
+
+		std::string source = itr.first;
 
 		std::string objectPath = "/" + source;
 
 		boost::algorithm::erase_all(objectPath, "-");
 
-		for(auto zoneItr = zones.begin(); zoneItr != zones.end(); zoneItr++)
+		for(auto zone : zones)
 		{
-			Zone::Type zone = (*zoneItr).first;
 			T* t = new T(prop, re, connection);
 			std::stringstream fullobjectPath;
 			fullobjectPath<< objectPath << "/" << zone << "/" <<t->objectName();
 			t->setObjectPath(fullobjectPath.str());
 			t->setSourceFilter(source);
 			t->setZoneFilter(zone);
-			t->supportedChanged(re->supported());
+			t->supportedChanged(supported);
 		}
 
 	}
+}
+
+template <typename T>
+void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
+{
+	exportProperty<T>("", re, connection);
 }
 
 static void
@@ -162,74 +135,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 
 	new AutomotiveManager(connection);
 
-	/// properties:
-	exportProperty<AccelerationProperty>(iface->re,connection);
-	exportProperty<VehicleSpeedProperty>(iface->re, connection);
-	exportProperty<TireProperty>(iface->re, connection);
-	exportProperty<EngineSpeedProperty>(iface->re, connection);
-	exportProperty<VehiclePowerModeProperty>(iface->re, connection);
-	exportProperty<TripMeterProperty>(iface->re, connection);
-	exportProperty<TransmissionProperty>(iface->re, connection);
-	exportProperty<CruiseControlProperty>(iface->re, connection);
-	exportProperty<WheelBrakeProperty>(iface->re, connection);
-	exportProperty<BrakeOperation>(iface->re, connection);
-	exportProperty<LightStatusProperty>(iface->re, connection);
-	exportProperty<HornProperty>(iface->re, connection);
-	exportProperty<FuelProperty>(iface->re, connection);
-	exportProperty<EngineOilProperty>(iface->re, connection);
-	exportProperty<ExteriorBrightnessProperty>(iface->re, connection);
-	exportProperty<Temperature>(iface->re, connection);
-	exportProperty<RainSensor>(iface->re, connection);
-	exportProperty<WindshieldWiper>(iface->re, connection);
-	exportProperty<HVACProperty>(iface->re, connection);
-	exportProperty<ClimateControlProperty>(iface->re, connection);
-	exportProperty<WindowStatusProperty>(iface->re, connection);
-	exportProperty<DefrostProperty>(iface->re, connection);
-	exportProperty<Sunroof>(iface->re, connection);
-	exportProperty<ConvertibleRoof>(iface->re, connection);
-	exportProperty<VehicleId>(iface->re, connection);
-	exportProperty<VehicleTypeProperty>(iface->re, connection);
-	exportProperty<FuelInfoProperty>(iface->re, connection);
-	exportProperty<SizeProperty>(iface->re, connection);
-	exportProperty<DoorsProperty>(iface->re, connection);
-	exportProperty<WheelInformationProperty>(iface->re, connection);
-	exportProperty<OdometerProperty>(iface->re, connection);
-	exportProperty<FluidProperty>(iface->re, connection);
-	exportProperty<BatteryProperty>(iface->re, connection);
-	exportProperty<BatteryStatusProperty>(iface->re, connection);
-	exportProperty<SecurityAlertProperty>(iface->re, connection);
-	exportProperty<ParkingBrakeProperty>(iface->re, connection);
-	exportProperty<ParkingLightProperty>(iface->re, connection);
-	exportProperty<HazardLightProperty>(iface->re, connection);
-	exportProperty<LocationProperty>(iface->re, connection);
-	exportProperty<AntilockBrakingSystemProperty>(iface->re, connection);
-	exportProperty<TractionControlSystemProperty>(iface->re, connection);
-	exportProperty<VehicleTopSpeedLimitProperty>(iface->re, connection);
-	exportProperty<AirbagStatusProperty>(iface->re, connection);
-	exportProperty<DoorStatusProperty>(iface->re, connection);
-	exportProperty<SeatBeltStatusProperty>(iface->re, connection);
-	exportProperty<OccupantStatusProperty>(iface->re, connection);
-	exportProperty<ObstacleDistanceProperty>(iface->re, connection);
-	exportProperty<SeatPostionProperty>(iface->re, connection);
-	exportProperty<SteeringWheelPositionProperty>(iface->re, connection);
-	exportProperty<SteeringWheel>(iface->re, connection);
-	exportProperty<MirrorSettingProperty>(iface->re, connection);
-	exportProperty<ThrottlePosition>(iface->re, connection);
-	exportProperty<EngineCoolant>(iface->re, connection);
-	exportProperty<NightMode>(iface->re, connection);
-	exportProperty<DrivingMode>(iface->re, connection);
-	exportProperty<PowertrainTorque>(iface->re, connection);
-	exportProperty<AcceleratorPedalPosition>(iface->re, connection);
-	exportProperty<Chime>(iface->re, connection);
-	exportProperty<WheelTick>(iface->re, connection);
-	exportProperty<IgnitionTime>(iface->re, connection);
-	exportProperty<YawRate>(iface->re, connection);
-	exportProperty<TransmissionClutch>(iface->re, connection);
-	exportProperty<TransmissionOil>(iface->re, connection);
-	exportProperty<BrakeMaintenance>(iface->re, connection);
-	exportProperty<WasherFluid>(iface->re, connection);
-
-	iface->registerCustomTypes();
+	iface->registerTypes();
 }
 
 static void
@@ -279,18 +185,89 @@ void DBusInterfaceManager::supportedChanged(const PropertyList &supportedPropert
 		return;
 	}
 
-	registerCustomTypes();
+	registerTypes();
 }
 
-void DBusInterfaceManager::registerCustomTypes()
+void DBusInterfaceManager::registerTypes()
 {
+	/// properties:
+	exportProperty<AccelerationProperty>(re, connection);
+	exportProperty<VehicleSpeedProperty>(re, connection);
+	exportProperty<TireProperty>(re, connection);
+	exportProperty<EngineSpeedProperty>(re, connection);
+	exportProperty<VehiclePowerModeProperty>(re, connection);
+	exportProperty<TripMeterProperty>(re, connection);
+	exportProperty<TransmissionProperty>(re, connection);
+	exportProperty<CruiseControlProperty>(re, connection);
+	exportProperty<WheelBrakeProperty>(re, connection);
+	exportProperty<BrakeOperation>(re, connection);
+	exportProperty<LightStatusProperty>(re, connection);
+	exportProperty<HornProperty>(re, connection);
+	exportProperty<FuelProperty>(re, connection);
+	exportProperty<EngineOilProperty>(re, connection);
+	exportProperty<ExteriorBrightnessProperty>(re, connection);
+	exportProperty<Temperature>(re, connection);
+	exportProperty<RainSensor>(re, connection);
+	exportProperty<WindshieldWiper>(re, connection);
+	exportProperty<HVACProperty>(re, connection);
+	exportProperty<ClimateControlProperty>(re, connection);
+	exportProperty<WindowStatusProperty>(re, connection);
+	exportProperty<DefrostProperty>(re, connection);
+	exportProperty<Sunroof>(re, connection);
+	exportProperty<ConvertibleRoof>(re, connection);
+	exportProperty<VehicleId>(re, connection);
+	exportProperty<VehicleTypeProperty>(re, connection);
+	exportProperty<FuelInfoProperty>(re, connection);
+	exportProperty<SizeProperty>(re, connection);
+	exportProperty<DoorsProperty>(re, connection);
+	exportProperty<WheelInformationProperty>(re, connection);
+	exportProperty<OdometerProperty>(re, connection);
+	exportProperty<FluidProperty>(re, connection);
+	exportProperty<BatteryProperty>(re, connection);
+	exportProperty<BatteryStatusProperty>(re, connection);
+	exportProperty<SecurityAlertProperty>(re, connection);
+	exportProperty<ParkingBrakeProperty>(re, connection);
+	exportProperty<ParkingLightProperty>(re, connection);
+	exportProperty<HazardLightProperty>(re, connection);
+	exportProperty<LocationProperty>(re, connection);
+	exportProperty<AntilockBrakingSystemProperty>(re, connection);
+	exportProperty<TractionControlSystemProperty>(re, connection);
+	exportProperty<VehicleTopSpeedLimitProperty>(re, connection);
+	exportProperty<AirbagStatusProperty>(re, connection);
+	exportProperty<DoorStatusProperty>(re, connection);
+	exportProperty<SeatBeltStatusProperty>(re, connection);
+	exportProperty<OccupantStatusProperty>(re, connection);
+	exportProperty<ObstacleDistanceProperty>(re, connection);
+	exportProperty<SeatPostionProperty>(re, connection);
+	exportProperty<SteeringWheelPositionProperty>(re, connection);
+	exportProperty<SteeringWheel>(re, connection);
+	exportProperty<MirrorSettingProperty>(re, connection);
+	exportProperty<ThrottlePosition>(re, connection);
+	exportProperty<EngineCoolant>(re, connection);
+	exportProperty<NightMode>(re, connection);
+	exportProperty<DrivingMode>(re, connection);
+	exportProperty<PowertrainTorque>(re, connection);
+	exportProperty<AcceleratorPedalPosition>(re, connection);
+	exportProperty<Chime>(re, connection);
+	exportProperty<WheelTick>(re, connection);
+	exportProperty<IgnitionTime>(re, connection);
+	exportProperty<YawRate>(re, connection);
+	exportProperty<TransmissionClutch>(re, connection);
+	exportProperty<TransmissionOil>(re, connection);
+	exportProperty<BrakeMaintenance>(re, connection);
+	exportProperty<WasherFluid>(re, connection);
+	exportProperty<MalfunctionIndicator>(re, connection);
+	exportProperty<Diagnostics>(re, connection);
+	exportProperty<MirrorProperty>(re, connection);
+	exportProperty<SeatAdjustment>(re, connection);
+	exportProperty<DriveMode>(re, connection);
+	exportProperty<VehicleSound>(re, connection);
+
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();
 
-	for (auto itr = list.begin(); itr != list.end(); itr++)
+	for (auto prop : list)
 	{
-		VehicleProperty::Property prop = *itr;
-
 		if(!contains(implemented, prop))
 		{
 			exportProperty<CustomPropertyInterface>(prop, re, connection);

@@ -101,12 +101,7 @@ AsyncPropertyReply *AmbPluginImpl::setProperty(const AsyncSetPropertyRequest& re
 
 void AmbPluginImpl::subscribeToPropertyChanges(const VehicleProperty::Property& property)
 {
-	std::list<Zone::Type> zones = getPropertyInfo(property).zones();
-	for( auto it=zones.begin(); it!=zones.end(); ++it) {
-		AbstractPropertyType *value = findPropertyType(property, *it);
-		if(value)
-			routingEngine->updateProperty(value, uuid());
-	}
+
 }
 
 PropertyList AmbPluginImpl::supported() const
@@ -168,7 +163,7 @@ std::shared_ptr<AbstractPropertyType> AmbPluginImpl::addPropertySupport(Zone::Ty
 	return propertyType;
 }
 
-PropertyInfo AmbPluginImpl::getPropertyInfo(const VehicleProperty::Property& property) const
+PropertyInfo AmbPluginImpl::getPropertyInfo(const VehicleProperty::Property & property)
 {
 	auto it = properties.find(property);
 	if(it != properties.end()) {

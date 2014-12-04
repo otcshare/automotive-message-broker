@@ -65,7 +65,7 @@ bool TestPlugin::testCoreSetSupported()
 {
 	PropertyList supported(routingEngine->supported());
 	TEST(contains(supported,TestProptertyName1) == false);
-	std::list<std::string> sources(routingEngine->sourcesForProperty(TestProptertyName1));
+	std::vector<std::string> sources(routingEngine->sourcesForProperty(TestProptertyName1));
 	TEST(contains(sources,uuid()) == false);
 
 	// if we were registered in Core, it will ask us and we will return it valid, but we haven't registered yet
@@ -346,9 +346,9 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	BasicPropertyType<uint16_t> v1(0);
 	BasicPropertyType<uint16_t> v2(5);
 	BasicPropertyType<uint16_t> v3(10);
-	tfirst->append(&v1);
-	tfirst->append(&v2);
-	tfirst->append(&v3);
+	tfirst->append(v1);
+	tfirst->append(v2);
+	tfirst->append(v3);
 	tsecond->fromVariant(tfirst->toVariant());
 
 	g_assert (tfirst->toString() == tsecond->toString());
