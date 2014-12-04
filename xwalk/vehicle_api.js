@@ -334,15 +334,25 @@ _defineVehicleSignalProperty(exports, 'washerFluid');
 _defineVehicleSignalProperty(exports, 'malfunctionIndicator');
 _defineVehicleSignalProperty(exports, 'batteryStatus');
 _defineVehicleSignalProperty(exports, 'tire');
+_defineVehicleSignalProperty(exports, 'diagnostics');
 
 /// Personalization attributes:
 _defineVehicleSignalProperty(exports, 'mirror');
 _defineVehicleSignalProperty(exports, 'seatAdjustment');
 _defineVehicleSignalProperty(exports, 'driveMode');
 _defineVehicleSignalProperty(exports, 'dashboardIllumination');
+_defineVehicleSignalProperty(exports, 'vehicleSound');
 
-
+/// Driving Safety attributes:
+_defineVehicleSignalProperty(exports, 'antilockBreakingSystem');
+_defineVehicleSignalProperty(exports, 'tractionControlSystem');
+_defineVehicleSignalProperty(exports, 'electronicStabilityControl');
+_defineVehicleSignalProperty(exports, 'topSpeedLimit');
+_defineVehicleSignalProperty(exports, 'airbagStatus');
 _defineVehicleSignalProperty(exports, 'door');
+_defineVehicleSignalProperty(exports, 'childSafetyLock');
+_defineVehicleSignalProperty(exports, 'seat');
+
 _defineVehicleSignalProperty(exports, 'temperature');
 _defineVehicleSignalProperty(exports, 'climateControl');
 _defineVehicleSignalProperty(exports, 'defrost');

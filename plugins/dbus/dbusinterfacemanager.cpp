@@ -262,6 +262,10 @@ void DBusInterfaceManager::registerTypes()
 	exportProperty<SeatAdjustment>(re, connection);
 	exportProperty<DriveMode>(re, connection);
 	exportProperty<VehicleSound>(re, connection);
+	exportProperty<ElectronicStabilityControl>(re, connection);
+	exportProperty<ChildSafetyLock>(re, connection);
+	exportProperty<SeatProperty>(re, connection);
+	exportProperty<DoorProperty>(re, connection);
 
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();

@@ -64,6 +64,18 @@ const char* Door::W3C::Closed = "closed";
 const char* Door::W3C::Open = "open";
 const char* Door::W3C::Ajar = "ajar";
 
+const char* Seat::W3C::Vacant = "vacant";
+const char* Seat::W3C::Child = "child";
+const char* Seat::W3C::Adult = "adult";
+
+const char* Seat::W3C::Pin = "pin";
+const char* Seat::W3C::Keyfob = "keyfob";
+const char* Seat::W3C::Bluetooth = "Bluetooth";
+const char* Seat::W3C::NFC = "NFC";
+const char* Seat::W3C::Fingerprint = "fingerprint";
+const char* Seat::W3C::Camera = "camera";
+const char* Seat::W3C::Voice = "voice";
+
 const char* HVAC::W3C::FloorPanel = "floorpanel";
 const char* HVAC::W3C::FloorDuct = "floorduct";
 const char* HVAC::W3C::Bilevel = "bilevel";
@@ -172,8 +184,12 @@ const VehicleProperty::Property VehicleProperty::ParkingBrakeStatus = "ParkingBr
 const VehicleProperty::Property VehicleProperty::ParkingLightStatus = "ParkingLightStatus";
 const VehicleProperty::Property VehicleProperty::HazardLightStatus = "HazardLightStatus";
 const VehicleProperty::Property VehicleProperty::AirbagStatus = "AirbagStatus";
+const VehicleProperty::Property VehicleProperty::AirbagDeployed = "AirbagDeployed";
+const VehicleProperty::Property VehicleProperty::AirbagActivated = "AirbagActivated";
 const VehicleProperty::Property VehicleProperty::AntilockBrakingSystem = "AntilockBrakingSystem";
+const VehicleProperty::Property VehicleProperty::AntilockBrakingSystemEnabled = "AntilockBrakingSystemEnabled";
 const VehicleProperty::Property VehicleProperty::TractionControlSystem = "TractionControlSystem";
+const VehicleProperty::Property VehicleProperty::TractionControlSystemEnabled = "TractionControlSystemEnabled";
 const VehicleProperty::Property VehicleProperty::VehicleTopSpeedLimit = "VehicleTopSpeedLimit";
 const VehicleProperty::Property VehicleProperty::DoorStatus = "DoorStatus";
 const VehicleProperty::Property VehicleProperty::DoorStatusW3C = "DoorStatusW3C";
@@ -182,6 +198,7 @@ const VehicleProperty::Property VehicleProperty::ChildLockStatus = "ChildLockSta
 const VehicleProperty::Property VehicleProperty::SeatBeltStatus = "SeatBeltStatus";
 const VehicleProperty::Property VehicleProperty::WindowLockStatus = "WindowLockStatus";
 const VehicleProperty::Property VehicleProperty::OccupantStatus = "OccupantStatus";
+const VehicleProperty::Property VehicleProperty::OccupantStatusW3C = "OccupantStatusW3C";
 const VehicleProperty::Property VehicleProperty::ObstacleDistance = "ObstacleDistance";
 const VehicleProperty::Property VehicleProperty::RainSensor = "RainSensor";
 const VehicleProperty::Property VehicleProperty::WindshieldWiper = "WindshieldWiper";
@@ -244,6 +261,10 @@ const VehicleProperty::Property VehicleProperty::VehicleDriveMode = "VehicleDriv
 const VehicleProperty::Property VehicleProperty::ActiveNoiseControlMode = "ActiveNoiseControlMode";
 const VehicleProperty::Property VehicleProperty::AvailableSounds = "AvailableSounds";
 const VehicleProperty::Property VehicleProperty::EngineSoundEnhancementMode = "EngineSoundEnhancementMode";
+const VehicleProperty::Property VehicleProperty::ElectronicStabilityControlEnabled = "ElectronicStabilityControlEnabled";
+const VehicleProperty::Property VehicleProperty::ElectronicStabilityControlEngaged = "ElectronicStabilityControlEngaged";
+const VehicleProperty::Property VehicleProperty::OccupantIdentificationType = "OccupantIdentificationType";
+const VehicleProperty::Property VehicleProperty::OccupantName = "OccupantName";
 
 PropertyList VehicleProperty::mCapabilities;
 PropertyList VehicleProperty::mCustomProperties;
@@ -354,10 +375,15 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ParkingBrakeStatus, false);
 	REGISTERPROPERTY(ParkingLightStatus, false);
 	REGISTERPROPERTY(HazardLightStatus, false);
+	/// TODO: deprecated in 0.14
 	REGISTERPROPERTY(AirbagStatus, Airbag::Inactive);
+	REGISTERPROPERTY(AirbagActivated, false);
+	REGISTERPROPERTY(AirbagDeployed, false);
 
 	REGISTERPROPERTY(AntilockBrakingSystem, false);
+	REGISTERPROPERTY(AntilockBrakingSystemEnabled, false);
 	REGISTERPROPERTY(TractionControlSystem, false);
+	REGISTERPROPERTY(TractionControlSystemEnabled, false);
 	REGISTERPROPERTY(VehicleTopSpeedLimit, 0);
 
 	REGISTERPROPERTY(DoorStatus, Door::Closed);
@@ -365,7 +391,9 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(DoorLockStatus, false);
 	REGISTERPROPERTY(ChildLockStatus, false);
 	REGISTERPROPERTY(SeatBeltStatus, false);
+	/// TODO: deprecated in 0.14
 	REGISTERPROPERTY(OccupantStatus, Seat::Vacant);
+	REGISTERPROPERTY(OccupantStatusW3C, Seat::W3C::Vacant);
 	REGISTERPROPERTY(WindowLockStatus, false);
 	REGISTERPROPERTY(ObstacleDistance, 0);
 
@@ -442,6 +470,11 @@ VehicleProperty::VehicleProperty()
 		return t;
 	});
 	REGISTERPROPERTY(EngineSoundEnhancementMode, "");
+	REGISTERPROPERTY(ElectronicStabilityControlEnabled, false);
+	REGISTERPROPERTY(ElectronicStabilityControlEngaged, false);
+	REGISTERPROPERTY(OccupantIdentificationType, Seat::W3C::Pin);
+	REGISTERPROPERTY(OccupantName, "");
+
 }
 
 void VehicleProperty::factory()

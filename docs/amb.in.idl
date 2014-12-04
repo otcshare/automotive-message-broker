@@ -1,5 +1,7 @@
 /*! amb.idl
-* /brief This document describes the DBus interfaces and data types for the
+* \name @PROJECT_NAME@
+* \version @PROJECT_VERSION@
+* \brief This document describes the DBus interfaces and data types for the
 * Automotive Message Broker API.  The data types are intended to as-close-as-
 * possible be compatible with the W3C vehicle <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html>data spec</a>.
 */
@@ -48,7 +50,7 @@ interface VehiclePropertyType {
   attribute Zone Zone readonly
 
   /*!
-  * \brief returns dictionary of objectName and values for data between
+  * \brief return dictionary of objectName and values for data between
   * 'beginTime' and 'endTime'
   * \arg beginTime time stamp in Seconds since Unix Epoc
   * \arg endTime time stamp in Seconds since Unix Epoc
@@ -77,7 +79,7 @@ enumeration Zone {
 interface org.automotive.Manager  {
 
   /*! List
-   *  \brief returns supported properties
+   *  \brief return supported properties
   */
   method List {
     out { String[] }
@@ -93,7 +95,7 @@ interface org.automotive.Manager  {
    *  when the last proccess that calls Find* disconnects from DBus.
    *
    *  \arg String objectName to find
-   *  \returns list of object paths that provide the given object Name.
+   *  \return list of object paths that provide the given object Name.
   */
   method FindObject {
     in {
@@ -107,10 +109,10 @@ interface org.automotive.Manager  {
   /*!
    * FindObjectForZone
    *  \brief find the DBus object path which matches "objectName" and "zone".  This has the same behavior as FindObject
-   * except that it takes an addition zone argument and only returns the path for that zone.
+   * except that it takes an addition zone argument and only return the path for that zone.
    *  \arg String property is the requested property to be retrieved.
    *  \arg Zone zone is the zone which the object
-   *  \returns string representing the DBus Object path.  Possible errors:
+   *  \return string representing the DBus Object path.  Possible errors:
    * "org.automotive.Manager.InvalidZone"
    * "org.automotive.Manager.ObjectNotFound"
   */
@@ -128,7 +130,7 @@ interface org.automotive.Manager  {
    * ZonesForObjectName
    *  \brief get a list of zones for a given objectName.
    *  \arg String objectName object name.
-   *  \returns list of zones for the given objectName (@see Zone)
+   *  \return list of zones for the given objectName (@see Zone)
   */
   method ZonesForObjectName {
     in {
@@ -143,7 +145,7 @@ interface org.automotive.Manager  {
    * SupportsProperty
    * \brief check whether a Property exists.
    * \arg propertyName name of property of Object
-   * \returns true if Property exists
+   * \return true if Property exists
    */
   method SupportsProperty {
     in {
@@ -977,8 +979,19 @@ interface org.automotive.AntilockBrakingSystem extends VehiclePropertyType  {
 
   /*!  AntilockBrakingSystem
    *   \brief MUST return whether Antilock Braking System is Idle (false) or Engaged (true)
+   *   TODO: Deprecated.  Use Engaged.  Remove in 0.14
    */
    attribute Boolean AntilockBrakingSystem readonly
+
+  /*!
+  * \brief MUST return whether or not the ABS Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute Boolean Enabled readonly;
+
+  /*!
+  * \brief MUST return whether or not the ABS is engaged: engaged (true) or idle (false)
+  */
+  attribute Boolean Engaged readonly;
 }
 
 
@@ -986,15 +999,26 @@ interface org.automotive.TractionControlSystem extends VehiclePropertyType  {
 
   /*!  TractionControlSystem
    *   \brief MUST return whether Traction Control System is Off (false) or On (true)
+   * TODO: Deprecated.  Use Engaged.  Remove in 0.14
    */
    attribute Boolean TractionControlSystem readonly
+
+  /*!
+  * \brief MUST return whether or not the TCS Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute Boolean Enabled readonly;
+
+  /*!
+  * \brief MUST return whether or not the TCS is engaged: engaged (true) or idle (false)
+  */
+  attribute Boolean Engaged readonly;
 }
 
 
 interface org.automotive.VehicleTopSpeedLimit extends VehiclePropertyType  {
 
   /*!  VehicleTopSpeedLimit
-   *   \brief MUST returns top rated speed in km/h. 0 = no limit
+   *   \brief MUST return top rated speed in km/h. 0 = no limit
    */
    attribute UInt16 VehicleTopSpeedLimit readonly
 }
@@ -1002,16 +1026,24 @@ interface org.automotive.VehicleTopSpeedLimit extends VehiclePropertyType  {
 
 interface org.automotive.AirbagStatus extends VehiclePropertyType  {
 
-  const UInt16 AIRBAGSTATUS_INACTIVE = 0;
-  const UInt16 AIRBAGSTATUS_ACTIVE = 1;
-  const UInt16 AIRBAGSTATUS_DEPLOYED = 2;
-
   /*!  AirbagStatus
-   *   \brief MUST returns Airbag status (byte) (see AIRBAGSTATUS_*)
+   *   \brief MUST return Airbag status (byte) (see AIRBAGSTATUS_*)
+   *  TODO: deprecated.  Remove in 0.14
    */
    attribute UInt16 AirbagStatus readonly
+
+  /*!
+  * \brief MUST return whether or not the airbag is activaged: activated (true) or deactivated (false)
+  */
+  attribute Boolean Activated readonly;
+
+  /*!
+  * \brief MUST return whether the airbag is deployed: deployed (true) or not (false)
+  */
+  attribute Boolean Deployed readonly;
 }
 
+/// TODO: deprecated. Remove in 0.14
 enumeration AirbagStatus {
   inactive = 0,
   active = 1,
@@ -1023,10 +1055,8 @@ enumeration AirbagStatus {
  */
 interface org.automotive.DoorStatus extends VehiclePropertyType  {
 
-
-
   /*!  DoorStatus
-   *   \brief MUST returns Door status (byte).
+   *   \brief MUST return Door status (byte).
    * CLOSED = 0
    * OPEN = 1
    * AJAR = 2
@@ -1034,15 +1064,16 @@ interface org.automotive.DoorStatus extends VehiclePropertyType  {
    attribute UInt16 DoorStatus readonly
 
   /*!  DoorLockStatus
-   *   \brief MUST returns Door status (bool locked = true, unlocked = false).
+   *   \brief MUST return Door status (bool locked = true, unlocked = false).
    */
   attribute Boolean DoorLockStatus;
 
   /*!  ChildLockStatus
-   *   \brief MUST returns Child lock status of rear doors.  active = true, inactive = false.
+   *   \brief MUST return Child lock status of rear doors.  active = true, inactive = false.
    *   Setting this to 'true' will prevent the rear doors from being opened
    *   from the inside.
    */
+   ///TODO: Deprecated in 0.14.  Use org.automotive.ChildLockStatus
   attribute Boolean ChildLockStatus;
 }
 
@@ -1055,24 +1086,24 @@ enumeration DoorStatus {
 interface org.automotive.Door extends VehiclePropertyType  {
 
   /*!  Status
-   *   \brief MUST returns Door status (byte).  See DOORSTATUS_*
+   *   \brief MUST return Door status (byte).  See DOORSTATUS_*
    */
    attribute DoorStatus Status readonly
 
   /*!  Lock
-   *   \brief MUST returns Door status (bool locked = true, unlocked = false).
+   *   \brief MUST return Door status (bool locked = true, unlocked = false).
    */
   attribute Boolean Lock;
 
   /*!  ChildLock
-   *   \brief MUST returns Child lock status of rear doors.  active = true, inactive = false.
+   *   \brief MUST return Child lock status of rear doors.  active = true, inactive = false.
    *   Setting this to 'true' will prevent the rear doors from being opened
    *   from the inside.
    */
   attribute Boolean ChildLock;
 }
 
-
+///TODO: Deprecated in 0.14.  Use org.automotive.Seat
 interface org.automotive.SeatBelt extends VehiclePropertyType  {
 
   /*! Status
@@ -1081,11 +1112,11 @@ interface org.automotive.SeatBelt extends VehiclePropertyType  {
    attribute Boolean Status readonly
 }
 
-
+///TODO: Deprecated in 0.14.  Use org.automotive.Seat
 interface org.automotive.OccupantStatus extends VehiclePropertyType  {
 
   /*!  OccupantStatus
-   *   \brief MUST returns status of Occupant (byte, see
+   *   \brief MUST return status of Occupant (byte, see
    */
    attribute UInt16 OccupantStatus readonly
 }
@@ -1094,7 +1125,7 @@ interface org.automotive.OccupantStatus extends VehiclePropertyType  {
 interface org.automotive.ObstacleDistance extends VehiclePropertyType  {
 
   /*!  ObstacleDistance
-   *   \brief MUST returns Distance Sensor distance (Double) in m.
+   *   \brief MUST return Distance Sensor distance (Double) in m.
    */
    attribute Double ObstacleDistance readonly
 }
@@ -1582,5 +1613,68 @@ interface org.automotive.VehicleSound extends VehiclePropertyType {
   attribute array EngineSoundEnhancementMode of String readonly;
 }
 
+interface org.automotive.ElectronicStabilityControl extends VehiclePropertyType {
+  /*!
+  * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute Boolean Enabled readonly;
+
+  /*!
+  * \brief MUST return whether or not the ESC is engaged: engaged (true) or idle (false)
+  */
+  attribute Boolean Engaged readonly;
 }
+
+interface org.automotive.TopSpeedLimit extends VehiclePropertyType {
+  /*!
+  * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute UInt16 Speed readonly;
+}
+
+interface org.automotive.ChildSafetyLock extends VehiclePropertyType {
+  /*!
+  * \brief MUST return whether or not the Child Safety Lock is locked: locked (true) or unlocked (false)
+  */
+  attribute Boolean Lock;
+}
+
+enum OccupantStatus {
+  adult = "adult",
+  child = "child",
+  vacant = "vacant"
+};
+
+enum IdentificationTypeEnum {
+  pin = "pin",
+  keyfob = "keyfob",
+  Bluetooth = "Bluetooth",
+  NFC = "NFC",
+  fingerprint = "fingerprint",
+  camera = "camera",
+  voice = "voice"
+};
+
+interface org.automotive.Seat extends VehiclePropertyType {
+  /*!
+  * \brief MUST return the status of seat occupant
+  */
+  attribute OccupantStatus Occupant;
+
+  /*!
+  * \brief MUST return whether or not the seat belt is fastened: fastened (true) or unfastened (false)
+  */
+  attribute Boolean SeatBelt;
+
+  /*!
+  * \brief MUST return occupant identifier
+  */
+  attribute String OccupantName;
+
+  /*!
+  * \brief MUST return identification type
+  */
+  attribute IdentificationTypeEnum IdentificationType;
+}
+
 

@@ -110,10 +110,61 @@ bluemonkey.createCustomProperty("SeatPositionSideCushion", 0);
 
 bluemonkey.createCustomProperty("VehicleDriveMode", "auto");
 
-bluemonkey.createCustomProperty("MirrorSettingPan", 0);
-bluemonkey.createCustomProperty("MirrorSettingTilt", 0);
+bluemonkey.createCustomProperty("MirrorSettingPan", 0, Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("MirrorSettingTilt", 0, Zone.Front | Zone.Left);
+
+bluemonkey.createCustomProperty("MirrorSettingPan", 0, Zone.Front | Zone.Right);
+bluemonkey.createCustomProperty("MirrorSettingTilt", 0, Zone.Front | Zone.Right);
 
 bluemonkey.createCustomProperty("DashboardIllumination", 5);
+
+bluemonkey.createCustomProperty("AntilockBreakingSystem", false);
+bluemonkey.createCustomProperty("AntilockBreakingSystemEnabled", true);
+
+bluemonkey.createCustomProperty("TractionControlSystem", true);
+bluemonkey.createCustomProperty("TractionControlSystemEnabled", true);
+
+bluemonkey.createCustomProperty("ElectronicStabilityControlEnabled", true);
+bluemonkey.createCustomProperty("ElectronicStabilityControlEngaged", true);
+
+bluemonkey.createCustomProperty("VehicleTopSpeedLimit", 150);
+
+bluemonkey.createCustomProperty("AirbagActivated", true, Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("AirbagDeployed", false, Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("AirbagActivated", true, Zone.Front | Zone.Right);
+bluemonkey.createCustomProperty("AirbagDeployed", false, Zone.Front | Zone.Right);
+
+bluemonkey.createCustomProperty("ChildSafetyLock", false, Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("ChildSafetyLock", true, Zone.Rear | Zone.Right);
+
+bluemonkey.createCustomProperty("AntilockBrakingSystem", false);
+bluemonkey.createCustomProperty("AntilockBrakingSystemEnabled", true);
+
+bluemonkey.createCustomProperty("DoorStatusW3C", "closed", Zone.Front | Zone.Right);
+bluemonkey.createCustomProperty("DoorStatusW3C", "closed", Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("DoorStatusW3C", "closed", Zone.Rear | Zone.Right);
+bluemonkey.createCustomProperty("DoorStatusW3C", "closed", Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("DoorLockStatus", true, Zone.Front | Zone.Right);
+bluemonkey.createCustomProperty("DoorLockStatus", true, Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("DoorLockStatus", true, Zone.Rear | Zone.Right);
+bluemonkey.createCustomProperty("DoorLockStatus", true, Zone.Rear | Zone.Left);
+
+bluemonkey.createCustomProperty("OccupantStatusW3C", "adult", Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("OccupantStatusW3C", "adult", Zone.Front | Zone.Right);
+bluemonkey.createCustomProperty("OccupantStatusW3C", "child", Zone.Rear | Zone.Right);
+bluemonkey.createCustomProperty("OccupantStatusW3C", "child", Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("SeatBeltStatus", true, Zone.Front | Zone.Right);
+bluemonkey.createCustomProperty("SeatBeltStatus", true, Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("SeatBeltStatus", true, Zone.Rear | Zone.Right);
+bluemonkey.createCustomProperty("SeatBeltStatus", true, Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("OccupantName", "Kevron", Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("OccupantName", "Irene", Zone.Front | Zone.Right);
+bluemonkey.createCustomProperty("OccupantName", "Miggie", Zone.Rear | Zone.Right);
+bluemonkey.createCustomProperty("OccupantName", "Emma", Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("OccupantIdentificationType", "camera", Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("OccupantIdentificationType", "Bluetooth", Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("OccupantIdentificationType", "pin", Zone.Rear | Zone.Right);
+bluemonkey.createCustomProperty("OccupantIdentificationType", "pin", Zone.Rear | Zone.Left);
 
 var speedProperty = bluemonkey.subscribeTo("VehicleSpeed");
 

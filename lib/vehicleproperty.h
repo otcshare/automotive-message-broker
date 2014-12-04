@@ -226,6 +226,22 @@ enum Occupant
 	Child,
 	Adult
 };
+namespace W3C
+{
+extern const char * Vacant;
+extern const char * Child;
+extern const char * Adult;
+
+extern const char * Pin;
+extern const char * Keyfob;
+extern const char * Bluetooth;
+extern const char * NFC ;
+extern const char * Fingerprint;
+extern const char * Camera;
+extern const char * Voice;
+}
+
+
 }
 
 namespace Window
@@ -754,22 +770,31 @@ public:
 	 */
 	static const Property HazardLightStatus;
 	PROPERTYTYPEBASIC(HazardLightStatus, bool)
-	//typedef BasicPropertyType<bool> HazardLightStatusType;
 
 	static const Property AntilockBrakingSystem;
 	PROPERTYTYPEBASIC(AntilockBrakingSystem, bool)
-	//typedef BasicPropertyType<bool> AntilockBrakingSystemType;
+
+	static const Property AntilockBrakingSystemEnabled;
+	PROPERTYTYPEBASIC(AntilockBrakingSystemEnabled, bool)
 
 	static const Property TractionControlSystem;
 	PROPERTYTYPEBASIC(TractionControlSystem, bool)
-	//typedef BasicPropertyType<bool> TractionControlSystemType;
+
+	static const Property TractionControlSystemEnabled;
+	PROPERTYTYPEBASIC(TractionControlSystemEnabled, bool)
 
 	static const Property VehicleTopSpeedLimit;
 	PROPERTYTYPEBASIC(VehicleTopSpeedLimit,uint16_t)
-	//typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
 
+	///TODO: Deprecated in 0.14
 	static const Property AirbagStatus;
 	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
+
+	static const Property AirbagActivated;
+	PROPERTYTYPEBASIC(AirbagActivated, bool)
+
+	static const Property AirbagDeployed;
+	PROPERTYTYPEBASIC(AirbagDeployed, bool)
 
 	/// TODO: deprecate in 0.14.  Use DoorStatusW3C
 	static const Property DoorStatus;
@@ -792,8 +817,12 @@ public:
 	static const Property WindowLockStatus;
 	PROPERTYTYPEBASIC(WindowLockStatus, bool)
 
+	///TODO Deprecated in 0.14
 	static const Property OccupantStatus;
 	PROPERTYTYPEBASIC(OccupantStatus, Seat::Occupant)
+
+	static const Property OccupantStatusW3C;
+	PROPERTYTYPE(OccupantStatusW3C, OccupantStatusW3CType, StringPropertyType, std::string)
 
 	static const Property ObstacleDistance;
 	PROPERTYTYPEBASIC(ObstacleDistance, double)
@@ -977,6 +1006,18 @@ public:
 
 	static const Property EngineSoundEnhancementMode;
 	PROPERTYTYPE(EngineSoundEnhancementMode, EngineSoundEnhancementModeType, StringPropertyType, std::string)
+
+	static const Property ElectronicStabilityControlEnabled;
+	PROPERTYTYPEBASIC(ElectronicStabilityControlEnabled, bool)
+
+	static const Property ElectronicStabilityControlEngaged;
+	PROPERTYTYPEBASIC(ElectronicStabilityControlEngaged, bool)
+
+	static const Property OccupantIdentificationType;
+	PROPERTYTYPE(OccupantIdentificationType, OccupantIdentificationTypeType, StringPropertyType, std::string)
+
+	static const Property OccupantName;
+	PROPERTYTYPE(OccupantName, OccupantNameType, StringPropertyType, std::string)
 
 	/** END PROPERTIES **/
 
