@@ -2,6 +2,9 @@
 #include "abstractroutingengine.h"
 #include "listplusplus.h"
 #include "superptr.hpp"
+#include "uuidhelper.h"
+
+#include <thread>
 
 int bufferLength = 100;
 int timeout=1000;
@@ -11,14 +14,15 @@ extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, ma
 	return new DatabaseSinkManager(routingengine, config);
 }
 
-void * cbFunc(gpointer data)
+void * cbFunc(Shared* shared)
 {
-	Shared *shared = static_cast<Shared*>(data);
-
 	if(!shared)
 	{
 		throw std::runtime_error("Could not cast shared object.");
 	}
+
+	///new tripID:
+	shared->tripId = amb::createUuid();
 
 	vector<DictionaryList<string> > insertList;
 
@@ -41,6 +45,7 @@ void * cbFunc(gpointer data)
 		NameValuePair<string> zone("zone", boost::lexical_cast<string>(obj.zone));
 		NameValuePair<string> four("time", boost::lexical_cast<string>(obj.time));
 		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj.sequence));
+		NameValuePair<string> six("tripId", boost::lexical_cast<string>(shared->tripId));
 
 		dict.push_back(one);
 		dict.push_back(two);
@@ -48,6 +53,7 @@ void * cbFunc(gpointer data)
 		dict.push_back(zone);
 		dict.push_back(four);
 		dict.push_back(five);
+		dict.push_back(six);
 
 		insertList.push_back(dict);
 
@@ -127,11 +133,11 @@ int getNextEvent(gpointer data)
 }
 
 DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::string> config)
-	:AbstractSource(engine,config),thread(NULL),shared(NULL),playback(false),playbackShared(NULL), playbackMultiplier(1)
+	:AbstractSource(engine,config),shared(nullptr),playback(false),playbackShared(nullptr), playbackMultiplier(1)
 {
 	databaseName = "storage";
 	tablename = "data";
-	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, zone REAL, time REAL, sequence REAL)";
+	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, zone REAL, time REAL, sequence REAL, tripId TEXT)";
 
 	if(config.find("databaseFile") != config.end())
 	{
@@ -267,7 +273,7 @@ void DatabaseSink::stopDb()
 	obj.quit = true;
 	shared->queue.append(obj);
 
-	g_thread_join(thread);
+	thread.join();
 
 	delete shared;
 	shared = NULL;
@@ -289,7 +295,7 @@ void DatabaseSink::startDb()
 
 	initDb();
 
-	thread = g_thread_new("dbthread", cbFunc, shared);
+	thread = std::thread(cbFunc, shared);
 }
 
 void DatabaseSink::startPlayback()

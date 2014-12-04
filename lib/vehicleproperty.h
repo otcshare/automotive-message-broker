@@ -99,7 +99,7 @@ enum TransmissionPositions
 	Park = 255
 
 };
-/** TODO: deprecate in 0.13.  Replaced with Drive::Mode: **/
+/** TODO: deprecate in 0.14.  Replaced with Drive::Mode: **/
 enum Mode {
 	Normal=0,
 	Sports = 1,
@@ -413,7 +413,7 @@ public:
 				 BasicPropertyType<Transmission::TransmissionPositions>, Transmission::TransmissionPositions)
 	//typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
 
-	/// TODO: deprecate in 0.13.  Replaced by Drive::Mode
+	/// TODO: deprecate in 0.14.  Replaced by Drive::Mode
 	static const Property TransmissionMode;
 	PROPERTYTYPE(TransmissionMode, TransmissionModeType,
 				 BasicPropertyType<Transmission::Mode>, Transmission::Mode)
@@ -440,12 +440,12 @@ public:
 	//typedef BasicPropertyType<uint16_t> WheelBrakePressureType;
 
 	/**< Steering wheel angle (0-359)
-	 * TODO: Deprecate in 0.13.  Replace with SteeringWheelAngleW3C
+	 * TODO: Deprecate in 0.14.  Replace with SteeringWheelAngleW3C
 	*/
 	static const Property SteeringWheelAngle;
 	PROPERTYTYPE(SteeringWheelAngle, SteeringWheelAngleType, BasicPropertyType<uint16_t>, uint16_t)
 
-	/// TODO: Rename to "SteeringWheel" in 0.13
+	/// TODO: Rename to "SteeringWheel" in 0.14
 	static const Property SteeringWheelAngleW3C;
 	PROPERTYTYPEBASIC(SteeringWheelAngleW3C, int16_t)
 
@@ -693,7 +693,7 @@ public:
 	static const Property BrakePressure;
 	PROPERTYTYPEBASIC(BrakePressure, uint16_t)
 
-	/// TODO: deprecated.  remove in 0.13.  Use DistanceTotal
+	/// TODO: deprecated.  remove in 0.14.  Use DistanceTotal
 	static const Property Odometer;
 	PROPERTYTYPEBASIC(Odometer, uint)
 
@@ -771,7 +771,7 @@ public:
 	static const Property AirbagStatus;
 	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
 
-	/// TODO: deprecate in 0.13.  Use DoorStatusW3C
+	/// TODO: deprecate in 0.14.  Use DoorStatusW3C
 	static const Property DoorStatus;
 	PROPERTYTYPEBASIC(DoorStatus, Door::Status)
 
@@ -806,7 +806,7 @@ public:
 	PROPERTYTYPEBASIC(WindshieldWiper,Window::WiperSpeed)
 	//typedef BasicPropertyType<Window::WiperSpeed> WindshieldWiperType;
 
-	/// TODO: Deprecated.  Remove in 0.13
+	/// TODO: Deprecated.  Remove in 0.14
 	static const Property AirflowDirection;
 	PROPERTYTYPEBASIC(AirflowDirection,HVAC::AirflowDirection)
 
@@ -828,7 +828,7 @@ public:
 	static const Property Heater;
 	PROPERTYTYPEBASIC(Heater, bool)
 
-	/// TODO: deprecated. remove in 0.13
+	/// TODO: deprecated. remove in 0.14
 	static const Property Defrost;
 	PROPERTYTYPEBASIC(Defrost, bool )
 
