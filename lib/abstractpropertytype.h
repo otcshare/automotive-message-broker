@@ -696,7 +696,7 @@ public:
 	}
 };
 
-template <class T>
+template <class T = AbstractPropertyType>
 class ListPropertyType: public AbstractPropertyType
 {
 public:
@@ -758,6 +758,18 @@ public:
 		return new ListPropertyType(*this);
 	}
 
+	void quickCopy(AbstractPropertyType* other)
+	{
+		AbstractPropertyType::quickCopy(other);
+		ListPropertyType<T>* v = static_cast<ListPropertyType<T>*>(other);
+		if(!v)
+		{
+			DebugOut(DebugOut::Error) << "ListPropertyType Quick Copy failed" << endl;
+			return;
+		}
+		mList = v->list();
+	}
+
 	std::string toString() const
 	{
 		std::string str = "[";
@@ -785,12 +797,10 @@ public:
 		if(!str.length())
 			return;
 
-		if(str[0] != '[' && str[str.length()-1] != ']')
+		if(str[0] == '[' && str[str.length()-1] == ']')
 		{
-			return;
+			str = str.substr(1,str.length() - 2);
 		}
-
-		str = str.substr(1,str.length() - 2);
 
 		std::vector<std::string> elements;
 
@@ -802,6 +812,7 @@ public:
 			T foo("", element);
 			append (foo);
 		}
+		timestamp = amb::currentTime();
 	}
 
 

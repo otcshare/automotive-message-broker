@@ -81,9 +81,9 @@ QVariant gvariantToQVariant(GVariant *value)
 	{
 		gsize dictsize = g_variant_n_children(value);
 		QVariantList list;
-		for (int i=0;i<dictsize;i++)
+		for (int i=0; i<dictsize; i++)
 		{
-			GVariant *childvariant = g_variant_get_child_value(value,i);
+			GVariant *childvariant = g_variant_get_child_value(value, i);
 			GVariant *innervariant = g_variant_get_variant(childvariant);
 			list.append(gvariantToQVariant(innervariant));
 		}
@@ -93,6 +93,38 @@ QVariant gvariantToQVariant(GVariant *value)
 	else
 		return QVariant::Invalid;
 
+}
+
+AbstractPropertyType* qVariantToAbstractPropertyType(QString name, QVariant var)
+{
+	if(!var.isValid())
+		return nullptr;
+
+	if(var.type() == QVariant::UInt)
+		return new BasicPropertyType<uint>(name.toStdString(), var.toUInt());
+	else if(var.type() == QVariant::Double)
+		return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
+	else if(var.type() == QVariant::Bool)
+		return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
+	else if(var.type() == QVariant::Int)
+		return new BasicPropertyType<int>(name.toStdString(), var.toInt());
+	else if(var.type() == QVariant::String)
+		return new StringPropertyType(name.toStdString(), var.toString().toStdString());
+	else if(var.type() == QVariant::List && var.toList().count())
+	{
+		QVariant subVariant = var.toList().at(0);
+		if(subVariant.type() == QVariant::UInt)
+			return new ListPropertyType<BasicPropertyType<uint>>(name.toStdString(), subVariant.toUInt());
+		else if(subVariant.type() == QVariant::Double)
+			return new ListPropertyType<BasicPropertyType<double>>(name.toStdString(), subVariant.toDouble());
+		else if(subVariant.type() == QVariant::Bool)
+			return new ListPropertyType<BasicPropertyType<bool>>(name.toStdString(), subVariant.toBool());
+		else if(subVariant.type() == QVariant::Int)
+			return new ListPropertyType<BasicPropertyType<int>>(name.toStdString(), subVariant.toInt());
+		else if(subVariant.type() == QVariant::String)
+			return new ListPropertyType<StringPropertyType>(name.toStdString(), subVariant.toString().toStdString());
+	}
+	return nullptr;
 }
 
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent): QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
@@ -346,23 +378,11 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, i
 {
 	QVariant var = defaultValue.toVariant();
 
-	auto create = [defaultValue, name, var]() -> AbstractPropertyType*
+	DebugOut() << "Variant value for: " << name.toStdString() << " is " << defaultValue.toString().toStdString() << endl;
+
+	auto create = [name, var]() -> AbstractPropertyType*
 	{
-		if(!var.isValid())
-			return nullptr;
-
-		if(var.type() == QVariant::UInt)
-			return new BasicPropertyType<uint>(name.toStdString(), var.toUInt());
-		else if(var.type() == QVariant::Double)
-			return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
-		else if(var.type() == QVariant::Bool)
-			return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
-		else if(var.type() == QVariant::Int)
-			return new BasicPropertyType<int>(name.toStdString(), var.toInt());
-		else if(var.type() == QVariant::String)
-			return new StringPropertyType(name.toStdString(), var.toString().toStdString());
-
-		return nullptr;
+		return qVariantToAbstractPropertyType(name, var);
 	};
 
 	addPropertySupport(zone, create);
@@ -370,7 +390,7 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, i
 	AsyncSetPropertyRequest request;
 	request.property = name.toStdString();
 	request.zoneFilter = zone;
-	request.value = VehicleProperty::getPropertyTypeForPropertyNameValue(name.toStdString(), var.toString().toStdString());
+	request.value = VehicleProperty::getPropertyTypeForPropertyNameValue(name.toStdString(), defaultValue.toString().toStdString());
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
 	routingEngine->setProperty(request);

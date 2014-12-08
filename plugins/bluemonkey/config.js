@@ -98,7 +98,7 @@ bluemonkey.createCustomProperty("TirePressureLow", false);
 bluemonkey.createCustomProperty("TireTemperature", 20);
 
 bluemonkey.createCustomProperty("ActiveNoiseControlMode", false);
-bluemonkey.createCustomProperty("AvailableSounds", [""]);
+bluemonkey.createCustomProperty("AvailableSounds", ["LightSpeed", "v8"]);
 bluemonkey.createCustomProperty("EngineSoundEnhancementMode", "");
 
 bluemonkey.createCustomProperty("SeatPositionBackCushion", 0);
@@ -161,8 +161,8 @@ bluemonkey.createCustomProperty("OccupantName", "Kevron", Zone.Front | Zone.Left
 bluemonkey.createCustomProperty("OccupantName", "Irene", Zone.Front | Zone.Right);
 bluemonkey.createCustomProperty("OccupantName", "Miggie", Zone.Rear | Zone.Right);
 bluemonkey.createCustomProperty("OccupantName", "Emma", Zone.Rear | Zone.Left);
-bluemonkey.createCustomProperty("OccupantIdentificationType", "camera", Zone.Rear | Zone.Left);
-bluemonkey.createCustomProperty("OccupantIdentificationType", "Bluetooth", Zone.Rear | Zone.Left);
+bluemonkey.createCustomProperty("OccupantIdentificationType", "camera", Zone.Front | Zone.Left);
+bluemonkey.createCustomProperty("OccupantIdentificationType", "Bluetooth", Zone.Front | Zone.Right);
 bluemonkey.createCustomProperty("OccupantIdentificationType", "pin", Zone.Rear | Zone.Right);
 bluemonkey.createCustomProperty("OccupantIdentificationType", "pin", Zone.Rear | Zone.Left);
 

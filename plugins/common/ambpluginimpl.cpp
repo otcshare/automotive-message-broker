@@ -81,11 +81,8 @@ AsyncPropertyReply *AmbPluginImpl::setProperty(const AsyncSetPropertyRequest& re
 	AbstractPropertyType *value = findPropertyType(request.property, request.zoneFilter);
 	if (value && request.value) {
 		DebugOut(2) << "updating property "<< request.property << " to: " << request.value->toString() << endl;
-		value->fromString(request.value->toString());
-		DebugOut(2) << "New value of property "<< request.property << " is: " << value->toString() << endl;
-		value->timestamp = amb::currentTime();
+		value->quickCopy(request.value);
 		routingEngine->updateProperty(value, uuid());
-
 		reply->success = true;
 		reply->error = AsyncPropertyReply::NoError;
 	}
