@@ -2,9 +2,9 @@ if(xwalk_vehicle_extension)
 
 pkg_check_modules(gio REQUIRED gio-2.0)
 
-set(vehicle_api_headers vehicle.h vehicle_instance.h vehicle_extension.h common/extension.h picojson.h common/utils.h common/virtual_fs.h
+set(vehicle_api_headers vehicle.h vehicle_instance.h vehicle_extension.h common/extension.h common/picojson.h common/utils.h common/virtual_fs.h
     common/XW_Extension_EntryPoints.h common/XW_Extension.h common/XW_Permissions.h common/XW_Extension_Runtime.h common/XW_Extension_SyncMessage.h)
-set(vehicle_api_sources vehicle.cc vehicle_extension.cc vehicle_instance.cc common/extension.cc)
+set(vehicle_api_sources vehicle.cc vehicle_extension.cc vehicle_instance.cc common/extension.cc common/picojson.h)
 
 include_directories(${include_dirs} ${CMAKE_CURRENT_SOURCE_DIR}/)
 

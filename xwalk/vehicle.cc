@@ -99,22 +99,23 @@ picojson::value GetBasic(GVariant* value) {
 GVariant* GetBasic(picojson::value value, const std::string& type) {
 	GVariant* v = nullptr;
 
+	DebugOut() << "Getting GVariant value for signature " << type << " value: " << value.to_str() << endl;
+
 	if (type == "i") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (int32_t)value.get<double>());
+		DebugOut() << "Variant value: " << g_variant_get_int32(v) << endl;
 	} else if (type == "d") {
 		v = g_variant_new(type.c_str(), value.get<double>());
 	} else if (type == "q") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (uint16_t)value.get<double>());
 	} else if (type == "n") {
-		v = g_variant_new(type.c_str(), value.get<double>());
-	} else if (type == "y") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (int16_t)value.get<double>());
 	} else if (type == "u") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (uint32_t)value.get<double>());
 	} else if (type == "x") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (int64_t)value.get<double>());
 	} else if (type == "t") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (uint64_t)value.get<double>());
 	} else if (type == "b") {
 		v = g_variant_new(type.c_str(), value.get<bool>());
 	} else if (type == "s") {
@@ -681,6 +682,8 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 		}
 
 		GError* set_error = nullptr;
+
+		DebugOut() << "Trying to set " << attribute << " to " << itr.second.to_str() << endl;
 
 		g_dbus_proxy_call_sync(properties_proxy.get(), "Set",
 							   g_variant_new("(ssv)",

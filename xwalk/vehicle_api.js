@@ -151,8 +151,6 @@ function isAvailable(obj, attName)
 
   var reply = extension.internal.sendSyncMessage(JSON.stringify(msg));
 
-
-
   if (reply === "true") {
     return "available";
   } else {
@@ -173,6 +171,7 @@ function createPromise(msg) {
   msg.asyncCallId = next_async_call_id;
   extension.postMessage(JSON.stringify(msg));
   ++next_async_call_id;
+
   return promise;
 }
 
@@ -353,7 +352,10 @@ _defineVehicleSignalProperty(exports, 'door');
 _defineVehicleSignalProperty(exports, 'childSafetyLock');
 _defineVehicleSignalProperty(exports, 'seat');
 
+/// Climate attributes:
 _defineVehicleSignalProperty(exports, 'temperature');
+_defineVehicleSignalProperty(exports, 'rainSensor');
+_defineVehicleSignalProperty(exports, 'wiperStatus');
 _defineVehicleSignalProperty(exports, 'climateControl');
 _defineVehicleSignalProperty(exports, 'defrost');
 
