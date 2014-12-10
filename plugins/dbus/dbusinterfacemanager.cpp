@@ -162,13 +162,13 @@ DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine* engine,std::ma
 	:AbstractSink(engine,config),re(engine), connection(nullptr)
 {
 	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
-					DBusServiceName,
-					G_BUS_NAME_OWNER_FLAGS_NONE,
-					on_bus_acquired,
-					on_name_acquired,
-					on_name_lost,
-					this,
-					NULL);
+							 DBusServiceName,
+							 G_BUS_NAME_OWNER_FLAGS_NONE,
+							 on_bus_acquired,
+							 on_name_acquired,
+							 on_name_lost,
+							 this,
+							 NULL);
 
 }
 
@@ -266,6 +266,9 @@ void DBusInterfaceManager::registerTypes()
 	exportProperty<ChildSafetyLock>(re, connection);
 	exportProperty<SeatProperty>(re, connection);
 	exportProperty<DoorProperty>(re, connection);
+	exportProperty<WindshieldWiperStatus>(re, connection);
+	exportProperty<SideWindowStatusProperty>(re, connection);
+	exportProperty<AtmosphericPressure>(re, connection);
 
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();
@@ -294,5 +297,3 @@ void DBusInterfaceManager::registerTypes()
 		}
 	}
 }
-
-

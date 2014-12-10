@@ -358,4 +358,6 @@ _defineVehicleSignalProperty(exports, 'rainSensor');
 _defineVehicleSignalProperty(exports, 'wiperStatus');
 _defineVehicleSignalProperty(exports, 'climateControl');
 _defineVehicleSignalProperty(exports, 'defrost');
+_defineVehicleSignalProperty(exports, 'sunroof');
+_defineVehicleSignalProperty(exports, 'atmosphericPressure');
 

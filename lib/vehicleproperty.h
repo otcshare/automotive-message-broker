@@ -246,19 +246,6 @@ extern const char * Voice;
 
 namespace Window
 {
-enum Location
-{
-	Driver = 0,
-	Passenger,
-	LeftRear,
-	RightRear,
-	Sunroof,
-	Windshield,
-	SideMirrorLeft,
-	SideMirrorRight,
-	Rear
-};
-
 enum WiperSpeed
 {
 	Off = 0,
@@ -266,7 +253,29 @@ enum WiperSpeed
 	Fastest = 5,
 	Auto = 10
 };
+}
 
+namespace ConvertibleRoofW3C
+{
+extern const char * Opened;
+extern const char * Opening;
+extern const char * Closed;
+extern const char * Closing;
+}
+
+namespace WiperSpeedSetting
+{
+namespace W3C
+{
+extern const char * Off;
+extern const char * Once;
+extern const char * Slowest;
+extern const char * Slow;
+extern const char * Middle;
+extern const char * Fast;
+extern const char * Fastest;
+extern const char * Auto;
+}
 }
 
 namespace HVAC
@@ -800,7 +809,9 @@ public:
 	static const Property DoorStatus;
 	PROPERTYTYPEBASIC(DoorStatus, Door::Status)
 
-	/** use with Door::W3C::*
+	/*!
+	 * \brief DoorStatusW3C
+	 * use with Door::W3C::*
 	 */
 	static const Property DoorStatusW3C;
 	PROPERTYTYPE(DoorStatusW3C, DoorStatusW3CType, StringPropertyType, std::string)
@@ -829,11 +840,24 @@ public:
 
 	static const Property RainSensor;
 	PROPERTYTYPEBASIC(RainSensor, uint16_t)
-	//typedef BasicPropertyType<uint16_t> RainSensorType;
 
+	///TODO Deprecated in 0.14.  Use WinshieldWiperSpeed
 	static const Property WindshieldWiper;
-	PROPERTYTYPEBASIC(WindshieldWiper,Window::WiperSpeed)
-	//typedef BasicPropertyType<Window::WiperSpeed> WindshieldWiperType;
+	PROPERTYTYPEBASIC(WindshieldWiper, Window::WiperSpeed)
+
+	/*!
+	 * \brief WindshieldWiperSpeed
+	 * Use WiperSpeedSetting::W3C::* for value
+	 */
+	static const Property WindshieldWiperSpeed;
+	PROPERTYTYPE(WindshieldWiperSpeed, WindshieldWiperSpeedType, StringPropertyType, std::string)
+
+	/*!
+	 * \brief WindshieldWiperSetting
+	 * Use WiperSpeedSetting::W3C::* for value
+	 */
+	static const Property WindshieldWiperSetting;
+	PROPERTYTYPE(WindshieldWiperSetting, WindshieldWiperSettingType, StringPropertyType, std::string)
 
 	/// TODO: Deprecated.  Remove in 0.14
 	static const Property AirflowDirection;
@@ -892,7 +916,12 @@ public:
 
 	static const Property ConvertibleRoof;
 	PROPERTYTYPEBASIC(ConvertibleRoof, bool)
-	//typedef BasicPropertyType<bool> ConvertibleRoofType;
+
+	/*!
+	 * \brief ConvertibleRoofStatus use with ConvertibleRoofW3C::*
+	 */
+	static const Property ConvertibleRoofStatus;
+	PROPERTYTYPE(ConvertibleRoofStatus, ConvertibleRoofStatusType, StringPropertyType, std::string)
 
 	static const Property NightMode;
 	PROPERTYTYPEBASIC(NightMode, bool)
@@ -1018,6 +1047,9 @@ public:
 
 	static const Property OccupantName;
 	PROPERTYTYPE(OccupantName, OccupantNameType, StringPropertyType, std::string)
+
+	static const Property AtmosphericPressure;
+	PROPERTYTYPEBASIC(AtmosphericPressure, uint16_t)
 
 	/** END PROPERTIES **/
 

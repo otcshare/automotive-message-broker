@@ -232,6 +232,13 @@ void BluemonkeySink::loadConfig(QString str)
 	QJSValue val = engine->evaluate(script);
 
 	DebugOut()<<val.toString().toStdString()<<endl;
+
+	if(val.isError())
+	{
+		DebugOut(DebugOut::Error) << val.property("name").toString().toStdString() << endl;
+		DebugOut(DebugOut::Error) << val.property("message").toString().toStdString() << endl;
+		DebugOut(DebugOut::Error) << str.toStdString() << ":" <<val.property("lineNumber").toString().toStdString() << endl;
+	}
 }
 
 bool BluemonkeySink::loadModule(QString path)

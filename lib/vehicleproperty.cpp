@@ -88,6 +88,19 @@ const char* Drive::W3C::Eco = "eco";
 const char* Drive::W3C::Manual = "manual";
 const char* Drive::W3C::Winter = "winter";
 
+const char * WiperSpeedSetting::W3C::Off = "off";
+const char * WiperSpeedSetting::W3C::Once = "once";
+const char * WiperSpeedSetting::W3C::Slowest = "slowest";
+const char * WiperSpeedSetting::W3C::Slow = "slow";
+const char * WiperSpeedSetting::W3C::Middle = "middle";
+const char * WiperSpeedSetting::W3C::Fast = "fast";
+const char * WiperSpeedSetting::W3C::Fastest = "fastest";
+const char * WiperSpeedSetting::W3C::Auto = "auto";
+
+const char * ConvertibleRoofW3C::Closed = "closed";
+const char * ConvertibleRoofW3C::Closing = "closing";
+const char * ConvertibleRoofW3C::Opened = "opened";
+const char * ConvertibleRoofW3C::Opening = "opening";
 
 const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
 const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
@@ -202,6 +215,8 @@ const VehicleProperty::Property VehicleProperty::OccupantStatusW3C = "OccupantSt
 const VehicleProperty::Property VehicleProperty::ObstacleDistance = "ObstacleDistance";
 const VehicleProperty::Property VehicleProperty::RainSensor = "RainSensor";
 const VehicleProperty::Property VehicleProperty::WindshieldWiper = "WindshieldWiper";
+const VehicleProperty::Property VehicleProperty::WindshieldWiperSpeed = "WindshieldWiperSpeed";
+const VehicleProperty::Property VehicleProperty::WindshieldWiperSetting = "WindshieldWiperSetting";
 const VehicleProperty::Property VehicleProperty::AirflowDirection = "AirflowDirection";
 const VehicleProperty::Property VehicleProperty::AirflowDirectionW3C = "AirflowDirectionW3C";
 const VehicleProperty::Property VehicleProperty::FanSpeed = "FanSpeed";
@@ -219,6 +234,7 @@ const VehicleProperty::Property VehicleProperty::WindowStatus = "WindowStatus";
 const VehicleProperty::Property VehicleProperty::Sunroof = "Sunroof";
 const VehicleProperty::Property VehicleProperty::SunroofTilt = "SunroofTilt";
 const VehicleProperty::Property VehicleProperty::ConvertibleRoof = "ConvertibleRoof";
+const VehicleProperty::Property VehicleProperty::ConvertibleRoofStatus = "ConvertibleRoofStatus";
 const VehicleProperty::Property VehicleProperty::NightMode = "NightMode";
 const VehicleProperty::Property VehicleProperty::DrivingMode = "DrivingMode";
 const VehicleProperty::Property VehicleProperty::DrivingModeW3C = "DrivingModeW3C";
@@ -265,6 +281,7 @@ const VehicleProperty::Property VehicleProperty::ElectronicStabilityControlEnabl
 const VehicleProperty::Property VehicleProperty::ElectronicStabilityControlEngaged = "ElectronicStabilityControlEngaged";
 const VehicleProperty::Property VehicleProperty::OccupantIdentificationType = "OccupantIdentificationType";
 const VehicleProperty::Property VehicleProperty::OccupantName = "OccupantName";
+const VehicleProperty::Property VehicleProperty::AtmosphericPressure = "AtmosphericPressure";
 
 PropertyList VehicleProperty::mCapabilities;
 PropertyList VehicleProperty::mCustomProperties;
@@ -399,6 +416,8 @@ VehicleProperty::VehicleProperty()
 
 	REGISTERPROPERTY(RainSensor, 0);
 	REGISTERPROPERTY(WindshieldWiper, Window::Off);
+	REGISTERPROPERTY(WindshieldWiperSpeed, WiperSpeedSetting::W3C::Off);
+	REGISTERPROPERTY(WindshieldWiperSetting, WiperSpeedSetting::W3C::Off);
 	REGISTERPROPERTY(AirflowDirection, HVAC::Front);
 	REGISTERPROPERTY(AirflowDirectionW3C, HVAC::W3C::FloorPanel);
 	REGISTERPROPERTY(FanSpeed, 0);
@@ -418,6 +437,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Sunroof, 0);
 	REGISTERPROPERTY(SunroofTilt, 0);
 	REGISTERPROPERTY(ConvertibleRoof, false);
+	REGISTERPROPERTY(ConvertibleRoofStatus, "");
+
 	REGISTERPROPERTY(NightMode, false);
 	REGISTERPROPERTY(DrivingMode, Driving::None);
 	REGISTERPROPERTY(DrivingModeW3C, false);
@@ -474,7 +495,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ElectronicStabilityControlEngaged, false);
 	REGISTERPROPERTY(OccupantIdentificationType, Seat::W3C::Pin);
 	REGISTERPROPERTY(OccupantName, "");
-
+	REGISTERPROPERTY(AtmosphericPressure, 0);
 }
 
 void VehicleProperty::factory()
@@ -542,5 +563,6 @@ bool VehicleProperty::registerPropertyPriv(VehicleProperty::Property name, Vehic
 	return true;
 
 }
+
 
 
