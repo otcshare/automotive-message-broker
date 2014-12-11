@@ -12,3 +12,6 @@ Changes:
 - Removed unmaintained plugins: tpms, websocket{sink,source}
 
 Fixes:
+- [DBus plugin] Fix exporting properties in zones that really don't have support
+- [xwalk extension] fixed set() for some types did not work because of invalid GVariant creation.
+- [websocket plugin] Updated html test page.  Fixed protocol usage.
