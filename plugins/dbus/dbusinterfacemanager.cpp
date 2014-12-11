@@ -269,6 +269,8 @@ void DBusInterfaceManager::registerTypes()
 	exportProperty<WindshieldWiperStatus>(re, connection);
 	exportProperty<SideWindowStatusProperty>(re, connection);
 	exportProperty<AtmosphericPressure>(re, connection);
+	exportProperty<LaneDepartureStatus>(re, connection);
+	exportProperty<AlarmStatus>(re, connection);
 
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();

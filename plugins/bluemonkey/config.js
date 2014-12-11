@@ -238,6 +238,10 @@ bluemonkey.createCustomProperty("WindowLockStatus", true, Zone.Rear | Zone.Left)
 
 bluemonkey.createCustomProperty("AtmosphericPressure", 1013);
 
+bluemonkey.createCustomProperty("LaneDepartureStatus", "running");
+bluemonkey.createCustomProperty("AlarmStatus", "prearmed");
+bluemonkey.createCustomProperty("ParkingBrakeStatusW3C", "inactive");
+
 var speedProperty = bluemonkey.subscribeTo("VehicleSpeed");
 
 var testTimer = bluemonkey.createTimer();

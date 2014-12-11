@@ -361,3 +361,9 @@ _defineVehicleSignalProperty(exports, 'defrost');
 _defineVehicleSignalProperty(exports, 'sunroof');
 _defineVehicleSignalProperty(exports, 'atmosphericPressure');
 
+/// Vision and Parking Interfaces
+_defineVehicleSignalProperty(exports, 'langeDepartureStatus');
+_defineVehicleSignalProperty(exports, 'alarm');
+_defineVehicleSignalProperty(exports, 'parkingBrake');
+
+

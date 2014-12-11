@@ -102,6 +102,19 @@ const char * ConvertibleRoofW3C::Closing = "closing";
 const char * ConvertibleRoofW3C::Opened = "opened";
 const char * ConvertibleRoofW3C::Opening = "opening";
 
+const char * LaneDeparture::W3C::Off = "off";
+const char * LaneDeparture::W3C::Pause = "pause";
+const char * LaneDeparture::W3C::Running = "running";
+
+const char * Security::W3C::Alarmed = "alarmed";
+const char * Security::W3C::Armed = "armed";
+const char * Security::W3C::Disarmed = "disarmed";
+const char * Security::W3C::Prearmed = "prearmed";
+
+const char * ParkingBrake::W3C::Inactive = "inactive";
+const char * ParkingBrake::W3C::Active = "active";
+const char * ParkingBrake::W3C::Error = "error";
+
 const VehicleProperty::Property VehicleProperty::NoValue = "NoValue";
 const VehicleProperty::Property VehicleProperty::VehicleSpeed = "VehicleSpeed";
 const VehicleProperty::Property VehicleProperty::EngineSpeed = "EngineSpeed";
@@ -194,6 +207,7 @@ const VehicleProperty::Property VehicleProperty::WasherFluidLevel = "WasherFluid
 const VehicleProperty::Property VehicleProperty::WasherFluidLevelLow = "WasherFluidLevelLow";
 const VehicleProperty::Property VehicleProperty::SecurityAlertStatus = "SecurityAlertStatus";
 const VehicleProperty::Property VehicleProperty::ParkingBrakeStatus = "ParkingBrakeStatus";
+const VehicleProperty::Property VehicleProperty::ParkingBrakeStatusW3C = "ParkingBrakeStatusW3C";
 const VehicleProperty::Property VehicleProperty::ParkingLightStatus = "ParkingLightStatus";
 const VehicleProperty::Property VehicleProperty::HazardLightStatus = "HazardLightStatus";
 const VehicleProperty::Property VehicleProperty::AirbagStatus = "AirbagStatus";
@@ -282,6 +296,8 @@ const VehicleProperty::Property VehicleProperty::ElectronicStabilityControlEngag
 const VehicleProperty::Property VehicleProperty::OccupantIdentificationType = "OccupantIdentificationType";
 const VehicleProperty::Property VehicleProperty::OccupantName = "OccupantName";
 const VehicleProperty::Property VehicleProperty::AtmosphericPressure = "AtmosphericPressure";
+const VehicleProperty::Property VehicleProperty::LaneDepartureStatus = "LaneDepartureStatus";
+const VehicleProperty::Property VehicleProperty::AlarmStatus = "AlarmStatus";
 
 PropertyList VehicleProperty::mCapabilities;
 PropertyList VehicleProperty::mCustomProperties;
@@ -390,6 +406,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(WasherFluidLevelLow, false);
 	REGISTERPROPERTY(SecurityAlertStatus, Security::Idle);
 	REGISTERPROPERTY(ParkingBrakeStatus, false);
+	REGISTERPROPERTY(ParkingBrakeStatusW3C, "");
 	REGISTERPROPERTY(ParkingLightStatus, false);
 	REGISTERPROPERTY(HazardLightStatus, false);
 	/// TODO: deprecated in 0.14
@@ -496,6 +513,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(OccupantIdentificationType, Seat::W3C::Pin);
 	REGISTERPROPERTY(OccupantName, "");
 	REGISTERPROPERTY(AtmosphericPressure, 0);
+	REGISTERPROPERTY(LaneDepartureStatus, "");
+	REGISTERPROPERTY(AlarmStatus, "");
 }
 
 void VehicleProperty::factory()

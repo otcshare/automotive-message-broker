@@ -133,7 +133,7 @@ namespace Power {
  * Accessory2 = Vehicle is off and key is in Accessory2 position.
  * Run = Vehichle is running.  Key is in the running position.
  */
-enum PowerModes
+enum Modes
 {
 	Off = 0,
 	Accessory1 = 1,
@@ -188,6 +188,15 @@ enum Status
 	Armed,
 	AlarmDetected
 };
+
+namespace W3C
+{
+extern const char * Disarmed;
+extern const char * Prearmed;
+extern const char * Armed;
+extern const char * Alarmed;
+}
+
 }
 
 namespace Airbag {
@@ -339,6 +348,26 @@ enum Type
 };
 }
 
+namespace LaneDeparture
+{
+namespace W3C
+{
+extern const char * Off;
+extern const char * Pause;
+extern const char * Running;
+}
+}
+
+namespace ParkingBrake
+{
+namespace W3C
+{
+extern const char * Inactive;
+extern const char * Active;
+extern const char * Error;
+}
+}
+
 #include <boost/preprocessor/comma.hpp>
 
 #define PROPERTYTYPE(property, propertyType, baseClass, valueType) \
@@ -382,7 +411,6 @@ class VehicleProperty
 {
 
 public:
-
 
 	/*!
 	 * \brief factory constructs a static instance of VehicleProperty.  This should be called once before VehicleProperty is used in the app
@@ -524,9 +552,6 @@ public:
 	};
 
 
-
-
-
 	/**< Air intake temperature in degrees celcius */
 	static const Property AirIntakeTemperature;
 	PROPERTYTYPE(AirIntakeTemperature, AirIntakeTemperatureType, BasicPropertyType<int>, int)
@@ -588,10 +613,10 @@ public:
 	PROPERTYTYPEBASIC(TireTemperature, int16_t)
 
 	/**< Vehicle Power Mode.
-	 *@see Power::PowerModes
+	 *@see Power::Modes
 	 */
 	static const Property VehiclePowerMode;
-	PROPERTYTYPE(VehiclePowerMode, VehiclePowerModeType, BasicPropertyType<Power::PowerModes> ,Power::PowerModes)
+	PROPERTYTYPE(VehiclePowerMode, VehiclePowerModeType, BasicPropertyType<Power::Modes>, Power::Modes)
 	//typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
 	static const Property TripMeters;
@@ -755,18 +780,22 @@ public:
 	static const Property WasherFluidLevelLow;
 	PROPERTYTYPEBASIC(WasherFluidLevelLow, bool)
 
-	/**< Securty Alert Status
-	 * status of security alert
-	 * @see Security::Status
-	 */
+	///TODO: Depreciated in 0.14.  Use AlarmStatus
 	static const Property SecurityAlertStatus;
 	PROPERTYTYPEBASIC(SecurityAlertStatus, Security::Status)
 
 	/**< Parking Brake Status
 	 * status of parking break active (true) or inactive (false)
+	 * TODO: Deprecated in 0.14.
 	 */
 	static const Property ParkingBrakeStatus;
 	PROPERTYTYPEBASIC(ParkingBrakeStatus, bool)
+
+	/*!
+	 * \brief ParkingBrakeStatusW3C use with ParkingBrake::W3C::*
+	 */
+	static const Property ParkingBrakeStatusW3C;
+	PROPERTYTYPE(ParkingBrakeStatusW3C, ParkingBrakeStatusW3CType, StringPropertyType, std::string)
 
 	/**< Parking Light Status
 	 * status of parking lights active (true) or inactive (false)
@@ -1051,6 +1080,17 @@ public:
 	static const Property AtmosphericPressure;
 	PROPERTYTYPEBASIC(AtmosphericPressure, uint16_t)
 
+	static const Property LaneDepartureStatus;
+	PROPERTYTYPE(LaneDepartureStatus, LaneDepartureStatusType, StringPropertyType, std::string)
+
+	/*!
+	 * \brief AlarmStatus.  Use with Security::W3C*
+	 */
+	static const Property AlarmStatus;
+	PROPERTYTYPE(AlarmStatus, AlarmStatusType, StringPropertyType, std::string)
+
+	//static const Property Lane
+
 	/** END PROPERTIES **/
 
 	/*!
@@ -1108,4 +1148,5 @@ private:
 };
 
 #endif // VEHICLEPROPERTY_H
+
 

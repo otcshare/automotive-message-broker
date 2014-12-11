@@ -1002,13 +1002,18 @@ interface org.automotive.SecurityAlert extends VehiclePropertyType  {
    attribute Boolean SecurityAlert readonly
 }
 
-/// Deprecated.  Use LightStatus.  remove in 0.14
 interface org.automotive.ParkingBrake extends VehiclePropertyType  {
 
   /*!  ParkingBrake
    *   MUST return status of parking brake:  Engaged = true, Disengaged = false.
+   TODO: Deprecated in 0.14.  Use Status
    */
    attribute Boolean ParkingBrake readonly
+
+  /*!
+  * \brief MUST return the current status of parking brake.
+  */
+  attribute ParkingBrakeStatus Status;
 }
 
 /// Deprecated.  Use LightStatus.  remove in 0.14
@@ -1737,3 +1742,38 @@ interface org.automotive.AtmosphericPressure extends VehiclePropertyType {
   * \brief MUST return the current atmospheric pressure outside of the vehicle (Unit: hectopascal)
   */
   attribute UInt16 Pressure;
+}
+
+enum LaneDepartureStatus {
+    off = "off",
+    pause = "pause",
+    running = "running"
+};
+
+interface org.automotive.LaneDepartureDetection extends VehiclePropertyType {
+  /*!
+  * \brief MUST return current status of Lane departure warning function.
+  */
+  attribute LaneDepartureStatus Status readonly;
+}
+
+enum AlarmStatus {
+    disarmed = "disarmed",
+    prearmed = "prearmed",
+    armed = "armed",
+    alarmed = "alarmed"
+};
+
+interface org.automotive.Alarm extends VehiclePropertyType {
+  /*!
+  * \brief MUST return the current status of vehicle Alarm System.
+  */
+  attribute AlarmStatus Status;
+}
+
+enum ParkingBrakeStatus {
+    inactive = "inactive",
+    active = "active",
+    error = "error"
+};
+
