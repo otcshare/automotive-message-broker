@@ -32,8 +32,9 @@ void VehicleInstance::HandleMessage(const char* message) {
 	if (v.contains("zone")) {
 		picojson::value zone = v.get("zone");
 		if (zone.is<picojson::object>() && zone.contains("value")) {
-			picojson::array zones = zone.get("value").get<picojson::array>();
+			picojson::value::array zones = zone.get("value").get<picojson::value::array>();
 			amb_zone = ZoneToAMBZone(zones);
+			DebugOut() << "Converted W3C zone " << picojson::value(zones).to_str() << " to AMB zone: " << amb_zone << endl;
 		} else {
 			int callback_id = -1;
 			if (v.contains("asyncCallId"))
@@ -46,7 +47,6 @@ void VehicleInstance::HandleMessage(const char* message) {
 	if (method == "get") {
 		std::string attribute = v.get("name").to_str();
 		int callback_id = v.get("asyncCallId").get<double>();
-		Zone::Type amb_zone = 0;
 
 		std::transform(attribute.begin(), attribute.begin() + 1, attribute.begin(),
 					   ::toupper);
@@ -74,7 +74,6 @@ void VehicleInstance::HandleMessage(const char* message) {
 	} else if (method == "set") {
 		std::string attribute = v.get("name").to_str();
 		int callback_id = v.get("asyncCallId").get<double>();
-		Zone::Type amb_zone = 0;
 
 		std::transform(attribute.begin(), attribute.begin() + 1, attribute.begin(),
 					   ::toupper);
@@ -88,7 +87,6 @@ void VehicleInstance::HandleMessage(const char* message) {
 	} else if (method == "supported") {
 		std::string attribute = v.get("name").to_str();
 		int callback_id = v.get("asyncCallId").get<double>();
-		Zone::Type amb_zone = 0;
 
 		std::transform(attribute.begin(), attribute.begin() + 1, attribute.begin(),
 					   ::toupper);
@@ -131,17 +129,20 @@ int VehicleInstance::ZoneToAMBZone(picojson::array zones) {
 	for (auto zone : zones) {
 		std::string tempzone = zone.to_str();
 
-		if (tempzone == "Front") {
+		std::transform(tempzone.begin(), tempzone.end(), tempzone.begin(),
+							   ::tolower);
+
+		if (tempzone == "front") {
 			amb_zone |= Zone::Front;
-		} else if (tempzone == "Middle") {
+		} else if (tempzone == "middle") {
 			amb_zone |= Zone::Middle;
-		} else if (tempzone == "Right") {
+		} else if (tempzone == "right") {
 			amb_zone |= Zone::Right;
-		} else if (tempzone == "Left") {
+		} else if (tempzone == "left") {
 			amb_zone |= Zone::Left;
-		} else if (tempzone == "Rear") {
+		} else if (tempzone == "rear") {
 			amb_zone |= Zone::Rear;
-		} else if (tempzone == "Center") {
+		} else if (tempzone == "center") {
 			amb_zone |= Zone::Center;
 		}
 	}

@@ -72,7 +72,8 @@ picojson::value GetBasic(GVariant* value) {
 	picojson::value v;
 
 	if (type == "i") {
-		v = picojson::value(static_cast<double>(GVS<int>::value(value)));
+		int tempVal = GVS<int>::value(value);
+		v = picojson::value(static_cast<double>(tempVal));
 	} else if (type == "d") {
 		v = picojson::value(GVS<double>::value(value));
 	} else if (type == "q") {
@@ -99,11 +100,8 @@ picojson::value GetBasic(GVariant* value) {
 GVariant* GetBasic(picojson::value value, const std::string& type) {
 	GVariant* v = nullptr;
 
-	DebugOut() << "Getting GVariant value for signature " << type << " value: " << value.to_str() << endl;
-
 	if (type == "i") {
 		v = g_variant_new(type.c_str(), (int32_t)value.get<double>());
-		DebugOut() << "Variant value: " << g_variant_get_int32(v) << endl;
 	} else if (type == "d") {
 		v = g_variant_new(type.c_str(), value.get<double>());
 	} else if (type == "q") {
@@ -186,22 +184,22 @@ picojson::value::array AmbZoneToW3C(int amb_zone) {
 	picojson::value::array z;
 
 	if (amb_zone & Zone::Left) {
-		z.push_back(picojson::value("Left"));
+		z.push_back(picojson::value("left"));
 	}
 	if (amb_zone & Zone::Right) {
-		z.push_back(picojson::value("Right"));
+		z.push_back(picojson::value("right"));
 	}
 	if (amb_zone & Zone::Front) {
-		z.push_back(picojson::value("Front"));
+		z.push_back(picojson::value("front"));
 	}
 	if (amb_zone & Zone::Middle) {
-		z.push_back(picojson::value("Middle"));
+		z.push_back(picojson::value("middle"));
 	}
 	if (amb_zone & Zone::Center) {
-		z.push_back(picojson::value("Center"));
+		z.push_back(picojson::value("center"));
 	}
 	if (amb_zone & Zone::Rear) {
-		z.push_back(picojson::value("Rear"));
+		z.push_back(picojson::value("rear"));
 	}
 
 	return z;
