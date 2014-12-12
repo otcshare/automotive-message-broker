@@ -188,23 +188,20 @@ bluemonkey.createCustomProperty("OccupantIdentificationType", "pin", Zone.Rear |
 bluemonkey.createCustomProperty("OccupantIdentificationType", "pin", Zone.Rear | Zone.Left);
 
 bluemonkey.createCustomProperty("TargetTemperature", 20);
+bluemonkey.createCustomProperty("FanSpeed", 1);
+bluemonkey.createCustomProperty("AirConditioning", false);
+bluemonkey.createCustomProperty("Heater", false);
+bluemonkey.createCustomProperty("AirflowDirection", 0);
+bluemonkey.createCustomProperty("AirRecirculation", false);
 
-bluemonkey.createCustomProperty("AirflowDirection", 0, Zone.Front | Zone.Left);
-bluemonkey.createCustomProperty("FanSpeed", 1, Zone.Front | Zone.Left);
 bluemonkey.createCustomProperty("TargetTemperature", 20, Zone.Front | Zone.Left);
-bluemonkey.createCustomProperty("AirConditioning", false, Zone.Front | Zone.Left);
 bluemonkey.createCustomProperty("AirRecirculation", false, Zone.Front | Zone.Left);
-bluemonkey.createCustomProperty("Heater", false, Zone.Front | Zone.Left);
 bluemonkey.createCustomProperty("SteeringWheelHeater", 0, Zone.Front | Zone.Left);
 bluemonkey.createCustomProperty("SeatHeater", 0, Zone.Front | Zone.Left);
 bluemonkey.createCustomProperty("SeatCooler", 0, Zone.Front | Zone.Left);
 
 bluemonkey.createCustomProperty("AirflowDirection", 0, Zone.Front | Zone.Right);
-bluemonkey.createCustomProperty("FanSpeed", 1, Zone.Front | Zone.Right);
 bluemonkey.createCustomProperty("TargetTemperature", 25, Zone.Front | Zone.Right);
-bluemonkey.createCustomProperty("AirConditioning", false, Zone.Front | Zone.Right);
-bluemonkey.createCustomProperty("AirRecirculation", false, Zone.Front | Zone.Right);
-bluemonkey.createCustomProperty("Heater", false, Zone.Front | Zone.Right);
 bluemonkey.createCustomProperty("SeatHeater", 0, Zone.Front | Zone.Right);
 bluemonkey.createCustomProperty("SeatCooler", 0, Zone.Front | Zone.Right);
 
@@ -251,3 +248,5 @@ var testTimer = bluemonkey.createTimer();
   //VehicleSpeed
   speedProperty.value = Math.floor((Math.random() * 100) + 1);
  });
+
+//testTimer.start();

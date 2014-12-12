@@ -541,6 +541,7 @@ public:
 
 	/**< Button Event @see ButtonEvents::ButtonEventType */
 	///TODO: deprecated.  Use ButtonEventW3C. Remove in 0.14
+	[[deprecated("Depricated in 0.14.  Use ButtonEventW3C")]]
 	static const Property ButtonEvent;
 	PROPERTYTYPE(ButtonEvent, ButtonEventType, BasicPropertyType<ButtonEvents::ButtonEventType>, ButtonEvents::ButtonEventType)
 

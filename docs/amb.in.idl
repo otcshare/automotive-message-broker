@@ -112,7 +112,8 @@ interface org.automotive.Manager  {
    * except that it takes an addition zone argument and only return the path for that zone.
    *  \arg String property is the requested property to be retrieved.
    *  \arg Zone zone is the zone which the object
-   *  \return string representing the DBus Object path.  Possible errors:
+   *  \return string representing the DBus Object path.  
+   *  Possible errors:
    * "org.automotive.Manager.InvalidZone"
    * "org.automotive.Manager.ObjectNotFound"
   */
@@ -581,7 +582,7 @@ interface org.automotive.WindshieldWiper extends VehiclePropertyType  {
 
 }
 
-enum WiperControl {
+enumeration WiperControl {
   off = "off",
   once = "once",
   slowest = "slowest",
@@ -772,7 +773,7 @@ interface org.automotive.Sunroof extends VehiclePropertyType  {
 }
 
 
-enum ConvertibleRoofStatus {
+enumeration ConvertibleRoofStatus {
     closed = "closed",
     closing = "closing",
     opening = "opening",
@@ -1450,7 +1451,7 @@ interface org.automotive.BrakeOperation extends VehiclePropertyType {
    attribute Boolean BrakePedalDepressed readonly
 }
 
-enum Button {
+enumeration Button {
     home = "home",
     back = "back",
     search = "search",
@@ -1468,7 +1469,7 @@ enum Button {
     down = "down"
 }
 
-enum ButtonEventType {
+enumeration ButtonEventType {
     press = "press",
     long_press = "long_press",
     release = "release"
@@ -1633,7 +1634,7 @@ interface org.automotive.SeatAdjustment extends VehiclePropertyType {
    attribute UInt8 SeatSideCushion;
 }
 
-enum DriveModeType {
+enumeration DriveModeType {
   comfort = "comfort",
   auto = "auto",
   sport = "sport",
@@ -1699,13 +1700,13 @@ interface org.automotive.ChildSafetyLock extends VehiclePropertyType {
   attribute Boolean Lock;
 }
 
-enum OccupantStatus {
+enumeration OccupantStatus {
   adult = "adult",
   child = "child",
   vacant = "vacant"
 };
 
-enum IdentificationTypeEnum {
+enumeration IdentificationTypeEnum {
   pin = "pin",
   keyfob = "keyfob",
   Bluetooth = "Bluetooth",
@@ -1744,7 +1745,7 @@ interface org.automotive.AtmosphericPressure extends VehiclePropertyType {
   attribute UInt16 Pressure;
 }
 
-enum LaneDepartureStatus {
+enumeration LaneDepartureStatus {
     off = "off",
     pause = "pause",
     running = "running"
@@ -1757,7 +1758,7 @@ interface org.automotive.LaneDepartureDetection extends VehiclePropertyType {
   attribute LaneDepartureStatus Status readonly;
 }
 
-enum AlarmStatus {
+enumeration AlarmStatus {
     disarmed = "disarmed",
     prearmed = "prearmed",
     armed = "armed",
@@ -1771,9 +1772,15 @@ interface org.automotive.Alarm extends VehiclePropertyType {
   attribute AlarmStatus Status;
 }
 
-enum ParkingBrakeStatus {
+enumeration ParkingBrakeStatus {
     inactive = "inactive",
     active = "active",
     error = "error"
 };
 
+interface org.automotive.ParkingBrake extends VehiclePropertyType {
+  /*!
+  * \brief MUST return the current status of vehicle Alarm System.
+  */
+  attribute ParkingBrakeStatus Status readonly;
+}

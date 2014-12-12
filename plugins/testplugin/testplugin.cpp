@@ -64,37 +64,30 @@ bool beginsWith(std::string a, std::string b)
 bool TestPlugin::testCoreSetSupported()
 {
 	PropertyList supported(routingEngine->supported());
-	TEST(contains(supported,TestProptertyName1) == false);
-	std::vector<std::string> sources(routingEngine->sourcesForProperty(TestProptertyName1));
-	TEST(contains(sources,uuid()) == false);
-
-	// if we were registered in Core, it will ask us and we will return it valid, but we haven't registered yet
-	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == false);
+	TEST(contains(supported, TestProptertyName1) == false);
 
 	//
 	// CALL setSupported
 	//
-	routingEngine->updateSupported(m_supportedProperties, PropertyList(), nullptr);// invalid input
-	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == false);
 
 	// valid call
-	routingEngine->updateSupported(m_supportedProperties, PropertyList(), this);// we are register as source from now
+	routingEngine->updateSupported(m_supportedProperties, PropertyList(), this);
 
 	TEST(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).isValid() == true);
 	Zone::ZoneList zones(routingEngine->getPropertyInfo(TestProptertyName1, uuid()).zones());
 	TEST(contains(zones, Zone::LeftSide) == true);
 
 	supported = routingEngine->supported();
-	TEST(contains(supported,TestProptertyName1) == true);
-	TEST(contains(supported,TestProptertyName2) == true);
-	TEST(contains(supported,VehicleProperty::ClutchStatus) == false);
+	TEST(contains(supported, TestProptertyName1) == true);
+	TEST(contains(supported, TestProptertyName2) == true);
+	TEST(contains(supported, VehicleProperty::ClutchStatus) == false);
 
-	sources = routingEngine->sourcesForProperty(TestProptertyName1);
+	std::vector<std::string> sources = routingEngine->sourcesForProperty(TestProptertyName1);
 	TEST(contains(sources,uuid()) == true);
 
 	TEST(routingEngine->getPropertyInfo(TestProptertyName2, uuid()).isValid() == true);
 	zones = routingEngine->getPropertyInfo(TestProptertyName2, uuid()).zones();
-	TEST(contains(zones,Zone::FrontSide) == true);
+	TEST(contains(zones, Zone::FrontSide) == true);
 
 	return true;
 }
@@ -351,11 +344,14 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	tfirst->append(v3);
 	tsecond->fromVariant(tfirst->toVariant());
 
-	g_assert (tfirst->toString() == tsecond->toString());
+	GVariant* testGVSVariant = g_variant_new("i", 9);
+	TEST(GVS<int>::value(testGVSVariant) == 9);
+
+	TEST (tfirst->toString() == tsecond->toString());
 
 	testBooleanToStringFromString();
 
-	g_assert (testCoreUpdateSupported());
+	TEST (testCoreUpdateSupported());
 
 	testSubscription();
 

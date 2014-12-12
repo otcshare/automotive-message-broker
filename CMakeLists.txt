@@ -43,7 +43,7 @@ set(XWALK_EXTENSION_PATH "/automotive-message-broker/xwalk" CACHE PATH "director
 
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++1y")
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")

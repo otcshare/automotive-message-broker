@@ -15,9 +15,9 @@
 *
 * \section basic_usage Basic Recommended Usage
 *
-* It is recomended that the Manager interface be used to find the DBus Object that contains the
+* It is recommended that the Manager interface be used to find the DBus Object that contains the
 * data type you need.  This is done through the FindObject() call.  It is expected that DBus
-* Object Paths may change and so it is not appropriate to hard code DBus Object Paths.  
+* Object Paths may change and so it is not appropriate to hard code DBus Object Paths.
 *
 * \section example Usage Example
 * Here is a pseudo-code example of how the api is to be used:
