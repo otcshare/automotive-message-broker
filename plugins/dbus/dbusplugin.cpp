@@ -57,6 +57,13 @@ void DBusSink::supportedChanged(const PropertyList &supportedProperties)
 	{
 		if(contains(supportedProperties, itr->ambPropertyName()))
 		{
+			PropertyInfo info = re->getPropertyInfo(itr->ambPropertyName(), mSourceFilter);
+
+			if (!info.isValid() || !contains(info.zones(), zoneFilter))
+			{
+				continue;
+			}
+
 			VariantType* prop = itr;
 			prop->setSourceFilter(mSourceFilter);
 			prop->setZoneFilter(zoneFilter);

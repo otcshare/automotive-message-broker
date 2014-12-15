@@ -17,7 +17,7 @@ int lwsWrite(libwebsocket *lws, QByteArray d, int len)
 	QByteArray temp = d;
 
 	int numframes = 1;
-	int framesize = 122;
+	int framesize = 512;
 
 	if(d.length() > framesize)
 	{

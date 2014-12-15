@@ -76,46 +76,23 @@ function updateInput(input, value) {
     }, false);
 }
 
-function getValue(eventlist) {
-    var zoneList =  getZone(eventlist);
-    var types = window.vehicle.get(eventlist, zoneList,
+function getValue(event) {
+    var zone =  getZone(event);
+    var types = window.vehicle.get(event, zone,
         function(data) {
             if (data) {
                 PRINT.pass("values received:");
-                if (eventlist.length > 1 && !! data.length && data.length > 0) {
-                    var list = [];
-                    for (var i = 0; i < data.length; i++) {
-                        list[i] = data[i].property;
-                        //list[i] = data[i].name; ???
-                        PRINT.log(data[i].property + ": " + data[i].value + ", zone: " + data[i].zone);
-                        //PRINT.log(data[i].name+": "+data[i].value); ???
-                    }
+                PRINT.log(data.property + ": " + data.value + ", zone: " + data.zone);
 
                     var elements = document.getElementsByClassName('proptest');
                     for (var i = 0; i < elements.length; i++) {
                         var propinfo = elements[i].getElementsByClassName('propinfo')[0];
                         var name = propinfo.innerHTML;
-                        var idx = list.indexOf(name);
-                        if (idx >= 0) {
-                            var zone = elements[i].getElementsByTagName('input')[1];
-                            updateInput(zone, zone.value);
-                            var input = elements[i].getElementsByTagName('input')[0];
-                            updateInput(input, data[idx].value);
-                        }
+                        var zone = elements[i].getElementsByTagName('input')[1];
+                        updateInput(zone, zone.value);
+                        var input = elements[i].getElementsByTagName('input')[0];
+                        updateInput(input, data.value);
                     }
-                } else {
-                    PRINT.log(JSON.stringify(data));
-                    var elements = document.getElementsByClassName('proptest');
-                    for (var i = 0; i < elements.length; i++) {
-                        var propinfo = elements[i].getElementsByClassName('propinfo')[0];
-                        if (data.property == propinfo.innerHTML) {
-                            var zone = elements[i].getElementsByTagName('input')[1];
-                            updateInput(zone, zone.value);
-                            var input = elements[i].getElementsByTagName('input')[0];
-                            updateInput(input, data.value);
-                        }
-                    }
-                }
             } else {
                 PRINT.fail("no values retrieved for " + eventlist);
             }
@@ -177,13 +154,7 @@ function subscribe(event) {
     window.vehicle.subscribe(event, zoneList,
         function(data) {
             PRINT.pass("Subscribe success for: " + data);
-            for (var i = 0; i < data.length; i++) {
-                var sub = data[i] + "_subscribe";
-                var unsub = data[i] + "_unsubscribe";
-                //                document.getElementById(sub).className = "testbutton subscribe disable"
-                //                document.getElementById(unsub).className = "testbutton unsubscribe";
-                document.addEventListener(data[i], eventListener, false);
-            }
+            document.addEventListener(data, eventListener, false);
         },
         function(msg) {
             PRINT.fail("Subscribe failed for: " + msg);
@@ -191,21 +162,15 @@ function subscribe(event) {
     );
 }
 
-function unsubscribe(event, zoneList) {
-    zoneList =  getZone(event);
+function unsubscribe(event, zone) {
+    zone = getZone(event);
     /* kill the handers first, so even if the service fails to acknowledge */
     /* we've stopped listening */
     document.removeEventListener(event, eventListener, false);
 
-    window.vehicle.unsubscribe(event, zoneList,
+    window.vehicle.unsubscribe(event, zone,
         function(data) {
             PRINT.pass("Unsubscribe success for: " + data);
-            for (var i = 0; i < data.length; i++) {
-                var sub = data[i] + "_subscribe";
-                var unsub = data[i] + "_unsubscribe";
-                //                document.getElementById(unsub).className = "testbutton unsubscribe disable";
-                //                document.getElementById(sub).className = "testbutton subscribe";
-            }
         },
         function(msg) {
             PRINT.fail("Unsubscribe failed for: " + msg);
@@ -214,37 +179,15 @@ function unsubscribe(event, zoneList) {
 }
 
 function getZone(eventlist) {
-    var list = [];
-    if (eventlist.length > 1) {
-
-        // for (var i = 0; i < data.length; i++) {
-        //     list[i] = data[i].property;
-        //     //list[i] = data[i].name; ???
-        //     PRINT.log(data[i].property + ": " + data[i].value);
-        //     //PRINT.log(data[i].name+": "+data[i].value); ???
-        // }
 
         var elements = document.getElementsByClassName('proptest');
         for (var i = 0; i < elements.length; i++) {
             var propinfo = elements[i].getElementsByClassName('propinfo')[0];
-            var name = propinfo.innerHTML;
-            var idx = eventlist.indexOf(name);
-            if (idx >= 0) {
+            if (event == propinfo.innerHTML) {
                 var zone = elements[i].getElementsByTagName('input')[1];
-                list.push(zone.value);
+                return zone.value;
             }
         }
-    } else {
-        var elements = document.getElementsByClassName('proptest');
-        for (var i = 0; i < elements.length; i++) {
-            var propinfo = elements[i].getElementsByClassName('propinfo')[0];
-            if (eventlist[0] == propinfo.innerHTML) {
-                var zone = elements[i].getElementsByTagName('input')[1];
-                list.push(zone.value);
-            }
-        }
-    }
-    return list.join();
 }
 
 function select(elem) {
@@ -280,10 +223,10 @@ function start(msg) {
         '")></div><div id="',
         '_subscribe" class="testbutton subscribe" onclick=subscribe("',
         '")></div><div id="',
-        '_unsubscribe" class="testbutton unsubscribe" onclick=unsubscribe(["',
-        '"])></div><div class="testbutton get" onclick=getValue(["',
-        '"])></div><div class="testbutton set" onclick=setValue(["',
-        '"])></div><input class = "Textvalue" type="text" value="0" placeholder="Value" /><div class = "smallText"> Zone: </div><input class = "zone" type="text" value="0" placeholder="Zone"/></div></div>'
+        '_unsubscribe" class="testbutton unsubscribe" onclick=unsubscribe("',
+        '")></div><div class="testbutton get" onclick=getValue("',
+        '")></div><div class="testbutton set" onclick=setValue("',
+        '")></div><input class = "Textvalue" type="text" value="0" placeholder="Value" /><div class = "smallText"> Zone: </div><input class = "zone" type="text" value="0" placeholder="Zone"/></div></div>'
     ];
     var events = vehicleEventType.event;
 

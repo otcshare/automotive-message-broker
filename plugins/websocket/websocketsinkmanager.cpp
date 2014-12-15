@@ -143,7 +143,7 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 		info.ssl_private_key_filepath = ssl_key_path.c_str();
 	}
 	context = libwebsocket_create_context(&info);
-	
+
 }
 
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property, Zone::Type zone, string id)
@@ -251,18 +251,20 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 	AsyncRangePropertyReply* reply = routingEngine->getRangePropertyAsync(rangedRequest);
 }
 
-void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid)
+void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid, Zone::Type zone)
 {
 	if (m_sinkMap.find(property) != m_sinkMap.end())
 	{
 		list<WebSocketSink*> sinks = m_sinkMap[property];
 
-		for(auto i = sinks.begin(); i != sinks.end(); i++)
+		for(auto i : sinks)
 		{
-			delete *i;
+			if(i->zone() == zone)
+			{
+				m_sinkMap[property].remove(i);
+				delete i;
+			}
 		}
-
-		m_sinkMap.erase(property);
 
 		QVariantMap reply;
 		reply["type"]="methodReply";
@@ -325,7 +327,7 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 	delete type;
 
 }
-void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property,string uuid)
+void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property, string uuid, Zone::Type zone)
 {
 	PropertyList foo = VehicleProperty::capabilities();
 	if (!contains(foo,property))
@@ -353,7 +355,7 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 
 	lwsWrite(socket, replystr, replystr.length());
 
-	WebSocketSink *sink = new WebSocketSink(m_engine,socket,uuid,property,property);
+	WebSocketSink *sink = new WebSocketSink(m_engine, socket, uuid, property, property, zone);
 	m_sinkMap[property].push_back(sink);
 }
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
@@ -568,14 +570,15 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				}
 				else if (name == "subscribe")
 				{
-					std::string data = call["data"].toString().toStdString();
-					sinkManager->addSink(wsi, data, id);
+					QVariantMap data = call["data"].toMap();
+					int zone = data["zone"].toInt();
+					sinkManager->addSink(wsi, data["property"].toString().toStdString(), id, zone);
 
 				}
 				else if (name == "unsubscribe")
 				{
-					std::string data = call["data"].toString().toStdString();
-					sinkManager->removeSink(wsi,data,id);
+					QVariantMap data = call["data"].toMap();
+					sinkManager->removeSink(wsi, data["property"].toString().toStdString(), id, data["zone"].toInt());
 
 				}
 				else if (name == "getSupportedEventTypes")
@@ -650,7 +653,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			break;
 		}
 	}
-	return 0; 
+	return 0;
 }
 
 bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
@@ -672,7 +675,7 @@ bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
 
 	//This is the polling function. If it return false, glib will stop polling this FD.
 	//printf("Polling...%i\n",condition);
-	
+
 	lws_tokens token;
 	struct pollfd pollstruct;
 	int newfd = g_io_channel_unix_get_fd(source);
