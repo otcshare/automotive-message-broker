@@ -1,0 +1,385 @@
+%bcond_without qt5
+
+Name:       automotive-message-broker
+Summary:    Automotive Message Broker is a vehicle network abstraction system
+Version:    0.12.900
+Release:    0
+Group:      Automotive/Service
+License:    LGPL-2.1
+URL:        https://github.com/otcshare/automotive-message-broker
+Source0:    %{name}-%{version}.tar.bz2
+Requires: automotive-message-broker-plugins
+Requires: automotive-message-broker-plugins-murphy
+Requires(post): /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
+
+Requires:       default-ac-domains
+Requires:       dbus-python
+BuildRequires:  cmake
+BuildRequires:  boost-devel
+BuildRequires:  pkgconfig(json)
+BuildRequires:  libtool-ltdl-devel
+BuildRequires:  pkgconfig(libwebsockets)
+BuildRequires:  pkgconfig(uuid)
+BuildRequires:  pkgconfig(sqlite3)
+BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(opencv)
+BuildRequires:  murphy
+BuildRequires:  pkgconfig(murphy-glib)
+BuildRequires:  pkgconfig(dbus-1)
+%if %{with qt5}
+BuildRequires:  qt5-qtcore-devel
+BuildRequires:  qt5-qtconcurrent-devel
+BuildRequires:  qt5-qtdbus-devel
+BuildRequires:  qt5-qtnetwork-devel
+BuildRequires:  qt5-qtdeclarative-devel
+BuildRequires:  qt5-plugin-bearer-generic
+BuildRequires:  qt5-plugin-bearer-connman
+BuildRequires:  qt5-plugin-bearer-nm
+BuildRequires:  qt5-plugin-sqldriver-sqlite
+%endif
+
+%description
+Automotive Message Broker is a vehicle network abstraction system.
+It brokers information from the vehicle to applications.
+
+%package devel
+Summary:    Automotive Message Broker development files
+Group:      Automotive/API
+Requires:   %{name} = %{version}-%{release}
+Requires:   libuuid-devel
+Requires:   boost-devel
+
+%description devel
+Development files for the automotive-message-broker
+
+%package doc
+Summary:    Documentation for the automotive-message-broker API
+Group:      Automotive/Documentation
+Requires:   %{name} = %{version}-%{release}
+
+%description doc
+Document files that describe the D-Bus API exposed by automotive-message-broker
+
+%if %{with qt5}
+%package plugins-qtmainloop
+Summary:    qt5 mainloop plugin
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   qt5-qtcore
+
+%description plugins-qtmainloop
+Qt mainloop plugin enables qt-based source and sink plugins to run using qt mainloop
+
+%package plugins-websocket
+Summary:    Websocket source and sink plugins
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   libwebsockets
+Requires:   qt5-qtcore
+
+%description plugins-websocket
+websocket source and sink plugins
+
+%package plugins-opencvlux
+Summary:    Plugin for simulating ExteriorBrightness using a common webcam
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   opencv
+
+%description plugins-opencvlux
+Plugin for simulating ExteriorBrightness using a common webcam
+
+%package plugins-bluetooth
+Summary:   Interface to AMB over bluetooth
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-bluetooth
+Bluetooth SPP server interface
+%endif
+
+%package plugins
+Summary:    Various plugins for automotive-message-broker
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+
+%description plugins
+Collection of plugins for automotive-message-broker.  Contains example, demo and dbus plugins.
+
+%package plugins-common
+Summary:  Common plugin library
+Group:    Automotive/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description plugins-common
+library containing a kitchen-sink of common utility functions
+
+%package plugins-obd2
+Summary:    OBD-II plugin
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:   %{name}-plugins-common = %{version}-%{release}
+
+%description plugins-obd2
+OBD-II plugin that uses ELM 327-compatible scantools to access vehicle data
+
+%package plugins-wheel
+Summary:    Source plugin for using the Logitech G27 racing wheel
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+
+%description plugins-wheel
+source plugin for using the Logitech G27 racing wheel package
+
+%package plugins-database
+Summary:    Database logging plugin for automotive-message-broker
+Group:      Automotive/Libraries
+Requires:   %{name} = %{version}-%{release}
+Requires:  sqlite
+
+%description plugins-database
+Database logging plugin for automotive-message-broker package
+
+%package plugins-murphy
+Summary:   Plugin for integration with the murphy policy system
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires:  murphy
+
+%description plugins-murphy
+Plugin for integration with the murphy policy system package
+
+%package plugins-gpsnmea
+Summary:   Plugin that provides gps data from nmea devices
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-gpsnmea
+Plugin that provides location data from nmea devices including bluetooth
+
+%package plugins-test
+Summary:   Plugin that tests AMB code
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-test
+Plugin that tests some internal AMB code and plugin functionality.  This plugin will assert if something is wrong.
+
+%package plugins-cangen
+Summary:   Plugin that generates CAN data
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-cangen
+CAN frames generator plug-in for the AMB CAN Simulator
+
+%package plugins-cansim
+Summary:   CAN frames listener plug-in for the AMB CAN Simulator
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+
+%description plugins-cansim
+CAN frames listener plug-in for the AMB CAN Simulator package
+
+%if %{with qt5}
+%package plugins-bluemonkey
+Summary:   javascript plugin engine
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires: qt5-qtdeclarative
+Requires: %{name}-plugins-qtmainloop
+
+%description plugins-bluemonkey
+Engine for creating scriptable plugins for AMB
+
+%package -n bluemonkey-modules-db
+Summary:   javascript plugin engine db module
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires: qt5-plugin-sqldriver-sqlite
+
+%description -n bluemonkey-modules-db
+Engine for creating scriptable plugins for AMB
+
+%endif
+
+%package xwalk-vehicle-extension
+Summary:  crosswalk vehicle API extension
+Group:    Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires: crosswalk
+
+%description xwalk-vehicle-extension
+Crosswalk vehicle API extension based on the W3C Automotive Business Group Vehicle and Data API Specification
+
+%prep
+%setup -q -n %{name}-%{version}
+
+%build
+%cmake \
+       -Dxwalk_vehicle_extension=ON \
+       -DXWALK_EXTENSION_PATH=/tizen-extensions-crosswalk \
+%if %{with qt5}
+       -Dqtmainloop=ON \
+       -Dopencvlux_plugin=ON \
+       -Dwebsocket_plugin=ON \
+       -Dbluetooth_plugin=ON \
+       -Dbluemonkey_plugin=ON \
+%endif
+       -Ddatabase_plugin=ON \
+       -Dmurphy_plugin=ON \
+       -Dobd2_plugin=ON \
+       -Dtest_plugin=ON \
+       -Dgpsnmea_plugin=ON \
+       -Dcangen_plugin=ON \
+       -Dcansim_plugin=ON \
+       -Dusebluez5=ON \
+       -Denable_docs=ON
+
+
+%__make %{?jobs:-j%jobs}
+
+%install
+rm -rf %{buildroot}
+%make_install
+
+mkdir -p %{buildroot}%{_unitdir}/network.target.wants
+cp packaging.in/ambd.service.systemd.tizen %{buildroot}%{_unitdir}/ambd.service
+ln -s ../ambd.service %{buildroot}%{_unitdir}/network.target.wants/ambd.service
+%install_service multi-user.target.wants ambd.service
+
+cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
+
+%post -p /sbin/ldconfig
+%postun -p /sbin/ldconfig
+
+%post plugins -p /sbin/ldconfig
+%postun plugins -p /sbin/ldconfig
+
+%files
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest
+%config %{_sysconfdir}/ambd/config
+%config %{_sysconfdir}/ambd/config.tizen
+%config %{_sysconfdir}/ambd/examples/*
+%{_bindir}/ambd
+%{_libdir}/libamb.so*
+%{_unitdir}/ambd.service
+%{_unitdir}/network.target.wants/ambd.service
+%{_unitdir}/multi-user.target.wants/ambd.service
+%{_bindir}/amb-get
+%{_bindir}/amb-get-history
+%{_bindir}/amb-set
+%{_bindir}/amb-listen
+
+%files devel
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_includedir}/amb/*.h
+%{_includedir}/amb/*.hpp
+%{_libdir}/pkgconfig/*.pc
+
+%if %{with qt5}
+%files plugins-qtmainloop
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/qtmainloopplugin.so
+
+%files plugins-websocket
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/websocketsource.so
+%{_libdir}/%{name}/websocketsink.so
+
+%files plugins-opencvlux
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/opencvluxplugin.so
+
+%files plugins-bluetooth
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluetoothplugin.so
+%config %{_sysconfdir}/dbus-1/system.d/ambbt.conf
+%endif
+
+%files plugins
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/examplesourceplugin.so
+%{_libdir}/%{name}/examplesinkplugin.so
+%{_libdir}/%{name}/dbussinkplugin.so
+%{_libdir}/%{name}/demosinkplugin.so
+%config %{_sysconfdir}/dbus-1/system.d/amb.conf
+
+%files plugins-common
+%manifest packaging.in/amb.manifest.plugins
+%defattr(-,root,root,-)
+%{_libdir}/libamb-plugins-common.so
+
+%files plugins-wheel
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/wheelsourceplugin.so
+
+%files plugins-obd2
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/obd2sourceplugin.so
+
+%files plugins-database
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/databasesinkplugin.so
+
+%files plugins-murphy
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/murphysourceplugin.so
+
+%files plugins-gpsnmea
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/gpsnmea.so
+
+%files doc
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%doc %{_docdir}/%{name}/*
+
+%files plugins-test
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/testplugin.so
+
+%files plugins-cangen
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/cangenplugin.so
+%{_bindir}/gen-set
+
+%files plugins-cansim
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/cansimplugin.so
+
+
+%if %{with qt5}
+
+%files plugins-bluemonkey
+%defattr(-,root,root,-)
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluemonkeyplugin.so
+%config %{_sysconfdir}/ambd/bluemonkey
+
+%files -n bluemonkey-modules-db
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluemonkeyDbModule.so
+
+%endif
+
+%files xwalk-vehicle-extension
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/tizen-extensions-crosswalk/*
+%{_datadir}/%{name}/xwalk/examples/*
