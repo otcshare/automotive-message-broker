@@ -22,6 +22,7 @@
 #include "listplusplus.h"
 
 #include <mutex>
+#include <condition_variable>
 #include <unordered_set>
 
 namespace amb
@@ -31,10 +32,12 @@ template <typename T, class Pred = std::equal_to<T> >
 class Queue
 {
 public:
-	Queue()
+	Queue(bool blocking = false)
+		:mBlocking(blocking)
 	{
 
 	}
+
 	virtual ~Queue()
 	{
 
@@ -49,7 +52,15 @@ public:
 
 	T pop()
 	{
-		std::lock_guard<std::mutex> lock(mutex);
+		std::unique_lock<std::mutex> lock(mutex);
+
+		if(mBlocking)
+		{
+			while(!mQueue.size())
+			{
+				cond.wait(lock);
+			}
+		}
 
 		auto itr = mQueue.begin();
 
@@ -65,6 +76,11 @@ public:
 		std::lock_guard<std::mutex> lock(mutex);
 
 		mQueue.insert(item);
+
+		if(mBlocking)
+		{
+			cond.notify_one();
+		}
 	}
 
 	void remove(T item)
@@ -74,7 +90,9 @@ public:
 	}
 
 protected:
+	bool mBlocking;
 	std::mutex mutex;
+	std::condition_variable cond;
 	std::unordered_set<T, std::hash<T>, Pred> mQueue;
 };
 

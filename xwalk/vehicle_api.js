@@ -151,8 +151,6 @@ function isAvailable(obj, attName)
 
   var reply = extension.internal.sendSyncMessage(JSON.stringify(msg));
 
-
-
   if (reply === "true") {
     return "available";
   } else {
@@ -173,6 +171,7 @@ function createPromise(msg) {
   msg.asyncCallId = next_async_call_id;
   extension.postMessage(JSON.stringify(msg));
   ++next_async_call_id;
+
   return promise;
 }
 
@@ -334,10 +333,37 @@ _defineVehicleSignalProperty(exports, 'washerFluid');
 _defineVehicleSignalProperty(exports, 'malfunctionIndicator');
 _defineVehicleSignalProperty(exports, 'batteryStatus');
 _defineVehicleSignalProperty(exports, 'tire');
+_defineVehicleSignalProperty(exports, 'diagnostics');
 
+/// Personalization attributes:
+_defineVehicleSignalProperty(exports, 'mirror');
+_defineVehicleSignalProperty(exports, 'seatAdjustment');
+_defineVehicleSignalProperty(exports, 'driveMode');
+_defineVehicleSignalProperty(exports, 'dashboardIllumination');
+_defineVehicleSignalProperty(exports, 'vehicleSound');
 
+/// Driving Safety attributes:
+_defineVehicleSignalProperty(exports, 'antilockBreakingSystem');
+_defineVehicleSignalProperty(exports, 'tractionControlSystem');
+_defineVehicleSignalProperty(exports, 'electronicStabilityControl');
+_defineVehicleSignalProperty(exports, 'topSpeedLimit');
+_defineVehicleSignalProperty(exports, 'airbagStatus');
 _defineVehicleSignalProperty(exports, 'door');
+_defineVehicleSignalProperty(exports, 'childSafetyLock');
+_defineVehicleSignalProperty(exports, 'seat');
+
+/// Climate attributes:
 _defineVehicleSignalProperty(exports, 'temperature');
+_defineVehicleSignalProperty(exports, 'rainSensor');
+_defineVehicleSignalProperty(exports, 'wiperStatus');
 _defineVehicleSignalProperty(exports, 'climateControl');
 _defineVehicleSignalProperty(exports, 'defrost');
+_defineVehicleSignalProperty(exports, 'sunroof');
+_defineVehicleSignalProperty(exports, 'atmosphericPressure');
+
+/// Vision and Parking Interfaces
+_defineVehicleSignalProperty(exports, 'langeDepartureStatus');
+_defineVehicleSignalProperty(exports, 'alarm');
+_defineVehicleSignalProperty(exports, 'parkingBrake');
+
 

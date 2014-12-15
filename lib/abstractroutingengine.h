@@ -349,9 +349,9 @@ public:
 	/**
 	 * /brief sourcesForProperty
 	 * /param property
-	 * /return list of source uuid's that support the "property"
+	 * /return vector of source uuid's that support the "property"
 	 */
-	virtual std::list<std::string> sourcesForProperty(const VehicleProperty::Property & property) = 0;
+	virtual std::vector<std::string> sourcesForProperty(const VehicleProperty::Property & property) = 0;
 
 	/**
 	 * /brief getPropertyAsync requests a property value from a source.  This call has a timeout and the callback specified in the request will always be called.

@@ -1,0 +1,874 @@
+* Thu Nov 05 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20141029.180744-6-gfa57967
+- updated docs. added deleted callback
+- updated chlog
+- fixed obd2 disconnect bug
+- fixed bluemonkey config path
+- fixed spec to install qtmainloop with bluemonkey plugin
+- fixed FanSpeedLevel name
+- update cache of dbus properties even if not currently registered
+- fixed battery ChargeLevel type error
+- fixed Temperature interface name
+- updated spec
+- version bump 0.11.904
+- fixed regression in cangen plugin
+- fixed regression in cangen plugin
+- version bump 0.11.904
+- dbus plugin will cache. updating release notes
+- fixed Obd2Connected
+- fixed database playback
+- 0.12 final
+- added mainpage for lib documentation
+- disable dbus property rules
+
+* Mon Oct 13 2014 tripzero <kevron.m.rees@intel.com> submit/tizen_ivi/20141001.165128-11-g4c16abd
+- some opencvlux fixes
+- use pure dlopen to open source/sink plugins
+- additional fixes to opencv plugin
+- version bump 0.11.903
+- updated release notes
+- cleaned up unused code block
+- updated chlog and spec version
+- removed all libtool usage
+- use set instead of list in cmake for better compatibility
+- 0.11.903 bump
+
+* Wed Oct 01 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140919.161146-9-g0e92e8f
+- fix lib install dir for qtmainloop plugin
+- reference amb.idl in dbus docs
+- fixed obd2 bluetooth for bluez5
+- updated chlog
+- fixed opencvlux plugin
+- version bump 0.11.902
+- use smart pointer in opencvlux
+- fixed install path for amb.idl
+
+* Fri Sep 19 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140916.213438-15-g734500b
+- bump version
+- fixed up bluez5 support code
+- bluemonkey enhancements
+- multi-arch support
+- multi-arch support
+- add usebluez5 flag to cmake
+- fixes for bluemonkey and wheel
+- disabled irc in bluemonkey
+- removed generated files
+- point at franca docs for dbus
+- convert bluemonkey script to be qml based engine
+- version bump
+- fixed up bluemonkey configuration
+- manual merge
+- fixed crash in murphy plugin
+- fix to spec
+- fixed lib install dir for qtmainloop plugin
+- updated spec for 0.11.901
+
+* Tue Sep 02 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140820.174605-9-g7f1852a
+- DBus signaller will combine duplicate signals for same object path
+- Fixed issue with Murphy plugin using wronge type for certain Properties.
+- Some fixes and performance tweaks.
+- version bump 0.11.812
+- fixed periodic crash when sending dbus signal
+- cleaned up debug output
+- updated to upstream 0.11.812
+- fixed up test plugin
+- made some of the dbus API compliant with w3c auto-bg specification
+- enginecoolant should be signed
+- version bump 0.11.900.  We are now beta
+- fix for wheel plugin
+- fixed frequency option in dbus plugin
+- fixed up database plugin
+
+* Wed Aug 20 2014 tripzero <kevron.m.rees@intel.com> submit/tizen_ivi/20140612.200613@a721703
+- Merge branch '0.12' into tizen
+- Merge pull request #19 from tripzero/master
+- Merge branch '0.12' into tizen
+- version bump 0.11.811
+- removed docs
+- Update RELEASE
+- Version bump 0.11.811
+- added tools
+- priority queues
+- cleaned up documents. idl is the authority
+- added asyncqueue.  Made updateProperty() thread safe
+- updated docs
+- created franca idl doc
+- some performance tweaks to core and dbussignaller
+- add rule to only generate dbus docs from idl
+- fixed crash when gpsnmea gets blank gprmc messages
+- removed client library stubs
+- cleaned up debug output
+- fixed periodic crash when sending dbus signal
+- version bump 0.11.812
+- Some fixes and performance tweaks.
+- Fixed issue with Murphy plugin using wronge type for certain Properties.
+- DBus signaller will combine duplicate signals for same object path
+- Merge pull request #17 from tripzero/master
+- automotive-message-broker should not depend on qt
+- removed docs
+- Update RELEASE
+- Version bump 0.11.811
+- added tools
+- priority queues
+- cleaned up documents. idl is the authority
+- added asyncqueue.  Made updateProperty() thread safe
+- updated docs
+- created franca idl doc
+- some performance tweaks to core and dbussignaller
+- add rule to only generate dbus docs from idl
+- fixed crash when gpsnmea gets blank gprmc messages
+- removed client library stubs
+- Merge branch '0.12' into tizen
+- multiple dbus properties can support the same amb property
+- Merge branch '0.12' into tizen
+- fixed missing symbol
+- Merge branch '0.12' into tizen
+- use const string ref
+- Updated spec
+- Merge branch '0.12' into tizen
+- fix libamb label
+- added support for lambda subscriptions.  initial bluetooth5 support in obd2 plugin
+- updated docs to reflect change to vehicle and engine speed
+- updated Vehicle and EngineSpeed interfaces to match w3c vehicle data draft spec.  Old attributes exist for compatibility
+- version bump 0.11.810
+- added SteeringWheelAngle
+- added stub ambclient code
+- Merge branch '0.12' into tizen
+- added more debug to bluetooth
+- Merge branch '0.12' into tizen
+- use gio for watching fd
+- Merge branch '0.12' into tizen
+- updated method signature
+- got bluez5 client somewhat working
+- Merge branch '0.12' into tizen
+- updated spec
+- fixed a GVS error
+- Merge branch '0.12' into tizen
+- add ambbt service file
+- added service record for spp
+- Merge branch '0.12' into tizen
+- added dbus system config
+- door lock are not readonly
+- Merge branch '0.12' into tizen
+- registerProfile after registering the dbus object
+- Merge branch '0.12' into tizen
+- corrected signature call to RegisterProfile
+- Merge branch '0.12' into tizen
+- updated spec to install bluetooth plugin
+- load non-SinkManager plugins
+- Merge branch '0.12' into tizen
+- check if registerProfile is valid
+- initial bluetooth plugin
+- fix cmake file
+- manual merge
+- reworked tests in gpsnmea
+- deprecated gpsd plugin
+- fixed checksum()
+- make unhandled nmea messages level 7 to avoid spamming
+- change to example and dbus plugins
+- removed mcmodel compile option. added VideoLogging property to opencv plugin
+- Merge branch '0.12' into tizen
+- fixed crasher in gpsnmea
+- Merge branch '0.12' into tizen
+- fixed compile errors in database and murphy plugins
+- Merge branch '0.12' into tizen
+- fixed compile errors in obd2 plugin
+- Merge branch '0.12' into tizen
+- install canobserver header
+- fixed some compile errors
+- updated some docs and added testing document
+- Update README
+- updated changelog and spec
+- added velocity text to framewriter
+- use vector where possible
+
+* Wed Apr 16 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140326.195506@13f13b0
+- use debugout for errors instead of cerr
+- use mjpg codec
+- enable usage of different routing engines via config
+- version bump 0.11.809
+- use monotonic clock
+- removed build files from src
+- use c++11 chrono for time
+- updated spec
+- minor tweak to readme
+- Merge pull request #16 from OlivierDelbeke/master
+- Merge branch '0.12' into tizen
+- fixed up gpsnmea to work with devices with very fragmented nmea messages
+- Added the possibility to specify the baudrate of the GPS NMEA device
+- fixed runtime errors and warnings with dbus plugin
+- Updated plugins to work without the now deprecated setSupported() call.
+- fixed compile errors in various plugins
+- Update README
+- Merge pull request #15 from e8johan/master
+- some core changes as well as additions to opencv plugin
+- added SimCommand backdoor to the gen plugin
+- added cangen example config
+- Merge branch '0.12' into tizen
+- fixed invalidating of iterator in ranged for looop
+- updated chlog
+- Fixed warning about enabling c++11 for C sources
+- Removed stray files.
+- Fixed error messages for libtool to indicate that it is libltdl that is missing.
+
+* Fri Mar 21 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140320.231725@5748dc3
+- added cansim plugin
+- added cansim, cangen plugins
+
+* Thu Mar 20 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140319.172635@8669b09
+- version bump 0.11.808
+- fixed issue with complex objects only firing the last property and dropping all others
+- fixed throw when trying to parse empty speed
+- do not crash if connection has not been established
+- version bump 0.11.807
+- only listen to specified paths
+- reenabled ico vehicle plugin
+- Added incomplete message to gpsnmea test
+- playing with videowriter in cv plugin
+- updated chlog and spec
+
+* Thu Mar 13 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140305.213149@afb8a15
+- fixed random crash when process subscribes to an object interface
+- fixed debug output statement
+- added more debug output to murphy plugin
+
+* Wed Mar 05 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20140224.190956@6425ef6
+- Merge branch '0.12' into tizen
+- Remove performance from dbusconfig. fix crasher in varianttype.
+- added more debug to gpsnmea. example source default return for set operations.
+- added support for string and double in amb-set
+- make startOnLoad and playbackOnLoad work with 'true' or 'false'
+- fixed amb-set
+- amb-listen works. zone attribute included in all signals.
+- updated chlog
+
+* Thu Feb 24 2014 - <kevron.m.rees@intel.com>
+- 0.11.805 release
+- updated smack rules to allow murphy socket connection
+
+* Fri Feb 14 2014 - <kevron.m.rees@intel.com>
+- 0.11.804 release
+
+* Tue Feb 11 2014 - <kevron.m.rees@intel.com>
+- 0.11.803 release
+
+* Wed Feb 05 2014 - <kevron.m.rees@intel.com>
+- fixed missing symbol issue in murphy plugin
+
+* Tue Feb 04 2014 - <kevron.m.rees@intel.com>
+- 0.11.802 release
+
+* Fri Jan 31 2014 - <kevron.m.rees@intel.com>
+- 0.11.801 release
+
+* Tue Jan 28 2014 - <kevron.m.rees@intel.com>
+- 0.11.800 release
+
+* Wed Jan 09 2014 - <kevron.m.rees@intel.com>
+- Fixed up tree so obs can build it
+
+* Wed Jan  08 23:41:34 UTC 2014 - tracy.graydon@intel.com
+- Fix the date in the previous changelog entry to make OBS happy 
+
+* Wed Jan 08 2014 - <kevron.m.rees@intel.com>
+- Upstream 0.10.902
+- Temporarily install rule-less manifest so security=none works
+
+* Thu Dec 19 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.901
+- Fixed packaging to install manifests for all subpackages
+- Fix for TIVI-2324
+
+* Mon Dec 16 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.900 ("challenger" beta)
+- Fixed manifest so ambd now runs as new AMB domain
+- Cleaned up tree
+
+* Fri Nov 22 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.805 ("challenger" alpha)
+- Install smack manifest file
+
+* Thu Nov 21 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.804 ("challenger" alpha)
+- Fixes TIVI-2081, TIVI-2122
+- Cleaned up branch with new release patches
+
+* Fri Nov 11 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.803 ("challenger" alpha)
+
+* Thu Nov 04 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.802 ("challenger" alpha)
+- added tizen specialized systemd service file
+
+* Tue Oct 16 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.10.800 ("challenger" alpha)
+- Changes DBus API with the concent of zones
+- New location plugin that uses nmea devices
+- updated packaging
+- lots more docs are now available in the docs package
+
+* Thu Sep 12 2013 - <kevron.m.rees@intel.com>
+- Official 0.10.0 ("chevelle") release
+- added LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so to fix opencvlux plugin issues
+
+* Tue Sep 10 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.9.19 ("chevelle" beta).
+- upstream changed time and sequence data types.
+
+* Mon Sep 09 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.9.18 ("chevelle" beta).
+- upstream added "sequence" properties to dbus api.
+- Make manager interface register last (workaround for dbus race condition).
+
+* Thu Sep 05 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.9.17 ("chevelle" beta)
+- new version fixes systemd race condition with dbus
+
+* Tue Sep 03 2013 - <kevron.m.rees@intel.com>
+- Fixed TIVI-1708
+- New upstream release 0.9.16 ("chevelle" beta)
+
+
+* Thu Aug 23 2013 - <kevron.m.rees@intel.com>
+- New upstream 0.9.15 ("chevelle" beta)
+- new GetHistory call
+- fixed some minor issues with properties registering on dbus
+- added smack manifest with AMB domain (disabled currently)
+- reenabled murphy plugin
+
+* Tue Aug 13 2013 - <kevron.m.rees@intel.com>
+- New upstream release 0.9.13 ("chevelle" beta)
+- Enabled murphy plugin by default
+- Fixed memory smashing bug with json parsing
+- Added support for additional buttons in wheel plugin
+
+* Tue Jul 30 2013 - <kevron.m.rees@intel.com>
+- New upstreadm release 0.9.11 ("chevelle" beta)
+
+* Tue Jul 30 2013 - <kevron.m.rees@intel.com>
+- Fixed rmplint errors
+
+* Mon Jul 29 2013 - <kevron.m.rees@intel.com
+- fixed findProperty call to return object names not objects that match amb property names
+- added list dbus call
+
+* Fri Jul 19 15:09:00 PST 2013 - <kevron.m.rees@intel.com>
+- readded .gbs.conf file to point to upstream branch
+- set upstream branch to track upstream so gbs will stop complaining
+- recreated tizen branch from upstream
+- submitting to tizen build
+- added fix for compiling with gcc 4.7.0
+
+* Thu Jul 18 10:39:00 PST 2013 - <kevron.m.rees@intel.com>
+- version 0.9.9 ("chevelle" beta)
+
+* Wed Jul 17 13:21:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fix for bug TIVI-1427
+
+* Thu Jul 11 11:13:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fix for bug TIVI-1175
+
+* Mon Jul 08 18:48:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fixed dbus policy example
+
+* Fri Jun 28 11:06:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fixed segfault on timeout reply
+
+* Wed Jun 26 13:40:00 UTC 2013 - <kevron.m.rees@intel.com>
+- Fixed systemd startup issue
+- Merged in latest upstream fixes from the 0.10 branch
+
+* Thu Jun 20 22:38:34 UTC 2013 - tracy.graydon@intel.com
+- Fix up a couple of deps and a spec parsing issue 
+
+* Tue Jun 18 11:12:00 PST 2013 - <kevron.m.rees@intel.com>
+- New upstream version 0.9.8 (0.10 alpha) "chevelle"
+
+* Mon Jun 03 10:47:00 PST 2013 - <kevron.m.rees@intel.com>
+- submitting to tizen build
+
+* Tue May 21 11:19:00 PST 2013 - <kevron.m.rees@intel.com>
+- Updated to latest upstream on the 0.9 branch
+- disabled gpsd plugin since we don't have a modern version of gpsd on tizen
+
+* Thu Mar 21 16:02:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fix for performance issues in opencvlux plugin
+- Murphy code added but not built by default yet
+
+* Tue Mar 19 11:09:00 PST 2013 - <kevron.m.rees@intel.com>
+- Fix for JIRA TIVI-525
+
+* Mon Mar 18 14:23:00 PST 2013 - <kevron.m.rees@intel.com>
+- Merged upstream bug fixes from 0.8.0 branch.
+
+* Thu Mar 07 13:40:00 PST 2013 - <kevron.m.rees@intel.com>
+- new beta releast 0.7.9
+
+* Wed Feb 06 10:38:00 PST 2013 - <kevron.m.rees@intel.com>
+- dbus fixes
+- compiler fixes
+
+* Thu Jan 24 14:44:00 UTC 2013 - <kevron_m_rees@linux.intel.com>
+- memory usage fixes
+
+* Mon Jan 21 10:57:00 UTC 2013 - <kevron_m_rees@linux.intel.com>
+- updated to 0.6.9
+
+
+* Wed Jan 3 10:57:00 UTC 2013 - <kevron_m_rees@linux.intel.com> 3718d3f
+- updated spec to include database package
+
+* Fri Dec  7 23:19:19 UTC 2012 - tracy.graydon@intel.com
+- Add libuuid-devel dep and a couple of minor spec changes to fix build issue 
+
+* Thu Dec 06 2012 tripzero <kevron_m_rees@linux.intel.com> b1870c5
+- version bump and install sysvinit
+- uuidhelper
+- fixed initiation of sequence and timestamp defaults
+- example requests ranged from 10s ago after 10s timeout
+- do not blow up if baud is empty
+- version bump 0.6.0
+- fixed tpms plugin
+- Updated todo
+- worked out some bugs with websocket source and sink
+- getRanged works with database sink
+- database plugin works
+- set precision before writing to debug
+- refactored how timestamp and sequence are stored: moved to AbstractProperty
+- fixed merge
+- Merge branch 'malcom'
+- register air intake
+- Change so websocketsink now reports the proper list of supported properties
+- Fix for WMI pid being returned as true when engine coolant temp is selected
+- fixed potential Obd2Amb bug
+- Change for updateProperty shouldn't be called if there is a pending reply
+- check for property changed in core, but don't use right now
+- Change so getPropertyAsync is properly replied to in obd2source
+- fixed currenttime bugs
+- added multisource test script in examples and added --log option
+- worked some debug messages
+- added air intake temp property to obd2source
+- Fix for CopyMe<T> having an error in its constructor paramter
+- Change so re-subscribing to a pid, removes it from the blacklist if it has been tagged as invalid
+- Change for blacklisting OBD2 pids that return NODATA
+- Change for debugging random disconnects
+- Addition for using the bluez bluetooth disconnect feature when OBD disconnects
+- added disconnect call to bluetooth
+- Change so BT rfcomm port name is re-reqested every time a connect is requested
+- register OBD2Connect property
+- Change for removing extra debug output, and fixing disconnect on device removal
+- Fix for an issue where a NODATA response from an OBD2 tool would cause a disconnect
+- Addition of feature to disconnect from OBD port on failure, and reconnect only on new incoming subscriptions
+- Addition of getPropertyAsync and setProperty support through websocketsource
+- Addition of getPropertyAsync and setProperty support through websocketsource
+- initial sequence and timestamp support
+- fixed tryParse returning false issue
+- stub databasekink
+- Fix copy/paste issue preventing OBD2Source from supporting Engine Speed
+- endl
+- Fix for high CPU usage due to change in how updateProperties was called
+- clean up sources and sinks
+- Addition of method for shutting down OBD thread upon closure
+- fixed example config
+- enabled obd2 by default for now
+- fixed include
+- Addition of disconnect on last unsubscribe and extra debugging
+- Continuation of Kevron's refactoring, including connect on first subscribe
+- initial placeholder for database plugin
+- Update plugins/obd2plugin/README
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- updated obd2source readme
+- start of obd2 refactoring
+- fixed todo merge
+- todo updated
+
+* Mon Dec 03 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20121112.191808@cbfefb5
+- version bump in spec
+- version bump 0.6.0
+- updated changes
+- todo updated
+
+* Fri Nov 02 2012 tripzero <kevron_m_rees@linux.intel.com> 1.0_branch@7de9474
+- new version
+- Manual merge
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker into release
+- version bump 0.5.0
+- added getHistory support to websocket sink plugin and added api to test api.js
+- Adding json-glib as a runtime requirement.
+- added a bunch of properties and consolodated some things in obd2source
+- updated tpms plugin so it compiles
+- refactored setProperty: made it async with callback
+- updated todo
+- some enhancements to obd2source
+- updated TODO
+- configurable bt adapter
+- Update TODO
+- Update README
+- Update spec file:  - Use valid Tizen Group  - Fix typo  - Use macro instead of hardcoded path in %install section
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- report why cannot connect to obdII device
+- solved possible memory leak in websocketsink
+- TPMS compile switch with default OFF
+- fixed websocketsource. possibly removed mem leak
+- gracefully handle no-root and no-device situations
+- added light status and updated fuel docs
+- cruise control properties
+- fix kPa
+- pressures all in kPa
+- updates to support all 4 tires and pressures
+- some basic info about the plugin
+- convert tire types to float
+- merge
+- merge
+- fix typo
+- add tire temperature parameters
+- tire temperature values added
+- tire temperature values added
+- tire temperature values added
+- working USB TPMS sensor reading
+- only export dbus properties that are supported
+- USB module compile & link from TPMS plugin
+- added trip meter property
+- changed trip meter to finite set of trips
+- made adding properties more straightforward
+- cleanup
+- adding files for TPMS USB framework
+- basic TPMS plugin framework without USB sensor interaction
+- changes to allow build on Ubuntu 12.04
+- added property registration system
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker
+- property changes
+- removed 100ms delay
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- removed 500ms blocking call when sending things to obd2
+- fixed spec from merge
+- more changes to changes
+- Merge changes
+- Merge changes
+- Merge changes
+- Merge "added maketag"
+- Merge changes Ibab9e115,I4028a068,Iaec87c6c,I03a7ebde,I2ca0262d,I65c6147e,Ie1f8ec4e,I8bf5640b,I8a6ed52b,Iba369a37
+- Merge changes Iba9f4a4a,Ic07308c7,Icfe8b20e,Ic0d8a7d4
+- Merge "Update README"
+- Merge "added tire pressure properties"
+- Merge "fixed up engine coolant down button"
+- updated chlog
+- Merge branch 'upstream' into release
+- mkdir first
+- Merge branch 'upstream' into release
+- make link
+- Merge branch 'upstream' into release
+- updated version number in spec
+- updated chlog
+- updated spec
+- Merge branch 'upstream' into release
+- updated chlog
+- Merge branch 'upstream' into release
+- updated changelog
+- Merge branch 'upstream' into release
+- changelog update
+
+* Mon Oct 01 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20121001.202146@cd77669
+- fixed merge
+- changes
+- Merge branch 'upstream' into release
+- added packaging directory
+
+* Mon Oct 01 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120926.232908@e180e9d
+- updated spec version
+- Merge branch 'upstream' into release
+- changes
+- version bump
+- report out property updates per second
+- removed glibmm requirement
+- made obd2 updates happen on an idle callback
+- obdII is b0rked but getting closer
+- Update docs/runningstatus.txt
+- only sleep if list is empty
+- integrated obdII source with mainloop
+- updated draft running status dbus doc
+- updated TODO
+- Added debug output confirming set working
+- Fix for "set" requests
+- added maketag
+- updated chlog
+- mkdir first
+- make link
+- updated version number in spec
+- updated chlog
+- updated spec
+- updated chlog
+- updated changelog
+- changelog update
+- added packaging directory
+
+* Wed Sep 26 2012 tripzero <kevron_m_rees@linux.intel.com> ba9f4a4
+- atsp0 ftw
+- fixed compile errors introduced by foolishly merging
+- fixed mergers
+- obd source support bluetooth devices
+- Update README
+- config required to construct plugins.  device config added to wheel plugin
+- added tire pressure properties
+- fixed up engine coolant down button
+- added maketag
+- updated chlog
+- mkdir first
+- make link
+- updated version number in spec
+- updated chlog
+- updated spec
+- updated chlog
+- updated changelog
+- changelog update
+- added packaging directory
+
+* Fri Sep 14 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120912.232202@8d10311
+- Merge branch 'upstream' into release
+- fixed config
+- mkdir first
+- Merge branch 'upstream' into release
+- make link
+- don't do dbus by default
+- don't install service in wrong place
+- Merge branch 'upstream' into release
+- updated version number in spec
+- install service in right place so it starts
+- version bump 0.3
+- Add button event generation for Button[1-4]Preset to wheel plugin Make demo sink plugin listen for the above ButtonEvents Make rundemo script react to the above buttons
+- Add hard-coded calibration values to wheel plugin for G27 racing wheel
+- Fixed one last printf
+- Merge remote-tracking branch 'origin/master'
+- added debug
+- Fix for const_iterator that should be iterator
+- Fix for const_iterator that should be iterator
+- fixed capabilities
+- Fix for only a single subscription being operated on
+- Fix for only a single subscription being operated on
+- added mg to example plugin
+- updated chlog
+
+* Wed Sep 12 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120912.231933@81ea024
+- updated spec
+- Merge branch 'upstream' into release
+- updated chlog
+- fixed compile error
+
+* Wed Sep 12 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120911.205626@03b4484
+- Merge branch 'upstream' into release
+- Merge branch 'mal'
+- made awesome debugout
+- Code cleanup, comments, and change of ALL printf's to DebugOut() calls
+- adding democonfig
+- Fix for typo in config
+- Addition of obdsource
+- Change for websocket options
+- simple rundemo script
+- Addition of all OBD2 properties in the TODO file, async and standard requests
+- updated changelog
+- Fix
+
+* Tue Sep 11 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120911.205626@d545a4c
+- Merge branch 'upstream' into release
+- updated examples with more properties
+- demosink uses strings for turn signal
+- added wheel example and fixed example websocketsource config
+- fixed enums in wheel
+- Merge branch 'mal'
+- Merge branch 'master' of https://github.com/malcom2073/automotive-message-broker into mal
+- fixed up AbstractPropertyType so it can use enums
+- Fix for bug involving websocket messages being incomplete
+- changelog update
+- Merge branch 'master' of https://github.com/malcom2073/automotive-message-broker into mal
+- Fix for bad if/else statements found by Kevron
+- Addition of new obd2 plugin
+
+* Mon Sep 10 2012 tripzero <kevron_m_rees@linux.intel.com> submit/release/20120910.223349@2021380
+- Merge branch 'upstream' into release
+- const value()
+- fixed websocketsource cmake
+- added packaging directory
+- added more properties
+- Addition of only requesting OBD2 values after a subscription request
+- Change in the libwebsocket_write call to fix string length, due to passing a pointer in the middle of a string.
+- Fix for huge memory leak, and more config changes
+- Changes for new config values
+- made setConfiguration virtual
+- Change for setConfiguration to be handled properly for settings
+- new configuration format
+- added button events
+- Fix compile error due to const iterator issues in websocketsinkmanager
+- added todo
+- moved example configs to subfolder. updated readme
+- fix the target_link_library for example plugins
+- Code cleanup
+- Fix for GIOChannel watch's hanging around longer than they should be
+- fixed parallalel building and make install
+- install all the files
+- fixed printhelp() with config option.  thanks geoffroy
+- Fix for gioPolling final
+- Fix for some weird issues with the switch
+- Change for gioPollingFunc to keep it from blocking
+- Changed where obd2plugin looks for obdlib.h
+- Merge branch 'master' of https://github.com/malcom2073/automotive-message-broker into mal2
+- Change for switch falling through
+- Change for GIO to only poll libwebsockets when it actually needs to
+- Change for GIO to only poll libwebsockets when it actually needs to
+- fixed type for transshift/gear part 2
+- fixed type for transshift/gear
+- Fix for bad if/else statements found by Kevron
+- Fix for bad if/else statements found by Kevron
+- Fix for bad if/else statements found by Kevron
+- use nullptr.h
+- define nullptr if using < gcc 4.6
+- Addition of new obd2 plugin
+- Addition of new obd2 plugin
+- fixed dbus plugin not to use the temp pointer
+- some additional updates
+- use pointer to avoid implicit casting fail
+- Merge branch 'mal'; commit '1aad5d5' into propertytype
+- Fixes for new AbstractPropertyType
+- it compiles
+- added missings
+- more updating. still broken
+- Add two new configs for source/sink websocket tests
+- sinks auto-register with the routing engine
+- Fixes for issues concerning subscriptions and websocketsource
+- example sink reacts to supported changed
+- Changes to allow websocketsourceplugin to operate properly, and load from a config file
+- subscribeToProperty being called on the source now
+- some more changes
+- Addition of new websocketsource plugin
+- Fixing a bug where a AMBD property request was being replied as a genivi request
+- major breakage ahead...
+- example supports engine coolant
+- example does throttle
+- Fix for subscriptions not working properly due to non-standard AMB properties not being supported
+- Addition of handling of generic string properties. If they're supported by AMBD, they'll be supported through
+- added capabilities call to VehicleProperty
+- checked in a small fix to the api.js to handle when the service doesn't return the proper acknowledgement on unsubscribe
+- added signal handler for sigterm and sigint
+- fixed types expressed in the example source plugin
+- updated example to produce fake data for wheel and transmission shift properties
+- Merge pull request #7 from malcom2073/master
+- Addition of new debugging output, and better error handling
+- Added unsubscribe supportedeventtype
+- Addition of getSupportedEventTypes with no data field for listing supported properties
+- Code formatting cleanup
+- Changes for unsubscribe to work properly, as well as getSupportedEventTypes
+- Fix for current subscription changes to api.js. Added steering wheel angle and transmission status
+- Clean up the boost::any casting a bit Fulfill property get requests
+- Add event propogation of all data items from the wheel
+- change get and set to allow an array of events, added subscribe and unsubscribe for an array of events, upgraded the index.html tester to all selecting a list of any events to do get, subscribe, and unsubscribe on. Added an input field for each event to allow the tester to set the value to whatever they want. The fields update on get or a valuechanged event on subscribe, when the value changes it flashes red so you can confirm the data is coming in easily.
+- Change for subscription requests to now operate properly
+- Make the boost::any conversions actually work in WheelSource
+- fixed unsubscribe
+- Make WheelPlugin actually read JS events, print out event info Make basic framework for processing received JS events TODO: Button/Axis mapping to VehicleProperty values
+- Add PropertySet typedef to VehicleProperty
+- made VehicleProperty::Property strings
+- added vehiclespeed property
+- Merge remote-tracking branch 'origin/master' into wheelsource
+- Make wheelsourceplugin actually read JS events (currently just prints out)
+- Merge pull request #6 from malcom2073/master
+- Slight change to support uuid string transactionids from the client websocket
+- Changes to support latest websocket protocol api. Now supports running_status_speedometer and running_status_engine_speed
+- in api.js, changed transactionid to a uuid
+- in api.js, changed transactionid to a uuid
+- added better comments to api.js and moved server test code into subdir
+- added better comments to api.js and moved server test code into subdir
+- made websockets work out of the box
+- made websockets work out of the box
+- Additions for creating new WebsockSink class instances per tcp connection
+- missing files added
+- missing files added
+- added check header so cmake will fail if you are missing libwebsockets
+- added check header so cmake will fail if you are missing libwebsockets
+- added set functionality, the basics are in place for hooking up the backend service
+- added set functionality, the basics are in place for hooking up the backend service
+- latest vehicle api supports getevent types and get
+- latest vehicle api supports getevent types and get
+- Update README
+- Update README
+- Update README
+- Update README
+- Merge pull request #5 from malcom2073/master
+- Update README
+- Update README
+- Update README
+- Update README
+- Name change for tcpsink to be websocketsink
+- Merge pull request #4 from malcom2073/master
+- Change for websocket port to be 7681
+- Merge remote-tracking branch 'origin'
+- Add opening of joystick dev file, and reading of various JS info
+- Add opening of joystick dev file, and reading of various JS info
+- Changes for api.js to set protocol, config to include tcpsink plugin, and tcpsinkplugin to handle incoming json requests
+- initial working dbus plugin
+- Merge branch 'par_build_fix'
+- added properties to support wheel
+- Fix parallel build issue (issue #3)
+- mikeleib'd
+- adding missing files
+- updated dbus plugin
+- Fix tcpsinkplugin build on glib 2.32.3
+- Update README
+- added reference/test javascript api to websocket plugin
+- dbus plugin updates
+- added dbus sink subdir
+- Merge pull request #2 from malcom2073/master
+- Initial commit of tcpsink, a websocket providing sink plugin.
+- added dbus plugin
+- Merge pull request #1 from jausmus/wheelsource
+- Add wheel plugin subdir for wheel source plugin Modify plugins/CMakeLists.txt to include wheel subdir
+- added some properties to support the logitec wheel
+- changed async reply callback argument
+- added async and sync property getter
+- fixed compile error due to hardcoded path
+- missing this
+- basic routing working
+- adding example config
+- use map instead of unordered_map
+- cleaned up headers
+- added abstract routing engine class
+- revamped plugin interfaces
+- more progress on core
+- missed these files
+- more progress
+- more code added to core
+- started core routing engine
+- plugins load ftw
+- Merge branch 'master' of https://github.com/otcshare/automotive-message-broker
+- updated architecture presentation
+- initial config reading
+- a bit more progress on the plugin loader
+- some serious changes
+- acceleration type double
+- set default values for each property
+- fixed dbus signal emition
+- Fixed pkgconfig and header issues
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker
+- Version bump 0.2
+- Version bump 0.2
+- removed wheeltick from docs
+- removed wheeltick
+- more properties added to running status
+- added engine oil property stub
+- added new properties and assignment overloads
+- lots of new properties to running status
+- trip meter property
+- Merge branch 'master' of github.com:otcshare/automotive-message-broker
+- some changes to abstract property
+- Updated readme with project description.
+- added explainatory presentation document
+- added fuel economy property
+- added EngineSpeed and VehiclePowerMode properties
+- some updates to docs
+- added README
+- added COPYING file with license
+- all files have license comments
+- fixed compile errors and added dist target
+- fixed crasher; implemented setProperty; updated Docs
+- added runtime options
+- cleanup and project rename
+- initial add
+- initial project import from KDevelop
+

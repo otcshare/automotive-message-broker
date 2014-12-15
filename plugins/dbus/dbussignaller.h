@@ -117,7 +117,7 @@ private:
 					variantMap[property->name()] = val;
 					variantMap[sequenceName] = g_variant_new("i", property->sequence());
 					variantMap["Time"] = g_variant_new("d", property->timestamp());
-					variantMap["Zone"] = g_variant_new("i", property->value()->zone);
+					variantMap["Zone"] = g_variant_new("i", property->zoneFilter());
 				}
 
 				GVariantBuilder builder;

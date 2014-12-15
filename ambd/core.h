@@ -57,7 +57,7 @@ public:
 	PropertyList supported();
 
 	PropertyInfo getPropertyInfo(const VehicleProperty::Property &,const std::string &sourceUuid);
-	std::list<std::string> sourcesForProperty(const VehicleProperty::Property & property);
+	std::vector<std::string> sourcesForProperty(const VehicleProperty::Property & property);
 
 	struct Performance {
 		Performance(): propertiesPerSecond(0), firedPropertiesPerSecond(0) {}
@@ -81,7 +81,6 @@ private:
 	// to support zone filtering replace VehicleProperty::Property with ZonePropertyType
 	std::multimap<AbstractSource*, VehicleProperty::Property> mMasterPropertyList;
 
-	// K = AbstractSource::uuid(), T = AbstractSource*
 	std::unordered_set<AbstractSource*> mSources;
 	std::unordered_set<AbstractSink*> mSinks;
 

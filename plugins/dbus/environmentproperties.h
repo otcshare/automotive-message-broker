@@ -9,7 +9,7 @@
 class ExteriorBrightnessProperty: public DBusSink
 {
 public:
-	ExteriorBrightnessProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ExteriorBrightnessProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ExteriorBrightness", re, connection, map<string, string>())
 	{
 		/**
@@ -27,25 +27,16 @@ public:
 class Temperature: public DBusSink
 {
 public:
-	Temperature(AbstractRoutingEngine* re, GDBusConnection* connection)
+	Temperature(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Temperature", re, connection, map<string, string>())
 	{
-		/**
-		 * @attributeName Interior
-		 * @type signed long
-		 * @access readonly
-		 * @attributeComment \brief Must return the temperature of the interior of the vehicle in celcius.
-		 */
+
+		///TODO Depricated in 0.14.  Use InteriorTemperature
 		wantPropertyVariant(VehicleProperty::InteriorTemperature, "Interior", AbstractProperty::Read);
 
 		wantPropertyVariant(VehicleProperty::InteriorTemperature, "InteriorTemperature", AbstractProperty::Read);
 
-		/**
-		 * @attributeName Exterior
-		 * @type signed long
-		 * @access readonly
-		 * @attributeComment \brief Must return the temperature of the exterior of the vehicle in celcius.
-		 */
+		///TODO Depricated in 0.14.  Use ExteriorTemperature
 		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "Exterior", AbstractProperty::Read);
 
 		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "ExteriorTemperature", AbstractProperty::Read);
@@ -58,50 +49,44 @@ public:
 class RainSensor: public DBusSink
 {
 public:
-	RainSensor(AbstractRoutingEngine* re, GDBusConnection* connection)
+	RainSensor(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("RainSensor", re, connection, map<string, string>())
 	{
-		/**
-		 * @attributeName RainSensor
-		 * @type unsigned short
-		 * @access readonly
-		 * @attributeComment \brief Must return level of rain intensity 0: No Rain - 10: Heaviest Rain.
-		 */
-		wantPropertyVariant(VehicleProperty::RainSensor, "RainSensor", "q", AbstractProperty::Read);
-
+		///TODO: Depricated in 0.14
+		wantPropertyVariant(VehicleProperty::RainSensor, "RainSensor", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::RainSensor, "RainIntensity", AbstractProperty::Read);
 	}
 };
 
 /** @interface WindshieldWiper : VehiclePropertyType **/
+///TODO: depricated in 0.14
 class WindshieldWiper: public DBusSink
 {
 public:
-	WindshieldWiper(AbstractRoutingEngine* re, GDBusConnection* connection)
+	WindshieldWiper(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindshieldWiper", re, connection, map<string, string>())
 	{
-		/**
-		 * @enum const unsigned short WIPERSPEED_OFF = 0;
-		 * @enum const unsigned short WIPERSPEED_SLOWEST= 1;
-		 * @enum const unsigned short WIPERSPEED_FASTEST = 5;
-		 * @enum const unsigned short WIPERSPEED_AUTO = 10;
-		 **/
+		wantPropertyVariant(VehicleProperty::WindshieldWiper, "WindshieldWiper", AbstractProperty::ReadWrite);
+	}
+};
 
-		/**
-		 * @attributeName WindshieldWiper
-		 * @type unsigned short
-		 * @access readonly
-		 * @attributeComment \brief Must return Level of windshield whiper speed (see WIPERSPEED_)
-		 */
-		wantPropertyVariant(VehicleProperty::RainSensor, "WindshieldWiper", "y", AbstractProperty::ReadWrite);
-
+class WindshieldWiperStatus: public DBusSink
+{
+public:
+	WindshieldWiperStatus(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("WiperStatus", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::WindshieldWiperSpeed, "WiperSpeed", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WindshieldWiperSetting, "WiperSetting", AbstractProperty::ReadWrite);
 	}
 };
 
 /** @interface HVAC : VehiclePropertyType **/
+///TODO Depricated in 0.14.  Use ClimateControl
 class HVACProperty: public DBusSink
 {
 public:
-	HVACProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	HVACProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("HVAC", re, connection, map<string, string>())
 	{
 		/**
@@ -118,7 +103,7 @@ public:
 		 * @attributeComment \brief Must return airflow direction.  See AIRFLOWDIRECTION_*.
 		 */
 		/// TODO: Deprecated.  Remove in 0.13
-		wantPropertyVariant(VehicleProperty::AirflowDirection, "AirflowDirection", "y", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirflowDirection, "AirflowDirection", AbstractProperty::ReadWrite);
 
 		/**
 		 * @attributeName FanSpeed
@@ -191,7 +176,7 @@ public:
 class ClimateControlProperty: public DBusSink
 {
 public:
-	ClimateControlProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ClimateControlProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ClimateControl", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::AirflowDirectionW3C, "AirflowDirection", AbstractProperty::ReadWrite);
@@ -215,10 +200,11 @@ public:
 };
 
 /** @interface WindowStatus : VehiclePropertyType **/
+/// TODO: Depricated in 0.14.  Use SideWindow
 class WindowStatusProperty: public DBusSink
 {
 public:
-	WindowStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	WindowStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindowStatus", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", AbstractProperty::ReadWrite);
@@ -226,10 +212,21 @@ public:
 	}
 };
 
+class SideWindowStatusProperty: public DBusSink
+{
+public:
+	SideWindowStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("SideWindow", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowLockStatus, "Lock", AbstractProperty::ReadWrite);
+	}
+};
+
 class DefrostProperty: public DBusSink
 {
 public:
-	DefrostProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	DefrostProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Defrost", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::DefrostWindow,"DefrostWindow", AbstractProperty::ReadWrite);
@@ -241,13 +238,11 @@ public:
 class Sunroof: public DBusSink
 {
 public:
-	Sunroof(AbstractRoutingEngine* re, GDBusConnection* connection)
+	Sunroof(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Sunroof", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::Sunroof, "Openness", "y", AbstractProperty::ReadWrite);
-
-		wantPropertyVariant(VehicleProperty::SunroofTilt, "Tilt", "y", AbstractProperty::ReadWrite);
-
+		wantPropertyVariant(VehicleProperty::Sunroof, "Openness", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SunroofTilt, "Tilt", AbstractProperty::ReadWrite);
 	}
 };
 
@@ -255,10 +250,21 @@ public:
 class ConvertibleRoof: public DBusSink
 {
 public:
-	ConvertibleRoof(AbstractRoutingEngine* re, GDBusConnection* connection)
+	ConvertibleRoof(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ConvertibleRoof", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ConvertibleRoof, "Openness", "y", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::ConvertibleRoof, "Setting", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::ConvertibleRoofStatus, "Status", AbstractProperty::Read);
+	}
+};
+
+class AtmosphericPressure: public DBusSink
+{
+public:
+	AtmosphericPressure(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("AtmosphericPressure", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::AtmosphericPressure, "Pressure", AbstractProperty::ReadWrite);
 	}
 };
 #endif

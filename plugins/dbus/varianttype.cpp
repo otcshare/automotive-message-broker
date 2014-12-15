@@ -68,8 +68,7 @@ void VariantType::fromGVariant(GVariant *val)
 		{
 			DebugOut(DebugOut::Error)<<"SetProperty fail: "<<reply->error<<endl;
 		}
-		///TODO: we segfault here.
-		///if(v) delete v;
+
 		delete reply;
 	};
 

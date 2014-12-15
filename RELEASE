@@ -1,12 +1,17 @@
 Release notes for release 0.13
 
 New features:
-- [OpenCV plugin] code updated to the new 3.0 API
-- [OpenCV plugin] driver drowsiness detection test code
 - [xwalk extension] implements full W3C automotive BG vehicle and data APIs
+- [OpenCV plugin] code updated to the new 3.0 beta API
+- [OpenCV plugin] driver drowsiness detection test code
 - [Bluemonkey plugin] support for zones in JS API.
+- [Bluemonkey plugin] database module.
 
 Changes:
 - OpenCV plugin experimental options for cuda and kinect are removed
+- Removed unmaintained plugins: tpms, websocket{sink,source}
 
 Fixes:
+- [DBus plugin] Fix exporting properties in zones that really don't have support
+- [xwalk extension] fixed set() for some types did not work because of invalid GVariant creation.
+- [websocket plugin] Updated html test page.  Fixed protocol usage.

@@ -10,7 +10,7 @@
 class OdometerProperty: public DBusSink
 {
 public:
-	OdometerProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	OdometerProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Odometer", re, connection, map<string, string>())
 	{
 		/** @attributeName Odometer
@@ -30,7 +30,7 @@ public:
 class FluidProperty : public DBusSink
 {
 public:
-	FluidProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	FluidProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Fluid", re, connection, map<string, string>())
 	{
 		/** @attributeName Transmission
@@ -63,7 +63,7 @@ public:
 class BatteryProperty: public DBusSink
 {
 public:
-	BatteryProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	BatteryProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Battery", re, connection, map<string, string>())
 	{
 		/** @attributeName Voltage
@@ -87,7 +87,7 @@ public:
 class BatteryStatusProperty: public DBusSink
 {
 public:
-	BatteryStatusProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	BatteryStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("BatteryStatus", re, connection, map<string, string>())
 	{
 		/** @attributeName Voltage
@@ -113,7 +113,7 @@ public:
 class TireProperty: public DBusSink
 {
 public:
-	TireProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	TireProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Tire", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::TirePressure, "Pressure", AbstractProperty::Read);
@@ -126,7 +126,7 @@ public:
 class EngineCoolant: public DBusSink
 {
 public:
-	EngineCoolant(AbstractRoutingEngine* re, GDBusConnection* connection)
+	EngineCoolant(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("EngineCoolant", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::EngineCoolantLevel, "Level", AbstractProperty::Read);
@@ -137,7 +137,7 @@ public:
 class TransmissionOil: public DBusSink
 {
 public:
-	TransmissionOil(AbstractRoutingEngine* re, GDBusConnection* connection)
+	TransmissionOil(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("TransmissionOil", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::TransmissionOilWear, "Wear", AbstractProperty::Read);
@@ -148,7 +148,7 @@ public:
 class TransmissionClutch: public DBusSink
 {
 public:
-	TransmissionClutch(AbstractRoutingEngine* re, GDBusConnection* connection)
+	TransmissionClutch(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("TransmissionClutch", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::TransmissionClutchWear, "Wear", AbstractProperty::Read);
@@ -158,7 +158,7 @@ public:
 class BrakeMaintenance: public DBusSink
 {
 public:
-	BrakeMaintenance(AbstractRoutingEngine* re, GDBusConnection* connection)
+	BrakeMaintenance(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("BrakeMaintenance", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::BrakePadWear, "PadWear", AbstractProperty::Read);
@@ -170,7 +170,7 @@ public:
 class WasherFluid: public DBusSink
 {
 public:
-	WasherFluid(AbstractRoutingEngine* re, GDBusConnection* connection)
+	WasherFluid(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WasherFluid", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::WasherFluidLevel, "Level", AbstractProperty::Read);
@@ -181,10 +181,24 @@ public:
 class MalfunctionIndicator: public DBusSink
 {
 public:
-	MalfunctionIndicator(AbstractRoutingEngine* re, GDBusConnection* connection)
+	MalfunctionIndicator(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("MalfunctionIndicator", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::MalfunctionIndicatorOn, "On", AbstractProperty::Read);
+	}
+};
+
+class Diagnostics: public DBusSink
+{
+public:
+	Diagnostics(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("Diagnostics", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(VehicleProperty::AccumulatedEngineRuntime, "AccumulatedEngineRuntime", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DistanceWithMILOn, "DistanceWithMILOn", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DistanceSinceCodeCleared, "DistanceSinceCodeCleared", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TimeRunMILOn, "TimeRunMILOn", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TimeTroubleCodeClear, "TimeTroubleCodeClear", AbstractProperty::Read);
 	}
 };
 

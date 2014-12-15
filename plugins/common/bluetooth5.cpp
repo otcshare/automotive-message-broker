@@ -199,35 +199,43 @@ std::string findDevice(std::string address, std::string adapterPath="")
 
 Bluetooth5::Bluetooth5()
 {
-	GError* error = NULL;
+	GError* errorIntrospection = NULL;
 
-	GDBusNodeInfo* introspection = g_dbus_node_info_new_for_xml(introspection_xml, &error);
+	GDBusNodeInfo* introspection = g_dbus_node_info_new_for_xml(introspection_xml, &errorIntrospection);
 
-	if(error)
+	auto errorIntrospectionPtr = amb::make_super(errorIntrospection);
+
+	if(errorIntrospectionPtr)
 	{
-		DebugOut(DebugOut::Error)<<"in instrospection xml: "<<error->message<<endl;
-		g_error_free(error);
-		throw -1;
+		DebugOut(DebugOut::Error)<<"in instrospection xml: "<<errorIntrospectionPtr->message<<endl;
+		return;
 	}
+
+	GError* errorBus = nullptr;
 
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, "org.bluez.Profile1");
 
-	GDBusConnection *mConnection = g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &error);
+	mConnection = amb::make_super(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &errorBus));
 
-	if(error)
+	auto errorBusPtr = amb::make_super(errorBus);
+
+	if(errorBusPtr)
 	{
-		DebugOut(DebugOut::Error)<<"getting system bus: "<<error->message<<endl;
-		g_error_free(error);
-		throw -1;
+		DebugOut(DebugOut::Error)<<"getting system bus: "<<errorBusPtr->message<<endl;
+		return;
 	}
 
-	int regId = g_dbus_connection_register_object(mConnection, "/org/bluez/spp", mInterfaceInfo, &interfaceVTable, this, NULL, &error);
-	g_dbus_node_info_unref(introspection);
+	GError* errorRegister = nullptr;
 
-	if(error)
+	int regId = g_dbus_connection_register_object(mConnection.get(), "/org/bluez/spp", mInterfaceInfo, &interfaceVTable, this, NULL, &errorRegister);
+
+	auto errorRegisterPtr = amb::make_super(errorRegister);
+
+	if(errorRegisterPtr)
 	{
-		g_error_free(error);
-		throw -1;
+
+		DebugOut(DebugOut::Error)<<"Registering org.bluez.Profile1 Interface: "<<errorRegisterPtr->message<<endl;
+		return;
 	}
 
 	GVariantBuilder builder;
@@ -237,18 +245,22 @@ Bluetooth5::Bluetooth5()
 	g_variant_builder_add(&builder, "{sv}", "Role", g_variant_new("s","client"));
 	g_variant_builder_add(&builder, "{sv}", "AutoConnect", g_variant_new("b",true));
 
-	g_dbus_connection_call_sync(mConnection,
+	GError* errorRegisterCall = nullptr;
+
+	g_dbus_connection_call_sync(mConnection.get(),
 								"org.bluez",
 								"/org/bluez",
 								"org.bluez.ProfileManager1",
 								"RegisterProfile",
 								g_variant_new("(osa{sv})", "/org/bluez/spp", "00001101-0000-1000-8000-00805F9B34FB", &builder),
-								nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &error);
+								nullptr, G_DBUS_CALL_FLAGS_NONE, -1, nullptr, &errorRegisterCall);
 
-	if(error)
+	auto errorRegisterCallPtr = amb::make_super(errorRegisterCall);
+
+	if(errorRegisterCallPtr)
 	{
-		DebugOut(DebugOut::Error)<<"RegisterProfile failed: "<<error->message<<endl;
-		throw -1;
+		DebugOut(DebugOut::Error)<<"RegisterProfile failed: "<<errorRegisterCallPtr->message<<endl;
+		return;
 	}
 }
 

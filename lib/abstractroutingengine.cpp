@@ -63,7 +63,8 @@ void AsyncPropertyReply::setTimeout()
 			thisReply->error = Timeout;
 			if(thisReply->timedout)
 				thisReply->timedout(thisReply);
-			thisReply->completed(thisReply);
+			if(thisReply->completed)
+				thisReply->completed(thisReply);
 		}
 		return 0;
 	};

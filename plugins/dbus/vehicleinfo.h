@@ -10,7 +10,7 @@
 class VehicleId: public DBusSink
 {
 public:
-	VehicleId(AbstractRoutingEngine* re, GDBusConnection* connection)
+	VehicleId(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehicleId", re, connection, map<string, string>())
 	{
 		/** @attributeName WMI
@@ -28,7 +28,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::VIN, "VIN", "s", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -36,7 +36,7 @@ public:
 class SizeProperty: public DBusSink
 {
 public:
-	SizeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	SizeProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Size", re, connection, map<string, string>())
 	{
 		/** @attributeName Width
@@ -60,7 +60,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::VehicleLength, "Length", "u", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -68,7 +68,7 @@ public:
 class FuelInfoProperty: public DBusSink
 {
 public:
-	FuelInfoProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	FuelInfoProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("FuelInfo", re, connection, map<string, string>())
 	{
 		/**
@@ -100,7 +100,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::FuelPositionSide, "RefuelPosition", "y", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -108,7 +108,7 @@ public:
 class VehicleTypeProperty: public DBusSink
 {
 public:
-	VehicleTypeProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	VehicleTypeProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehicleType", re, connection, map<string, string>())
 	{
 		/**
@@ -127,7 +127,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::VehicleType, "Type", "y", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -135,7 +135,7 @@ public:
 class DoorsProperty: public DBusSink
 {
 public:
-	DoorsProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	DoorsProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Doors", re, connection, map<string, string>())
 	{
 		/** @attributeName DoorsPerRow
@@ -148,7 +148,7 @@ public:
 		 **/
 		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "ay", AbstractProperty::Read);
 
-		
+
 	}
 };
 
@@ -156,7 +156,7 @@ public:
 class WheelInformationProperty: public DBusSink
 {
 public:
-	WheelInformationProperty(AbstractRoutingEngine* re, GDBusConnection* connection)
+	WheelInformationProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WheelInformation", re, connection, map<string, string>())
 	{
 
@@ -187,8 +187,6 @@ public:
 		 *  @attributeComment \brief MUST return Antilock Brake System status: on = true, off = false.
 		 **/
 		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
-
-		
 	}
 };
 

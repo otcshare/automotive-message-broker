@@ -94,6 +94,7 @@ public:
 	using QObject::setProperty;
 
 	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config,  AbstractSource& parent);
+	~BluemonkeySink();
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType* value);
@@ -148,6 +149,7 @@ public Q_SLOTS:
 	void createCustomProperty(QString name, QJSValue defaultValue, int zone);
 
 private:
+	QList<void*> modules;
 	QJSEngine* engine;
 	QStringList configsToLoad;
 

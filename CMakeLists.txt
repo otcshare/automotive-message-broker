@@ -6,9 +6,9 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
-set(PROJECT_VERSION "0.12.803")
+set(PROJECT_VERSION "0.12.900")
 set(PROJECT_CODENAME "agera")
-set(PROJECT_QUALITY "alpha")
+set(PROJECT_QUALITY "beta")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
@@ -23,8 +23,6 @@ set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}
 
 option(qtmainloop "Use QCoreApplication mainloop " OFF)
 option(websocket_plugin "websocket source and sink plugins" OFF)
-option(websocketold_plugin "old websocket sink plugin" OFF)
-option(tpms_plugin "TPMS plugin " OFF)
 option(obd2_plugin "OBD-II plugin" OFF)
 option(database_plugin "Database plugins" OFF)
 option(qt_bindings "AMB Qt DBus bindings" OFF)
@@ -45,7 +43,7 @@ set(XWALK_EXTENSION_PATH "/automotive-message-broker/xwalk" CACHE PATH "director
 
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++1y")
 
 if(opencvlux_plugin)
    message(STATUS "OpenCV Lux plugin enabled")
@@ -154,3 +152,4 @@ add_subdirectory(docs)
 add_subdirectory(tests)
 add_subdirectory(examples)
 add_subdirectory(xwalk)
+add_subdirectory(packaging)

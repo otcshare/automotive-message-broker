@@ -88,7 +88,13 @@ public:
 	}
 
 	void setSourceFilter(std::string filter) { mSourceFilter = filter; }
-	void setZoneFilter(Zone::Type zone) { mZoneFilter = zone; }
+	void setZoneFilter(Zone::Type zone)
+	{
+		if(mValue)
+			mValue->zone = zone;
+
+		mZoneFilter = zone;
+	}
 
 	std::string sourceFilter() { return mSourceFilter; }
 	Zone::Type zoneFilter() { return mZoneFilter; }

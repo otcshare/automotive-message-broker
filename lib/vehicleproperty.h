@@ -99,7 +99,7 @@ enum TransmissionPositions
 	Park = 255
 
 };
-/** TODO: deprecate in 0.13.  Replaced with Drive::Mode: **/
+/** TODO: deprecate in 0.14.  Replaced with Drive::Mode: **/
 enum Mode {
 	Normal=0,
 	Sports = 1,
@@ -133,7 +133,7 @@ namespace Power {
  * Accessory2 = Vehicle is off and key is in Accessory2 position.
  * Run = Vehichle is running.  Key is in the running position.
  */
-enum PowerModes
+enum Modes
 {
 	Off = 0,
 	Accessory1 = 1,
@@ -188,6 +188,15 @@ enum Status
 	Armed,
 	AlarmDetected
 };
+
+namespace W3C
+{
+extern const char * Disarmed;
+extern const char * Prearmed;
+extern const char * Armed;
+extern const char * Alarmed;
+}
+
 }
 
 namespace Airbag {
@@ -226,23 +235,26 @@ enum Occupant
 	Child,
 	Adult
 };
+namespace W3C
+{
+extern const char * Vacant;
+extern const char * Child;
+extern const char * Adult;
+
+extern const char * Pin;
+extern const char * Keyfob;
+extern const char * Bluetooth;
+extern const char * NFC ;
+extern const char * Fingerprint;
+extern const char * Camera;
+extern const char * Voice;
+}
+
+
 }
 
 namespace Window
 {
-enum Location
-{
-	Driver = 0,
-	Passenger,
-	LeftRear,
-	RightRear,
-	Sunroof,
-	Windshield,
-	SideMirrorLeft,
-	SideMirrorRight,
-	Rear
-};
-
 enum WiperSpeed
 {
 	Off = 0,
@@ -250,7 +262,29 @@ enum WiperSpeed
 	Fastest = 5,
 	Auto = 10
 };
+}
 
+namespace ConvertibleRoofW3C
+{
+extern const char * Opened;
+extern const char * Opening;
+extern const char * Closed;
+extern const char * Closing;
+}
+
+namespace WiperSpeedSetting
+{
+namespace W3C
+{
+extern const char * Off;
+extern const char * Once;
+extern const char * Slowest;
+extern const char * Slow;
+extern const char * Middle;
+extern const char * Fast;
+extern const char * Fastest;
+extern const char * Auto;
+}
 }
 
 namespace HVAC
@@ -291,6 +325,17 @@ enum Mode {
 	OEMCustom1 = 3,
 	OEMCustom2 = 4
 };
+
+namespace W3C
+{
+extern const char* Comfort;
+extern const char* Auto;
+extern const char* Sport;
+extern const char* Eco;
+extern const char* Manual;
+extern const char* Winter;
+}
+
 }
 
 namespace Measurement
@@ -301,6 +346,26 @@ enum Type
 	ImperialUS = 1,
 	ImperialUK = 2
 };
+}
+
+namespace LaneDeparture
+{
+namespace W3C
+{
+extern const char * Off;
+extern const char * Pause;
+extern const char * Running;
+}
+}
+
+namespace ParkingBrake
+{
+namespace W3C
+{
+extern const char * Inactive;
+extern const char * Active;
+extern const char * Error;
+}
 }
 
 #include <boost/preprocessor/comma.hpp>
@@ -346,7 +411,6 @@ class VehicleProperty
 {
 
 public:
-
 
 	/*!
 	 * \brief factory constructs a static instance of VehicleProperty.  This should be called once before VehicleProperty is used in the app
@@ -402,7 +466,7 @@ public:
 				 BasicPropertyType<Transmission::TransmissionPositions>, Transmission::TransmissionPositions)
 	//typedef BasicPropertyType<Transmission::TransmissionPositions> TransmissionGearPositionType;
 
-	/// TODO: deprecate in 0.13.  Replaced by Drive::Mode
+	/// TODO: deprecate in 0.14.  Replaced by Drive::Mode
 	static const Property TransmissionMode;
 	PROPERTYTYPE(TransmissionMode, TransmissionModeType,
 				 BasicPropertyType<Transmission::Mode>, Transmission::Mode)
@@ -429,12 +493,12 @@ public:
 	//typedef BasicPropertyType<uint16_t> WheelBrakePressureType;
 
 	/**< Steering wheel angle (0-359)
-	 * TODO: Deprecate in 0.13.  Replace with SteeringWheelAngleW3C
+	 * TODO: Deprecate in 0.14.  Replace with SteeringWheelAngleW3C
 	*/
 	static const Property SteeringWheelAngle;
 	PROPERTYTYPE(SteeringWheelAngle, SteeringWheelAngleType, BasicPropertyType<uint16_t>, uint16_t)
 
-	/// TODO: Rename to "SteeringWheel" in 0.13
+	/// TODO: Rename to "SteeringWheel" in 0.14
 	static const Property SteeringWheelAngleW3C;
 	PROPERTYTYPEBASIC(SteeringWheelAngleW3C, int16_t)
 
@@ -477,6 +541,7 @@ public:
 
 	/**< Button Event @see ButtonEvents::ButtonEventType */
 	///TODO: deprecated.  Use ButtonEventW3C. Remove in 0.14
+	[[deprecated("Depricated in 0.14.  Use ButtonEventW3C")]]
 	static const Property ButtonEvent;
 	PROPERTYTYPE(ButtonEvent, ButtonEventType, BasicPropertyType<ButtonEvents::ButtonEventType>, ButtonEvents::ButtonEventType)
 
@@ -486,9 +551,6 @@ public:
 	public:
 		ButtonEventW3CType() : MapPropertyType(ButtonEventW3C) {}
 	};
-
-
-
 
 
 	/**< Air intake temperature in degrees celcius */
@@ -524,7 +586,7 @@ public:
 	PROPERTYTYPEBASIC(EngineOilRemaining, uint16_t)
 
 	static const Property EngineOilLifeRemaining;
-	PROPERTYTYPEBASIC(EngineOilLifeRemaining, uint8_t)
+	PROPERTYTYPEBASIC(EngineOilLifeRemaining, uint16_t)
 
 	static const Property EngineOilChangeIndicator;
 	PROPERTYTYPEBASIC(EngineOilChangeIndicator, bool)
@@ -552,14 +614,14 @@ public:
 	PROPERTYTYPEBASIC(TireTemperature, int16_t)
 
 	/**< Vehicle Power Mode.
-	 *@see Power::PowerModes
+	 *@see Power::Modes
 	 */
 	static const Property VehiclePowerMode;
-	PROPERTYTYPE(VehiclePowerMode, VehiclePowerModeType, BasicPropertyType<Power::PowerModes> ,Power::PowerModes)
+	PROPERTYTYPE(VehiclePowerMode, VehiclePowerModeType, BasicPropertyType<Power::Modes>, Power::Modes)
 	//typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
 	static const Property TripMeters;
-	PROPERTYTYPE(TripMeters, TripMetersType, ListPropertyType<BasicPropertyType<uint16_t> >, AbstractPropertyType*)
+	PROPERTYTYPE(TripMeters, TripMetersType, ListPropertyType<BasicPropertyType<uint16_t> >, uint16_t)
 	//typedef ListPropertyType<BasicPropertyType<uint16_t> > TripMetersType;
 
 	static const Property CruiseControlActive;
@@ -661,35 +723,28 @@ public:
 	PROPERTYTYPE(VehicleHeight, VehicleHeightType, BasicPropertyType<uint>, uint)
 	static const Property VehicleLength;
 	PROPERTYTYPE(VehicleLength, VehicleLengthType, BasicPropertyType<uint>, uint)
-	//typedef BasicPropertyType<uint> VehicleSizeType;
 
 	static const Property VehicleType;
 	PROPERTYTYPE(VehicleType, VehicleTypeType, BasicPropertyType<Vehicle::Type>, Vehicle::Type)
-	//typedef BasicPropertyType<Vehicle::Type> VehicleTypeType;
 
 	static const Property DoorsPerRow;
-	PROPERTYTYPE(DoorsPerRow, DoorsPerRowType, ListPropertyType<BasicPropertyType<uint16_t> >, AbstractPropertyType*)
-	//typedef ListPropertyType<BasicPropertyType<uint16_t> > DoorsPerRowType;
+	PROPERTYTYPE(DoorsPerRow, DoorsPerRowType, ListPropertyType<BasicPropertyType<uint16_t> >, uint16_t)
 
 	static const Property TransmissionGearType;
 	PROPERTYTYPE(TransmissionGearType, TransmissionGearTypeType, BasicPropertyType<Transmission::Type>, Transmission::Type)
-	//typedef BasicPropertyType<Transmission::Type> TransmissionGearTypeType;
 
 	static const Property FrontWheelRadius;
 	PROPERTYTYPE(FrontWheelRadius, FrontWheelRadiusType, BasicPropertyType<uint16_t>, uint16_t)
 	static const Property RearWheelRadius;
 	PROPERTYTYPE(RearWheelRadius, RearWheelRadiusType, BasicPropertyType<uint16_t>, uint16_t)
-//	/typedef BasicPropertyType<uint16_t> WheelRadiusType;
 
 	static const Property WheelTrack;
 	PROPERTYTYPE(WheelTrack, WheelTrackType, BasicPropertyType<uint>, uint)
-//	typedef BasicPropertyType<uint> WheelTrackType;
 
 	static const Property BrakePressure;
 	PROPERTYTYPEBASIC(BrakePressure, uint16_t)
-	//typedef BasicPropertyType<uint16_t> BrakePressureType;
 
-	/// TODO: deprecated.  remove in 0.13.  Use DistanceTotal
+	/// TODO: deprecated.  remove in 0.14.  Use DistanceTotal
 	static const Property Odometer;
 	PROPERTYTYPEBASIC(Odometer, uint)
 
@@ -705,39 +760,43 @@ public:
 	PROPERTYTYPEBASIC(TransmissionFluidLevel, uint16_t)
 
 	static const Property TransmissionOilWear;
-	PROPERTYTYPEBASIC(TransmissionOilWear, uint8_t)
+	PROPERTYTYPEBASIC(TransmissionOilWear, uint16_t)
 
 	static const Property TransmissionOilTemperature;
-	PROPERTYTYPEBASIC(TransmissionOilTemperature, int8_t)
+	PROPERTYTYPEBASIC(TransmissionOilTemperature, int16_t)
 
 	static const Property TransmissionClutchWear;
-	PROPERTYTYPEBASIC(TransmissionClutchWear, uint8_t)
+	PROPERTYTYPEBASIC(TransmissionClutchWear, uint16_t)
 
 	/**< Brake Fluid Level 0-100%.
 	 **/
 	static const Property BrakeFluidLevel;
-	PROPERTYTYPEBASIC(BrakeFluidLevel, uint8_t)
+	PROPERTYTYPEBASIC(BrakeFluidLevel, uint16_t)
 
 	/**< Washer Fluid Level 0-100%.
 	 **/
 	static const Property WasherFluidLevel;
-	PROPERTYTYPEBASIC(WasherFluidLevel, uint8_t)
+	PROPERTYTYPEBASIC(WasherFluidLevel, uint16_t)
 
 	static const Property WasherFluidLevelLow;
 	PROPERTYTYPEBASIC(WasherFluidLevelLow, bool)
 
-	/**< Securty Alert Status
-	 * status of security alert
-	 * @see Security::Status
-	 */
+	///TODO: Depreciated in 0.14.  Use AlarmStatus
 	static const Property SecurityAlertStatus;
 	PROPERTYTYPEBASIC(SecurityAlertStatus, Security::Status)
 
 	/**< Parking Brake Status
 	 * status of parking break active (true) or inactive (false)
+	 * TODO: Deprecated in 0.14.
 	 */
 	static const Property ParkingBrakeStatus;
 	PROPERTYTYPEBASIC(ParkingBrakeStatus, bool)
+
+	/*!
+	 * \brief ParkingBrakeStatusW3C use with ParkingBrake::W3C::*
+	 */
+	static const Property ParkingBrakeStatusW3C;
+	PROPERTYTYPE(ParkingBrakeStatusW3C, ParkingBrakeStatusW3CType, StringPropertyType, std::string)
 
 	/**< Parking Light Status
 	 * status of parking lights active (true) or inactive (false)
@@ -750,28 +809,39 @@ public:
 	 */
 	static const Property HazardLightStatus;
 	PROPERTYTYPEBASIC(HazardLightStatus, bool)
-	//typedef BasicPropertyType<bool> HazardLightStatusType;
 
 	static const Property AntilockBrakingSystem;
 	PROPERTYTYPEBASIC(AntilockBrakingSystem, bool)
-	//typedef BasicPropertyType<bool> AntilockBrakingSystemType;
+
+	static const Property AntilockBrakingSystemEnabled;
+	PROPERTYTYPEBASIC(AntilockBrakingSystemEnabled, bool)
 
 	static const Property TractionControlSystem;
 	PROPERTYTYPEBASIC(TractionControlSystem, bool)
-	//typedef BasicPropertyType<bool> TractionControlSystemType;
+
+	static const Property TractionControlSystemEnabled;
+	PROPERTYTYPEBASIC(TractionControlSystemEnabled, bool)
 
 	static const Property VehicleTopSpeedLimit;
 	PROPERTYTYPEBASIC(VehicleTopSpeedLimit,uint16_t)
-	//typedef BasicPropertyType<uint16_t> VehicleTopSpeedLimitType;
 
+	///TODO: Deprecated in 0.14
 	static const Property AirbagStatus;
 	PROPERTYTYPEBASIC(AirbagStatus, Airbag::Status)
 
-	/// TODO: deprecate in 0.13.  Use DoorStatusW3C
+	static const Property AirbagActivated;
+	PROPERTYTYPEBASIC(AirbagActivated, bool)
+
+	static const Property AirbagDeployed;
+	PROPERTYTYPEBASIC(AirbagDeployed, bool)
+
+	/// TODO: deprecate in 0.14.  Use DoorStatusW3C
 	static const Property DoorStatus;
 	PROPERTYTYPEBASIC(DoorStatus, Door::Status)
 
-	/** use with Door::W3C::*
+	/*!
+	 * \brief DoorStatusW3C
+	 * use with Door::W3C::*
 	 */
 	static const Property DoorStatusW3C;
 	PROPERTYTYPE(DoorStatusW3C, DoorStatusW3CType, StringPropertyType, std::string)
@@ -788,21 +858,38 @@ public:
 	static const Property WindowLockStatus;
 	PROPERTYTYPEBASIC(WindowLockStatus, bool)
 
+	///TODO Deprecated in 0.14
 	static const Property OccupantStatus;
 	PROPERTYTYPEBASIC(OccupantStatus, Seat::Occupant)
+
+	static const Property OccupantStatusW3C;
+	PROPERTYTYPE(OccupantStatusW3C, OccupantStatusW3CType, StringPropertyType, std::string)
 
 	static const Property ObstacleDistance;
 	PROPERTYTYPEBASIC(ObstacleDistance, double)
 
 	static const Property RainSensor;
 	PROPERTYTYPEBASIC(RainSensor, uint16_t)
-	//typedef BasicPropertyType<uint16_t> RainSensorType;
 
+	///TODO Deprecated in 0.14.  Use WinshieldWiperSpeed
 	static const Property WindshieldWiper;
-	PROPERTYTYPEBASIC(WindshieldWiper,Window::WiperSpeed)
-	//typedef BasicPropertyType<Window::WiperSpeed> WindshieldWiperType;
+	PROPERTYTYPEBASIC(WindshieldWiper, Window::WiperSpeed)
 
-	/// TODO: Deprecated.  Remove in 0.13
+	/*!
+	 * \brief WindshieldWiperSpeed
+	 * Use WiperSpeedSetting::W3C::* for value
+	 */
+	static const Property WindshieldWiperSpeed;
+	PROPERTYTYPE(WindshieldWiperSpeed, WindshieldWiperSpeedType, StringPropertyType, std::string)
+
+	/*!
+	 * \brief WindshieldWiperSetting
+	 * Use WiperSpeedSetting::W3C::* for value
+	 */
+	static const Property WindshieldWiperSetting;
+	PROPERTYTYPE(WindshieldWiperSetting, WindshieldWiperSettingType, StringPropertyType, std::string)
+
+	/// TODO: Deprecated.  Remove in 0.14
 	static const Property AirflowDirection;
 	PROPERTYTYPEBASIC(AirflowDirection,HVAC::AirflowDirection)
 
@@ -824,7 +911,7 @@ public:
 	static const Property Heater;
 	PROPERTYTYPEBASIC(Heater, bool)
 
-	/// TODO: deprecated. remove in 0.13
+	/// TODO: deprecated. remove in 0.14
 	static const Property Defrost;
 	PROPERTYTYPEBASIC(Defrost, bool )
 
@@ -859,7 +946,12 @@ public:
 
 	static const Property ConvertibleRoof;
 	PROPERTYTYPEBASIC(ConvertibleRoof, bool)
-	//typedef BasicPropertyType<bool> ConvertibleRoofType;
+
+	/*!
+	 * \brief ConvertibleRoofStatus use with ConvertibleRoofW3C::*
+	 */
+	static const Property ConvertibleRoofStatus;
+	PROPERTYTYPE(ConvertibleRoofStatus, ConvertibleRoofStatusType, StringPropertyType, std::string)
 
 	static const Property NightMode;
 	PROPERTYTYPEBASIC(NightMode, bool)
@@ -918,7 +1010,7 @@ public:
 	PROPERTYTYPEBASIC(PowertrainTorque, uint16_t)
 
 	static const Property AcceleratorPedalPosition;
-	PROPERTYTYPEBASIC(AcceleratorPedalPosition, uint8_t)
+	PROPERTYTYPEBASIC(AcceleratorPedalPosition, uint16_t)
 
 	static const Property Chime;
 	PROPERTYTYPEBASIC(Chime, bool)
@@ -936,7 +1028,7 @@ public:
 	PROPERTYTYPEBASIC(YawRate, int16_t)
 
 	static const Property BrakePadWear;
-	PROPERTYTYPEBASIC(BrakePadWear, uint8_t)
+	PROPERTYTYPEBASIC(BrakePadWear, uint16_t)
 
 	static const Property BrakeFluidLevelLow;
 	PROPERTYTYPEBASIC(BrakeFluidLevelLow, bool)
@@ -947,8 +1039,60 @@ public:
 	static const Property MalfunctionIndicatorOn;
 	PROPERTYTYPEBASIC(MalfunctionIndicatorOn, bool)
 
-	/** END PROPERTIES **/
+	static const Property AccumulatedEngineRuntime;
+	PROPERTYTYPEBASIC(AccumulatedEngineRuntime, uint32_t)
 
+	static const Property DistanceSinceCodeCleared;
+	PROPERTYTYPEBASIC(DistanceSinceCodeCleared, uint32_t)
+
+	static const Property DistanceWithMILOn;
+	PROPERTYTYPEBASIC(DistanceWithMILOn, uint32_t)
+
+	static const Property TimeRunMILOn;
+	PROPERTYTYPEBASIC(TimeRunMILOn, uint32_t)
+
+	static const Property TimeTroubleCodeClear;
+	PROPERTYTYPEBASIC(TimeTroubleCodeClear, uint32_t)
+
+	static const Property VehicleDriveMode;
+	PROPERTYTYPE(VehicleDriveMode, VehicleDriveModeType, StringPropertyType, std::string)
+
+	static const Property ActiveNoiseControlMode;
+	PROPERTYTYPEBASIC(ActiveNoiseControlMode, bool)
+
+	static const Property AvailableSounds;
+	PROPERTYTYPE(AvailableSounds, AvailableSoundsType, ListPropertyType<StringPropertyType>, StringPropertyType)
+
+	static const Property EngineSoundEnhancementMode;
+	PROPERTYTYPE(EngineSoundEnhancementMode, EngineSoundEnhancementModeType, StringPropertyType, std::string)
+
+	static const Property ElectronicStabilityControlEnabled;
+	PROPERTYTYPEBASIC(ElectronicStabilityControlEnabled, bool)
+
+	static const Property ElectronicStabilityControlEngaged;
+	PROPERTYTYPEBASIC(ElectronicStabilityControlEngaged, bool)
+
+	static const Property OccupantIdentificationType;
+	PROPERTYTYPE(OccupantIdentificationType, OccupantIdentificationTypeType, StringPropertyType, std::string)
+
+	static const Property OccupantName;
+	PROPERTYTYPE(OccupantName, OccupantNameType, StringPropertyType, std::string)
+
+	static const Property AtmosphericPressure;
+	PROPERTYTYPEBASIC(AtmosphericPressure, uint16_t)
+
+	static const Property LaneDepartureStatus;
+	PROPERTYTYPE(LaneDepartureStatus, LaneDepartureStatusType, StringPropertyType, std::string)
+
+	/*!
+	 * \brief AlarmStatus.  Use with Security::W3C*
+	 */
+	static const Property AlarmStatus;
+	PROPERTYTYPE(AlarmStatus, AlarmStatusType, StringPropertyType, std::string)
+
+	//static const Property Lane
+
+	/** END PROPERTIES **/
 
 	/*!
 	 * \brief capabilities
@@ -1005,4 +1149,5 @@ private:
 };
 
 #endif // VEHICLEPROPERTY_H
+
 

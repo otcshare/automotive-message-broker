@@ -72,7 +72,8 @@ picojson::value GetBasic(GVariant* value) {
 	picojson::value v;
 
 	if (type == "i") {
-		v = picojson::value(static_cast<double>(GVS<int>::value(value)));
+		int tempVal = GVS<int>::value(value);
+		v = picojson::value(static_cast<double>(tempVal));
 	} else if (type == "d") {
 		v = picojson::value(GVS<double>::value(value));
 	} else if (type == "q") {
@@ -100,21 +101,19 @@ GVariant* GetBasic(picojson::value value, const std::string& type) {
 	GVariant* v = nullptr;
 
 	if (type == "i") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (int32_t)value.get<double>());
 	} else if (type == "d") {
 		v = g_variant_new(type.c_str(), value.get<double>());
 	} else if (type == "q") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (uint16_t)value.get<double>());
 	} else if (type == "n") {
-		v = g_variant_new(type.c_str(), value.get<double>());
-	} else if (type == "y") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (int16_t)value.get<double>());
 	} else if (type == "u") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (uint32_t)value.get<double>());
 	} else if (type == "x") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (int64_t)value.get<double>());
 	} else if (type == "t") {
-		v = g_variant_new(type.c_str(), value.get<double>());
+		v = g_variant_new(type.c_str(), (uint64_t)value.get<double>());
 	} else if (type == "b") {
 		v = g_variant_new(type.c_str(), value.get<bool>());
 	} else if (type == "s") {
@@ -185,22 +184,22 @@ picojson::value::array AmbZoneToW3C(int amb_zone) {
 	picojson::value::array z;
 
 	if (amb_zone & Zone::Left) {
-		z.push_back(picojson::value("Left"));
+		z.push_back(picojson::value("left"));
 	}
 	if (amb_zone & Zone::Right) {
-		z.push_back(picojson::value("Right"));
+		z.push_back(picojson::value("right"));
 	}
 	if (amb_zone & Zone::Front) {
-		z.push_back(picojson::value("Front"));
+		z.push_back(picojson::value("front"));
 	}
 	if (amb_zone & Zone::Middle) {
-		z.push_back(picojson::value("Middle"));
+		z.push_back(picojson::value("middle"));
 	}
 	if (amb_zone & Zone::Center) {
-		z.push_back(picojson::value("Center"));
+		z.push_back(picojson::value("center"));
 	}
 	if (amb_zone & Zone::Rear) {
-		z.push_back(picojson::value("Rear"));
+		z.push_back(picojson::value("rear"));
 	}
 
 	return z;
@@ -681,6 +680,8 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 		}
 
 		GError* set_error = nullptr;
+
+		DebugOut() << "Trying to set " << attribute << " to " << itr.second.to_str() << endl;
 
 		g_dbus_proxy_call_sync(properties_proxy.get(), "Set",
 							   g_variant_new("(ssv)",

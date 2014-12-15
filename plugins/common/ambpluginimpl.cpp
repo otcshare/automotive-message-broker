@@ -81,11 +81,8 @@ AsyncPropertyReply *AmbPluginImpl::setProperty(const AsyncSetPropertyRequest& re
 	AbstractPropertyType *value = findPropertyType(request.property, request.zoneFilter);
 	if (value && request.value) {
 		DebugOut(2) << "updating property "<< request.property << " to: " << request.value->toString() << endl;
-		value->fromString(request.value->toString());
-		DebugOut(2) << "New value of property "<< request.property << " is: " << value->toString() << endl;
-		value->timestamp = amb::currentTime();
+		value->quickCopy(request.value);
 		routingEngine->updateProperty(value, uuid());
-
 		reply->success = true;
 		reply->error = AsyncPropertyReply::NoError;
 	}
@@ -101,12 +98,7 @@ AsyncPropertyReply *AmbPluginImpl::setProperty(const AsyncSetPropertyRequest& re
 
 void AmbPluginImpl::subscribeToPropertyChanges(const VehicleProperty::Property& property)
 {
-	std::list<Zone::Type> zones = getPropertyInfo(property).zones();
-	for( auto it=zones.begin(); it!=zones.end(); ++it) {
-		AbstractPropertyType *value = findPropertyType(property, *it);
-		if(value)
-			routingEngine->updateProperty(value, uuid());
-	}
+
 }
 
 PropertyList AmbPluginImpl::supported() const
@@ -168,7 +160,7 @@ std::shared_ptr<AbstractPropertyType> AmbPluginImpl::addPropertySupport(Zone::Ty
 	return propertyType;
 }
 
-PropertyInfo AmbPluginImpl::getPropertyInfo(const VehicleProperty::Property& property) const
+PropertyInfo AmbPluginImpl::getPropertyInfo(const VehicleProperty::Property & property)
 {
 	auto it = properties.find(property);
 	if(it != properties.end()) {

@@ -14,13 +14,15 @@ class IrcCommunication: public IrcSession
 {
 	Q_OBJECT
 	Q_PROPERTY(QStringList channels READ channels WRITE setChannels)
-	Q_PROPERTY(bool ssl WRITE setSsl)
+	Q_PROPERTY(bool ssl READ ssl WRITE setSsl)
 public:
 	IrcCommunication(std::map<std::string, std::string> config, QObject* parent=0);
 	QStringList channels() { return mChannels; }
 	void setChannels(QStringList c) { mChannels = c; }
 
 	void announceDequeue();
+
+	bool ssl() { return isSecure(); }
 
 public Q_SLOTS:
 	void respond(QString target, QString msg);

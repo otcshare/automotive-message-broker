@@ -201,9 +201,9 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 		BasicPropertyType<uint16_t> row2(2);
 		BasicPropertyType<uint16_t> row3(1);
 
-		temp.append(&row1);
-		temp.append(&row2);
-		temp.append(&row3);
+		temp.append(row1);
+		temp.append(row2);
+		temp.append(row3);
 
 		reply->value = &temp;
 		reply->success = true;

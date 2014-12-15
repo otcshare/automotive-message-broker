@@ -23,141 +23,20 @@
 #include "abstractsink.h"
 #include "abstractsource.h"
 #include "basedb.hpp"
+#include <asyncqueue.hpp>
 #include "listplusplus.h"
 
 #include <glib.h>
 
 #include <functional>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <unordered_map>
 
 const std::string DatabaseLogging = "DatabaseLogging";
 const std::string DatabasePlayback = "DatabasePlayback";
 const std::string DatabaseFile = "DatabaseFile";
-
-template <typename T>
-class Queue
-{
-public:
-	Queue()
-	{
-		g_mutex_init(&mutex);
-		g_cond_init(&cond);
-	}
-	virtual ~Queue()
-	{
-
-	}
-
-	int count()
-	{
-		g_mutex_lock(&mutex);
-		int ret = mQueue.count();
-		g_mutex_unlock(&mutex);
-
-		return ret;
-	}
-
-	T pop()
-	{
-		g_mutex_lock(&mutex);
-
-		while(!mQueue.size())
-		{
-			g_cond_wait(&cond, &mutex);
-		}
-
-		auto itr = mQueue.begin();
-
-		T item = *itr;
-
-		mQueue.erase(itr);
-
-		g_mutex_unlock(&mutex);
-
-		return item;
-	}
-
-	virtual void append(T item)
-	{
-		g_mutex_lock(&mutex);
-
-		g_cond_signal(&cond);
-
-		mQueue.push_back(item);
-
-		g_mutex_unlock(&mutex);
-	}
-
-protected:
-	GMutex mutex;
-	GCond cond;
-	std::vector<T> mQueue;
-};
-
-template <typename T>
-class UniqueQueue
-{
-public:
-	UniqueQueue()
-	{
-		g_mutex_init(&mutex);
-		g_cond_init(&cond);
-	}
-	virtual ~UniqueQueue()
-	{
-
-	}
-
-	int count()
-	{
-		g_mutex_lock(&mutex);
-		int ret = mQueue.count();
-		g_mutex_unlock(&mutex);
-
-		return ret;
-	}
-
-	T pop()
-	{
-		g_mutex_lock(&mutex);
-
-		while(!mQueue.size())
-		{
-			g_cond_wait(&cond, &mutex);
-		}
-
-		auto itr = mQueue.begin();
-
-		T item = (*itr);
-
-		mQueue.erase(itr);
-
-		g_mutex_unlock(&mutex);
-
-		return item;
-	}
-
-	void append(T item)
-	{
-		g_mutex_lock(&mutex);
-
-		g_cond_signal(&cond);
-
-		if(contains(mQueue, item))
-		{
-			/// remove old one.  We only want the freshest of values
-			mQueue.erase(std::find(mQueue.begin(), mQueue.end(), item));
-		}
-		mQueue.push_back(item);
-
-		g_mutex_unlock(&mutex);
-	}
-
-private:
-	GMutex mutex;
-	GCond cond;
-	std::vector<T> mQueue;
-};
 
 class DBObject {
 public:
@@ -168,6 +47,8 @@ public:
 	int32_t zone;
 	double time;
 	int32_t sequence;
+	std::string tripId;
+
 	bool quit;
 
 	bool operator ==(const DBObject & other) const
@@ -182,10 +63,40 @@ public:
 	}
 };
 
+namespace amb
+{
+
+struct DBObjectCompare
+{
+	bool operator()(DBObject const & lhs, DBObject & rhs) const
+	{
+		if (lhs == rhs)
+		{
+			return true;
+		}
+
+		return false;
+	}
+
+};
+
+}
+
+namespace std {
+  template <> struct hash<DBObject>
+  {
+	size_t operator()(const DBObject & x) const
+	{
+	  return x.key.length();
+	}
+  };
+}
+
 class Shared
 {
 public:
 	Shared()
+		:queue(true)
 	{
 		db = new BaseDB;
 	}
@@ -195,7 +106,8 @@ public:
 	}
 
 	BaseDB * db;
-	UniqueQueue<DBObject> queue;
+	amb::Queue<DBObject, amb::DBObjectCompare> queue;
+	std::string tripId;
 };
 
 class PlaybackShared
@@ -259,7 +171,7 @@ private: //methods:
 private:
 	PropertyList mSubscriptions;
 	Shared *shared;
-	GThread* thread;
+	std::thread thread;
 	//std::string databaseName;
 	std::string tablename;
 	std::string tablecreate;

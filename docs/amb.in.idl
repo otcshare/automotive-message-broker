@@ -1,5 +1,7 @@
 /*! amb.idl
-* /brief This document describes the DBus interfaces and data types for the
+* \name @PROJECT_NAME@
+* \version @PROJECT_VERSION@
+* \brief This document describes the DBus interfaces and data types for the
 * Automotive Message Broker API.  The data types are intended to as-close-as-
 * possible be compatible with the W3C vehicle <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html>data spec</a>.
 */
@@ -48,7 +50,7 @@ interface VehiclePropertyType {
   attribute Zone Zone readonly
 
   /*!
-  * \brief returns dictionary of objectName and values for data between
+  * \brief return dictionary of objectName and values for data between
   * 'beginTime' and 'endTime'
   * \arg beginTime time stamp in Seconds since Unix Epoc
   * \arg endTime time stamp in Seconds since Unix Epoc
@@ -77,7 +79,7 @@ enumeration Zone {
 interface org.automotive.Manager  {
 
   /*! List
-   *  \brief returns supported properties
+   *  \brief return supported properties
   */
   method List {
     out { String[] }
@@ -93,7 +95,7 @@ interface org.automotive.Manager  {
    *  when the last proccess that calls Find* disconnects from DBus.
    *
    *  \arg String objectName to find
-   *  \returns list of object paths that provide the given object Name.
+   *  \return list of object paths that provide the given object Name.
   */
   method FindObject {
     in {
@@ -107,10 +109,11 @@ interface org.automotive.Manager  {
   /*!
    * FindObjectForZone
    *  \brief find the DBus object path which matches "objectName" and "zone".  This has the same behavior as FindObject
-   * except that it takes an addition zone argument and only returns the path for that zone.
+   * except that it takes an addition zone argument and only return the path for that zone.
    *  \arg String property is the requested property to be retrieved.
    *  \arg Zone zone is the zone which the object
-   *  \returns string representing the DBus Object path.  Possible errors:
+   *  \return string representing the DBus Object path.  
+   *  Possible errors:
    * "org.automotive.Manager.InvalidZone"
    * "org.automotive.Manager.ObjectNotFound"
   */
@@ -128,7 +131,7 @@ interface org.automotive.Manager  {
    * ZonesForObjectName
    *  \brief get a list of zones for a given objectName.
    *  \arg String objectName object name.
-   *  \returns list of zones for the given objectName (@see Zone)
+   *  \return list of zones for the given objectName (@see Zone)
   */
   method ZonesForObjectName {
     in {
@@ -143,7 +146,7 @@ interface org.automotive.Manager  {
    * SupportsProperty
    * \brief check whether a Property exists.
    * \arg propertyName name of property of Object
-   * \returns true if Property exists
+   * \return true if Property exists
    */
   method SupportsProperty {
     in {
@@ -163,7 +166,7 @@ interface org.automotive.Manager  {
 interface org.automotive.VehicleSpeed extends VehiclePropertyType  {
 
   /*!  Speed
-   *   \brief  Must return Vehicle Speed in kilometers per hour.
+   *   \brief  MUST return Vehicle Speed in kilometers per hour.
    */
   attribute UInt16 Speed readonly
 }
@@ -175,7 +178,7 @@ interface org.automotive.VehicleSpeed extends VehiclePropertyType  {
 interface org.automotive.EngineSpeed extends VehiclePropertyType  {
 
   /*!  EngineSpeed
-   *   \brief  Must return Engine Speed in rotations per minute.
+   *   \brief  MUST return Engine Speed in rotations per minute.
    */
    attribute UInt16 Speed readonly
 }
@@ -190,7 +193,7 @@ enumeration PowerMode {
 interface org.automotive.VehiclePowerMode extends VehiclePropertyType  {
 
   /*!  VehiclePowerMode
-   *   \brief  Must return vehicle power mode
+   *   \brief  MUST return vehicle power mode
    */
   attribute PowerMode VehiclePowerMode readonly
 }
@@ -202,9 +205,9 @@ interface org.automotive.VehiclePowerMode extends VehiclePropertyType  {
 interface org.automotive.TripMeter extends VehiclePropertyType  {
 
   /*!  TripMeters
-   *   \brief  Must return trip meters.  Changing any items in the array will reset the item's value to '0'.
+   *   \brief  MUST return trip meters.  Changing any items in the array will reset the item's value to '0'.
    */
-   attribute UInt16[] TripMeters
+   attribute array TripMeters of UInt16;
 }
 
 /*! org.automotive.Acceleration
@@ -270,7 +273,7 @@ enumeration TransmissionGearType
 
 interface org.automotive.Transmission extends VehiclePropertyType  {
   /*!  GearPosition
-   *   \brief  Must return transmission gear position (see TRANSMISSIONPOSITION) Deprecated.  Replaced with Gear
+   *   \brief  MUST return transmission gear position (see TRANSMISSIONPOSITION) Deprecated.  Replaced with Gear
    */
    attribute TransmissionPosition GearPosition readonly
 
@@ -281,12 +284,12 @@ interface org.automotive.Transmission extends VehiclePropertyType  {
    attribute TransmissionGearType Type;
 
   /*!  Gear
-   *   \brief  Must return transmission gear position 1-10
+   *   \brief  MUST return transmission gear position 1-10
    */
    attribute UInt8 Gear readonly
 
   /*!  Mode
-   *   \brief  Must return transmission Mode
+   *   \brief  MUST return transmission Mode
    */
    attribute TransmissionMode Mode readonly
 }
@@ -295,17 +298,17 @@ interface org.automotive.Transmission extends VehiclePropertyType  {
 interface org.automotive.CruiseControlStatus extends VehiclePropertyType  {
 
   /*!  Activated
-   *   \brief  Must return whether or not the Cruise Control system is active (true) or inactive (false). Depricated.  Remove in 0.14.  Use "Status"
+   *   \brief  MUST return whether or not the Cruise Control system is active (true) or inactive (false). Depricated.  Remove in 0.14.  Use "Status"
    */
    attribute Boolean Activated readonly
 
   /*!  Speed
-   *   \brief  Must return target Cruise Control speed in kilometers per hour (kph).
+   *   \brief  MUST return target Cruise Control speed in kilometers per hour (kph).
    */
    attribute UInt16 Speed readonly
 
   /*!  Status
-   *   \brief  Must return whether or not the Cruise Control system is active (true) or inactive (false).
+   *   \brief  MUST return whether or not the Cruise Control system is active (true) or inactive (false).
    */
    attribute Boolean Status readonly
 }
@@ -316,7 +319,7 @@ interface org.automotive.CruiseControlStatus extends VehiclePropertyType  {
 interface org.automotive.WheelBrake extends VehiclePropertyType  {
 
   /*!  Engaged
-   *   \brief  Must return Wheel Brake status: Engaged = true, disengaged = false
+   *   \brief  MUST return Wheel Brake status: Engaged = true, disengaged = false
    */
    attribute Boolean Engaged readonly
 }
@@ -324,7 +327,7 @@ interface org.automotive.WheelBrake extends VehiclePropertyType  {
 interface org.automotive.BrakeOperation extends VehiclePropertyType  {
 
   /*!  BrakePedalDepressed
-   *   \brief  must return whether brake pedal is depressed or not. true: brake pedal is depressed, false: brake pedal is not depressed
+   *   \brief  MUST return whether brake pedal is depressed or not. true: brake pedal is depressed, false: brake pedal is not depressed
    */
    attribute Boolean BrakePedalDepressed readonly
 }
@@ -332,52 +335,52 @@ interface org.automotive.BrakeOperation extends VehiclePropertyType  {
 interface org.automotive.LightStatus extends VehiclePropertyType  {
 
   /*!  Head
-   *   \brief  Must return headlight status: on = true, off = false.
+   *   \brief  MUST return headlight status: on = true, off = false.
    */
    attribute Boolean Head
 
   /*!  RightTurn
-   *   \brief  Must return right turn signal status: on = true, off = false.
+   *   \brief  MUST return right turn signal status: on = true, off = false.
    */
    attribute Boolean RightTurn
 
   /*!  LeftTurn
-   *   \brief  Must return left turn signal status: on = true, off = false.
+   *   \brief  MUST return left turn signal status: on = true, off = false.
    */
    attribute Boolean LeftTurn
 
   /*!  Brake
-   *   \brief  Must return  brake signal light status: on = true, off = false.
+   *   \brief  MUST return  brake signal light status: on = true, off = false.
    */
    attribute Boolean Brake
 
   /*!  Fog
-   *   \brief  Must return fog light status: on = true, off = false.
+   *   \brief  MUST return fog light status: on = true, off = false.
    */
    attribute Boolean Fog
 
   /*!  Hazard
-   *   \brief  Must return hazard light status: on = true, off = false.
+   *   \brief  MUST return hazard light status: on = true, off = false.
    */
    attribute Boolean Hazard
 
   /*!  Parking
-   *   \brief  Must return parking light status: on = true, off = false.
+   *   \brief  MUST return parking light status: on = true, off = false.
    */
    attribute Boolean Parking
 
   /*!  HighBeam
-   *   \brief  Must return high beam status: on = true, off = false.
+   *   \brief  MUST return high beam status: on = true, off = false.
    */
    attribute Boolean HighBeam
 
   /*!  AutomaticHeadlights
-   *   \brief  Must return automatic headlight status: on = true, off = false.
+   *   \brief  MUST return automatic headlight status: on = true, off = false.
    */
   attribute Boolean AutomaticHeadlights
 
   /*!  DynamicHighBeam
-   *   \brief  Must return dynamic high beam status: on = true, off = false.
+   *   \brief  MUST return dynamic high beam status: on = true, off = false.
    */
   attribute Boolean DynamicHighBeam
 }
@@ -386,22 +389,22 @@ interface org.automotive.LightStatus extends VehiclePropertyType  {
 interface org.automotive.InteriorLightStatus extends VehiclePropertyType  {
 
   /*!  Passenger
-   *   \brief  Must return passenger interior light status: on = true, off = false. Deprecated.  Remove in 0.14.   Use status and zone.
+   *   \brief  MUST return passenger interior light status: on = true, off = false. Deprecated.  Remove in 0.14.   Use status and zone.
    */
    attribute Boolean Passenger readonly
 
   /*!  Driver
-   *   \brief  Must return driver interior light status: on = true, off = false. Deprecated.  Remove in 0.14.   Use status and zone.
+   *   \brief  MUST return driver interior light status: on = true, off = false. Deprecated.  Remove in 0.14.   Use status and zone.
    */
    attribute Boolean Driver readonly
 
   /*!  Center
-   *   \brief  Must return center interior light status: on = true, off = false. Deprecated.  Remove in 0.14.   Use status and zone.
+   *   \brief  MUST return center interior light status: on = true, off = false. Deprecated.  Remove in 0.14.   Use status and zone.
    */
    attribute Boolean Center readonly
 
   /*!  Status
-   *   \brief  Must return interior light status for the zone. on = true, off = false
+   *   \brief  MUST return interior light status for the zone. on = true, off = false
    */
     attribute Boolean Status
 }
@@ -410,7 +413,7 @@ interface org.automotive.InteriorLightStatus extends VehiclePropertyType  {
 interface org.automotive.Horn extends VehiclePropertyType  {
 
   /*!  On
-   *   \brief  Must return horn status: on = true, off = false
+   *   \brief  MUST return horn status: on = true, off = false
    */
    attribute Boolean On readonly
 }
@@ -419,42 +422,42 @@ interface org.automotive.Horn extends VehiclePropertyType  {
 interface org.automotive.Fuel extends VehiclePropertyType  {
 
   /*!  Level
-   *   \brief  Must return fuel level as a percentage of fullness.
+   *   \brief  MUST return fuel level as a percentage of fullness.
    */
    attribute UInt16 Level readonly
 
   /*!  Range
-   *   \brief  Must return estimated fuel range in meters.
+   *   \brief  MUST return estimated fuel range in meters.
    */
    attribute UInt32 Range readonly
 
   /*!  InstantConsumption
-   *   \brief  Must return instant fuel consumption in per distance travelled (Unit: milliliters per 100 kilometers).
+   *   \brief  MUST return instant fuel consumption in per distance travelled (Unit: milliliters per 100 kilometers).
    */
    attribute UInt32 InstantConsumption readonly
 
   /*!  InstantEconomy
-   *   \brief  Must return instant fuel 'economy' in kilometers per liter of fuel.
+   *   \brief  MUST return instant fuel 'economy' in kilometers per liter of fuel.
    */
    attribute UInt16 InstantEconomy readonly
 
   /*!  AverageEconomy
-   *   \brief  Must return average fuel 'economy' in kilometers per liter of fuel since last reset.  Setting this to any value should reset the counter to '0'
+   *   \brief  MUST return average fuel 'economy' in kilometers per liter of fuel since last reset.  Setting this to any value should reset the counter to '0'
    */
    attribute UInt16 AverageEconomy;
 
   /*!  AverageConsumption
-   *   \brief  Must return average fuel consumption in per distance travelled (Unit: milliliters per 100 kilometers). Setting this to any value should reset the counter to '0'
+   *   \brief  MUST return average fuel consumption in per distance travelled (Unit: milliliters per 100 kilometers). Setting this to any value should reset the counter to '0'
    */
    attribute UInt32 AverageConsumption;
 
   /*!  FuelConsumedSinceRestart
-   *   \brief must return fuel consumed since engine start; (Unit: milliliters per 100 kilometers) resets to 0 each restart
+   *   \brief MUST return fuel consumed since engine start; (Unit: milliliters per 100 kilometers) resets to 0 each restart
    */
    attribute UInt32 FuelConsumedSinceRestart readonly;
 
   /*!  TimeSinceRestart
-   *   \brief must  return time elapsed since vehicle restart (Unit: seconds)
+   *   \brief MUST  return time elapsed since vehicle restart (Unit: seconds)
    */
    attribute UInt32 TimeSinceRestart readonly;
 }
@@ -463,32 +466,32 @@ interface org.automotive.Fuel extends VehiclePropertyType  {
 interface org.automotive.EngineOil extends VehiclePropertyType  {
 
   /*!  Remaining
-   *   \brief Must return remaining engine oil as percentage of fullness.  Deprecated.  Remove in 0.14.  Use "Level"
+   *   \brief MUST return remaining engine oil as percentage of fullness.  Deprecated.  Remove in 0.14.  Use "Level"
    */
    attribute UInt16 Remaining readonly
 
   /*!  Temperature
-   *   \brief Must return Engine Oil Temperature in Celcius.
+   *   \brief MUST return Engine Oil Temperature in Celcius.
    */
    attribute long Temperature readonly
 
   /*!  Pressure
-   *   \brief Must return Engine Oil Pressure in kPa.
+   *   \brief MUST return Engine Oil Pressure in kPa.
    */
    attribute UInt16 Pressure readonly
 
   /*!  Level
-   *   \brief Must return engine oil level (Unit: percentage, 0%: empty, 100%: full
+   *   \brief MUST return engine oil level (Unit: percentage, 0%: empty, 100%: full
    */
    attribute UInt16 Level readonly
 
   /*!  Change
-   *   \brief Must return engine oil change indicator status: change oil (true) or no change (false)
+   *   \brief MUST return engine oil change indicator status: change oil (true) or no change (false)
    */
    attribute boolean Change readonly
 
   /*!  LifeRemaining
-   *   \brief Must return engine oil change indicator status: change oil (true) or no change (false)
+   *   \brief MUST return engine oil change indicator status: change oil (true) or no change (false)
    */
    attribute boolean LifeRemaining readonly
 
@@ -498,22 +501,22 @@ interface org.automotive.EngineOil extends VehiclePropertyType  {
 interface org.automotive.Location extends VehiclePropertyType  {
 
   /*!  Latitude
-   *   \brief  Must return latitude in Deg.Min (-180, +180)
+   *   \brief  MUST return latitude in Deg.Min (-180, +180)
    */
    attribute Double Latitude readonly
 
   /*!  Longitude
-   *   \brief  Must return longitude in Deg.Min (-90, +90)
+   *   \brief  MUST return longitude in Deg.Min (-90, +90)
    */
    attribute Double Longitude readonly
 
   /*!  Altitude
-   *   \brief  Must return altitude in meters above sea-level (0).
+   *   \brief  MUST return altitude in meters above sea-level (0).
    */
    attribute Double Altitude readonly
 
   /*!  Direction
-   *   \brief  Must return direction in Degrees  (0-360)
+   *   \brief  MUST return direction in Degrees  (0-360)
    */
    attribute UInt16 Direction readonly
 }
@@ -522,7 +525,7 @@ interface org.automotive.Location extends VehiclePropertyType  {
 interface org.automotive.ExteriorBrightness extends VehiclePropertyType  {
 
   /*!  ExteriorBrightness
-   *   \brief Must return the brightness outside the vehicle in lux.
+   *   \brief MUST return the brightness outside the vehicle in lux.
    */
    attribute UInt16 ExteriorBrightness readonly
 }
@@ -531,24 +534,24 @@ interface org.automotive.ExteriorBrightness extends VehiclePropertyType  {
 interface org.automotive.Temperature extends VehiclePropertyType  {
 
   /*!  Interior
-   *   \brief Must return the temperature of the interior of the vehicle in celcius.
+   *   \brief MUST return the temperature of the interior of the vehicle in celcius.
    */
    /// Deprecated.  Use InteriorTemperature.  Remove in 0.14
    attribute signed short Interior readonly
 
   /*!  Exterior
-   *   \brief Must return the temperature of the exterior of the vehicle in celcius.
+   *   \brief MUST return the temperature of the exterior of the vehicle in celcius.
    */
    /// Deprecated.  Use ExteriorTemperature.  Remove in 0.14
    attribute signed short Exterior readonly
 
   /*!  Interior
-   *   \brief Must return the temperature of the interior of the vehicle in celcius.
+   *   \brief MUST return the temperature of the interior of the vehicle in celcius.
    */
    attribute signed short InteriorTemperature readonly
 
   /*!  Exterior
-   *   \brief Must return the temperature of the exterior of the vehicle in celcius.
+   *   \brief MUST return the temperature of the exterior of the vehicle in celcius.
    */
    attribute signed short ExteriorTemperature readonly
 }
@@ -557,22 +560,50 @@ interface org.automotive.Temperature extends VehiclePropertyType  {
 interface org.automotive.RainSensor extends VehiclePropertyType  {
 
   /*!  RainSensor
-   *   \brief Must return level of rain intensity 0: No Rain - 10: Heaviest Rain.
+   *   \brief MUST return level of rain intensity 0: No Rain - 10: Heaviest Rain.
+   *   Deprecated in 0.14.  Use rainIntensity
    */
    attribute UInt16 RainSensor readonly
+
+  /*!  RainIntensity
+   *   \brief MUST return level of rain intensity 0: No Rain - 10: Heaviest Rain.
+   */
+   attribute UInt16 RainIntensity readonly
 }
 
 
+/// TODO: Depricated in 0.14  Use WiperStatus
 interface org.automotive.WindshieldWiper extends VehiclePropertyType  {
-  const UInt16 WIPERSPEED_OFF = 0;
-  const UInt16 WIPERSPEED_SLOWEST= 1;
-  const UInt16 WIPERSPEED_FASTEST = 5;
-  const UInt16 WIPERSPEED_AUTO = 10;
 
   /*!  WindshieldWiper
-   *   \brief Must return Level of windshield whiper speed (see WIPERSPEED)
+   *   \brief MUST return Level of windshield whiper speed (0-10)
    */
    attribute UInt16 WindshieldWiper readonly
+
+}
+
+enumeration WiperControl {
+  off = "off",
+  once = "once",
+  slowest = "slowest",
+  slow = "slow",
+  middle = "middle",
+  fast = "fast",
+  fastest = "fastest",
+  auto = "auto"
+};
+
+interface org.automotive.WiperStatus extends VehiclePropertyType  {
+
+  /*!  WiperSpeed
+   *   \brief MUST return current speed interval of wiping windshield
+   */
+   attribute WiperControl WiperSpeed readonly
+
+  /*!  WiperSetting
+   *   \brief MUST return current setting of the front wiper controller. It can be used to send user's request for changing setting.
+   */
+   attribute WiperControl WiperSetting
 }
 
 /*! Deprecated.  Use ClimateControl interface.  Remove in 0.14
@@ -584,47 +615,47 @@ interface org.automotive.HVAC extends VehiclePropertyType  {
   const UInt16 AIRFLOWDIRECTION_DEFROSTER = 0x04;
 
   /*!  AirflowDirection
-   *   \brief Must return airflow direction.  See
+   *   \brief MUST return airflow direction.  See
    */
   attribute UInt16 AirflowDirection;
 
   /*!  FanSpeed
-   *   \brief Must return speed of the fan (0-7)
+   *   \brief MUST return speed of the fan (0-7)
    */
   attribute UInt16 FanSpeed;
 
   /*!  TargetTemperature
-   *   \brief Must return target desired temperature in celcius.
+   *   \brief MUST return target desired temperature in celcius.
    */
   attribute UInt16 TargetTemperature;
 
   /*!  AirConditioning
-   *   \brief Must return air conditioning on (true) / off (false).
+   *   \brief MUST return air conditioning on (true) / off (false).
    */
   attribute Boolean AirConditioning;
 
   /*!  AirRecirculation
-   *   \brief Must return air recirculation on (true) / off (false).
+   *   \brief MUST return air recirculation on (true) / off (false).
    */
   attribute Boolean AirRecirculation;
 
   /*!  Heater
-   *   \brief Must return heater on (true) / off (false).
+   *   \brief MUST return heater on (true) / off (false).
    */
   attribute Boolean Heater;
 
   /*!  SteeringWheelHeater
-   *   \brief Must return air recirculation on (true) / off (false).
+   *   \brief MUST return air recirculation on (true) / off (false).
    */
   attribute Boolean SteeringWheelHeater;
 
   /*!  SeatHeater
-   *   \brief Must return seat heater status: 0-100%.
+   *   \brief MUST return seat heater status: 0-100%.
    */
   attribute UInt16 SeatHeater;
 
   /*!  SeatCooler
-   *   \brief Must return seat heater status: on (true) / off (false).
+   *   \brief MUST return seat heater status: on (true) / off (false).
    */
   attribute Boolean SeatCooler;
 }
@@ -639,76 +670,90 @@ enumeration AirflowDirectionType
 
 interface org.automotive.ClimateControl extends VehiclePropertyType  {
   /*!  AirflowDirection
-  *   \brief Must return current status of the direction of the air flow through the ventilation system
+  *   \brief MUST return current status of the direction of the air flow through the ventilation system
   */
   attribute AirflowDirectionType AirflowDirection;
 
   /*!  FanSpeedLevel
-  *   \brief Must return seat heater status: on (true) / off (false).
+  *   \brief MUST return seat heater status: on (true) / off (false).
   */
   attribute UInt8 FanSpeedLevel;
 
   /*!  TargetTemperature
-  *   \brief Must return current setting of the desired temperature (Unit: celsius)
+  *   \brief MUST return current setting of the desired temperature (Unit: celsius)
   */
   attribute Int8 TargetTemperature;
 
   /*!  AirConditioning
-  *   \brief Must return current status of the air conditioning system: on (true) or off (false)
+  *   \brief MUST return current status of the air conditioning system: on (true) or off (false)
   */
   attribute Boolean AirConditioning;
 
   /*!  Heater
-  *   \brief Must return current status of the heating system: on (true) or off (false)
+  *   \brief MUST return current status of the heating system: on (true) or off (false)
   */
   attribute Boolean Heater;
 
   /*!  SeatHeater
-  *   \brief Must return current status of the seat warmer ( 0: off, 1: least warm, 10: warmest )
+  *   \brief MUST return current status of the seat warmer ( 0: off, 1: least warm, 10: warmest )
   */
   attribute UInt8 SeatHeater;
 
   /*!  SeatCooler
-  *   \brief Must return current status of the seat ventilation ( 0: off, 1: least warm, 10: warmest )
+  *   \brief MUST return current status of the seat ventilation ( 0: off, 1: least warm, 10: warmest )
   */
   attribute UInt8 SeatCooler;
 
   /*!  AirRecirculation
-  *   \brief Must return current setting of air recirculation: on (true) or pulling in outside air (false).
+  *   \brief MUST return current setting of air recirculation: on (true) or pulling in outside air (false).
   */
   attribute Boolean AirRecirculation;
 
   /*!  SteeringWheelHeater
-  *   \brief Must return current status of steering wheel heater ( 0: off, 1: least warm, 10: warmest ).
+  *   \brief MUST return current status of steering wheel heater ( 0: off, 1: least warm, 10: warmest ).
   */
   attribute UInt8 SteeringWheelHeater;
 }
 
+/// Deprecated in 0.14.  Use SideWindow
 interface org.automotive.WindowStatus extends VehiclePropertyType  {
 
   /*!  Openness
-   *   \brief Must return window openness percentage (100% fully open, 0% fully closed)
+   *   \brief MUST return window openness percentage (100% fully open, 0% fully closed)
    *  for the window location see "zone" attribute
    */
   attribute UInt16 Openness;
 
   /*!  Defrost
-   *   \brief Must return the defroster status of the window. On = true, Off = false.
+   *   \brief MUST return the defroster status of the window. On = true, Off = false.
    *   Deprecated.  Use Defrost interface.  Remove in 0.14.
    */
   attribute Boolean Defrost;
 }
 
+interface org.automotive.SideWindow extends VehiclePropertyType  {
+
+  /*!  Openness
+   *   \brief MUST return window openness percentage (100% fully open, 0% fully closed)
+   */
+  attribute UInt16 Openness;
+
+  /*! Lock
+   * \brief MUST return whether or not the window is locked (true) or unlocked (false)
+   */
+  attribute Boolean Lock;
+}
+
 interface org.automotive.Defrost extends VehiclePropertyType  {
 
   /*! DefrostWindow
-   *  \brief Must return current status of the defrost switch for mirrors. It can be
+   *  \brief MUST return current status of the defrost switch for mirrors. It can be
    *  used to send user's request for changing setting.
    */
   attribute Boolean DefrostWindow;
 
   /*! DefrostMirrors
-   *  \brief Must return current status of the defrost switch for window. It can be
+   *  \brief MUST return current status of the defrost switch for window. It can be
    *  used to send user's request for changing setting.
    */
   attribute Boolean DefrostMirrors;
@@ -717,23 +762,36 @@ interface org.automotive.Defrost extends VehiclePropertyType  {
 interface org.automotive.Sunroof extends VehiclePropertyType  {
 
   /*!  Openness
-   *   \brief Must return window status for sunroof openness percentage.
+   *   \brief MUST return window status for sunroof openness percentage.
    */
   attribute UInt16 Openness;
 
   /*!  Tilt
-   *   \brief Must return tilt status for sunroof percentage.
+   *   \brief MUST return tilt status for sunroof percentage.
    */
   attribute UInt16 Tilt;
 }
 
 
-interface org.automotive.ConvertibleRoof extends VehiclePropertyType  {
+enumeration ConvertibleRoofStatus {
+    closed = "closed",
+    closing = "closing",
+    opening = "opening",
+    opened = "opened"
+};
 
-  /*!  Openness
-   *   \brief Must return convertible roof openness percentage.
+interface org.automotive.ConvertibleRoof extends VehiclePropertyType  {
+  /*!  Status
+   *   \brief MUST return current status of Convertible Roof.
+   *
    */
-   attribute UInt16 Openness;
+   attribute ConvertibleRoofStatus Status readonly;
+
+  /*!  Setting
+   *   \brief MUST return current setting of Convertible Roof.  This is used to open (true) and close (false).
+   *
+   */
+   attribute Boolean Setting;
 }
 
 
@@ -817,7 +875,7 @@ interface org.automotive.Doors extends VehiclePropertyType  {
    *   Example a common mini-van may have Doors[0] = 2 doors,
    *   Doors[1] = 1 (side door), Doors[2] = 1 (trunk).
    */
-   attribute Array<UInt16> DoorsPerRow readonly
+   attribute array DoorsPerRow of UInt16 readonly
 }
 
 
@@ -945,20 +1003,25 @@ interface org.automotive.SecurityAlert extends VehiclePropertyType  {
    attribute Boolean SecurityAlert readonly
 }
 
-/// Deprecated.  Use LightStatus.  remove in 0.14
 interface org.automotive.ParkingBrake extends VehiclePropertyType  {
 
   /*!  ParkingBrake
-   *   must return status of parking brake:  Engaged = true, Disengaged = false.
+   *   MUST return status of parking brake:  Engaged = true, Disengaged = false.
+   TODO: Deprecated in 0.14.  Use Status
    */
    attribute Boolean ParkingBrake readonly
+
+  /*!
+  * \brief MUST return the current status of parking brake.
+  */
+  attribute ParkingBrakeStatus Status;
 }
 
 /// Deprecated.  Use LightStatus.  remove in 0.14
 interface org.automotive.ParkingLight extends VehiclePropertyType  {
 
   /*!  ParkingLight
-   *   must return status of parking light:  Engaged = true, Disengaged = false.
+   *   MUST return status of parking light:  Engaged = true, Disengaged = false.
    */
    attribute Boolean ParkingLight readonly
 }
@@ -967,7 +1030,7 @@ interface org.automotive.ParkingLight extends VehiclePropertyType  {
 interface org.automotive.HazardLight extends VehiclePropertyType  {
 
   /*!  HazardLight
-   *   must return status of hazard light:  Engaged = true, Disengaged = false.
+   *   MUST return status of hazard light:  Engaged = true, Disengaged = false.
    */
    attribute Boolean HazardLight readonly
 }
@@ -977,8 +1040,19 @@ interface org.automotive.AntilockBrakingSystem extends VehiclePropertyType  {
 
   /*!  AntilockBrakingSystem
    *   \brief MUST return whether Antilock Braking System is Idle (false) or Engaged (true)
+   *   TODO: Deprecated.  Use Engaged.  Remove in 0.14
    */
    attribute Boolean AntilockBrakingSystem readonly
+
+  /*!
+  * \brief MUST return whether or not the ABS Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute Boolean Enabled readonly;
+
+  /*!
+  * \brief MUST return whether or not the ABS is engaged: engaged (true) or idle (false)
+  */
+  attribute Boolean Engaged readonly;
 }
 
 
@@ -986,15 +1060,26 @@ interface org.automotive.TractionControlSystem extends VehiclePropertyType  {
 
   /*!  TractionControlSystem
    *   \brief MUST return whether Traction Control System is Off (false) or On (true)
+   * TODO: Deprecated.  Use Engaged.  Remove in 0.14
    */
    attribute Boolean TractionControlSystem readonly
+
+  /*!
+  * \brief MUST return whether or not the TCS Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute Boolean Enabled readonly;
+
+  /*!
+  * \brief MUST return whether or not the TCS is engaged: engaged (true) or idle (false)
+  */
+  attribute Boolean Engaged readonly;
 }
 
 
 interface org.automotive.VehicleTopSpeedLimit extends VehiclePropertyType  {
 
   /*!  VehicleTopSpeedLimit
-   *   \brief MUST returns top rated speed in km/h. 0 = no limit
+   *   \brief MUST return top rated speed in km/h. 0 = no limit
    */
    attribute UInt16 VehicleTopSpeedLimit readonly
 }
@@ -1002,16 +1087,24 @@ interface org.automotive.VehicleTopSpeedLimit extends VehiclePropertyType  {
 
 interface org.automotive.AirbagStatus extends VehiclePropertyType  {
 
-  const UInt16 AIRBAGSTATUS_INACTIVE = 0;
-  const UInt16 AIRBAGSTATUS_ACTIVE = 1;
-  const UInt16 AIRBAGSTATUS_DEPLOYED = 2;
-
   /*!  AirbagStatus
-   *   \brief MUST returns Airbag status (byte) (see AIRBAGSTATUS_*)
+   *   \brief MUST return Airbag status (byte) (see AIRBAGSTATUS_*)
+   *  TODO: deprecated.  Remove in 0.14
    */
    attribute UInt16 AirbagStatus readonly
+
+  /*!
+  * \brief MUST return whether or not the airbag is activaged: activated (true) or deactivated (false)
+  */
+  attribute Boolean Activated readonly;
+
+  /*!
+  * \brief MUST return whether the airbag is deployed: deployed (true) or not (false)
+  */
+  attribute Boolean Deployed readonly;
 }
 
+/// TODO: deprecated. Remove in 0.14
 enumeration AirbagStatus {
   inactive = 0,
   active = 1,
@@ -1023,10 +1116,8 @@ enumeration AirbagStatus {
  */
 interface org.automotive.DoorStatus extends VehiclePropertyType  {
 
-
-
   /*!  DoorStatus
-   *   \brief MUST returns Door status (byte).
+   *   \brief MUST return Door status (byte).
    * CLOSED = 0
    * OPEN = 1
    * AJAR = 2
@@ -1034,15 +1125,16 @@ interface org.automotive.DoorStatus extends VehiclePropertyType  {
    attribute UInt16 DoorStatus readonly
 
   /*!  DoorLockStatus
-   *   \brief MUST returns Door status (bool locked = true, unlocked = false).
+   *   \brief MUST return Door status (bool locked = true, unlocked = false).
    */
   attribute Boolean DoorLockStatus;
 
   /*!  ChildLockStatus
-   *   \brief MUST returns Child lock status of rear doors.  active = true, inactive = false.
+   *   \brief MUST return Child lock status of rear doors.  active = true, inactive = false.
    *   Setting this to 'true' will prevent the rear doors from being opened
    *   from the inside.
    */
+   ///TODO: Deprecated in 0.14.  Use org.automotive.ChildLockStatus
   attribute Boolean ChildLockStatus;
 }
 
@@ -1055,24 +1147,24 @@ enumeration DoorStatus {
 interface org.automotive.Door extends VehiclePropertyType  {
 
   /*!  Status
-   *   \brief MUST returns Door status (byte).  See DOORSTATUS_*
+   *   \brief MUST return Door status (byte).  See DOORSTATUS_*
    */
    attribute DoorStatus Status readonly
 
   /*!  Lock
-   *   \brief MUST returns Door status (bool locked = true, unlocked = false).
+   *   \brief MUST return Door status (bool locked = true, unlocked = false).
    */
   attribute Boolean Lock;
 
   /*!  ChildLock
-   *   \brief MUST returns Child lock status of rear doors.  active = true, inactive = false.
+   *   \brief MUST return Child lock status of rear doors.  active = true, inactive = false.
    *   Setting this to 'true' will prevent the rear doors from being opened
    *   from the inside.
    */
   attribute Boolean ChildLock;
 }
 
-
+///TODO: Deprecated in 0.14.  Use org.automotive.Seat
 interface org.automotive.SeatBelt extends VehiclePropertyType  {
 
   /*! Status
@@ -1081,11 +1173,11 @@ interface org.automotive.SeatBelt extends VehiclePropertyType  {
    attribute Boolean Status readonly
 }
 
-
+///TODO: Deprecated in 0.14.  Use org.automotive.Seat
 interface org.automotive.OccupantStatus extends VehiclePropertyType  {
 
   /*!  OccupantStatus
-   *   \brief MUST returns status of Occupant (byte, see
+   *   \brief MUST return status of Occupant (byte, see
    */
    attribute UInt16 OccupantStatus readonly
 }
@@ -1094,7 +1186,7 @@ interface org.automotive.OccupantStatus extends VehiclePropertyType  {
 interface org.automotive.ObstacleDistance extends VehiclePropertyType  {
 
   /*!  ObstacleDistance
-   *   \brief MUST returns Distance Sensor distance (Double) in m.
+   *   \brief MUST return Distance Sensor distance (Double) in m.
    */
    attribute Double ObstacleDistance readonly
 }
@@ -1123,7 +1215,7 @@ interface org.automotive.DrivingMode extends VehiclePropertyType {
    attribute UInt16 DrivingMode readonly
 
   /*!
-  * \brief must return true if vehicle is in driving mode
+  * \brief MUST return true if vehicle is in driving mode
   */
    attribute Boolean Mode readonly
 }
@@ -1155,16 +1247,18 @@ interface org.automotive.MeasurementSystem extends VehiclePropertyType {
 }
 
 
+///TODO Deprecated.  Use org.automotive.Mirror.  Remove in 0.14
 interface org.automotive.MirrorSetting extends VehiclePropertyType {
 
   /*!
   * \brief MUST return
   */
-   attribute UInt16 Pan readonly
-   attribute UInt16 Tilt readonly
+   attribute UInt8 Pan readonly
+   attribute UInt8 Tilt readonly
 }
 
 
+///TODO Deprecated.  Use org.automotive.SeadAdjustment.  Remove in 0.14
 interface org.automotive.SeatPosition extends VehiclePropertyType {
 
   /*!
@@ -1221,7 +1315,7 @@ interface org.automotive.DashboardIllumination extends VehiclePropertyType {
    attribute UInt16 DashboardIllumination readonly
 }
 
-
+///TODO Deprecated.  Use org.automotive.VehicleSound. Remove in 0.14
 interface org.automotive.GeneratedVehicleSoundMode extends VehiclePropertyType {
 
   /*!
@@ -1308,7 +1402,7 @@ interface org.automotive.EngineCoolant extends VehiclePropertyType {
 interface org.automotive.PowertrainTorque extends VehiclePropertyType {
 
   /*!
-   * \brief must return powertrain torque (Unit: newton meters)
+   * \brief MUST return powertrain torque (Unit: newton meters)
    */
    attribute UInt16 Value readonly
 }
@@ -1316,7 +1410,7 @@ interface org.automotive.PowertrainTorque extends VehiclePropertyType {
 interface org.automotive.AcceleratorPedalPosition extends VehiclePropertyType {
 
   /*!
-   * \brief must  return accelerator pedal position as a percentage (Unit: percentage, 0%: released pedal, 100%: fully depressed)
+   * \brief MUST  return accelerator pedal position as a percentage (Unit: percentage, 0%: released pedal, 100%: fully depressed)
    */
    attribute UInt8 Value readonly
 }
@@ -1324,19 +1418,19 @@ interface org.automotive.AcceleratorPedalPosition extends VehiclePropertyType {
 interface org.automotive.WheelTick extends VehiclePropertyType {
 
   /*!
-   * \brief must return number of ticks per second (Unit: ticks per second)
+   * \brief MUST return number of ticks per second (Unit: ticks per second)
    */
    attribute UInt8 Value readonly
 }
 
 interface IgnitionTime : VehicleCommonDataType {
    /*!
-    * \brief must return time at ignition on
+    * \brief MUST return time at ignition on
     */
     attribute UInt64 ignitionOnTime readonly
 
     /*!
-     * \brief must return time at ignition off
+     * \brief MUST return time at ignition off
      */
      attribute UInt64 ignitionOffTime readonly
 };
@@ -1344,7 +1438,7 @@ interface IgnitionTime : VehicleCommonDataType {
 interface org.automotive.YawRate extends VehiclePropertyType {
 
   /*!
-   * \brief must return yaw rate of vehicle. (Unit: degrees per second)
+   * \brief MUST return yaw rate of vehicle. (Unit: degrees per second)
    */
    attribute Int16 Value readonly
 }
@@ -1352,12 +1446,12 @@ interface org.automotive.YawRate extends VehiclePropertyType {
 interface org.automotive.BrakeOperation extends VehiclePropertyType {
 
   /*!
-   * \brief must return whether brake pedal is depressed or not. true: brake pedal is depressed, false: brake pedal is not depressed
+   * \brief MUST return whether brake pedal is depressed or not. true: brake pedal is depressed, false: brake pedal is not depressed
    */
    attribute Boolean BrakePedalDepressed readonly
 }
 
-enum Button {
+enumeration Button {
     home = "home",
     back = "back",
     search = "search",
@@ -1375,7 +1469,7 @@ enum Button {
     down = "down"
 }
 
-enum ButtonEventType {
+enumeration ButtonEventType {
     press = "press",
     long_press = "long_press",
     release = "release"
@@ -1383,12 +1477,12 @@ enum ButtonEventType {
 
 interface VehicleButton {
     /*!
-    * \brief must return the button corresponding to the event.
+    * \brief MUST return the button corresponding to the event.
     */
     attribute Button button readonly;
 
     /*!
-    * \brief must return the type of event
+    * \brief MUST return the type of event
     */
     attribute ButtonEventType state readonly;
 }
@@ -1396,7 +1490,7 @@ interface VehicleButton {
 interface org.automotive.ButtonEvent extends VehiclePropertyType {
 
   /*!
-   * \brief must return the button events that occured. This supports multiple simultanious button events.
+   * \brief MUST return the button events that occured. This supports multiple simultanious button events.
    */
    attribute array Button of VehicleButton readonly;
 }
@@ -1404,12 +1498,12 @@ interface org.automotive.ButtonEvent extends VehiclePropertyType {
 interface org.automotive.TransmissionOil extends VehiclePropertyType {
 
   /*!
-   * \brief must return current temperature of the transmission oil(Unit: celsius).
+   * \brief MUST return current temperature of the transmission oil(Unit: celsius).
    */
    attribute Int8 Temperature readonly;
 
   /*!
-   * \brief must return transmission oil wear (Unit: percentage, 0: no wear, 100: completely worn).
+   * \brief MUST return transmission oil wear (Unit: percentage, 0: no wear, 100: completely worn).
    */
    attribute UInt8 Wear readonly;
 }
@@ -1417,7 +1511,7 @@ interface org.automotive.TransmissionOil extends VehiclePropertyType {
 interface org.automotive.TransmissionClutch extends VehiclePropertyType {
 
   /*!
-   * \brief must return transmission clutch wear (Unit: percentage, 0: no wear, 100: completely worn).
+   * \brief MUST return transmission clutch wear (Unit: percentage, 0: no wear, 100: completely worn).
    */
    attribute UInt8 Wear readonly;
 }
@@ -1425,22 +1519,22 @@ interface org.automotive.TransmissionClutch extends VehiclePropertyType {
 interface org.automotive.BrakeMaintenance extends VehiclePropertyType {
 
   /*!
-   * \brief must return brake pad wear (Unit: percentage, 0%: no wear, 100%: completely worn).
+   * \brief MUST return brake pad wear (Unit: percentage, 0%: no wear, 100%: completely worn).
    */
    attribute UInt8 PadWear readonly;
 
   /*!
-   * \brief must return brake fluid level (Unit: percentage, 0%: empty, 100%: full).
+   * \brief MUST return brake fluid level (Unit: percentage, 0%: empty, 100%: full).
    */
    attribute UInt8 FluidLevel readonly;
 
   /*!
-   * \brief must return true if brake fluid level: low (true), not low (false)
+   * \brief MUST return true if brake fluid level: low (true), not low (false)
    */
    attribute Boolean FluidLevelLow readonly;
 
   /*!
-   * \brief must return true if brakes are worn: worn (true), not worn (false)
+   * \brief MUST return true if brakes are worn: worn (true), not worn (false)
    */
    attribute Boolean BrakesWorn readonly;
 }
@@ -1448,12 +1542,12 @@ interface org.automotive.BrakeMaintenance extends VehiclePropertyType {
 interface org.automotive.WasherFluid extends VehiclePropertyType {
 
   /*!
-   * \brief must return washer fluid level (Unit: percentage, 0%: empty, 100%: full).
+   * \brief MUST return washer fluid level (Unit: percentage, 0%: empty, 100%: full).
    */
    attribute UInt8 Level readonly;
 
   /*!
-   * \brief must return true if washer fluid level is low: low (true), not low: (false)
+   * \brief MUST return true if washer fluid level is low: low (true), not low: (false)
    */
    attribute Boolean LevelLow readonly;
 }
@@ -1461,10 +1555,232 @@ interface org.automotive.WasherFluid extends VehiclePropertyType {
 interface org.automotive.MalfunctionIndicator extends VehiclePropertyType {
 
   /*!
-   * \brief must return true if washer fluid level is low: low (true), not low: (false)
+   * \brief MUST return true if washer fluid level is low: low (true), not low: (false)
    */
    attribute Boolean On readonly;
 }
 
+interface org.automotive.Diagnostic extends VehiclePropertyType {
+
+  /*!
+   * \brief MUST return engine runtime (Unit: seconds)
+   */
+   attribute UInt32 AccumulatedEngineRuntime readonly;
+
+   /*!
+    * \brief MUST return distance travelled since the codes were last cleared (Unit: meters)
+    */
+   attribute UInt32 DistanceSinceCodeCleared readonly;
+
+   /*!
+    * \brief MUST return distance travelled with the malfunction indicator light on (Unit: meters)
+    */
+   attribute UInt32 DistanceWithMILOn readonly;
+
+   /*!
+    * \brief MUST return time elapsed with the malfunction indicator light on (Unit: seconds)
+    */
+   attribute UInt32 TimeRunMILOn readonly;
+
+   /*!
+    * \brief MUST return time elapsed since the trouble codes were last cleared (Unit: seconds)
+    */
+   attribute UInt32 TimeTroubleCodeClear readonly;
 }
 
+interface org.automotive.Mirror extends VehiclePropertyType {
+
+  /*!
+   * \brief MUST return mirror pan position in percentage distance travelled, from left to right position (Unit: percentage, %0: center position, -100%: fully left, 100%: fully right)
+   */
+   attribute UInt8 MirrorPan;
+
+  /*!
+   * \brief MUST return mirror tilt position in percentage distance travelled, from downward-facing to upward-facing position (Unit: percentage, 0%:center position, -100%:fully downward, 100%:full upward)
+   */
+   attribute UInt8 MirrorTilt;
+}
+
+interface org.automotive.SeatAdjustment extends VehiclePropertyType {
+
+  /*!
+  * \brief MUST return seat back recline position as percent to completely reclined (Unit: percentage, 0%: fully forward, 100%: fully reclined)
+  */
+   attribute UInt8 ReclineSeatBack;
+
+  /*!
+  * \brief MUST return seat slide position as percentage of distance travelled away from forwardmost position (Unit: percentage, 0%: farthest forward, 100%: farthest back)
+  */
+   attribute UInt8 SeatSlide;
+
+  /*!
+  * \brief MUST return seat cushion height position as a percentage of upward distance travelled (Unit: percentage, 0%:lowest. 100%:highest)
+  */
+   attribute UInt8 SeatCushionHeight;
+
+  /*!
+  * \brief MUST return headrest position as a percentage of upward distance travelled (Unit: percentage, 0%: lowest, 100%: highest)
+  */
+   attribute UInt8 SeatHeadrest;
+
+  /*!
+  * \brief MUST return back cushion position as a percentage of lumbar curvature (Unit: percentage, 0%: flat, 100%: maximum curvature)
+  */
+   attribute UInt8 SeatBackCushion;
+
+  /*!
+  * \brief MUST return sides of back cushion position as a percentage of curvature (Unit: percentage, 0%: flat, 100%: maximum curvature)
+  */
+   attribute UInt8 SeatSideCushion;
+}
+
+enumeration DriveModeType {
+  comfort = "comfort",
+  auto = "auto",
+  sport = "sport",
+  eco = "eco",
+  manual = "manual",
+  winter = "winter"
+};
+
+interface org.automotive.DriveMode extends VehiclePropertyType {
+  /*!
+  * \brief MUST return vehicle drive mode. See http://w3c.github.io/automotive-bg/data_spec.html#idl-def-DriveModeEnum
+  */
+  attribute DriveModeType DriveMode;
+}
+
+interface org.automotive.DashboardIllumination extends VehiclePropertyType {
+  /*!
+  * \brief MUST return illumination of dashboard as a percentage (Unit: percentage, 0%: none, 100%: maximum illumination)
+  */
+  attribute UInt8 DashboardIllumination;
+}
+
+interface org.automotive.VehicleSound extends VehiclePropertyType {
+  /*!
+  * \brief MUST return active noise control status: not-activated (false), activated (true)
+  */
+  attribute Boolean ActiveNoiseControlMode;
+
+  /*!
+  * \brief MUST return active noise control status: not-activated (false), activated (true)
+  */
+  attribute Boolean EngineSoundEnhancementMode;
+
+  /*!
+  * \brief MUST return array of available sounds. See EngineSoundEnhancementMode
+  */
+  attribute array EngineSoundEnhancementMode of String readonly;
+}
+
+interface org.automotive.ElectronicStabilityControl extends VehiclePropertyType {
+  /*!
+  * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute Boolean Enabled readonly;
+
+  /*!
+  * \brief MUST return whether or not the ESC is engaged: engaged (true) or idle (false)
+  */
+  attribute Boolean Engaged readonly;
+}
+
+interface org.automotive.TopSpeedLimit extends VehiclePropertyType {
+  /*!
+  * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
+  */
+  attribute UInt16 Speed readonly;
+}
+
+interface org.automotive.ChildSafetyLock extends VehiclePropertyType {
+  /*!
+  * \brief MUST return whether or not the Child Safety Lock is locked: locked (true) or unlocked (false)
+  */
+  attribute Boolean Lock;
+}
+
+enumeration OccupantStatus {
+  adult = "adult",
+  child = "child",
+  vacant = "vacant"
+};
+
+enumeration IdentificationTypeEnum {
+  pin = "pin",
+  keyfob = "keyfob",
+  Bluetooth = "Bluetooth",
+  NFC = "NFC",
+  fingerprint = "fingerprint",
+  camera = "camera",
+  voice = "voice"
+};
+
+interface org.automotive.Seat extends VehiclePropertyType {
+  /*!
+  * \brief MUST return the status of seat occupant
+  */
+  attribute OccupantStatus Occupant;
+
+  /*!
+  * \brief MUST return whether or not the seat belt is fastened: fastened (true) or unfastened (false)
+  */
+  attribute Boolean SeatBelt;
+
+  /*!
+  * \brief MUST return occupant identifier
+  */
+  attribute String OccupantName;
+
+  /*!
+  * \brief MUST return identification type
+  */
+  attribute IdentificationTypeEnum IdentificationType;
+}
+
+interface org.automotive.AtmosphericPressure extends VehiclePropertyType {
+  /*!
+  * \brief MUST return the current atmospheric pressure outside of the vehicle (Unit: hectopascal)
+  */
+  attribute UInt16 Pressure;
+}
+
+enumeration LaneDepartureStatus {
+    off = "off",
+    pause = "pause",
+    running = "running"
+};
+
+interface org.automotive.LaneDepartureDetection extends VehiclePropertyType {
+  /*!
+  * \brief MUST return current status of Lane departure warning function.
+  */
+  attribute LaneDepartureStatus Status readonly;
+}
+
+enumeration AlarmStatus {
+    disarmed = "disarmed",
+    prearmed = "prearmed",
+    armed = "armed",
+    alarmed = "alarmed"
+};
+
+interface org.automotive.Alarm extends VehiclePropertyType {
+  /*!
+  * \brief MUST return the current status of vehicle Alarm System.
+  */
+  attribute AlarmStatus Status;
+}
+
+enumeration ParkingBrakeStatus {
+    inactive = "inactive",
+    active = "active",
+    error = "error"
+};
+
+interface org.automotive.ParkingBrake extends VehiclePropertyType {
+  /*!
+  * \brief MUST return the current status of vehicle Alarm System.
+  */
+  attribute ParkingBrakeStatus Status readonly;
+}
