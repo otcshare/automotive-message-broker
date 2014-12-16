@@ -73,7 +73,7 @@ protected:
 };
 
 
-/// TODO:  deprecate in 0.13.
+/// TODO:  deprecate in 0.14.
 class AbstractSinkManager
 {
 public:
