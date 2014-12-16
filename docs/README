@@ -6,4 +6,4 @@ cmake -Denable_docs=ON ..
 The internal AMB class and interface documentation is generated in the docs/amb folder.
 DBus API documentation is generated in the docs/dbus folder.
 
-
+Specific plugin documentation can be found in the plugin/README (ie plugins/dbus/README).
