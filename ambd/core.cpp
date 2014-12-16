@@ -501,6 +501,11 @@ void Core::handleAddSupported(const PropertyList& added, AbstractSource* source)
 	if(!source)
 		throw std::runtime_error("Core::handleAddSupported passed a null source");
 
+	if(!contains(mSources, source))
+	{
+		mSources.insert(source);
+	}
+
 	for(auto property : added)
 	{
 		if(!sourceForProperty(property, source->uuid()))
