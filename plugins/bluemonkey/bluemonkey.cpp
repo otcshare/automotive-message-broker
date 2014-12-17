@@ -127,7 +127,8 @@ AbstractPropertyType* qVariantToAbstractPropertyType(QString name, QVariant var)
 	return nullptr;
 }
 
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent): QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
+BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent)
+	: QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
 {
 	QTimer::singleShot(1,this,SLOT(reloadEngine()));
 

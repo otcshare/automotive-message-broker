@@ -25,6 +25,7 @@
 #include "basedb.hpp"
 #include <asyncqueue.hpp>
 #include "listplusplus.h"
+#include "ambpluginimpl.h"
 
 #include <glib.h>
 
@@ -136,15 +137,15 @@ PROPERTYTYPEBASIC(DatabaseLogging, bool)
 PROPERTYTYPEBASIC(DatabasePlayback, bool)
 PROPERTYTYPE(DatabaseFile, DatabaseFileType, StringPropertyType, std::string)
 
-class DatabaseSink : public AbstractSource
+class DatabaseSink : public AmbPluginImpl
 {
 
 public:
-	DatabaseSink(AbstractRoutingEngine* engine, map<string, string> config);
+	DatabaseSink(AbstractRoutingEngine* engine, map<string, string> config, AbstractSource &parent);
 	~DatabaseSink();
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType *value);
-	const std::string uuid();
+	const std::string uuid() const;
 
 	///source role:
 	virtual void getPropertyAsync(AsyncPropertyReply *reply);
@@ -153,9 +154,7 @@ public:
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	virtual PropertyList supported();
-	int supportedOperations() { return GetRanged | Get | Set;}
-
-	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
+	int supportedOperations() const { return AbstractSource::GetRanged | AbstractSource::Get | AbstractSource::Set;}
 
 private: //methods:
 
@@ -182,20 +181,6 @@ private:
 	DatabasePlaybackType playback;
 	DatabaseFileType databaseName;
 	DatabaseLoggingType databaseLogging;
-};
-
-
-class DatabaseSinkManager: public AbstractSinkManager
-{
-public:
-	DatabaseSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
-	:AbstractSinkManager(engine, config)
-	{
-		new DatabaseSink(routingEngine, config);
-		VehicleProperty::registerProperty(DatabaseLogging, [](){return new DatabaseLoggingType(false);});
-		VehicleProperty::registerProperty(DatabasePlayback, [](){return new DatabasePlaybackType(false);});
-		VehicleProperty::registerProperty(DatabaseFile, [](){return new DatabaseFileType("storage");});
-	}
 };
 
 #endif // DATABASESINK_H

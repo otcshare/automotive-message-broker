@@ -223,7 +223,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 {
 	string nameToLower = property->name();
 	boost::algorithm::to_lower<string>(nameToLower);
-	
+
 	string access;
 
 	if(property->access() == AbstractProperty::Read)
@@ -250,7 +250,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 			"	<arg type='d' name='timestamp' direction='out' />"
 			"</signal>"
 			"<property type='i' name='" + property->name() + "Sequence' access='read' />";
-	
+
 	properties[property->name()] = property;
 
 	if(!contains(mimplementedProperties, property->ambPropertyName()))
@@ -266,7 +266,7 @@ void AbstractDBusInterface::registerObject()
 	{
 		throw std::runtime_error("forgot to call setDBusConnection on AbstractDBusInterface");
 	}
-	
+
 	if(introspectionXml.empty())
 	{
 		cerr<<"no interface to export: "<<mInterfaceName<<endl;
@@ -278,11 +278,11 @@ void AbstractDBusInterface::registerObject()
 		introspectionXml += "</interface>"
 				"</node>";
 	}
-	
+
 	GError* error=NULL;
 
 	GDBusNodeInfo* introspection = g_dbus_node_info_new_for_xml(introspectionXml.c_str(), &error);
-	
+
 	if(!introspection || error)
 	{
 
@@ -312,7 +312,7 @@ void AbstractDBusInterface::registerObject()
 		DebugOut(DebugOut::Error)<<error2->message<<endl;
 		g_error_free(error2);
 	}
-	
+
 	if(regId == 0)
 	{
 		DebugOut(DebugOut::Error)<<"We failed to register on DBus"<<endl;
@@ -360,6 +360,19 @@ list<AbstractDBusInterface *> AbstractDBusInterface::interfaces()
 	for(auto itr = objectMap.begin(); itr != objectMap.end(); itr++)
 	{
 		ifaces.push_back((*itr).second);
+	}
+
+	return ifaces;
+}
+
+std::vector<std::string> AbstractDBusInterface::supportedInterfaces()
+{
+	std::vector<std::string> ifaces;
+
+	for(auto itr : objectMap)
+	{
+		if(itr.second->isSupported())
+			ifaces.push_back(itr.second->objectName());
 	}
 
 	return ifaces;

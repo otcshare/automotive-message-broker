@@ -3,15 +3,19 @@
 #include "listplusplus.h"
 #include "superptr.hpp"
 #include "uuidhelper.h"
+#include "ambplugin.h"
 
 #include <thread>
 
 int bufferLength = 100;
 int timeout=1000;
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new DatabaseSinkManager(routingengine, config);
+	auto plugin = new AmbPlugin<DatabaseSink>(routingengine, config);
+	plugin->init();
+
+	return plugin;
 }
 
 void * cbFunc(Shared* shared)
@@ -132,8 +136,8 @@ int getNextEvent(gpointer data)
 	return 0;
 }
 
-DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::string> config)
-	:AbstractSource(engine,config),shared(nullptr),playback(false),playbackShared(nullptr), playbackMultiplier(1)
+DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::string> config, AbstractSource &parent)
+	:AmbPluginImpl(engine, config, parent), shared(nullptr), playback(false), playbackShared(nullptr), playbackMultiplier(1)
 {
 	databaseName = "storage";
 	tablename = "data";
@@ -168,16 +172,16 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		parseConfig();
 	}
 
-	for(auto itr=propertiesToSubscribeTo.begin();itr!=propertiesToSubscribeTo.end();itr++)
+	for(auto itr : propertiesToSubscribeTo)
 	{
-		engine->subscribeToProperty(*itr,this);
+		engine->subscribeToProperty(itr, &parent);
 	}
 
-	mSupported.push_back(DatabaseFile);
-	mSupported.push_back(DatabaseLogging);
-	mSupported.push_back(DatabasePlayback);
+	addPropertySupport(Zone::None, [](){return new DatabaseFileType("storage");});
+	addPropertySupport(Zone::None, [](){return new DatabasePlaybackType(false);});
+	addPropertySupport(Zone::None, [](){return new DatabaseLoggingType(false);});
 
-	routingEngine->updateSupported(supported(), PropertyList(), this);
+	routingEngine->updateSupported(supported(), PropertyList(), &parent);
 
 	if(config.find("startOnLoad")!= config.end())
 	{
@@ -214,17 +218,6 @@ DatabaseSink::~DatabaseSink()
 void DatabaseSink::supportedChanged(const PropertyList &supportedProperties)
 {
 
-}
-
-PropertyList DatabaseSink::supported()
-{
-	return mSupported;
-}
-
-PropertyInfo DatabaseSink::getPropertyInfo(VehicleProperty::Property property)
-{
-	/// TODO: Compute update frequency for properties in the database
-	return PropertyInfo::invalid();
 }
 
 void DatabaseSink::parseConfig()
@@ -381,14 +374,18 @@ void DatabaseSink::setDatabaseFileName(string filename)
 
 	for(int i=0; i < supportedStr.size(); i++)
 	{
-		if(!contains(mSupported, supportedStr[i][0]))
-			mSupported.push_back(supportedStr[i][0]);
+		if(!contains(supported(), supportedStr[i][0]))
+		{
+			std::string name = supportedStr[i][0];
+			Zone::Type zone = boost::lexical_cast<int, std::string>(supportedStr[i][3]);
+			addPropertySupport(zone, [name]() { return VehicleProperty::getPropertyTypeForPropertyNameValue(name); });
+		}
 	}
 
 	delete shared;
 	shared = NULL;
 
-	routingEngine->updateSupported(mSupported, PropertyList(), this);
+	routingEngine->updateSupported(mSupported, PropertyList(), &source);
 }
 
 void DatabaseSink::propertyChanged(AbstractPropertyType *value)
@@ -398,10 +395,10 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 	if(!shared)
 		return;
 
-	if(!contains(mSupported, property))
+	if(!contains(supported(), property))
 	{
-		mSupported.push_back(property);
-		routingEngine->updateSupported(mSupported, PropertyList(), this);
+		addPropertySupport(value->zone, [property]() { return VehicleProperty::getPropertyTypeForPropertyNameValue(property);});
+		routingEngine->updateSupported(mSupported, PropertyList(), &source);
 	}
 
 	DBObject obj;
@@ -416,7 +413,7 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 }
 
 
-const string DatabaseSink::uuid()
+const std::string DatabaseSink::uuid() const
 {
 	return "9f88156e-cb92-4472-8775-9c08addf50d3";
 }
