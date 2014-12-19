@@ -21,16 +21,15 @@ void VariantType::initialize()
 	request.zoneFilter = mZoneFilter;
 
 	using namespace std::placeholders;
-	request.completed = [this](AsyncPropertyReply* reply)
+	request.completed = [this](AsyncPropertyReply* r)
 	{
+		auto reply = amb::make_unique(r);
 		if(reply->success)
 			setValue(reply->value->copy());
 		else
 			DebugOut(DebugOut::Error)<<"get request unsuccessful for "<<reply->property<<" : "<<reply->error<<endl;
 
 		mInitialized = true;
-
-		delete reply;
 	};
 
 	/// do not request if not supported:
@@ -61,15 +60,14 @@ void VariantType::fromGVariant(GVariant *val)
 	request.property = mAmbPropertyName;
 	request.value = v;
 	request.zoneFilter = mZoneFilter;
-	request.completed = [&](AsyncPropertyReply* reply)
+	request.completed = [&](AsyncPropertyReply* r)
 	{
+		auto reply = amb::make_unique(r);
 		/// TODO: throw dbus exception
 		if(!reply->success)
 		{
 			DebugOut(DebugOut::Error)<<"SetProperty fail: "<<reply->error<<endl;
 		}
-
-		delete reply;
 	};
 
 	routingEngine->setProperty(request);

@@ -282,7 +282,9 @@ public:
 
 	static int value(GVariant* v)
 	{
-		return g_variant_get_int32(v);
+		int val = 0;
+		g_variant_get(v, signature(), &val);
+		return val;
 	}
 
 	static std::string stringize(std::string v)
