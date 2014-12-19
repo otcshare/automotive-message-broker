@@ -29,14 +29,13 @@ class WebSocketSink : public AbstractSink
 {
 
 public:
-	WebSocketSink(AbstractRoutingEngine* re, libwebsocket *wsi, string uuid, VehicleProperty::Property property, std::string ambdproperty, Zone::Type zone);
+	WebSocketSink(AbstractRoutingEngine* re, libwebsocket *wsi, string uuid, VehicleProperty::Property property, std::string ambdproperty);
 	~WebSocketSink();
 	const string uuid() ;
 	void propertyChanged(AbstractPropertyType *value);
 	void supportedChanged(const PropertyList & supportedProperties);
 	PropertyList subscriptions();
 	libwebsocket *socket() { return m_wsi; }
-	Zone::Type zone() { return mZone; }
 
 private:
 	char *webSocketBuffer;
@@ -45,7 +44,6 @@ private:
 	libwebsocket *m_wsi;
 	string m_uuid;
 	string m_property;
-	Zone::Type mZone;
 };
 
 #endif // WEBSOCKETSINK_H

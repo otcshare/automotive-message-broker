@@ -12,6 +12,10 @@
   ],
   "sinks": [
     {
+       "name" : "DBusSink",
+       "path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
+    },
+    {
        "name" : "ExampleSink",
        "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
     }

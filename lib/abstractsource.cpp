@@ -31,11 +31,5 @@ AbstractSource::~AbstractSource()
 
 }
 
-PropertyInfo AbstractSource::getPropertyInfo(const VehicleProperty::Property & property)
-{
-	DebugOut(DebugOut::Error) << "getPropertyInfo is not implemented in this source plugin." << endl;
-	return PropertyInfo::invalid();
-}
-
 
 

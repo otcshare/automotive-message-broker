@@ -141,12 +141,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 {
 	databaseName = "storage";
 	tablename = "data";
-	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, zone REAL, time REAL, sequence REAL, tripId TEXT)";
-
-	if(config.find("databaseFile") != config.end())
-	{
-		setDatabaseFileName(config["databaseFile"]);
-	}
+	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, zone INTEGER, time REAL, sequence REAL, tripId TEXT)";
 
 	if(config.find("bufferLength") != config.end())
 	{
@@ -177,11 +172,9 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		engine->subscribeToProperty(itr, &parent);
 	}
 
-	addPropertySupport(Zone::None, [](){return new DatabaseFileType("storage");});
-	addPropertySupport(Zone::None, [](){return new DatabasePlaybackType(false);});
-	addPropertySupport(Zone::None, [](){return new DatabaseLoggingType(false);});
-
-	routingEngine->updateSupported(supported(), PropertyList(), &parent);
+	addPropertySupport(Zone::None, [](){ return new DatabaseFileType("storage"); });
+	addPropertySupport(Zone::None, [](){ return new DatabasePlaybackType(false); });
+	addPropertySupport(Zone::None, [](){ return new DatabaseLoggingType(false); });
 
 	if(config.find("startOnLoad")!= config.end())
 	{
@@ -197,8 +190,6 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	{
 		setPlayback(config["playbackOnLoad"] == "true");
 	}
-
-
 }
 
 DatabaseSink::~DatabaseSink()
@@ -327,7 +318,7 @@ void DatabaseSink::startPlayback()
 		obj.key = results[i][0];
 		obj.value = results[i][1];
 		obj.source = results[i][2];
-		obj.zone = boost::lexical_cast<double>(results[i][3]);
+		obj.zone = boost::lexical_cast<int>(results[i][3]);
 		obj.time = boost::lexical_cast<double>(results[i][4]);
 		obj.sequence = boost::lexical_cast<double>(results[i][5]);
 
@@ -370,14 +361,19 @@ void DatabaseSink::setDatabaseFileName(string filename)
 
 	initDb();
 
-	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key FROM "+tablename);
+	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key, zone FROM "+tablename);
 
 	for(int i=0; i < supportedStr.size(); i++)
 	{
-		if(!contains(supported(), supportedStr[i][0]))
+		std::string name = supportedStr[i][0];
+
+		if(!contains(supported(), name))
 		{
-			std::string name = supportedStr[i][0];
-			Zone::Type zone = boost::lexical_cast<int, std::string>(supportedStr[i][3]);
+			std::string zoneStr = supportedStr[i][1];
+
+			DebugOut() << "adding property " << name << " in zone: " << zoneStr << endl;
+
+			Zone::Type zone = boost::lexical_cast<Zone::Type>(zoneStr);
 			addPropertySupport(zone, [name]() { return VehicleProperty::getPropertyTypeForPropertyNameValue(name); });
 		}
 	}
@@ -385,7 +381,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 	delete shared;
 	shared = NULL;
 
-	routingEngine->updateSupported(mSupported, PropertyList(), &source);
+	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
 
 void DatabaseSink::propertyChanged(AbstractPropertyType *value)
@@ -398,7 +394,7 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 	if(!contains(supported(), property))
 	{
 		addPropertySupport(value->zone, [property]() { return VehicleProperty::getPropertyTypeForPropertyNameValue(property);});
-		routingEngine->updateSupported(mSupported, PropertyList(), &source);
+		routingEngine->updateSupported(supported(), PropertyList(), &source);
 	}
 
 	DBObject obj;
@@ -416,6 +412,16 @@ void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 const std::string DatabaseSink::uuid() const
 {
 	return "9f88156e-cb92-4472-8775-9c08addf50d3";
+}
+
+void DatabaseSink::init()
+{
+	if(configuration.find("databaseFile") != configuration.end())
+	{
+		setDatabaseFileName(configuration["databaseFile"]);
+	}
+
+	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
 
 void DatabaseSink::getPropertyAsync(AsyncPropertyReply *reply)
@@ -591,3 +597,4 @@ void DatabaseSink::subscribeToPropertyChanges(VehicleProperty::Property )
 void DatabaseSink::unsubscribeToPropertyChanges(VehicleProperty::Property )
 {
 }
+

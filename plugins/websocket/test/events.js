@@ -17,14 +17,13 @@ function VehicleEventType()
 "AirRecirculation",
 "AirflowDirection",
 "AvgKW",
-"BatteryStatus",
+"BatteryVoltage",
 "ChildLock",
 "Defrost",
 "ExteriorBrightness",
 "ExteriorTemperature",
 "FanSpeed",
 "FrontWheelRadius",
-"FullBatteryRange",
 "InteriorTemperature",
 "LightHazard",
 "LightHead",
@@ -50,7 +49,7 @@ function VehicleEventType()
 VehicleEventType.prototype.getSupportedEventList = function(val)
 {
     /* for undefined just assume everything */
-    if((val == undefined)||(val === ""))
+    if((val === undefined)||(val === ""))
         return this.event;
 
     /* grab every event with case insensitive prefix of val */

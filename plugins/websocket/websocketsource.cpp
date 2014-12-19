@@ -51,7 +51,7 @@ class UniquePropertyCache
 public:
 	bool hasProperty(std::string name, std::string source, Zone::Type zone)
 	{
-		for(auto i : properties)
+		for(auto i : mProperties)
 		{
 			if(i->name == name &&
 					i->sourceUuid == source &&
@@ -63,9 +63,9 @@ public:
 		return false;
 	}
 
-	std::shared_ptr<AbstractPropertyType> append(std::string name, std::string source, Zone::Type zone)
+	std::shared_ptr<AbstractPropertyType> append(std::string name, std::string source, Zone::Type zone, std::string type)
 	{
-		for(auto i : properties)
+		for(auto i : mProperties)
 		{
 			if(i->name == name &&
 					i->sourceUuid == source &&
@@ -79,20 +79,55 @@ public:
 
 		if(!t)
 		{
-			throw std::runtime_error(name + "name is not a known type");
+			VehicleProperty::registerProperty(name, [name, type]() -> AbstractPropertyType* {
+				if(type == amb::BasicTypes::UInt16Str)
+				{
+					return new BasicPropertyType<uint16_t>(name, 0);
+				}
+				else if(type == amb::BasicTypes::Int16Str)
+				{
+					return new BasicPropertyType<int16_t>(name, 0);
+				}
+				else if(type == amb::BasicTypes::UInt32Str)
+				{
+					return new BasicPropertyType<uint32_t>(name, 0);
+				}
+				else if(type == amb::BasicTypes::Int32Str)
+				{
+					return new BasicPropertyType<int32_t>(name, 0);
+				}
+				else if(type == amb::BasicTypes::StringStr)
+				{
+					return new StringPropertyType(name);
+				}
+				else if(type == amb::BasicTypes::DoubleStr)
+				{
+					return new BasicPropertyType<double>(name, 0);
+				}
+				else if(type == amb::BasicTypes::BooleanStr)
+				{
+					return new BasicPropertyType<bool>(name, false);
+				}
+				DebugOut(DebugOut::Warning) << "Unknown or unsupported type: " << type << endl;
+				return nullptr;
+			});
+			t = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
 		}
 
-		t->sourceUuid = source;
-		t->zone = zone;
+		if(t)/// check again to see if registration succeeded
+		{
+			t->sourceUuid = source;
+			t->zone = zone;
 
-		properties.emplace_back(t);
+			mProperties.emplace_back(t);
+		}
 
-		return property(name, source, zone);
+		return property(name, source, zone); /// will return nullptr if t didn't register
 	}
 
 	std::shared_ptr<AbstractPropertyType> property(std::string name, std::string source, Zone::Type zone)
 	{
-		for(auto i : properties)
+		for(auto i : mProperties)
 		{
 			if(i->name == name &&
 					i->sourceUuid == source &&
@@ -105,8 +140,10 @@ public:
 		return nullptr;
 	}
 
+	std::vector<std::shared_ptr<AbstractPropertyType>> properties() { return mProperties; }
+
 private:
-	std::vector<std::shared_ptr<AbstractPropertyType>> properties;
+	std::vector<std::shared_ptr<AbstractPropertyType>> mProperties;
 };
 
 UniquePropertyCache properties;
@@ -144,20 +181,10 @@ void WebSocketSource::checkSubscriptions()
 
 		reply["type"] = "method";
 		reply["name"] = "subscribe";
-		reply["data"] = prop.c_str();
+		reply["property"] = prop.c_str();
 		reply["transactionid"] = "d293f670-f0b3-11e1-aff1-0800200c9a66";
 
-		QByteArray replystr;
-
-		if(doBinary)
-			replystr = QJsonDocument::fromVariant(reply).toBinaryData();
-		else
-		{
-			replystr = QJsonDocument::fromVariant(reply).toJson();
-			cleanJson(replystr);
-		}
-
-		lwsWrite(clientsocket, replystr, replystr.length());
+		lwsWriteVariant(clientsocket, reply);
 	}
 }
 void WebSocketSource::setConfiguration(map<string, string> config)
@@ -205,14 +232,21 @@ void WebSocketSource::setConfiguration(map<string, string> config)
 		sslval = 2;
 	}
 
-	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, sslval,"/", "localhost", "websocket",protocols[0].name, -1);
-
-
+	clientsocket = libwebsocket_client_connect(context, ip.c_str(), port, sslval,"/", "localhost", "websocket", protocols[0].name, -1);
 }
 
-PropertyInfo WebSocketSource::getPropertyInfo(VehicleProperty::Property property)
+PropertyInfo WebSocketSource::getPropertyInfo(const VehicleProperty::Property &property)
 {
-	return PropertyInfo::invalid();
+	Zone::ZoneList zones;
+	for(auto i : properties.properties())
+	{
+		if(i->name == property)
+		{
+			zones.push_back(i->zone);
+		}
+	}
+
+	return PropertyInfo(0, zones);
 }
 
 bool gioPollingFunc(GIOChannel *source, GIOCondition condition, gpointer data)
@@ -310,26 +344,16 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 
 			QVariantMap toSend;
 			toSend["type"] = "method";
-			toSend["name"] = "getSupportedEventTypes";
+			toSend["name"] = "getSupported";
 			toSend["transactionid"] = amb::createUuid().c_str();
 
-			QByteArray replystr;
-
-			if(doBinary)
-				replystr = QJsonDocument::fromVariant(toSend).toBinaryData();
-			else
-			{
-				replystr = QJsonDocument::fromVariant(toSend).toJson();
-				cleanJson(replystr);
-			}
-
-			lwsWrite(wsi, replystr, replystr.length());
+			lwsWriteVariant(wsi, toSend);
 
 			break;
 		}
 		case LWS_CALLBACK_CLIENT_RECEIVE:
 		{
-			QByteArray d((char*)in,len);
+			QByteArray d((char*)in, len);
 
 			WebSocketSource * manager = source;
 
@@ -357,7 +381,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 
 			if(doc.isNull())
 			{
-				DebugOut(DebugOut::Error)<<"Invalid message"<<endl;
+				DebugOut(DebugOut::Warning)<<"Invalid message"<<endl;
 				break;
 			}
 
@@ -384,18 +408,26 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 				double timestamp = data["timestamp"].toDouble();
 				int sequence = data["sequence"].toInt();
 				Zone::Type zone = data["zone"].toInt();
+				string type = data["type"].toString().toStdString();
 
 				DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Value changed:" << name << value << endl;
 
 				try
 				{
-					auto type = properties.append(name, source->uuid(), zone);
+					auto property = properties.append(name, source->uuid(), zone, type);
 
-					type->timestamp = timestamp;
-					type->sequence = sequence;
-					type->fromString(value);
+					if(!property)
+					{
+						DebugOut(DebugOut::Warning) << "We either don't have this or don't support it ("
+													<< name << "," << zone << "," << type << ")" << endl;
+					}
 
-					m_re->updateProperty(type.get(), source->uuid());
+					property->timestamp = timestamp;
+					property->sequence = sequence;
+					property->fromString(value);
+
+					m_re->updateProperty(property.get(), source->uuid());
+
 					double currenttime = amb::currentTime();
 
 					/** This is now the latency between when something is available to read on the socket, until
@@ -403,12 +435,12 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 					 *  JSON parsing in this section.
 					 */
 
-					DebugOut(2)<<"websocket network + parse latency: "<<(currenttime - type->timestamp)*1000<<"ms"<<endl;
+					DebugOut()<<"websocket network + parse latency: "<<(currenttime - property->timestamp)*1000<<"ms"<<endl;
 					totalTime += (currenttime - oldTimestamp)*1000;
 					numUpdates ++;
 					averageLatency = totalTime / numUpdates;
 
-					DebugOut(2)<<"Average parse latency: "<<averageLatency<<endl;
+					DebugOut()<<"Average parse latency: "<<averageLatency<<endl;
 				}
 				catch (exception ex)
 				{
@@ -418,23 +450,29 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 			}
 			else if (type == "methodReply")
 			{
-				if (name == "getSupportedEventTypes")
+				if (name == "getSupported" || name == "supportedChanged")
 				{
 
 					QVariant data = call["data"];
 
-					QStringList supported = data.toStringList();
+					QVariantList supported = data.toList();
 
-					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupportedEventTypes request"<<endl;
-					PropertyList props;
+					DebugOut() << __SMALLFILE__ <<":"<< __LINE__ << "Got getSupported request"<<endl;
 
-					Q_FOREACH(QString p, supported)
+
+					Q_FOREACH(QVariant p, supported)
 					{
-						props.push_back(p.toStdString());
+						QVariantMap d = p.toMap();
+						Zone::Type zone = d["zone"].toInt();
+						std::string name = d["name"].toString().toStdString();
+						std::string proptype = d["type"].toString().toStdString();
+						std::string source = d["source"].toString().toStdString();
+
+						properties.append(name, source, zone, proptype);
 					}
 
-					source->setSupported(props);
-					//m_re->updateSupported(m_supportedProperties,PropertyList());
+					source->updateSupported();
+
 				}
 				else if (name == "getRanged")
 				{
@@ -451,7 +489,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 						double timestamp = obj["timestamp"].toDouble();
 						int sequence = obj["sequence"].toInt();
 
-						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name,value);
+						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name, value);
 						type->timestamp = timestamp;
 						type->sequence = sequence;
 
@@ -540,11 +578,16 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 		return 0;
 	}
 }
-void WebSocketSource::setSupported(PropertyList list)
+void WebSocketSource::updateSupported()
 {
-	DebugOut() <<__SMALLFILE__ << ":" << __LINE__ <<" "<< __FUNCTION__ <<endl;
-	m_supportedProperties = list;
-	m_re->updateSupported(list,PropertyList(),this);
+	PropertyList list;
+	for(auto i : properties.properties())
+	{
+		if(!contains(list, i->name))
+			list.push_back(i->name);
+	}
+
+	m_re->updateSupported(list, PropertyList(), this);
 }
 
 WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config), partialMessageIndex(0),expectedMessageFrames(0)
@@ -578,7 +621,12 @@ WebSocketSource::WebSocketSource(AbstractRoutingEngine *re, map<string, string> 
 }
 PropertyList WebSocketSource::supported()
 {
-	return m_supportedProperties;
+	PropertyList list;
+	for(auto i : properties.properties())
+	{
+		list.push_back(i->name);
+	}
+	return list;
 }
 
 int WebSocketSource::supportedOperations()
@@ -629,17 +677,7 @@ void WebSocketSource::getPropertyAsync(AsyncPropertyReply *reply)
 	replyvar["data"] = data;
 	replyvar["transactionid"] = uuid.c_str();
 
-	QByteArray replystr;
-
-	if(doBinary)
-		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
-	else
-	{
-		replystr = QJsonDocument::fromVariant(replyvar).toJson();
-		cleanJson(replystr);
-	}
-
-	lwsWrite(clientsocket, replystr, replystr.length());
+	lwsWriteVariant(clientsocket, replyvar);
 }
 
 void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -671,17 +709,7 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	replyvar["data"] = properties;
 
-	QByteArray replystr;
-
-	if(doBinary)
-		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
-	else
-	{
-		replystr = QJsonDocument::fromVariant(replyvar).toJson();
-		cleanJson(replystr);
-	}
-
-	lwsWrite(clientsocket, replystr, replystr.length());
+	lwsWriteVariant(clientsocket, replyvar);
 }
 
 AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest request )
@@ -700,17 +728,7 @@ AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest reque
 	replyvar["data"] = data;
 	replyvar["transactionid"] = amb::createUuid().c_str();
 
-	QByteArray replystr;
-
-	if(doBinary)
-		replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
-	else
-	{
-		replystr = QJsonDocument::fromVariant(replyvar).toJson();
-		cleanJson(replystr);
-	}
-
-	lwsWrite(clientsocket, replystr, replystr.length());
+	lwsWriteVariant(clientsocket, replyvar);
 
 	///TODO: we should actually wait for a response before we simply complete the call
 	reply->success = true;

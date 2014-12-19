@@ -270,6 +270,14 @@ int MurphySource::connectToMurphy()
 	return 0;
 }
 
+PropertyInfo MurphySource::getPropertyInfo(const VehicleProperty::Property &property)
+{
+	Zone::ZoneList zones;
+	zones.push_back(murphyProperties[property]->zone);
+
+	return PropertyInfo(0, zones);
+}
+
 
 MurphySource::MurphySource(AbstractRoutingEngine *re, map<string, string> config) : AbstractSource(re, config)
 {

@@ -147,13 +147,14 @@ public:
 	virtual void propertyChanged(AbstractPropertyType *value);
 	const std::string uuid() const;
 
+	void init();
+
 	///source role:
 	virtual void getPropertyAsync(AsyncPropertyReply *reply);
 	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
-	virtual PropertyList supported();
 	int supportedOperations() const { return AbstractSource::GetRanged | AbstractSource::Get | AbstractSource::Set;}
 
 private: //methods:
@@ -175,7 +176,6 @@ private:
 	std::string tablename;
 	std::string tablecreate;
 	std::list<VehicleProperty::Property> propertiesToSubscribeTo;
-	PropertyList mSupported;
 	PlaybackShared* playbackShared;
 	uint playbackMultiplier;
 	DatabasePlaybackType playback;

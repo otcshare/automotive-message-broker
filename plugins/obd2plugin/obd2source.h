@@ -152,6 +152,8 @@ public:
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	PropertyList supported();
 
+	PropertyInfo getPropertyInfo(const VehicleProperty::Property &property);
+
 	int supportedOperations();
 
 	PropertyList queuedRequests;

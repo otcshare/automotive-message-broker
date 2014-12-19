@@ -63,7 +63,7 @@ static const Zone::Type MiddleLeft;
 static const Zone::Type RearRight;
 static const Zone::Type RearLeft;
 
-typedef std::list<Zone::Type> ZoneList;
+typedef std::vector<Zone::Type> ZoneList;
 
 };
 
@@ -220,6 +220,22 @@ public:
 	boost::any anyValue()
 	{
 		return mValue;
+	}
+
+	/*!
+	 * \brief signature
+	 * \return gvariant signature
+	 */
+	virtual const string signature()
+	{
+		auto var = amb::make_super(toVariant());
+		if(!var) return "";
+
+		const string s = g_variant_get_type_string(var.get());
+
+		DebugOut() << "returning signature: " << s << " for "<< name << endl;
+
+		return s;
 	}
 
 	/**

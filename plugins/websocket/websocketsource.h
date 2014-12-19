@@ -48,11 +48,10 @@ public:
 	void checkSubscriptions();
 	PropertyList activeRequests;
 	PropertyList removeRequests;
-	void setSupported(PropertyList list);
+	void updateSupported();
 	void supportedChanged(const PropertyList &) {}
 	void setConfiguration(std::map<std::string, std::string> config);
-	//map<VehicleProperty::Property,AsyncPropertyReply*> propertyReplyMap;
-	//map<VehicleProperty::Property,AsyncRangePropertyReply*> rangedPropertyReplyMap;
+
 	std::map<std::string,AsyncPropertyReply*> uuidReplyMap;
 	std::map<std::string,double> uuidTimeoutMap;
 	std::map<std::string, AsyncRangePropertyReply*> uuidRangedReplyMap;
@@ -61,11 +60,7 @@ public:
 	QByteArray incompleteMessage;
 	int expectedMessageFrames;
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property property);
-
-private:
-	PropertyList m_supportedProperties;
-
+	PropertyInfo getPropertyInfo(const VehicleProperty::Property & property);
 };
 
 #endif // WEBSOCKETSOURCE_H

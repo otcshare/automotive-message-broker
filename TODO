@@ -1,9 +1,6 @@
 
 - Refactor obd2 plugin with AsyncQueue.  Use thread safe-update property.
-- Rewrite websocket test html
-- update json protocol to include getPropertyInfo calls
 - update json protocol to support rangerequests with PropertyList instead of a signel property (Verify)
-- update json protocol to support zones
 - update database to support zone column 
 - general support for source and zone filtering in database plugin
 - no reason for pluginloader to track sources.  core already does it.
