@@ -201,7 +201,7 @@ static void handleMethodCall(GDBusConnection       *connection,
 	
 	else if(method == "List")
 	{
-		std::list<AbstractDBusInterface*> list = AbstractDBusInterface::interfaces();
+		std::vector<std::string> list = AbstractDBusInterface::supportedInterfaces();
 
 		if(!list.size())
 		{
@@ -212,17 +212,10 @@ static void handleMethodCall(GDBusConnection       *connection,
 		GVariantBuilder builder;
 		g_variant_builder_init(&builder, G_VARIANT_TYPE_ARRAY);
 
-
-		for(auto itr = list.begin(); itr != list.end(); itr++)
+		for(auto objectName : list)
 		{
-			if(!(*itr)->isSupported())
-				continue;
-
-			std::string objectName = (*itr)->objectName();
-
 			g_variant_builder_add(&builder, "s", objectName.c_str());
 		}
-
 
 		g_dbus_method_invocation_return_value(invocation,g_variant_new("(as)",&builder));
 	}
