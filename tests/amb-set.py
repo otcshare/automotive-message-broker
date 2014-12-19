@@ -16,24 +16,23 @@ args = parser.parse_args()
 objectName = args.objectName
 propertyToSet = args.property
 value = args.value
-valueType = args.valueType
+valueType = args.valueType.lower()
 zone = int(args.zone)
 
 realValue = 0
 
-print "valueType: " + valueType
-
 if valueType == "boolean":
   realValue = value == "true"
 elif valueType == "integer":
-  realValue = int(value)
+  realValue = dbus.Int32(value)
 elif valueType == "string":
   realValue = value
 elif valueType == "double":
   realValue = double(value)
 elif valueType == "UInt16":
-  print "can has UInt16!!!"
   realValue = dbus.UInt16(value)
+else:
+  raise Exception("Unknown type: " + valueType)
 
 bus = dbus.SystemBus()
 managerObject = bus.get_object("org.automotive.message.broker", "/");
