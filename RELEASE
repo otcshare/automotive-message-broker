@@ -10,8 +10,12 @@ New features:
 Changes:
 - OpenCV plugin experimental options for cuda and kinect are removed
 - Removed unmaintained plugins: tpms, websocket{sink,source}
+- AbstractSource::getPropertyInfo() is now mandatory
+- [websocket plugin] protocol changes: getSupportedEventTypes is getSupported.  'data' changed type to array of objects
+  instead of array of strings.  See plugins/websocket/protocol
 
 Fixes:
 - [DBus plugin] Fix exporting properties in zones that really don't have support
 - [xwalk extension] fixed set() for some types did not work because of invalid GVariant creation.
 - [websocket plugin] Updated html test page.  Fixed protocol usage.
+- [websocket plugin] Source zones properly supported

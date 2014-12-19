@@ -395,7 +395,7 @@ void ExampleSourcePlugin::addPropertySupport(VehicleProperty::Property property,
 {
 	mSupported.push_back(property);
 
-	std::list<Zone::Type> zones;
+	Zone::ZoneList zones;
 
 	zones.push_back(zone);
 

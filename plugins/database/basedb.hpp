@@ -12,7 +12,7 @@
  * more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 
+ * this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  *
  */
@@ -52,50 +52,50 @@ class BaseDB
 public:
 	BaseDB():db(NULL),q(NULL)
 	{
-		
+
 	}
-	
-	
+
+
 	virtual ~BaseDB()
 	{
 		DebugOut()<<"BaseDB: Destroying db object. Table: "<<table<<endl;
 		delete q;
 		delete db;
 	}
-	
+
 	void setTable(string tablename)
 	{
 		if(tablename == "") return;
 		table = tablename;
-		
+
 		if(!tableExists())
 			reloadTable();
 	}
-	
+
 	virtual void
 	init(string dbname, string tablename, string tablestring)
 	{
 		DebugOut()<<"BaseDB: Initializing db object. Table: "<<tablename.c_str()<<endl;
 		tableString = tablestring;
-		
+
 		db = new sqlitedatabase();
-		
+
 		db->init(dbname);
-		
+
 		DebugOut()<<"BaseDB: Using db/db-file: "<<dbname.c_str()<<endl;
-		
+
 		if(! db->Connected())
 		{
 			DebugOut(0)<<"BaseDB: database not found "<<dbname<<endl;
 			throw -1;
 		}
 		q = new sqlitequery();
-		
+
 		q->init(db);
 
 		setTable(tablename);
 	}
-	
+
 	virtual void
 	reloadTable()
 	{
@@ -103,7 +103,7 @@ public:
 		dropTable();
 		createTable();
 	}
-	
+
 	virtual bool tableExists()
 	{
 		bool exists=false;
@@ -119,7 +119,7 @@ public:
 		q->freeResult();
 		return exists;
 	}
-	
+
 	virtual void
 	renameTable(string newname)
 	{
@@ -127,7 +127,7 @@ public:
 		string query = "ALTER TABLE "+table+" RENAME TO "+newname;
 		q->execute(query);
 	}
-	
+
 	template<typename T>
 	void insert(DictionaryList<T> params)
 	{
@@ -142,7 +142,7 @@ public:
 			endquery<<"'"<<fixInvalids(tempval.str())<<"'";
 			if(i < params.size()-1)
 			{
-				query+=",";	
+				query+=",";
 				endquery<<",";
 			}
 		}
@@ -151,7 +151,7 @@ public:
 		DebugOut()<<"BaseDB: "<<query<<endl;
 		q->execute(query);
 	}
-	
+
 	template<typename T>
 	void
 	insert(NameValuePair<T> param)
@@ -168,13 +168,13 @@ public:
 		DebugOut()<<"BaseDB: "<<query<<endl;
 		q->execute(query);
 	}
-	
+
 	virtual void
 	insert(DictionaryList<string> params)
 	{
 		insert<string>(params);
 	}
-	
+
 	template<typename T, typename TT, typename T3>
 	void
 	update(T col, TT colval, NameValuePair<T3> qualifier)
@@ -187,17 +187,17 @@ public:
 		query << "UPDATE "<< table <<
 			" SET `"<<col<<"` = '"<<fixInvalids(tempcolval.str())<<
 			"' WHERE `"<<fixInvalids(qualifier.name)<<"` = '"<<fixInvalids(tempval.str())<<"'";
-		printf("BaseDB: Update: %s",query.str().c_str());
+		DebugOut() << "BaseDB: Update: " << query.str() << endl;
 		q->execute(query.str());
 	}
-	
+
 	template<typename T, typename TT>
-	void 
+	void
 	update(NameValuePair<T> param, NameValuePair<TT> qualifier)
 	{
 		update<string,T,TT>(param.name, param.value, qualifier);
 	}
-	
+
 	template<typename T, typename TT>
 	void
 	update(DictionaryList<T> params, NameValuePair<TT> qualifier)
@@ -207,12 +207,12 @@ public:
 			update<T,TT>(params[i],qualifier);
 		}
 	}
-	
+
 	virtual void update(NameValuePair<string> param, NameValuePair<string> qualifier)
 	{
 		update<string,string>(param,qualifier);
 	}
-	
+
 	template<typename T>
 	void deleteRow(NameValuePair<T> qualifier)
 	{
@@ -221,30 +221,30 @@ public:
 		tempval<<qualifier.value;
 		query << "DELETE FROM "<< table<<
 				" WHERE `"<<qualifier.name<<"` = '"<<fixInvalids(tempval.str())<<"'";
-		printf("BaseDB: %s: %s",__FUNCTION__, query.str().c_str());
+		DebugOut() << "BaseDB: " << __FUNCTION__ << " : " << query.str() << endl;
 		q->execute(query.str());
 	}
-	
-	virtual void 
+
+	virtual void
 	deleteRow(NameValuePair<string> qualifier)
 	{
 		deleteRow<string>(qualifier);
 	}
-	
+
 	virtual void
 	dropTable()
 	{
 		dropTable(table);
 	}
-	
+
 	virtual void
 	dropTable(string tablename)
 	{
 		string query="DROP TABLE IF EXISTS "+tablename;
-		printf("BaseDB: Dropping Table %s with query:? %s",tablename.c_str(),query.c_str());
+		DebugOut() << "BaseDB: Dropping Table " << tablename <<" with query: " << query << endl;
 		q->execute(query);
 	}
-	
+
 	virtual void
 	createTable()
 	{
@@ -253,18 +253,18 @@ public:
 		string::size_type i=t.find("%s",0);
 		if(i!=string::npos) query=t.replace(i, 2, table);
 		else query = t;
-		printf("BaseDB: Creating Table %s with query:? %s",table.c_str(),query.c_str());
+		DebugOut() << "BaseDB: Creating Table" << table << " with query: " << query << endl;
 		q->execute(query);
 	}
-	
 
-	
+
+
 	string
 	fixInvalids(string filename)
 	{
 		return filename;
 	}
-	
+
 	vector<vector<string> > select(string query)
 	{
 		DebugOut()<<query<<endl;
@@ -305,7 +305,7 @@ public:
 	}
 
 protected:
-	
+
 	void
 	fixFilename(string* filename)
 	{
@@ -332,9 +332,9 @@ protected:
 			filename->replace(i,1,"");
 			unfixFilename(filename);
 		}
-		
+
 	}
-		
+
 	sqlitedatabase *db;
 	sqlitequery *q;
 	string table;

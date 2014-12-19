@@ -32,7 +32,7 @@ class WheelSourcePlugin: public AbstractSource
 public:
 	WheelSourcePlugin(AbstractRoutingEngine* re, map<string, string> config);
 	~WheelSourcePlugin();
-	
+
 	const string uuid();
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply){}
@@ -42,13 +42,15 @@ public:
 	PropertyList supported();
 
 	int supportedOperations();
-	
+
 	void supportedChanged(const PropertyList &) {}
 
 	map<string, string> getConfiguration() { return configuration; }
 
-	friend class WheelPrivate;	
-	
+	PropertyInfo getPropertyInfo(const VehicleProperty::Property &property);
+
+	friend class WheelPrivate;
+
 private:
 
 	WheelPrivate *mWheel;

@@ -130,9 +130,8 @@ void Core::updateSupported(PropertyList added, PropertyList removed, AbstractSou
 
 	if(!s.size()) return;
 
-	for(auto itr = mSinks.begin(); itr != mSinks.end(); ++itr)
+	for(auto sink : mSinks)
 	{
-		AbstractSink* sink = *itr;
 		sink->supportedChanged(s);
 	}
 }

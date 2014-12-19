@@ -42,15 +42,12 @@ std::unordered_map<std::string, std::unordered_set<Zone::Type>> getUniqueSources
 {
 	std::unordered_map<std::string, std::unordered_set<Zone::Type>> uniqueSourcesList;
 
-	for(auto itr = implementedProperties.begin(); itr != implementedProperties.end(); itr++)
+	for(auto property : implementedProperties)
 	{
-		VehicleProperty::Property property = *itr;
 		std::vector<std::string> sources = re->sourcesForProperty(property);
 
-		for(auto itr2 = sources.begin(); itr2 != sources.end(); itr2++)
+		for(auto source : sources)
 		{
-			std::string source = *itr2;
-
 			PropertyInfo info = re->getPropertyInfo(property, source);
 
 			std::unordered_set<Zone::Type> uniqueZoneList;
@@ -60,7 +57,7 @@ std::unordered_map<std::string, std::unordered_set<Zone::Type>> getUniqueSources
 				uniqueZoneList = uniqueSourcesList[source];
 			}
 
-			std::list<Zone::Type> zoneList = info.zones();
+			Zone::ZoneList zoneList = info.zones();
 
 			if(!zoneList.size())
 			{

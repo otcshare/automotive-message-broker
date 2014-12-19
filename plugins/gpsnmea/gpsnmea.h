@@ -49,7 +49,7 @@ public:
 
 	void supportedChanged(const PropertyList &) {}
 
-	PropertyInfo getPropertyInfo(VehicleProperty::Property property)
+	PropertyInfo getPropertyInfo(VehicleProperty::Property const & property)
 	{
 		if(propertyInfoMap.find(property) != propertyInfoMap.end())
 			return propertyInfoMap[property];

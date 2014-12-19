@@ -681,6 +681,14 @@ PropertyList OBD2Source::supported()
 	return m_supportedProperties;
 }
 
+PropertyInfo OBD2Source::getPropertyInfo(const VehicleProperty::Property &)
+{
+	Zone::ZoneList zones;
+	zones.push_back(0);
+
+	return PropertyInfo(0, zones);
+}
+
 int OBD2Source::supportedOperations()
 {
 	return Get | Set;

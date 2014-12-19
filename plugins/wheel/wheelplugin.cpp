@@ -179,6 +179,13 @@ int WheelSourcePlugin::supportedOperations()
 	return Get | Set;
 }
 
+PropertyInfo WheelSourcePlugin::getPropertyInfo(const VehicleProperty::Property &property)
+{
+	Zone::ZoneList zones;
+	zones.push_back(0);
+	return PropertyInfo(0, zones);
+}
+
 void WheelSourcePlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	mRequests.erase(property);

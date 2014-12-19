@@ -41,6 +41,10 @@ add_library(websocketsource MODULE ${websocketsource_sources})
 set_target_properties(websocketsource PROPERTIES PREFIX "")
 target_link_libraries(websocketsource amb ${websockets_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES})
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/vehicle.js ${CMAKE_CURRENT_SOURCE_DIR}/test/vehicle.js)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/test.js ${CMAKE_CURRENT_SOURCE_DIR}/test/test.js)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/events.js ${CMAKE_CURRENT_SOURCE_DIR}/test/events.js)
+
 install(TARGETS websocketsource LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 endif(websocket_plugin)

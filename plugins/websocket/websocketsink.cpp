@@ -34,14 +34,13 @@
 #include <QJsonDocument>
 #include <QVariantMap>
 
-WebSocketSink::WebSocketSink(AbstractRoutingEngine* re, libwebsocket *wsi, string uuid, VehicleProperty::Property property, std::string ambdproperty, Zone::Type zone)
+WebSocketSink::WebSocketSink(AbstractRoutingEngine* re, libwebsocket *wsi, string uuid, VehicleProperty::Property property, std::string ambdproperty)
 	: AbstractSink(re,map<string, string> ())
 {
 	m_amdbproperty = ambdproperty;
 	m_uuid = uuid;
 	m_wsi = wsi;
 	m_property = property;
-	mZone = zone;
 	m_re = re;
 	re->subscribeToProperty(ambdproperty, this);
 }
@@ -53,9 +52,6 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
 
-	if(value->zone != mZone)
-		return;
-
 	QVariantMap data;
 	QVariantMap reply;
 
@@ -63,22 +59,14 @@ void WebSocketSink::propertyChanged(AbstractPropertyType *value)
 	data["zone"] = value->zone;
 	data["timestamp"]=value->timestamp;
 	data["sequence"]=value->sequence;
+	data["type"] = amb::BasicTypes::fromSignature(amb::make_unique(VehicleProperty::getPropertyTypeForPropertyNameValue(property))->signature()).c_str();
 
 	reply["data"]=data;
 	reply["type"]="valuechanged";
 	reply["name"]=property.c_str();
 	reply["transactionid"]=m_uuid.c_str();
 
-	QByteArray replystr;
-	if(doBinary)
-		replystr = QJsonDocument::fromVariant(reply).toBinaryData();
-	else
-	{
-		replystr = QJsonDocument::fromVariant(reply).toJson();
-		cleanJson(replystr);
-	}
-
-	lwsWrite(m_wsi, replystr,replystr.length());
+	lwsWriteVariant(m_wsi, reply);
 }
 WebSocketSink::~WebSocketSink()
 {
