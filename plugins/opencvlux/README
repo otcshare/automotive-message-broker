@@ -1,6 +1,7 @@
 OpenCV "lux" plugin
+Version: @PROJECT_VERSION@
 
-This plugin simulates the ExteriorBrigtness property using a traditional webcamera.  It works 
+This plugin simulates the ExteriorBrigtness property using a traditional webcamera.  It works
 by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
 can be calibrated using the "pixelUpperBound" and "pixelLowerBound" variables.
 
@@ -13,14 +14,14 @@ Currently, this plugin has been tested with OpenCV 2.4.4.
 To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/config:
 
 {
-	"name" : "OpenCV LUX",
-	"path" : "/usr/lib/automotive-message-broker/opencvluxplugin.so",
-	"threaded" : "true",
-	"pixelLowerBound" : "0",
-	"pixelUpperBound" : "255",
-	"fps" : "30",
-	"opencl" : "false",
-	"device" : "0"
+  "name" : "OpenCV LUX",
+  "path" : "/usr/lib/automotive-message-broker/opencvluxplugin.so",
+  "threaded" : "true",
+  "pixelLowerBound" : "0",
+  "pixelUpperBound" : "255",
+  "fps" : "30",
+  "opencl" : "false",
+  "device" : "0"
 }
 
 NOTE: some features require the qtmainloop to be running.  see the main README for details.
@@ -50,13 +51,13 @@ How many times per second to poll image data from the camera.
 Default: "30"
 
 "pixelLowerBound"
-Lowest calibration value for a camera.  This is the average pixel intensity value the camera reports when 
+Lowest calibration value for a camera.  This is the average pixel intensity value the camera reports when
 it is completely covered.
 
 Default: "0"
 
 "pixelUpperBound"
-The highest calibration value for camera.  This is the average pixel intensity value when a very bright 
+The highest calibration value for camera.  This is the average pixel intensity value when a very bright
 light (like the sun) is being projected at the camera.
 
 Default: "255"
@@ -89,16 +90,19 @@ open or closed.  If closed for a period of time, DriverDrowsiness will change to
 Default: "false"
 
 
-AMB Properties:
+Properties:
 
 VideoLogging
 Turn on and off video logging
-
 Type: bool
 Access: readwrite
 
 DriverDrowsiness
 True if the driver has been detected drowsy.
+Type: bool
+Access: readonly
 
+OpenCL
+True if OpenCL acceleration is enabled.
 Type: bool
 Access: readonly

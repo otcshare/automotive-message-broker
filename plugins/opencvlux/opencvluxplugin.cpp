@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "timestamp.h"
 #include <listplusplus.h>
 #include <superptr.hpp>
+#include <ambplugin.h>
 
 #include <iostream>
 #include <thread>
@@ -45,26 +46,28 @@ const std::string OpenCL = "OpenCL";
 
 extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	VehicleProperty::registerProperty(VideoLogging, [](){
+	auto plugin = new AmbPlugin<OpenCvLuxPlugin>(routingengine, config);
+	plugin->init();
+
+	return plugin;
+}
+
+OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config, AbstractSource &parent)
+	:AmbPluginImpl(re, config, parent), lastLux(0), speed(0), latitude(0), longitude(0)
+{
+	videoLogging = addPropertySupport(Zone::None, [](){
 		return new BasicPropertyType<bool>(VideoLogging, false);
 	});
 
-	VehicleProperty::registerProperty(DriverDrowsiness, [](){
+	driverDrowsiness = addPropertySupport(Zone::None, [](){
 		return new OpenCvLuxPlugin::DriverDrowsinessType(DriverDrowsiness, false);
 	});
 
-	VehicleProperty::registerProperty(OpenCL, [](){
+	openCl = addPropertySupport(Zone::None, [](){
 		return new BasicPropertyType<bool>(OpenCL, false);
 	});
 
-	return new OpenCvLuxPlugin(routingengine, config);
-}
-
-OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config)
-	:AbstractSource(re, config), lastLux(0), speed(0), latitude(0), longitude(0), extBrightness(new VehicleProperty::ExteriorBrightnessType(0))
-{
-	driverDrowsiness = amb::make_unique(new DriverDrowsinessType(DriverDrowsiness, false));
-	openCl = amb::make_unique(new BasicPropertyType<bool>(OpenCL, false));
+	extBrightness = addPropertySupport<VehicleProperty::ExteriorBrightnessType>(Zone::None);
 
 	shared = amb::make_unique(new Shared);
 	shared->parent = this;
@@ -131,7 +134,9 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 			openCl->setValue(cv::ocl::useOpenCL());
 		}
 		else
+		{
 			DebugOut(DebugOut::Warning) << "You really don't have openCL support." << endl;
+		}
 	}
 
 	if(config.find("ddd") != config.end())
@@ -167,9 +172,9 @@ OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> 
 
 	}
 
-	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, this);
-	routingEngine->subscribeToProperty(VehicleProperty::Latitude, this);
-	routingEngine->subscribeToProperty(VehicleProperty::Longitude, this);
+	routingEngine->subscribeToProperty(VehicleProperty::VehicleSpeed, &parent);
+	routingEngine->subscribeToProperty(VehicleProperty::Latitude, &parent);
+	routingEngine->subscribeToProperty(VehicleProperty::Longitude, &parent);
 }
 
 OpenCvLuxPlugin::~OpenCvLuxPlugin()
@@ -177,7 +182,7 @@ OpenCvLuxPlugin::~OpenCvLuxPlugin()
 
 }
 
-const string OpenCvLuxPlugin::uuid()
+const string OpenCvLuxPlugin::uuid() const
 {
 	return "3c7a1ea0-7d2e-11e2-9e96-0800200c9a66";
 }
@@ -192,28 +197,11 @@ void OpenCvLuxPlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	{
 		/// we want to turn on the camera for one shot to get an image and determine the intensity
 
-		if(init())
-			grabImage(shared.get());
+		init();
+		grabImage(shared.get());
 	}
 
-	if(reply->property == VehicleProperty::ExteriorBrightness)
-	{
-		replyQueue.push_back(reply);
-	}
-	else if(reply->property == VideoLogging)
-	{
-		BasicPropertyType<bool> tmp(VideoLogging, shared->loggingOn);
-		reply->value = &tmp;
-		reply->success = true;
-		reply->completed(reply);
-	}
-	else  ///We don't support what you are asking for.  Reply false
-	{
-		reply->value = nullptr;
-		reply->success = false;
-		reply->error = AsyncPropertyReply::InvalidOperation;
-		reply->completed(reply);
-	}
+	AmbPluginImpl::getPropertyAsync(reply);
 }
 
 void OpenCvLuxPlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -223,29 +211,25 @@ void OpenCvLuxPlugin::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 AsyncPropertyReply *OpenCvLuxPlugin::setProperty(AsyncSetPropertyRequest request )
 {
-	AsyncPropertyReply *reply = new AsyncPropertyReply(request);
-
-	reply->success = false;
-	reply->error = AsyncPropertyReply::InvalidOperation;
-
 	if(request.property == VideoLogging)
 	{
 		shared->loggingOn = request.value->value<bool>();
-		reply->success = true;
-		reply->error = AsyncPropertyReply::NoError;
+	}
+	if(request.property == OpenCL)
+	{
+		QMutexLocker lock(&mutex);
+		cv::ocl::setUseOpenCL(request.value->value<bool>());
 	}
 
-	reply->completed(reply);
-
-	return reply;
+	return AmbPluginImpl::setProperty(request);;
 }
 
 void OpenCvLuxPlugin::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	if(!shared->mRequests.size())
 	{
-		if(init())
-			g_timeout_add(1000 / shared->fps, grabImage, shared.get());
+		init();
+		g_timeout_add(1000 / shared->fps, grabImage, shared.get());
 	}
 
 	shared->mRequests.push_back(property);
@@ -254,21 +238,6 @@ void OpenCvLuxPlugin::subscribeToPropertyChanges(VehicleProperty::Property prope
 void OpenCvLuxPlugin::unsubscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	removeOne(&shared->mRequests,property);
-}
-
-PropertyList OpenCvLuxPlugin::supported()
-{
-	PropertyList props;
-	props.push_back(VehicleProperty::ExteriorBrightness);
-	props.push_back(DriverDrowsiness);
-	props.push_back(VideoLogging);
-
-	return props;
-}
-
-int OpenCvLuxPlugin::supportedOperations()
-{
-	return Get | Set;
 }
 
 void OpenCvLuxPlugin::propertyChanged(AbstractPropertyType *value)
@@ -326,7 +295,7 @@ static int grabImage(void *data)
 		}
 	}
 
-	/*if(shared->threaded)
+	if(shared->threaded)
 	{
 		QFutureWatcher<uint> *watcher = new QFutureWatcher<uint>();
 		QObject::connect(watcher, &QFutureWatcher<uint>::finished, shared->parent, &OpenCvLuxPlugin::imgProcResult);
@@ -338,10 +307,11 @@ static int grabImage(void *data)
 	}
 	else
 	{
-		shared->parent->writeVideoFrame(m_image);
+		if(shared->parent->videoLogging->value<bool>())
+			shared->parent->writeVideoFrame(m_image);
 		try
 		{
-			int lux = evalImage(m_image, shared);
+			uint16_t lux = evalImage(m_image, shared);
 			shared->parent->updateProperty(lux);
 		}
 		catch(...)
@@ -350,7 +320,7 @@ static int grabImage(void *data)
 		}
 
 		//detectLight(m_image,shared);
-	}*/
+	}
 
 	if(shared->mRequests.size())
 	{
@@ -386,7 +356,7 @@ static uint evalImage(cv::UMat qImg, OpenCvLuxPlugin::Shared *shared)
 }
 
 
-bool OpenCvLuxPlugin::init()
+void OpenCvLuxPlugin::init()
 {
 	if(!shared->m_capture)
 	{
@@ -398,13 +368,11 @@ bool OpenCvLuxPlugin::init()
 
 	if(!shared->m_capture->isOpened())
 	{
-		DebugOut()<<"we failed to open camera device ("<<device<<") or no camera found"<<endl;
-		return false;
+		DebugOut() << "we failed to open camera device (" << device << ") or no camera found" << endl;
+		return;
 	}
 
-	if(configuration.find("logging") != configuration.end() &&
-			configuration["logging"] == "true" &&
-			(!shared->mWriter || !shared->mWriter->isOpened()))
+	if(!shared->mWriter || !shared->mWriter->isOpened())
 	{
 		cv::Size s = cv::Size((int) shared->m_capture->get(cv::CAP_PROP_FRAME_WIDTH),
 							  (int) shared->m_capture->get(cv::CAP_PROP_FRAME_HEIGHT));
@@ -413,7 +381,7 @@ bool OpenCvLuxPlugin::init()
 
 		if(codec.empty() || codec.size() != 4)
 		{
-			DebugOut(DebugOut::Warning)<<"Invalid codec.  Using default: MJPG"<<endl;
+			DebugOut(DebugOut::Warning)<<"Invalid codec: "<<codec <<". Using default: MJPG"<<endl;
 			codec = "MJPG";
 		}
 
@@ -430,7 +398,7 @@ bool OpenCvLuxPlugin::init()
 	DebugOut()<<"camera frame height: "<<shared->m_capture->get(cv::CAP_PROP_FRAME_HEIGHT)<<endl;
 	DebugOut()<<"camera frame fps: "<<shared->m_capture->get(cv::CAP_PROP_FPS)<<endl;
 
-	return true;
+	return;
 }
 
 
@@ -485,33 +453,15 @@ void OpenCvLuxPlugin::writeVideoFrame(cv::UMat f)
 	}
 }
 
-void OpenCvLuxPlugin::updateProperty(uint lux)
+void OpenCvLuxPlugin::updateProperty(uint16_t lux)
 {
-	 extBrightness->setValue(lux);
-
-	for(auto reply : replyQueue)
-	{
-		reply->value = extBrightness.get();
-		reply->success = true;
-		try{
-			if(reply->completed)
-				reply->completed(reply);
-		}
-		catch(...)
-		{
-			DebugOut(DebugOut::Warning)<<"reply failed"<<endl;
-		}
-	}
-
-	replyQueue.clear();
+	extBrightness->setValue(lux);
 
 	if(lux != lastLux && shared->mRequests.size())
 	{
 		lastLux = lux;
 		routingEngine->updateProperty(extBrightness.get(), uuid());
 	}
-
-
 }
 
 void OpenCvLuxPlugin::imgProcResult()
@@ -531,10 +481,10 @@ void OpenCvLuxPlugin::imgProcResult()
 	}
 }
 
-TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
+TrafficLight::Color detectLight(cv::UMat img, OpenCvLuxPlugin::Shared *shared)
 {
 
-	cv::Mat gray;
+	cv::UMat gray;
 
 	cv::cvtColor(img, gray, cv::COLOR_BGR2GRAY);
 	cv::GaussianBlur(gray, gray, cv::Size(9,9), 2, 2);
@@ -554,11 +504,11 @@ TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared *shared)
 
 		try {
 
-			cv::Mat light(img, rect);
+			cv::UMat light(img, rect);
 
-			cv::circle( img, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
+			cv::circle(img, center, radius, cv::Scalar(0,0,255), 3, 8, 0 );
 
-			cv::rectangle(img, rect,cv::Scalar(255,0,0));
+			cv::rectangle(img, rect.tl(), rect.br(), cv::Scalar(255,0,0));
 
 			cv::Scalar avgPixel = cv::mean(light);
 
@@ -624,14 +574,19 @@ void OpenCvLuxPlugin::detectEyes(cv::UMat frame)
 			hasEyes = true;
 			DebugOut() << "Number of eyes: " << eyes.size() << endl;
 
-			driverDrowsiness->setValue(false);
-			routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
+			if(driverDrowsiness->value<bool>())
+			{
+				driverDrowsiness->setValue(false);
+				routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
+			}
 		}
 		else
 		{
-			DebugOut() << "No eyes!!!" << endl;
-			driverDrowsiness->setValue(true);
-			routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
+			if(!driverDrowsiness->value<bool>())
+			{
+				driverDrowsiness->setValue(true);
+				routingEngine->updateProperty(driverDrowsiness.get(), this->uuid());
+			}
 		}
 	}
 }

@@ -20,6 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define OPENCVLUXPLUGIN_H
 
 #include <abstractsource.h>
+#include <ambpluginimpl.h>
 #include <string>
 #include <memory>
 
@@ -31,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
-class OpenCvLuxPlugin: public QObject, public AbstractSource
+class OpenCvLuxPlugin: public QObject, public AmbPluginImpl
 {
 Q_OBJECT
 public:
@@ -57,40 +58,35 @@ public:
 		int frameCount;
 	};
 
-	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config);
+	OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config,  AbstractSource& parent);
 
 	~OpenCvLuxPlugin();
 
-	const string uuid();
+	const string uuid() const;
 	void getPropertyAsync(AsyncPropertyReply *reply);
 	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	void subscribeToPropertyChanges(VehicleProperty::Property property);
 	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
-	PropertyList supported();
-
-	int supportedOperations();
 
 	void propertyChanged(AbstractPropertyType* value);
 
 	void supportedChanged(const PropertyList &);
 
-	void updateProperty(uint lux);
+	void updateProperty(uint16_t lux);
 
 	void writeVideoFrame(cv::UMat frame);
 
 	void detectEyes(cv::UMat frame);
 
+	void init();
+
+	std::shared_ptr<AbstractPropertyType> videoLogging;
+
 public Q_SLOTS:
 	void imgProcResult();
 
-
-private: /// methods:
-	bool init();
-
 private:
-
-
 	uint speed;
 	uint latitude;
 	uint longitude;
@@ -99,7 +95,7 @@ private:
 	std::string device;
 	std::list<AsyncPropertyReply*> replyQueue;
 
-	std::unique_ptr<VehicleProperty::ExteriorBrightnessType> extBrightness;
+	std::shared_ptr<AbstractPropertyType> extBrightness;
 
 	std::unique_ptr<Shared> shared;
 	QMutex mutex;
@@ -107,13 +103,12 @@ private:
 	std::unique_ptr<cv::CascadeClassifier> faceCascade;
 	std::unique_ptr<cv::CascadeClassifier> eyeCascade;
 
-	std::unique_ptr<DriverDrowsinessType> driverDrowsiness;
-
-	std::unique_ptr<BasicPropertyType<bool>> openCl;
+	std::shared_ptr<AbstractPropertyType> driverDrowsiness;
+	std::shared_ptr<AbstractPropertyType> openCl;
 };
 
 static int grabImage(void *data);
-static uint evalImage(cv::Mat qImg, OpenCvLuxPlugin::Shared *shared);
+static uint evalImage(cv::UMat qImg, OpenCvLuxPlugin::Shared *shared);
 
 namespace TrafficLight
 {
@@ -126,7 +121,7 @@ enum Color
 };
 }
 
-TrafficLight::Color detectLight(cv::Mat img, OpenCvLuxPlugin::Shared* shared);
+TrafficLight::Color detectLight(cv::UMat img, OpenCvLuxPlugin::Shared* shared);
 
 
 #endif // EXAMPLEPLUGIN_H
