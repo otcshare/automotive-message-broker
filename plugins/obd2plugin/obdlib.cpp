@@ -58,7 +58,7 @@ int obdLib::openPort(const int fd, int baudrate)
 	//struct termios oldtio;
 	struct termios newtio;
 	//bzero(&newtio,sizeof(newtio));
-	tcgetattr(portHandle,&newtio);
+	tcgetattr(portHandle, &newtio);
 	long BAUD = B9600;
 	switch (baudrate)
 	{
@@ -107,7 +107,7 @@ int obdLib::openPort(const int fd, int baudrate)
 		debug(obdLib::DEBUG_VERBOSE,"Setting baud rate to %i\n",baudrate);
 	}
 	fcntl(portHandle, F_SETFL, 0); //Set to blocking
-	tcsetattr(portHandle,TCSANOW,&newtio);
+	tcsetattr(portHandle, TCSANOW, &newtio);
 
 	return 0;
 }

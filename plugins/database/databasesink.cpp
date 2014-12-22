@@ -18,7 +18,7 @@ extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<str
 	return plugin;
 }
 
-void * cbFunc(Shared* shared)
+static void * cbFunc(Shared* shared)
 {
 	if(!shared)
 	{
@@ -139,13 +139,12 @@ int getNextEvent(gpointer data)
 DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::string> config, AbstractSource &parent)
 	:AmbPluginImpl(engine, config, parent), shared(nullptr), playback(false), playbackShared(nullptr), playbackMultiplier(1)
 {
-	databaseName = "storage";
 	tablename = "data";
 	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, zone INTEGER, time REAL, sequence REAL, tripId TEXT)";
 
 	if(config.find("bufferLength") != config.end())
 	{
-		bufferLength = atoi(config["bufferLength"].c_str());
+		bufferLength = boost::lexical_cast<int>(config["bufferLength"]);
 	}
 
 	if(config.find("frequency") != config.end())
@@ -158,8 +157,6 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		{
 			DebugOut(DebugOut::Error)<<"Failed to parse frequency: Invalid value "<<config["frequency"]<<endl;
 		}
-
-
 	}
 
 	if(config.find("properties") != config.end())
@@ -172,13 +169,13 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		engine->subscribeToProperty(itr, &parent);
 	}
 
-	addPropertySupport(Zone::None, [](){ return new DatabaseFileType("storage"); });
-	addPropertySupport(Zone::None, [](){ return new DatabasePlaybackType(false); });
-	addPropertySupport(Zone::None, [](){ return new DatabaseLoggingType(false); });
+	databaseName = addPropertySupport(Zone::None, [](){ return new DatabaseFileType("storage"); });
+	playback = addPropertySupport(Zone::None, [](){ return new DatabasePlaybackType(false); });
+	databaseLogging = addPropertySupport(Zone::None, [](){ return new DatabaseLoggingType(false); });
 
 	if(config.find("startOnLoad")!= config.end())
 	{
-		setLogging(config["startOnLoad"] == "true");
+		databaseLogging->setValue(config["startOnLoad"] == "true");
 	}
 
 	if(config.find("playbackMultiplier")!= config.end())
@@ -188,7 +185,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("playbackOnLoad")!= config.end())
 	{
-		setPlayback(config["playbackOnLoad"] == "true");
+		playback->setValue(config["playbackOnLoad"] == "true");
 	}
 }
 
@@ -257,7 +254,8 @@ void DatabaseSink::stopDb()
 	obj.quit = true;
 	shared->queue.append(obj);
 
-	thread.join();
+	if(thread && thread->joinable())
+		thread->join();
 
 	delete shared;
 	shared = NULL;
@@ -265,7 +263,7 @@ void DatabaseSink::stopDb()
 
 void DatabaseSink::startDb()
 {
-	if(playback.basicValue())
+	if(playback->value<bool>())
 	{
 		DebugOut(0)<<"ERROR: tried to start logging during playback.  Only logging or playback can be used at one time"<<endl;
 		return;
@@ -279,15 +277,18 @@ void DatabaseSink::startDb()
 
 	initDb();
 
-	thread = std::thread(cbFunc, shared);
+	if(thread && thread->joinable())
+		thread->detach();
+
+	thread = amb::make_unique(new std::thread(cbFunc, shared));
 }
 
 void DatabaseSink::startPlayback()
 {
-	if(playback.basicValue())
+	if(playback->value<bool>())
 		return;
 
-	playback = true;
+	playback->setValue(true);
 
 	initDb();
 
@@ -333,35 +334,14 @@ void DatabaseSink::initDb()
 	if(shared) delete shared;
 
 	shared = new Shared;
-	shared->db->init(databaseName.value<std::string>(), tablename, tablecreate);
-}
-
-void DatabaseSink::setPlayback(bool v)
-{
-	AsyncSetPropertyRequest request;
-	request.property = DatabasePlayback;
-	request.value = new DatabasePlaybackType(v);
-
-	setProperty(request);
-}
-
-void DatabaseSink::setLogging(bool b)
-{
-	databaseLogging = b;
-	AsyncSetPropertyRequest request;
-	request.property = DatabaseLogging;
-	request.value = &databaseLogging;
-
-	setProperty(request);
+	shared->db->init(databaseName->value<std::string>(), tablename, tablecreate);
 }
 
 void DatabaseSink::setDatabaseFileName(string filename)
 {
-	databaseName = filename;
-
 	initDb();
 
-	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key, zone FROM "+tablename);
+	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key, zone FROM " + tablename);
 
 	for(int i=0; i < supportedStr.size(); i++)
 	{
@@ -418,54 +398,17 @@ void DatabaseSink::init()
 {
 	if(configuration.find("databaseFile") != configuration.end())
 	{
+		databaseName->setValue(configuration["databaseFile"]);
 		setDatabaseFileName(configuration["databaseFile"]);
 	}
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
 
-void DatabaseSink::getPropertyAsync(AsyncPropertyReply *reply)
-{
-	reply->success = false;
-
-	if(reply->property == DatabaseFile)
-	{
-		DatabaseFileType temp(databaseName);
-		reply->value = &temp;
-
-		reply->success = true;
-		reply->completed(reply);
-
-		return;
-	}
-	else if(reply->property == DatabaseLogging)
-	{
-		databaseLogging = shared != nullptr;
-
-		reply->value = &databaseLogging;
-		reply->success = true;
-		reply->completed(reply);
-
-		return;
-	}
-
-	else if(reply->property == DatabasePlayback)
-	{
-		DatabasePlaybackType temp = playback;
-		reply->value = &temp;
-		reply->success = true;
-		reply->completed(reply);
-
-		return;
-	}
-
-	reply->completed(reply);
-}
-
 void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 {
 	BaseDB * db = new BaseDB();
-	db->init(databaseName.value<std::string>(), tablename, tablecreate);
+	db->init(databaseName->value<std::string>(), tablename, tablecreate);
 
 	ostringstream query;
 	query.precision(15);
@@ -532,46 +475,28 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 {
-	AsyncPropertyReply* reply = new AsyncPropertyReply(request);
-	reply->success = false;
+	AsyncPropertyReply* reply = AmbPluginImpl::setProperty(request);
 
 	if(request.property == DatabaseLogging)
 	{
 		if(request.value->value<bool>())
 		{
-			setPlayback(false);
 			startDb();
-			reply->success = true;
-			databaseLogging = true;
-			routingEngine->updateProperty(&databaseLogging,uuid());
 		}
 		else
 		{
 			stopDb();
-			reply->success = true;
-			databaseLogging = false;
-			routingEngine->updateProperty(&databaseLogging,uuid());
 		}
 	}
-
 	else if(request.property == DatabaseFile)
 	{
-		std::string fname = request.value->toString();
-
-		databaseName = fname;
-
-		routingEngine->updateProperty(&databaseName,uuid());
-
-		reply->success = true;
+		setDatabaseFileName(databaseName->value<std::string>());
 	}
 	else if( request.property == DatabasePlayback)
 	{
 		if(request.value->value<bool>())
 		{
-			setLogging(false);
 			startPlayback();
-
-			routingEngine->updateProperty(&playback,uuid());
 		}
 		else
 		{
@@ -579,11 +504,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 				playbackShared->stop = true;
 
 			playback = false;
-
-			routingEngine->updateProperty(&playback,uuid());
 		}
-
-		reply->success = true;
 	}
 
 	return reply;

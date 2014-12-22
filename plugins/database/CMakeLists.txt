@@ -14,4 +14,6 @@ target_link_libraries(databasesinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib $
 
 install(TARGETS databasesinkplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_SOURCE_DIR}/README @ONLY)
+
 endif(database_plugin)

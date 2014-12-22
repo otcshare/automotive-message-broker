@@ -150,7 +150,6 @@ public:
 	void init();
 
 	///source role:
-	virtual void getPropertyAsync(AsyncPropertyReply *reply);
 	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
 	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
@@ -164,23 +163,20 @@ private: //methods:
 	void startDb();
 	void startPlayback();
 	void initDb();
-	void setPlayback(bool v);
-	void setLogging(bool b);
-	void setDatabaseFileName(std::string filename);
+		void setDatabaseFileName(std::string filename);
 
 private:
 	PropertyList mSubscriptions;
 	Shared *shared;
-	std::thread thread;
-	//std::string databaseName;
+	std::unique_ptr<std::thread> thread;
 	std::string tablename;
 	std::string tablecreate;
-	std::list<VehicleProperty::Property> propertiesToSubscribeTo;
+	PropertyList propertiesToSubscribeTo;
 	PlaybackShared* playbackShared;
 	uint playbackMultiplier;
-	DatabasePlaybackType playback;
-	DatabaseFileType databaseName;
-	DatabaseLoggingType databaseLogging;
+	std::shared_ptr<AbstractPropertyType> playback;
+	std::shared_ptr<AbstractPropertyType> databaseName;
+	std::shared_ptr<AbstractPropertyType> databaseLogging;
 };
 
 #endif // DATABASESINK_H

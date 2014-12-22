@@ -741,7 +741,7 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 		g_async_queue_push(subscriptionAddQueue, pid);
 		CommandRequest *req = new CommandRequest();
 		req->req = "connectifnot";
-		g_async_queue_push(commandQueue,req);
+		g_async_queue_push(commandQueue, req);
 	}
 }
 
@@ -807,13 +807,13 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 		{
 			CommandRequest *req = new CommandRequest();
 			req->req = "connectifnot";
-			g_async_queue_push(commandQueue,req);
+			g_async_queue_push(commandQueue, req);
 		}
 		else
 		{
 			CommandRequest *req = new CommandRequest();
 			req->req = "disconnect";
-			g_async_queue_push(commandQueue,req);
+			g_async_queue_push(commandQueue, req);
 		}
 
 	}
