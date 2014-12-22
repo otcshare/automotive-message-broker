@@ -1,5 +1,4 @@
 OpenCV "lux" plugin
-Version: @PROJECT_VERSION@
 
 This plugin simulates the ExteriorBrigtness property using a traditional webcamera.  It works
 by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
