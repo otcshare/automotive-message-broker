@@ -74,7 +74,7 @@ vehicle.lightStatus.set({"fog" : false}).then(function() {
 });
 
 for(var propName in vehicle) {
-  if(typeof(obj[propName]) != "undefined") {
+  if(typeof(vehicle[propName]) != "undefined") {
     debug("vehicle." + propName);
     get(propName);
   }
