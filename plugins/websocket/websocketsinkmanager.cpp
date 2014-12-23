@@ -16,7 +16,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
 #include "websocketsinkmanager.h"
 #include "websocketsink.h"
 #include "common.h"
@@ -58,6 +57,7 @@ WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<st
 
 
 }
+
 void WebSocketSinkManager::init()
 {
 	//Protocol list for libwebsockets.
@@ -67,10 +67,12 @@ void WebSocketSinkManager::init()
 
 	setConfiguration(configuration);
 }
+
 PropertyList WebSocketSinkManager::getSupportedProperties()
 {
 	return m_engine->supported();
 }
+
 void WebSocketSinkManager::setConfiguration(map<string, string> config)
 {
 // 	//Config has been passed, let's start stuff up.
@@ -149,17 +151,8 @@ void WebSocketSinkManager::setConfiguration(map<string, string> config)
 void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProperty::Property property, Zone::Type zone, string id)
 {
 	AsyncPropertyRequest request;
-	PropertyList foo = VehicleProperty::capabilities();
-	if (contains(foo,property))
-	{
-		request.property = property;
-	}
-	else
-	{
-		DebugOut(0)<<"websocketsink: Invalid property requested: "<<property;
-		return;
-	}
 
+	request.property = property;
 	request.zoneFilter = zone;
 	request.completed = [socket,id,property](AsyncPropertyReply* reply)
 	{
@@ -185,17 +178,7 @@ void WebSocketSinkManager::addSingleShotSink(libwebsocket* socket, VehicleProper
 		replyvar["data"]= data;
 		replyvar["transactionid"]=id.c_str();
 
-		QByteArray replystr;
-
-		if(doBinary)
-			replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
-		else
-		{
-			replystr = QJsonDocument::fromVariant(replyvar).toJson();
-			cleanJson(replystr);
-		}
-
-		lwsWrite(socket, replystr, replystr.length());
+		lwsWriteVariant(socket, replyvar);
 
 		delete reply;
 	};
@@ -233,17 +216,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 		replyvar["data"]=list;
 		replyvar["transactionid"]=id.c_str();
 
-		QByteArray replystr;
-
-		if(doBinary)
-			replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
-		else
-		{
-			replystr = QJsonDocument::fromVariant(replyvar).toJson();
-			cleanJson(replystr);
-		}
-
-		lwsWrite(socket, replystr, replystr.length());
+		lwsWriteVariant(socket, replyvar);
 
 		delete reply;
 	};
@@ -251,7 +224,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 	AsyncRangePropertyReply* reply = routingEngine->getRangePropertyAsync(rangedRequest);
 }
 
-void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid, Zone::Type zone)
+void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid)
 {
 	if (m_sinkMap.find(property) != m_sinkMap.end())
 	{
@@ -259,30 +232,17 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 
 		for(auto i : sinks)
 		{
-			if(i->zone() == zone)
-			{
-				m_sinkMap[property].remove(i);
-				delete i;
-			}
+			m_sinkMap[property].remove(i);
+			delete i;
 		}
 
 		QVariantMap reply;
 		reply["type"]="methodReply";
 		reply["name"]="unsubscribe";
-		reply["data"]=property.c_str();
+		reply["property"]=property.c_str();
 		reply["transactionid"]= uuid.c_str();
 
-		QByteArray replystr;
-
-		if(doBinary)
-			replystr = QJsonDocument::fromVariant(reply).toBinaryData();
-		else
-		{
-			replystr = QJsonDocument::fromVariant(reply).toJson();
-			cleanJson(replystr);
-		}
-
-		lwsWrite(socket, replystr, replystr.length());
+		lwsWriteVariant(socket, reply);
 	}
 }
 void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Property property,string value,Zone::Type zone,string uuid)
@@ -307,17 +267,7 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 		replyvar["data"]= data;
 		replyvar["transactionid"]=uuid.c_str();
 
-		QByteArray replystr;
-
-		if(doBinary)
-			replystr = QJsonDocument::fromVariant(replyvar).toBinaryData();
-		else
-		{
-			replystr = QJsonDocument::fromVariant(replyvar).toJson();
-			cleanJson(replystr);
-		}
-
-		lwsWrite(socket, replystr, replystr.length());
+		lwsWriteVariant(socket, replyvar);
 
 		delete reply;
 	};
@@ -327,35 +277,18 @@ void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Proper
 	delete type;
 
 }
-void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property, string uuid, Zone::Type zone)
+void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Property property, string uuid)
 {
-	PropertyList foo = VehicleProperty::capabilities();
-	if (!contains(foo,property))
-	{
-		DebugOut(DebugOut::Warning)<<"Invalid property requested: "<<property<<endl;
-		return;
-	}
-
 	QVariantMap reply;
 
 	reply["type"] = "methodReply";
 	reply["name"] = "subscribe";
-	reply["data"] = property.c_str();
+	reply["property"] = property.c_str();
 	reply["transactionid"] = uuid.c_str();
 
-	QByteArray replystr;
+	lwsWriteVariant(socket, reply);
 
-	if(doBinary)
-		replystr = QJsonDocument::fromVariant(reply).toBinaryData();
-	else
-	{
-		replystr = QJsonDocument::fromVariant(reply).toJson();
-		cleanJson(replystr);
-	}
-
-	lwsWrite(socket, replystr, replystr.length());
-
-	WebSocketSink *sink = new WebSocketSink(m_engine, socket, uuid, property, property, zone);
+	WebSocketSink *sink = new WebSocketSink(m_engine, socket, uuid, property, property);
 	m_sinkMap[property].push_back(sink);
 }
 extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
@@ -570,44 +503,51 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 				}
 				else if (name == "subscribe")
 				{
-					QVariantMap data = call["data"].toMap();
-					int zone = data["zone"].toInt();
-					sinkManager->addSink(wsi, data["property"].toString().toStdString(), id, zone);
-
+					std::string property = call["property"].toString().toStdString();
+					sinkManager->addSink(wsi, property, id);
 				}
 				else if (name == "unsubscribe")
 				{
-					QVariantMap data = call["data"].toMap();
-					sinkManager->removeSink(wsi, data["property"].toString().toStdString(), id, data["zone"].toInt());
-
+					sinkManager->removeSink(wsi, call["property"].toString().toStdString(), id);
 				}
-				else if (name == "getSupportedEventTypes")
+				else if (name == "getSupportedEventTypes" || name == "getSupported")
 				{
 					QVariantMap reply;
-					QStringList list;
+					QVariantList list;
 
 					PropertyList supported = sinkManager->getSupportedProperties();
+					DebugOut() << "we support " << supported.size() << " properties" << endl;
 					for(VehicleProperty::Property i : supported)
 					{
-						list.append(i.c_str());
+						std::vector<std::string> sources = sinkManager->router()->sourcesForProperty(i);
+						for(auto source : sources)
+						{
+							PropertyInfo info = sinkManager->router()->getPropertyInfo(i, source);
+
+							for(auto zone : info.zones())
+							{
+								auto property = amb::make_unique(VehicleProperty::getPropertyTypeForPropertyNameValue(i));
+
+								std::string signature = property->signature();
+								const std::string basicType = amb::BasicTypes::fromSignature(signature);
+
+								QVariantMap map;
+								map["zone"] = zone;
+								map["name"] = i.c_str();
+								map["type"] = basicType.c_str();
+								map["source"] = source.c_str();
+
+								list.append(map);
+							}
+						}
 					}
 
 					reply["type"] = "methodReply";
-					reply["name"] = "getSupportedEventTypes";
+					reply["name"] = "getSupported";
 					reply["transactionid"] = id.c_str();
 					reply["data"] = list;
 
-					QByteArray replystr;
-
-					if(doBinary)
-						replystr = QJsonDocument::fromVariant(reply).toBinaryData();
-					else
-					{
-						replystr = QJsonDocument::fromVariant(reply).toJson();
-						cleanJson(replystr);
-					}
-
-					lwsWrite(wsi, replystr, replystr.length());
+					lwsWriteVariant(wsi, reply);
 				}
 				else
 				{

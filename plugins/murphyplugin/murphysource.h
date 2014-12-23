@@ -36,54 +36,55 @@ class MurphySource : public AbstractSource
 {
 
 public:
-    MurphySource(AbstractRoutingEngine* re, map<string, string> config);
-    ~MurphySource();
+	MurphySource(AbstractRoutingEngine* re, map<string, string> config);
+	~MurphySource();
 
 	const string uuid() { return "murphy"; }
-    void getPropertyAsync(AsyncPropertyReply *reply);
-    void getRangePropertyAsync(AsyncRangePropertyReply *reply);
-    AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
-    void subscribeToPropertyChanges(VehicleProperty::Property property);
-    void unsubscribeToPropertyChanges(VehicleProperty::Property property);
-    PropertyList supported();
+	void getPropertyAsync(AsyncPropertyReply *reply);
+	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
+	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
+	void subscribeToPropertyChanges(VehicleProperty::Property property);
+	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
+	PropertyList supported();
 
-    int supportedOperations();
+	int supportedOperations();
 
 	void supportedChanged(const PropertyList &) {}
 
-    void processValue(string propertyName, AbstractPropertyType *value);
+	void processValue(string propertyName, AbstractPropertyType *value);
 
-    bool hasProperty(string propertyName);
+	bool hasProperty(string propertyName);
 
-    void setState(mrp_process_state_t state);
-    mrp_process_state_t getState();
+	void setState(mrp_process_state_t state);
+	mrp_process_state_t getState();
 
-    void setConnected(bool connected);
+	void setConnected(bool connected);
 
-    int connectToMurphy();
+	int connectToMurphy();
 
+	PropertyInfo getPropertyInfo(const VehicleProperty::Property &property);
 
 private:
-    void checkSubscriptions();
-    void setConfiguration(map<string, string> config);
-    void readyToConnect(mrp_mainloop_t *ml);
+	void checkSubscriptions();
+	void setConfiguration(map<string, string> config);
+	void readyToConnect(mrp_mainloop_t *ml);
 
-    PropertyList m_supportedProperties;
+	PropertyList m_supportedProperties;
 
-    MurphySource *m_source;
-    AbstractRoutingEngine *m_re;
+	MurphySource *m_source;
+	AbstractRoutingEngine *m_re;
 
-    // known properties
+	// known properties
 
-    map<string, AbstractPropertyType *> murphyProperties;
+	map<string, AbstractPropertyType *> murphyProperties;
 
-    // murphy integration
+	// murphy integration
 
-    mrp_mainloop_t *m_ml;
-    mrp_transport_t *m_tport;
-    string m_address; // transport address
-    mrp_process_state_t m_state;
-    bool m_connected;
+	mrp_mainloop_t *m_ml;
+	mrp_transport_t *m_tport;
+	string m_address; // transport address
+	mrp_process_state_t m_state;
+	bool m_connected;
 };
 
 #endif // MURPHYSOURCE_H

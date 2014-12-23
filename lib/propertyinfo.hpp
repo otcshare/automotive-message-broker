@@ -2,7 +2,6 @@
 #define PROPERTYINFO_H_
 
 #include "abstractpropertytype.h"
-#include <list>
 
 class PropertyInfo
 {
@@ -18,7 +17,7 @@ public:
 	 * @arg updateFrequency
 	 * @arg zonesList
 	 */
-	PropertyInfo(uint updateFreq, std::list<Zone::Type> zonesList)
+	PropertyInfo(uint updateFreq, Zone::ZoneList zonesList)
 		:mUpdateFrequency(updateFreq), mZones(zonesList), mIsValid(true)
 	{
 
@@ -38,7 +37,7 @@ public:
 	 * Number of different zones supported by this property.
 	 *
 	 */
-	std::list<Zone::Type> zones()
+	Zone::ZoneList zones()
 	{
 		return mZones;
 	}
@@ -65,7 +64,7 @@ public:
 private:
 
 	uint mUpdateFrequency;
-	std::list<Zone::Type> mZones;
+	Zone::ZoneList mZones;
 	bool mIsValid;
 };
 

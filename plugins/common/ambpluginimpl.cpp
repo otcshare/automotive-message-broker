@@ -164,7 +164,7 @@ PropertyInfo AmbPluginImpl::getPropertyInfo(const VehicleProperty::Property & pr
 {
 	auto it = properties.find(property);
 	if(it != properties.end()) {
-		std::list<Zone::Type> zones;
+		Zone::ZoneList zones;
 		for(auto itZonePropType = it->second.begin(); itZonePropType != it->second.end(); ++itZonePropType)
 			zones.push_back(itZonePropType->first);
 

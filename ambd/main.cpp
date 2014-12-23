@@ -155,7 +155,7 @@ int main(int argc, char **argv)
 
 	if(getuid() == 0)
 	{
-		DebugOut(DebugOut::Error)<<"Running as root.  This is dangerous."<<endl;
+		DebugOut(DebugOut::Warning)<<"Running as root.  This is dangerous."<<endl;
 	}
 
 #ifndef GLIB_VERSION_2_36
@@ -207,9 +207,9 @@ void daemonize()
 		close(i);	// close all descriptors
 	}
 	{	// handle standard I/O
-	i = open("/dev/null", O_RDWR);
-	dup(i);
-	dup(i);
+		i = open("/dev/null", O_RDWR);
+		dup(i);
+		dup(i);
 	}
 	// first instance continues
 }

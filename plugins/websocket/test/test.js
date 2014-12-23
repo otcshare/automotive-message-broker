@@ -48,14 +48,9 @@ function getTypes(event) {
     var types = window.vehicle.getSupportedEventTypes(event, false,
         function(data) {
             if (data && data.length > 1) {
-                PRINT.pass(event + " is a set of " + data.length + " events:");
+                PRINT.pass(event + " is a set of " + data.length + " objects:");
                 for (i in data) {
-                    PRINT.log(data[i]);
-                }
-            } else if (data && data.length > 0) {
-                PRINT.pass(event + " is a single event:");
-                for (i in data) {
-                    PRINT.log(data[i]);
+                    PRINT.log(JSON.stringify(data[i]));
                 }
             } else {
                 PRINT.fail(event + " unexcepted empty data field");
@@ -79,19 +74,21 @@ function updateInput(input, value) {
 function getValue(event) {
     var zone =  getZone(event);
     var types = window.vehicle.get(event, zone,
-        function(data) {
-            if (data) {
+        function(propertyValue) {
+            if (propertyValue) {
                 PRINT.pass("values received:");
-                PRINT.log(data.property + ": " + data.value + ", zone: " + data.zone);
+                PRINT.log(propertyValue.data.property + ": " + propertyValue.data.value + ", zone: " + propertyValue.data.zone);
 
                     var elements = document.getElementsByClassName('proptest');
                     for (var i = 0; i < elements.length; i++) {
                         var propinfo = elements[i].getElementsByClassName('propinfo')[0];
                         var name = propinfo.innerHTML;
                         var zone = elements[i].getElementsByTagName('input')[1];
-                        updateInput(zone, zone.value);
+                        if(zone)
+                            updateInput(zone, zone.value);
                         var input = elements[i].getElementsByTagName('input')[0];
-                        updateInput(input, data.value);
+                        if(input)
+                            updateInput(input, propertyValue.value);
                     }
             } else {
                 PRINT.fail("no values retrieved for " + eventlist);
@@ -124,7 +121,7 @@ function setValue(eventlist) {
         }
     }
 
-    var types = window.vehicle.set(eventlist, valuelist, zoneList, 
+    var types = window.vehicle.set(eventlist, valuelist, zoneList,
         function(msg) {
             PRINT.pass("Set success for: " + JSON.stringify(msg));
         },
@@ -135,7 +132,7 @@ function setValue(eventlist) {
 }
 
 function eventListener(e) {
-	PRINT.log(e.name + " update: " + JSON.stringify(e.value));
+  PRINT.log(e.name + " update: " + JSON.stringify(e.value));
     var elements = document.getElementsByClassName('proptest');
     for (var i = 0; i < elements.length; i++) {
         var propinfo = elements[i].getElementsByClassName('propinfo')[0];
@@ -153,8 +150,8 @@ function subscribe(event) {
    var zoneList =  getZone(event);
     window.vehicle.subscribe(event, zoneList,
         function(data) {
-            PRINT.pass("Subscribe success for: " + data);
-            document.addEventListener(data, eventListener, false);
+            PRINT.pass("Subscribe success for: " + data.property);
+            document.addEventListener(data.property, eventListener, false);
         },
         function(msg) {
             PRINT.fail("Subscribe failed for: " + msg);

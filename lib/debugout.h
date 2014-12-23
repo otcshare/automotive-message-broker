@@ -30,11 +30,18 @@ using namespace std;
 
 void debugOut(const string &message);
 
-class DebugOut 
+class DebugOut
 {
 public:
 
+	/*!
+	 * \brief Error use when essential functionality is blocked
+	 */
 	static const int Error;
+
+	/*!
+	 * \brief Warning use when non-essential functionality is bocked, or when workarounds exist.
+	 */
 	static const int Warning;
 
 	DebugOut(int debugLevel = 4)
@@ -85,7 +92,7 @@ public:
 		}
 		return *this;
 	}
-	
+
 	DebugOut const & operator << (double val) const
 	{
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)

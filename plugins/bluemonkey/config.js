@@ -239,6 +239,11 @@ bluemonkey.createCustomProperty("LaneDepartureStatus", "running");
 bluemonkey.createCustomProperty("AlarmStatus", "prearmed");
 bluemonkey.createCustomProperty("ParkingBrakeStatusW3C", "inactive");
 
+bluemonkey.createCustomProperty("Altitude", 200);
+bluemonkey.createCustomProperty("Latitude", 45.541174);
+bluemonkey.createCustomProperty("Longitude", -122.958967);
+
+
 var speedProperty = bluemonkey.subscribeTo("VehicleSpeed");
 
 var testTimer = bluemonkey.createTimer();

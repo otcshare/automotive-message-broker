@@ -33,9 +33,9 @@ public:
 	static ByteArray compress(ByteArray replyVector)
 	{
 		ByteArray tmp;
-		for (int i=0;i<replyVector.size();i++)
+		for (int i=0;i<replyVector.size()-1;i++)
 		{
-			tmp.push_back(obdLib::byteArrayToByte(replyVector[i],replyVector[i+1]));
+			tmp.push_back(obdLib::byteArrayToByte(replyVector[i], replyVector[i+1]));
 			i++;
 		}
 		return tmp;

@@ -138,14 +138,23 @@ protected:
 	 * \param zone Zone of the property to be found.
 	 * \return AbstractPropertyType* if signal exits otherwise nullptr(in this case we do not know its datatype)
 	 */
-	virtual AbstractPropertyType* findPropertyType(const VehicleProperty::Property& propertyName, const Zone::Type& zone);
+	virtual AbstractPropertyType* findPropertyType(const VehicleProperty::Property& propertyName, const Zone::Type& zone = Zone::None);
 
 	/*! Registers property in AMB
 	 * \param zone Zone of the property to be registered.
 	 * \param typeFactory Function to be used to create instance of the AbstractPropertyType for registered property
 	 * \return AbstractPropertyType* if signal exits otherwise nullptr(in this case we do not know its datatype)
 	 */
-	virtual std::shared_ptr<AbstractPropertyType> addPropertySupport(Zone::Type zone, std::function<AbstractPropertyType* (void)> typeFactory);
+	std::shared_ptr<AbstractPropertyType> addPropertySupport(Zone::Type zone, std::function<AbstractPropertyType* (void)> typeFactory);
+
+	template <class T>
+	std::shared_ptr<AbstractPropertyType> addPropertySupport(Zone::Type zone)
+	{
+		auto typeFactory = [](){
+			return new T;
+		};
+		return addPropertySupport(zone, typeFactory);
+	}
 
 	//
 	// data:

@@ -331,7 +331,7 @@ void Bluetooth5::connect(ConnectedCallback onconnectedCallback)
 
 		if(errorPtr)
 		{
-			DebugOut(DebugOut::Error) << "error trying to connect profile: " << errorPtr->message << endl;
+			DebugOut(DebugOut::Warning) << "error trying to connect profile: " << errorPtr->message << endl;
 		}
 	},
 	this);

@@ -40,7 +40,7 @@ map Dictionary {
 interface VehiclePropertyType {
 
   /*!
-  * \brief time stamp marking the last time a property in the interface updated
+  * \brief time in seconds since system start when a property in the interface updated.
   */
   attribute Double Time readonly
 
@@ -71,10 +71,8 @@ enumeration Zone {
 }
 
 /*! org.automotive.Manager
- * \brief Manager is a helper interface for discovering and finding available objects
- * Manager is a helper interface that helps inform of supported data types and find
- * specified data type objects' path on DBus
- * DBus Path: /
+ * \brief Manager is a helper interface for discovering and finding available objects.
+ * Objects represent interfaces to data types.
  */
 interface org.automotive.Manager  {
 
@@ -82,7 +80,7 @@ interface org.automotive.Manager  {
    *  \brief return supported properties
   */
   method List {
-    out { String[] }
+    out {array of String objectNames}
   }
 
   /*!
@@ -102,7 +100,7 @@ interface org.automotive.Manager  {
       String objectName
     }
     out {
-      String[] objectPaths
+      array of String objectPaths
     }
   }
 
@@ -138,7 +136,7 @@ interface org.automotive.Manager  {
       String objectName
     }
     out {
-      UInt32[] zones
+      array of UInt32 zones
     }
   }
 

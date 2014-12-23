@@ -681,6 +681,14 @@ PropertyList OBD2Source::supported()
 	return m_supportedProperties;
 }
 
+PropertyInfo OBD2Source::getPropertyInfo(const VehicleProperty::Property &)
+{
+	Zone::ZoneList zones;
+	zones.push_back(0);
+
+	return PropertyInfo(0, zones);
+}
+
 int OBD2Source::supportedOperations()
 {
 	return Get | Set;
@@ -733,7 +741,7 @@ void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 		g_async_queue_push(subscriptionAddQueue, pid);
 		CommandRequest *req = new CommandRequest();
 		req->req = "connectifnot";
-		g_async_queue_push(commandQueue,req);
+		g_async_queue_push(commandQueue, req);
 	}
 }
 
@@ -799,13 +807,13 @@ AsyncPropertyReply *OBD2Source::setProperty(AsyncSetPropertyRequest request )
 		{
 			CommandRequest *req = new CommandRequest();
 			req->req = "connectifnot";
-			g_async_queue_push(commandQueue,req);
+			g_async_queue_push(commandQueue, req);
 		}
 		else
 		{
 			CommandRequest *req = new CommandRequest();
 			req->req = "disconnect";
-			g_async_queue_push(commandQueue,req);
+			g_async_queue_push(commandQueue, req);
 		}
 
 	}

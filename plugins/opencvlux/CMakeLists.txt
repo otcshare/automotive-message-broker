@@ -46,15 +46,17 @@ if(Qt5Core_FOUND)
 endif(Qt5Core_FOUND)
 set(CMAKE_AUTOMOC ON)
 
-include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${QT_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${OpenCV_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${QT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common)
 
 set(opencvluxplugin_headers opencvluxplugin.h)
 set(opencvluxplugin_sources opencvluxplugin.cpp)
 
 add_library(opencvluxplugin MODULE ${opencvluxplugin_sources})
 set_target_properties(opencvluxplugin PROPERTIES PREFIX "")
-target_link_libraries(opencvluxplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES})
+target_link_libraries(opencvluxplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${OpenCV_LIBS} ${Boost_LIBRARIES} ${QT_LIBRARIES} amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common)
 
 install(TARGETS opencvluxplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_SOURCE_DIR}/README @ONLY)
 
 endif(opencvlux_plugin)

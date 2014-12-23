@@ -4,7 +4,6 @@ set(amb_examples configwheel databaseconfig databasesource dbusconfig examplecon
 
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/configwheel.in ${CMAKE_CURRENT_SOURCE_DIR}/configwheel @ONLY)
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/databaseconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/databaseconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/databasesource.in ${CMAKE_CURRENT_SOURCE_DIR}/databasesource @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/dbusconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/dbusconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/exampleconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/exampleconfig @ONLY)
