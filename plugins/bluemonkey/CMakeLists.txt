@@ -57,7 +57,7 @@ install (FILES ${config_files} DESTINATION /etc/ambd/bluemonkey)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey.in.idl ${CMAKE_CURRENT_BINARY_DIR}/docs/bluemonkey.idl @ONLY)
 
-set(bluemonkey_docs ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.idl)
+set(bluemonkey_docs ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README ${CMAKE_CURRENT_BINARY_DIR}/docs/bluemonkey.idl)
 
 if(enable_docs)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
