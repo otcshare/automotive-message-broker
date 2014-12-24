@@ -6,12 +6,28 @@ import sys
 import json
 import gobject
 import fileinput
+import glib
 from dbus.mainloop.glib import DBusGMainLoop
+
+def help():
+		help = ("Available commands:\n"
+						"help           Prints help data\n"
+						"list           List supported ObjectNames\n"
+						"get            Get properties from an ObjectName\n"
+						"listen         Listen for changes on an ObjectName\n"
+						"set            Set a property for an ObjectName\n"
+						"getHistory     Get logged data within a time range\n"
+						"quit           Exit ambctl\n")
+		return help
 
 def changed(interface, properties, invalidated):
 	print json.dumps(properties, indent=2)
 
 def processCommand(command, commandArgs):
+
+	if command == '':
+			return 1
+
 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 	bus = dbus.SystemBus()
 	managerObject = bus.get_object("org.automotive.message.broker", "/");
@@ -107,12 +123,14 @@ args = parser.parse_args()
 
 if args.command == "stdin":
 	while True:
-		line = raw_input("ambctl>> ")
+		line = raw_input("[ambctl]# ")
 		if line == 'quit':
 			sys.exit()
-		words = line.split(' ')
-		print words[1:]
-		processCommand(words[0], words[1:])
+		elif line == 'help':
+				print help()
+		else:
+				words = line.split(' ')
+				processCommand(words[0], words[1:])
 else:
 	processCommand(args.command, args.commandArgs)
 
