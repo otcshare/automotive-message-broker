@@ -70,6 +70,7 @@ void DBusSink::supportedChanged(const PropertyList &supportedProperties)
 			routingEngine->subscribeToProperty(p, mSourceFilter, this);
 			addProperty(prop);
 			supported = true;
+			mTime = amb::currentTime();
 		}
 	}
 }

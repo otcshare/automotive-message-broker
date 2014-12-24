@@ -103,7 +103,8 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 		{
 			AbstractProperty* prop = (*itr).second;
 
-			propertyList.push_back(prop->ambPropertyName());
+			if(!contains(propertyList, prop->ambPropertyName()))
+				propertyList.push_back(prop->ambPropertyName());
 		}
 
 		std::string ifaceName = iface->interfaceName();
@@ -114,7 +115,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 		request.timeBegin = beginTime;
 		request.timeEnd = endTime;
 		request.zone = iface->zone();
-		request.sourceUuid = iface->source();
+		//request.sourceUuid = iface->source();
 
 		request.completed = [&invocation,&ifaceName](AsyncRangePropertyReply* reply)
 		{
@@ -247,7 +248,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 			"</method>"
 			"<signal name='" + pn + "Changed' >"
 			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
-			"	<arg type='d' name='timestamp' direction='out' />"
+			"	<arg type='d' name='imestamp' direction='out' />"
 			"</signal>"
 			"<property type='i' name='" + property->name() + "Sequence' access='read' />";
 
