@@ -87,7 +87,7 @@ public:
 		if(! db->Connected())
 		{
 			DebugOut(0)<<"BaseDB: database not found "<<dbname<<endl;
-			throw -1;
+			return;
 		}
 		q = new sqlitequery();
 
