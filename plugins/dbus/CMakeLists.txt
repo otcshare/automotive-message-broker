@@ -17,4 +17,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/amb.conf DESTINATION /etc/dbus-1/syst
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/amb.conf ${CMAKE_CURRENT_SOURCE_DIR}/amb.conf)
 
+set(dbus_mapping_headers ${CMAKE_CURRENT_SOURCE_DIR}/runningstatus.h ${CMAKE_CURRENT_SOURCE_DIR}/environmentproperties.h ${CMAKE_CURRENT_SOURCE_DIR}/vehicleinfo.h ${CMAKE_CURRENT_SOURCE_DIR}/maintenance.h ${CMAKE_CURRENT_SOURCE_DIR}/parking.h ${CMAKE_CURRENT_SOURCE_DIR}/drivingsafety.h	${CMAKE_CURRENT_SOURCE_DIR}/personalization.h
+		CACHE INTERNAL "dbus mapping headers")
+
 add_subdirectory(amb-qt)

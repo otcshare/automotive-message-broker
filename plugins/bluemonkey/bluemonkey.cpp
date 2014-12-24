@@ -127,6 +127,20 @@ AbstractPropertyType* qVariantToAbstractPropertyType(QString name, QVariant var)
 	return nullptr;
 }
 
+QVariant toQVariant(AbstractPropertyType* val)
+{
+	QVariantMap value;
+
+	value["name"] = val->name.c_str();
+	value["zone"] = val->zone;
+	value["source"] = val->sourceUuid.c_str();
+	value["timestamp"] = val->timestamp;
+	value["sequence"] = val->sequence;
+	value["value"] = gvariantToQVariant(val->toVariant());
+
+	return value;
+}
+
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent)
 	: QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
 {
@@ -174,12 +188,12 @@ QObject *BluemonkeySink::subscribeTo(QString str)
 	return new Property(str.toStdString(), "", routingEngine, Zone::None, this);
 }
 
-QObject *BluemonkeySink::subscribeToSource(QString str, QString srcFilter)
+QObject *BluemonkeySink::subscribeTo(QString str, int zone, QString srcFilter)
 {
-	return new Property(str.toStdString(), srcFilter, routingEngine, Zone::None, this);
+	return new Property(str.toStdString(), srcFilter, routingEngine, zone, this);
 }
 
-QObject* BluemonkeySink::subscribeToZone(QString str, int zone)
+QObject* BluemonkeySink::subscribeTo(QString str, int zone)
 {
 	return new Property(str.toStdString(), "", routingEngine, zone, this);
 }
@@ -363,11 +377,9 @@ void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTi
 		{
 			QVariantList list;
 
-			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
+			for(auto val : reply->values)
 			{
-				AbstractPropertyType *val = *itr;
-
-				list.append(gvariantToQVariant(val->toVariant()));
+				list.append(toQVariant(val));
 			}
 
 			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
@@ -469,12 +481,11 @@ void Property::getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction)
 		{
 			QVariantList list;
 
-			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
+			for(auto val : reply->values)
 			{
-				AbstractPropertyType *val = *itr;
-
-				list.append(gvariantToQVariant(val->toVariant()));
+				list.append(toQVariant(val));
 			}
+
 			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
 			cbFunction.call(QJSValueList()<<val);
 
@@ -492,15 +503,15 @@ Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRo
 	setType(prop.c_str());
 }
 
-QString Property::type()
+QString Property::name()
 {
 	return mValue->name.c_str();
 }
 
 void Property::setType(QString t)
 {
-	if(mValue && type() != "")
-		routingEngine->unsubscribeToProperty(type().toStdString(), this);
+	if(mValue && name() != "")
+		routingEngine->unsubscribeToProperty(name().toStdString(), this);
 
 	routingEngine->subscribeToProperty(t.toStdString(), this);
 

@@ -47,15 +47,27 @@ Q_DECLARE_INTERFACE(ModuleInterface, "org.automotive.bluemonkey.moduleinterface"
 class Property: public QObject, public AbstractSink
 {
 	Q_OBJECT
-	Q_PROPERTY(QString type READ type)
+	Q_PROPERTY(QString name READ name)
+	Q_PROPERTY(QString source READ source)
+	Q_PROPERTY(double timestamp READ timestamp)
 	Q_PROPERTY(QVariant value READ value WRITE setValue)
 	Q_PROPERTY(int zone READ zone)
 
 public:
 	Property(VehicleProperty::Property, QString srcFilter, AbstractRoutingEngine* re, Zone::Type zone = Zone::None, QObject *parent = 0);
 
-	QString type();
+	QString name();
 	void setType(QString t);
+
+	QString source()
+	{
+		return mValue->sourceUuid.c_str();
+	}
+
+	double timestamp()
+	{
+		return mValue->timestamp;
+	}
 
 	virtual PropertyList subscriptions() { return PropertyList(); }
 	virtual void supportedChanged(const PropertyList &)
@@ -111,8 +123,9 @@ private: //source privates
 public Q_SLOTS:
 
 	QObject* subscribeTo(QString str);
-	QObject* subscribeToSource(QString str, QString srcFilter);
-	QObject* subscribeToZone(QString str, int zone);
+	QObject* subscribeTo(QString str, int zone);
+	QObject* subscribeTo(QString str, int zone, QString srcFilter);
+
 
 	QStringList sourcesForProperty(QString property);
 	QVariant zonesForProperty(QString property, QString src);

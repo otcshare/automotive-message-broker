@@ -35,10 +35,10 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Vehicle Speed in kilometers per hour.
 		 **/
-		wantPropertyVariant(VehicleProperty::VehicleSpeed,"Speed", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleSpeed, "Speed",  AbstractProperty::Read);
 
 		/// Deprecated:
-		wantPropertyVariant(VehicleProperty::VehicleSpeed,"VehicleSpeed", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleSpeed, "VehicleSpeed", AbstractProperty::Read);
 
 	}
 
@@ -57,10 +57,10 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief  Must return Engine Speed in rotations per minute.
 		 **/
-		wantPropertyVariant(VehicleProperty::EngineSpeed,"Speed", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineSpeed, "Speed", AbstractProperty::Read);
 
 		/// Deprecated:
-		wantPropertyVariant(VehicleProperty::EngineSpeed,"EngineSpeed", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineSpeed, "EngineSpeed", AbstractProperty::Read);
 
 	}
 
@@ -131,17 +131,13 @@ public:
 	:DBusSink("Transmission", re, connection, map<string, string>())
 	{
 
-		wantPropertyVariant(VehicleProperty::TransmissionShiftPosition,
-														  "ShiftPosition", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionShiftPosition, "ShiftPosition", "y", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::TransmissionGearPosition,
-														  "GearPosition", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionGearPosition, "GearPosition", "y", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::TransmissionGearPosition,
-														  "Gear", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionGearPosition, "Gear", "y", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::TransmissionModeW3C,
-														  "Mode", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionModeW3C, "Mode", "y", AbstractProperty::Read);
 
 		wantPropertyVariant(VehicleProperty::TransmissionGearType, "Type", "q", AbstractProperty::Read);
 	}
@@ -242,8 +238,8 @@ public:
 		:DBusSink("Horn", re, connection, map<string, string>())
 	{
 		/// TODO: deprecated remove in 0.14
-		wantPropertyVariant(VehicleProperty::Horn,"On",AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::Horn,"Status",AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Horn, "On", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Horn, "Status", AbstractProperty::Read);
 
 	}
 };
@@ -255,21 +251,21 @@ public:
 	FuelProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("Fuel", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::FuelLevel,"Level", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelLevel, "Level", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::FuelRange,"Range", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelRange, "Range", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::FuelConsumption,"InstantConsumption", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelConsumption, "InstantConsumption", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::FuelEconomy,"InstantEconomy", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelEconomy, "InstantEconomy", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::FuelAverageEconomy,"AverageEconomy", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FuelAverageEconomy, "AverageEconomy", AbstractProperty::ReadWrite);
 
-		wantPropertyVariant(VehicleProperty::FuelAverageConsumption,"AverageConsumption", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FuelAverageConsumption, "AverageConsumption", AbstractProperty::ReadWrite);
 
-		wantPropertyVariant(VehicleProperty::FuelConsumptionSinceRestart,"FuelConsumedSinceRestart", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FuelConsumptionSinceRestart, "FuelConsumedSinceRestart", AbstractProperty::ReadWrite);
 
-		wantPropertyVariant(VehicleProperty::FuelTimeSinceRestart,"TimeSinceRestart", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FuelTimeSinceRestart, "TimeSinceRestart", AbstractProperty::ReadWrite);
 
 	}
 };
