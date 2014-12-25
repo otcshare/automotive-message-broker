@@ -6,6 +6,7 @@ set(CMAKE_BUILD_TYPE, Debug)
 include(FindPkgConfig)
 
 set(PROJECT_NAME "automotive-message-broker")
+set(PROJECT_PRETTY_NAME "Automotive Message Broker")
 set(PROJECT_VERSION "0.12.902")
 set(PROJECT_CODENAME "agera")
 set(PROJECT_QUALITY "beta")

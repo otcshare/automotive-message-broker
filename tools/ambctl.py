@@ -6,7 +6,9 @@ import sys
 import json
 import gobject
 import fileinput
+import termios, fcntl, os
 import glib
+import curses.ascii
 from dbus.mainloop.glib import DBusGMainLoop
 
 def help():
@@ -23,18 +25,23 @@ def help():
 def changed(interface, properties, invalidated):
 	print json.dumps(properties, indent=2)
 
-def processCommand(command, commandArgs):
+def processCommand(command, commandArgs, noMain=True):
 
-	if command == '':
+	if command == 'help':
+			print help()
 			return 1
 
 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 	bus = dbus.SystemBus()
-	managerObject = bus.get_object("org.automotive.message.broker", "/");
-	managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
+	try:
+			managerObject = bus.get_object("org.automotive.message.broker", "/");
+			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
+	except:
+			print "Error connecting to AMB.  is AMB running?"
+			return 1
 
 	if command == "list" :
-		supportedList = managerInterface.List();
+		supportedList = managerInterface.List()
 		for objectName in supportedList:
 			print objectName
 		return 1
@@ -44,7 +51,7 @@ def processCommand(command, commandArgs):
 			return 1
 
 		for objectName in commandArgs:
-			objects = managerInterface.FindObject(objectName);
+			objects = managerInterface.FindObject(objectName)
 			print objectName
 			for o in objects:
 				propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", o),"org.freedesktop.DBus.Properties")
@@ -55,16 +62,19 @@ def processCommand(command, commandArgs):
 			print "ObjectName [ObjectName...]"
 			return 1
 		for objectName in commandArgs:
-			objects = managerInterface.FindObject(objectName);
+			objects = managerInterface.FindObject(objectName)
 			for o in objects:
 				bus.add_signal_receiver(changed,
 					dbus_interface="org.freedesktop.DBus.Properties",
 					signal_name="PropertiesChanged", path=o)
-		loop = gobject.MainLoop()
-		loop.run()
-
+		if noMain != True:
+				try:
+						main_loop = gobject.MainLoop(None, False)
+						main_loop.run()
+				except KeyboardInterrupt:
+						return 1
 	elif command == "set":
-		if commandArgs[0] == "help":
+		if len(commandArgs) and commandArgs[0] == "help":
 			print "ObjectName PropertyName VALUE [ZONE]"
 			return 1
 		if len(commandArgs) < 3:
@@ -108,7 +118,7 @@ def processCommand(command, commandArgs):
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
 	else:
-		print "unknown command"
+		print "Invalid command"
 	return 1
 
 
@@ -122,15 +132,210 @@ parser.add_argument('commandArgs', metavar='ARG', nargs='*',
 args = parser.parse_args()
 
 if args.command == "stdin":
-	while True:
-		line = raw_input("[ambctl]# ")
-		if line == 'quit':
-			sys.exit()
-		elif line == 'help':
-				print help()
-		else:
-				words = line.split(' ')
-				processCommand(words[0], words[1:])
+		class Data:
+				history = []
+				line = ""
+				templine = ""
+				promptAmbctl = "[ambctl]"
+				promptEnd = "# "
+				fullprompt = promptAmbctl + promptEnd
+				curpos = 0
+				historypos = -1
+				def full_line_len(self):
+						return len(self.fullprompt) + len(self.line)
+				def insert(self, str):
+						if self.curpos == len(self.line):
+								self.line+=str
+								self.curpos = len(self.line)
+						else:
+								self.line = self.line[:self.curpos] + str + self.line[self.curpos:]
+								self.curpos+=1
+				def arrow_back(self):
+						if self.curpos > 0:
+								self.curpos-=1
+								return True
+						return False
+
+				def arrow_forward(self):
+						if self.curpos < len(self.line):
+								self.curpos+=1
+								return True
+						return False
+
+				def back_space(self):
+						if self.curpos > 0:
+								self.curpos-=1
+								self.line = self.line[:self.curpos] + self.line[self.curpos+1:]
+								return True
+						return False
+				def delete(self):
+						if self.curpos < len(self.line):
+								self.line = self.line[:self.curpos] + self.line[self.curpos+2:]
+								return True
+						return False
+
+				def save_temp(self):
+						if len(self.history)-1 == 0 or len(self.history)-1 != self.historypos:
+								return
+						self.templine = self.line
+
+				def push(self):
+						self.history.append(self.line)
+						self.historypos = len(self.history)-1
+						self.clear()
+
+				def set(self, str):
+						self.line = str
+						self.curpos = len(self.line)
+
+				def history_up(self):
+						if self.historypos >= 0:
+								self.line = self.history[self.historypos]
+								if self.historypos != 0:
+										self.historypos-=1
+								return True
+						return False
+
+				def history_down(self):
+						if self.historypos >= 0 and self.historypos < len(self.history)-1:
+								self.historypos+=1
+								self.line = self.history[self.historypos]
+
+						else:
+								self.historypos = len(self.history)-1
+								self.set(self.templine)
+
+						return True
+
+				def clear(self):
+						self.set("")
+						templist = ""
+
+
+
+		class bcolors:
+				HEADER = '\x1b[95m'
+				OKBLUE = '\x1b[94m'
+				OKGREEN = '\x1b[92m'
+				WARNING = '\x1b[93m'
+				FAIL = '\x1b[91m'
+				ENDC = '\x1b[0m'
+				GREEN = '\x1b[32m'
+				WHITE = '\x1b[37m'
+				BLUE = '\x1b[34m'
+
+		def erase_line():
+				sys.stdout.write('\x1b[2K\x1b[80D')
+
+		def cursor_left():
+				sys.stdout.write('\x1b[1D')
+
+		def cursor_right():
+				sys.stdout.write('\x1b[1C')
+
+		def display_prompt():
+				sys.stdout.write(bcolors.OKBLUE+Data.promptAmbctl+bcolors.WHITE+Data.promptEnd);
+
+		def redraw(data):
+				erase_line()
+				display_prompt()
+				sys.stdout.write(data.line)
+				cursorpos = len(data.line) - data.curpos
+				for x in xrange(cursorpos):
+						cursor_left()
+				sys.stdout.flush()
+
+		def handle_keyboard(source, cond, data):
+						str = source.read()
+						#print "char: ", ord(str)
+
+						if len(str) > 1:
+								if ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 68: #left arrow
+										if data.arrow_back():
+												cursor_left()
+												sys.stdout.flush()
+								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 67: #right arrow
+										if data.arrow_forward():
+												cursor_right()
+												sys.stdout.flush()
+								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 70: #end
+										while data.arrow_forward():
+												cursor_right()
+												sys.stdout.flush()
+								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 72: #home
+										while data.arrow_back():
+												cursor_left()
+										sys.stdout.flush()
+								elif len(str) == 4 and ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 51 and ord(str[3]) == 126: #del
+										data.delete()
+										redraw(data)
+								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 65:
+										#up arrow
+										data.save_temp()
+										data.history_up()
+										while data.arrow_forward():
+												cursor_right()
+										redraw(data)
+								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 66:
+										#down arrow
+										data.history_down()
+										while data.arrow_forward():
+												cursor_right()
+										redraw(data)
+						elif ord(str) == 10: #enter
+								if data.line == "":
+										return True
+								print ""
+								words = data.line.split(' ')
+								if words[0] == "quit":
+										sys.exit()
+								try:
+										if len(words) > 1:
+												processCommand(words[0], words[1:])
+										else:
+												processCommand(words[0], [])
+								except dbus.exceptions.DBusException, error:
+										print error
+								except:
+										print "Error running command ", sys.exc_info()[0]
+								data.push();
+								data.clear()
+								redraw(data)
+						elif ord(str) == 127: #backspace
+								data.back_space()
+								redraw(data)
+						elif curses.ascii.isalnum(ord(str)) or ord(str) == curses.ascii.SP: #regular text
+								data.insert(str)
+								redraw(data)
+
+						return True
+		print "@PROJECT_PRETTY_NAME@ @PROJECT_VERSION@"
+
+		data = Data()
+		fd = sys.stdin.fileno()
+		old = termios.tcgetattr(fd)
+		new = termios.tcgetattr(fd)
+		new[3] = new[3] & ~termios.ICANON & ~termios.ECHO
+		termios.tcsetattr(fd, termios.TCSANOW, new)
+
+		oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
+		fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
+
+		io_stdin = glib.IOChannel(fd)
+		io_stdin.add_watch(glib.IO_IN, handle_keyboard, data)
+
+		try:
+				erase_line()
+				display_prompt()
+				sys.stdout.flush()
+				main_loop = gobject.MainLoop(None, False)
+				main_loop.run()
+		except KeyboardInterrupt:
+				sys.exit()
+		finally:
+				termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+				fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+
 else:
-	processCommand(args.command, args.commandArgs)
+	processCommand(args.command, args.commandArgs, False)
 

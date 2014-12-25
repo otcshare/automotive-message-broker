@@ -5,6 +5,8 @@ import sys
 import argparse
 import json
 
+print "This application is deprecated.  It will disappear in the future.  Use ambctl"
+
 parser = argparse.ArgumentParser()
 parser.add_argument("get", help="get {objectName}")
 args = parser.parse_args()
