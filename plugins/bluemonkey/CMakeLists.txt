@@ -57,24 +57,27 @@ install (FILES ${config_files} DESTINATION /etc/ambd/bluemonkey)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey.in.idl ${CMAKE_CURRENT_BINARY_DIR}/docs/bluemonkey.idl @ONLY)
 
-set(bluemonkey_docs ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README ${CMAKE_CURRENT_BINARY_DIR}/docs/bluemonkey.idl)
+set(bluemonkey_doc_files ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README ${CMAKE_CURRENT_BINARY_DIR}/docs/bluemonkey.idl)
 
 if(enable_docs)
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-	add_custom_target(bluemonkey_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-										COMMENT "Generating Bluemonkey javascript API documentation with Doxygen" VERBATIM)
+	find_package(Doxygen)
+	if(DOXYGEN_FOUND)
+		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+		add_custom_target(bluemonkey_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+											COMMENT "Generating Bluemonkey javascript API documentation with Doxygen" VERBATIM)
 
-	#generate mappings documentation
-	add_custom_target(genmappings_bluemonkey
-										python ${CMAKE_SOURCE_DIR}/tools/genmapping --output ${CMAKE_CURRENT_BINARY_DIR}/docs/ambdbusmappings.idl ${dbus_mapping_headers}
-										COMMENT "running genmapping")
-	add_dependencies(bluemonkey_docs genmappings_bluemonkey)
+		#generate mappings documentation
+		add_custom_target(genmappings_bluemonkey
+											python ${CMAKE_SOURCE_DIR}/tools/genmapping --output ${CMAKE_CURRENT_BINARY_DIR}/docs/ambdbusmappings.idl ${dbus_mapping_headers}
+											COMMENT "running genmapping")
+		add_dependencies(bluemonkey_docs genmappings_bluemonkey)
 
-	install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/html DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
-	install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/latex DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
+		install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/html DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
+		install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/latex DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
+	endif(DOXYGEN_FOUND)
 
 endif(enable_docs)
 
-install (FILES ${bluemonkey_docs} DESTINATION ${DOC_INSTALL_DIR}/plugins)
+install (FILES ${bluemonkey_doc_files} DESTINATION ${DOC_INSTALL_DIR}/plugins)
 
 endif(bluemonkey_plugin)
