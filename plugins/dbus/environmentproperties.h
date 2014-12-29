@@ -18,7 +18,7 @@ public:
 		 * @access readonly
 		 * @attributeComment \brief Must return the brightness outside the vehicle in lux.
 		 */
-		wantPropertyVariant(VehicleProperty::ExteriorBrightness,"ExteriorBrightness", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ExteriorBrightness, "ExteriorBrightness", "q", AbstractProperty::Read);
 
 	}
 };
@@ -207,7 +207,7 @@ public:
 	WindowStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindowStatus", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowStatus, "Openness", AbstractProperty::ReadWrite);
 		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", AbstractProperty::ReadWrite);
 	}
 };
@@ -218,7 +218,7 @@ public:
 	SideWindowStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SideWindow", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::WindowStatus,"Openness", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowStatus, "Openness", AbstractProperty::ReadWrite);
 		wantPropertyVariant(VehicleProperty::WindowLockStatus, "Lock", AbstractProperty::ReadWrite);
 	}
 };
@@ -229,7 +229,7 @@ public:
 	DefrostProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Defrost", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::DefrostWindow,"DefrostWindow", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::DefrostWindow, "DefrostWindow", AbstractProperty::ReadWrite);
 		wantPropertyVariant(VehicleProperty::DefrostMirror, "DefrostMirror", AbstractProperty::ReadWrite);
 	}
 };

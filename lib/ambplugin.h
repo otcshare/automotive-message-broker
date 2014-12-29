@@ -24,10 +24,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <string>
 
 /*!
- * \defgroup ivipocbase ivipocbase static library
+ * \file ambplugin.h
  * \brief Contains common code used in all IviPoC II plugins for Automotive message broker(AMB).
+ */
+
+/*!
+ * AmbPlugin class contains common code used in all IviPoC II plugins for Automotive message broker(AMB).
+ * For the AMB library API please visit <a href="https://github.com/otcshare/automotive-message-broker">Automotive message broker web page</a>.
  *
- * Example of the minimal code to write a new plugin using ivipocbase:
+ * \class AmbPlugin
+ *
+ * Example of the minimal code to write a new plugin using AmbPlugin:
  *
  * \code
  * #include "ambpluginimpl.h"
@@ -50,15 +57,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *
  *  @{
  */
-
-/*!
- * AmbPlugin class contains common code used in all IviPoC II plugins for Automotive message broker(AMB).
- * For the AMB library API please visit <a href="https://github.com/otcshare/automotive-message-broker">Automotive message broker web page</a>.
- *
- * \class AmbPlugin
- */
-
-//class AmbPluginImpl;
 
 template<class T>
 class AmbPlugin : public AbstractSource {

@@ -1,4 +1,5 @@
 Database plugin
+Version: @PROJECT_VERSION@
 
 This plugin logs properties in a sqlite database file.  It can also be used as a source to
 play back previous logs to AMB.
@@ -10,15 +11,15 @@ cmake -Ddatabase_plugin=On ..
 To use the Database plugin, add the following to the "sources" array in /etc/ambd/config:
 
 {
-	"name" : "Database",
-	"path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
-	"databaseFile" : "storage",
-	"bufferLength" : "100",
-	"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
-	"startOnLoad" : "false",
-	"playbackOnLoad" : "false",
-	"playbackMultiplier" : "1",
-	"frequency" : "1"
+  "name" : "Database",
+  "path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
+  "databaseFile" : "storage",
+  "bufferLength" : "100",
+  "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
+  "startOnLoad" : "false",
+  "playbackOnLoad" : "false",
+  "playbackMultiplier" : "1",
+  "frequency" : "1"
 }
 
 Configuration Key Definitions:
@@ -35,7 +36,7 @@ path to log file
 Default: "storage"
 
 "bufferLength"
-Number of logged items to keep in memory before flushing to the database file.  
+Number of logged items to keep in memory before flushing to the database file.
 A higher number will reduce writes and improve performance.
 
 Default: 100
@@ -63,7 +64,7 @@ Default: 1
 
 "frequency"
 Frequency in Hz in which the database will write contents.  Only the newest values
-will be written.  Other values are discarded.  If bufferLength is not full,the 
+will be written.  Other values are discarded.  If bufferLength is not full,the
 database will not be written to until it is.
 
 Default: 1
@@ -72,7 +73,7 @@ AMB Properties:
 
 DatabaseFile
 Type: string
-File to be used to log or play back.  
+File to be used to log or play back.
 
 corresponds to configuration option "databaseFile".
 
@@ -91,7 +92,7 @@ Type: bool
 Access: read/write
 
 Indicates whether database playback is occuring.  Set to true to turn on playback.
-Set to false to turn off playback. This property is mutually exclusive with the 
+Set to false to turn off playback. This property is mutually exclusive with the
 DatabaseLogging property.  Setting this to true will turn off logging.
 
 Default: false when configuration option "playbackOnLoad" is not set.

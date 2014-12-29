@@ -133,8 +133,10 @@ AbstractPropertyType* AmbPluginImpl::findPropertyType(const VehicleProperty::Pro
 	return nullptr;
 }
 
-std::shared_ptr<AbstractPropertyType> AmbPluginImpl::addPropertySupport(Zone::Type zone, std::function<AbstractPropertyType* (void)> typeFactory)
+std::shared_ptr<AbstractPropertyType> AmbPluginImpl::addPropertySupport(Zone::Type zone, std::function<AbstractPropertyType* (void)> typeFactory, std::string sourceUuid)
 {
+	if(sourceUuid.empty())
+		sourceUuid = uuid();
 	std::shared_ptr<AbstractPropertyType> propertyType(typeFactory());
 	if(!propertyType)
 		return propertyType;
@@ -154,9 +156,10 @@ std::shared_ptr<AbstractPropertyType> AmbPluginImpl::addPropertySupport(Zone::Ty
 		propertyType.swap(registeredPropertyType);
 	}
 	propertyType->zone = zone;
-	propertyType->sourceUuid = uuid();
+	propertyType->sourceUuid = sourceUuid;
+	propertyType->timestamp = amb::currentTime();
 	ZonePropertyType& zonePropType = properties[name];
-	zonePropType.insert( make_pair(zone, propertyType));
+	zonePropType.insert(make_pair(zone, propertyType));
 	return propertyType;
 }
 

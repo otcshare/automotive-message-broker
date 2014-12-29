@@ -140,7 +140,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 	:AmbPluginImpl(engine, config, parent), shared(nullptr), playback(false), playbackShared(nullptr), playbackMultiplier(1)
 {
 	tablename = "data";
-	tablecreate = "CREATE TABLE IF NOT EXISTS data (key TEXT, value BLOB, source TEXT, zone INTEGER, time REAL, sequence REAL, tripId TEXT)";
+	tablecreate = database_table_create;
 
 	if(config.find("bufferLength") != config.end())
 	{
@@ -341,7 +341,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 {
 	initDb();
 
-	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key, zone FROM " + tablename);
+	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key, zone, source FROM " + tablename);
 
 	for(int i=0; i < supportedStr.size(); i++)
 	{
@@ -350,11 +350,13 @@ void DatabaseSink::setDatabaseFileName(string filename)
 		if(!contains(supported(), name))
 		{
 			std::string zoneStr = supportedStr[i][1];
+			std::string sourceStr = supportedStr[i][2];
 
-			DebugOut() << "adding property " << name << " in zone: " << zoneStr << endl;
+			DebugOut() << "adding property " << name << " in zone: " << zoneStr << "for source: " << sourceStr << endl;
 
 			Zone::Type zone = boost::lexical_cast<Zone::Type>(zoneStr);
-			addPropertySupport(zone, [name]() { return VehicleProperty::getPropertyTypeForPropertyNameValue(name); });
+			auto property = addPropertySupport(zone, [name]() { return VehicleProperty::getPropertyTypeForPropertyNameValue(name); });
+			property->sourceUuid = sourceStr;
 		}
 	}
 
@@ -417,17 +419,18 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	for(auto itr = reply->properties.begin(); itr != reply->properties.end(); itr++)
 	{
+		DebugOut() << "prop: " << (*itr) << endl;
 		if(itr != reply->properties.begin())
 			query<<" OR ";
 
 		query<<"key='"<<(*itr)<<"'";
 	}
 
-	query<<") AND";
+	query<<")";
 
-	if(reply->timeBegin && reply->timeEnd)
+	if(reply->timeEnd)
 	{
-		query<<" time BETWEEN "<<reply->timeBegin<<" AND "<<reply->timeEnd;
+		query<<" AND time BETWEEN "<<reply->timeBegin<<" AND "<<reply->timeEnd;
 	}
 
 	if(reply->sequenceBegin >= 0 && reply->sequenceEnd >=0)
@@ -444,9 +447,19 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 
 	DebugOut()<<"Dataset size "<<data.size()<<endl;
 
-	for(auto i=0;i<data.size();i++)
+	if(!data.size())
 	{
-		if(data[i].size() != 6)
+		reply->success = false;
+		reply->error = AsyncPropertyReply::InvalidOperation;
+	}
+	else
+	{
+		reply->success = true;
+	}
+
+	for(auto i=0; i<data.size(); i++)
+	{
+		if(data[i].size() != 7)
 			continue;
 
 		DBObject dbobj;
@@ -456,6 +469,7 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 		dbobj.zone = boost::lexical_cast<double>(data[i][3]);
 		dbobj.time = boost::lexical_cast<double>(data[i][4]);
 		dbobj.sequence = boost::lexical_cast<double>(data[i][5]);
+		dbobj.tripId = data[i][6];
 
 		AbstractPropertyType* property = VehicleProperty::getPropertyTypeForPropertyNameValue(dbobj.key, dbobj.value);
 		if(property)
@@ -467,7 +481,7 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 		}
 	}
 
-	reply->success = true;
+
 	reply->completed(reply);
 
 	delete db;

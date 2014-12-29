@@ -10,21 +10,41 @@ vehicle = navigator.vehicle;
 
 function get(objName) {
 
-  if(!vehicle[objName].get) {
-    debug("no get() method for " + objName);
-    return;
-  }
+	if(!vehicle[objName].get) {
+		debug("Error no get() method for " + objName);
+		return;
+	}
 
-  vehicle[objName].get().then(function(data) {
-   try {
-      debug("get " + objName + ": " + JSON.stringify(data));
-    } catch(error) {
-      debug("error " + error.message);
-   }
-  },
-  function(error) {
-    debug("error getting " + objName + ": " + error.message);
-  });
+	var zones = vehicle[objName].zones;
+	if(zones.length !== 0)
+	{
+		for(var zone in zones)
+		{
+			vehicle[objName].get(zone).then(function(data) {
+				try {
+					debug("get " + objName + ": " + JSON.stringify(data));
+				} catch(error) {
+					debug("error " + error.message);
+				}
+			},
+			function(error) {
+				debug("error getting " + objName + ": " + error.message);
+			});
+		}
+	}
+	else
+	{
+		vehicle[objName].get().then(function(data) {
+			try {
+				debug("get " + objName + ": " + JSON.stringify(data));
+			} catch(error) {
+				debug("error " + error.message);
+			}
+		},
+		function(error) {
+			debug("error getting " + objName + ": " + error.message);
+		});
+	}
 }
 
 debug("testing zones...");
@@ -50,34 +70,34 @@ debug("testing subscribe()");
 
 var subReplies = 0;
 var handle = vehicle.vehicleSpeed.subscribe(function(data) {
-  console.log("got subscribe callback");
-  debug("Vehicle speed changed: " + data.speed);
-  subReplies++;
+	console.log("got subscribe callback");
+	debug("Vehicle speed changed: " + data.speed);
+	subReplies++;
 
-  if (subReplies === 5) {
-    debug("unsubscribing");
-    vehicle.vehicleSpeed.unsubscribe(handle);
-  }
+	if (subReplies === 5) {
+		debug("unsubscribing");
+		vehicle.vehicleSpeed.unsubscribe(handle);
+	}
 });
 
 debug("test invalid zone error");
 vehicle.vehicleSpeed.get("invalidzone").then(function() { },
-  function(error) { debug("Invalid zone: " + error.message); });
+	function(error) { debug("Invalid zone: " + error.message); });
 
 ///test set()
 debug("testing set()");
 
 vehicle.lightStatus.set({"fog" : false}).then(function() {
-   debug("set success!");
+	 debug("set success!");
 }, function(error) {
-   debug("set fail! " + error.message);
+	 debug("set fail! " + error.message);
 });
 
 for(var propName in vehicle) {
-  if(typeof(obj[propName]) != "undefined") {
-    debug("vehicle." + propName);
-    get(propName);
-  }
+	if(typeof(vehicle[propName]) != "undefined") {
+		debug("vehicle." + propName);
+		get(propName);
+	}
 }
 
 </script>

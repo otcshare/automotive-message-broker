@@ -4,6 +4,8 @@ import dbus
 import sys
 import argparse
 
+print "This application is deprecated.  It will disappear in the future.  Use ambctl"
+
 parser = argparse.ArgumentParser()
 parser.add_argument("objectName", help="{objectName}")
 parser.add_argument("property", help="{propertyToSet}")
@@ -22,17 +24,17 @@ zone = int(args.zone)
 realValue = 0
 
 if valueType == "boolean":
-  realValue = value == "true"
+	realValue = value == "true"
 elif valueType == "integer":
-  realValue = dbus.Int32(value)
+	realValue = dbus.Int32(value)
 elif valueType == "string":
-  realValue = value
+	realValue = value
 elif valueType == "double":
-  realValue = double(value)
+	realValue = double(value)
 elif valueType == "UInt16":
-  realValue = dbus.UInt16(value)
+	realValue = dbus.UInt16(value)
 else:
-  raise Exception("Unknown type: " + valueType)
+	raise Exception("Unknown type: " + valueType)
 
 bus = dbus.SystemBus()
 managerObject = bus.get_object("org.automotive.message.broker", "/");
