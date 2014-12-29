@@ -304,20 +304,26 @@ AsyncPropertyReply *Core::getPropertyAsync(AsyncPropertyRequest request)
 	return reply;
 }
 
-AsyncRangePropertyReply * Core::getRangePropertyAsync(AsyncRangePropertyRequest request)
+void Core::getRangePropertyAsync(AsyncRangePropertyRequest request)
 {
 	AsyncRangePropertyReply * reply = new AsyncRangePropertyReply(request);
 
-	for(auto itr = mSources.begin(); itr != mSources.end(); ++itr)
+	bool anySupport = false;
+	for(auto src : mSources)
 	{
-		AbstractSource* src = *itr;
 		if(((src->supportedOperations() & AbstractSource::GetRanged) == AbstractSource::GetRanged))
 		{
+			anySupport = true;
 			src->getRangePropertyAsync(reply);
 		}
 	}
 
-	return reply;
+	if(!anySupport)
+	{
+		reply->success = false;
+		reply->error = AsyncPropertyReply::InvalidOperation;
+		reply->completed(reply);
+	}
 }
 
 AsyncPropertyReply * Core::setProperty(AsyncSetPropertyRequest request)

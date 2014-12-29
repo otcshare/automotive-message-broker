@@ -1,4 +1,5 @@
 OpenCV "lux" plugin
+Version: @PROJECT_VERSION@
 
 This plugin simulates the ExteriorBrigtness property using a traditional webcamera.  It works
 by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
@@ -14,7 +15,7 @@ To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/
 
 {
   "name" : "OpenCV LUX",
-  "path" : "/usr/lib/automotive-message-broker/opencvluxplugin.so",
+  "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
   "threaded" : "true",
   "pixelLowerBound" : "0",
   "pixelUpperBound" : "255",

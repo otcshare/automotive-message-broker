@@ -69,6 +69,8 @@ def processCommand(command, commandArgs, noMain=True):
 				print json.dumps(propertiesInterface.GetAll("org.automotive."+objectName), indent=2)
 		return 1
 	elif command == "listen":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
 		if commandArgs[0] == "help":
 			print "ObjectName [ObjectName...]"
 			return 1
@@ -85,6 +87,8 @@ def processCommand(command, commandArgs, noMain=True):
 				except KeyboardInterrupt:
 						return 1
 	elif command == "set":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
 		if len(commandArgs) and commandArgs[0] == "help":
 			print "ObjectName PropertyName VALUE [ZONE]"
 			return 1
@@ -109,22 +113,24 @@ def processCommand(command, commandArgs, noMain=True):
 			print "Error setting property"
 		return 1
 	elif command == "getHistory":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
 		if commandArgs[0] == "help":
-			print "ObjectName [STARTTIME] [ENDTIME] [ZONE]"
+			print "ObjectName [ZONE] [STARTTIME] [ENDTIME] "
 			return 1
 		if len(commandArgs) < 1:
 			print "getHistory requires more arguments (see getHistory help)"
 			return 1
 		objectName = commandArgs[0]
 		start = 1
-		if len(commandArgs) >= 2:
-			start = float(commandArgs[1])
-		end = 9999999999
 		if len(commandArgs) >= 3:
-			end = float(commandArgs[2])
+			start = float(commandArgs[2])
+		end = 9999999999
+		if len(commandArgs) >= 4:
+			end = float(commandArgs[3])
 		zone = 0
-		if len(commandArgs) == 4:
-			zone = int(commandArgs[3])
+		if len(commandArgs) >= 2:
+			zone = int(commandArgs[1])
 		object = managerInterface.FindObjectForZone(objectName, zone);
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
@@ -342,4 +348,7 @@ if args.command == "stdin":
 				sys.exit()
 
 else:
-	processCommand(args.command, args.commandArgs, False)
+	try:
+		processCommand(args.command, args.commandArgs, False)
+	except dbus.exceptions.DBusException, error:
+		print error

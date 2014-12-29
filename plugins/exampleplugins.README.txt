@@ -1,0 +1,36 @@
+example source and sink plugins
+Version: @PROJECT_VERSION@
+
+The example plugins are source and sink plugin that provide a simple example of how to create a plugin.
+They are useful for testing AMB but only support a limited number of properties.
+
+The example plugins is enabled by default.
+
+
+To use the example source plugin, add the following to the "sources" array in /etc/ambd/config:
+
+{
+	  "name" : "ExampleSouce",
+	  "path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so",
+	  "delay" : "1"
+}
+
+To use the example sink, add the following to the "sinks" array in /etc/ambd/config:
+
+{
+	  "name" : "ExampleSink",
+	  "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
+}
+
+Configuration Key Definitions:
+
+"name"
+name of plugin.  This key is not used by the plugin at this moment.
+
+"path"
+path to plugin on the filesystem.
+
+"delay" (source plugin only)
+Delay in miliseconds when the source will generate a changed event
+
+default: 1000

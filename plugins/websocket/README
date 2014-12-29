@@ -1,6 +1,7 @@
-websocket plugins
+Websocket plugins
+Version: @PROJECT_VERSION@
 
-The websocket sink and source plugins are designed to relay data between devices and 
+The websocket sink and source plugins are designed to relay data between devices and
 potentially to web pages.
 
 To enable the websocket plugins, run cmake and enable the websocket_plugin option:
@@ -12,7 +13,7 @@ To use the websocket sink plugin, add the following to the "sinks" array in /etc
 
 {
 	"name" : "websocket sink",
-	"path" : "/usr/lib/automotive-message-broker/websocketsink.so",
+	"path" : "@PLUGIN_INSTALL_PATH@/websocketsink.so",
 	"interface" : "lo",
 	"useExtensions" : "true",
 	"binaryProtocol" : "false",
@@ -25,7 +26,7 @@ To use the websocket source plugin, add the following to the "sources" array in 
 
 {
 	"name" : "WebsocketSource",
-	"path" : "/usr/lib/automotive-message-broker/websocketsource.so",
+	"path" : "@PLUGIN_INSTALL_PATH@/websocketsource.so",
 	"port" : "23000",
 	"ssl" : "false",
 	"ip" : "192.168.1.40",

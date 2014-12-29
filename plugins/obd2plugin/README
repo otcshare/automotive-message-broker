@@ -1,4 +1,5 @@
 OBD-II Source Plugin
+Version: @PROJECT_VERSION@
 
 The OBD-II Source plugin uses ELM compatible scantools to get vehicle information.
 It is known to work with a number of commercial scantools including:
@@ -13,7 +14,7 @@ To use the OBD-II Source plugin, add the following config to your /etc/ambd/conf
 "sources" : [
 		{
 			"name" : "OBD2Source",
-			"path" : "/usr/lib/automotive-message-broker/obd2sourceplugin.so",
+			"path" : "@PLUGIN_INSTALL_PATH@/obd2sourceplugin.so",
 			"device" : "/dev/ttyUSB0",
 			"baud" : "9600",
 			"bluetoothAdapter" : ""

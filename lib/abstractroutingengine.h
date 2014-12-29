@@ -142,6 +142,20 @@ public:
 		ZoneNotSupported
 	};
 
+	static std::string errorToStr(Error err)
+	{
+		if(err == NoError)
+			return "NoError";
+		else if(err == Timeout)
+			return "Timeout";
+		else if(err == InvalidOperation)
+			return "InvalidOperation";
+		else if(err == PermissionDenied)
+			return "PermissionDenied";
+		else if(err == ZoneNotSupported)
+			return "ZoneNotSupported";
+	}
+
 	/*!
 	 * \brief value of the reply.  This may be null if success = false.  This is owned by the source.
 	 */
@@ -399,7 +413,8 @@ public:
 	 *	routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);
 	 *
 	 */
-	virtual AsyncRangePropertyReply * getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
+
+	virtual void getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
 
 	/*!
 	 * \brief setProperty sets a property to a value.

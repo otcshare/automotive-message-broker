@@ -1,4 +1,5 @@
-gps nmea plugin
+GPS NMEA plugin
+Version: @PROJECT_VERSION@
 
 This plugin uses NMEA-compatible devices to provide location information to AMB.
 
@@ -10,7 +11,7 @@ To use the Database plugin, add the following to the "sources" array in /etc/amb
 
 {
 	"name" : "gpsnmea",
-	"path" : "/usr/lib/automotive-message-broker/gpsnmea.so",
+	"path" : "@PLUGIN_INSTALL_PATH@/gpsnmea.so",
 	"device" : "/dev/ttyUSB0",
 	"baudrate" : "4800",
 	"bluetoothAdapter" : "00:00:00:00:00:00"

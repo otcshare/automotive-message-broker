@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 2.8)
 set(CMAKE_BUILD_TYPE, Debug)
 
 include(FindPkgConfig)
+include(CMakeDependentOption)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_PRETTY_NAME "Automotive Message Broker")
@@ -74,33 +75,6 @@ add_definitions(-DDBusServiceName="org.automotive.message.broker")
 set(include_dirs ${libtool_INCLUDE_DIR} ${glib_INCLUDE_DIRS} ${gio_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS} ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 set(link_libraries -lamb ${glib_LIBRARIES} ${json_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
 
-if(qtmainloop)
-	message(STATUS "using Qt mainloop")
-
-	find_package(Qt5Core)
-	if(Qt5Core_FOUND)
-		message(STATUS "using Qt5")
-		set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS})
-		set(QT_LIBRARIES ${Qt5Core_LIBRARIES})
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
-	#	if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-	#		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=large")
-	#	endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
-		add_definitions(${Qt5Core_DEFINITIONS})
-	else(Qt5Core_FOUND)
-		message(STATUS "using Qt4")
-		find_package( Qt4 REQUIRED )
-		include(${QT_USE_FILE})
-
-	endif(Qt5Core_FOUND)
-
-	set(include_dirs ${include_dirs} ${QT_INCLUDE_DIRS})
-	set(link_libraries ${link_libraries} ${QT_LIBRARIES})
-
-	add_definitions(-DQT_NO_KEYWORDS)
-	add_definitions(-DUSE_QT_CORE)
-endif(qtmainloop)
-
 if(usebluez5)
 	add_definitions(-DUSE_BLUEZ5)
 
@@ -135,8 +109,8 @@ INCLUDE(CPack)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/packaging.in/config.tizen.in ${CMAKE_CURRENT_BINARY_DIR}/packaging.in/config.tizen @ONLY)
 
 add_subdirectory(lib)
-add_subdirectory(ambd)
 add_subdirectory(plugins)
+add_subdirectory(ambd)
 add_subdirectory(docs)
 add_subdirectory(tests)
 add_subdirectory(tools)

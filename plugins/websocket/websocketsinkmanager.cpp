@@ -221,7 +221,7 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 		delete reply;
 	};
 
-	AsyncRangePropertyReply* reply = routingEngine->getRangePropertyAsync(rangedRequest);
+	routingEngine->getRangePropertyAsync(rangedRequest);
 }
 
 void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Property property, string uuid)
