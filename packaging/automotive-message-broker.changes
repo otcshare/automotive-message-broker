@@ -1,4 +1,107 @@
-* Thu Nov 05 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20141029.180744-6-gfa57967
+* Mon Dec 29 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20141224.181835-11-g3b0b2fc
+- updated docs. added deleted callback
+- fixed crashes in websocketsource
+- bluemonkey irc module
+- fixed obd2 disconnect bug
+- fixed bluemonkey config path
+- fixed FanSpeedLevel name
+- update cache of dbus properties even if not currently registered
+- initial zone support for bluemonkey
+- fixed battery ChargeLevel type error
+- fixed Temperature interface name
+- added xwalk. added set
+- add JS for set and post reply when done
+- fixed bluemonkey type
+- transform attribute name to something AMB expects
+- fixed regression in cangen plugin
+- 0.13 codename 'agera'
+- fixed Obd2Connected
+- fixed xwalk subscribe issue
+- fixed database playback
+- added support for several w3c data spec properties
+- some ddd facial/eye detection stuff
+- opencl works
+- fixed yellow light
+- try-catch some functions that might throw
+- running status api's complete
+- version bump 0.12.801
+- added test js scripts from xwalk upstream
+- added mainpage for lib documentation
+- added more tests to xwalk
+- bluemonkey set default values
+- [xwalk] install js test files
+- create connection at startup
+- manager null by default
+- init manager in constructor
+- support engine coolant
+- version bump 0.12.802
+- show frame
+- do intensity detection on gray image
+- support all maintenance properties
+- initial support for supported()
+- updated to opencv 3.0
+- add new manager API: SupportsProperty()
+- default no logging
+- initial support for availability api
+- fixed availability api
+- bluemonkey database module
+- removed generated code
+- updated opencv README and removed deprecated features
+- update gps plugin to use smart pointers
+- generate vehicle_api.cc properly
+- some cleanup
+- clean up modules handles
+- [websocket] fix subscribe, update test.html
+- amb needs to start up after bluez to take advantage of bluetooth
+- added personalization properties
+- async queue blocking option. tripid in database
+- added driving safety attributes
+- removed unmaintained plugins
+- bluemonkey support list types
+- added packaging
+- fixed gvariant creation for set
+- do not export properties not in our zone
+- climate properties
+- added driving safety attributes
+- updated release notes
+- fixed incorrect reporting of zone in dbus signal
+- fixed zone issue
+- fixed docs; fixed test plugin
+- clean rebase.  added packaging.
+- Update README
+- Update README
+- updated idl
+- fixed issue where database plugin was not properly exporting zones for supported properties
+- Update testing
+- Fix all plugins; fix websocket plugins
+- added location to bluemonkey
+- fixed amb-set script to better handle wrong types
+- use unique pointers for memory management
+- fixed issues with OpenCV plugin
+- fixed database and obd2
+- Update README
+- Update README
+- updated idl
+- fixed issue where database plugin was not properly exporting zones for supported properties
+- Update testing
+- Fix all plugins; fix websocket plugins
+- added location to bluemonkey
+- fixed amb-set script to better handle wrong types
+- use unique pointers for memory management
+- fixed issues with OpenCV plugin
+- fixed database and obd2
+- fix for typo in CMakeFile and vehicle.html
+- lots of added documentation, including bluemonkey javascript api docs
+- added cmake file for tools
+- install bluemonkey.idl from correct location
+- [tools] ambctl test script
+- ambctl can read input from user
+- help menu for ambctl
+- added terminal-like behavior to ambctl
+- fix build issue with bluemonkey docs
+- added ambctl to install, bumped version
+
+* Wed Nov 05 2014 tripzero <kevron.m.rees@intel.com> submit/tizen/20141029.180744-6-gfa57967
 - updated docs. added deleted callback
 - updated chlog
 - fixed obd2 disconnect bug
