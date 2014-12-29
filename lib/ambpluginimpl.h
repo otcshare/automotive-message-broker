@@ -145,7 +145,7 @@ protected:
 	 * \param typeFactory Function to be used to create instance of the AbstractPropertyType for registered property
 	 * \return AbstractPropertyType* if signal exits otherwise nullptr(in this case we do not know its datatype)
 	 */
-	std::shared_ptr<AbstractPropertyType> addPropertySupport(Zone::Type zone, std::function<AbstractPropertyType* (void)> typeFactory);
+	std::shared_ptr<AbstractPropertyType> addPropertySupport(Zone::Type zone, std::function<AbstractPropertyType* (void)> typeFactory, std::string sourceUuid="");
 
 	template <class T>
 	std::shared_ptr<AbstractPropertyType> addPropertySupport(Zone::Type zone)

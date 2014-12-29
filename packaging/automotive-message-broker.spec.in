@@ -272,6 +272,7 @@ cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %{_bindir}/amb-get-history
 %{_bindir}/amb-set
 %{_bindir}/amb-listen
+%{_bindir}/ambctl
 
 %files devel
 %defattr(-,root,root,-)

@@ -87,7 +87,7 @@ public:
 	AbstractPropertyType(std::string property)
 		: name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None), priority(Normal)
 	{
-		void*(name);
+
 	}
 
 	virtual ~AbstractPropertyType()

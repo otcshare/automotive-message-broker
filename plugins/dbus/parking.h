@@ -13,7 +13,7 @@ public:
 	SecurityAlertProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SecurityAlert", re, connection, map<string, string>())
 	{
-		wantProperty<Security::Status>(VehicleProperty::SecurityAlertStatus,"SecurityAlert", "i", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::SecurityAlertStatus, "SecurityAlert", "i", AbstractProperty::Read);
 	}
 };
 
@@ -29,9 +29,9 @@ public:
 		 *  @access readonly
 		 *  @attributeComment must return status of parking brake:  Engaged = true, Disengaged = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::ParkingBrakeStatus,"ParkingBrake", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ParkingBrakeStatus, "ParkingBrake", "b", AbstractProperty::Read);
 
-		wantPropertyVariant(VehicleProperty::ParkingBrakeStatusW3C,"Status", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ParkingBrakeStatusW3C, "Status", AbstractProperty::Read);
 
 
 	}
@@ -50,7 +50,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment must return status of parking light:  Engaged = true, Disengaged = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::ParkingLightStatus,"ParkingLight", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ParkingLightStatus, "ParkingLight", "b", AbstractProperty::Read);
 	}
 };
 
@@ -66,7 +66,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment must return status of hazard light:  Engaged = true, Disengaged = false.
 		 **/
-		wantProperty<bool>(VehicleProperty::HazardLightStatus,"HazardLight", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::HazardLightStatus, "HazardLight", "b", AbstractProperty::ReadWrite);
 	}
 };
 

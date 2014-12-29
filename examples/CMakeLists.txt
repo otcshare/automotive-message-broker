@@ -2,7 +2,6 @@ set(amb_examples configwheel databasesource dbusconfig exampleconfig
         gpsnmea obdsourceconfig opencvluxconfig opencvdbusconfig qtmainloopconfig websocketsink2 websocketsource2
         testsourceconfig bluemonkey/bluemonkeyconfig)
 
-
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/configwheel.in ${CMAKE_CURRENT_SOURCE_DIR}/configwheel @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/databasesource.in ${CMAKE_CURRENT_SOURCE_DIR}/databasesource @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/dbusconfig.in ${CMAKE_CURRENT_SOURCE_DIR}/dbusconfig @ONLY)

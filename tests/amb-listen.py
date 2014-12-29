@@ -7,6 +7,7 @@ import gobject
 import json
 from dbus.mainloop.glib import DBusGMainLoop
 
+print "This application is deprecated.  It will disappear in the future.  Use ambctl"
 
 def print_data(interface, properties, invalidated):
 	print json.dumps(properties, indent=2)
@@ -28,7 +29,7 @@ for o in objects:
 	bus.add_signal_receiver(print_data,
 				dbus_interface="org.freedesktop.DBus.Properties",
 				signal_name="PropertiesChanged",
-                                path=o)
+																path=o)
 
 loop = gobject.MainLoop()
 loop.run()
