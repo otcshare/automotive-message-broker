@@ -17,10 +17,10 @@ add_definitions(-DPROJECT_CODENAME="${PROJECT_CODENAME}")
 add_definitions(-DPROJECT_QUALITY="${PROJECT_QUALITY}")
 
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
-set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" CACHE STRING "Directory where lib will install")
+set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" )
 set (PLUGIN_INSTALL_PATH "${LIB_INSTALL_DIR}/${PROJECT_NAME}")
-set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include" CACHE PATH "The directory the headers are installed in")
-set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}" CACHE PATH "The directory the docs will be installed to")
+set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")
+set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}")
 
 option(qtmainloop "Use QCoreApplication mainloop " OFF)
 option(websocket_plugin "websocket source and sink plugins" OFF)
