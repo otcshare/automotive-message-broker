@@ -11,15 +11,26 @@ import glib
 import curses.ascii
 from dbus.mainloop.glib import DBusGMainLoop
 
+class bcolors:
+		HEADER = '\x1b[95m'
+		OKBLUE = '\x1b[94m'
+		OKGREEN = '\x1b[92m'
+		WARNING = '\x1b[93m'
+		FAIL = '\x1b[91m'
+		ENDC = '\x1b[0m'
+		GREEN = '\x1b[32m'
+		WHITE = '\x1b[37m'
+		BLUE = '\x1b[34m'
+
 def help():
 		help = ("Available commands:\n"
-						"help           Prints help data\n"
-						"list           List supported ObjectNames\n"
-						"get            Get properties from an ObjectName\n"
-						"listen         Listen for changes on an ObjectName\n"
-						"set            Set a property for an ObjectName\n"
-						"getHistory     Get logged data within a time range\n"
-						"quit           Exit ambctl\n")
+						+bcolors.HEADER+ "help" +bcolors.WHITE+ "           Prints help data\n"
+						+bcolors.HEADER+ "list" +bcolors.WHITE+ "           List supported ObjectNames\n"
+						+bcolors.HEADER+ "get" +bcolors.WHITE+ "            Get properties from an ObjectName\n"
+						+bcolors.HEADER+ "listen" +bcolors.WHITE+ "         Listen for changes on an ObjectName\n"
+						+bcolors.HEADER+ "set" +bcolors.WHITE+ "            Set a property for an ObjectName\n"
+						+bcolors.HEADER+ "getHistory" +bcolors.WHITE+ "     Get logged data within a time range\n"
+						+bcolors.HEADER+ "quit" +bcolors.WHITE+ "           Exit ambctl\n")
 		return help
 
 def changed(interface, properties, invalidated):
@@ -123,13 +134,19 @@ def processCommand(command, commandArgs, noMain=True):
 
 
 
-parser = argparse.ArgumentParser(description='Process DBus mappings.')
+parser = argparse.ArgumentParser(description='Process DBus mappings.', add_help=False)
 parser.add_argument('command', metavar='COMMAND [help]', nargs='?', default='stdin', help='amb dbus command')
-
 parser.add_argument('commandArgs', metavar='ARG', nargs='*',
 			help='amb dbus command arguments')
+parser.add_argument('-h', '--help', help='print help', action='store_true')
 
 args = parser.parse_args()
+
+if args.help:
+		parser.print_help()
+		print
+		print help()
+		sys.exit()
 
 if args.command == "stdin":
 		class Data:
@@ -210,19 +227,6 @@ if args.command == "stdin":
 				def clear(self):
 						self.set("")
 						templist = ""
-
-
-
-		class bcolors:
-				HEADER = '\x1b[95m'
-				OKBLUE = '\x1b[94m'
-				OKGREEN = '\x1b[92m'
-				WARNING = '\x1b[93m'
-				FAIL = '\x1b[91m'
-				ENDC = '\x1b[0m'
-				GREEN = '\x1b[32m'
-				WHITE = '\x1b[37m'
-				BLUE = '\x1b[34m'
 
 		def erase_line():
 				sys.stdout.write('\x1b[2K\x1b[80D')
@@ -335,7 +339,7 @@ if args.command == "stdin":
 		finally:
 				termios.tcsetattr(fd, termios.TCSAFLUSH, old)
 				fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+				sys.exit()
 
 else:
 	processCommand(args.command, args.commandArgs, False)
-
