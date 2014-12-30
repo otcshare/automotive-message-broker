@@ -23,7 +23,7 @@
 #include "debugout.h"
 #include "listplusplus.h"
 
-DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
+DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config)
 	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
 	  AbstractSink(engine, config)
 {

@@ -49,9 +49,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * };
  *
  * // library exported function for plugin loader
- * extern "C" AbstractSource* create(AbstractRoutingEngine* routingengine, std::map<std::string, std::string> config)
+ * extern "C" void create(AbstractRoutingEngine* routingengine, std::map<std::string, std::string> config)
  * {
- *     return new AmbPlugin<MyPlugin>(routingengine, config);
+ *     new AmbPlugin<MyPlugin>(routingengine, config);
  * }
  * \endcode
  *

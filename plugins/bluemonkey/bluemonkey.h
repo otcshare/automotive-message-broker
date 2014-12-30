@@ -126,7 +126,6 @@ public Q_SLOTS:
 	QObject* subscribeTo(QString str, int zone);
 	QObject* subscribeTo(QString str, int zone, QString srcFilter);
 
-
 	QStringList sourcesForProperty(QString property);
 	QVariant zonesForProperty(QString property, QString src);
 
@@ -160,6 +159,8 @@ public Q_SLOTS:
 	}
 
 	void createCustomProperty(QString name, QJSValue defaultValue, int zone);
+
+	void exportInterface(QString name, QJSValue properties);
 
 private:
 	QList<void*> modules;

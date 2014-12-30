@@ -131,6 +131,22 @@ public:
 	 */
 	virtual void init();
 
+	/*!
+	 * \brief setValue of a property
+	 */
+	template <typename T>
+	void setValue(std::shared_ptr<AbstractPropertyType> property, T value)
+	{
+		if(property->value<T>() == value)
+		{
+			return;
+		}
+
+		property->setValue(value);
+		routingEngine->updateProperty(property.get(), source.uuid());
+	}
+
+
 protected:
 
 	/*! Finds property type in #properties

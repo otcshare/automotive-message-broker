@@ -20,26 +20,25 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #ifndef DBUSINTERFACEMANAGER_H
 #define DBUSINTERFACEMANAGER_H
 
-#include "abstractsink.h"
+#include "ambpluginimpl.h"
 #include "gio/gio.h"
+#include <memory>
 
 class AbstractRoutingEngine;
 
-class DBusInterfaceManager: public AbstractSink
+class DBusInterfaceManager: public AmbPluginImpl
 {
 
 public:
-	DBusInterfaceManager(AbstractRoutingEngine* re, std::map<string, string> config);
+	DBusInterfaceManager(AbstractRoutingEngine* re, std::map<string, string> config, AbstractSource & parent);
 	~DBusInterfaceManager();
 
-	AbstractRoutingEngine* re;
-
 	/// From AbstractSink:
-	virtual const string uuid(){ return "DBusInterfaceManager"; }
-	virtual void propertyChanged(VehicleProperty::Property property, AbstractPropertyType* value, string  uuid) { }
+	virtual const string uuid() const { return "DBusInterfaceManager"; }
 	virtual void supportedChanged(const PropertyList & supportedProperties);
     
-	GDBusConnection * connection;
+	std::shared_ptr<GDBusConnection> connection;
+	std::shared_ptr<AbstractPropertyType> dbusConnected;
 
 	void registerTypes();
 

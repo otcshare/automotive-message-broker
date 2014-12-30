@@ -76,12 +76,14 @@ interface Bluemonkey {
 	void log(DOMString text);
 
 	/*!
-	 * \brief
+	 * \brief createTimer
+	 * \return QTimer object
 	 */
 	QTimer createTimer();
 
 	/*!
-	 * \brief
+	 * \brief createQObject
+	 * \return empty QObject
 	 */
 	QObject createQObject();
 
@@ -91,40 +93,45 @@ interface Bluemonkey {
 	 void getHistory(DOMString[] properties, Date begin, Date end, HistoryCallback callback);
 
 	/*!
-	 * \brief
+	 * \brief createCustomProperty
 	 */
 	 void createCustomProperty(DOMString name, any value, optional unsigned short zone);
+
+	/*!
+	 * \brief exportInterface
+	 */
+	 void exportInterface(DOMString interfaceName, ExportMap[] properties);
 
 };
 
 interface PropertyInterface {
 	/*!
-	 * \brief
+	 * \brief AMB property name of this property
 	 */
 	readonly attribute DOMString type;
 
 	/*!
-	 * \brief
+	 * \brief zone for this property
 	 */
 	readonly attribute unsigned short zone;
 
 	/*!
-	 * \brief
+	 * \brief value for this property
 	 */
 	readonly attribute any value;
 
 	/*!
-	 * \brief
+	 * \brief source where this property came from
 	 */
 	readonly attribute DOMString source;
 
 	/*!
-	 * \brief
+	 * \brief timestamp when property was last updated
 	 */
 	readonly attribute DOMTimestamp timestamp;
 
 	/*!
-	 * \brief
+	 * \brief changed signal
 	 */
 	readonly attribute Signal changed;
 
@@ -133,10 +140,23 @@ interface PropertyInterface {
 
 interface Signal {
 	/*!
-	 * \brief
+	 * \brief connect function.
+	 * Use to connect to signals
 	 */
 	 void connect(ChangedCallback callback)
 };
+
+interface ExportMap {
+	 /*!
+	  * \brief internal AMB property name
+	  */
+	 attribute DOMString AmbPropertyName;
+
+	 /*!
+	  * \brief name you want to export as a DBus property
+	  */
+	 attribute DOMString DBusPropertyName;
+}
 
 callback ChangedCallback = void(any value); ();
 

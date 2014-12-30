@@ -1,9 +1,9 @@
 set(plugins_common_sources abstractio.hpp serialport.hpp bluetoothadapterproxy.c bluetooth.hpp bluetoothmanagerproxy.c bluetoothserialproxy.c bluetooth5.cpp
-		canadapter.cpp cansocket.cpp cansocketreader.cpp canbusimpl.cpp cansocketadapter.cpp logger.cpp mutex.cpp thread.cpp dbusexport.hpp dbusplugin.cpp
+		canadapter.cpp cansocket.cpp cansocketreader.cpp canbusimpl.cpp cansocketadapter.cpp logger.cpp mutex.cpp thread.cpp dbusexport.cpp dbusplugin.cpp
 		abstractdbusinterface.cpp dbussignaller.cpp varianttype.cpp)
 set(plugins_common_headers_install abstractio.hpp serialport.hpp bluetooth.hpp bluetoothadapterproxy.h bluetoothmanagerproxy.h bluetoothserialproxy.h
 		bluetooth5.h canbus.h canadapter.h cansocket.h cansocketreader.h canbusimpl.h cansocketadapter.h canobserver.h logger.h mutex.h thread.h
-		dbusexport.hpp dbusplugin.h abstractdbusinterface.h dbussignaller.h varianttype.h)
+		dbusexport.h dbusplugin.h abstractdbusinterface.h dbussignaller.h varianttype.h)
 
 add_library(amb-plugins-common SHARED ${plugins_common_sources})
 

@@ -29,7 +29,7 @@ class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
 
 public:
-	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config);
+	DBusSink(std::string objectName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = std::map<std::string, std::string>());
 	virtual ~DBusSink() {
 		for(auto i : propertyDBusMap)
 		{
@@ -60,8 +60,6 @@ public:
 	{
 		zoneFilter = zone;
 	}
-
-protected:
 
 	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, VariantType::Access access)
 	{

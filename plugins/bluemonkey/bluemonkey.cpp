@@ -22,6 +22,9 @@
 #include "ambplugin.h"
 #include "debugout.h"
 
+#include "dbusplugin.h"
+#include "dbusexport.h"
+
 #include <QJsonDocument>
 #include <QJSEngine>
 #include <QDateTime>
@@ -138,6 +141,16 @@ QVariant toQVariant(AbstractPropertyType* val)
 
 	return value;
 }
+
+class BluemonkeyDBusInterface: public DBusSink
+{
+public:
+	BluemonkeyDBusInterface(std::string ifaceName, AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink(ifaceName, re, connection)
+	{
+
+	}
+};
 
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent)
 	: QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
@@ -414,6 +427,24 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, i
 	routingEngine->setProperty(request);
 }
 
+void BluemonkeySink::exportInterface(QString name, QJSValue properties)
+{
+	std::unordered_map<std::string, std::string> propertiesMap;
+
+	QVariantList tempProps = properties.toVariant().toList();
+
+	DebugOut() << "num keys: " << tempProps.size() << endl;
+
+	Q_FOREACH(QVariant i, tempProps)
+	{
+		QVariantMap obj = i.toMap();
+		propertiesMap[obj.firstKey().toStdString()] = obj.first().toString().toStdString();
+	}
+
+	DebugOut() << "exporting new dbus interface: " << name.toStdString() << endl;
+	auto exporter = amb::Exporter::instance();
+	exporter->exportProperty<DBusSink>(name.toStdString(), propertiesMap, routingEngine);
+}
 
 QVariant Property::value()
 {

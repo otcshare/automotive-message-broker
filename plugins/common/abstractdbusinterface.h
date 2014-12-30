@@ -62,6 +62,10 @@ public:
 	static std::vector<string> supportedInterfaces();
 
 	std::string interfaceName() { return mInterfaceName; }
+	void setInterfaceName(const std::string & ifaceName)
+	{
+		mInterfaceName = ifaceName;
+	}
 
 	bool implementsProperty(std::string property);
 
