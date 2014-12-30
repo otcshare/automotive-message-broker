@@ -1,25 +1,12 @@
-Release notes for release 0.13
+Release notes for release 0.14
 
 New features:
-- [xwalk extension] implements full W3C automotive BG vehicle and data APIs
-- [OpenCV plugin] code updated to the new 3.0 beta API
-- [OpenCV plugin] driver drowsiness detection test code
-- [Bluemonkey plugin] support for zones in JS API.
-- [Bluemonkey plugin] database module.
-- [tools] new ambctl. replaces amb-get, amb-set, etc
+- [DBus] some classes for exporting custom interfaces moved to plugins-common
+- [Bluemonkey plugin] support for creating custom dbus interfaces: bluemonkey.exportInterface()
 
 Changes:
-- OpenCV plugin experimental options for cuda and kinect are removed
-- Removed unmaintained plugins: tpms, websocket{sink,source}
-- Implementing AbstractSource::getPropertyInfo() is now mandatory
-- [websocket plugin] protocol changes: getSupportedEventTypes is getSupported.  'data' changed type to array of objects
-  instead of array of strings.  See plugins/websocket/protocol
-- Removed old ButtonEvent interface as it conflicted with the new ButtonEvent.
-- Extensive documentation improvements.  Plugin docs install to @DOC_INSTALL_PREFIX@/plugins/.
-- Bluemonkey JS API docs @DOC_INSTALL_PREFIX@/plugins/bluemonkey/html/.
+- Plugin create() method signature changed.
+- Removed AbstractSinkManager class
+- Removed deprecated dbus interfaces
 
 Fixes:
-- [DBus plugin] Fix exporting properties in zones that really don't have support
-- [xwalk extension] fixed set() for some types did not work because of invalid GVariant creation.
-- [websocket plugin] Updated html test page.  Fixed protocol usage.
-- [websocket plugin] Source zones properly supported
