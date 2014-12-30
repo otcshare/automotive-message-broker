@@ -1,3 +1,81 @@
+/*!
+* \mainpage Automotive Message Broker DBus API Documentation
+*
+* \section intro Introduction
+* AMB organizes the API into two general interface categories.  First the Manager interface (see manager.txt)
+* which includes tools for using the other interfaces.  Second is a number of interfaces that
+* represent vehicle data.  The latter follows the schema of "org.automotive.DataType" and are
+* contained in verious DBus paths.  The DBus paths are generally organized by
+* /{source}/{zone}/DataType.  "source" refers to the AMB source that produces the data.  "zone"
+* refers to the zone in which the data type is located in the vehicle or "0" for no zone.
+*
+* The interfaces and data types are documented in <a href="amb.fidl">amb.fidl</a>.  Franca IDL
+* tools can be used to generate DBus introspection xml which can be used to generate bindings
+* for your language of choice.  These interfaces types map to internal AMB properties.  To understand the mappings,
+* see the <a href="ambdbusmappings_8idl.html">mapping documentation</a>
+*
+* \section basic_usage Basic Recommended Usage
+*
+* It is recommended that the Manager interface be used to find the DBus Object that contains the
+* data type you need.  This is done through the FindObject() call.  It is expected that DBus
+* Object Paths may change and so it is not appropriate to hard code DBus Object Paths.
+*
+* Here is a pseudo-code example of how the api is to be used:
+*
+* \code
+* var manager = dbus.interface("org.automotive.Manager", "/");
+*
+* var speedObjectPaths = manager.FindObject("VehicleSpeed");
+*
+* var speedObject = dbus.interface("org.automotive.VehicleSpeed", speedObjectPaths[0]);
+*
+* console.log("Vehicle Speed: " + speedObject.Speed);
+* \endcode
+* \section automotive_manager Automotive Manager
+* Manager is a helper interface for discovering and finding available objects.  Manager also helps users look up objects by zone and get additional information about a data type (ieorg.automotive.Manager.ZonesForObjectName).
+* \section zones Zones
+*
+* 'Zone' describes the position in the vehicle where the object is located.  The Zone type is a bitfield of values that can be combined to describe a specific location.  For example
+*
+* \code
+* Zone.Front | Zone.Left
+* \endcode
+*
+* (which is '9') may represent the driver position.
+*
+* \code
+* enumeration Zone {
+*   None = 0,
+*   Front = 1,
+*   Middle = 1 << 1,
+*   Right = 1 << 2,
+*   Left = 1 << 3,
+*   Rear = 1 << 4,
+*   Center = 1 << 5
+* }
+* \endcode
+*
+* \section vehicle_property_type Vehicle Property Type
+* Vehicle Property Type is the common interface which all Data types are derived.  This interface is as follows:
+*
+* \code
+* interface VehiclePropertyType {
+*   attribute Double Time readonly
+*   attribute Zone Zone readonly
+*   method GetHistory(Double beginTime, Double endTime) {
+*     out{ Dictionary result}
+*   }
+* }
+* \endcode
+*
+* \section data_types Data types
+*
+* The data types try to conform to the [http://w3c.github.io/automotive-bg/data_spec.html W3C Automotive Business Group Vehicle Data Specification] as much as possible.  There are differences in the Zone type, and this vehicle API contains some additional data types that the W3C Business Group has not yet defined.  'Time' also represents relative time in seconds rather than time in ms since epoch (DOMTimeStamp).  The names of the attributes are also different because of Web vs. DBus conventions.  In this Vehicle API, DBus properties use CamelCase (ie Speed vs speed) vs lowerCamelCase.  Units and types are the same where possible.
+*
+* Also note that many types have been marked "deprecated" and replaced with the W3C version of the type.  Deprecated types should not be used in new projects.
+*
+*/
+
 /*! amb.fidl
 * \name @PROJECT_NAME@
 * \version @PROJECT_VERSION@
@@ -56,7 +134,7 @@ interface VehiclePropertyType {
   * \arg endTime time stamp in Seconds since Unix Epoc
   */
   method GetHistory(Double beginTime, Double endTime) {
-    out{ Dictionary result}
+	out{ Dictionary result}
   }
 }
 
@@ -80,7 +158,7 @@ interface org.automotive.Manager  {
    *  \brief return supported properties
   */
   method List {
-    out {array of String objectNames}
+	out {array of String objectNames}
   }
 
   /*!
@@ -96,12 +174,12 @@ interface org.automotive.Manager  {
    *  \return list of object paths that provide the given object Name.
   */
   method FindObject {
-    in {
-      String objectName
-    }
-    out {
-      array of String objectPaths
-    }
+	in {
+	  String objectName
+	}
+	out {
+	  array of String objectPaths
+	}
   }
 
   /*!
@@ -110,19 +188,19 @@ interface org.automotive.Manager  {
    * except that it takes an addition zone argument and only return the path for that zone.
    *  \arg String property is the requested property to be retrieved.
    *  \arg Zone zone is the zone which the object
-   *  \return string representing the DBus Object path.  
+   *  \return string representing the DBus Object path.
    *  Possible errors:
    * "org.automotive.Manager.InvalidZone"
    * "org.automotive.Manager.ObjectNotFound"
   */
   method FindObjectForZone {
-    in {
-      String objectName
-      Zone zone
-    }
-    out {
-      String objectPath
-    }
+	in {
+	  String objectName
+	  Zone zone
+	}
+	out {
+	  String objectPath
+	}
   }
 
   /*!
@@ -132,12 +210,12 @@ interface org.automotive.Manager  {
    *  \return list of zones for the given objectName (@see Zone)
   */
   method ZonesForObjectName {
-    in {
-      String objectName
-    }
-    out {
-      array of UInt32 zones
-    }
+	in {
+	  String objectName
+	}
+	out {
+	  array of UInt32 zones
+	}
   }
 
   /*!
@@ -147,12 +225,12 @@ interface org.automotive.Manager  {
    * \return true if Property exists
    */
   method SupportsProperty {
-    in {
-      String propertyName
-    }
-    out {
-      Boolean supported
-    }
+	in {
+	  String propertyName
+	}
+	out {
+	  Boolean supported
+	}
   }
 
 }
@@ -404,7 +482,7 @@ interface org.automotive.InteriorLightStatus extends VehiclePropertyType  {
   /*!  Status
    *   \brief  MUST return interior light status for the zone. on = true, off = false
    */
-    attribute Boolean Status
+	attribute Boolean Status
 }
 
 
@@ -772,10 +850,10 @@ interface org.automotive.Sunroof extends VehiclePropertyType  {
 
 
 enumeration ConvertibleRoofStatus {
-    closed = "closed",
-    closing = "closing",
-    opening = "opening",
-    opened = "opened"
+	closed = "closed",
+	closing = "closing",
+	opening = "opening",
+	opened = "opened"
 }
 
 interface org.automotive.ConvertibleRoof extends VehiclePropertyType  {
@@ -1264,7 +1342,7 @@ interface org.automotive.SeatPosition extends VehiclePropertyType {
   */
    attribute UInt16 Recline readonly
 
-    /*!
+	/*!
   * \brief MUST return
   */
    attribute UInt16 Slide readonly
@@ -1399,14 +1477,14 @@ interface org.automotive.WheelTick extends VehiclePropertyType {
 
 interface IgnitionTime : VehicleCommonDataType {
    /*!
-    * \brief MUST return time at ignition on
-    */
-    attribute UInt64 ignitionOnTime readonly
+	* \brief MUST return time at ignition on
+	*/
+	attribute UInt64 ignitionOnTime readonly
 
-    /*!
-     * \brief MUST return time at ignition off
-     */
-     attribute UInt64 ignitionOffTime readonly
+	/*!
+	 * \brief MUST return time at ignition off
+	 */
+	 attribute UInt64 ignitionOffTime readonly
 }
 
 interface org.automotive.YawRate extends VehiclePropertyType {
@@ -1426,38 +1504,38 @@ interface org.automotive.BrakeOperation extends VehiclePropertyType {
 }
 
 enumeration Button {
-    home = "home",
-    back = "back",
-    search = "search",
-    call = "call",
-    end_call = "end_call",
-    media_play = "media_play",
-    media_next = "media_next",
-    media_previous = "media_previous",
-    media_pause = "media_pause",
-    voice_recognize = "voice_recognize",
-    enter = "enter",
-    left = "left",
-    right = "right",
-    up = "up",
-    down = "down"
+	home = "home",
+	back = "back",
+	search = "search",
+	call = "call",
+	end_call = "end_call",
+	media_play = "media_play",
+	media_next = "media_next",
+	media_previous = "media_previous",
+	media_pause = "media_pause",
+	voice_recognize = "voice_recognize",
+	enter = "enter",
+	left = "left",
+	right = "right",
+	up = "up",
+	down = "down"
 }
 
 enumeration ButtonEventType {
-    press = "press",
-    long_press = "long_press",
-    release = "release"
+	press = "press",
+	long_press = "long_press",
+	release = "release"
 }
 
 interface VehicleButton {
-    /*!
-    * \brief MUST return the button corresponding to the event.
-    */
+	/*!
+	* \brief MUST return the button corresponding to the event.
+	*/
 	attribute Button button readonly
 
-    /*!
-    * \brief MUST return the type of event
-    */
+	/*!
+	* \brief MUST return the type of event
+	*/
 	attribute ButtonEventType state readonly
 }
 
@@ -1542,23 +1620,23 @@ interface org.automotive.Diagnostic extends VehiclePropertyType {
    attribute UInt32 AccumulatedEngineRuntime readonly
 
    /*!
-    * \brief MUST return distance travelled since the codes were last cleared (Unit: meters)
-    */
+	* \brief MUST return distance travelled since the codes were last cleared (Unit: meters)
+	*/
    attribute UInt32 DistanceSinceCodeCleared readonly
 
    /*!
-    * \brief MUST return distance travelled with the malfunction indicator light on (Unit: meters)
-    */
+	* \brief MUST return distance travelled with the malfunction indicator light on (Unit: meters)
+	*/
    attribute UInt32 DistanceWithMILOn readonly
 
    /*!
-    * \brief MUST return time elapsed with the malfunction indicator light on (Unit: seconds)
-    */
+	* \brief MUST return time elapsed with the malfunction indicator light on (Unit: seconds)
+	*/
    attribute UInt32 TimeRunMILOn readonly
 
    /*!
-    * \brief MUST return time elapsed since the trouble codes were last cleared (Unit: seconds)
-    */
+	* \brief MUST return time elapsed since the trouble codes were last cleared (Unit: seconds)
+	*/
    attribute UInt32 TimeTroubleCodeClear readonly
 }
 
@@ -1720,9 +1798,9 @@ interface org.automotive.AtmosphericPressure extends VehiclePropertyType {
 }
 
 enumeration LaneDepartureStatus {
-    off = "off",
-    pause = "pause",
-    running = "running"
+	off = "off",
+	pause = "pause",
+	running = "running"
 }
 
 interface org.automotive.LaneDepartureDetection extends VehiclePropertyType {
@@ -1733,10 +1811,10 @@ interface org.automotive.LaneDepartureDetection extends VehiclePropertyType {
 }
 
 enumeration AlarmStatus {
-    disarmed = "disarmed",
-    prearmed = "prearmed",
-    armed = "armed",
-    alarmed = "alarmed"
+	disarmed = "disarmed",
+	prearmed = "prearmed",
+	armed = "armed",
+	alarmed = "alarmed"
 }
 
 interface org.automotive.Alarm extends VehiclePropertyType {
@@ -1747,9 +1825,9 @@ interface org.automotive.Alarm extends VehiclePropertyType {
 }
 
 enumeration ParkingBrakeStatus {
-    inactive = "inactive",
-    active = "active",
-    error = "error"
+	inactive = "inactive",
+	active = "active",
+	error = "error"
 }
 
 interface org.automotive.ParkingBrake extends VehiclePropertyType {

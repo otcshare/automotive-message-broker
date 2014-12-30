@@ -1,0 +1,14 @@
+/*!
+* \mainpage Automotive Message Broker Documentation
+* \version @PROJECT_VERSION@
+* \section links AMB Documentation Sections
+* - <a href="../dbus/html/index.html">DBus API documentation</a>
+* - <a href="../amb/html/index.html">libamb internal API documentation</a>
+* - <a href="../plugins/bluemonkey/html/index.html">Bluemonkey Javascript API documentation</a>
+*
+* \section intro Introduction
+* Automotive Message Broker (AMB) is a framework for providing applications with standardized access to vehicle data.
+* It uses a plugin architecture to allow customization for different vehicles and devices.  Here is a diagram of how
+* AMB is architected:
+* \image html AMBArchitecture.png
+*/
