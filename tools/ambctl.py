@@ -104,6 +104,8 @@ def processCommand(command, commandArgs, noMain=True):
 		object = managerInterface.FindObjectForZone(objectName, zone)
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.freedesktop.DBus.Properties")
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)
+		if property.__class__ == dbus.Boolean:
+			value = value.lower() == "true"
 		realValue = property.__class__(value)
 		propertiesInterface.Set("org.automotive."+objectName, propertyName, realValue)
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)

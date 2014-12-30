@@ -20,7 +20,7 @@ static void * cbFunc(Shared* shared)
 {
 	if(!shared)
 	{
-		throw std::runtime_error("Could not cast shared object.");
+		throw std::runtime_error("Could not get shared object.");
 	}
 
 	///new tripID:
@@ -59,7 +59,7 @@ static void * cbFunc(Shared* shared)
 
 		insertList.push_back(dict);
 
-		if(insertList.size() > bufferLength)
+		if(insertList.size() >= bufferLength)
 		{
 			shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
 			for(int i=0; i< insertList.size(); i++)
@@ -173,6 +173,7 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 
 	if(config.find("startOnLoad")!= config.end())
 	{
+		DebugOut() << "start on load? " << config["startOnLoad"] << endl;
 		databaseLogging->setValue(config["startOnLoad"] == "true");
 	}
 
@@ -245,6 +246,8 @@ void DatabaseSink::parseConfig()
 
 void DatabaseSink::stopDb()
 {
+	databaseLogging->setValue(false);
+
 	if(!shared)
 		return;
 
@@ -257,19 +260,21 @@ void DatabaseSink::stopDb()
 
 	delete shared;
 	shared = NULL;
+
+	routingEngine->updateProperty(databaseLogging.get(), source.uuid());
 }
 
 void DatabaseSink::startDb()
 {
 	if(playback->value<bool>())
 	{
-		DebugOut(0)<<"ERROR: tried to start logging during playback.  Only logging or playback can be used at one time"<<endl;
+		DebugOut(DebugOut::Error)<<"ERROR: tried to start logging during playback.  Only logging or playback can be used at one time"<<endl;
 		return;
 	}
 
 	if(shared)
 	{
-		DebugOut(0)<<"WARNING: logging already started.  doing nothing."<<endl;
+		DebugOut(DebugOut::Warning)<<"WARNING: logging already started.  doing nothing."<<endl;
 		return;
 	}
 
@@ -279,6 +284,9 @@ void DatabaseSink::startDb()
 		thread->detach();
 
 	thread = amb::make_unique(new std::thread(cbFunc, shared));
+
+	databaseLogging->setValue(true);
+	routingEngine->updateProperty(databaseLogging.get(), source.uuid());
 }
 
 void DatabaseSink::startPlayback()
@@ -294,9 +302,7 @@ void DatabaseSink::startPlayback()
 
 	vector<vector<string> > results = shared->db->select("SELECT * FROM "+tablename);
 
-	/// we are done with shared.  clean up:
-	delete shared;
-	shared = NULL;
+	stopDb();
 
 	if(playbackShared)
 	{
@@ -337,6 +343,9 @@ void DatabaseSink::initDb()
 
 void DatabaseSink::setDatabaseFileName(string filename)
 {
+	bool isLogging = databaseLogging->value<bool>();
+
+	stopDb();
 	initDb();
 
 	vector<vector<string> > supportedStr = shared->db->select("SELECT DISTINCT key, zone, source FROM " + tablename);
@@ -358,8 +367,11 @@ void DatabaseSink::setDatabaseFileName(string filename)
 		}
 	}
 
-	delete shared;
-	shared = NULL;
+	if(isLogging)
+	{
+		stopDb();
+		startDb();
+	}
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
@@ -401,6 +413,8 @@ void DatabaseSink::init()
 		databaseName->setValue(configuration["databaseFile"]);
 		setDatabaseFileName(configuration["databaseFile"]);
 	}
+
+	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
@@ -485,13 +499,13 @@ void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	delete db;
 }
 
-AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
+AsyncPropertyReply *DatabaseSink::setProperty(const AsyncSetPropertyRequest &request)
 {
 	AsyncPropertyReply* reply = AmbPluginImpl::setProperty(request);
 
 	if(request.property == DatabaseLogging)
 	{
-		if(request.value->value<bool>())
+		if(databaseLogging->value<bool>())
 		{
 			startDb();
 		}
@@ -506,7 +520,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(AsyncSetPropertyRequest request)
 	}
 	else if( request.property == DatabasePlayback)
 	{
-		if(request.value->value<bool>())
+		if(playback->value<bool>())
 		{
 			startPlayback();
 		}
