@@ -151,7 +151,7 @@ public:
 
 	///source role:
 	virtual void getRangePropertyAsync(AsyncRangePropertyReply *reply);
-	virtual AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
+	virtual AsyncPropertyReply * setProperty(const AsyncSetPropertyRequest & request);
 	virtual void subscribeToPropertyChanges(VehicleProperty::Property property);
 	virtual void unsubscribeToPropertyChanges(VehicleProperty::Property property);
 	int supportedOperations() const { return AbstractSource::GetRanged | AbstractSource::Get | AbstractSource::Set;}
