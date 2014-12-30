@@ -27,6 +27,6 @@ endif(DOXYGEN_FOUND)
 
 endif(enable_docs)
 
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/amb.in.idl ${CMAKE_CURRENT_SOURCE_DIR}/amb.fidl @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/amb.in.fidl ${CMAKE_CURRENT_SOURCE_DIR}/amb.fidl @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/dbus.idl ${CMAKE_CURRENT_SOURCE_DIR}/dbus.idl @ONLY)
 
