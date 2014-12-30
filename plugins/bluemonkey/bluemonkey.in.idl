@@ -20,6 +20,7 @@
  *   //VehicleSpeed
  *   speedProperty.value = Math.floor((Math.random() * 100) + 1);
  * });
+ * testTimer.start();
  * \endcode
  * \section Javascript API documentation
  * Javascript API documentation is found in bluemonkey.idl and is described using WebIDL.  Plugin configuration documentation can be found in bluemonkey.README.
@@ -33,11 +34,22 @@
  * \see Qt's QMetaObject system for additional details
  */
 
-
+/*!
+ * \brief Entry point for bluemonkey
+ */
 partial interface Navigator {
 	readonly attribute Bluemonkey bluemonkey;
 };
 
+/*!
+ * \brief Bluemonkey interface
+ * Bluemonkey provides AMB plugin-like interfaces and allows the loading of other modules, timers, and QObject creation.
+ * Typical usage is such:
+ * \code
+ * var speedProperty = bluemonkey.subscribeTo("VehicleSpeed");
+ * bluemonkey.log("Current speed: " + speedProperty.value);
+ * \endcode
+ */
 interface Bluemonkey {
 	/*!
 	 * \brief subscribe to a property

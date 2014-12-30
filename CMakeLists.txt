@@ -96,24 +96,8 @@ SET(CPACK_STRIP_FILES true)
 SET(CPACK_PACKAGE_CONTACT "tripzero.kev@gmail.com")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
 
-
 # Always build .tar.gz and .sh files
 SET(CPACK_GENERATOR "STGZ;TGZ;TBZ2")
-
-SET(CPACK_GENERATOR "${CPACK_GENERATOR};DEB")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libopencv, libjson0, libltdl7")
-SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION ${CPACK_PACKAGE_DESCRIPTION})
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "tripzero.kev@gmail.com")
-
-find_program(rpmbuild rpmbuild /usr/bin)
-if(rpmbuild)
-  SET(CPACK_GENERATOR "${CPACK_GENERATOR};RPM")
-  SET(CPACK_RPM_USER_BINARY_SPECFILE "${CMAKE_SOURCE_DIR}/packaging/automotive-message-broker.spec")
-  SET(CPACK_RPM_PACKAGE_ARCHITECTURE "x86_64")
-endif(rpmbuild)
-INCLUDE(CPack)
-
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/packaging.in/config.tizen.in ${CMAKE_CURRENT_BINARY_DIR}/packaging.in/config.tizen @ONLY)
 
 add_subdirectory(lib)
 add_subdirectory(plugins)
@@ -123,4 +107,4 @@ add_subdirectory(tests)
 add_subdirectory(tools)
 add_subdirectory(examples)
 add_subdirectory(xwalk)
-add_subdirectory(packaging)
+add_subdirectory(packaging.in)
