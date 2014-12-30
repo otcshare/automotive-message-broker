@@ -66,9 +66,9 @@ DemoSink::~DemoSink()
 
 }
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingEngine, map<string, string> config)
 {
-	return new DemoSinkManager(routingengine, config);
+	new DemoSink(routingEngine, config);
 }
 
 const string DemoSink::uuid()

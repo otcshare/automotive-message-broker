@@ -694,15 +694,16 @@ int OBD2Source::supportedOperations()
 	return Get | Set;
 }
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new OBD2Source(routingengine, config);
-
+	new OBD2Source(routingengine, config);
 }
+
 const string OBD2Source::uuid()
 {
 	return "f77af740-f1f8-11e1-aff1-0800200c9a66";
 }
+
 void OBD2Source::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	if (property == VehicleProperty::VIN)

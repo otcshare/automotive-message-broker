@@ -43,11 +43,8 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 bool gioPollingFunc(GIOChannel *source,GIOCondition condition,gpointer data);
 
 WebSocketSinkManager::WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
-	:AbstractSinkManager(engine, config), partialMessageIndex(0), expectedMessageFrames(0)
+	:routingEngine(engine), configuration(config), partialMessageIndex(0), expectedMessageFrames(0)
 {
-	m_engine = engine;
-
-
 	if(config.find("binaryProtocol") != config.end())
 	{
 		doBinary = config["binaryProtocol"] == "true";
@@ -291,11 +288,10 @@ void WebSocketSinkManager::addSink(libwebsocket* socket, VehicleProperty::Proper
 	WebSocketSink *sink = new WebSocketSink(m_engine, socket, uuid, property, property);
 	m_sinkMap[property].push_back(sink);
 }
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	sinkManager = new WebSocketSinkManager(routingengine, config);
 	sinkManager->init();
-	return sinkManager;
 }
 void WebSocketSinkManager::disconnectAll(libwebsocket* socket)
 {

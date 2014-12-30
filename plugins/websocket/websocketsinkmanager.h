@@ -31,7 +31,7 @@
 #include <stdlib.h>
 #include <QByteArray>
 
-class WebSocketSinkManager: public AbstractSinkManager
+class WebSocketSinkManager
 {
 public:
 	WebSocketSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
@@ -59,6 +59,9 @@ private:
 	std::map<int, guint> m_ioSourceMap;
 	AbstractRoutingEngine *m_engine;
 	struct libwebsocket_protocols protocollist[2];
+
+	AbstractRoutingEngine * routingEngine;
+	std::map<std::string, std::string> configuration;
 
 };
 

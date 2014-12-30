@@ -26,7 +26,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <listplusplus.h>
 
 #include "varianttype.h"
-
 #include "dbussignaller.h"
 
 static DBusSignaller* signaller = nullptr;
@@ -101,7 +100,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 		for(auto itr = propertyMap.begin(); itr != propertyMap.end(); itr++)
 		{
-			AbstractProperty* prop = (*itr).second;
+			VariantType* prop = (*itr).second;
 
 			if(!contains(propertyList, prop->ambPropertyName()))
 				propertyList.push_back(prop->ambPropertyName());
@@ -165,14 +164,14 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 			return;
 		}
 
-		AbstractProperty* property = propertyMap[propertyName];
+		VariantType * property = propertyMap[propertyName];
 
 		GError *error = NULL;
 
 		GVariant **params = g_new(GVariant*,4);
 		GVariant *val = g_variant_ref(property->value()->toVariant());
 		params[0] = g_variant_new("v", val);
-		params[1] = g_variant_new("d",property->timestamp);
+		params[1] = g_variant_new("d",property->timestamp());
 		params[2] = g_variant_new("i",property->value()->sequence);
 		params[3] = g_variant_new("i",property->updateFrequency());
 
@@ -223,22 +222,22 @@ AbstractDBusInterface::~AbstractDBusInterface()
 
 }
 
-void AbstractDBusInterface::addProperty(AbstractProperty* property)
+void AbstractDBusInterface::addProperty(VariantType * property)
 {
-	string nameToLower = property->name;
+	string nameToLower = property->name();
 	boost::algorithm::to_lower<string>(nameToLower);
 
 	string access;
 
-	if(property->access() == AbstractProperty::Read)
+	if(property->access() == VariantType::Read)
 		access = "read";
-	else if(property->access() == AbstractProperty::Write)
+	else if(property->access() == VariantType::Write)
 		access = "write";
-	else if(property->access() == AbstractProperty::ReadWrite)
+	else if(property->access() == VariantType::ReadWrite)
 		access = "readwrite";
 	else throw -1; //FIXME: don't throw
 
-	std::string pn = property->name;
+	std::string pn = property->name();
 
 	///see which properties are supported:
 	introspectionXml +=
@@ -253,9 +252,9 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
 			"	<arg type='d' name='imestamp' direction='out' />"
 			"</signal>"
-			"<property type='i' name='" + property->name + "Sequence' access='read' />";
+			"<property type='i' name='" + pn + "Sequence' access='read' />";
 
-	properties[property->name] = property;
+	properties[pn] = property;
 
 	if(!contains(mimplementedProperties, property->ambPropertyName()))
 	{
@@ -334,7 +333,7 @@ void AbstractDBusInterface::unregisterObject()
 	regId=0;
 }
 
-void AbstractDBusInterface::updateValue(AbstractProperty *property)
+void AbstractDBusInterface::updateValue(VariantType *property)
 {
 	if(mConnection == nullptr)
 	{
@@ -440,7 +439,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 
 		std::string p = pn.substr(0,pos);
 
-		AbstractProperty* theProperty = t->property(p);
+		VariantType * theProperty = t->property(p);
 
 		if(!theProperty)
 		{
@@ -448,7 +447,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 			return nullptr;
 		}
 
-		int sequence = theProperty->sequence;
+		int sequence = theProperty->sequence();
 
 		GVariant* value = g_variant_new("i", sequence);
 		return value;

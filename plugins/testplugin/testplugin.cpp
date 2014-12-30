@@ -373,10 +373,9 @@ int TestPlugin::supportedOperations()
 	return Get | Set;
 }
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new TestPlugin(routingengine, config);
-
+	new TestPlugin(routingengine, config);
 }
 const string TestPlugin::uuid()
 {

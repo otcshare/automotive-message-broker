@@ -43,19 +43,5 @@ private:
 	PropertySet mRequests;
 };
 
-class DemoSinkManager: public AbstractSinkManager
-{
-public:
-	DemoSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
-	:AbstractSinkManager(engine, config)
-	{
-		DemoSink* sink = new DemoSink(routingEngine, config);
-	}
-
-	void setConfiguration(map<string, string> config)
-	{
-
-	}
-};
 
 #endif // WHEELPLUGIN_H

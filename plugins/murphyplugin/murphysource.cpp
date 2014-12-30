@@ -27,19 +27,9 @@
 #include <timestamp.h>
 
 #include <murphy/common.h>
-
-/*#ifdef USE_QT_CORE
-#include <murphy/qt/qt-glue.h>
-#else*/
-
 #include <murphy/glib/glib-glue.h>
-//#endif
-
-// #include <vehicleproperty.h>
-// #include <abstractpropertytype.h>
 
 #include "debugout.h"
-
 
 void MurphySource::processValue(string propertyName, AbstractPropertyType *prop)
 {
@@ -54,7 +44,6 @@ void MurphySource::processValue(string propertyName, AbstractPropertyType *prop)
 		m_re->updateSupported(supported(), PropertyList(), this);
 	}
 
-	// cout << "updating property!" << endl;
 	m_re->updateProperty(prop, uuid());
 }
 
@@ -466,8 +455,8 @@ AsyncPropertyReply *MurphySource::setProperty(AsyncSetPropertyRequest request)
 }
 
 #if 1
-extern "C" AbstractSource *create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new MurphySource(routingengine, config);
+	new MurphySource(routingengine, config);
 }
 #endif

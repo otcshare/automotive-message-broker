@@ -33,18 +33,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 //----------------------------------------------------------------------------
 
 // library exported function for plugin loader
-extern "C" AbstractSource* create(AbstractRoutingEngine* routingengine, std::map<std::string, std::string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, std::map<std::string, std::string> config)
 {
 #ifndef UNIT_TESTS
 	DEBUG_CONF("cangenplugin",
-		CUtil::Logger::file_off|CUtil::Logger::screen_on,
+		CUtil::Logger::file_off | CUtil::Logger::screen_on,
 		CUtil::Logger::EInfo, CUtil::Logger::EInfo
 	);
 #endif
 
-	std::unique_ptr< AmbPlugin<CANGenPlugin> > plugin(new AmbPlugin<CANGenPlugin>(routingengine, config));
+	AmbPlugin<CANGenPlugin> * plugin = new AmbPlugin<CANGenPlugin>(routingengine, config);
 	plugin->init();
-	return plugin.release();
 }
 
 //----------------------------------------------------------------------------

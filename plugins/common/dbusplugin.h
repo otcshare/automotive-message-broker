@@ -63,20 +63,11 @@ public:
 
 protected:
 
-	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, AbstractProperty::Access access)
+	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, VariantType::Access access)
 	{
 		propertyDBusMap.push_back(new VariantType(routingEngine, ambProperty, propertyName, access));
 	}
 
-};
-
-class DBusInterfaceManager;
-class DBusSinkManager: public AbstractSinkManager
-{
-	DBusInterfaceManager* manager;
-public:
-	DBusSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
-	~DBusSinkManager();
 };
 
 #endif

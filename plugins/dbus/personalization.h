@@ -11,8 +11,8 @@ public:
 	SteeringWheelPositionProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SteeringWheelPosition", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::SteeringWheelPositionSlide, "Slide", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SteeringWheelPositionTilt, "Tilt", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SteeringWheelPositionSlide, "Slide", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SteeringWheelPositionTilt, "Tilt", VariantType::ReadWrite);
 	}
 };
 
@@ -22,8 +22,8 @@ public:
 	MirrorProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Mirror", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::MirrorSettingPan, "MirrorPan", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::MirrorSettingTilt, "MirrorTilt", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::MirrorSettingPan, "MirrorPan", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::MirrorSettingTilt, "MirrorTilt", VariantType::ReadWrite);
 	}
 };
 
@@ -33,12 +33,12 @@ public:
 	SeatAdjustment(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SeatAdjustment", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::SeatPositionBackCushion, "SeatBackCushion", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatPositionRecline, "SeatReclineBack", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatPositionSlide, "SeatSlide", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatPositionCushionHeight, "SeatCushionHeight", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatPositionHeadrest, "SeatHeadrest", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatPositionSideCushion, "SeatSideCushion", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatPositionBackCushion, "SeatBackCushion", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatPositionRecline, "SeatReclineBack", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatPositionSlide, "SeatSlide", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatPositionCushionHeight, "SeatCushionHeight", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatPositionHeadrest, "SeatHeadrest", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatPositionSideCushion, "SeatSideCushion", VariantType::ReadWrite);
 	}
 };
 
@@ -48,7 +48,7 @@ public:
 	DriveMode(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("DriveMode", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::VehicleDriveMode, "DriveMode", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::VehicleDriveMode, "DriveMode", VariantType::ReadWrite);
 	}
 };
 
@@ -58,9 +58,9 @@ public:
 	VehicleSound(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehicleSound", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ActiveNoiseControlMode, "ActiveNoiseControlMode", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::EngineSoundEnhancementMode, "EngineSoundEnhancementMode", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::AvailableSounds, "AvailableSounds", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::ActiveNoiseControlMode, "ActiveNoiseControlMode", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::EngineSoundEnhancementMode, "EngineSoundEnhancementMode", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AvailableSounds, "AvailableSounds", VariantType::ReadWrite);
 	}
 };
 

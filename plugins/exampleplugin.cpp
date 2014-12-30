@@ -107,10 +107,9 @@ ExampleSourcePlugin::ExampleSourcePlugin(AbstractRoutingEngine* re, map<string, 
 
 
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new ExampleSourcePlugin(routingengine, config);
-
+	new ExampleSourcePlugin(routingengine, config);
 }
 
 const string ExampleSourcePlugin::uuid()

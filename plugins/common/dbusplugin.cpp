@@ -20,14 +20,8 @@
 
 #include "dbusplugin.h"
 #include "abstractroutingengine.h"
-#include "dbusinterfacemanager.h"
 #include "debugout.h"
 #include "listplusplus.h"
-
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
-{
-	return new DBusSinkManager(routingengine, config);
-}
 
 DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config = map<string, string>())
 	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
@@ -86,7 +80,7 @@ void DBusSink::propertyChanged(AbstractPropertyType *value)
 	{
 		if(i->ambPropertyName() == property)
 		{
-			AbstractProperty* prop = i;
+			VariantType* prop = i;
 			mTime = value->timestamp;
 			prop->updateValue(value);
 			updateValue(prop);
@@ -97,19 +91,4 @@ void DBusSink::propertyChanged(AbstractPropertyType *value)
 const string DBusSink::uuid()
 {
 	return "c2e6cafa-eef5-4b8a-99a0-0f2c9be1057d";
-}
-
-DBusSinkManager::DBusSinkManager(AbstractRoutingEngine *engine, map<string, string> config) :
-	AbstractSinkManager(engine, config),
-	manager(nullptr)
-{
-	manager = new DBusInterfaceManager(engine, config);
-}
-
-DBusSinkManager::~DBusSinkManager()
-{
-	if(manager){
-		// delete manager; <-- currently AbstractSink* instances are deleted in Core::~Core()
-		manager = nullptr;
-	}
 }

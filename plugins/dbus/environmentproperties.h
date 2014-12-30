@@ -12,7 +12,7 @@ public:
 	ExteriorBrightnessProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ExteriorBrightness", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ExteriorBrightness, "ExteriorBrightness", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ExteriorBrightness, "ExteriorBrightness", VariantType::Read);
 	}
 };
 
@@ -23,8 +23,8 @@ public:
 	Temperature(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Temperature", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::InteriorTemperature, "InteriorTemperature", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "ExteriorTemperature", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::InteriorTemperature, "InteriorTemperature", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::ExteriorTemperature, "ExteriorTemperature", VariantType::Read);
 	}
 };
 
@@ -35,7 +35,7 @@ public:
 	RainSensor(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("RainSensor", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::RainSensor, "RainIntensity", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::RainSensor, "RainIntensity", VariantType::Read);
 	}
 };
 
@@ -45,8 +45,8 @@ public:
 	WindshieldWiperStatus(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WiperStatus", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::WindshieldWiperSpeed, "WiperSpeed", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::WindshieldWiperSetting, "WiperSetting", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindshieldWiperSpeed, "WiperSpeed", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::WindshieldWiperSetting, "WiperSetting", VariantType::ReadWrite);
 	}
 };
 
@@ -56,15 +56,15 @@ public:
 	ClimateControlProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ClimateControl", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::AirflowDirectionW3C, "AirflowDirection", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeedLevel", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::TargetTemperature, "TargetTemperature", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::AirConditioning, "AirConditioning", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::Heater, "Heater", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SteeringWheelHeater, "SteeringWheelHeater", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatHeater, "SeatHeater", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatCooler, "SeatCooler", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirflowDirectionW3C, "AirflowDirection", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::FanSpeed, "FanSpeedLevel", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::TargetTemperature, "TargetTemperature", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirConditioning, "AirConditioning", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AirRecirculation, "AirRecirculation", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::Heater, "Heater", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SteeringWheelHeater, "SteeringWheelHeater", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatHeater, "SeatHeater", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatCooler, "SeatCooler", VariantType::ReadWrite);
 	}
 };
 
@@ -76,8 +76,8 @@ public:
 	WindowStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WindowStatus", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::WindowStatus, "Openness", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowStatus, "Openness", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::Defrost, "Defrost", VariantType::ReadWrite);
 	}
 };
 
@@ -87,8 +87,8 @@ public:
 	SideWindowStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SideWindow", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::WindowStatus, "Openness", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::WindowLockStatus, "Lock", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowStatus, "Openness", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::WindowLockStatus, "Lock", VariantType::ReadWrite);
 	}
 };
 
@@ -98,8 +98,8 @@ public:
 	DefrostProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Defrost", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::DefrostWindow, "DefrostWindow", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::DefrostMirror, "DefrostMirror", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::DefrostWindow, "DefrostWindow", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::DefrostMirror, "DefrostMirror", VariantType::ReadWrite);
 	}
 };
 
@@ -110,8 +110,8 @@ public:
 	Sunroof(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Sunroof", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::Sunroof, "Openness", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SunroofTilt, "Tilt", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::Sunroof, "Openness", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SunroofTilt, "Tilt", VariantType::ReadWrite);
 	}
 };
 
@@ -122,8 +122,8 @@ public:
 	ConvertibleRoof(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ConvertibleRoof", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ConvertibleRoof, "Setting", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::ConvertibleRoofStatus, "Status", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ConvertibleRoof, "Setting", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::ConvertibleRoofStatus, "Status", VariantType::Read);
 	}
 };
 
@@ -133,7 +133,7 @@ public:
 	AtmosphericPressure(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("AtmosphericPressure", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::AtmosphericPressure, "Pressure", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AtmosphericPressure, "Pressure", VariantType::ReadWrite);
 	}
 };
 #endif

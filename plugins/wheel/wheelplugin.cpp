@@ -123,9 +123,9 @@ WheelSourcePlugin::~WheelSourcePlugin()
 
 
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new WheelSourcePlugin(routingengine, config);
+	new WheelSourcePlugin(routingengine, config);
 }
 
 const string WheelSourcePlugin::uuid()

@@ -29,7 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "abstractpropertytype.h"
 #include <abstractroutingengine.h>
 #include "varianttype.h"
-#include "dbussignaller.h"
 
 const uint getPid(const char *owner);
 
@@ -51,8 +50,8 @@ public:
 	void registerObject();
 	void unregisterObject();
 
-	void addProperty(AbstractProperty* property);
-	virtual void updateValue(AbstractProperty* property);
+	void addProperty(VariantType* property);
+	virtual void updateValue(VariantType* property);
 
 	static PropertyList implementedProperties() { return mimplementedProperties; }
 
@@ -76,7 +75,7 @@ public:
 
 		for(auto i : propertyDBusMap)
 		{
-			if(i->dbusName() == attributeName)
+			if(i->name() == attributeName)
 			{
 				return true;
 			}
@@ -91,7 +90,7 @@ public:
 
 	double time() { return mTime; }
 
-	AbstractProperty* property(std::string propertyName)
+	VariantType* property(std::string propertyName)
 	{
 		if(properties.find(propertyName) != properties.end())
 			return properties[propertyName];
@@ -115,7 +114,7 @@ public:
 
 	std::string source() { return mSourceFilter; }
 
-	std::unordered_map<std::string, AbstractProperty*> getProperties() { return properties; }
+	std::unordered_map<std::string, VariantType*> getProperties() { return properties; }
 
 	bool isRegistered() { return regId > 0; }
 
@@ -135,7 +134,7 @@ protected:
 
 	void setTimeout(int timeout);
 
-	std::unordered_map<std::string, AbstractProperty*> properties;
+	std::unordered_map<std::string, VariantType*> properties;
 
 	Zone::Type zoneFilter;
 

@@ -42,12 +42,10 @@ const std::string OpenCL = "OpenCL";
 
 #include "debugout.h"
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	auto plugin = new AmbPlugin<OpenCvLuxPlugin>(routingengine, config);
 	plugin->init();
-
-	return plugin;
 }
 
 OpenCvLuxPlugin::OpenCvLuxPlugin(AbstractRoutingEngine* re, map<string, string> config, AbstractSource &parent)

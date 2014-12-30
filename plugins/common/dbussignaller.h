@@ -41,7 +41,7 @@ public:
 	std::string objectPath;
 	std::string interface;
 	std::string signalName;
-	AbstractProperty* property;
+	VariantType* property;
 };
 
 class DBusSignaller
@@ -56,7 +56,7 @@ public:
 	}
 
 	void fireSignal(GDBusConnection* conn, const std::string & objPath, const std::string & iface,
-					const std::string & sigName, AbstractProperty* prop)
+					const std::string & sigName, VariantType* prop)
 	{
 		DBusSignal * signal = new DBusSignal(conn, objPath, iface, sigName, prop);
 
@@ -109,14 +109,14 @@ private:
 					interfaceName = signal->interface;
 					signalName = signal->signalName;
 
-					AbstractProperty* property = signal->property;
+					VariantType* property = signal->property;
 
-					auto val = amb::make_super(property->toVariant());
-					std::string sequenceName = property->name + "Sequence";
+					auto val = g_variant_ref(property->toVariant());
+					std::string sequenceName = property->name() + "Sequence";
 
-					variantMap[property->name] = val.get();
-					variantMap[sequenceName] = g_variant_new("i", property->sequence);
-					variantMap["Time"] = g_variant_new("d", property->timestamp);
+					variantMap[property->name()] = val;
+					variantMap[sequenceName] = g_variant_new("i", property->sequence());
+					variantMap["Time"] = g_variant_new("d", property->timestamp());
 					variantMap["Zone"] = g_variant_new("i", property->zoneFilter());
 				}
 

@@ -13,7 +13,7 @@ public:
 	ParkingBrakeProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ParkingBrake", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ParkingBrakeStatusW3C, "Status", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ParkingBrakeStatusW3C, "Status", VariantType::Read);
 	}
 };
 
@@ -24,7 +24,7 @@ public:
 	HazardLightProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("HazardLight", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::HazardLightStatus, "HazardLight", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::HazardLightStatus, "HazardLight", VariantType::ReadWrite);
 	}
 };
 
@@ -34,7 +34,7 @@ public:
 	LaneDepartureStatus(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("LaneDepartureDetection", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::LaneDepartureStatus, "Status", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::LaneDepartureStatus, "Status", VariantType::Read);
 	}
 };
 
@@ -44,7 +44,7 @@ public:
 	AlarmStatus(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Alarm", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::AlarmStatus, "Status", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::AlarmStatus, "Status", VariantType::ReadWrite);
 	}
 };
 

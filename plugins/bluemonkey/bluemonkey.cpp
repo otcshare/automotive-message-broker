@@ -36,12 +36,10 @@
 
 typedef std::map<std::string, QObject*> create_bluemonkey_module_t(std::map<std::string, std::string> config, QObject* parent);
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	auto plugin = new AmbPlugin<BluemonkeySink>(routingengine, config);
 	plugin->init();
-
-	return plugin;
 }
 
 QVariant gvariantToQVariant(GVariant *value)

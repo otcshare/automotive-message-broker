@@ -33,7 +33,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 using namespace std;
 
-typedef void* create_t(AbstractRoutingEngine*, map<string, string> );
+typedef void create_t(AbstractRoutingEngine*, map<string, string> );
 typedef void* create_mainloop_t(int argc, char** argv);
 typedef void* createRoutingEngine(void);
 
@@ -44,8 +44,6 @@ public:
 	PluginLoader(string configFile, int argc, char** argv);
 	~PluginLoader();
 
-	SourceList sources();
-
 	IMainLoop* mainloop();
 
 	std::string errorString();
@@ -53,8 +51,7 @@ public:
 
 private: ///methods:
 
-	template<class T>
-	T loadPlugin(string pluginName, map<string, string> config)
+	bool loadPlugin(string pluginName, map<string, string> config)
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 
@@ -64,7 +61,7 @@ private: ///methods:
 		{
 			mErrorString = dlerror();
 			DebugOut(DebugOut::Error)<<"error opening plugin: "<<pluginName<<" in "<<__FILE__<<" - "<<__FUNCTION__<<":"<<__LINE__<<" "<<mErrorString<<endl;
-			return nullptr;
+			return false;
 		}
 
 		openHandles.push_back(handle);
@@ -73,11 +70,11 @@ private: ///methods:
 
 		if(f_create)
 		{
-			void* obj = f_create(routingEngine, config);
-			return static_cast<T>(obj);
+			f_create(routingEngine, config);
+			return true;
 		}
 
-		return nullptr;
+		return false;
 	}
 
 	IMainLoop* loadMainLoop(string pluginName, int argc, char** argv)
@@ -138,13 +135,9 @@ private:
 
 	AbstractRoutingEngine* routingEngine;
 
-	SourceList mSources;
-	list<AbstractSinkManager*> mSinkManagers;
-
 	create_t * f_create;
 	create_mainloop_t * m_create;
 	createRoutingEngine * r_create;
-
 
 	IMainLoop* mMainLoop;
 

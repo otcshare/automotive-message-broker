@@ -64,10 +64,9 @@ BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, 
 
 }
 
-extern "C" AbstractSink * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new BluetoothSinkPlugin(routingengine, config);
-
+	new BluetoothSinkPlugin(routingengine, config);
 }
 
 const string BluetoothSinkPlugin::uuid()

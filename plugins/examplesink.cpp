@@ -25,9 +25,9 @@
 #include <glib.h>
 
 
-extern "C" AbstractSinkManager * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingEngine, map<string, string> config)
 {
-	return new ExampleSinkManager(routingengine, config);
+	new ExampleSink(routingEngine, config);
 }
 
 ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> config): AbstractSink(engine, config)

@@ -34,14 +34,4 @@ public:
 	virtual const std::string uuid();
 };
 
-class ExampleSinkManager: public AbstractSinkManager
-{
-public:
-	ExampleSinkManager(AbstractRoutingEngine* engine, map<string, string> config)
-	:AbstractSinkManager(engine, config)
-	{
-		new ExampleSink(routingEngine, config);
-	}
-};
-
 #endif // EXAMPLESINK_H

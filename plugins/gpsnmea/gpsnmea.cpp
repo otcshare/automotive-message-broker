@@ -387,10 +387,9 @@ bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
 	return true;
 }
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
-	return new GpsNmeaSource(routingengine, config);
-
+	new GpsNmeaSource(routingengine, config);
 }
 
 GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> config)

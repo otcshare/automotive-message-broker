@@ -72,18 +72,4 @@ protected:
 	map<string, string> configuration;
 };
 
-
-/// TODO:  deprecate in 0.14.
-class AbstractSinkManager
-{
-public:
-
-	AbstractSinkManager(AbstractRoutingEngine* engine, map<string, string> config);
-	virtual ~AbstractSinkManager(){}
-
-protected:
-	AbstractRoutingEngine* routingEngine;
-	map<string, string> configuration;
-};
-
 #endif // ABSTRACTSINK_H

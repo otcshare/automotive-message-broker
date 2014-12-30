@@ -10,12 +10,10 @@
 int bufferLength = 100;
 int timeout=1000;
 
-extern "C" AbstractSource * create(AbstractRoutingEngine* routingengine, map<string, string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
 	auto plugin = new AmbPlugin<DatabaseSink>(routingengine, config);
 	plugin->init();
-
-	return plugin;
 }
 
 static void * cbFunc(Shared* shared)

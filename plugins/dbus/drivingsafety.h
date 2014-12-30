@@ -12,9 +12,9 @@ public:
 		:DBusSink("AntilockBrakingSystem", re, connection, map<string, string>())
 	{
 		/// TODO: Deprecated.  Remove in 0.14
-		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "Engaged", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::AntilockBrakingSystemEnabled, "Enabled", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "Engaged", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::AntilockBrakingSystemEnabled, "Enabled", VariantType::Read);
 	}
 };
 
@@ -25,9 +25,9 @@ public:
 		:DBusSink("TractionControlSystem", re, connection, map<string, string>())
 	{
 		/// TODO: Deprecated.  Remove in 0.14
-		wantPropertyVariant(VehicleProperty::TractionControlSystem, "TractionControlSystem", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TractionControlSystemEnabled, "Enabled", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TractionControlSystem, "Engaged", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TractionControlSystem, "TractionControlSystem", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::TractionControlSystemEnabled, "Enabled", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::TractionControlSystem, "Engaged", VariantType::Read);
 	}
 };
 
@@ -39,8 +39,8 @@ public:
 		:DBusSink("VehicleTopSpeedLimit", re, connection, map<string, string>())
 	{
 		/// TODO: Deprecated.  Remove in 0.14
-		wantPropertyVariant(VehicleProperty::VehicleTopSpeedLimit, "VehicleTopSpeedLimit", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::VehicleTopSpeedLimit, "Speed", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleTopSpeedLimit, "VehicleTopSpeedLimit", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::VehicleTopSpeedLimit, "Speed", VariantType::Read);
 	}
 };
 
@@ -51,9 +51,9 @@ public:
 		:DBusSink("AirbagStatus", re, connection, map<string, string>())
 	{
 		/// TODO: Deprecated in 0.14
-		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::AirbagActivated, "AirbagActivated", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::AirbagDeployed, "AirbagDeployed", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AirbagStatus, "AirbagStatus", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::AirbagActivated, "AirbagActivated", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::AirbagDeployed, "AirbagDeployed", VariantType::Read);
 	}
 };
 
@@ -65,12 +65,12 @@ public:
 		:DBusSink("DoorStatus", re, connection, map<string, string>())
 	{
 
-		wantPropertyVariant(VehicleProperty::DoorStatus, "DoorStatus", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorStatus, "DoorStatus", VariantType::Read);
 
-		wantPropertyVariant(VehicleProperty::DoorLockStatus, "DoorLockStatus", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorLockStatus, "DoorLockStatus", VariantType::Read);
 
 		///TODO: Deprecated in 0.14
-		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLockStatus", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLockStatus", VariantType::Read);
 	}
 };
 
@@ -81,12 +81,12 @@ public:
 		:DBusSink("Door", re, connection, map<string, string>())
 	{
 
-		wantPropertyVariant(VehicleProperty::DoorStatusW3C, "Status", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorStatusW3C, "Status", VariantType::Read);
 
-		wantPropertyVariant(VehicleProperty::DoorLockStatus, "Lock", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::DoorLockStatus, "Lock", VariantType::ReadWrite);
 
 		///TODO: Deprecated in 0.14
-		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLock", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ChildLockStatus, "ChildLock", VariantType::Read);
 	}
 };
 
@@ -97,7 +97,7 @@ public:
 	SeatBeltStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("SeatBelt", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "Status", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "Status", VariantType::Read);
 	}
 };
 
@@ -108,7 +108,7 @@ public:
 	OccupantStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("OccupantStatus", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::OccupantStatus, "OccupantStatus", VariantType::Read);
 	}
 };
 
@@ -118,7 +118,7 @@ public:
 	ObstacleDistanceProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ObstacleDistance", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ObstacleDistance, "ObstacleDistance", VariantType::Read);
 	}
 };
 
@@ -128,8 +128,8 @@ public:
 	ElectronicStabilityControl(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ElectronicStabilityControl", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ElectronicStabilityControlEnabled, "Enabled", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::ElectronicStabilityControlEngaged, "Engaged", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::ElectronicStabilityControlEnabled, "Enabled", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::ElectronicStabilityControlEngaged, "Engaged", VariantType::Read);
 	}
 };
 
@@ -139,7 +139,7 @@ public:
 	ChildSafetyLock(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ChildSafetyLock", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::ChildLockStatus, "Lock", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::ChildLockStatus, "Lock", VariantType::ReadWrite);
 	}
 };
 
@@ -149,10 +149,10 @@ public:
 	SeatProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Seat", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::OccupantStatusW3C, "Occupant", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "SeatBelt", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::OccupantName, "OccupantName", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::OccupantIdentificationType, "IdentificationType", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::OccupantStatusW3C, "Occupant", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::SeatBeltStatus, "SeatBelt", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::OccupantName, "OccupantName", VariantType::ReadWrite);
+		wantPropertyVariant(VehicleProperty::OccupantIdentificationType, "IdentificationType", VariantType::ReadWrite);
 	}
 };
 

@@ -197,7 +197,6 @@ void Core::updateProperty(AbstractPropertyType * value)
 
 	performance.propertiesPerSecond++;
 
-	//auto sinks = propertySinkMap[property]; !!! this will insert empty std::set<AbstractSink*> into propertySinkMap !!!
 	auto filteredSourceSinkMapIt =  propertySinkMap.find(property);
 	auto cbMapItr = propertyCbMap.find(property);
 

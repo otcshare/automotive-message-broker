@@ -39,6 +39,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "drivingsafety.h"
 #include "personalization.h"
 
+extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
+{
+	new DBusInterfaceManager(routingengine, config);
+}
+
 static void
 on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
 {

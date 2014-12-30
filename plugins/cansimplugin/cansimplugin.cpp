@@ -35,7 +35,7 @@ static const char* DEFAULT_CAN_IF_NAME = "vcan0";
 //----------------------------------------------------------------------------
 
 // library exported function for plugin loader
-extern "C" AbstractSource* create(AbstractRoutingEngine* routingengine, std::map<std::string, std::string> config)
+extern "C" void create(AbstractRoutingEngine* routingengine, std::map<std::string, std::string> config)
 {
 #ifndef UNIT_TESTS
 	DEBUG_CONF("cansimplugin",
@@ -43,9 +43,8 @@ extern "C" AbstractSource* create(AbstractRoutingEngine* routingengine, std::map
 		CUtil::Logger::EInfo, CUtil::Logger::EInfo
 	);
 #endif
-	std::unique_ptr< AmbPlugin<CANSimPlugin> > plugin(new AmbPlugin<CANSimPlugin>(routingengine, config));
+	AmbPlugin<CANSimPlugin> * plugin = new AmbPlugin<CANSimPlugin>(routingengine, config);
 	plugin->init();
-	return plugin.release();
 }
 
 //----------------------------------------------------------------------------

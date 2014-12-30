@@ -24,10 +24,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <iostream>
 #include <stdexcept>
 #include <boost/concept_check.hpp>
-//#include <json-glib/json-glib.h>
-
-
-using namespace std;
 
 std::string get_file_contents(const char *filename)
 {
@@ -43,6 +39,7 @@ std::string get_file_contents(const char *filename)
 	}
 	return output;
 }
+
 PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(NULL), routingEngine(nullptr), mMainLoop(nullptr)
 {
 	DebugOut()<<"Loading config file: "<<configFile<<endl;
@@ -179,12 +176,8 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 
 		string path = configurationMap["path"];
 
-		AbstractSource* plugin = loadPlugin<AbstractSource*>(path,configurationMap);
-
-		if(plugin != nullptr)
-		{
-			mSources.push_back(plugin);
-		}
+		if(!loadPlugin(path,configurationMap))
+			DebugOut(DebugOut::Warning) << "Failed to load plugin: " << path <<endl;
 	}
 
 	//json_object_put(sourcesobject);
@@ -224,23 +217,7 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 
 		string path = configurationMap["path"];
 
-		AbstractSinkManager* plugin = loadPlugin<AbstractSinkManager*>(path, configurationMap);
-
-		if(plugin == nullptr)
-		{
-			DebugOut()<<"plugin is not a SinkManager"<<endl;
-
-			AbstractSink* sink = loadPlugin<AbstractSink*>(path, configurationMap);
-
-			if(!sink)
-			{
-				DebugOut(DebugOut::Warning)<<"plugin seems to be invalid: "<<path<<endl;
-			}
-		}
-		else
-		{
-			mSinkManagers.push_back(plugin);
-		}
+		loadPlugin(path, configurationMap);
 	}
 
 	//json_object_put(sinksobject);
@@ -256,11 +233,6 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 
 PluginLoader::~PluginLoader()
 {
-	for(auto i :mSinkManagers)
-	{
-		delete i;
-	}
-
 	for(auto handle : openHandles)
 		dlclose(handle);
 }
@@ -268,11 +240,6 @@ PluginLoader::~PluginLoader()
 IMainLoop *PluginLoader::mainloop()
 {
 	return mMainLoop;
-}
-
-SourceList PluginLoader::sources()
-{
-	return mSources;
 }
 
 std::string PluginLoader::errorString()

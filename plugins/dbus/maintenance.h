@@ -18,10 +18,10 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Distance traveled in km
 		 **/
-		wantPropertyVariant(VehicleProperty::Odometer, "Odometer", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Odometer, "Odometer", VariantType::Read);
 
-		wantPropertyVariant(VehicleProperty::DistanceTotal, "DistanceTotal", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::DistanceSinceStart, "DistanceSinceStart", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DistanceTotal, "DistanceTotal", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::DistanceSinceStart, "DistanceSinceStart", VariantType::Read);
 	}
 };
 
@@ -33,7 +33,7 @@ public:
 	FluidProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Fluid", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::TransmissionFluidLevel, "Transmission", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionFluidLevel, "Transmission", VariantType::Read);
 	}
 };
 
@@ -44,9 +44,9 @@ public:
 	BatteryStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("BatteryStatus", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::BatteryVoltage, "Voltage", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::BatteryCurrent, "Current", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::BatteryChargeLevel, "ChargeLevel", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::BatteryVoltage, "Voltage", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::BatteryCurrent, "Current", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::BatteryChargeLevel, "ChargeLevel", VariantType::Read);
 	}
 };
 
@@ -57,9 +57,9 @@ public:
 	TireProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Tire", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::TirePressure, "Pressure", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TirePressureLow, "PressureLow", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TireTemperature, "Temperature", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TirePressure, "Pressure", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::TirePressureLow, "PressureLow", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::TireTemperature, "Temperature", VariantType::Read);
 	}
 };
 
@@ -70,8 +70,8 @@ public:
 	EngineCoolant(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("EngineCoolant", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::EngineCoolantLevel, "Level", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::EngineCoolantTemperature, "Temperature", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::EngineCoolantLevel, "Level", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::EngineCoolantTemperature, "Temperature", VariantType::Read);
 	}
 };
 
@@ -81,8 +81,8 @@ public:
 	TransmissionOil(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("TransmissionOil", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::TransmissionOilWear, "Wear", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TransmissionOilTemperature, "Temperature", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionOilWear, "Wear", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionOilTemperature, "Temperature", VariantType::Read);
 	}
 };
 
@@ -92,7 +92,7 @@ public:
 	TransmissionClutch(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("TransmissionClutch", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::TransmissionClutchWear, "Wear", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionClutchWear, "Wear", VariantType::Read);
 	}
 };
 
@@ -102,9 +102,9 @@ public:
 	BrakeMaintenance(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("BrakeMaintenance", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::BrakePadWear, "PadWear", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::BrakeFluidLevel, "FluidLevel", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::BrakeFluidLevelLow, "FluidLevelLow", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::BrakePadWear, "PadWear", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::BrakeFluidLevel, "FluidLevel", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::BrakeFluidLevelLow, "FluidLevelLow", VariantType::Read);
 	}
 };
 
@@ -114,8 +114,8 @@ public:
 	WasherFluid(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("WasherFluid", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::WasherFluidLevel, "Level", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::WasherFluidLevelLow, "LevelLow", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WasherFluidLevel, "Level", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::WasherFluidLevelLow, "LevelLow", VariantType::Read);
 	}
 };
 
@@ -125,7 +125,7 @@ public:
 	MalfunctionIndicator(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("MalfunctionIndicator", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::MalfunctionIndicatorOn, "On", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::MalfunctionIndicatorOn, "On", VariantType::Read);
 	}
 };
 
@@ -135,11 +135,11 @@ public:
 	Diagnostics(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Diagnostics", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::AccumulatedEngineRuntime, "AccumulatedEngineRuntime", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::DistanceWithMILOn, "DistanceWithMILOn", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::DistanceSinceCodeCleared, "DistanceSinceCodeCleared", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TimeRunMILOn, "TimeRunMILOn", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::TimeTroubleCodeClear, "TimeTroubleCodeClear", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AccumulatedEngineRuntime, "AccumulatedEngineRuntime", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::DistanceWithMILOn, "DistanceWithMILOn", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::DistanceSinceCodeCleared, "DistanceSinceCodeCleared", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::TimeRunMILOn, "TimeRunMILOn", VariantType::Read);
+		wantPropertyVariant(VehicleProperty::TimeTroubleCodeClear, "TimeTroubleCodeClear", VariantType::Read);
 	}
 };
 
