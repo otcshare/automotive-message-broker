@@ -300,7 +300,9 @@ if args.command == "stdin":
 								print ""
 								words = data.line.split(' ')
 								if words[0] == "quit":
-										sys.exit()
+									termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+									fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+									sys.exit()
 								try:
 										if len(words) > 1:
 												processCommand(words[0], words[1:])
