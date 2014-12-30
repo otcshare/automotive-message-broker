@@ -1,10 +1,9 @@
 /*!
  * \mainpage Automotive Message Broker Library Documentation - Bluemonkey Plugin
- * \version @PROJECT_VERSION@
+ * \version 0.12.903
  * \section intro Introduction
  * Bluemonkey is a javascript rendering engine that allows the scripting of source plugin behavior in javascript.
  * It allows developers a quick way to prototype plugin code as well as a way to create custom properties.
- *
  * \section properties Properties
  * Bluemonkey uses internal property names (not DBus API interface names).  These properties are defined in
  * lib/vehicleproperty.h.  There are mappings from AMB internal property names to DBus API properties in the
@@ -28,9 +27,8 @@
  */
 
  /*!
- * \file bluemonkey.idl
- * \name @PROJECT_NAME@ Bluemonkey interface documentation
- * \version @PROJECT_VERSION@
+ * \name automotive-message-broker Bluemonkey interface documentation
+ * \version 0.12.903
  * \brief the bluemonkey script engine is powered by Qt QML's javascript engine.  It supports QObject types as well
  * as ECMA script (javascript).  All QObject properties, slots, and signals are available in javascript.
  * \see Qt's QMetaObject system for additional details
@@ -90,14 +88,12 @@ interface Bluemonkey {
 	void log(DOMString text);
 
 	/*!
-	 * \brief create a QTimer
-	 * \return QTimer object
+	 * \brief
 	 */
 	QTimer createTimer();
 
 	/*!
-	 * \brief create a QObject
-	 * \return empty QObject
+	 * \brief
 	 */
 	QObject createQObject();
 
@@ -107,73 +103,52 @@ interface Bluemonkey {
 	 void getHistory(DOMString[] properties, Date begin, Date end, HistoryCallback callback);
 
 	/*!
-	 * \brief creates a custom property
+	 * \brief
 	 */
 	 void createCustomProperty(DOMString name, any value, optional unsigned short zone);
-
-	/*!
-	 * \brief exportInterface
-	 */
-	 void exportInterface(DOMString interfaceName, ExportMap[] properties);
 
 };
 
 interface PropertyInterface {
 	/*!
-	 * \brief AMB property name of this property
+	 * \brief
 	 */
 	readonly attribute DOMString type;
 
 	/*!
-	 * \brief zone in the vehicle where this property is located
+	 * \brief
 	 */
 	readonly attribute unsigned short zone;
 
 	/*!
-	 * \brief value for this property
+	 * \brief
 	 */
 	readonly attribute any value;
 
 	/*!
-	 * \brief source where this property came from
+	 * \brief
 	 */
 	readonly attribute DOMString source;
 
 	/*!
-	 * \brief timestamp when this property last changed
+	 * \brief
 	 */
 	readonly attribute DOMTimestamp timestamp;
 
 	/*!
-	 * \brief changed signal
+	 * \brief
 	 */
 	readonly attribute Signal changed;
 
 	void getHistory(Date begin, Date end, HistoryCallback callback);
 };
 
-/*!
-* \brief Signal represents an way to connect to Qt signals and get a javascript callback
-*/
 interface Signal {
 	/*!
-	 * \brief connect to this signal.
-	 *  callback will be called whenever the signal is emitted.
+	 * \brief
 	 */
 	 void connect(ChangedCallback callback)
 };
-
-interface ExportMap {
-	 /*!
-	  * \brief internal AMB property name
-	  */
-	 attribute DOMString AmbPropertyName;
-
-	 /*!
-	  * \brief name you want to export as a DBus property
-	  */
-	 attribute DOMString DBusPropertyName;
-}
 
 callback ChangedCallback = void(any value); ();
 
