@@ -142,7 +142,7 @@ def processCommand(command, commandArgs, noMain=True):
 
 
 
-parser = argparse.ArgumentParser(description='Process DBus mappings.', add_help=False)
+parser = argparse.ArgumentParser(prog="ambctl", description='Process DBus mappings.', add_help=False)
 parser.add_argument('command', metavar='COMMAND [help]', nargs='?', default='stdin', help='amb dbus command')
 parser.add_argument('commandArgs', metavar='ARG', nargs='*',
 			help='amb dbus command arguments')

@@ -76,12 +76,13 @@
 *
 */
 
-/*! amb.fidl
+/*!
+* \file amb.fidl
 * \name @PROJECT_NAME@
 * \version @PROJECT_VERSION@
 * \brief This document describes the DBus interfaces and data types for the
 * Automotive Message Broker API.  The data types are intended to as-close-as-
-* possible be compatible with the W3C vehicle <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html>data spec</a>.
+* possible be compatible with the W3C vehicle <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html">data spec</a>.
 */
 
 /*!
