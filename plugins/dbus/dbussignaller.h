@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 #include "debugout.h"
-#include "abstractproperty.h"
+#include "varianttype.h"
 #include "superptr.hpp"
 #include "listplusplus.h"
 
@@ -17,7 +17,7 @@ class DBusSignal
 {
 public:
 	DBusSignal():connection(nullptr), property(nullptr){}
-	DBusSignal(GDBusConnection* conn, const std::string & objPath, const std::string & iface, const std::string & sigName, AbstractProperty* var)
+	DBusSignal(GDBusConnection* conn, const std::string & objPath, const std::string & iface, const std::string & sigName, VariantType* var)
 		: connection(conn), objectPath(objPath), interface(iface), signalName(sigName), property(var)
 	{
 
@@ -111,12 +111,12 @@ private:
 
 					AbstractProperty* property = signal->property;
 
-					auto val = g_variant_ref(property->toGVariant());
-					std::string sequenceName = property->name() + "Sequence";
+					auto val = amb::make_super(property->toVariant());
+					std::string sequenceName = property->name + "Sequence";
 
-					variantMap[property->name()] = val;
-					variantMap[sequenceName] = g_variant_new("i", property->sequence());
-					variantMap["Time"] = g_variant_new("d", property->timestamp());
+					variantMap[property->name] = val.get();
+					variantMap[sequenceName] = g_variant_new("i", property->sequence);
+					variantMap["Time"] = g_variant_new("d", property->timestamp);
 					variantMap["Zone"] = g_variant_new("i", property->zoneFilter());
 				}
 

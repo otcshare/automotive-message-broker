@@ -31,8 +31,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "varianttype.h"
 #include "dbussignaller.h"
 
-class AbstractProperty;
-
 const uint getPid(const char *owner);
 
 typedef std::vector<VariantType*> PropertyDBusMap;
@@ -78,7 +76,7 @@ public:
 
 		for(auto i : propertyDBusMap)
 		{
-			if(i->name() == attributeName)
+			if(i->dbusName() == attributeName)
 			{
 				return true;
 			}

@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <gio/gio.h>
 #include <listplusplus.h>
 
-#include "abstractproperty.h"
+#include "varianttype.h"
 
 #include "dbussignaller.h"
 
@@ -171,8 +171,8 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 		GVariant **params = g_new(GVariant*,4);
 		GVariant *val = g_variant_ref(property->value()->toVariant());
-		params[0] = g_variant_new("v",val);
-		params[1] = g_variant_new("d",property->timestamp());
+		params[0] = g_variant_new("v", val);
+		params[1] = g_variant_new("d",property->timestamp);
 		params[2] = g_variant_new("i",property->value()->sequence);
 		params[3] = g_variant_new("i",property->updateFrequency());
 
@@ -225,7 +225,7 @@ AbstractDBusInterface::~AbstractDBusInterface()
 
 void AbstractDBusInterface::addProperty(AbstractProperty* property)
 {
-	string nameToLower = property->name();
+	string nameToLower = property->name;
 	boost::algorithm::to_lower<string>(nameToLower);
 
 	string access;
@@ -238,7 +238,7 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 		access = "readwrite";
 	else throw -1; //FIXME: don't throw
 
-	std::string pn = property->name();
+	std::string pn = property->name;
 
 	///see which properties are supported:
 	introspectionXml +=
@@ -253,9 +253,9 @@ void AbstractDBusInterface::addProperty(AbstractProperty* property)
 			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
 			"	<arg type='d' name='imestamp' direction='out' />"
 			"</signal>"
-			"<property type='i' name='" + property->name() + "Sequence' access='read' />";
+			"<property type='i' name='" + property->name + "Sequence' access='read' />";
 
-	properties[property->name()] = property;
+	properties[property->name] = property;
 
 	if(!contains(mimplementedProperties, property->ambPropertyName()))
 	{
@@ -448,7 +448,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 			return nullptr;
 		}
 
-		int sequence = theProperty->sequence();
+		int sequence = theProperty->sequence;
 
 		GVariant* value = g_variant_new("i", sequence);
 		return value;
@@ -500,7 +500,7 @@ void AbstractDBusInterface::setProperty(string propertyName, GVariant *value)
 {
 	if(properties.count(propertyName))
 	{
-		properties[propertyName]->fromGVariant(value);
+		properties[propertyName]->fromVariant(value);
 	}
 	else
 	{
@@ -511,7 +511,7 @@ void AbstractDBusInterface::setProperty(string propertyName, GVariant *value)
 GVariant *AbstractDBusInterface::getProperty(string propertyName)
 {
 	if(properties.count(propertyName))
-		return properties[propertyName]->toGVariant();
+		return properties[propertyName]->toVariant();
 	else
 		throw -1;
 }

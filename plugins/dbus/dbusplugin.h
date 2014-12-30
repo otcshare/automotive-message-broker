@@ -20,12 +20,10 @@
 #define DBUSSINK_H_
 
 #include "abstractsink.h"
-#include "abstractproperty.h"
 #include "abstractdbusinterface.h"
 #include "varianttype.h"
 
 #include <map>
-#include <type_traits>
 
 class DBusSink : public AbstractSink, public AbstractDBusInterface
 {
@@ -65,15 +63,8 @@ public:
 
 protected:
 
-	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, std::string signature, AbstractProperty::Access access)
-	{
-		//propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
-		propertyDBusMap.push_back(new VariantType(routingEngine, ambProperty, propertyName, access));
-	}
-
 	void wantPropertyVariant(VehicleProperty::Property ambProperty, std::string propertyName, AbstractProperty::Access access)
 	{
-		//propertyDBusMap[ambProperty] = new VariantType(routingEngine, signature, ambProperty, propertyName, access);
 		propertyDBusMap.push_back(new VariantType(routingEngine, ambProperty, propertyName, access));
 	}
 

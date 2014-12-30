@@ -30,19 +30,8 @@ public:
 	VehicleSpeedProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehicleSpeed", re, connection, map<string, string>())
 	{
-		/** @attributeName VehicleSpeed
-		 *  @type unsigned long
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return Vehicle Speed in kilometers per hour.
-		 **/
 		wantPropertyVariant(VehicleProperty::VehicleSpeed, "Speed",  AbstractProperty::Read);
-
-		/// Deprecated:
-		wantPropertyVariant(VehicleProperty::VehicleSpeed, "VehicleSpeed", AbstractProperty::Read);
-
 	}
-
-
 };
 
 /** @interface EngineSpeed : VehiclePropertyType **/
@@ -52,19 +41,8 @@ public:
 	EngineSpeedProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("EngineSpeed", re, connection, map<string, string>())
 	{
-		/** @attributeName EngineSpeed
-		 *  @type unsigned long
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return Engine Speed in rotations per minute.
-		 **/
 		wantPropertyVariant(VehicleProperty::EngineSpeed, "Speed", AbstractProperty::Read);
-
-		/// Deprecated:
-		wantPropertyVariant(VehicleProperty::EngineSpeed, "EngineSpeed", AbstractProperty::Read);
-
 	}
-
-
 };
 
 /** @interface VehiclePowerMode : VehiclePropertyType **/
@@ -74,21 +52,7 @@ public:
 	VehiclePowerModeProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("VehiclePowerMode", re, connection, map<string, string>())
 	{
-		/**
-		 * @enum const unsigned short VEHICLEPOWERMODE_OFF = 0,
-		 * @enum const unsigned short VEHICLEPOWERMODE_ACCESSORY1 = 1,
-		 * @enum const unsigned short VEHICLEPOWERMODE_ACCESSORY2 = 2,
-		 * @enum const unsigned short VEHICLEPOWERMODE_RUN = 3;
-		 **/
-
-
-		/** @attributeName VehiclePowerMode
-		 *  @type octet
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return Vehicle Power mode (see VEHICLEPOWERMODE)
-		 **/
-		wantPropertyVariant(VehicleProperty::VehiclePowerMode, "VehiclePowerMode","i",AbstractProperty::Read);
-
+		wantPropertyVariant(VehicleProperty::VehiclePowerMode, "VehiclePowerMode",AbstractProperty::Read);
 	}
 };
 
@@ -99,13 +63,7 @@ public:
 	TripMeterProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("TripMeter", re, connection, map<string, string>())
 	{
-		/** @attributeName TripMeters
-		 *  @type sequence<unsigned long>
-		 *  @attributeComment \brief  Must return trip metes. Changing any items in the array will reset the item's value to '0''.
-		 **/
-		wantPropertyVariant(VehicleProperty::TripMeters, "TripMeters", "aq", AbstractProperty::ReadWrite);
-
-
+		wantPropertyVariant(VehicleProperty::TripMeters, "TripMeters", AbstractProperty::ReadWrite);
 	}
 };
 
@@ -119,7 +77,6 @@ public:
 		wantPropertyVariant(VehicleProperty::AccelerationX, "X", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::AccelerationY, "Y", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::AccelerationZ, "Z", AbstractProperty::Read);
-
 	}
 };
 
@@ -130,16 +87,11 @@ public:
 	TransmissionProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("Transmission", re, connection, map<string, string>())
 	{
-
-		wantPropertyVariant(VehicleProperty::TransmissionShiftPosition, "ShiftPosition", "y", AbstractProperty::Read);
-
-		wantPropertyVariant(VehicleProperty::TransmissionGearPosition, "GearPosition", "y", AbstractProperty::Read);
-
-		wantPropertyVariant(VehicleProperty::TransmissionGearPosition, "Gear", "y", AbstractProperty::Read);
-
-		wantPropertyVariant(VehicleProperty::TransmissionModeW3C, "Mode", "y", AbstractProperty::Read);
-
-		wantPropertyVariant(VehicleProperty::TransmissionGearType, "Type", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionShiftPosition, "ShiftPosition", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionGearPosition, "GearPosition", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionGearPosition, "Gear", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionModeW3C, "Mode", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::TransmissionGearType, "Type", AbstractProperty::Read);
 	}
 };
 
@@ -150,28 +102,8 @@ public:
 	CruiseControlProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 	:DBusSink("CruiseControlStatus", re, connection, map<string, string>())
 	{
-		///TODO: deprecate Activated.  Remove in 0.14
-		wantPropertyVariant(VehicleProperty::CruiseControlActive, "Activated", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::CruiseControlSpeed, "Speed", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::CruiseControlActive, "Status", AbstractProperty::Read);
-	}
-};
-
-/** @interface WheelBrake : VehiclePropertyType **/
-/// TODO: deprecated remove in 0.14
-class WheelBrakeProperty: public DBusSink
-{
-public:
-	WheelBrakeProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
-		:DBusSink("WheelBrake", re, connection, map<string, string>())
-	{
-		/** @attributeName Engaged
-		 *  @type boolean
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return Wheel Brake status: Engaged = true, disengaged = false
-		 **/
-		wantPropertyVariant(VehicleProperty::WheelBrake, "Engaged", "b", AbstractProperty::Read);
-
 	}
 };
 
@@ -182,13 +114,7 @@ public:
 	BrakeOperation(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("BrakeOperation", re, connection, map<string, string>())
 	{
-		/** @attributeName Engaged
-		 *  @type boolean
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return Wheel Brake status: Engaged = true, disengaged = false
-		 **/
 		wantPropertyVariant(VehicleProperty::WheelBrake, "BrakePedalDepressed", AbstractProperty::Read);
-
 	}
 };
 
@@ -199,17 +125,16 @@ public:
 	LightStatusProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("LightStatus", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::LightHead, "Head", "b", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::LightRightTurn, "RightTurn", "b", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::LightLeftTurn, "LeftTurn", "b", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::LightBrake, "Brake", "b", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::LightFog, "Fog", "b", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::LightHazard, "Hazard", "b", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::LightParking, "Parking", "b", AbstractProperty::ReadWrite);
-		wantPropertyVariant(VehicleProperty::LightHighBeam, "HighBeam", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightHead, "Head", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightRightTurn, "RightTurn", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightLeftTurn, "LeftTurn", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightBrake, "Brake", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightFog, "Fog", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightHazard, "Hazard", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightParking, "Parking", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::LightHighBeam, "HighBeam", AbstractProperty::ReadWrite);
 		wantPropertyVariant(VehicleProperty::LightAutomatic, "AutomaticHeadlights", AbstractProperty::ReadWrite);
 		wantPropertyVariant(VehicleProperty::LightDynamicHighBeam, "DynamicHighBeam", AbstractProperty::ReadWrite);
-
 	}
 };
 
@@ -219,13 +144,6 @@ public:
 	InteriorLightStatusProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("InteriorLightStatus", re, connection, map<string, string>())
 	{
-		/// TODO: deprecated remove in 0.14
-		wantPropertyVariant(VehicleProperty::InteriorLightPassenger, "Passenger", AbstractProperty::Read);
-		/// TODO: deprecated remove in 0.14
-		wantPropertyVariant(VehicleProperty::InteriorLightPassenger, "Driver", AbstractProperty::Read);
-		/// TODO: deprecated remove in 0.14
-		wantPropertyVariant(VehicleProperty::InteriorLightCenter, "Center", AbstractProperty::Read);
-
 		wantPropertyVariant(VehicleProperty::InteriorLightStatus, "Status", AbstractProperty::ReadWrite);
 	}
 };
@@ -237,10 +155,7 @@ public:
 	HornProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 		:DBusSink("Horn", re, connection, map<string, string>())
 	{
-		/// TODO: deprecated remove in 0.14
-		wantPropertyVariant(VehicleProperty::Horn, "On", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::Horn, "Status", AbstractProperty::Read);
-
 	}
 };
 
@@ -252,21 +167,13 @@ public:
 		:DBusSink("Fuel", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::FuelLevel, "Level", AbstractProperty::Read);
-
 		wantPropertyVariant(VehicleProperty::FuelRange, "Range", AbstractProperty::Read);
-
 		wantPropertyVariant(VehicleProperty::FuelConsumption, "InstantConsumption", AbstractProperty::Read);
-
 		wantPropertyVariant(VehicleProperty::FuelEconomy, "InstantEconomy", AbstractProperty::Read);
-
 		wantPropertyVariant(VehicleProperty::FuelAverageEconomy, "AverageEconomy", AbstractProperty::ReadWrite);
-
 		wantPropertyVariant(VehicleProperty::FuelAverageConsumption, "AverageConsumption", AbstractProperty::ReadWrite);
-
 		wantPropertyVariant(VehicleProperty::FuelConsumptionSinceRestart, "FuelConsumedSinceRestart", AbstractProperty::ReadWrite);
-
 		wantPropertyVariant(VehicleProperty::FuelTimeSinceRestart, "TimeSinceRestart", AbstractProperty::ReadWrite);
-
 	}
 };
 
@@ -277,14 +184,11 @@ public:
 	EngineOilProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("EngineOil", re, connection, map<string, string>())
 	{
-		///TODO depricated.  Use Level.  Remove in 0.14
-		wantPropertyVariant(VehicleProperty::EngineOilRemaining, "Remaining", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::EngineOilRemaining, "Level", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::EngineOilTemperature, "Temperature", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::EngineOilPressure, "Pressure", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::EngineOilChangeIndicator, "Change", AbstractProperty::Read);
 		wantPropertyVariant(VehicleProperty::EngineOilLifeRemaining, "LifeRemaining", AbstractProperty::Read);
-
 	}
 };
 
@@ -295,33 +199,10 @@ public:
 	LocationProperty(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("Location", re, connection, map<string, string>())
 	{
-		/** @attributeName Latitude
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return latitude in Deg.Min (-180, +180)
-		 **/
-		wantPropertyVariant(VehicleProperty::Latitude, "Latitude", "d", AbstractProperty::Read);
-
-		/** @attributeName Longitude
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return longitude in Deg.Min (-90, +90)
-		 **/
-		wantPropertyVariant(VehicleProperty::Longitude, "Longitude", "d", AbstractProperty::Read);
-
-		/** @attributeName Altitude
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return altitude in meters above sea-level (0).
-		 **/
-		wantPropertyVariant(VehicleProperty::Altitude, "Altitude", "d", AbstractProperty::Read);
-
-		/** @attributeName Direction
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief  Must return direction in Degrees  (0-360)
-		 **/
-		wantPropertyVariant(VehicleProperty::Direction, "Direction", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Latitude, "Latitude", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Longitude, "Longitude", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Altitude, "Altitude", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::Direction, "Direction", AbstractProperty::Read);
 
 	}
 };
@@ -352,8 +233,8 @@ public:
 	NightMode(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("NightMode", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::NightMode, "NightMode", "b", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::NightMode, "Mode", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::NightMode, "NightMode", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::NightMode, "Mode", AbstractProperty::Read);
 	}
 };
 
@@ -363,8 +244,8 @@ public:
 	DrivingMode(VehicleProperty::Property, AbstractRoutingEngine *re, GDBusConnection *connection)
 			:DBusSink("DrivingMode", re, connection, map<string, string>())
 	{
-		wantPropertyVariant(VehicleProperty::DrivingMode, "DrivingMode", "i", AbstractProperty::Read);
-		wantPropertyVariant(VehicleProperty::DrivingModeW3C, "Mode", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DrivingMode, "DrivingMode", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DrivingModeW3C, "Mode", AbstractProperty::Read);
 	}
 };
 

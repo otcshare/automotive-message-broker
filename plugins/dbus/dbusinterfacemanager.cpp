@@ -26,6 +26,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "automotivemanager.h"
 #include <unordered_set>
 
+#include <dbusexport.hpp>
+
 ///properties:
 #include "runningstatus.h"
 #include "custompropertyinterface.h"
@@ -36,92 +38,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "parking.h"
 #include "drivingsafety.h"
 #include "personalization.h"
-
-
-std::unordered_map<std::string, std::unordered_set<Zone::Type>> getUniqueSourcesList(AbstractRoutingEngine *re, PropertyList implementedProperties)
-{
-	std::unordered_map<std::string, std::unordered_set<Zone::Type>> uniqueSourcesList;
-
-	for(auto property : implementedProperties)
-	{
-		std::vector<std::string> sources = re->sourcesForProperty(property);
-
-		for(auto source : sources)
-		{
-			PropertyInfo info = re->getPropertyInfo(property, source);
-
-			std::unordered_set<Zone::Type> uniqueZoneList;
-
-			if(uniqueSourcesList.count(source))
-			{
-				uniqueZoneList = uniqueSourcesList[source];
-			}
-
-			Zone::ZoneList zoneList = info.zones();
-
-			if(!zoneList.size())
-			{
-				uniqueZoneList.emplace(Zone::None);
-			}
-
-			for(auto zoneItr : zoneList)
-			{
-				uniqueZoneList.emplace(zoneItr);
-			}
-
-			uniqueSourcesList[source] = uniqueZoneList;
-		}
-	}
-
-	return uniqueSourcesList;
-}
-
-template <typename T>
-void exportProperty(VehicleProperty::Property prop, AbstractRoutingEngine *re, GDBusConnection *connection)
-{
-	T* t = new T(prop, re, connection);
-
-	prop = t->objectName();
-
-	/// check if we need more than one instance:
-
-	PropertyList implementedProperties = t->wantsProperties();
-
-	std::unordered_map<std::string, std::unordered_set<Zone::Type> > uniqueSourcesList = getUniqueSourcesList(re, implementedProperties);
-
-	delete t;
-
-	PropertyList supported = re->supported();
-
-	for(auto itr : uniqueSourcesList)
-	{
-		std::unordered_set<Zone::Type> zones = itr.second;
-
-		std::string source = itr.first;
-
-		std::string objectPath = "/" + source;
-
-		boost::algorithm::erase_all(objectPath, "-");
-
-		for(auto zone : zones)
-		{
-			T* t = new T(prop, re, connection);
-			std::stringstream fullobjectPath;
-			fullobjectPath<< objectPath << "/" << zone << "/" <<t->objectName();
-			t->setObjectPath(fullobjectPath.str());
-			t->setSourceFilter(source);
-			t->setZoneFilter(zone);
-			t->supportedChanged(supported);
-		}
-
-	}
-}
-
-template <typename T>
-void exportProperty(AbstractRoutingEngine *re, GDBusConnection *connection)
-{
-	exportProperty<T>("", re, connection);
-}
 
 static void
 on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_data)
@@ -188,86 +104,78 @@ void DBusInterfaceManager::supportedChanged(const PropertyList &supportedPropert
 void DBusInterfaceManager::registerTypes()
 {
 	/// properties:
-	exportProperty<AccelerationProperty>(re, connection);
-	exportProperty<VehicleSpeedProperty>(re, connection);
-	exportProperty<TireProperty>(re, connection);
-	exportProperty<EngineSpeedProperty>(re, connection);
-	exportProperty<VehiclePowerModeProperty>(re, connection);
-	exportProperty<TripMeterProperty>(re, connection);
-	exportProperty<TransmissionProperty>(re, connection);
-	exportProperty<CruiseControlProperty>(re, connection);
-	exportProperty<WheelBrakeProperty>(re, connection);
-	exportProperty<BrakeOperation>(re, connection);
-	exportProperty<LightStatusProperty>(re, connection);
-	exportProperty<HornProperty>(re, connection);
-	exportProperty<FuelProperty>(re, connection);
-	exportProperty<EngineOilProperty>(re, connection);
-	exportProperty<ExteriorBrightnessProperty>(re, connection);
-	exportProperty<Temperature>(re, connection);
-	exportProperty<RainSensor>(re, connection);
-	exportProperty<WindshieldWiper>(re, connection);
-	exportProperty<HVACProperty>(re, connection);
-	exportProperty<ClimateControlProperty>(re, connection);
-	exportProperty<WindowStatusProperty>(re, connection);
-	exportProperty<DefrostProperty>(re, connection);
-	exportProperty<Sunroof>(re, connection);
-	exportProperty<ConvertibleRoof>(re, connection);
-	exportProperty<VehicleId>(re, connection);
-	exportProperty<VehicleTypeProperty>(re, connection);
-	exportProperty<FuelInfoProperty>(re, connection);
-	exportProperty<SizeProperty>(re, connection);
-	exportProperty<DoorsProperty>(re, connection);
-	exportProperty<WheelInformationProperty>(re, connection);
-	exportProperty<OdometerProperty>(re, connection);
-	exportProperty<FluidProperty>(re, connection);
-	exportProperty<BatteryProperty>(re, connection);
-	exportProperty<BatteryStatusProperty>(re, connection);
-	exportProperty<SecurityAlertProperty>(re, connection);
-	exportProperty<ParkingBrakeProperty>(re, connection);
-	exportProperty<ParkingLightProperty>(re, connection);
-	exportProperty<HazardLightProperty>(re, connection);
-	exportProperty<LocationProperty>(re, connection);
-	exportProperty<AntilockBrakingSystemProperty>(re, connection);
-	exportProperty<TractionControlSystemProperty>(re, connection);
-	exportProperty<VehicleTopSpeedLimitProperty>(re, connection);
-	exportProperty<AirbagStatusProperty>(re, connection);
-	exportProperty<DoorStatusProperty>(re, connection);
-	exportProperty<SeatBeltStatusProperty>(re, connection);
-	exportProperty<OccupantStatusProperty>(re, connection);
-	exportProperty<ObstacleDistanceProperty>(re, connection);
-	exportProperty<SeatPostionProperty>(re, connection);
-	exportProperty<SteeringWheelPositionProperty>(re, connection);
-	exportProperty<SteeringWheel>(re, connection);
-	exportProperty<MirrorSettingProperty>(re, connection);
-	exportProperty<ThrottlePosition>(re, connection);
-	exportProperty<EngineCoolant>(re, connection);
-	exportProperty<NightMode>(re, connection);
-	exportProperty<DrivingMode>(re, connection);
-	exportProperty<PowertrainTorque>(re, connection);
-	exportProperty<AcceleratorPedalPosition>(re, connection);
-	exportProperty<Chime>(re, connection);
-	exportProperty<WheelTick>(re, connection);
-	exportProperty<IgnitionTime>(re, connection);
-	exportProperty<YawRate>(re, connection);
-	exportProperty<TransmissionClutch>(re, connection);
-	exportProperty<TransmissionOil>(re, connection);
-	exportProperty<BrakeMaintenance>(re, connection);
-	exportProperty<WasherFluid>(re, connection);
-	exportProperty<MalfunctionIndicator>(re, connection);
-	exportProperty<Diagnostics>(re, connection);
-	exportProperty<MirrorProperty>(re, connection);
-	exportProperty<SeatAdjustment>(re, connection);
-	exportProperty<DriveMode>(re, connection);
-	exportProperty<VehicleSound>(re, connection);
-	exportProperty<ElectronicStabilityControl>(re, connection);
-	exportProperty<ChildSafetyLock>(re, connection);
-	exportProperty<SeatProperty>(re, connection);
-	exportProperty<DoorProperty>(re, connection);
-	exportProperty<WindshieldWiperStatus>(re, connection);
-	exportProperty<SideWindowStatusProperty>(re, connection);
-	exportProperty<AtmosphericPressure>(re, connection);
-	exportProperty<LaneDepartureStatus>(re, connection);
-	exportProperty<AlarmStatus>(re, connection);
+	amb::exportProperty<AccelerationProperty>(re, connection);
+	amb::exportProperty<VehicleSpeedProperty>(re, connection);
+	amb::exportProperty<TireProperty>(re, connection);
+	amb::exportProperty<EngineSpeedProperty>(re, connection);
+	amb::exportProperty<VehiclePowerModeProperty>(re, connection);
+	amb::exportProperty<TripMeterProperty>(re, connection);
+	amb::exportProperty<TransmissionProperty>(re, connection);
+	amb::exportProperty<CruiseControlProperty>(re, connection);
+	amb::exportProperty<BrakeOperation>(re, connection);
+	amb::exportProperty<LightStatusProperty>(re, connection);
+	amb::exportProperty<HornProperty>(re, connection);
+	amb::exportProperty<FuelProperty>(re, connection);
+	amb::exportProperty<EngineOilProperty>(re, connection);
+	amb::exportProperty<ExteriorBrightnessProperty>(re, connection);
+	amb::exportProperty<Temperature>(re, connection);
+	amb::exportProperty<RainSensor>(re, connection);
+	amb::exportProperty<ClimateControlProperty>(re, connection);
+	amb::exportProperty<WindowStatusProperty>(re, connection);
+	amb::exportProperty<DefrostProperty>(re, connection);
+	amb::exportProperty<Sunroof>(re, connection);
+	amb::exportProperty<ConvertibleRoof>(re, connection);
+	amb::exportProperty<VehicleId>(re, connection);
+	amb::exportProperty<VehicleTypeProperty>(re, connection);
+	amb::exportProperty<FuelInfoProperty>(re, connection);
+	amb::exportProperty<SizeProperty>(re, connection);
+	amb::exportProperty<DoorsProperty>(re, connection);
+	amb::exportProperty<WheelInformationProperty>(re, connection);
+	amb::exportProperty<OdometerProperty>(re, connection);
+	amb::exportProperty<FluidProperty>(re, connection);
+	amb::exportProperty<BatteryStatusProperty>(re, connection);
+	amb::exportProperty<ParkingBrakeProperty>(re, connection);
+	amb::exportProperty<HazardLightProperty>(re, connection);
+	amb::exportProperty<LocationProperty>(re, connection);
+	amb::exportProperty<AntilockBrakingSystemProperty>(re, connection);
+	amb::exportProperty<TractionControlSystemProperty>(re, connection);
+	amb::exportProperty<VehicleTopSpeedLimitProperty>(re, connection);
+	amb::exportProperty<AirbagStatusProperty>(re, connection);
+	amb::exportProperty<DoorStatusProperty>(re, connection);
+	amb::exportProperty<SeatBeltStatusProperty>(re, connection);
+	amb::exportProperty<OccupantStatusProperty>(re, connection);
+	amb::exportProperty<ObstacleDistanceProperty>(re, connection);
+	amb::exportProperty<SteeringWheelPositionProperty>(re, connection);
+	amb::exportProperty<SteeringWheel>(re, connection);
+	amb::exportProperty<ThrottlePosition>(re, connection);
+	amb::exportProperty<EngineCoolant>(re, connection);
+	amb::exportProperty<NightMode>(re, connection);
+	amb::exportProperty<DrivingMode>(re, connection);
+	amb::exportProperty<PowertrainTorque>(re, connection);
+	amb::exportProperty<AcceleratorPedalPosition>(re, connection);
+	amb::exportProperty<Chime>(re, connection);
+	amb::exportProperty<WheelTick>(re, connection);
+	amb::exportProperty<IgnitionTime>(re, connection);
+	amb::exportProperty<YawRate>(re, connection);
+	amb::exportProperty<TransmissionClutch>(re, connection);
+	amb::exportProperty<TransmissionOil>(re, connection);
+	amb::exportProperty<BrakeMaintenance>(re, connection);
+	amb::exportProperty<WasherFluid>(re, connection);
+	amb::exportProperty<MalfunctionIndicator>(re, connection);
+	amb::exportProperty<Diagnostics>(re, connection);
+	amb::exportProperty<MirrorProperty>(re, connection);
+	amb::exportProperty<SeatAdjustment>(re, connection);
+	amb::exportProperty<DriveMode>(re, connection);
+	amb::exportProperty<VehicleSound>(re, connection);
+	amb::exportProperty<ElectronicStabilityControl>(re, connection);
+	amb::exportProperty<ChildSafetyLock>(re, connection);
+	amb::exportProperty<SeatProperty>(re, connection);
+	amb::exportProperty<DoorProperty>(re, connection);
+	amb::exportProperty<WindshieldWiperStatus>(re, connection);
+	amb::exportProperty<SideWindowStatusProperty>(re, connection);
+	amb::exportProperty<AtmosphericPressure>(re, connection);
+	amb::exportProperty<LaneDepartureStatus>(re, connection);
+	amb::exportProperty<AlarmStatus>(re, connection);
 
 	PropertyList list = VehicleProperty::customProperties();
 	PropertyList implemented = AbstractDBusInterface::implementedProperties();
@@ -276,7 +184,7 @@ void DBusInterfaceManager::registerTypes()
 	{
 		if(!contains(implemented, prop))
 		{
-			exportProperty<CustomPropertyInterface>(prop, re, connection);
+			amb::exportProperty<CustomPropertyInterface>(prop, re, connection);
 		}
 	}
 
@@ -292,7 +200,7 @@ void DBusInterfaceManager::registerTypes()
 
 		if(!contains(implemented, prop))
 		{
-			exportProperty<UncategorizedPropertyInterface>(prop, re, connection);
+			amb::exportProperty<UncategorizedPropertyInterface>(prop, re, connection);
 		}
 	}
 }

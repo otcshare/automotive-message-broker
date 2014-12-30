@@ -33,53 +33,7 @@ public:
 	FluidProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("Fluid", re, connection, map<string, string>())
 	{
-		/** @attributeName Transmission
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return Transmission fluid level percentage. 0-100.
-		 **/
 		wantPropertyVariant(VehicleProperty::TransmissionFluidLevel, "Transmission", AbstractProperty::Read);
-
-		/** @attributeName Brake
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return Brake fluid level percentage. 0-100.
-		 **/
-		///TODO: deprecated in 0.14
-		wantPropertyVariant(VehicleProperty::BrakeFluidLevel, "Brake", AbstractProperty::Read);
-
-		/** @attributeName Washer
-		 *  @type unsigned short
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return Washer fluid level percentage. 0-100.
-		 **/
-		///TODO: Deprecated in 0.14
-		wantPropertyVariant(VehicleProperty::WasherFluidLevel, "Washer", AbstractProperty::Read);
-	}
-};
-
-/** @interface Battery : VehiclePropertyType **/
-/// TODO: deprecated.  remove in 0.13
-class BatteryProperty: public DBusSink
-{
-public:
-	BatteryProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("Battery", re, connection, map<string, string>())
-	{
-		/** @attributeName Voltage
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return battery voltage.
-		 **/
-		wantPropertyVariant(VehicleProperty::BatteryVoltage, "Voltage", "d", AbstractProperty::Read);
-
-		/** @attributeName Current
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return battery current in Amperes
-		 **/
-		wantPropertyVariant(VehicleProperty::BatteryCurrent, "Current", "d", AbstractProperty::Read);
-
 	}
 };
 
@@ -90,22 +44,9 @@ public:
 	BatteryStatusProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("BatteryStatus", re, connection, map<string, string>())
 	{
-		/** @attributeName Voltage
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return battery voltage.
-		 **/
 		wantPropertyVariant(VehicleProperty::BatteryVoltage, "Voltage", AbstractProperty::Read);
-
-		/** @attributeName Current
-		 *  @type double
-		 *  @access readonly
-		 *  @attributeComment \brief MUST return battery current in Amperes
-		 **/
 		wantPropertyVariant(VehicleProperty::BatteryCurrent, "Current", AbstractProperty::Read);
-
 		wantPropertyVariant(VehicleProperty::BatteryChargeLevel, "ChargeLevel", AbstractProperty::Read);
-
 	}
 };
 

@@ -1,24 +1,25 @@
 #include "varianttype.h"
 #include "abstractroutingengine.h"
+#include "abstractdbusinterface.h"
 #include "debugout.h"
 #include "listplusplus.h"
 
 VariantType::VariantType(AbstractRoutingEngine* re, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access)
-	:AbstractProperty(propertyName, access), mInitialized(false)
+	:AbstractPropertyType(ambPropertyName), mInitialized(false), mAccess(access), mPropertyName(propertyName),
+	  routingEngine(re)
 {
-	mAmbPropertyName = ambPropertyName;
-	routingEngine = re;
+	name = ambPropertyName;
 	//set default value:
-	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName));
+	setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(name));
 }
 
 void VariantType::initialize()
 {
 	if(mInitialized) return;
 	AsyncPropertyRequest request;
-	request.property = mAmbPropertyName;
-	request.sourceUuidFilter = mSourceFilter;
-	request.zoneFilter = mZoneFilter;
+	request.property = name;
+	request.sourceUuidFilter = sourceUuid;
+	request.zoneFilter = zone;
 
 	using namespace std::placeholders;
 	request.completed = [this](AsyncPropertyReply* r)
@@ -35,15 +36,15 @@ void VariantType::initialize()
 	/// do not request if not supported:
 	PropertyList proplist = routingEngine->supported();
 
-	if(contains(proplist, mAmbPropertyName))
+	if(contains(proplist, name))
 		routingEngine->getPropertyAsync(request);
 }
 
-GVariant *VariantType::toGVariant()
+GVariant *VariantType::toVariant()
 {
 	if(!value())
 	{
-		setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName));
+		setValue(VehicleProperty::getPropertyTypeForPropertyNameValue(name));
 	}
 
 	auto v = value();
@@ -51,15 +52,15 @@ GVariant *VariantType::toGVariant()
 	return v->toVariant();
 }
 
-void VariantType::fromGVariant(GVariant *val)
+void VariantType::fromVariant(GVariant *val)
 {
-	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(mAmbPropertyName);
+	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
 	v->fromVariant(val);
 
 	AsyncSetPropertyRequest request;
-	request.property = mAmbPropertyName;
+	request.property = name;
 	request.value = v;
-	request.zoneFilter = mZoneFilter;
+	request.zoneFilter = zone;
 	request.completed = [&](AsyncPropertyReply* r)
 	{
 		auto reply = amb::make_unique(r);

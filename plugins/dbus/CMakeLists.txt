@@ -1,24 +1,30 @@
 
-include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
+include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${CMAKE_SOURCE_DIR}/plugins/common)
 
 pkg_check_modules(gio REQUIRED gio-2.0)
 
-set(dbussinkplugin_headers dbussignaller.h automotivemanager.h dbusplugin.h abstractproperty.h abstractdbusinterface.h dbusinterfacemanager.h runningstatus.h varianttype.h
+set(dbussinkplugin_headers dbussignaller.h automotivemanager.h dbusplugin.h abstractdbusinterface.h dbusinterfacemanager.h runningstatus.h varianttype.h
 custompropertyinterface.h uncategorizedproperty.h environmentproperties.h vehicleinfo.h maintenance.h parking.h fakeidlheader.h drivingsafety.h personalization.h)
-set(dbussinkplugin_sources dbussignaller.cpp automotivemanager.cpp dbusplugin.cpp abstractproperty.cpp abstractdbusinterface.cpp dbusinterfacemanager.cpp runningstatus.cpp
+set(dbussinkplugin_sources dbussignaller.cpp automotivemanager.cpp dbusplugin.cpp abstractdbusinterface.cpp dbusinterfacemanager.cpp runningstatus.cpp
 varianttype.cpp custompropertyinterface.cpp uncategorizedproperty.cpp environmentproperties.cpp vehicleinfo.cpp maintenance.cpp parking.cpp drivingsafety.cpp personalization.cpp)
 
 add_library(dbussinkplugin MODULE ${dbussinkplugin_sources})
 set_target_properties(dbussinkplugin PROPERTIES PREFIX "")
-target_link_libraries(dbussinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES})
+target_link_libraries(dbussinkplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${gio_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common amb-plugins-common)
 
 install (TARGETS dbussinkplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/amb.conf DESTINATION /etc/dbus-1/system.d )
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/amb.conf ${CMAKE_CURRENT_SOURCE_DIR}/amb.conf)
 
-set(dbus_mapping_headers ${CMAKE_CURRENT_SOURCE_DIR}/runningstatus.h ${CMAKE_CURRENT_SOURCE_DIR}/environmentproperties.h ${CMAKE_CURRENT_SOURCE_DIR}/vehicleinfo.h ${CMAKE_CURRENT_SOURCE_DIR}/maintenance.h ${CMAKE_CURRENT_SOURCE_DIR}/parking.h ${CMAKE_CURRENT_SOURCE_DIR}/drivingsafety.h	${CMAKE_CURRENT_SOURCE_DIR}/personalization.h
-		CACHE INTERNAL "dbus mapping headers")
+set(dbus_mapping_headers ${CMAKE_CURRENT_SOURCE_DIR}/runningstatus.h CACHE INTERNAL "dbus mapping headers")
+set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/environmentproperties.h CACHE INTERNAL "dbus mapping headers")
+set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/vehicleinfo.h CACHE INTERNAL "dbus mapping headers")
+set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/maintenance.h CACHE INTERNAL "dbus mapping headers")
+set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/parking.h CACHE INTERNAL "dbus mapping headers")
+set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/drivingsafety.h CACHE INTERNAL "dbus mapping headers")
+set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/personalization.h CACHE INTERNAL "dbus mapping headers")
+
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/dbus.README @ONLY)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus.README DESTINATION ${DOC_INSTALL_DIR}/plugins)

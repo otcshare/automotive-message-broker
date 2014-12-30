@@ -19,14 +19,14 @@ public:
 		 *  @attributeComment \brief MUST return World Manufacturer Identifier (WMI)
 		 *  @attributeComment WMI is defined by SAE ISO 3780:2009.  3 characters.
 		 **/
-		wantPropertyVariant(VehicleProperty::WMI, "WMI", "s", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WMI, "WMI", AbstractProperty::Read);
 
 		/** @attributeName VIN
 		 *  @type DOMString
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Vehicle Identification Number (VIN) as defined by ISO 3779. 17 characters.
 		 **/
-		wantPropertyVariant(VehicleProperty::VIN, "VIN", "s", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VIN, "VIN", AbstractProperty::Read);
 
 
 	}
@@ -44,21 +44,21 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return width of vehicle in mm
 		 **/
-		wantPropertyVariant(VehicleProperty::VehicleWidth, "Width", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleWidth, "Width", AbstractProperty::Read);
 
 		/** @attributeName Height
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return height of vehicle in mm
 		 **/
-		wantPropertyVariant(VehicleProperty::VehicleHeight, "Height", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleHeight, "Height", AbstractProperty::Read);
 
 		/** @attributeName Length
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return length of vehicle in mm
 		 **/
-		wantPropertyVariant(VehicleProperty::VehicleLength, "Length", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleLength, "Length", AbstractProperty::Read);
 
 
 	}
@@ -84,7 +84,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return type of fuel.  integer 0-4 (see FUELTYPE_*)
 		 **/
-		wantPropertyVariant(VehicleProperty::FuelType, "Type", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelType, "Type", AbstractProperty::Read);
 
 		/**
 		 * @enum const unsigned short REFUELPOSITION_LEFT = 0;
@@ -98,7 +98,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return position of refuling (see REFUELPOSITION_*)
 		 **/
-		wantPropertyVariant(VehicleProperty::FuelPositionSide, "RefuelPosition", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FuelPositionSide, "RefuelPosition", AbstractProperty::Read);
 
 
 	}
@@ -125,7 +125,7 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return type of Vehicle.  Integer 0-5 (see VEHICLETYPE_*)
 		 **/
-		wantPropertyVariant(VehicleProperty::VehicleType, "Type", "y", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::VehicleType, "Type", AbstractProperty::Read);
 
 
 	}
@@ -146,7 +146,7 @@ public:
 		 *  @attributeComment Example a common mini-van may have Doors[0] = 2 doors,
 		 *  @attributeComment Doors[1] = 1 (side door), Doors[2] = 1 (trunk).
 		 **/
-		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", "ay", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::DoorsPerRow, "DoorsPerRow", AbstractProperty::Read);
 
 
 	}
@@ -165,28 +165,28 @@ public:
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Radius of Front Wheel(s) in mm.
 		 **/
-		wantPropertyVariant(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::FrontWheelRadius, "FrontWheelRadius", AbstractProperty::Read);
 
 		/** @attributeName RearWheelRadius
 		 *  @type unsigned short
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Radius of Rear Wheel(s) in mm.
 		 **/
-		wantPropertyVariant(VehicleProperty::RearWheelRadius, "RearWheelRadius", "q", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::RearWheelRadius, "RearWheelRadius", AbstractProperty::Read);
 
 		/** @attributeName WheelTrack
 		 *  @type unsigned long
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Wheel Track in mm.
 		 **/
-		wantPropertyVariant(VehicleProperty::WheelTrack, "WheelTrack", "u", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::WheelTrack, "WheelTrack", AbstractProperty::Read);
 
 		/** @attributeName ABS
 		 *  @type boolean
 		 *  @access readonly
 		 *  @attributeComment \brief MUST return Antilock Brake System status: on = true, off = false.
 		 **/
-		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", "b", AbstractProperty::Read);
+		wantPropertyVariant(VehicleProperty::AntilockBrakingSystem, "AntilockBrakingSystem", AbstractProperty::Read);
 	}
 };
 

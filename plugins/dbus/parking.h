@@ -6,17 +6,6 @@
 #include "abstractdbusinterface.h"
 #include "abstractroutingengine.h"
 
-///TODO Deprecated in 0.14.  Use AlarmStatus
-class SecurityAlertProperty: public DBusSink
-{
-public:
-	SecurityAlertProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("SecurityAlert", re, connection, map<string, string>())
-	{
-		wantPropertyVariant(VehicleProperty::SecurityAlertStatus, "SecurityAlert", "i", AbstractProperty::Read);
-	}
-};
-
 /** @interface ParkingBrake : VehiclePropertyType **/
 class ParkingBrakeProperty: public DBusSink
 {
@@ -24,33 +13,7 @@ public:
 	ParkingBrakeProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("ParkingBrake", re, connection, map<string, string>())
 	{
-		/** @attributeName ParkingBrake
-		 *  @type boolean
-		 *  @access readonly
-		 *  @attributeComment must return status of parking brake:  Engaged = true, Disengaged = false.
-		 **/
-		wantPropertyVariant(VehicleProperty::ParkingBrakeStatus, "ParkingBrake", "b", AbstractProperty::Read);
-
 		wantPropertyVariant(VehicleProperty::ParkingBrakeStatusW3C, "Status", AbstractProperty::Read);
-
-
-	}
-};
-
-/** @interface ParkingLight : VehiclePropertyType **/
-///TODO: Deprecated in 0.14
-class ParkingLightProperty: public DBusSink
-{
-public:
-	ParkingLightProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("ParkingLight", re, connection, map<string, string>())
-	{
-		/** @attributeName ParkingLight
-		 *  @type boolean
-		 *  @access readonly
-		 *  @attributeComment must return status of parking light:  Engaged = true, Disengaged = false.
-		 **/
-		wantPropertyVariant(VehicleProperty::ParkingLightStatus, "ParkingLight", "b", AbstractProperty::Read);
 	}
 };
 
@@ -61,12 +24,7 @@ public:
 	HazardLightProperty(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
 		:DBusSink("HazardLight", re, connection, map<string, string>())
 	{
-		/** @attributeName HazardLight
-		 *  @type boolean
-		 *  @access readonly
-		 *  @attributeComment must return status of hazard light:  Engaged = true, Disengaged = false.
-		 **/
-		wantPropertyVariant(VehicleProperty::HazardLightStatus, "HazardLight", "b", AbstractProperty::ReadWrite);
+		wantPropertyVariant(VehicleProperty::HazardLightStatus, "HazardLight", AbstractProperty::ReadWrite);
 	}
 };
 
