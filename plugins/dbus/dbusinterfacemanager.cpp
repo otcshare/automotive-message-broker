@@ -89,7 +89,7 @@ on_name_lost (GDBusConnection *connection, const gchar *name, gpointer user_data
 DBusInterfaceManager::DBusInterfaceManager(AbstractRoutingEngine * engine, std::map<std::string,std::string> config, AbstractSource & parent)
 	:AmbPluginImpl(engine, config, parent), connection(nullptr)
 {
-	dbusConnected = addPropertySupport(Zone::None, []() { return new BasicPropertyType<bool>("DBusConnected", false); });
+	dbusConnected = addPropertySupport(Zone::None, []() { return new BasicPropertyType<bool>(DBusConnected, false); });
 
 	ownerId = g_bus_own_name(G_BUS_TYPE_SYSTEM,
 							 DBusServiceName,

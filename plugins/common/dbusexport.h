@@ -7,6 +7,8 @@
 
 #include "varianttype.h"
 
+#define DBusConnected "DBusConnected"
+
 namespace amb
 {
 

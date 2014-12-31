@@ -42,7 +42,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  * class MyPlugin: public AmbPluginImpl {
  *
  * public:
- *     MyPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSink& parent);
+ *     MyPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSource& parent);
  *     ~MyPlugin();
  *
  *     const std::string uuid() const { return "plugin_uuid"; }

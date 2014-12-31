@@ -20,9 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #define GPSNMEAPLUGIN_H
 
 #include <abstractsource.h>
+
 #include <string>
 
-#include "abstractio.hpp"
+#include <abstractio.hpp>
+#include <ambpluginimpl.h>
 
 using namespace std;
 
@@ -30,45 +32,27 @@ class Location;
 class Bluetooth5;
 class BluetoothDevice;
 
-class GpsNmeaSource: public AbstractSource
+class GpsNmeaSource: public AmbPluginImpl
 {
 
 public:
-	GpsNmeaSource(AbstractRoutingEngine* re, map<string, string> config);
+	GpsNmeaSource(AbstractRoutingEngine* re, map<string, string> config, AbstractSource &parent);
 	~GpsNmeaSource();
 
-	const string uuid();
-	void getPropertyAsync(AsyncPropertyReply *reply);
-	void getRangePropertyAsync(AsyncRangePropertyReply *reply);
-	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
-	void subscribeToPropertyChanges(VehicleProperty::Property property);
-	void unsubscribeToPropertyChanges(VehicleProperty::Property property);
-	PropertyList supported();
-
-	int supportedOperations();
-
-	void supportedChanged(const PropertyList &) {}
-
-	PropertyInfo getPropertyInfo(VehicleProperty::Property const & property)
-	{
-		if(propertyInfoMap.find(property) != propertyInfoMap.end())
-			return propertyInfoMap[property];
-
-		return PropertyInfo::invalid();
-	}
+	const string uuid() const;
 
 	void canHasData();
 
 	void test();
 
+	int supportedOperations() const;
+
+	void init();
+
 private:
 	bool tryParse(std::string data);
 
-	void addPropertySupport(VehicleProperty::Property property, Zone::Type zone);
-
 	bool checksum(string sentence);
-
-	std::map<VehicleProperty::Property, PropertyInfo> propertyInfoMap;
 
 	PropertyList mRequests;
 	PropertyList mSupported;
@@ -79,6 +63,9 @@ private:
 	std::string mUuid;
 
 	std::string buffer;
+
+	std::shared_ptr<AbstractPropertyType> rawNmea;
+
 #ifdef USE_BLUEZ5
 	Bluetooth5 * bt;
 #else
