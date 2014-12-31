@@ -12,9 +12,10 @@ Requires: automotive-message-broker-plugins
 Requires: automotive-message-broker-plugins-murphy
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-
-Requires:       default-ac-domains
-Requires:       dbus-python
+Requires: default-ac-domains
+Requires: dbus-python
+Requires: python-curses
+Requires: python-gobject
 BuildRequires:  cmake
 BuildRequires:  boost-devel
 BuildRequires:  pkgconfig(json)
