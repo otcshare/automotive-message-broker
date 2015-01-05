@@ -1,0 +1,5 @@
+debian/tmp/@PLUGIN_INSTALL_PATH@/examplesourceplugin.so
+debian/tmp/@PLUGIN_INSTALL_PATH@/examplesinkplugin.so
+debian/tmp/@PLUGIN_INSTALL_PATH@/dbussinkplugin.so
+debian/tmp/@PLUGIN_INSTALL_PATH@/demosinkplugin.so
+debian/tmp/etc/dbus-1/system.d/amb.conf

@@ -55,7 +55,7 @@ const uint getPid(const char *owner)
 
 	if(error)
 	{
-		throw std::runtime_error(error->message);
+		DebugOut(DebugOut::Error)<< error->message << endl;
 	}
 
 	uint thePid=0;

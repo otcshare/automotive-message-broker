@@ -66,7 +66,7 @@ if(enable_docs)
 	find_package(Doxygen)
 	if(DOXYGEN_FOUND)
 		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-		add_custom_target(bluemonkey_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		add_custom_target(bluemonkey_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 											COMMENT "Generating Bluemonkey javascript API documentation with Doxygen" VERBATIM)
 
 		#generate mappings documentation
@@ -75,8 +75,7 @@ if(enable_docs)
 											COMMENT "running genmapping")
 		add_dependencies(bluemonkey_docs genmappings_bluemonkey)
 
-		install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/html DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
-		install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/latex DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
+		install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
 	endif(DOXYGEN_FOUND)
 
 endif(enable_docs)

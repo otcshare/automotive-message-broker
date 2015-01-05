@@ -62,6 +62,9 @@ public:
 			}
 		}
 
+		if(!mQueue.size())
+			throw std::runtime_error("nothing in queue");
+
 		auto itr = mQueue.begin();
 
 		T item = *itr;
@@ -73,9 +76,11 @@ public:
 
 	virtual void append(T item)
 	{
-		std::lock_guard<std::mutex> lock(mutex);
+		{
+			std::lock_guard<std::mutex> lock(mutex);
 
-		mQueue.insert(item);
+			mQueue.insert(item);
+		}
 
 		if(mBlocking)
 		{

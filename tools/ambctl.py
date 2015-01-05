@@ -104,6 +104,8 @@ def processCommand(command, commandArgs, noMain=True):
 		object = managerInterface.FindObjectForZone(objectName, zone)
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.freedesktop.DBus.Properties")
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)
+		if property.__class__ == dbus.Boolean:
+			value = value.lower() == "true"
 		realValue = property.__class__(value)
 		propertiesInterface.Set("org.automotive."+objectName, propertyName, realValue)
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)
@@ -140,7 +142,7 @@ def processCommand(command, commandArgs, noMain=True):
 
 
 
-parser = argparse.ArgumentParser(description='Process DBus mappings.', add_help=False)
+parser = argparse.ArgumentParser(prog="ambctl", description='Process DBus mappings.', add_help=False)
 parser.add_argument('command', metavar='COMMAND [help]', nargs='?', default='stdin', help='amb dbus command')
 parser.add_argument('commandArgs', metavar='ARG', nargs='*',
 			help='amb dbus command arguments')
@@ -298,7 +300,9 @@ if args.command == "stdin":
 								print ""
 								words = data.line.split(' ')
 								if words[0] == "quit":
-										sys.exit()
+									termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+									fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+									sys.exit()
 								try:
 										if len(words) > 1:
 												processCommand(words[0], words[1:])
