@@ -4,11 +4,10 @@
 
 [Unit]
 Description=Automotive Message Broker
-After=syslog.target 
+Wants=bluetooth.service
 
 [Service]
 Type=dbus
-User=app
 BusName=org.automotive.message.broker
 Environment=LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so
 ExecStart=/usr/bin/ambd -c /etc/ambd/config.tizen
