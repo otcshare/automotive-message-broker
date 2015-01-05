@@ -576,9 +576,10 @@ void GpsNmeaSource::test()
 	location.parse("GPRMC,061211,A,2351.9605,S,15112.5239,E,000.0,053.4,170303,009.9,E*6E");
 
 	DebugOut(0)<<"lat: "<<location.latitude().toString()<<endl;
+	DebugOut(0)<<"time: "<<location.gpsTime().toString()<<endl;
 
 	g_assert(location.latitude().toString() == "-23.86600833");
-	g_assert(location.gpsTime().toString() == "1050585131");
+	g_assert(location.gpsTime().toString() == "1050588731");
 
 	location.parse("GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47");
 
@@ -640,6 +641,7 @@ bool GpsNmeaSource::tryParse(string data)
 	{
 		if(checksum(line))
 		{
+			DebugOut(7) << "checksome checks out for: " << line << endl;
 			buffer = line;
 		}
 		else
@@ -651,7 +653,7 @@ bool GpsNmeaSource::tryParse(string data)
 
 		if(pos != std::string::npos && pos != 0)
 		{
-			///Throw the incomplete stuff away.  if it doesn't begin with "G" it'll never be complete
+			DebugOut(7) << "Throwing the incomplete stuff away.  if it doesn't begin with 'G'' it'll never be complete: " << buffer << endl;
 			buffer = buffer.substr(pos);
 		}
 
@@ -667,10 +669,10 @@ bool GpsNmeaSource::tryParse(string data)
 		{
 			if(pos == 0 )
 			{
-				uint cs = buffer.find('*');
+				std::string::size_type cs = buffer.find('*');
 				if (cs != std::string::npos && cs != buffer.length()-1)
 				{
-					///This means we have a false flag somewhere.
+					DebugOut(7) << "false flag somewhere: "<< cs << " " << buffer << endl;
 					buffer = buffer.substr(cs+(buffer.length() - cs));
 				}
 			}

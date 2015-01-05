@@ -365,6 +365,20 @@ list<AbstractDBusInterface *> AbstractDBusInterface::interfaces()
 	return ifaces;
 }
 
+std::vector<std::string> AbstractDBusInterface::supportedInterfaces()
+{
+	std::vector<std::string> ifaces;
+
+	for(auto itr : objectMap)
+	{
+		if(itr.second->isSupported())
+			ifaces.push_back(itr.second->objectName());
+	}
+
+	return ifaces;
+}
+
+
 bool AbstractDBusInterface::implementsProperty(string property)
 {
 	for(auto itr = properties.begin(); itr != properties.end(); itr++)

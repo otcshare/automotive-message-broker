@@ -59,6 +59,8 @@ public:
 
 	static list<AbstractDBusInterface*> interfaces();
 
+	static std::vector<string> supportedInterfaces();
+
 	std::string interfaceName() { return mInterfaceName; }
 
 	bool implementsProperty(std::string property);
