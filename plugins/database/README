@@ -12,7 +12,7 @@ To use the Database plugin, add the following to the "sources" array in /etc/amb
 
 {
   "name" : "Database",
-  "path" : "/usr/lib/automotive-message-broker/databasesinkplugin.so",
+  "path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
   "databaseFile" : "storage",
   "bufferLength" : "100",
   "properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",

@@ -13,12 +13,8 @@ if(Qt5Core_FOUND)
   set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} )
   set(QT_LIBRARIES ${Qt5Core_LIBRARIES} )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
-  message(STATUS "size of void_p: ${CMAKE_SIZEOF_VOID_P}")
-  if(CMAKE_SIZEOF_VOID_P MATCHES "8")
-    message(STATUS "64bit enabled")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mcmodel=large")
-  endif(CMAKE_SIZEOF_VOID_P MATCHES "8")
   add_definitions(${Qt5Core_DEFINITIONS} -DQTBINARY_DATA)
+  add_definitions(-DQT_NO_KEYWORDS)
   set(CMAKE_AUTOMOC ON)
 endif(Qt5Core_FOUND)
 
@@ -46,5 +42,9 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/test.js ${CMAKE_CURRENT_SOURCE_D
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/events.js ${CMAKE_CURRENT_SOURCE_DIR}/test/events.js)
 
 install(TARGETS websocketsource LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/websocket.README @ONLY)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/websocket.README DESTINATION ${DOC_INSTALL_DIR}/plugins)
 
 endif(websocket_plugin)

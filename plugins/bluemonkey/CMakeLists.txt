@@ -1,16 +1,19 @@
 if(bluemonkey_plugin)
 
+message(STATUS "enabling bluemonkey plugin")
+
+set(qtmainloop ON CACHE INTERNAL "")
+
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Network REQUIRED)
 find_package(Qt5Qml REQUIRED)
 if(Qt5Core_FOUND)
-	message(STATUS "using Qt5")
-
 	set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS} ${Qt5Qml_INCLUDE_DIRS})
 	set(QT_LIBRARIES ${Qt5Core_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Qml_LIBRARIES})
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
 	add_definitions(${Qt5Core_DEFINITIONS})
-
+	add_definitions(-DQT_NO_KEYWORDS)
+	add_definitions(-DUSE_QT_CORE)
 endif(Qt5Core_FOUND)
 
 set(CMAKE_AUTOMOC ON)
@@ -63,7 +66,7 @@ if(enable_docs)
 	find_package(Doxygen)
 	if(DOXYGEN_FOUND)
 		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-		add_custom_target(bluemonkey_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		add_custom_target(bluemonkey_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 											COMMENT "Generating Bluemonkey javascript API documentation with Doxygen" VERBATIM)
 
 		#generate mappings documentation
@@ -72,8 +75,7 @@ if(enable_docs)
 											COMMENT "running genmapping")
 		add_dependencies(bluemonkey_docs genmappings_bluemonkey)
 
-		install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/html DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
-		install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/latex DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
+		install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION ${DOC_INSTALL_DIR}/plugins/bluemonkey COMPONENT Docs)
 	endif(DOXYGEN_FOUND)
 
 endif(enable_docs)

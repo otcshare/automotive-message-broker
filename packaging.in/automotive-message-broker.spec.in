@@ -12,9 +12,8 @@ Requires: automotive-message-broker-plugins
 Requires: automotive-message-broker-plugins-murphy
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-
-Requires:       default-ac-domains
-Requires:       dbus-python
+Requires: default-ac-domains
+Requires: dbus-python
 Requires: python-curses
 Requires: python-gobject
 BuildRequires:  cmake
@@ -220,24 +219,24 @@ Crosswalk vehicle API extension based on the W3C Automotive Business Group Vehic
 
 %build
 %cmake \
-       -Dxwalk_vehicle_extension=ON \
-       -DXWALK_EXTENSION_PATH=/tizen-extensions-crosswalk \
+	   -Dxwalk_vehicle_extension=ON \
+	   -DXWALK_EXTENSION_PATH=/tizen-extensions-crosswalk \
 %if %{with qt5}
-       -Dqtmainloop=ON \
-       -Dopencvlux_plugin=ON \
-       -Dwebsocket_plugin=ON \
-       -Dbluetooth_plugin=ON \
-       -Dbluemonkey_plugin=ON \
+	   -Dqtmainloop=ON \
+	   -Dopencvlux_plugin=ON \
+	   -Dwebsocket_plugin=ON \
+	   -Dbluetooth_plugin=ON \
+	   -Dbluemonkey_plugin=ON \
 %endif
-       -Ddatabase_plugin=ON \
-       -Dmurphy_plugin=ON \
-       -Dobd2_plugin=ON \
-       -Dtest_plugin=ON \
-       -Dgpsnmea_plugin=ON \
-       -Dcangen_plugin=ON \
-       -Dcansim_plugin=ON \
-       -Dusebluez5=ON \
-       -Denable_docs=ON
+	   -Ddatabase_plugin=ON \
+	   -Dmurphy_plugin=ON \
+	   -Dobd2_plugin=ON \
+	   -Dtest_plugin=ON \
+	   -Dgpsnmea_plugin=ON \
+	   -Dcangen_plugin=ON \
+	   -Dcansim_plugin=ON \
+	   -Dusebluez5=ON \
+	   -Denable_docs=ON
 
 
 %__make %{?jobs:-j%jobs}
@@ -251,7 +250,7 @@ cp packaging.in/ambd.service.systemd.tizen %{buildroot}%{_unitdir}/ambd.service
 ln -s ../ambd.service %{buildroot}%{_unitdir}/network.target.wants/ambd.service
 %install_service multi-user.target.wants ambd.service
 
-cp packaging.in/config.tizen %{buildroot}%{_sysconfdir}/ambd/
+cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 
 %post -p /sbin/ldconfig
 %postun -p /sbin/ldconfig

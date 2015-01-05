@@ -1,3 +1,4 @@
+<!DOCTYPE text/html>
 <html>
 <h1>Hello,Vehicle API!</h1>
 
@@ -15,35 +16,30 @@ function get(objName) {
 		return;
 	}
 
+	getSuccess = function(data) {
+		try {
+			debug("get " + objName + ": " + JSON.stringify(data));
+		} catch(error) {
+			debug("error " + error.message);
+		}
+	}
+
+	getError = function(error) {
+		debug("error getting " + objName + ": " + error.message);
+	}
+
 	var zones = vehicle[objName].zones;
+
 	if(zones.length !== 0)
 	{
 		for(var zone in zones)
 		{
-			vehicle[objName].get(zone).then(function(data) {
-				try {
-					debug("get " + objName + ": " + JSON.stringify(data));
-				} catch(error) {
-					debug("error " + error.message);
-				}
-			},
-			function(error) {
-				debug("error getting " + objName + ": " + error.message);
-			});
+			vehicle[objName].get(zone).then(getSuccess, getError);
 		}
 	}
 	else
 	{
-		vehicle[objName].get().then(function(data) {
-			try {
-				debug("get " + objName + ": " + JSON.stringify(data));
-			} catch(error) {
-				debug("error " + error.message);
-			}
-		},
-		function(error) {
-			debug("error getting " + objName + ": " + error.message);
-		});
+		vehicle[objName].get().then(getSuccess, getError);
 	}
 }
 

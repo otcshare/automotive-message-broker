@@ -32,9 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <QtConcurrent/QtConcurrent>
 
 
-#ifdef OPENCL
 #include <opencv2/core/ocl.hpp>
-#endif
 
 using namespace std;
 

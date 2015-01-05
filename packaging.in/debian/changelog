@@ -1,0 +1,5 @@
+automotive-message-broker (@PROJECT_VERSION@) utopic; urgency=low
+
+  * @PROJECT_VERSION@ release
+
+ -- Kevron Rees <tripzero.kev@gmail.com>  Tue, 30 Dec 2014 15:17:51 -0700

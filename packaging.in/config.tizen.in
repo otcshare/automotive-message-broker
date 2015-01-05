@@ -1,18 +1,14 @@
 {
-	"sources" : [ 
+"sources" :
+	[
 		{
-                        "name" : "Murphy Source",
-                        "path" : "@PLUGIN_INSTALL_PATH@/murphysourceplugin.so",
-                        "address" : "unxs:/tmp/murphy/amb"
-                },
-                { 
-                        "name" : "VehicleSource",
-                        "path" : "@PLUGIN_INSTALL_PATH@/vehicleplugin.so",
-                        "configfile" : "/etc/ambd/AMBformat.conf"
-                }
-
+			"name" : "Murphy Source",
+			"path" : "@PLUGIN_INSTALL_PATH@/murphysourceplugin.so",
+			"address" : "unxs:/tmp/murphy/amb"
+		}
 	],
-	"sinks": [
+"sinks":
+	[
 		{
 			"name" : "DBusSink",
 			"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"

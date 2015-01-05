@@ -1,14 +1,16 @@
 Bluemonkey Source Plugin
+Version: @PROJECT_VERSION@
 
 Bluemonkey is a javascript rendering engine that allows the scripting of source plugin behavior in javascript.
 
 To use the OBD-II Source plugin, add the following config to your /etc/ambd/config:
 
 
-"sources" : [
+"sources" :
+	[
 		{
 			"name" : "bluemonkey",
-			"path" : "/usr/lib/automotive-message-broker/bluemonkeyplugin.so",
+			"path" : "@PLUGIN_INSTALL_PATH@/bluemonkeyplugin.so",
 			"config" : "/etc/ambd/bluemonkey/config.js"
 		}
 	]
@@ -26,5 +28,5 @@ path to the bluemonkey configuration script.
 
 Bluemonkey Javascript API:
 
-see bluemonkey.idl (installed to ${PREFIX}share/doc/packages/automotive-meassage-broker/plugins/
+see bluemonkey.idl (installed to @DOC_INSTALL_DIR@/plugins/bluemonkey
 

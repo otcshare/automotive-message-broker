@@ -55,7 +55,7 @@ const uint getPid(const char *owner)
 
 	if(error)
 	{
-		throw std::runtime_error(error->message);
+		DebugOut(DebugOut::Error)<< error->message << endl;
 	}
 
 	uint thePid=0;
@@ -117,12 +117,13 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 		request.zone = iface->zone();
 		//request.sourceUuid = iface->source();
 
-		request.completed = [&invocation,&ifaceName](AsyncRangePropertyReply* reply)
+		request.completed = [&invocation,&ifaceName](AsyncRangePropertyReply* r)
 		{
+			auto reply = amb::make_unique(r);
 			if(!reply->success)
 			{
 				stringstream str;
-				str<<"Error during request: "<<reply->error;
+				str<<"Error during request: "<<AsyncPropertyReply::errorToStr(reply->error);
 				ifaceName += ".Error";
 				g_dbus_method_invocation_return_dbus_error(invocation, ifaceName.c_str(), str.str().c_str());
 				return;
@@ -150,9 +151,11 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 		};
 
 		iface->re->getRangePropertyAsync(request);
+
+		return;
 	}
 
-	else if(boost::algorithm::starts_with(method,"Get"))
+	else if(boost::algorithm::starts_with(method, "Get"))
 	{
 		std::string propertyName = method.substr(3);
 		auto propertyMap = iface->getProperties();

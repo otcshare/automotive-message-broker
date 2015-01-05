@@ -46,7 +46,7 @@ public:
 	void registerSink(AbstractSink *self);
 	void unregisterSink(AbstractSink *self);
 	AsyncPropertyReply* getPropertyAsync(AsyncPropertyRequest request);
-	AsyncRangePropertyReply* getRangePropertyAsync(AsyncRangePropertyRequest request);
+	void getRangePropertyAsync(AsyncRangePropertyRequest request);
 	AsyncPropertyReply * setProperty(AsyncSetPropertyRequest request);
 	uint subscribeToProperty(const VehicleProperty::Property &, AbstractRoutingEngine::PropertyChangedType, std::string pid="");
 	bool subscribeToProperty(const VehicleProperty::Property &, AbstractSink* self);

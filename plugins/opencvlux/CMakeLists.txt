@@ -1,7 +1,5 @@
 if(opencvlux_plugin)
 
-set(qtmainloop "ON")
-
 find_package(OpenCV REQUIRED)
 
 if(OpenCV_LIBS)
@@ -10,7 +8,7 @@ else(OpenCV_LIBS)
    message(FATAL_ERROR "opencv missing.  please install opencv")
 endif(OpenCV_LIBS)
 
-option(ocl "enable opencl" OFF)
+set(qtmainloop ON CACHE INTERNAL "")
 
 add_definitions(-DCV_DATA="${OpenCV_CONFIG_PATH}")
 
@@ -39,7 +37,6 @@ if(Qt5Core_FOUND)
   set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} )
   set(QT_LIBRARIES ${Qt5Core_LIBRARIES} )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
-  message(STATUS "size of void_p: ${CMAKE_SIZEOF_VOID_P}")
   add_definitions(${Qt5Core_DEFINITIONS})
   add_definitions(-DQT_NO_KEYWORDS)
 
@@ -57,6 +54,8 @@ target_link_libraries(opencvluxplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${li
 
 install(TARGETS opencvluxplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_SOURCE_DIR}/README @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/opencvlux.README @ONLY)
+set(opencvlux_doc_files ${CMAKE_CURRENT_BINARY_DIR}/opencvlux.README)
+install (FILES ${opencvlux_doc_files} DESTINATION ${DOC_INSTALL_DIR}/plugins)
 
 endif(opencvlux_plugin)

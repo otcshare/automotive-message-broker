@@ -11,15 +11,26 @@ import glib
 import curses.ascii
 from dbus.mainloop.glib import DBusGMainLoop
 
+class bcolors:
+		HEADER = '\x1b[95m'
+		OKBLUE = '\x1b[94m'
+		OKGREEN = '\x1b[92m'
+		WARNING = '\x1b[93m'
+		FAIL = '\x1b[91m'
+		ENDC = '\x1b[0m'
+		GREEN = '\x1b[32m'
+		WHITE = '\x1b[37m'
+		BLUE = '\x1b[34m'
+
 def help():
 		help = ("Available commands:\n"
-						"help           Prints help data\n"
-						"list           List supported ObjectNames\n"
-						"get            Get properties from an ObjectName\n"
-						"listen         Listen for changes on an ObjectName\n"
-						"set            Set a property for an ObjectName\n"
-						"getHistory     Get logged data within a time range\n"
-						"quit           Exit ambctl\n")
+						+bcolors.HEADER+ "help" +bcolors.WHITE+ "           Prints help data\n"
+						+bcolors.HEADER+ "list" +bcolors.WHITE+ "           List supported ObjectNames\n"
+						+bcolors.HEADER+ "get" +bcolors.WHITE+ "            Get properties from an ObjectName\n"
+						+bcolors.HEADER+ "listen" +bcolors.WHITE+ "         Listen for changes on an ObjectName\n"
+						+bcolors.HEADER+ "set" +bcolors.WHITE+ "            Set a property for an ObjectName\n"
+						+bcolors.HEADER+ "getHistory" +bcolors.WHITE+ "     Get logged data within a time range\n"
+						+bcolors.HEADER+ "quit" +bcolors.WHITE+ "           Exit ambctl\n")
 		return help
 
 def changed(interface, properties, invalidated):
@@ -58,6 +69,8 @@ def processCommand(command, commandArgs, noMain=True):
 				print json.dumps(propertiesInterface.GetAll("org.automotive."+objectName), indent=2)
 		return 1
 	elif command == "listen":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
 		if commandArgs[0] == "help":
 			print "ObjectName [ObjectName...]"
 			return 1
@@ -74,6 +87,8 @@ def processCommand(command, commandArgs, noMain=True):
 				except KeyboardInterrupt:
 						return 1
 	elif command == "set":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
 		if len(commandArgs) and commandArgs[0] == "help":
 			print "ObjectName PropertyName VALUE [ZONE]"
 			return 1
@@ -89,6 +104,8 @@ def processCommand(command, commandArgs, noMain=True):
 		object = managerInterface.FindObjectForZone(objectName, zone)
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.freedesktop.DBus.Properties")
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)
+		if property.__class__ == dbus.Boolean:
+			value = value.lower() == "true"
 		realValue = property.__class__(value)
 		propertiesInterface.Set("org.automotive."+objectName, propertyName, realValue)
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)
@@ -98,22 +115,24 @@ def processCommand(command, commandArgs, noMain=True):
 			print "Error setting property"
 		return 1
 	elif command == "getHistory":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
 		if commandArgs[0] == "help":
-			print "ObjectName [STARTTIME] [ENDTIME] [ZONE]"
+			print "ObjectName [ZONE] [STARTTIME] [ENDTIME] "
 			return 1
 		if len(commandArgs) < 1:
 			print "getHistory requires more arguments (see getHistory help)"
 			return 1
 		objectName = commandArgs[0]
 		start = 1
-		if len(commandArgs) >= 2:
-			start = float(commandArgs[1])
-		end = 9999999999
 		if len(commandArgs) >= 3:
-			end = float(commandArgs[2])
+			start = float(commandArgs[2])
+		end = 9999999999
+		if len(commandArgs) >= 4:
+			end = float(commandArgs[3])
 		zone = 0
-		if len(commandArgs) == 4:
-			zone = int(commandArgs[3])
+		if len(commandArgs) >= 2:
+			zone = int(commandArgs[1])
 		object = managerInterface.FindObjectForZone(objectName, zone);
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
@@ -123,13 +142,19 @@ def processCommand(command, commandArgs, noMain=True):
 
 
 
-parser = argparse.ArgumentParser(description='Process DBus mappings.')
+parser = argparse.ArgumentParser(prog="ambctl", description='Process DBus mappings.', add_help=False)
 parser.add_argument('command', metavar='COMMAND [help]', nargs='?', default='stdin', help='amb dbus command')
-
 parser.add_argument('commandArgs', metavar='ARG', nargs='*',
 			help='amb dbus command arguments')
+parser.add_argument('-h', '--help', help='print help', action='store_true')
 
 args = parser.parse_args()
+
+if args.help:
+		parser.print_help()
+		print
+		print help()
+		sys.exit()
 
 if args.command == "stdin":
 		class Data:
@@ -211,19 +236,6 @@ if args.command == "stdin":
 						self.set("")
 						templist = ""
 
-
-
-		class bcolors:
-				HEADER = '\x1b[95m'
-				OKBLUE = '\x1b[94m'
-				OKGREEN = '\x1b[92m'
-				WARNING = '\x1b[93m'
-				FAIL = '\x1b[91m'
-				ENDC = '\x1b[0m'
-				GREEN = '\x1b[32m'
-				WHITE = '\x1b[37m'
-				BLUE = '\x1b[34m'
-
 		def erase_line():
 				sys.stdout.write('\x1b[2K\x1b[80D')
 
@@ -288,7 +300,9 @@ if args.command == "stdin":
 								print ""
 								words = data.line.split(' ')
 								if words[0] == "quit":
-										sys.exit()
+									termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+									fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+									sys.exit()
 								try:
 										if len(words) > 1:
 												processCommand(words[0], words[1:])
@@ -335,7 +349,10 @@ if args.command == "stdin":
 		finally:
 				termios.tcsetattr(fd, termios.TCSAFLUSH, old)
 				fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+				sys.exit()
 
 else:
-	processCommand(args.command, args.commandArgs, False)
-
+	try:
+		processCommand(args.command, args.commandArgs, False)
+	except dbus.exceptions.DBusException, error:
+		print error
