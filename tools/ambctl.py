@@ -22,15 +22,69 @@ class bcolors:
 		WHITE = '\x1b[37m'
 		BLUE = '\x1b[34m'
 
+class Autocomplete:
+	Command = 0
+	Property = 1
+	wants = 0
+
+	class Cmd:
+		name = ""
+		description = ""
+		def __init__(self, n, d):
+			self.name = n
+			self.description = d
+
+	commands = []
+	properties = []
+
+	def __init__(self):
+		Autocomplete.wants = self.Command
+		self.commands.append(Autocomplete.Cmd('help', 'Prints help data'))
+		self.commands.append(Autocomplete.Cmd('list', 'List supported ObjectNames'))
+		self.commands.append(Autocomplete.Cmd('get', 'Get properties from an ObjectName'))
+		self.commands.append(Autocomplete.Cmd('listen', 'Listen for changes on an ObjectName'))
+		self.commands.append(Autocomplete.Cmd('set', 'Set a property for an ObjectName'))
+		self.commands.append(Autocomplete.Cmd('getHistory', 'Get logged data within a time range'))
+		self.commands.append(Autocomplete.Cmd('quit', 'Exit ambctl'))
+
+		bus = dbus.SystemBus()
+		try:
+			managerObject = bus.get_object("org.automotive.message.broker", "/");
+			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
+			self.properties = managerInterface.List()
+		except dbus.exceptions.DBusException, error:
+			print error
+
+
+	def wantsCommand(self):
+		Autocomplete.wants = Autocomplete.Command
+
+	def wantsProperty(self):
+		Autocomplete.wants = Autocomplete.Property
+
+	def complete(self, partialString):
+		results = []
+		if Autocomplete.wants == self.Command:
+			for cmd in self.commands:
+				if not (len(partialString)) or cmd.name.startswith(partialString):
+					results.append(cmd.name)
+		elif Autocomplete.wants == self.Property:
+			for property in self.properties:
+				if not(len(partialString)) or property.startswith(partialString):
+					results.append(property)
+
+		return results
+
+
 def help():
-		help = ("Available commands:\n"
-						+bcolors.HEADER+ "help" +bcolors.WHITE+ "           Prints help data\n"
-						+bcolors.HEADER+ "list" +bcolors.WHITE+ "           List supported ObjectNames\n"
-						+bcolors.HEADER+ "get" +bcolors.WHITE+ "            Get properties from an ObjectName\n"
-						+bcolors.HEADER+ "listen" +bcolors.WHITE+ "         Listen for changes on an ObjectName\n"
-						+bcolors.HEADER+ "set" +bcolors.WHITE+ "            Set a property for an ObjectName\n"
-						+bcolors.HEADER+ "getHistory" +bcolors.WHITE+ "     Get logged data within a time range\n"
-						+bcolors.HEADER+ "quit" +bcolors.WHITE+ "           Exit ambctl\n")
+		help = ("Available commands:\n")
+		autocomplete = Autocomplete()
+		for cmd in autocomplete.commands:
+			help += bcolors.HEADER + cmd.name + bcolors.WHITE
+			for i in range(1, 15 - len(cmd.name)):
+				help += " "
+			help += cmd.description + "\n"
+
 		return help
 
 def changed(interface, properties, invalidated):
@@ -39,17 +93,17 @@ def changed(interface, properties, invalidated):
 def processCommand(command, commandArgs, noMain=True):
 
 	if command == 'help':
-			print help()
-			return 1
+		print help()
+		return 1
 
 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 	bus = dbus.SystemBus()
 	try:
-			managerObject = bus.get_object("org.automotive.message.broker", "/");
-			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
+		managerObject = bus.get_object("org.automotive.message.broker", "/");
+		managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
 	except:
-			print "Error connecting to AMB.  is AMB running?"
-			return 1
+		print "Error connecting to AMB.  is AMB running?"
+		return 1
 
 	if command == "list" :
 		supportedList = managerInterface.List()
@@ -260,6 +314,7 @@ if args.command == "stdin":
 		def handle_keyboard(source, cond, data):
 						str = source.read()
 						#print "char: ", ord(str)
+						autocomplete = Autocomplete()
 
 						if len(str) > 1:
 								if ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 68: #left arrow
@@ -278,46 +333,53 @@ if args.command == "stdin":
 										while data.arrow_back():
 												cursor_left()
 										sys.stdout.flush()
-								elif len(str) == 4 and ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 51 and ord(str[3]) == 126: #del
-										data.delete()
-										redraw(data)
+								elif len(str) == 4 and ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 51 and ord(str[3]) == 126:
+									#del
+									data.delete()
+									redraw(data)
 								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 65:
-										#up arrow
-										data.save_temp()
-										data.history_up()
-										while data.arrow_forward():
-												cursor_right()
-										redraw(data)
+									#up arrow
+									data.save_temp()
+									data.history_up()
+									while data.arrow_forward():
+										cursor_right()
+									redraw(data)
 								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 66:
-										#down arrow
-										data.history_down()
-										while data.arrow_forward():
-												cursor_right()
-										redraw(data)
-						elif ord(str) == 10: #enter
-								if data.line == "":
-										return True
-								print ""
-								words = data.line.split(' ')
-								if words[0] == "quit":
-									termios.tcsetattr(fd, termios.TCSAFLUSH, old)
-									fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
-									sys.exit()
+									#down arrow
+									data.history_down()
+									while data.arrow_forward():
+										cursor_right()
+									redraw(data)
+						elif ord(str) == 10:
+							#enter
+							if data.line == "":
+								return True
+							print ""
+							words = data.line.split(' ')
+							if words[0] == "quit":
+								termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+								fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+								sys.exit()
 								try:
-										if len(words) > 1:
-												processCommand(words[0], words[1:])
-										else:
-												processCommand(words[0], [])
+									if len(words) > 1:
+										processCommand(words[0], words[1:])
+									else:
+										processCommand(words[0], [])
 								except dbus.exceptions.DBusException, error:
-										print error
+									print error
 								except:
-										print "Error running command ", sys.exc_info()[0]
+									print "Error running command ", sys.exc_info()[0]
 								data.push();
 								data.clear()
 								redraw(data)
 						elif ord(str) == 127: #backspace
-								data.back_space()
-								redraw(data)
+							data.back_space()
+							redraw(data)
+						elif ord(str) == 9:
+							#tab
+							results = autocomplete.complete(data.line)
+							print results
+							redraw(data)
 						elif curses.ascii.isalnum(ord(str)) or ord(str) == curses.ascii.SP: #regular text
 								data.insert(str)
 								redraw(data)
@@ -349,6 +411,7 @@ if args.command == "stdin":
 		finally:
 				termios.tcsetattr(fd, termios.TCSAFLUSH, old)
 				fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+				print ""
 				sys.exit()
 
 else:
