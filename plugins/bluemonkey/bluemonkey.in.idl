@@ -110,7 +110,9 @@ interface Bluemonkey {
 	 void createCustomProperty(DOMString name, any value, optional unsigned short zone);
 
 };
-
+/*!
+ * \brief PropertyInterface represents an interface to an AMB Property
+ */
 interface PropertyInterface {
 	/*!
 	 * \brief type AMB property name
@@ -142,6 +144,10 @@ interface PropertyInterface {
 	 */
 	readonly attribute Signal changed;
 
+	/*!
+	 * \brief get logged data between \arg begin and \arg end.
+	 * callback is called with the results of this method.
+	 */
 	void getHistory(Date begin, Date end, HistoryCallback callback);
 };
 
