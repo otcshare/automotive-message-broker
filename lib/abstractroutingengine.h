@@ -112,8 +112,8 @@ public:
 };
 
 /*!
- * \brief The AsyncPropertyReply class is used by sources to reply to Get and Set operations.  The source should
- * set success to true if the call is successful or 'false' if the request was not successful and set 'error'
+ * \brief The AsyncPropertyReply class is used by sources to reply to Get and Set operations.
+ * The source should set success to true if the call is successful or 'false' if the request was not successful and set 'error'
  * to the appropriate error.
  * \see AbstractRoutingEngine::getPropertyAsync
  * \see AsyncPropertyReply
@@ -142,6 +142,9 @@ public:
 		ZoneNotSupported
 	};
 
+	/*!
+	 * \brief errorToStr returns string representing the Error
+	 */
 	static std::string errorToStr(Error err)
 	{
 		if(err == NoError)
@@ -259,19 +262,22 @@ public:
 	Zone::Type zone;
 
 	/*!
-	 * \brief completed callback that is called when the ranged request is complete. The reply from this request is passed
+	 * \brief completed callback
+	 * 'completed' is called when the ranged request is complete. The reply from this request is passed
 	 * into the completed call.  The completed callback must free the reply before it returns or there will be a leak.
 	 */
 	GetRangedPropertyCompletedSignal completed;
 
 	/*!
-	 * \brief timeBegin set this to request values for the specified property beggining at this time.  Time is seconds\
+	 * \brief timeBegin
+	 * Set this to request values for the specified property beggining at this time.  Time is seconds\
 	 * since the unix epoc.  Set this to '0' if you do not want values within a time range.
 	 */
 	double timeBegin;
 
 	/*!
-	 * \brief timeEnd set this to request values for the specified property beggining at this time.  Time is seconds\
+	 * \brief timeEnd
+	 * Set this to request values for the specified property beggining at this time.  Time is seconds\
 	 * since the unix epoc.  Set this to '0' if you do not want values within a time range.
 	 */
 	double timeEnd;
@@ -296,7 +302,7 @@ public:
 
 /*!
  * \brief The AsyncRangePropertyReply class is used by a source to reply to an AsyncRangePropertyRequest.
- * the source should set success to 'true' and populate the 'values' member if the request was successful.
+ * The source should set success to 'true' and populate the 'values' member if the request was successful.
  * If the request is not successful, 'success' should be set to 'false' and the 'error' member should be set.
  */
 class AsyncRangePropertyReply: public AsyncRangePropertyRequest
@@ -373,7 +379,7 @@ public:
 	 * /see AsyncPropertyReply.
 	 * /param request requested property.
 	 * /return AsyncPropertyReply. The returned AsyncPropertyReply is owned by the caller of getPropertyAsync.
-	 * /example AsyncPropertyRequest request;
+	 * /code AsyncPropertyRequest request;
 	 * request.property = VehicleProperty::VehicleSpeed
 	 * request.completed = [](AsyncPropertyReply* reply)
 	 * {
@@ -381,14 +387,15 @@ public:
 	 *   delete reply;
 	 * };
 	 * routingEngine->getPropertyAsync(request);
+	 * /endcode
 	 */
 	virtual AsyncPropertyReply * getPropertyAsync(AsyncPropertyRequest request) = 0;
 
 	/*!
 	 * \brief getRangePropertyAsync is used for getting a range of properties that are within the specified time or sequence parameters.
-	 * \param request the request containing the property and other information required by the query
+	 * \arg request the request containing the property and other information required by the query
 	 * \return a pointer to the reply.
-	 * \example AsyncRangePropertyRequest vehicleSpeedFromLastWeek;
+	 * \code AsyncRangePropertyRequest vehicleSpeedFromLastWeek;
 	 *
 	 *	vehicleSpeedFromLastWeek.timeBegin = amb::currentTime() - 10;
 	 *	vehicleSpeedFromLastWeek.timeEnd = amb::currentTime();
@@ -411,16 +418,15 @@ public:
 	 *	};
 	 *
 	 *	routingEngine->getRangePropertyAsync(vehicleSpeedFromLastWeek);
-	 *
+	 * \endcode
 	 */
-
 	virtual void getRangePropertyAsync(AsyncRangePropertyRequest request) = 0;
 
 	/*!
 	 * \brief setProperty sets a property to a value.
 	 * \see AsyncSetPropertyRequest
 	 * \see AsyncPropertyReply
-	 * \param request the request containing the property and the value to set
+	 * \arg request the request containing the property and the value to set
 	 * \return a pointer to the reply which is owned by the caller of this method
 	 * \example
 	 */
@@ -428,24 +434,24 @@ public:
 
 	/*!
 	 * \brief subscribeToProperty subscribes to propertyName.  Value changes will be passed to callback.
-	 * \param propertyName
-	 * \param callback
-	 * \param pid process id of the requesting application
+	 * \arg propertyName
+	 * \arg callback
+	 * \arg pid process id of the requesting application
 	 * \return subscription handle
 	 */
 	virtual uint subscribeToProperty(const VehicleProperty::Property & propertyName, PropertyChangedType callback, std::string pid="") = 0;
 
 	/*!
 	 * \brief unsubscribeToProperty
-	 * \param handle
+	 * \arg handle
 	 */
 	virtual void unsubscribeToProperty(uint handle) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
-	 * \param propertyName name of the property to request a subscription for.
-	 * \param self pointer to the sink who is subscribing.
-	 * \example
+	 * \arg propertyName name of the property to request a subscription for.
+	 * \arg self pointer to the sink who is subscribing.
+	 * \code
 	 * //somewhere in the sink:
 	 * routingEngine->subscribeToProperty(VehicleProperty::EngineSpeed, this);
 	 *
@@ -457,23 +463,24 @@ public:
 	 *      ...
 	 *   }
 	 * }
+	 * \endcode
 	 */
 	virtual bool subscribeToProperty(const VehicleProperty::Property & propertyName, AbstractSink* self) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
-	 * \param propertyName name of the property to request a subscription for.
-	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
-	 * \param self pointer to the sink who is subscribing.
+	 * \arg propertyName name of the property to request a subscription for.
+	 * \arg sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
+	 * \arg self pointer to the sink who is subscribing.
 	 */
 	virtual bool subscribeToProperty(const VehicleProperty::Property & propertyName, const std::string & sourceUuidFilter, AbstractSink *self) = 0;
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
-	 * \param propertyName name of the property to request a subscription for.
-	 * \param sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
-	 * \param zoneFilter zone to filter.  Only updates from this zone will be passed to the sink.
-	 * \param self pointer to the sink who is subscribing.
+	 * \arg propertyName name of the property to request a subscription for.
+	 * \arg sourceUuidFilter source UUID to filter.  Only property updates from this source will be sent to the sink.
+	 * \arg zoneFilter zone to filter.  Only updates from this zone will be passed to the sink.
+	 * \arg self pointer to the sink who is subscribing.
 	 */
 	virtual bool subscribeToProperty(const VehicleProperty::Property & propertyName, const std::string & sourceUuidFilter, Zone::Type zoneFilter, AbstractSink *self) = 0;
 

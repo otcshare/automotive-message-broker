@@ -117,7 +117,9 @@ interface Bluemonkey {
 	 void exportInterface(DOMString interfaceName, ExportMap[] properties);
 
 };
-
+/*!
+ * \brief PropertyInterface represents an interface to an AMB Property
+ */
 interface PropertyInterface {
 	/*!
 	 * \brief AMB property name of this property
@@ -149,6 +151,10 @@ interface PropertyInterface {
 	 */
 	readonly attribute Signal changed;
 
+	/*!
+	 * \brief get logged data between \arg begin and \arg end.
+	 * callback is called with the results of this method.
+	 */
 	void getHistory(Date begin, Date end, HistoryCallback callback);
 };
 
@@ -163,6 +169,12 @@ interface Signal {
 	 void connect(ChangedCallback callback)
 };
 
+/*!
+ * \brief ExportMap is a dictionary from AmbPropertyName to DBusPropertyName
+ * AmbPropertyName should represent an internally defined or custom AMB property type.
+ * The DBusPropertyName should represent what you want the property to be represented in
+ * the DBus interface.
+ */
 interface ExportMap {
 	 /*!
 	  * \brief internal AMB property name
