@@ -112,7 +112,7 @@ interface Bluemonkey {
 	 void createCustomProperty(DOMString name, any value, optional unsigned short zone);
 
 	/*!
-	 * \brief exportInterface
+	 * \brief exportInterface export a custom DBus interface as org.automotive.[interfaceName] with properties
 	 */
 	 void exportInterface(DOMString interfaceName, ExportMap[] properties);
 

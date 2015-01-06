@@ -24,6 +24,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <unordered_set>
+#include <vector>
 
 namespace amb
 {
@@ -32,8 +33,8 @@ template <typename T, class Pred = std::equal_to<T> >
 class Queue
 {
 public:
-	Queue(bool blocking = false)
-		:mBlocking(blocking)
+	Queue(bool unique = false, bool blocking = false)
+		:mUnique(unique), mBlocking(blocking)
 	{
 
 	}
@@ -78,7 +79,12 @@ public:
 	{
 		{
 			std::lock_guard<std::mutex> lock(mutex);
-			mQueue.insert(item);
+
+			if(contains(mQueue, item))
+			{
+				mQueue.erase(std::find(mQueue.begin(), mQueue.end(), item));
+			}
+			mQueue.push_back(item);
 		}
 
 		if(mBlocking)
@@ -93,11 +99,12 @@ public:
 		removeOne(&mQueue, item);
 	}
 
-protected:
+private:
 	bool mBlocking;
+	bool mUnique;
 	std::mutex mutex;
 	std::condition_variable cond;
-	std::unordered_set<T, std::hash<T>, Pred> mQueue;
+	std::vector<T> mQueue;
 };
 
 template <typename T, class Pred = std::equal_to<T> >
