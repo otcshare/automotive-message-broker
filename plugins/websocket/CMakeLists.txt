@@ -8,8 +8,6 @@ include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs})
 find_package(Qt5Core REQUIRED)
 
 if(Qt5Core_FOUND)
-  message(STATUS "using Qt5")
-
   set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} )
   set(QT_LIBRARIES ${Qt5Core_LIBRARIES} )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
@@ -40,6 +38,7 @@ target_link_libraries(websocketsource amb ${websockets_LIBRARIES} -L${CMAKE_CURR
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/vehicle.js ${CMAKE_CURRENT_SOURCE_DIR}/test/vehicle.js)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/test.js ${CMAKE_CURRENT_SOURCE_DIR}/test/test.js)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/events.js ${CMAKE_CURRENT_SOURCE_DIR}/test/events.js)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/protocol ${CMAKE_CURRENT_SOURCE_DIR}/protocol)
 
 install(TARGETS websocketsource LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
