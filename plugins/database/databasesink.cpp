@@ -47,7 +47,7 @@ static void * cbFunc(Shared* shared)
 		NameValuePair<string> zone("zone", boost::lexical_cast<string>(obj.zone));
 		NameValuePair<string> four("time", boost::lexical_cast<string>(obj.time));
 		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj.sequence));
-		NameValuePair<string> six("tripId", boost::lexical_cast<string>(shared->tripId));
+		NameValuePair<string> six("tripId", shared->tripId);
 
 		dict.push_back(one);
 		dict.push_back(two);
@@ -76,9 +76,8 @@ static void * cbFunc(Shared* shared)
 	/// final flush of whatever is still in the queue:
 
 	shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
-	for(int i=0; i< insertList.size(); i++)
+	for(auto d : insertList)
 	{
-		DictionaryList<string> d = insertList[i];
 		shared->db->insert(d);
 	}
 	shared->db->exec("END TRANSACTION");
@@ -379,6 +378,8 @@ void DatabaseSink::setDatabaseFileName(string filename)
 void DatabaseSink::propertyChanged(AbstractPropertyType *value)
 {
 	VehicleProperty::Property property = value->name;
+
+	DebugOut() << "Received property change for " << property << endl;
 
 	if(!shared)
 		return;

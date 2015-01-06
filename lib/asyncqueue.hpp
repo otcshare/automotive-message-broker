@@ -56,7 +56,7 @@ public:
 
 		if(mBlocking)
 		{
-			while(!mQueue.size())
+			if(!mQueue.size())
 			{
 				cond.wait(lock);
 			}
@@ -78,13 +78,12 @@ public:
 	{
 		{
 			std::lock_guard<std::mutex> lock(mutex);
-
 			mQueue.insert(item);
 		}
 
 		if(mBlocking)
 		{
-			cond.notify_one();
+			cond.notify_all();
 		}
 	}
 

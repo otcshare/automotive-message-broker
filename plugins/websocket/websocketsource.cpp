@@ -377,7 +377,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 			{
 				doc = QJsonDocument::fromJson(d);
 				DebugOut(7)<<d.data()<<endl;
-			}
+			}	
 
 			if(doc.isNull())
 			{
@@ -490,6 +490,11 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 						int sequence = obj["sequence"].toInt();
 
 						AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(name, value);
+						if(!type)
+						{
+							DebugOut() << "TODO: support custom types here: " << endl;
+							continue;
+						}
 						type->timestamp = timestamp;
 						type->sequence = sequence;
 
@@ -697,7 +702,6 @@ void WebSocketSource::getRangePropertyAsync(AsyncRangePropertyReply *reply)
 	replyvar["timeEnd"] = reply->timeEnd;
 	replyvar["sequenceBegin"] = reply->sequenceBegin;
 	replyvar["sequenceEnd"] = reply->sequenceEnd;
-
 
 	QStringList properties;
 
