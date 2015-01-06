@@ -23,10 +23,6 @@ class bcolors:
 		BLUE = '\x1b[34m'
 
 class Autocomplete:
-	Command = 0
-	Property = 1
-	wants = 0
-
 	class Cmd:
 		name = ""
 		description = ""
@@ -38,7 +34,7 @@ class Autocomplete:
 	properties = []
 
 	def __init__(self):
-		Autocomplete.wants = self.Command
+		self.commands = []
 		self.commands.append(Autocomplete.Cmd('help', 'Prints help data'))
 		self.commands.append(Autocomplete.Cmd('list', 'List supported ObjectNames'))
 		self.commands.append(Autocomplete.Cmd('get', 'Get properties from an ObjectName'))
@@ -55,25 +51,28 @@ class Autocomplete:
 		except dbus.exceptions.DBusException, error:
 			print error
 
-
-	def wantsCommand(self):
-		Autocomplete.wants = Autocomplete.Command
-
-	def wantsProperty(self):
-		Autocomplete.wants = Autocomplete.Property
-
 	def complete(self, partialString):
 		results = []
-		if Autocomplete.wants == self.Command:
-			for cmd in self.commands:
-				if not (len(partialString)) or cmd.name.startswith(partialString):
-					results.append(cmd.name)
-		elif Autocomplete.wants == self.Property:
-			for property in self.properties:
-				if not(len(partialString)) or property.startswith(partialString):
-					results.append(property)
 
-		return results
+		sameString = ""
+
+		for cmd in self.commands:
+			if not (len(partialString)) or cmd.name.startswith(partialString):
+				results.append(cmd.name)
+
+		for property in self.properties:
+			if not(len(partialString)) or property.startswith(partialString):
+				results.append(str(property))
+
+		if len(results) > 1 and len(results[0]) > 0:
+			for i in range(len(results[0])):
+				for j in range(len(results[0])-i+1):
+					if j > len(sameString) and all(results[0][i:i+j] in x for x in results):
+						sameString = results[0][i:i+j]
+		elif len(results) == 1:
+			sameString = results[0]
+
+		return results, sameString
 
 
 def help():
@@ -220,6 +219,7 @@ if args.command == "stdin":
 				fullprompt = promptAmbctl + promptEnd
 				curpos = 0
 				historypos = -1
+				autocomplete = Autocomplete()
 				def full_line_len(self):
 						return len(self.fullprompt) + len(self.line)
 				def insert(self, str):
@@ -314,42 +314,44 @@ if args.command == "stdin":
 		def handle_keyboard(source, cond, data):
 						str = source.read()
 						#print "char: ", ord(str)
-						autocomplete = Autocomplete()
 
 						if len(str) > 1:
-								if ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 68: #left arrow
-										if data.arrow_back():
-												cursor_left()
-												sys.stdout.flush()
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 67: #right arrow
-										if data.arrow_forward():
-												cursor_right()
-												sys.stdout.flush()
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 70: #end
-										while data.arrow_forward():
-												cursor_right()
-												sys.stdout.flush()
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 72: #home
-										while data.arrow_back():
-												cursor_left()
-										sys.stdout.flush()
-								elif len(str) == 4 and ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 51 and ord(str[3]) == 126:
-									#del
-									data.delete()
-									redraw(data)
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 65:
-									#up arrow
-									data.save_temp()
-									data.history_up()
-									while data.arrow_forward():
-										cursor_right()
-									redraw(data)
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 66:
-									#down arrow
-									data.history_down()
-									while data.arrow_forward():
-										cursor_right()
-									redraw(data)
+							if ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 68:
+								#left arrow
+								if data.arrow_back():
+									cursor_left()
+									sys.stdout.flush()
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 67:
+								#right arrow
+								if data.arrow_forward():
+									cursor_right()
+									sys.stdout.flush()
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 70:
+								#end
+								while data.arrow_forward():
+									cursor_right()
+								sys.stdout.flush()
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 72: #home
+								while data.arrow_back():
+									cursor_left()
+								sys.stdout.flush()
+							elif len(str) == 4 and ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 51 and ord(str[3]) == 126:
+								#del
+								data.delete()
+								redraw(data)
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 65:
+								#up arrow
+								data.save_temp()
+								data.history_up()
+								while data.arrow_forward():
+									cursor_right()
+								redraw(data)
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 66:
+								#down arrow
+								data.history_down()
+								while data.arrow_forward():
+									cursor_right()
+								redraw(data)
 						elif ord(str) == 10:
 							#enter
 							if data.line == "":
@@ -360,29 +362,60 @@ if args.command == "stdin":
 								termios.tcsetattr(fd, termios.TCSAFLUSH, old)
 								fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
 								sys.exit()
-								try:
-									if len(words) > 1:
-										processCommand(words[0], words[1:])
-									else:
-										processCommand(words[0], [])
-								except dbus.exceptions.DBusException, error:
-									print error
-								except:
-									print "Error running command ", sys.exc_info()[0]
-								data.push();
-								data.clear()
-								redraw(data)
+							try:
+								if len(words) > 1:
+									processCommand(words[0], words[1:])
+								else:
+									processCommand(words[0], [])
+							except dbus.exceptions.DBusException, error:
+								print error
+							except:
+								print "Error running command ", sys.exc_info()[0]
+							data.push();
+							data.clear()
+							redraw(data)
 						elif ord(str) == 127: #backspace
 							data.back_space()
 							redraw(data)
 						elif ord(str) == 9:
 							#tab
-							results = autocomplete.complete(data.line)
-							print results
+							#get last string:
+							wordsList = data.line.split(' ')
+							toComplete = wordsList[-1]
+							results, samestring = data.autocomplete.complete(toComplete)
+							if len(samestring) and len(samestring) > len(toComplete) and not (samestring == toComplete):
+								if len(wordsList) > 1:
+									data.line = ' '.join(wordsList[0:-1]) + ' ' + samestring
+								else:
+									data.line = samestring
+								while data.arrow_forward():
+									cursor_right()
+
+							elif len(results) and not results[0] == toComplete:
+								print ""
+								if len(results) < 3:
+									print ' '.join(results)
+								else:
+									longestLen = 0
+									for r in results:
+										if len(r) > longestLen:
+											longestLen = len(r)
+									for i in range(0, len(results) / 3):
+										row = ""
+										endRow = -1
+										if len(results) >= i+3:
+											endRow = 3
+										print "endRow: ", endRow
+										for col in results[i : endRow]:
+											row += col
+											for i in range((longestLen + 5) - len(col)):
+												row += ' '
+										print row
+
 							redraw(data)
 						elif curses.ascii.isalnum(ord(str)) or ord(str) == curses.ascii.SP: #regular text
-								data.insert(str)
-								redraw(data)
+							data.insert(str)
+							redraw(data)
 
 						return True
 		print "@PROJECT_PRETTY_NAME@ @PROJECT_VERSION@"
