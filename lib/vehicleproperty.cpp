@@ -538,20 +538,24 @@ AbstractPropertyType* VehicleProperty::getPropertyTypeForPropertyNameValue(Vehic
 	if(registeredPropertyFactoryMap.count(name) > 0)
 	{
 		VehicleProperty::PropertyTypeFactoryCallback cb = registeredPropertyFactoryMap[name];
-		if ( cb != NULL )
+		if ( cb != nullptr )
 		{
 			AbstractPropertyType* type = cb();
-			if(type == NULL)
+			if(type == nullptr)
+			{
 				throw std::runtime_error("Cannot return NULL in a PropertyTypeFactory");
+			}
 
 			if(value != "" )
+			{
 				type->fromString(value);
+			}
 
 			return type;
 		}
 	}
 
-	DebugOut(DebugOut::Error)<<"Property not found"<<endl;
+	DebugOut(DebugOut::Warning) << "Property not found: " << name << endl;
 
 	return nullptr;
 }

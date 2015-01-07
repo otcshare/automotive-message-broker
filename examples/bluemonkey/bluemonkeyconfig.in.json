@@ -1,21 +1,18 @@
 {
-  "mainloop" : "@PLUGIN_INSTALL_PATH@/qtmainloopplugin.so",
-
-  "sources" : [
-    {
-      "path" : "@PLUGIN_INSTALL_PATH@/bluemonkeyplugin.so",
-      "config" : "/etc/ambd/bluemonkey/config.js"
-    }
-  ],
-
-  "sinks" : [
-
-    {
-      "path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
-    },
-    {
-      "path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
-    }
-  ]
+	"mainloop" : "@PLUGIN_INSTALL_PATH@/qtmainloopplugin.so",
+	"sources" : [
+		{
+			"path" : "@PLUGIN_INSTALL_PATH@/bluemonkeyplugin.so",
+			"config" : "/etc/ambd/bluemonkey/config.js"
+		}
+	],
+	"sinks" : [
+		{
+			"path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
+		},
+		{
+			"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
+		}
+	]
 }
 

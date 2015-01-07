@@ -45,7 +45,7 @@ void testBooleanToStringFromString()
 	boolean.fromString(boolean.toString());
 	std::string isTrue2 = boolean.toString();
 
-	g_assert(isTrue == isTrue2);
+	TEST(isTrue == isTrue2);
 }
 
 bool beginsWith(std::string a, std::string b)

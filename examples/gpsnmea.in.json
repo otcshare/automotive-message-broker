@@ -1,16 +1,16 @@
 {
-  "sources" : [
-    {
-      "name" : "gps nmea plugin",
-      "path" : "@PLUGIN_INSTALL_PATH@/gpsnmea.so",
-      "test" : "true",
-      "device" : "/dev/ttyACM0"
-    }
-  ],
-  "sinks": [
-    {
-      "path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
-    }
-  ]
+	"sources" : [
+		{
+			"name" : "gps nmea plugin",
+			"path" : "@PLUGIN_INSTALL_PATH@/gpsnmea.so",
+			"test" : "true",
+			"device" : "/dev/ttyACM0"
+		}
+	],
+	"sinks": [
+		{
+			"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
+		}
+	]
 }
 

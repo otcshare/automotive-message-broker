@@ -165,7 +165,7 @@ def processCommand(command, commandArgs, noMain=True):
 		if property == realValue:
 			print propertyName + " = ", property
 		else:
-			print "Error setting property"
+			print "Error setting property.  Expected value: ", realValue, " Received: ", property
 		return 1
 	elif command == "getHistory":
 		if len(commandArgs) == 0:

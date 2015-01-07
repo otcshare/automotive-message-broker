@@ -45,7 +45,7 @@ public:
 	void init();
 	std::map<std::string, list<WebSocketSink*> > m_sinkMap;
 	void setConfiguration(map<string, string> config);
-	void setValue(libwebsocket* socket,VehicleProperty::Property property,string value, Zone::Type zone, string uuid);
+	void setValue(libwebsocket* socket,VehicleProperty::Property property, string value, Zone::Type zone, string uuid);
 	PropertyList getSupportedProperties();
 
 	AbstractRoutingEngine * router() { return routingEngine; }

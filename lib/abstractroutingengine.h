@@ -157,6 +157,29 @@ public:
 			return "PermissionDenied";
 		else if(err == ZoneNotSupported)
 			return "ZoneNotSupported";
+
+		DebugOut(DebugOut::Warning) << "Could not translate error: " << err << endl;
+		return "";
+	}
+
+	/*!
+	 * \brief strToError returns Error representing the string
+	 */
+	static Error strToError(std::string err)
+	{
+		if(err == "NoError")
+			return NoError;
+		else if(err == "Timeout")
+			return Timeout;
+		else if(err == "InvalidOperation")
+			return InvalidOperation;
+		else if(err == "PermissionDenied")
+			return PermissionDenied;
+		else if(err == "ZoneNotSupported")
+			return ZoneNotSupported;
+
+		DebugOut(DebugOut::Warning) << "Could not translate error string: " << err << endl;
+		return NoError;
 	}
 
 	/*!

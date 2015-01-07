@@ -377,7 +377,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 			{
 				doc = QJsonDocument::fromJson(d);
 				DebugOut(7)<<d.data()<<endl;
-			}	
+			}
 
 			if(doc.isNull())
 			{
@@ -390,8 +390,6 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 			string type = call["type"].toString().toStdString();
 			string name = call["name"].toString().toStdString();
 			string id = call["transactionid"].toString().toStdString();
-
-			list<pair<string,string> > pairdata;
 
 			if(type == "multiframe")
 			{
@@ -464,7 +462,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 					{
 						QVariantMap d = p.toMap();
 						Zone::Type zone = d["zone"].toInt();
-						std::string name = d["name"].toString().toStdString();
+						std::string name = d["property"].toString().toStdString();
 						std::string proptype = d["type"].toString().toStdString();
 						std::string source = d["source"].toString().toStdString();
 
@@ -484,7 +482,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 					{
 						QVariantMap obj = d.toMap();
 
-						std::string name = obj["name"].toString().toStdString();
+						std::string name = obj["property"].toString().toStdString();
 						std::string value = obj["value"].toString().toStdString();
 						double timestamp = obj["timestamp"].toDouble();
 						int sequence = obj["sequence"].toInt();
@@ -516,7 +514,7 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 				else if (name == "get")
 				{
 
-					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" event:" << pairdata.size()<<endl;
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"GET\" reply" << endl;
 					if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end())
 					{
 						QVariantMap obj = call["data"].toMap();
@@ -527,14 +525,15 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 						int sequence = obj["sequence"].toInt();
 						Zone::Type zone = obj["zone"].toInt();
 
-						AbstractPropertyType* v = VehicleProperty::getPropertyTypeForPropertyNameValue(property, value);
+						auto v = amb::make_unique(VehicleProperty::getPropertyTypeForPropertyNameValue(property, value));
+
 						v->timestamp = timestamp;
 						v->sequence = sequence;
 						v->zone = zone;
 
 						if (source->uuidReplyMap.find(id) != source->uuidReplyMap.end() && source->uuidReplyMap[id]->error != AsyncPropertyReply::Timeout)
 						{
-							source->uuidReplyMap[id]->value = v;
+							source->uuidReplyMap[id]->value = v.get();
 							source->uuidReplyMap[id]->success = true;
 							source->uuidReplyMap[id]->completed(source->uuidReplyMap[id]);
 							source->uuidReplyMap.erase(id);
@@ -544,15 +543,56 @@ static int callback_http_only(libwebsocket_context *context, struct libwebsocket
 						{
 							DebugOut() << "get methodReply has been recieved, without a request being in!. This is likely due to a request coming in after the timeout has elapsed.\n";
 						}
-
-						delete v;
 					}
 					else
 					{
 						DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "GET Method Reply INVALID! Multiple properties detected, only single are supported!!!" << "\n";
 					}
 
-					//data will contain a property/value map.
+
+				}
+				else if (name == "set")
+				{
+					DebugOut() << __SMALLFILE__ << ":" << __LINE__ << "Got \"SET\" event" << endl;
+					std::string id = call["transactionid"].toString().toStdString();
+
+					if(source->setReplyMap.find(id) != source->setReplyMap.end() && source->setReplyMap[id]->error != AsyncPropertyReply::Timeout)
+					{
+						AsyncPropertyReply* reply = source->setReplyMap[id];
+
+						reply->success = call["success"].toBool();
+						reply->error = AsyncPropertyReply::strToError(call["error"].toString().toStdString());
+
+						QVariantMap obj = call["data"].toMap();
+
+						std::string property = obj["property"].toString().toStdString();
+						std::string value = obj["value"].toString().toStdString();
+
+						double timestamp = obj["timestamp"].toDouble();
+						int sequence = obj["sequence"].toInt();
+						Zone::Type zone = obj["zone"].toInt();
+
+						auto v = amb::make_unique(VehicleProperty::getPropertyTypeForPropertyNameValue(property, value));
+
+						if(v)
+						{
+							v->timestamp = timestamp;
+							v->sequence = sequence;
+							v->zone = zone;
+						}
+						else
+						{
+							throw std::runtime_error("property may not be registered.");
+						}
+
+						reply->value = v.get();
+						reply->completed(reply);
+						source->setReplyMap.erase(id);
+					}
+				}
+				else
+				{
+					DebugOut(DebugOut::Warning) << "Unhandled methodReply: " << name << endl;
 				}
 
 			}
@@ -720,23 +760,23 @@ AsyncPropertyReply * WebSocketSource::setProperty( AsyncSetPropertyRequest reque
 {
 	AsyncPropertyReply* reply = new AsyncPropertyReply(request);
 
+	std::string uuid = amb::createUuid();
+
 	QVariantMap data;
 	data["property"] = request.property.c_str();
 	data["value"] = request.value->toString().c_str();
 	data["zone"] = request.zoneFilter;
 
-
 	QVariantMap replyvar;
 	replyvar["type"] = "method";
 	replyvar["name"] = "set";
 	replyvar["data"] = data;
-	replyvar["transactionid"] = amb::createUuid().c_str();
+	replyvar["transactionid"] = uuid.c_str();
 
 	lwsWriteVariant(clientsocket, replyvar);
 
-	///TODO: we should actually wait for a response before we simply complete the call
-	reply->success = true;
-	reply->completed(reply);
+	setReplyMap[uuid] = reply;
+
 	return reply;
 }
 
