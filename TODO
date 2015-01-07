@@ -1,4 +1,4 @@
-
+- create IDL and docs for websocket protocol
 - Refactor obd2 plugin with AsyncQueue.  Use thread safe-update property.
 - update json protocol to support rangerequests with PropertyList instead of a singel property (Verify)
 - source export from database plugin does not reflect the source in the database

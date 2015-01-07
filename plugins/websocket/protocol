@@ -28,7 +28,10 @@ Unsubscribe to data:
 {"type":"method", "name":"unsubscribe", "property":"EngineSpeed", "transactionid":"d293f670-f0b3-11e1-aff1-0800200c9a66"}
 
 Get History request:
-{"type":"method","name":"getRange","data": {"property":"VehicleSpeed", "timeBegin":"1368825008.35948","timeEnd":"1368825018.35948","sequenceBegin":"-1","sequenceEnd":"-1"},"transactionid":"b07589ba-417c-4604-80c6-01c0dcbd524d"}
+{"type" : "method", "name" : "getRange", "data" : ["VehicleSpeed"], "timeBegin" : 1368825008.35948, "timeEnd" : 1368825018.35948, "sequenceBegin" : -1, "sequenceEnd" : -1, "transactionid" : "b07589ba-417c-4604-80c6-01c0dcbd524d"}
+
+Get History reply:
+{"data" : [{"name" : "EngineSpeed", "sequence":-1, "timestamp" : 143706.443, "value" : "13789"}], "name" : "getRanged", "transactionid" : "fe4a803e-d587-4fa0-bd5a-9cf689097d88", "type" : "methodReply"}
 
 Set property request:
 { "type" : "method", "name" : "set", "data" : { "property" : "MachineGunTurretStatus", "value" : "true", "zone" : 0 }, "transactionid" : "4123123123" }

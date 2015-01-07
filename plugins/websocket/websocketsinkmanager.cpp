@@ -194,19 +194,21 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 	rangedRequest.timeEnd = end;
 	rangedRequest.sequenceBegin = seqstart;
 	rangedRequest.sequenceEnd = seqend;
+	rangedRequest.properties = properties;
 
-	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
+	rangedRequest.completed = [socket, id](AsyncRangePropertyReply* reply)
 	{
 		QVariantMap replyvar;
 		QVariantList list;
 
 		std::list<AbstractPropertyType*> values = reply->values;
-		for(auto itr = values.begin(); itr != values.end(); itr++)
+		for(auto value : values)
 		{
 			QVariantMap obj;
-			obj["value"]= (*itr)->toString().c_str();
-			obj["timestamp"] = (*itr)->timestamp;
-			obj["sequence"] = (*itr)->sequence;
+			obj["name"] = value->name.c_str();
+			obj["value"] = value->toString().c_str();
+			obj["timestamp"] = value->timestamp;
+			obj["sequence"] = value->sequence;
 
 			list.append(obj);
 		}
@@ -456,16 +458,21 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			{
 				if(name == "getRanged")
 				{
-					QVariantMap data = call["data"].toMap();
+					QVariant dataVariant = call["data"];
+
+					QVariantList data = dataVariant.toList();
 
 					PropertyList propertyList;
 
-					propertyList.push_back(data["property"].toString().toStdString());
+					Q_FOREACH(QVariant v, data)
+					{
+						propertyList.push_back(v.toString().toStdString());
+					}
 
-					double timeBegin = data["timeBegin"].toDouble();
-					double timeEnd = data["timeEnd"].toDouble();
-					double sequenceBegin = data["sequenceBegin"].toInt();
-					double sequenceEnd = data["sequenceEnd"].toInt();
+					double timeBegin = call["timeBegin"].toDouble();
+					double timeEnd = call["timeEnd"].toDouble();
+					int sequenceBegin = call["sequenceBegin"].toInt();
+					int sequenceEnd = call["sequenceEnd"].toInt();
 
 					if ((timeBegin < 0 && timeEnd > 0) || (timeBegin > 0 && timeEnd < 0))
 					{
@@ -477,7 +484,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					}
 					else
 					{
-						sinkManager->addSingleShotRangedSink(wsi,propertyList,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
+						sinkManager->addSingleShotRangedSink(wsi, propertyList, timeBegin, timeEnd, sequenceBegin, sequenceEnd, id);
 					}
 				}
 				else if (name == "get")

@@ -366,8 +366,10 @@ void ExampleSourcePlugin::randomizeProperties()
 	DebugOut()<<"setting enginespeed to: "<<engineSpeed<<endl;
 
 	vel.setValue(velocity);
+	vel.sequence++;
 	vel.priority = AbstractPropertyType::High;
 	es.setValue(engineSpeed);
+	es.sequence++;
 	es.priority = AbstractPropertyType::Low;
 	ac.setValue(accelerationX);
 	swa.setValue(steeringWheelAngle);
