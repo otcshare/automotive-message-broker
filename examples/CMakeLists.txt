@@ -24,6 +24,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/opencvdbusconfig.in.json ${CMAKE_CUR
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/qtmainloopconfig.in.json ${CMAKE_CURRENT_BINARY_DIR}/qtmainloopconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/websocketsink2.in.json ${CMAKE_CURRENT_BINARY_DIR}/websocketsink2 @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/websocketsource2.in.json ${CMAKE_CURRENT_BINARY_DIR}/websocketsource2 @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/databasewebsocketsink.in.json ${CMAKE_CURRENT_BINARY_DIR}/databasewebsocketsink @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/testsourceconfig.in.json ${CMAKE_CURRENT_BINARY_DIR}/testsourceconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cangenconfig.in.json ${CMAKE_CURRENT_BINARY_DIR}/cangenconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey/bluemonkeyconfig.in.json ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey/bluemonkeyconfig @ONLY)
