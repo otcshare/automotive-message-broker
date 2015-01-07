@@ -1,6 +1,8 @@
 /*!
  * \mainpage Automotive Message Broker Library Documentation - Bluemonkey Plugin
  * \version @PROJECT_VERSION@
+ *
+ * <a href="../../../html/index.html">Back to AMB Documentation Main</a>
  * \section intro Introduction
  * Bluemonkey is a javascript rendering engine that allows the scripting of source plugin behavior in javascript.
  * It allows developers a quick way to prototype plugin code as well as a way to create custom properties.
