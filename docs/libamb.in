@@ -1,6 +1,9 @@
-/**
+/*!
  \mainpage Automotive Message Broker Library Documentation
  \version @PROJECT_VERSION@
+
+ <a href="../../html/index.html">Back to AMB Documentation Main</a>
+
  \section intro Introduction
  Automotive Message Broker (AMB) Library documentation outlines the internal classes and structures for building
  plugins for AMB.
