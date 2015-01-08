@@ -320,6 +320,45 @@ Vehicle::Vehicle(common::Instance* instance)
 		DebugOut(DebugOut::Error) << "calling GetAutomotiveManager: "
 				   << error_ptr->message << endl;
 	}
+
+
+	GError* list_error = nullptr;
+	auto supported_list_variant = amb::make_super(
+				g_dbus_proxy_call_sync(manager_proxy_.get(),
+									   "List",
+									   nullptr,
+									   G_DBUS_CALL_FLAGS_NONE,
+									   -1, NULL, &list_error));
+
+	auto list_error_ptr = amb::make_super(list_error);
+
+	if (list_error_ptr) {
+		DebugOut(DebugOut::Error) << "error calling List: "
+				   << error_ptr->message << endl;
+		return;
+	}
+
+	GVariantIter iter;
+	g_variant_iter_init(&iter, supported_list_variant.get());
+	picojson::array list;
+
+	gchar* propertyName = nullptr;
+
+	while(g_variant_iter_next(&iter,"s", &propertyName))
+	{
+		auto propertyNamePtr = amb::make_super(propertyName);
+
+		std::string p = propertyNamePtr.get();
+
+		std::transform(p.begin(), p.begin()+1, p.begin(), ::tolower);
+		list.push_back(picojson::value(p));
+	}
+
+	picojson::object obj;
+	obj["method"] = picojson::value("vehicleSupportedAttributes");
+	obj["value"] = picojson::value(list);
+
+	instance->PostMessage(picojson::value(obj).serialize().c_str());
 }
 
 Vehicle::~Vehicle() {
