@@ -24,7 +24,7 @@
   </define>
   <assign>
     <dbus name="org.automotive.message.broker" own="AMB" bus="system">
-      <node name="*/0/MachineGunTurretStatus" >
+      <!--<node name="*/0/MachineGunTurretStatus" >
         <interface name="org.freedesktop.DBus.Properties">
           <method name="Set" >
             <annotation name="com.tizen.smack" value="AMB::machinegun" />
@@ -38,6 +38,7 @@
           </method>
         </interface>
       </node>
+      -->
       <!--<node name="*" >
         <interface name="org.freedesktop.DBus.Properties">
           <method name="Get" >
