@@ -358,7 +358,7 @@ void Location::parseAltitude(string alt)
 
 double Location::degsToDecimal(double degs)
 {
-	double deg;
+	double deg = 0;
 	double min = 100.0 * modf(degs / 100.0, &deg);
 	return deg + (min / 60.0);
 }
@@ -668,7 +668,7 @@ bool GpsNmeaSource::tryParse(string data)
 		{
 			if(pos == 0 )
 			{
-				uint cs = buffer.find('*');
+				std::string::size_type cs = buffer.find('*');
 				if (cs != std::string::npos && cs != buffer.length()-1)
 				{
 					///This means we have a false flag somewhere.
