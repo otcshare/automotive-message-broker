@@ -31,10 +31,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 class AbstractDBusInterface;
 
-using namespace std;
-
-typedef function<void (boost::any)> SetterFunc;
-
 class VariantType
 {
 
@@ -55,11 +51,6 @@ public:
 				&& other.ambPropertyName() == ambPropertyName()
 				&& other.sourceFilter() == sourceFilter()
 				&& other.zoneFilter() == zoneFilter());
-	}
-
-	virtual void setSetterFunction(SetterFunc setterFunc)
-	{
-		mSetterFunc = setterFunc;
 	}
 
 	virtual const string signature()
@@ -100,7 +91,7 @@ public:
 	Zone::Type zoneFilter() { return mZoneFilter; }
 
 	virtual GVariant* toVariant();
-	virtual void fromVariant(GVariant *value);
+	virtual void fromVariant(GVariant *value, std::function<void (bool, AsyncPropertyReply::Error)> callback);
 
 	double timestamp()
 	{
@@ -166,7 +157,6 @@ protected:
 	AbstractRoutingEngine* routingEngine;
 	string mPropertyName;
 	VehicleProperty::Property mAmbPropertyName;
-	SetterFunc mSetterFunc;
 	Access mAccess;
 	AbstractPropertyType* mValue;
 	AbstractDBusInterface* mInterface;

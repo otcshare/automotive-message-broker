@@ -131,9 +131,13 @@ protected:
 								 gpointer userData);
 	static gboolean setProperty(GDBusConnection * connection, const gchar * sender, const gchar *objectPath,
 								const gchar *interfaceName, const gchar * propertyName, GVariant *value,
-								GError** error, gpointer userData);
+								GError** error, gpointer userData, std::function<void (bool, AsyncPropertyReply::Error)> callback);
 
-	virtual void setProperty(std::string propertyName, GVariant * value);
+	static void handleMyMethodCall(GDBusConnection *connection, const gchar *sender, const gchar *object_path,
+								   const gchar *interface_name, const gchar *method_name, GVariant *parameters,
+								   GDBusMethodInvocation *invocation, gpointer user_data);
+
+	virtual void setProperty(std::string propertyName, GVariant * value, std::function<void (bool, AsyncPropertyReply::Error)> callback);
 	virtual GVariant * getProperty(std::string propertyName);
 
 	void setTimeout(int timeout);

@@ -8,5 +8,8 @@ Changes:
 - Plugin create() method signature changed.
 - Removed AbstractSinkManager class
 - Removed deprecated dbus interfaces
+- Removed deprecated 'FooChanged' signal introspection description
+- Deprecated 'GetFoo' method.  This doesn't contain much more information that cannot already be 
+  obtained through the Properties interface.
 
 Fixes:

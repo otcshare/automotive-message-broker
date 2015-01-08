@@ -340,11 +340,11 @@ static void handleMethodCall(GDBusConnection       *connection,
 			}
 		}
 		DebugOut(6) << "member " << propertyToFindStrPtr.get() << " of " << objectNamePtr.get() << " was not found." << endl;
-		g_dbus_method_invocation_return_value(invocation,g_variant_new("(b)", false));
+		g_dbus_method_invocation_return_value(invocation, g_variant_new("(b)", false));
 	}
 	else
 	{
-		g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
+		g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
 	}
 }
 
