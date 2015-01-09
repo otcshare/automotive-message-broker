@@ -9,6 +9,7 @@
 #include <gio/gio.h>
 #include <glib.h>
 #include <listplusplus.h>
+#include <picojson.h>
 #include <superptr.hpp>
 
 #include <algorithm>
@@ -16,7 +17,6 @@
 #include <memory>
 
 #include "common/extension.h"
-#include "common/picojson.h"
 
 common::Instance* Vehicle::CallbackInfo::instance = nullptr;
 

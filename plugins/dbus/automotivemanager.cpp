@@ -438,14 +438,16 @@ AutomotiveManager::AutomotiveManager(GDBusConnection *connection)
 	regId = g_dbus_connection_register_object(mConnection, "/", mInterfaceInfo, &interfaceVTable, this, NULL, &error);
 	g_dbus_node_info_unref(introspection);
 
-	if(error){
-		g_error_free(error);
+	auto errorPtr = amb::make_super(error);
+
+	if(errorPtr){
+		DebugOut(DebugOut::Error) << "registering dbus object: " << "'org.automotive.Manager' " << errorPtr->message << endl;
 		throw -1;
 	}
 
 	g_assert(regId > 0);
 
-	g_dbus_connection_signal_subscribe(g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL,NULL), "org.freedesktop.DBus", "org.freedesktop.DBus",
+	g_dbus_connection_signal_subscribe(mConnection, "org.freedesktop.DBus", "org.freedesktop.DBus",
 																					   "NameOwnerChanged", "/org/freedesktop/DBus", NULL, G_DBUS_SIGNAL_FLAGS_NONE,
 																					   signalCallback, this, NULL);
 }

@@ -7,8 +7,9 @@
 
 #include <string>
 
+#include <picojson.h>
+
 #include "common/extension.h"
-#include "common/picojson.h"
 #include "vehicle.h"
 
 class VehicleInstance : public common::Instance {
