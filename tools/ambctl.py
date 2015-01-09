@@ -35,13 +35,13 @@ class Autocomplete:
 
 	def __init__(self):
 		self.commands = []
-		self.commands.append(Autocomplete.Cmd('help', 'Prints help data'))
+		self.commands.append(Autocomplete.Cmd('help', 'Prints help data (also see COMMAND help)'))
 		self.commands.append(Autocomplete.Cmd('list', 'List supported ObjectNames'))
 		self.commands.append(Autocomplete.Cmd('get', 'Get properties from an ObjectName'))
 		self.commands.append(Autocomplete.Cmd('listen', 'Listen for changes on an ObjectName'))
 		self.commands.append(Autocomplete.Cmd('set', 'Set a property for an ObjectName'))
 		self.commands.append(Autocomplete.Cmd('getHistory', 'Get logged data within a time range'))
-		self.commands.append(Autocomplete.Cmd('enablePlugin', 'Get logged data within a time range'))
+		self.commands.append(Autocomplete.Cmd('plugin', 'enable, disable and get info on a plugin'))
 		self.commands.append(Autocomplete.Cmd('quit', 'Exit ambctl'))
 
 		bus = dbus.SystemBus()
@@ -91,35 +91,36 @@ def changed(interface, properties, invalidated):
 	print json.dumps(properties, indent=2)
 
 def listPlugins():
-	list = {}
+	list = []
 	for root, dirs, files in os.walk('@PLUGIN_SEGMENT_INSTALL_PATH@'):
 		for file in files:
 			fullpath = root + "/" + file;
 			pluginFile = open(fullpath)
 			data = json.load(pluginFile)
+			data['segmentPath'] = fullpath
 			pluginFile.close()
-			list.update({data["name"]:fullpath})
-
+			list.append(data)
 	return list
 
 def enablePlugin(pluginName, enabled):
 	list = listPlugins()
-	if pluginName not in list:
-		return false
 
-	path = list[pluginName]
-	try :
-		file = open(path, 'rw+')
-		data = json.load(file)
-		data["enabled"] = enabled;
-		fixedData = json.JSONEncoder().encode(data)
-		file.truncate(0)
-		file.write(fixedData)
-		file.close()
-	except IOError, error:
-		print error
-	except:
-		print "Unknown error"
+	for plugin in list:
+		if plugin["name"] == pluginName:
+			try :
+				plugin["enabled"] = enabled
+				file = open(plugin["segmentPath"], 'rw+')
+				plugin.pop('segmentPath', None)
+				fixedData = json.dumps(plugin, separators=(', ', ' : '), indent=4)
+				file.truncate()
+				file.write(fixedData)
+				file.close()
+				return True
+			except IOError, error:
+				print error
+				return False
+	return False
+
 
 
 def processCommand(command, commandArgs, noMain=True):
@@ -222,20 +223,43 @@ def processCommand(command, commandArgs, noMain=True):
 		object = managerInterface.FindObjectForZone(objectName, zone);
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
-	elif command == "enablePlugin":
+	elif command == "plugin":
 		if len(commandArgs) == 0:
 			commandArgs = ['help']
 		if commandArgs[0] == 'help':
 			print "[list] [pluginName] [on/off]"
 			return 1
 		elif commandArgs[0] == 'list':
-			for name, path in listPlugins():
-				print name
+			for plugin in listPlugins():
+				print plugin['name']
 			return 1
+		elif len(commandArgs) == 1:
+			for plugin in listPlugins():
+				if plugin['name'] == commandArgs[0]:
+					print json.dumps(plugin, indent=4)
+					return 1
+				else:
+					print "name: " + plugin['name'] + "==?" + commandArgs[0]
+			print "plugin not found: ", commandArgs[0]
+			return 0
 		else:
 			if len(commandArgs) < 2:
 				return 1
-			enablePlugin(commandArgs[0], commandArgs[1] == "on")
+			enArg = commandArgs[1]
+			if not enArg == "on" and not enArg == "off":
+				print "please use 'on' or 'off' to enable/disable the plugin"
+				return 1
+			plugin = commandArgs[0]
+			enabled = enArg == "on"
+			enStr = "disabled"
+			if enablePlugin(plugin, enabled):
+				if enabled:
+					enStr = "enabled"
+			else:
+				print "Error could not enable", plugin
+
+			print plugin, enStr
+
 			return 1
 
 	else:
