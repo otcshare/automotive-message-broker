@@ -41,6 +41,7 @@ class Autocomplete:
 		self.commands.append(Autocomplete.Cmd('listen', 'Listen for changes on an ObjectName'))
 		self.commands.append(Autocomplete.Cmd('set', 'Set a property for an ObjectName'))
 		self.commands.append(Autocomplete.Cmd('getHistory', 'Get logged data within a time range'))
+		self.commands.append(Autocomplete.Cmd('enablePlugin', 'Get logged data within a time range'))
 		self.commands.append(Autocomplete.Cmd('quit', 'Exit ambctl'))
 
 		bus = dbus.SystemBus()
@@ -88,6 +89,38 @@ def help():
 
 def changed(interface, properties, invalidated):
 	print json.dumps(properties, indent=2)
+
+def listPlugins():
+	list = {}
+	for root, dirs, files in os.walk('@PLUGIN_SEGMENT_INSTALL_PATH@'):
+		for file in files:
+			fullpath = root + "/" + file;
+			pluginFile = open(fullpath)
+			data = json.load(pluginFile)
+			pluginFile.close()
+			list.update({data["name"]:fullpath})
+
+	return list
+
+def enablePlugin(pluginName, enabled):
+	list = listPlugins()
+	if pluginName not in list:
+		return false
+
+	path = list[pluginName]
+	try :
+		file = open(path, 'rw+')
+		data = json.load(file)
+		data["enabled"] = enabled;
+		fixedData = json.JSONEncoder().encode(data)
+		file.truncate(0)
+		file.write(fixedData)
+		file.close()
+	except IOError, error:
+		print error
+	except:
+		print "Unknown error"
+
 
 def processCommand(command, commandArgs, noMain=True):
 
@@ -189,6 +222,22 @@ def processCommand(command, commandArgs, noMain=True):
 		object = managerInterface.FindObjectForZone(objectName, zone);
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
+	elif command == "enablePlugin":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
+		if commandArgs[0] == 'help':
+			print "[list] [pluginName] [on/off]"
+			return 1
+		elif commandArgs[0] == 'list':
+			for name, path in listPlugins():
+				print name
+			return 1
+		else:
+			if len(commandArgs) < 2:
+				return 1
+			enablePlugin(commandArgs[0], commandArgs[1] == "on")
+			return 1
+
 	else:
 		print "Invalid command"
 	return 1
@@ -404,8 +453,7 @@ if args.command == "stdin":
 										row = ""
 										endRow = -1
 										if len(results) >= i+3:
-											endRow = 3
-										print "endRow: ", endRow
+											endRow = 2
 										for col in results[i : endRow]:
 											row += col
 											for i in range((longestLen + 5) - len(col)):

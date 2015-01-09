@@ -21,7 +21,12 @@ install(TARGETS examplesourceplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/exampleplugins.README.txt ${CMAKE_CURRENT_BINARY_DIR}/exampleplugins.README @ONLY)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/examplesource.in.json ${CMAKE_CURRENT_BINARY_DIR}/examplesource @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/examplesink.in.json ${CMAKE_CURRENT_BINARY_DIR}/examplesink @ONLY)
+
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/exampleplugins.README DESTINATION ${DOC_INSTALL_DIR}/plugins)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/examplesource DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/examplesink DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})
 
 add_subdirectory(common)
 

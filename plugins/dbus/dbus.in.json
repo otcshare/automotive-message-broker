@@ -1,0 +1,6 @@
+{
+	"name" : "DBusSink",
+	"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so",
+	"frequency" : "30",
+	"enabled" : true
+}

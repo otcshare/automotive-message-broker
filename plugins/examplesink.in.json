@@ -1,0 +1,6 @@
+{
+	"name" : "ExampleSink",
+	"path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so",
+	"frequency" : "30",
+	"enabled" : true
+}

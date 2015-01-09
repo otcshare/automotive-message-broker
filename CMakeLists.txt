@@ -22,6 +22,7 @@ set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_A
 set (PLUGIN_INSTALL_PATH "${LIB_INSTALL_DIR}/${PROJECT_NAME}")
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")
 set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}")
+set (PLUGIN_SEGMENT_INSTALL_PATH "/etc/ambd/plugins.d")
 
 option(qtmainloop "Use QCoreApplication mainloop " OFF)
 option(websocket_plugin "websocket source and sink plugins" OFF)
