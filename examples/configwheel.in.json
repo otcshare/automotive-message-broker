@@ -1,0 +1,16 @@
+{
+	"sources" : [
+		{
+			"name" : "WheelSource",
+			"path" : "@PLUGIN_INSTALL_PATH@/wheelsourceplugin.so",
+			"device" : "/dev/input/js0"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "DBusSink",
+			"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
+		}
+	]
+}
+

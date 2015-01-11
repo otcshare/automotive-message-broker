@@ -1,5 +1,8 @@
 /*!
 * \mainpage Automotive Message Broker DBus API Documentation
+* \version @PROJECT_VERSION@
+*
+* <a href="../../html/index.html">Back to AMB Documentation Main</a>
 *
 * \section intro Introduction
 * AMB organizes the API into two general interface categories.  First the Manager interface (see manager.txt)

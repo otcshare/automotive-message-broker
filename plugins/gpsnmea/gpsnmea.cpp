@@ -358,7 +358,7 @@ void Location::parseAltitude(string alt)
 
 double Location::degsToDecimal(double degs)
 {
-	double deg;
+	double deg = 0;
 	double min = 100.0 * modf(degs / 100.0, &deg);
 	return deg + (min / 60.0);
 }

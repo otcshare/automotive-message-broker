@@ -714,6 +714,9 @@ public:
 	}
 };
 
+/*!
+ * \brief ListPropertyType is a AbstractPropertyType for arrays of AbstractPropertyTypes
+ */
 template <class T = AbstractPropertyType>
 class ListPropertyType: public AbstractPropertyType
 {

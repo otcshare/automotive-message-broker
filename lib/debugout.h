@@ -30,6 +30,30 @@ using namespace std;
 
 void debugOut(const string &message);
 
+/*!
+ * \brief The DebugOut class represents a class used for outputing debug information
+ * The specified debug level will only be outputed if the debug level is => the debug threshhold
+ * Here's a simple example:
+ * \code
+ * DebugOut::setDebugThreshhold(3);
+ * DebugOut(DebugOut::Warning) << "This is a warning" << std::endl;
+ * DebugOut(3) << "This will only show if the threshhold is 3 or lower." << std::endl;
+ *
+ * /// Start logging to a file:
+ * ofstream logfile;
+ * logfile.open("amb.log", ios::out | ios::trunc);
+ * DebugOut::setOutput(logfile)
+ *
+ * /// Throw exception on warning or error:
+ * DebugOut::setThrowErr(true);
+ * DebugOut::setThrowWarn(true);
+ * DebugOut(DebugOut::Error) << "This will throw an exception." << std::endl;
+ *
+ * /// Log to stderr:
+ * DebugOut::setOutput(std::cerr);
+ * DebugOut() << "This will log to stderr." << std::endl;
+ * \endcode
+ */
 class DebugOut
 {
 public:

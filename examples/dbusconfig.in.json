@@ -1,0 +1,18 @@
+{
+	"sources" : [
+		{
+			"name" : "ExampleSouce",
+			"path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so",
+			"delay" : "6"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "DBusSink",
+			"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so",
+			"frequency" : "30"
+		}
+
+	]
+}
+

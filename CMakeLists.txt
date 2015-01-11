@@ -8,9 +8,9 @@ include(CMakeDependentOption)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_PRETTY_NAME "Automotive Message Broker")
-set(PROJECT_VERSION "0.12.903")
+set(PROJECT_VERSION "0.13")
 set(PROJECT_CODENAME "agera")
-set(PROJECT_QUALITY "beta")
+set(PROJECT_QUALITY "final")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
 add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
@@ -46,11 +46,6 @@ set(XWALK_EXTENSION_PATH "/automotive-message-broker/xwalk" CACHE PATH "director
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++1y")
-
-if(opencvlux_plugin)
-	 message(STATUS "OpenCV Lux plugin enabled")
-
-endif(opencvlux_plugin)
 
 include (CMakeForceCompiler)
 

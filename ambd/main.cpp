@@ -166,11 +166,6 @@ int main(int argc, char **argv)
 
 	PluginLoader loader(config, argc, argv);
 
-	if(!loader.sources().size())
-	{
-		throw std::runtime_error("No sources present. aborting");
-	}
-
 	mainloop = loader.mainloop();
 
 	/* Register signal handler */

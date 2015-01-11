@@ -1,6 +1,8 @@
 /*!
  * \mainpage Automotive Message Broker Library Documentation - Bluemonkey Plugin
  * \version @PROJECT_VERSION@
+ *
+ * <a href="../../../html/index.html">Back to AMB Documentation Main</a>
  * \section intro Introduction
  * Bluemonkey is a javascript rendering engine that allows the scripting of source plugin behavior in javascript.
  * It allows developers a quick way to prototype plugin code as well as a way to create custom properties.
@@ -110,7 +112,9 @@ interface Bluemonkey {
 	 void createCustomProperty(DOMString name, any value, optional unsigned short zone);
 
 };
-
+/*!
+ * \brief PropertyInterface represents an interface to an AMB Property
+ */
 interface PropertyInterface {
 	/*!
 	 * \brief type AMB property name
@@ -142,6 +146,10 @@ interface PropertyInterface {
 	 */
 	readonly attribute Signal changed;
 
+	/*!
+	 * \brief get logged data between \arg begin and \arg end.
+	 * callback is called with the results of this method.
+	 */
 	void getHistory(Date begin, Date end, HistoryCallback callback);
 };
 

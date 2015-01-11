@@ -1,0 +1,24 @@
+{
+	"mainloop" : "@PLUGIN_INSTALL_PATH@/qtmainloopplugin.so",
+	"sources" : [
+		{
+			"name" : "OpenCV Lux plugin",
+			"path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
+			"threaded" : "true",
+			"kinect" : "false",
+			"opencl" : "false",
+			"cuda" : "true",
+			"pixelLowerBound" : "0",
+			"pixelUpperBound" : "255",
+			"fps" : "30",
+			"device" : "0"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "Example sink",
+			"path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so"
+		}
+	]
+}
+

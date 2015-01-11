@@ -1,0 +1,440 @@
+/*!
+ * \mainpage Websocket Plugin Protocol Documentation
+ * \version @PROJECT_VERSION@
+ *
+ * <a href="../../../html/index.html">Back to AMB Documentation Main</a>
+ * \section intro Introduction
+ * This document describes the AMB Websocket protocol.  The messages are passed either as JSON or in binary format.  The binary format is
+ * defined by the <a href="http://doc.qt.io/qt-5/qjsondocument.html#toBinaryData">Qt project</a>.  The JSON format is described in protocol.idl.
+ *
+ * For information about the using the plugin with AMB, see <a href="../../websocket.README">the plugin documentation</a>
+ *
+ * \section example Example javascript
+ * The following is an example of using the websocket protocol in html5.  For a more complete example, see the <a href="../test/index.html">html test</a>.
+ * \code
+ * socket = new WebSocket('ws://localhost:23000/');
+ * socket.onmessage = function (msg)
+ * {
+ *   // we got a reply!
+ *   console.log(msg);
+ * };
+ *
+ * socket.onopen = function() {
+ *   var obj = {
+ *     "type" : "method",
+ *     "name" : "getSupported",
+ *     "transactionid" : 'ReallyUniqueId1',
+ *   }
+ *   socket.send(JSON.stringify(obj));
+ * };
+ * \endcode
+ */
+
+/*!
+ * \file protocol.idl
+ * \brief this document describes the websocket protocol
+ *
+ */
+
+enum MessageType {
+  "method",
+  "methodReply",
+  "valuechanged"
+}
+
+
+interface BaseMessage {
+
+  /*!
+   * \brief transactionid, id for this transaction.  For messages with responses, the transaction id is used to match the request with the response.
+   */
+  attribute DOMString transactionid;
+}
+
+enum PropertyType {
+  "UInt16",
+  "UInt32",
+  "Int16",
+  "Int32",
+  "String",
+  "Double",
+  "Boolean"
+}
+
+/*!
+ * \brief Property represents an AMB property
+ */
+interface Property {
+
+  /*!
+   * \brief property - AMB Property name
+   */
+  attribute DOMString? property;
+
+  /*!
+   * \brief value, value of the property
+   */
+   attribute DOMString? value;
+
+  /*!
+   * \brief zone, zone which this property is in
+   */
+   attribute unsigned short zone;
+
+  /*!
+   * \brief type - type of value
+   */
+  attribute PropertyType? type;
+
+  /*!
+   * \brief timestamp
+   */
+   attribute unsigned double? timestamp;
+
+  /*!
+   * \brief sequence
+   */
+   attribute unsigned long? sequence;
+}
+
+/*!
+ * \brief ValueChanged is a message which is generated when a subscribed Property changes.
+ * Subscribe will cause this message to be generated.  Unsubscribe stops this message.
+ * \see Subscribe
+ * \see Unsubscribe
+ * The following is an example message for this interface:
+ * \code
+ * {"type" : "valuechanged", "name" : "VehicleSpeed", "data" : {"value" :  "217", "zone" :  0, 'type' : 'UInt16', "timestamp" : "1354521964.60253", "sequence" : "0"}, "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66" }
+ * \endcode
+ */
+interface ValueChanged : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "valuechanged";
+
+  /*!
+   * \brief name of this message.
+   * This represents the property name which changed in this message
+   */
+  attribute DOMString name;
+
+  /*!
+   * \brief data represents the value for the property indicated by 'name'
+   */
+   attribute Property data;
+}
+
+/*!
+ * \brief GetPropertyRequest - request the value of a property
+ * The following is an example of this message:
+ * \code
+ * {"type" : "method", "name" : "get", "data" :  { "property" : "VehicleSpeed", "zone" : 0 }, "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface GetPropertyRequest : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "method";
+
+  /*!
+   * \brief name of this message.
+   * This represents the property name which changed in this message
+   */
+  const DOMString name = "get";
+
+  /*!
+   * \brief data represents property to get
+   * Property attributes type, timestamp, value, and sequence are ignored.
+   */
+   attribute Property data;
+}
+
+/*!
+ * \brief GetPropertyReply - response to GetPropertyRequest
+ * The following is an example of this message:
+ * \code
+ * {"type" : "methodReply", "name" : "get", "data" : {"property" : "VehicleSpeed", "value" : "17", "timestamp" : "1354521964.24962", "sequence" :  "0" }, "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface GetPropertyReply : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "methodReply";
+
+  /*!
+   * \brief name of this methodReply.
+   */
+  const DOMString name = "get";
+
+  /*!
+   * \brief data represents the requested property value
+   */
+   attribute Property data;
+}
+
+/*!
+ * \brief GetSupportedRequest - request supported properties
+ * The following is an example of this message:
+ * \code
+ * {"type" : "method", "name" : "getSupported", "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface GetSupportedRequest : BaseMessage {
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "method";
+
+  /*!
+   * \brief name of this method.
+   */
+  const DOMString name = "getSupported";
+}
+
+/*!
+ * \brief GetSupportedReply- reply for supported properties
+ * The following is an example of this message:
+ * \code
+ * {"type" : "methodReply", "name" : "getSupported", "data" : [{'property' :'EngineSpeed', 'zone' : 0, 'type' : 'UInt16'}, "{'property' :'VehicleSpeed', 'zone' : 0, 'type' : 'UInt16'}], "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface GetSupportedReply : BaseMessage {
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "methodReply";
+
+  /*!
+   * \brief name of this methodReply.
+   */
+  const DOMString name = "getSupported";
+
+  /*!
+   * \brief data - array of properties supported by the system
+   */
+  attribute Property[] data;
+}
+
+/*!
+ * \brief SupportedChanged - message occures when the system's supported properties changes
+ * NOTE: this message is not being generated in 0.13
+ * The following is an example of this message:
+ * \code
+ * {"type" : "methodReply", "name" : "supportedChanged", "data" : [{'property' :'EngineSpeed', 'zone' : 0, 'type' : 'UInt16'}, "{'property' :'VehicleSpeed', 'zone' : 0, 'type' : 'UInt16'}], "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface SupportedChanged : BaseMessage {
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "methodReply";
+
+  /*!
+   * \brief name of this methodReply.
+   */
+  const DOMString name = "getSupported";
+
+  /*!
+   * \brief data - array of properties supported by the system
+   */
+  attribute Property[] data;
+}
+
+/*!
+ * \brief Subscribe - subscribe request
+ * The following is an example of this message:
+ * \code
+ * {"type" : "method", "name" : "subscribe", "property" : "EngineSpeed", "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface Subscribe : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "method";
+
+  /*!
+   * \brief name of the method.
+   */
+  const DOMString name = "subscribe";
+
+  /*!
+   * \brief property to subscribe to
+   */
+   attribute DOMString property;
+}
+
+/*!
+ * \brief Unsubscribe - unsubscribe request
+ * The following is an example of this message:
+ * \code
+ * {"type" : "method", "name" : "unsubscribe", "property" : "EngineSpeed", "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface Unsubscribe : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "method";
+
+  /*!
+   * \brief name of the method.
+   */
+  const DOMString name = "subscribe";
+
+  /*!
+   * \brief property to subscribe to
+   */
+   attribute DOMString property;
+}
+
+/*!
+ * \brief GetRangedRequest - request a range of logged properties
+ * The following is an example of this message:
+ * \code
+ * {"type" : "method", "name" : "getRange", "data" : ["VehicleSpeed", "EngineSpeed"], "timeBegin" : "1368825008.35948",
+ *  "timeEnd" : "1368825018.35948", "sequenceBegin" : "-1", "sequenceEnd" : "-1", "transactionid" : "b07589ba-417c-4604-80c6-01c0dcbd524d"}
+ * \endcode
+ */
+interface GetRangedRequest : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "method";
+
+  /*!
+   * \brief name of the method.
+   */
+  const DOMString name = "getRange";
+
+  /*!
+   * \brief data - properties to request
+   */
+  attribute DOMString[] data;
+
+  /*!
+   * \brief zone, zone which this property is in
+   */
+   attribute unsigned short? zone;
+
+  /*!
+   * \brief timeBegin in seconds since Unix Epoc
+   */
+   attribute unsigned double? timeBegin;
+
+  /*!
+   * \brief timeEnd in seconds since Unix Epoc
+   */
+   attribute unsigned double? timeEnd;
+
+  /*!
+   * \brief sequenceBegin
+   */
+   attribute unsigned long? sequenceBegin;
+
+  /*!
+   * \brief sequenceEnd
+   */
+   attribute unsigned long? sequenceEnd;
+}
+
+/*!
+ * \brief GetRangedReply - reply for GetRangedRequest
+ * The following is an example of this message:
+ * \code
+ * {"type" : "methodReply", "name" : "getRanged", "data" : [{'property' :'EngineSpeed', 'zone' : 0, 'type' : 'UInt16'}, "{'property' :'VehicleSpeed', 'zone' : 0, 'type' : 'UInt16'}], "transactionid" : "d293f670-f0b3-11e1-aff1-0800200c9a66"}
+ * \endcode
+ */
+interface GetRangedReply : BaseMessage {
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "methodReply";
+
+  /*!
+   * \brief name of this methodReply.
+   */
+  const DOMString name = "getRanged";
+
+  /*!
+   * \brief data - array of properties supported by the system
+   */
+  attribute Property[] data;
+}
+
+/*!
+ * \brief SetPropertyRequest - request to set a property
+ * The following is an example of this message:
+ * \code
+ * { "type" : "method", "name" : "set", "data" : { "property" : "MachineGunTurretStatus", "value" : "true", "zone" : 0 }, "transactionid" : "4123123123" }
+ * \endcode
+ */
+interface SetPropertyRequest : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "method";
+
+  /*!
+   * \brief name of this methodReply.
+   */
+  const DOMString name = "set";
+
+  /*!
+   * \brief data represents the new property value
+   */
+   attribute Property data;
+}
+
+enum Error {
+  "NoError",
+  "Timeout",
+  "InvalidOperation",
+  "PermissionDenied",
+  "ZoneNotSupported"
+}
+
+/*!
+ * \brief SetPropertyReply - reply for SetPropertyRequest
+ * The following is an example of this message:
+ * \code
+ * { "type" : "methodReply", "name" : "set", "data" : { "property" : "MachineGunTurretStatus", "value" : "true", "zone" : 0}, "success" : true, "error" : "NoError", "transactionid" : "4123123123" }
+ * \endcode
+ */
+interface SetPropertyReply : BaseMessage {
+
+  /*!
+   * \brief message type
+   */
+  const MessageType type = "methodReply";
+
+  /*!
+   * \brief name of this methodReply.
+   */
+  const DOMString name = "set";
+
+  /*!
+   * \brief data represents the new property value
+   */
+   attribute Property data;
+
+  /*!
+   * \brief success - true if the set operation was successful
+   */
+   attribute boolean success;
+
+  /*!
+   * \brief error - error code
+   */
+   attribute Error error;
+}
