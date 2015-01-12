@@ -33,4 +33,6 @@ endif(enable_docs)
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/amb.in.fidl ${CMAKE_CURRENT_SOURCE_DIR}/amb.fidl @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/mainpage.in.idl ${CMAKE_CURRENT_SOURCE_DIR}/mainpage.idl @ONLY)
-
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/ambd-configuration.in.idl ${CMAKE_CURRENT_SOURCE_DIR}/ambd-configuration.idl @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/ambd.in.md ${CMAKE_CURRENT_SOURCE_DIR}/ambd.md @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/ambd.in.md ${CMAKE_SOURCE_DIR}/README.md @ONLY)

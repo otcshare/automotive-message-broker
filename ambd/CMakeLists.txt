@@ -38,4 +38,3 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.in.json ${CMAKE_CURRENT_BINAR
 
 install (TARGETS ambd RUNTIME DESTINATION bin)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/config DESTINATION /etc/ambd)
-
