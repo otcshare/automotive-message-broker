@@ -1,0 +1,50 @@
+GPS NMEA plugin
+Version: 0.13
+
+This plugin uses NMEA-compatible devices to provide location information to AMB.
+
+To enable the GPS NMEA plugin, run cmake and enable the gpsnmea_plugin option:
+
+cmake -Dgpsnmea_plugin=On ..
+
+To use the Database plugin, add the following to the "sources" array in /etc/ambd/config:
+
+{
+	"name" : "gpsnmea",
+	"path" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/gpsnmea.so",
+	"device" : "/dev/ttyUSB0",
+	"baudrate" : "4800",
+	"bluetoothAdapter" : "00:00:00:00:00:00"
+}
+
+Configuration Key Definitions:
+
+"name"
+name of plugin.  This key is not used by the plugin at this moment.
+
+"path"
+path to plugin on the filesystem.
+
+"device"
+gps device.  This must be a serial device.  It can also be a bluetooth address.
+
+Default: none
+
+"baudrate"
+Baudrate for serial devices : 2400,4800,9600,19200 or 38400.
+
+Default: 9600
+
+"bluetoothAdapter"
+bluetooth adapter to use.  This is only used if "device" is also a bluetooth device.
+If left blank, the system default adapter will be used.
+
+Default: none
+
+AMB Properties:
+
+GpsTime
+Timestamp in seconds from epoc UTC parsed from the NMEA output.
+
+Type: double
+Access: readonly

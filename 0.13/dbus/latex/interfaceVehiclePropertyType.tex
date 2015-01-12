@@ -1,0 +1,396 @@
+\hypertarget{interfaceVehiclePropertyType}{\section{Vehicle\+Property\+Type Interface Reference}
+\label{interfaceVehiclePropertyType}\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+}
+
+
+T\+O\+D\+O\+: Deprecated. Use \hyperlink{interfaceBatteryStatus}{Battery\+Status}. Remove in 0.\+14.  
+
+
+
+
+{\ttfamily import\char`\"{}amb.\+in.\+idl\char`\"{};}
+
+
+
+Collaboration diagram for Vehicle\+Property\+Type\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{interfaceVehiclePropertyType__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{interfaceVehiclePropertyType_a1f0e12a84b69b870c483bf44982988b9}{const U\+Int16 {\bfseries A\+I\+R\+F\+L\+O\+W\+D\+I\+R\+E\+C\+T\+I\+O\+N\+\_\+\+F\+R\+O\+N\+T\+P\+A\+N\+E\+L} = 0}\label{interfaceVehiclePropertyType_a1f0e12a84b69b870c483bf44982988b9}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_ac72eaf046f4d3fcb2b40843d3723ac77}{const U\+Int16 {\bfseries A\+I\+R\+F\+L\+O\+W\+D\+I\+R\+E\+C\+T\+I\+O\+N\+\_\+\+F\+L\+O\+O\+R\+D\+U\+C\+T} = 1}\label{interfaceVehiclePropertyType_ac72eaf046f4d3fcb2b40843d3723ac77}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_aad206ea60884f08c0397e16c1ea5e07b}{const U\+Int16 {\bfseries A\+I\+R\+F\+L\+O\+W\+D\+I\+R\+E\+C\+T\+I\+O\+N\+\_\+\+F\+R\+O\+N\+T} = 0x02}\label{interfaceVehiclePropertyType_aad206ea60884f08c0397e16c1ea5e07b}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_aa200bb713a7ef0f40ab50d8dbef307b6}{const U\+Int16 {\bfseries A\+I\+R\+F\+L\+O\+W\+D\+I\+R\+E\+C\+T\+I\+O\+N\+\_\+\+D\+E\+F\+R\+O\+S\+T\+E\+R} = 0x04}\label{interfaceVehiclePropertyType_aa200bb713a7ef0f40ab50d8dbef307b6}
+
+\item 
+attribute U\+Int16 \hyperlink{interfaceVehiclePropertyType_a327f430820e8e67a77ca4dc1d15f78ca}{Airflow\+Direction}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return airflow direction. See. \end{DoxyCompactList}\item 
+attribute U\+Int16 \hyperlink{interfaceVehiclePropertyType_a03dc26f81191b1021260741f6c1bbd2b}{Fan\+Speed}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return speed of the fan (0-\/7) \end{DoxyCompactList}\item 
+attribute U\+Int16 \hyperlink{interfaceVehiclePropertyType_a8f6c68afc7aeb0334a22737b3e16abfa}{Target\+Temperature}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return target desired temperature in celcius. \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehiclePropertyType_ad28c5e04a201798b91e67206421f01d3}{Air\+Conditioning}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return air conditioning on (true) / off (false). \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehiclePropertyType_a0e02b02f90dae7cc3ab8ac559f274bd2}{Air\+Recirculation}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return air recirculation on (true) / off (false). \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehiclePropertyType_a9a5cea3b176457e74c05822ec0dd1644}{Heater}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return heater on (true) / off (false). \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehiclePropertyType_a8b1d53be28abbfc2bb58841cd4171237}{Steering\+Wheel\+Heater}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return air recirculation on (true) / off (false). \end{DoxyCompactList}\item 
+attribute U\+Int16 \hyperlink{interfaceVehiclePropertyType_a5dfb32720d0946f544bda753ea049276}{Seat\+Heater}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return seat heater status\+: 0-\/100\%. \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehiclePropertyType_aa6e78716c3c9d68fbeaae573d142a8db}{Seat\+Cooler}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return seat heater status\+: on (true) / off (false). \end{DoxyCompactList}\item 
+attribute \\*
+Convertible\+Roof\+Status \hyperlink{interfaceVehiclePropertyType_adc169ce047115d43399d1ffa9dd1fb83}{Status} \hyperlink{interfaceVehiclePropertyType_a80c4d8f18eee83fc77fded4ac07c687b}{readonly}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return current status of Convertible Roof. \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehiclePropertyType_ad09472a4b0e02adc79d0c4fe29131120}{Setting}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return current setting of Convertible Roof. This is used to open (true) and close (false). \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a977b3244a1649427b1893b440f705b68}{const U\+Int16 {\bfseries F\+U\+E\+L\+T\+Y\+P\+E\+\_\+\+G\+A\+S\+O\+L\+I\+N\+E} = 0}\label{interfaceVehiclePropertyType_a977b3244a1649427b1893b440f705b68}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_ae9f2becc65a05a117bb5305e2e47b5a3}{const U\+Int16 {\bfseries F\+U\+E\+L\+T\+Y\+P\+E\+\_\+\+H\+I\+G\+H\+\_\+\+O\+C\+T\+A\+N\+E} = 1}\label{interfaceVehiclePropertyType_ae9f2becc65a05a117bb5305e2e47b5a3}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a4abde753d3a62ca9258d2cd8f5c5e827}{const U\+Int16 {\bfseries F\+U\+E\+L\+T\+Y\+P\+E\+\_\+\+D\+I\+E\+S\+E\+L} = 2}\label{interfaceVehiclePropertyType_a4abde753d3a62ca9258d2cd8f5c5e827}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a520e8d887b445e9a51bd8a18301e7239}{const U\+Int16 {\bfseries F\+U\+E\+L\+T\+Y\+P\+E\+\_\+\+E\+L\+E\+C\+T\+R\+I\+C} = 3}\label{interfaceVehiclePropertyType_a520e8d887b445e9a51bd8a18301e7239}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a3a12f6dc58eb41dce38de47608eddd22}{const U\+Int16 {\bfseries F\+U\+E\+L\+T\+Y\+P\+E\+\_\+\+H\+Y\+D\+R\+O\+G\+E\+N} = 4}\label{interfaceVehiclePropertyType_a3a12f6dc58eb41dce38de47608eddd22}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a98135c4cda43a9bfe41cbb2b9aebf9c5}{const U\+Int16 {\bfseries R\+E\+F\+U\+E\+L\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+L\+E\+F\+T} = 0}\label{interfaceVehiclePropertyType_a98135c4cda43a9bfe41cbb2b9aebf9c5}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a038c4143c0b550a778d5d8b90486f50e}{const U\+Int16 {\bfseries R\+E\+F\+U\+E\+L\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+R\+I\+G\+H\+T} = 1}\label{interfaceVehiclePropertyType_a038c4143c0b550a778d5d8b90486f50e}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a7435c4f702f70811f8cab439ad387f62}{const U\+Int16 {\bfseries R\+E\+F\+U\+E\+L\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+F\+R\+O\+N\+T} = 2}\label{interfaceVehiclePropertyType_a7435c4f702f70811f8cab439ad387f62}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a13fd7e96a966ee31307473f207ee5e78}{const U\+Int16 {\bfseries R\+E\+F\+U\+E\+L\+P\+O\+S\+I\+T\+I\+O\+N\+\_\+\+R\+E\+A\+R} = 3}\label{interfaceVehiclePropertyType_a13fd7e96a966ee31307473f207ee5e78}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a2c0b89d5f568bd99e213707a320351b4}{const U\+Int16 {\bfseries V\+E\+H\+I\+C\+L\+E\+T\+Y\+P\+E\+\_\+\+S\+E\+D\+A\+N} = 0}\label{interfaceVehiclePropertyType_a2c0b89d5f568bd99e213707a320351b4}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a2ef8af72bc3c45e218542ffe983a6332}{const U\+Int16 {\bfseries V\+E\+H\+I\+C\+L\+E\+T\+Y\+P\+E\+\_\+\+C\+O\+U\+P\+E} = 1}\label{interfaceVehiclePropertyType_a2ef8af72bc3c45e218542ffe983a6332}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a3440feaca97ad43c1d91aead3a42d9d2}{const U\+Int16 {\bfseries V\+E\+H\+I\+C\+L\+E\+T\+Y\+P\+E\+\_\+\+C\+A\+B\+R\+I\+O\+L\+E} = 2}\label{interfaceVehiclePropertyType_a3440feaca97ad43c1d91aead3a42d9d2}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_ad5201a0e84464a03c1735666270b6d76}{const U\+Int16 {\bfseries V\+E\+H\+I\+C\+L\+E\+T\+Y\+P\+E\+\_\+\+R\+O\+A\+D\+S\+T\+E\+R} = 3}\label{interfaceVehiclePropertyType_ad5201a0e84464a03c1735666270b6d76}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_a3dffbbbd9e95ab9b4d6a76d950cc4662}{const U\+Int16 {\bfseries V\+E\+H\+I\+C\+L\+E\+T\+Y\+P\+E\+\_\+\+S\+U\+V} = 4}\label{interfaceVehiclePropertyType_a3dffbbbd9e95ab9b4d6a76d950cc4662}
+
+\item 
+\hypertarget{interfaceVehiclePropertyType_af3ebbbb52cfbc0b0a4c8ddac35209969}{const U\+Int16 {\bfseries V\+E\+H\+I\+C\+L\+E\+T\+Y\+P\+E\+\_\+\+T\+R\+U\+C\+K} = 5}\label{interfaceVehiclePropertyType_af3ebbbb52cfbc0b0a4c8ddac35209969}
+
+\item 
+attribute Boolean \hyperlink{interfaceParkingBrake}{Parking\+Brake} \\*
+\hyperlink{interfaceVehiclePropertyType_a80c4d8f18eee83fc77fded4ac07c687b}{readonly} attribute \\*
+Parking\+Brake\+Status \hyperlink{interfaceVehiclePropertyType_adc169ce047115d43399d1ffa9dd1fb83}{Status}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return the current status of parking brake. \end{DoxyCompactList}\item 
+attribute Boolean \\*
+\hyperlink{interfaceAntilockBrakingSystem}{Antilock\+Braking\+System} readonly \\*
+attribute Boolean Enabled \hyperlink{interfaceVehiclePropertyType_a760d70c9172989d6558d4d6a403df792}{readonly}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether Antilock Braking System is Idle (false) or Engaged (true) T\+O\+D\+O\+: Deprecated. Use Engaged. Remove in 0.\+14. \end{DoxyCompactList}\item 
+attribute Boolean Engaged \hyperlink{interfaceVehiclePropertyType_a80c4d8f18eee83fc77fded4ac07c687b}{readonly}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether or not the A\+B\+S is engaged\+: engaged (true) or idle (false) \end{DoxyCompactList}\item 
+attribute Boolean \\*
+\hyperlink{interfaceTractionControlSystem}{Traction\+Control\+System} readonly \\*
+attribute Boolean Enabled \hyperlink{interfaceVehiclePropertyType_a362c96d9ff226ff1307a26a18e954d48}{readonly}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether Traction Control System is Off (false) or On (true) T\+O\+D\+O\+: Deprecated. Use Engaged. Remove in 0.\+14. \end{DoxyCompactList}\item 
+attribute U\+Int16 \hyperlink{interfaceAirbagStatus}{Airbag\+Status} \\*
+readonly attribute Boolean \\*
+Activated \hyperlink{interfaceVehiclePropertyType_a85640ae0f23f03d2f35b9d8a3040f1d2}{readonly}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return Airbag status (byte) (see A\+I\+R\+B\+A\+G\+S\+T\+A\+T\+U\+S\+\_\+$\ast$) T\+O\+D\+O\+: deprecated. Remove in 0.\+14. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a659d2f71ad3a6b3f3bb23c4f33b72303}{attribute Boolean Deployed \hyperlink{interfaceVehiclePropertyType_a659d2f71ad3a6b3f3bb23c4f33b72303}{readonly}}\label{interfaceVehiclePropertyType_a659d2f71ad3a6b3f3bb23c4f33b72303}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether the airbag is deployed\+: deployed (true) or not (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_ac5655479847c7576c1ddda2089c43b94}{attribute array Button of \\*
+\hyperlink{interfaceVehicleButton}{Vehicle\+Button} \hyperlink{interfaceVehiclePropertyType_ac5655479847c7576c1ddda2089c43b94}{readonly}}\label{interfaceVehiclePropertyType_ac5655479847c7576c1ddda2089c43b94}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return the button events that occured. This supports multiple simultanious button events. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a9d93648a9559b5b7331ff185135c22af}{attribute Int8 \hyperlink{interfaceTemperature}{Temperature} \hyperlink{interfaceVehiclePropertyType_a9d93648a9559b5b7331ff185135c22af}{readonly}}\label{interfaceVehiclePropertyType_a9d93648a9559b5b7331ff185135c22af}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return current temperature of the transmission oil(\+Unit\+: celsius). \end{DoxyCompactList}\item 
+attribute U\+Int8 Wear \hyperlink{interfaceVehiclePropertyType_ae88854adacffc7b96a8afca00d2e6407}{readonly}
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return transmission oil wear (Unit\+: percentage, 0\+: no wear, 100\+: completely worn). \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a0e6fc7ea97a7950f618955fe7c1f8d28}{attribute U\+Int8 Pad\+Wear \hyperlink{interfaceVehiclePropertyType_a0e6fc7ea97a7950f618955fe7c1f8d28}{readonly}}\label{interfaceVehiclePropertyType_a0e6fc7ea97a7950f618955fe7c1f8d28}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return brake pad wear (Unit\+: percentage, 0\%\+: no wear, 100\%\+: completely worn). \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_adfe93bb0d1a3a9ee9e0508dae8102b65}{attribute U\+Int8 Fluid\+Level \hyperlink{interfaceVehiclePropertyType_adfe93bb0d1a3a9ee9e0508dae8102b65}{readonly}}\label{interfaceVehiclePropertyType_adfe93bb0d1a3a9ee9e0508dae8102b65}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return brake fluid level (Unit\+: percentage, 0\%\+: empty, 100\%\+: full). \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a1417a3eb00b00a34ed81c19037c71edc}{attribute Boolean Fluid\+Level\+Low \hyperlink{interfaceVehiclePropertyType_a1417a3eb00b00a34ed81c19037c71edc}{readonly}}\label{interfaceVehiclePropertyType_a1417a3eb00b00a34ed81c19037c71edc}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return true if brake fluid level\+: low (true), not low (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a04a633cdc80cecf15929ca37ac245205}{attribute Boolean Brakes\+Worn \hyperlink{interfaceVehiclePropertyType_a04a633cdc80cecf15929ca37ac245205}{readonly}}\label{interfaceVehiclePropertyType_a04a633cdc80cecf15929ca37ac245205}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return true if brakes are worn\+: worn (true), not worn (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a695d0842a00451d3aaf9fafeb4f3154b}{attribute U\+Int8 Level \hyperlink{interfaceVehiclePropertyType_a695d0842a00451d3aaf9fafeb4f3154b}{readonly}}\label{interfaceVehiclePropertyType_a695d0842a00451d3aaf9fafeb4f3154b}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return washer fluid level (Unit\+: percentage, 0\%\+: empty, 100\%\+: full). \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a67ff17fcdd746a3e1d2217a0fcd07119}{attribute Boolean Level\+Low \hyperlink{interfaceVehiclePropertyType_a67ff17fcdd746a3e1d2217a0fcd07119}{readonly}}\label{interfaceVehiclePropertyType_a67ff17fcdd746a3e1d2217a0fcd07119}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return true if washer fluid level is low\+: low (true), not low\+: (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a528390d47d556b5ed19e553e869b0337}{attribute Boolean On \hyperlink{interfaceVehiclePropertyType_a528390d47d556b5ed19e553e869b0337}{readonly}}\label{interfaceVehiclePropertyType_a528390d47d556b5ed19e553e869b0337}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return true if washer fluid level is low\+: low (true), not low\+: (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_ad61ab7456d7cc8bca79ab6b6151ffb37}{attribute U\+Int32 \\*
+Accumulated\+Engine\+Runtime \hyperlink{interfaceVehiclePropertyType_ad61ab7456d7cc8bca79ab6b6151ffb37}{readonly}}\label{interfaceVehiclePropertyType_ad61ab7456d7cc8bca79ab6b6151ffb37}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return engine runtime (Unit\+: seconds) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a413216171a15c0eea2435a0f3cf9fa5e}{attribute U\+Int32 \\*
+Distance\+Since\+Code\+Cleared \hyperlink{interfaceVehiclePropertyType_a413216171a15c0eea2435a0f3cf9fa5e}{readonly}}\label{interfaceVehiclePropertyType_a413216171a15c0eea2435a0f3cf9fa5e}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return distance travelled since the codes were last cleared (Unit\+: meters) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a364e68bedb72fc982354e82cefc377e9}{attribute U\+Int32 Distance\+With\+M\+I\+L\+On \hyperlink{interfaceVehiclePropertyType_a364e68bedb72fc982354e82cefc377e9}{readonly}}\label{interfaceVehiclePropertyType_a364e68bedb72fc982354e82cefc377e9}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return distance travelled with the malfunction indicator light on (Unit\+: meters) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a1678d17008552e249fe7ea7e1178bc7f}{attribute U\+Int32 Time\+Run\+M\+I\+L\+On \hyperlink{interfaceVehiclePropertyType_a1678d17008552e249fe7ea7e1178bc7f}{readonly}}\label{interfaceVehiclePropertyType_a1678d17008552e249fe7ea7e1178bc7f}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return time elapsed with the malfunction indicator light on (Unit\+: seconds) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_ac56185888e2711efd33aeff8fe9d0063}{attribute U\+Int32 \\*
+Time\+Trouble\+Code\+Clear \hyperlink{interfaceVehiclePropertyType_ac56185888e2711efd33aeff8fe9d0063}{readonly}}\label{interfaceVehiclePropertyType_ac56185888e2711efd33aeff8fe9d0063}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return time elapsed since the trouble codes were last cleared (Unit\+: seconds) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a22e6512b56a5eb121501fb22c6fabbf9}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_a22e6512b56a5eb121501fb22c6fabbf9}{Mirror\+Pan}}\label{interfaceVehiclePropertyType_a22e6512b56a5eb121501fb22c6fabbf9}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return mirror pan position in percentage distance travelled, from left to right position (Unit\+: percentage, \%0\+: center position, -\/100\%\+: fully left, 100\%\+: fully right) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_af50eac0ab7c16089cc591665abe45b39}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_af50eac0ab7c16089cc591665abe45b39}{Mirror\+Tilt}}\label{interfaceVehiclePropertyType_af50eac0ab7c16089cc591665abe45b39}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return mirror tilt position in percentage distance travelled, from downward-\/facing to upward-\/facing position (Unit\+: percentage, 0\%\+:center position, -\/100\%\+:fully downward, 100\%\+:full upward) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a6dabef41941be10441f3ef763cf43cbf}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_a6dabef41941be10441f3ef763cf43cbf}{Recline\+Seat\+Back}}\label{interfaceVehiclePropertyType_a6dabef41941be10441f3ef763cf43cbf}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return seat back recline position as percent to completely reclined (Unit\+: percentage, 0\%\+: fully forward, 100\%\+: fully reclined) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a68b9b0518a804488a3190dbb58f49c3b}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_a68b9b0518a804488a3190dbb58f49c3b}{Seat\+Slide}}\label{interfaceVehiclePropertyType_a68b9b0518a804488a3190dbb58f49c3b}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return seat slide position as percentage of distance travelled away from forwardmost position (Unit\+: percentage, 0\%\+: farthest forward, 100\%\+: farthest back) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a5fe1b23b030d9c43d8ae2301834f30d5}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_a5fe1b23b030d9c43d8ae2301834f30d5}{Seat\+Cushion\+Height}}\label{interfaceVehiclePropertyType_a5fe1b23b030d9c43d8ae2301834f30d5}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return seat cushion height position as a percentage of upward distance travelled (Unit\+: percentage, 0\%\+:lowest. 100\%\+:highest) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_ac076265fd8c5ef7ce6463f9a56988478}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_ac076265fd8c5ef7ce6463f9a56988478}{Seat\+Headrest}}\label{interfaceVehiclePropertyType_ac076265fd8c5ef7ce6463f9a56988478}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return headrest position as a percentage of upward distance travelled (Unit\+: percentage, 0\%\+: lowest, 100\%\+: highest) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a96083e67905572a50e29d3d5e9385230}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_a96083e67905572a50e29d3d5e9385230}{Seat\+Back\+Cushion}}\label{interfaceVehiclePropertyType_a96083e67905572a50e29d3d5e9385230}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return back cushion position as a percentage of lumbar curvature (Unit\+: percentage, 0\%\+: flat, 100\%\+: maximum curvature) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a4156acb1aaf01a178d12ffbd0a513f2f}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_a4156acb1aaf01a178d12ffbd0a513f2f}{Seat\+Side\+Cushion}}\label{interfaceVehiclePropertyType_a4156acb1aaf01a178d12ffbd0a513f2f}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return sides of back cushion position as a percentage of curvature (Unit\+: percentage, 0\%\+: flat, 100\%\+: maximum curvature) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a45038c577f25a2eb7fc7f95a32ca753f}{attribute Drive\+Mode\+Type \hyperlink{interfaceVehiclePropertyType_a45038c577f25a2eb7fc7f95a32ca753f}{Drive\+Mode}}\label{interfaceVehiclePropertyType_a45038c577f25a2eb7fc7f95a32ca753f}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return vehicle drive mode. See \href{http://w3c.github.io/automotive-bg/data_spec.html#idl-def-DriveModeEnum}{\tt http\+://w3c.\+github.\+io/automotive-\/bg/data\+\_\+spec.\+html\#idl-\/def-\/\+Drive\+Mode\+Enum}. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a544743c3673a2878489b5e6585eac22f}{attribute U\+Int8 \hyperlink{interfaceVehiclePropertyType_a544743c3673a2878489b5e6585eac22f}{Dashboard\+Illumination}}\label{interfaceVehiclePropertyType_a544743c3673a2878489b5e6585eac22f}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return illumination of dashboard as a percentage (Unit\+: percentage, 0\%\+: none, 100\%\+: maximum illumination) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_aaa41506b53934ad248298ae8bd3de3d9}{attribute Boolean \hyperlink{interfaceVehiclePropertyType_aaa41506b53934ad248298ae8bd3de3d9}{Active\+Noise\+Control\+Mode}}\label{interfaceVehiclePropertyType_aaa41506b53934ad248298ae8bd3de3d9}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return active noise control status\+: not-\/activated (false), activated (true) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a5b7585bb847ccfc1ea5b10dafdb86860}{attribute Boolean \hyperlink{interfaceVehiclePropertyType_a5b7585bb847ccfc1ea5b10dafdb86860}{Engine\+Sound\+Enhancement\+Mode}}\label{interfaceVehiclePropertyType_a5b7585bb847ccfc1ea5b10dafdb86860}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return active noise control status\+: not-\/activated (false), activated (true) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a7a391be9018ad8415ff5462f4e4dae7b}{attribute array \\*
+\hyperlink{interfaceVehiclePropertyType_a5b7585bb847ccfc1ea5b10dafdb86860}{Engine\+Sound\+Enhancement\+Mode} of \\*
+String \hyperlink{interfaceVehiclePropertyType_a7a391be9018ad8415ff5462f4e4dae7b}{readonly}}\label{interfaceVehiclePropertyType_a7a391be9018ad8415ff5462f4e4dae7b}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return array of available sounds. See Engine\+Sound\+Enhancement\+Mode. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_aa93e3186f8f9f1b43561f94cc33df444}{attribute Boolean Enabled \hyperlink{interfaceVehiclePropertyType_aa93e3186f8f9f1b43561f94cc33df444}{readonly}}\label{interfaceVehiclePropertyType_aa93e3186f8f9f1b43561f94cc33df444}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether or not the E\+S\+C Setting is enabled\+: enabled (true) or disabled (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a781f1d7f5ee07c0eb4e99da26365f215}{attribute U\+Int16 Speed \hyperlink{interfaceVehiclePropertyType_a781f1d7f5ee07c0eb4e99da26365f215}{readonly}}\label{interfaceVehiclePropertyType_a781f1d7f5ee07c0eb4e99da26365f215}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether or not the E\+S\+C Setting is enabled\+: enabled (true) or disabled (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a7361c79cf1c48bcb81f03e946e598328}{attribute Boolean \hyperlink{interfaceVehiclePropertyType_a7361c79cf1c48bcb81f03e946e598328}{Lock}}\label{interfaceVehiclePropertyType_a7361c79cf1c48bcb81f03e946e598328}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether or not the Child Safety Lock is locked\+: locked (true) or unlocked (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a15f0d0b367ab9aa60f69eb03fb6352ab}{attribute \hyperlink{interfaceOccupantStatus}{Occupant\+Status} \hyperlink{interfaceVehiclePropertyType_a15f0d0b367ab9aa60f69eb03fb6352ab}{Occupant}}\label{interfaceVehiclePropertyType_a15f0d0b367ab9aa60f69eb03fb6352ab}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return the status of seat occupant. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a5572d9df193da429b92a8062ab616db6}{attribute Boolean \hyperlink{interfaceVehiclePropertyType_a5572d9df193da429b92a8062ab616db6}{Seat\+Belt}}\label{interfaceVehiclePropertyType_a5572d9df193da429b92a8062ab616db6}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return whether or not the seat belt is fastened\+: fastened (true) or unfastened (false) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_ad84e4a4284f47ee59d19b162b3eb1d2f}{attribute String \hyperlink{interfaceVehiclePropertyType_ad84e4a4284f47ee59d19b162b3eb1d2f}{Occupant\+Name}}\label{interfaceVehiclePropertyType_ad84e4a4284f47ee59d19b162b3eb1d2f}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return occupant identifier. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a4ec657559470562608b83276f480e045}{attribute Identification\+Type\+Enum \hyperlink{interfaceVehiclePropertyType_a4ec657559470562608b83276f480e045}{Identification\+Type}}\label{interfaceVehiclePropertyType_a4ec657559470562608b83276f480e045}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return identification type. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_ab38c3d3e43448122ff441f04e184344b}{attribute U\+Int16 \hyperlink{interfaceVehiclePropertyType_ab38c3d3e43448122ff441f04e184344b}{Pressure}}\label{interfaceVehiclePropertyType_ab38c3d3e43448122ff441f04e184344b}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return the current atmospheric pressure outside of the vehicle (Unit\+: hectopascal) \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a6366153f0fe90c81378eae321934ce9b}{attribute Lane\+Departure\+Status \\*
+\hyperlink{interfaceVehiclePropertyType_adc169ce047115d43399d1ffa9dd1fb83}{Status} \hyperlink{interfaceVehiclePropertyType_a6366153f0fe90c81378eae321934ce9b}{readonly}}\label{interfaceVehiclePropertyType_a6366153f0fe90c81378eae321934ce9b}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return current status of Lane departure warning function. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_a263f110949917d7a27f64d7a263a3d9c}{attribute Alarm\+Status \hyperlink{interfaceVehiclePropertyType_a263f110949917d7a27f64d7a263a3d9c}{Status}}\label{interfaceVehiclePropertyType_a263f110949917d7a27f64d7a263a3d9c}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return the current status of vehicle \hyperlink{interfaceAlarm}{Alarm} System. \end{DoxyCompactList}\item 
+\hypertarget{interfaceVehiclePropertyType_af8e356b341ea7e49ba0351547664032c}{attribute Parking\+Brake\+Status \hyperlink{interfaceVehiclePropertyType_adc169ce047115d43399d1ffa9dd1fb83}{Status} \hyperlink{interfaceVehiclePropertyType_af8e356b341ea7e49ba0351547664032c}{readonly}}\label{interfaceVehiclePropertyType_af8e356b341ea7e49ba0351547664032c}
+
+\begin{DoxyCompactList}\small\item\em M\+U\+S\+T return the current status of vehicle \hyperlink{interfaceAlarm}{Alarm} System. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+T\+O\+D\+O\+: Deprecated. Use \hyperlink{interfaceBatteryStatus}{Battery\+Status}. Remove in 0.\+14. 
+
+Deprecated. Use \hyperlink{interfaceLightStatus}{Light\+Status}. remove in 0.\+14.
+
+Deprecated. Use \hyperlink{interfaceClimateControl}{Climate\+Control} interface. Remove in 0.\+14 
+
+\subsection{Member Data Documentation}
+\hypertarget{interfaceVehiclePropertyType_ad28c5e04a201798b91e67206421f01d3}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Air\+Conditioning@{Air\+Conditioning}}
+\index{Air\+Conditioning@{Air\+Conditioning}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Air\+Conditioning}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\+Property\+Type\+::\+Air\+Conditioning}}\label{interfaceVehiclePropertyType_ad28c5e04a201798b91e67206421f01d3}
+
+
+M\+U\+S\+T return air conditioning on (true) / off (false). 
+
+Air\+Conditioning \hypertarget{interfaceVehiclePropertyType_a327f430820e8e67a77ca4dc1d15f78ca}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Airflow\+Direction@{Airflow\+Direction}}
+\index{Airflow\+Direction@{Airflow\+Direction}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Airflow\+Direction}]{\setlength{\rightskip}{0pt plus 5cm}attribute U\+Int16 Vehicle\+Property\+Type\+::\+Airflow\+Direction}}\label{interfaceVehiclePropertyType_a327f430820e8e67a77ca4dc1d15f78ca}
+
+
+M\+U\+S\+T return airflow direction. See. 
+
+Airflow\+Direction \hypertarget{interfaceVehiclePropertyType_a0e02b02f90dae7cc3ab8ac559f274bd2}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Air\+Recirculation@{Air\+Recirculation}}
+\index{Air\+Recirculation@{Air\+Recirculation}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Air\+Recirculation}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\+Property\+Type\+::\+Air\+Recirculation}}\label{interfaceVehiclePropertyType_a0e02b02f90dae7cc3ab8ac559f274bd2}
+
+
+M\+U\+S\+T return air recirculation on (true) / off (false). 
+
+Air\+Recirculation \hypertarget{interfaceVehiclePropertyType_a03dc26f81191b1021260741f6c1bbd2b}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Fan\+Speed@{Fan\+Speed}}
+\index{Fan\+Speed@{Fan\+Speed}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Fan\+Speed}]{\setlength{\rightskip}{0pt plus 5cm}attribute U\+Int16 Vehicle\+Property\+Type\+::\+Fan\+Speed}}\label{interfaceVehiclePropertyType_a03dc26f81191b1021260741f6c1bbd2b}
+
+
+M\+U\+S\+T return speed of the fan (0-\/7) 
+
+Fan\+Speed \hypertarget{interfaceVehiclePropertyType_a9a5cea3b176457e74c05822ec0dd1644}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Heater@{Heater}}
+\index{Heater@{Heater}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Heater}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\+Property\+Type\+::\+Heater}}\label{interfaceVehiclePropertyType_a9a5cea3b176457e74c05822ec0dd1644}
+
+
+M\+U\+S\+T return heater on (true) / off (false). 
+
+Heater \hypertarget{interfaceVehiclePropertyType_a80c4d8f18eee83fc77fded4ac07c687b}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!readonly@{readonly}}
+\index{readonly@{readonly}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{readonly}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Engaged Vehicle\+Property\+Type\+::readonly}}\label{interfaceVehiclePropertyType_a80c4d8f18eee83fc77fded4ac07c687b}
+
+
+M\+U\+S\+T return current status of Convertible Roof. 
+
+M\+U\+S\+T return whether or not the E\+S\+C is engaged\+: engaged (true) or idle (false)
+
+M\+U\+S\+T return transmission clutch wear (Unit\+: percentage, 0\+: no wear, 100\+: completely worn).
+
+M\+U\+S\+T return whether or not the T\+C\+S is engaged\+: engaged (true) or idle (false)
+
+Status \hypertarget{interfaceVehiclePropertyType_a760d70c9172989d6558d4d6a403df792}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!readonly@{readonly}}
+\index{readonly@{readonly}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{readonly}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean {\bf Antilock\+Braking\+System} readonly attribute Boolean Enabled Vehicle\+Property\+Type\+::readonly}}\label{interfaceVehiclePropertyType_a760d70c9172989d6558d4d6a403df792}
+
+
+M\+U\+S\+T return whether Antilock Braking System is Idle (false) or Engaged (true) T\+O\+D\+O\+: Deprecated. Use Engaged. Remove in 0.\+14. 
+
+\hyperlink{interfaceAntilockBrakingSystem}{Antilock\+Braking\+System}
+
+M\+U\+S\+T return whether or not the A\+B\+S Setting is enabled\+: enabled (true) or disabled (false) \hypertarget{interfaceVehiclePropertyType_a80c4d8f18eee83fc77fded4ac07c687b}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!readonly@{readonly}}
+\index{readonly@{readonly}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{readonly}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Engaged Vehicle\+Property\+Type\+::readonly}}\label{interfaceVehiclePropertyType_a80c4d8f18eee83fc77fded4ac07c687b}
+
+
+M\+U\+S\+T return whether or not the A\+B\+S is engaged\+: engaged (true) or idle (false) 
+
+M\+U\+S\+T return whether or not the E\+S\+C is engaged\+: engaged (true) or idle (false)
+
+M\+U\+S\+T return whether or not the T\+C\+S is engaged\+: engaged (true) or idle (false) \hypertarget{interfaceVehiclePropertyType_a362c96d9ff226ff1307a26a18e954d48}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!readonly@{readonly}}
+\index{readonly@{readonly}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{readonly}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean {\bf Traction\+Control\+System} readonly attribute Boolean Enabled Vehicle\+Property\+Type\+::readonly}}\label{interfaceVehiclePropertyType_a362c96d9ff226ff1307a26a18e954d48}
+
+
+M\+U\+S\+T return whether Traction Control System is Off (false) or On (true) T\+O\+D\+O\+: Deprecated. Use Engaged. Remove in 0.\+14. 
+
+\hyperlink{interfaceTractionControlSystem}{Traction\+Control\+System}
+
+M\+U\+S\+T return whether or not the T\+C\+S Setting is enabled\+: enabled (true) or disabled (false) \hypertarget{interfaceVehiclePropertyType_a85640ae0f23f03d2f35b9d8a3040f1d2}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!readonly@{readonly}}
+\index{readonly@{readonly}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{readonly}]{\setlength{\rightskip}{0pt plus 5cm}attribute U\+Int16 {\bf Airbag\+Status} readonly attribute Boolean Activated Vehicle\+Property\+Type\+::readonly}}\label{interfaceVehiclePropertyType_a85640ae0f23f03d2f35b9d8a3040f1d2}
+
+
+M\+U\+S\+T return Airbag status (byte) (see A\+I\+R\+B\+A\+G\+S\+T\+A\+T\+U\+S\+\_\+$\ast$) T\+O\+D\+O\+: deprecated. Remove in 0.\+14. 
+
+\hyperlink{interfaceAirbagStatus}{Airbag\+Status}
+
+M\+U\+S\+T return whether or not the airbag is activaged\+: activated (true) or deactivated (false) \hypertarget{interfaceVehiclePropertyType_ae88854adacffc7b96a8afca00d2e6407}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!readonly@{readonly}}
+\index{readonly@{readonly}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{readonly}]{\setlength{\rightskip}{0pt plus 5cm}attribute U\+Int8 Wear Vehicle\+Property\+Type\+::readonly}}\label{interfaceVehiclePropertyType_ae88854adacffc7b96a8afca00d2e6407}
+
+
+M\+U\+S\+T return transmission oil wear (Unit\+: percentage, 0\+: no wear, 100\+: completely worn). 
+
+M\+U\+S\+T return transmission clutch wear (Unit\+: percentage, 0\+: no wear, 100\+: completely worn). \hypertarget{interfaceVehiclePropertyType_aa6e78716c3c9d68fbeaae573d142a8db}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Seat\+Cooler@{Seat\+Cooler}}
+\index{Seat\+Cooler@{Seat\+Cooler}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Seat\+Cooler}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\+Property\+Type\+::\+Seat\+Cooler}}\label{interfaceVehiclePropertyType_aa6e78716c3c9d68fbeaae573d142a8db}
+
+
+M\+U\+S\+T return seat heater status\+: on (true) / off (false). 
+
+Seat\+Cooler \hypertarget{interfaceVehiclePropertyType_a5dfb32720d0946f544bda753ea049276}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Seat\+Heater@{Seat\+Heater}}
+\index{Seat\+Heater@{Seat\+Heater}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Seat\+Heater}]{\setlength{\rightskip}{0pt plus 5cm}attribute U\+Int16 Vehicle\+Property\+Type\+::\+Seat\+Heater}}\label{interfaceVehiclePropertyType_a5dfb32720d0946f544bda753ea049276}
+
+
+M\+U\+S\+T return seat heater status\+: 0-\/100\%. 
+
+Seat\+Heater \hypertarget{interfaceVehiclePropertyType_ad09472a4b0e02adc79d0c4fe29131120}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Setting@{Setting}}
+\index{Setting@{Setting}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Setting}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\+Property\+Type\+::\+Setting}}\label{interfaceVehiclePropertyType_ad09472a4b0e02adc79d0c4fe29131120}
+
+
+M\+U\+S\+T return current setting of Convertible Roof. This is used to open (true) and close (false). 
+
+Setting \hypertarget{interfaceVehiclePropertyType_adc169ce047115d43399d1ffa9dd1fb83}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Status@{Status}}
+\index{Status@{Status}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Status}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean {\bf Parking\+Brake} {\bf readonly} attribute Parking\+Brake\+Status Vehicle\+Property\+Type\+::\+Status}}\label{interfaceVehiclePropertyType_adc169ce047115d43399d1ffa9dd1fb83}
+
+
+M\+U\+S\+T return the current status of parking brake. 
+
+\hyperlink{interfaceParkingBrake}{Parking\+Brake} M\+U\+S\+T return status of parking brake\+: Engaged = true, Disengaged = false. T\+O\+D\+O\+: Deprecated in 0.\+14. Use Status \hypertarget{interfaceVehiclePropertyType_a8b1d53be28abbfc2bb58841cd4171237}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Steering\+Wheel\+Heater@{Steering\+Wheel\+Heater}}
+\index{Steering\+Wheel\+Heater@{Steering\+Wheel\+Heater}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Steering\+Wheel\+Heater}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\+Property\+Type\+::\+Steering\+Wheel\+Heater}}\label{interfaceVehiclePropertyType_a8b1d53be28abbfc2bb58841cd4171237}
+
+
+M\+U\+S\+T return air recirculation on (true) / off (false). 
+
+Steering\+Wheel\+Heater \hypertarget{interfaceVehiclePropertyType_a8f6c68afc7aeb0334a22737b3e16abfa}{\index{Vehicle\+Property\+Type@{Vehicle\+Property\+Type}!Target\+Temperature@{Target\+Temperature}}
+\index{Target\+Temperature@{Target\+Temperature}!Vehicle\+Property\+Type@{Vehicle\+Property\+Type}}
+\subsubsection[{Target\+Temperature}]{\setlength{\rightskip}{0pt plus 5cm}attribute U\+Int16 Vehicle\+Property\+Type\+::\+Target\+Temperature}}\label{interfaceVehiclePropertyType_a8f6c68afc7aeb0334a22737b3e16abfa}
+
+
+M\+U\+S\+T return target desired temperature in celcius. 
+
+Target\+Temperature 
+
+The documentation for this interface was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/kev/src/automotive-\/message-\/broker/docs/amb.\+in.\+idl\end{DoxyCompactItemize}

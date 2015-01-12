@@ -1,0 +1,115 @@
+\hypertarget{namespaceVehicle}{\section{Vehicle Namespace Reference}
+\label{namespaceVehicle}\index{Vehicle@{Vehicle}}
+}
+
+
+Allows access to the vehicle A\-P\-I.  
+
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+interface \hyperlink{interfaceVehicle_1_1VehiclePropertyError}{Vehicle\-Property\-Error}
+\item 
+interface \hyperlink{interfaceVehicle_1_1VehiclePropertyType}{Vehicle\-Property\-Type}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum {\bfseries Type} \{ \\*
+{\bfseries Unknown} = -\/1, 
+{\bfseries Sedan} = 0, 
+{\bfseries Coupe}, 
+{\bfseries Cabriole}, 
+\\*
+{\bfseries Roadster}, 
+{\bfseries S\-U\-V}, 
+{\bfseries Truck}
+ \}
+\item 
+enum {\bfseries Sound\-Mode} \{ {\bfseries Normal} = 0, 
+{\bfseries Quiet} = 1, 
+{\bfseries Sportive} = 2
+ \}
+\item 
+enum {\bfseries Zone} \{ \\*
+{\bfseries None} = 0, 
+{\bfseries Front} = 1, 
+{\bfseries Middle} = 1 $<$$<$ 1, 
+{\bfseries Right} = 1 $<$$<$ 2, 
+\\*
+{\bfseries Left} = 1 $<$$<$ 3, 
+{\bfseries Rear} = 1 $<$$<$ 4, 
+{\bfseries Center} = 1 $<$$<$ 5
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+enum Vehicle\-::\-Zone \hyperlink{namespaceVehicle_af77c9ebf26d9c771820d6f7d79b089c7}{List} ()
+\begin{DoxyCompactList}\small\item\em Manager is a helper interface for discovering and finding available objects. \end{DoxyCompactList}\item 
+String \hyperlink{namespaceVehicle_a8ec254d4291b889c2df9a908e1b0efc9}{Find\-Object\-For\-Zone} (String object\-Name, \hyperlink{classZone}{Zone} zone)
+\begin{DoxyCompactList}\small\item\em find the D\-Bus object path which matches \char`\"{}object\-Name\char`\"{} and \char`\"{}zone\char`\"{}. \end{DoxyCompactList}\item 
+Array$<$ String $>$ \hyperlink{namespaceVehicle_a1d9fc6e33737ab7df4ad30d699df5f95}{Find\-Object} (String object\-Name) Array$<$ U\-Int16 $>$ Zones\-For\-Object\-Name(String object\-Name)\}
+\begin{DoxyCompactList}\small\item\em find the D\-Bus object path matching the given \char`\"{}object\-Name\char`\"{}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Allows access to the vehicle A\-P\-I. Details. 
+
+\subsection{Function Documentation}
+\hypertarget{namespaceVehicle_a1d9fc6e33737ab7df4ad30d699df5f95}{\index{Vehicle@{Vehicle}!Find\-Object@{Find\-Object}}
+\index{Find\-Object@{Find\-Object}!Vehicle@{Vehicle}}
+\subsubsection[{Find\-Object}]{\setlength{\rightskip}{0pt plus 5cm}Array$<$String$>$ Vehicle\-::\-Find\-Object (
+\begin{DoxyParamCaption}
+\item[{String}]{object\-Name}
+\end{DoxyParamCaption}
+)}}\label{namespaceVehicle_a1d9fc6e33737ab7df4ad30d699df5f95}
+
+
+find the D\-Bus object path matching the given \char`\"{}object\-Name\char`\"{}. 
+
+If the object path does not exist, it will be created. The object path will be removed when the last proccess that calls Find$\ast$ disconnects from D\-Bus.
+
+\begin{DoxyItemize}
+\item String object\-Name to find \begin{DoxyReturn}{Returns}
+list of object paths that provide the given object Name. get a list of zones for a given object\-Name.
+\end{DoxyReturn}
+If the object path does not exist, it will be created. The object path will be removed when the last proccess that calls Find$\ast$ disconnects from D\-Bus.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item String object\-Name object name. \begin{DoxyReturn}{Returns}
+list of zones for the given object\-Name (
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classZone}{Zone}) 
+\end{DoxySeeAlso}
+\end{DoxyItemize}
+\hypertarget{namespaceVehicle_a8ec254d4291b889c2df9a908e1b0efc9}{\index{Vehicle@{Vehicle}!Find\-Object\-For\-Zone@{Find\-Object\-For\-Zone}}
+\index{Find\-Object\-For\-Zone@{Find\-Object\-For\-Zone}!Vehicle@{Vehicle}}
+\subsubsection[{Find\-Object\-For\-Zone}]{\setlength{\rightskip}{0pt plus 5cm}String Vehicle\-::\-Find\-Object\-For\-Zone (
+\begin{DoxyParamCaption}
+\item[{String}]{object\-Name, }
+\item[{{\bf Zone}}]{zone}
+\end{DoxyParamCaption}
+)}}\label{namespaceVehicle_a8ec254d4291b889c2df9a908e1b0efc9}
+
+
+find the D\-Bus object path which matches \char`\"{}object\-Name\char`\"{} and \char`\"{}zone\char`\"{}. 
+
+\begin{DoxyItemize}
+\item String property is the requested property to be retrieved. \item \hyperlink{classZone}{Zone} zone is the zone which the object \begin{DoxyReturn}{Returns}
+string representing the D\-Bus Object path 
+\end{DoxyReturn}
+\end{DoxyItemize}
+\hypertarget{namespaceVehicle_af77c9ebf26d9c771820d6f7d79b089c7}{\index{Vehicle@{Vehicle}!List@{List}}
+\index{List@{List}!Vehicle@{Vehicle}}
+\subsubsection[{List}]{\setlength{\rightskip}{0pt plus 5cm}enum Vehicle\-::\-Zone Vehicle\-::\-List (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespaceVehicle_af77c9ebf26d9c771820d6f7d79b089c7}
+
+
+Manager is a helper interface for discovering and finding available objects. 
+
+org.\-automotive.\-Manager returns supported properties 

@@ -1,0 +1,24 @@
+\begin{DoxyVersion}{Version}
+0.\+13
+\end{DoxyVersion}
+\href{../../html/index.html}{\tt Back to A\+M\+B Documentation Main}\hypertarget{index_intro}{}\section{Introduction}\label{index_intro}
+Automotive Message Broker (A\+M\+B) Library documentation outlines the internal classes and structures for building plugins for A\+M\+B.\hypertarget{index_architecture}{}\section{General Architecture}\label{index_architecture}
+A\+M\+B has 3 main parts. Source plugins which provide data, a routing engine that routes data and sink plugins that consume the data.\hypertarget{index_properties}{}\section{Properties}\label{index_properties}
+A\+M\+B defines a number of properties itself. These properties are defined in \hyperlink{vehicleproperty_8h_source}{vehicleproperty.\+h}. The D\+Bus plugin will take many of these properties and combine them in D\+Bus interfaces. The mappings of A\+M\+B internal properties to D\+Bus Interface properties can be found in the \href{ambdbusmappings_8idl.html}{\tt mappings documentation}. This file will come in handy when you want to implement a particular A\+M\+B D\+Bus interface in your source plugin.
+
+By default, for any property not explicitly included in a D\+Bus interface, the D\+Bus plugin will generate a custom interface. The pattern is as follows\+:
+
+Custom\+Property = \char`\"{}org.\+automotive.\+Custom\+Property.\+Custom\+Property\char`\"{}
+
+"org.\+automotive.\+Custom\+Property is the D\+Bus interface and Custom\+Property is a D\+Bus property in that interface.\hypertarget{index_plugins}{}\section{Plugins}\label{index_plugins}
+There are two types of plugins\+: plugins that provide data, called \char`\"{}sources\char`\"{} (\hyperlink{classAbstractSource}{Abstract\+Source}) and plugins that consume data, called \char`\"{}sinks\char`\"{} (\hyperlink{classAbstractSink}{Abstract\+Sink}). A typical source would get data from the vehicle and then translate the raw data into A\+M\+B property types. Sinks then subscribe to the property types and do useful things with the data.
+
+Example plugins can be found in plugins/exampleplugin.\{h,cpp\} for an example source plugin and plugins/examplesink.\{h,cpp\} for an example sink plugin. There are also many different types of plugins useful for testing and development in the plugins/ directory.
+
+Various plugins have separate documentation found in /usr/share/doc/packages/automotive-\/message-\/broker/plugins/.\hypertarget{index_plugin_creation}{}\section{Creating your own plugin}\label{index_plugin_creation}
+A\+M\+B allows you to create your own plugins. Plugins inherit from either \hyperlink{classAbstractSource}{Abstract\+Source}, \hyperlink{classAbstractSink}{Abstract\+Sink}, or \hyperlink{classAmbPluginImpl}{Amb\+Plugin\+Impl}.
+
+It is recommended that new plugins be written using \hyperlink{classAmbPlugin}{Amb\+Plugin} and \hyperlink{classAmbPluginImpl}{Amb\+Plugin\+Impl}.\hypertarget{index_routing_engine}{}\section{Routing Engine Plugins}\label{index_routing_engine}
+As of 0.\+12, the routing engine itself can be exchanged for a plugin. This allows users to swap in routing engines with different behaviors, additional security, and custom throttling and filtering features.
+
+The easiest way to get started creating a routing engine plugin would be to look at \hyperlink{classAbstractRoutingEngine}{Abstract\+Routing\+Engine}, the base class for all routing engines and the default routing engine in ambd/core.\+cpp. 

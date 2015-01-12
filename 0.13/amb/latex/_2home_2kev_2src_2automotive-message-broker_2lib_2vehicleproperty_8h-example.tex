@@ -1,0 +1,17 @@
+\hypertarget{_2home_2kev_2src_2automotive-message-broker_2lib_2vehicleproperty_8h-example}{\section{/home/kev/src/automotive-\/message-\/broker/lib/vehicleproperty.\+h}
+}
+register\+Property registers properties with the Vehicle Property system. Returns true if property has been registered successfully. 
+\begin{DoxyParams}{Parameters}
+{\em name} & -\/ name of property. Name cannot match any existing property or it will be rejected and this method will return false. \\
+\hline
+{\em factor} & -\/ callback function that returns an \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} representation of the value. custom properties will need to return a custom \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} based object.\\
+\hline
+\end{DoxyParams}
+\#include $<$\hyperlink{vehicleproperty_8h_source}{vehicleproperty.\+h}$>$ \#include $<$\hyperlink{abstractpropertytype_8h_source}{abstractpropertytype.\+h}$>$
+
+//\+Somewhere in a source plugin\+: ... Property Vehicle\+Jet\+Engine\+Status = \char`\"{}\+Vehicle\+Jet\+Engine\+Status\char`\"{}; Vehicle\+Property\+::register\+Property(Vehicle\+Jet\+Engine\+Status, \mbox{[}\mbox{]}()\{return new Basic\+Property\+Type$<$bool$>$(\+Vehicle\+Jet\+Engine\+Status, false);\}); ... //other initialization
+
+
+\begin{DoxyCodeInclude}
+\end{DoxyCodeInclude}
+ 

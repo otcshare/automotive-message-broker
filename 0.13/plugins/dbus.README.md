@@ -1,0 +1,26 @@
+DBus plugin
+Version: 0.13
+
+This plugin provides a nice DBus API to application who want access to AMB data.
+
+To use the DBus plugin, add the following to the "sinks" array in /etc/ambd/config:
+
+{
+	"name" : "dbussink",
+	"path" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/dbussinkplugin.so",
+	"frequency" : "60"
+}
+
+Configuration Key Definitions:
+
+"name"
+name of plugin.  This key is not used by the plugin at this moment.
+
+"path"
+path to plugin on the filesystem.
+
+"frequency"
+Frequency in Hz which AMB will fire dbus signals.  AMB will fire the most recent values at this rate.
+
+Default: 60
+

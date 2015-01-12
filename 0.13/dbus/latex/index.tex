@@ -1,0 +1,62 @@
+\begin{DoxyVersion}{Version}
+0.\+13
+\end{DoxyVersion}
+\href{../../html/index.html}{\tt Back to A\+M\+B Documentation Main}\hypertarget{index_intro}{}\section{Introduction}\label{index_intro}
+A\+M\+B organizes the A\+P\+I into two general interface categories. First the Manager interface (see manager.\+txt) which includes tools for using the other interfaces. Second is a number of interfaces that represent vehicle data. The latter follows the schema of \char`\"{}org.\+automotive.\+Data\+Type\char`\"{} and are contained in verious D\+Bus paths. The D\+Bus paths are generally organized by /\{source\}/\{zone\}/\+Data\+Type. \char`\"{}source\char`\"{} refers to the A\+M\+B source that produces the data. \char`\"{}zone\char`\"{} refers to the zone in which the data type is located in the vehicle or \char`\"{}0\char`\"{} for no zone.
+
+The interfaces and data types are documented in \href{amb.fidl}{\tt amb.\+fidl}. Franca I\+D\+L tools can be used to generate D\+Bus introspection xml which can be used to generate bindings for your language of choice. These interfaces types map to internal A\+M\+B properties. To understand the mappings, see the \href{ambdbusmappings_8idl.html}{\tt mapping documentation}\hypertarget{index_basic_usage}{}\section{Basic Recommended Usage}\label{index_basic_usage}
+It is recommended that the Manager interface be used to find the D\+Bus Object that contains the data type you need. This is done through the Find\+Object() call. It is expected that D\+Bus Object Paths may change and so it is not appropriate to hard code D\+Bus Object Paths.
+
+Here is a pseudo-\/code example of how the api is to be used\+:
+
+
+\begin{DoxyCode}
+var manager = dbus.interface(\textcolor{stringliteral}{"org.automotive.Manager"}, \textcolor{stringliteral}{"/"});
+
+var speedObjectPaths = manager.FindObject(\textcolor{stringliteral}{"VehicleSpeed"});
+
+var speedObject = dbus.interface(\textcolor{stringliteral}{"org.automotive.VehicleSpeed"}, speedObjectPaths[0]);
+
+console.log(\textcolor{stringliteral}{"Vehicle Speed: "} + speedObject.Speed);
+\end{DoxyCode}
+ \hypertarget{index_automotive_manager}{}\section{Automotive Manager}\label{index_automotive_manager}
+Manager is a helper interface for discovering and finding available objects. Manager also helps users look up objects by zone and get additional information about a data type (ieorg.\+automotive.\+Manager.\+Zones\+For\+Object\+Name). \hypertarget{index_zones}{}\section{Zones}\label{index_zones}
+'Zone' describes the position in the vehicle where the object is located. The Zone type is a bitfield of values that can be combined to describe a specific location. For example
+
+
+\begin{DoxyCode}
+Zone.Front | Zone.Left
+\end{DoxyCode}
+
+
+(which is '9') may represent the driver position.
+
+
+\begin{DoxyCode}
+enumeration Zone \{
+  None = 0,
+  Front = 1,
+  Middle = 1 << 1,
+  Right = 1 << 2,
+  Left = 1 << 3,
+  Rear = 1 << 4,
+  Center = 1 << 5
+\}
+\end{DoxyCode}
+\hypertarget{index_vehicle_property_type}{}\section{Vehicle Property Type}\label{index_vehicle_property_type}
+Vehicle Property Type is the common interface which all Data types are derived. This interface is as follows\+:
+
+
+\begin{DoxyCode}
+\textcolor{keyword}{interface }VehiclePropertyType \{
+  attribute Double Time readonly
+  attribute Zone Zone readonly
+  method \hyperlink{amb_8fidl_aea9b81502a85e8451cb2de497511ce5c}{GetHistory}(Double beginTime, Double endTime) \{
+    out\{ Dictionary result\}
+  \}
+\}
+\end{DoxyCode}
+\hypertarget{index_data_types}{}\section{Data types}\label{index_data_types}
+The data types try to conform to the \mbox{[}\href{http://w3c.github.io/automotive-bg/data_spec.html}{\tt http\+://w3c.\+github.\+io/automotive-\/bg/data\+\_\+spec.\+html} W3\+C Automotive Business Group Vehicle Data Specification\mbox{]} as much as possible. There are differences in the Zone type, and this vehicle A\+P\+I contains some additional data types that the W3\+C Business Group has not yet defined. 'Time' also represents relative time in seconds rather than time in ms since epoch (D\+O\+M\+Time\+Stamp). The names of the attributes are also different because of Web vs. D\+Bus conventions. In this Vehicle A\+P\+I, D\+Bus properties use Camel\+Case (ie Speed vs speed) vs lower\+Camel\+Case. Units and types are the same where possible.
+
+Also note that many types have been marked \char`\"{}deprecated\char`\"{} and replaced with the W3\+C version of the type. Deprecated types should not be used in new projects. 

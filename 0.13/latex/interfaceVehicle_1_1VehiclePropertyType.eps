@@ -1,0 +1,423 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: ClassName
+%%Creator: Doxygen
+%%CreationDate: Time
+%%For: 
+%Magnification: 1.00
+%%Orientation: Portrait
+%%BoundingBox: 0 0 500 1757.575758
+%%Pages: 0
+%%BeginSetup
+%%EndSetup
+%%EndComments
+
+% ----- variables -----
+
+/boxwidth 0 def
+/boxheight 40 def
+/fontheight 24 def
+/marginwidth 10 def
+/distx 20 def
+/disty 40 def
+/boundaspect 0.284483 def  % aspect ratio of the BoundingBox (width/height)
+/boundx 500 def
+/boundy boundx boundaspect div def
+/xspacing 0 def
+/yspacing 0 def
+/rows 58 def
+/cols 2 def
+/scalefactor 0 def
+/boxfont /Times-Roman findfont fontheight scalefont def
+
+% ----- procedures -----
+
+/dotted { [1 4] 0 setdash } def
+/dashed { [5] 0 setdash } def
+/solid  { [] 0 setdash } def
+
+/max % result = MAX(arg1,arg2)
+{
+  /a exch def
+  /b exch def
+  a b gt {a} {b} ifelse
+} def
+
+/xoffset % result = MAX(0,(scalefactor-(boxwidth*cols+distx*(cols-1)))/2)
+{
+  0 scalefactor boxwidth cols mul distx cols 1 sub mul add sub 2 div max
+} def
+
+/cw % boxwidth = MAX(boxwidth, stringwidth(arg1))
+{
+  /str exch def
+  /boxwidth boxwidth str stringwidth pop max def
+} def
+
+/box % draws a box with text `arg1' at grid pos (arg2,arg3)
+{ gsave
+  2 setlinewidth
+  newpath
+  exch xspacing mul xoffset add
+  exch yspacing mul
+  moveto
+  boxwidth 0 rlineto 
+  0 boxheight rlineto 
+  boxwidth neg 0 rlineto 
+  0 boxheight neg rlineto 
+  closepath
+  dup stringwidth pop neg boxwidth add 2 div
+  boxheight fontheight 2 div sub 2 div
+  rmoveto show stroke
+  grestore
+} def  
+
+/mark
+{ newpath
+  exch xspacing mul xoffset add boxwidth add
+  exch yspacing mul
+  moveto
+  0 boxheight 4 div rlineto
+  boxheight neg 4 div boxheight neg 4 div rlineto
+  closepath
+  eofill
+  stroke
+} def
+
+/arrow
+{ newpath
+  moveto
+  3 -8 rlineto
+  -6 0 rlineto
+  3 8 rlineto
+  closepath
+  eofill
+  stroke
+} def
+
+/out % draws an output connector for the block at (arg1,arg2)
+{
+  newpath
+  exch xspacing mul xoffset add boxwidth 2 div add
+  exch yspacing mul boxheight add
+  /y exch def
+  /x exch def
+  x y moveto
+  0 disty 2 div rlineto 
+  stroke
+  1 eq { x y disty 2 div add arrow } if
+} def
+
+/in % draws an input connector for the block at (arg1,arg2)
+{
+  newpath
+  exch xspacing mul xoffset add boxwidth 2 div add
+  exch yspacing mul disty 2 div sub
+  /y exch def
+  /x exch def
+  x y moveto
+  0 disty 2 div rlineto
+  stroke
+  1 eq { x y disty 2 div add arrow } if
+} def
+
+/hedge
+{
+  exch xspacing mul xoffset add boxwidth 2 div add
+  exch yspacing mul boxheight 2 div sub
+  /y exch def
+  /x exch def
+  newpath
+  x y moveto
+  boxwidth 2 div distx add 0 rlineto
+  stroke
+  1 eq
+  { newpath x boxwidth 2 div distx add add y moveto
+    -8 3 rlineto
+    0 -6 rlineto
+    8 3 rlineto
+    closepath
+    eofill
+    stroke
+  } if
+} def
+
+/vedge
+{
+  /ye exch def
+  /ys exch def
+  /xs exch def
+  newpath
+  xs xspacing mul xoffset add boxwidth 2 div add dup
+  ys yspacing mul boxheight 2 div sub
+  moveto
+  ye yspacing mul boxheight 2 div sub
+  lineto
+  stroke
+} def
+
+/conn % connections the blocks from col `arg1' to `arg2' of row `arg3'
+{
+  /ys exch def
+  /xe exch def
+  /xs exch def
+  newpath
+  xs xspacing mul xoffset add boxwidth 2 div add
+  ys yspacing mul disty 2 div sub
+  moveto
+  xspacing xe xs sub mul 0
+  rlineto
+  stroke
+} def
+
+% ----- main ------
+
+boxfont setfont
+1 boundaspect scale
+(Vehicle::VehiclePropertyType) cw
+(Vehicle::org::automotive::Acceleration) cw
+(Vehicle::org::automotive::AirbagStatus) cw
+(Vehicle::org::automotive::AntilockBrakingSystem) cw
+(Vehicle::org::automotive::Battery) cw
+(Vehicle::org::automotive::ButtoneEvent) cw
+(Vehicle::org::automotive::ConvertibleRoof) cw
+(Vehicle::org::automotive::CruiseControlStatus) cw
+(Vehicle::org::automotive::DashboardIllumination) cw
+(Vehicle::org::automotive::Doors) cw
+(Vehicle::org::automotive::DoorStatus) cw
+(Vehicle::org::automotive::DriverId) cw
+(Vehicle::org::automotive::DrivingMode) cw
+(Vehicle::org::automotive::EngineOil) cw
+(Vehicle::org::automotive::EngineSpeed) cw
+(Vehicle::org::automotive::ExteriorBrightness) cw
+(Vehicle::org::automotive::Fluid) cw
+(Vehicle::org::automotive::Fuel) cw
+(Vehicle::org::automotive::FuelInfo) cw
+(Vehicle::org::automotive::GeneratedVehicleSoundMode) cw
+(Vehicle::org::automotive::HazardLight) cw
+(Vehicle::org::automotive::Horn) cw
+(Vehicle::org::automotive::HVAC) cw
+(Vehicle::org::automotive::InteriorLightStatus) cw
+(Vehicle::org::automotive::KeyId) cw
+(Vehicle::org::automotive::Language) cw
+(Vehicle::org::automotive::LightStatus) cw
+(Vehicle::org::automotive::Location) cw
+(Vehicle::org::automotive::MeasurementSystem) cw
+(Vehicle::org::automotive::MirrorSetting) cw
+(Vehicle::org::automotive::NightMode) cw
+(Vehicle::org::automotive::ObstacleDistance) cw
+(Vehicle::org::automotive::OccupantStatus) cw
+(Vehicle::org::automotive::Odometer) cw
+(Vehicle::org::automotive::ParkingBrake) cw
+(Vehicle::org::automotive::ParkingLight) cw
+(Vehicle::org::automotive::RainSensor) cw
+(Vehicle::org::automotive::SeatBelt) cw
+(Vehicle::org::automotive::SeatPosition) cw
+(Vehicle::org::automotive::SecurityAlert) cw
+(Vehicle::org::automotive::Size) cw
+(Vehicle::org::automotive::SteeringWheelAngle) cw
+(Vehicle::org::automotive::SteeringWheelPosition) cw
+(Vehicle::org::automotive::Sunroof) cw
+(Vehicle::org::automotive::Temperature) cw
+(Vehicle::org::automotive::Tire) cw
+(Vehicle::org::automotive::TractionControlSystem) cw
+(Vehicle::org::automotive::Transmission) cw
+(Vehicle::org::automotive::TripMeter) cw
+(Vehicle::org::automotive::VehicleId) cw
+(Vehicle::org::automotive::VehiclePowerMode) cw
+(Vehicle::org::automotive::VehicleSpeed) cw
+(Vehicle::org::automotive::VehicleTopSpeedLimit) cw
+(Vehicle::org::automotive::VehicleType) cw
+(Vehicle::org::automotive::WheelBrake) cw
+(Vehicle::org::automotive::WheelInformation) cw
+(Vehicle::org::automotive::WindowStatus) cw
+(Vehicle::org::automotive::WindshieldWiper) cw
+/boxwidth boxwidth marginwidth 2 mul add def
+/xspacing boxwidth distx add def
+/yspacing boxheight disty add def
+/scalefactor 
+  boxwidth cols mul distx cols 1 sub mul add
+  boxheight rows mul disty rows 1 sub mul add boundaspect mul 
+  max def
+boundx scalefactor div boundy scalefactor div scale
+
+% ----- classes -----
+
+ (Vehicle::VehiclePropertyType) 0.000000 57.000000 box
+ (Vehicle::org::automotive::Acceleration) 1.000000 56.000000 box
+ (Vehicle::org::automotive::AirbagStatus) 1.000000 55.000000 box
+ (Vehicle::org::automotive::AntilockBrakingSystem) 1.000000 54.000000 box
+ (Vehicle::org::automotive::Battery) 1.000000 53.000000 box
+ (Vehicle::org::automotive::ButtoneEvent) 1.000000 52.000000 box
+ (Vehicle::org::automotive::ConvertibleRoof) 1.000000 51.000000 box
+ (Vehicle::org::automotive::CruiseControlStatus) 1.000000 50.000000 box
+ (Vehicle::org::automotive::DashboardIllumination) 1.000000 49.000000 box
+ (Vehicle::org::automotive::Doors) 1.000000 48.000000 box
+ (Vehicle::org::automotive::DoorStatus) 1.000000 47.000000 box
+ (Vehicle::org::automotive::DriverId) 1.000000 46.000000 box
+ (Vehicle::org::automotive::DrivingMode) 1.000000 45.000000 box
+ (Vehicle::org::automotive::EngineOil) 1.000000 44.000000 box
+ (Vehicle::org::automotive::EngineSpeed) 1.000000 43.000000 box
+ (Vehicle::org::automotive::ExteriorBrightness) 1.000000 42.000000 box
+ (Vehicle::org::automotive::Fluid) 1.000000 41.000000 box
+ (Vehicle::org::automotive::Fuel) 1.000000 40.000000 box
+ (Vehicle::org::automotive::FuelInfo) 1.000000 39.000000 box
+ (Vehicle::org::automotive::GeneratedVehicleSoundMode) 1.000000 38.000000 box
+ (Vehicle::org::automotive::HazardLight) 1.000000 37.000000 box
+ (Vehicle::org::automotive::Horn) 1.000000 36.000000 box
+ (Vehicle::org::automotive::HVAC) 1.000000 35.000000 box
+ (Vehicle::org::automotive::InteriorLightStatus) 1.000000 34.000000 box
+ (Vehicle::org::automotive::KeyId) 1.000000 33.000000 box
+ (Vehicle::org::automotive::Language) 1.000000 32.000000 box
+ (Vehicle::org::automotive::LightStatus) 1.000000 31.000000 box
+ (Vehicle::org::automotive::Location) 1.000000 30.000000 box
+ (Vehicle::org::automotive::MeasurementSystem) 1.000000 29.000000 box
+ (Vehicle::org::automotive::MirrorSetting) 1.000000 28.000000 box
+ (Vehicle::org::automotive::NightMode) 1.000000 27.000000 box
+ (Vehicle::org::automotive::ObstacleDistance) 1.000000 26.000000 box
+ (Vehicle::org::automotive::OccupantStatus) 1.000000 25.000000 box
+ (Vehicle::org::automotive::Odometer) 1.000000 24.000000 box
+ (Vehicle::org::automotive::ParkingBrake) 1.000000 23.000000 box
+ (Vehicle::org::automotive::ParkingLight) 1.000000 22.000000 box
+ (Vehicle::org::automotive::RainSensor) 1.000000 21.000000 box
+ (Vehicle::org::automotive::SeatBelt) 1.000000 20.000000 box
+ (Vehicle::org::automotive::SeatPosition) 1.000000 19.000000 box
+ (Vehicle::org::automotive::SecurityAlert) 1.000000 18.000000 box
+ (Vehicle::org::automotive::Size) 1.000000 17.000000 box
+ (Vehicle::org::automotive::SteeringWheelAngle) 1.000000 16.000000 box
+ (Vehicle::org::automotive::SteeringWheelPosition) 1.000000 15.000000 box
+ (Vehicle::org::automotive::Sunroof) 1.000000 14.000000 box
+ (Vehicle::org::automotive::Temperature) 1.000000 13.000000 box
+ (Vehicle::org::automotive::Tire) 1.000000 12.000000 box
+ (Vehicle::org::automotive::TractionControlSystem) 1.000000 11.000000 box
+ (Vehicle::org::automotive::Transmission) 1.000000 10.000000 box
+ (Vehicle::org::automotive::TripMeter) 1.000000 9.000000 box
+ (Vehicle::org::automotive::VehicleId) 1.000000 8.000000 box
+ (Vehicle::org::automotive::VehiclePowerMode) 1.000000 7.000000 box
+ (Vehicle::org::automotive::VehicleSpeed) 1.000000 6.000000 box
+ (Vehicle::org::automotive::VehicleTopSpeedLimit) 1.000000 5.000000 box
+ (Vehicle::org::automotive::VehicleType) 1.000000 4.000000 box
+ (Vehicle::org::automotive::WheelBrake) 1.000000 3.000000 box
+ (Vehicle::org::automotive::WheelInformation) 1.000000 2.000000 box
+ (Vehicle::org::automotive::WindowStatus) 1.000000 1.000000 box
+ (Vehicle::org::automotive::WindshieldWiper) 1.000000 0.000000 box
+
+% ----- relations -----
+
+solid
+1 0.000000 56.250000 out
+solid
+0 0.000000 56.500000 hedge
+solid
+0 0.000000 55.500000 hedge
+solid
+0 0.000000 54.500000 hedge
+solid
+0 0.000000 53.500000 hedge
+solid
+0 0.000000 52.500000 hedge
+solid
+0 0.000000 51.500000 hedge
+solid
+0 0.000000 50.500000 hedge
+solid
+0 0.000000 49.500000 hedge
+solid
+0 0.000000 48.500000 hedge
+solid
+0 0.000000 47.500000 hedge
+solid
+0 0.000000 46.500000 hedge
+solid
+0 0.000000 45.500000 hedge
+solid
+0 0.000000 44.500000 hedge
+solid
+0 0.000000 43.500000 hedge
+solid
+0 0.000000 42.500000 hedge
+solid
+0 0.000000 41.500000 hedge
+solid
+0 0.000000 40.500000 hedge
+solid
+0 0.000000 39.500000 hedge
+solid
+0 0.000000 38.500000 hedge
+solid
+0 0.000000 37.500000 hedge
+solid
+0 0.000000 36.500000 hedge
+solid
+0 0.000000 35.500000 hedge
+solid
+0 0.000000 34.500000 hedge
+solid
+0 0.000000 33.500000 hedge
+solid
+0 0.000000 32.500000 hedge
+solid
+0 0.000000 31.500000 hedge
+solid
+0 0.000000 30.500000 hedge
+solid
+0 0.000000 29.500000 hedge
+solid
+0 0.000000 28.500000 hedge
+solid
+0 0.000000 27.500000 hedge
+solid
+0 0.000000 26.500000 hedge
+solid
+0 0.000000 25.500000 hedge
+solid
+0 0.000000 24.500000 hedge
+solid
+0 0.000000 23.500000 hedge
+solid
+0 0.000000 22.500000 hedge
+solid
+0 0.000000 21.500000 hedge
+solid
+0 0.000000 20.500000 hedge
+solid
+0 0.000000 19.500000 hedge
+solid
+0 0.000000 18.500000 hedge
+solid
+0 0.000000 17.500000 hedge
+solid
+0 0.000000 16.500000 hedge
+solid
+0 0.000000 15.500000 hedge
+solid
+0 0.000000 14.500000 hedge
+solid
+0 0.000000 13.500000 hedge
+solid
+0 0.000000 12.500000 hedge
+solid
+0 0.000000 11.500000 hedge
+solid
+0 0.000000 10.500000 hedge
+solid
+0 0.000000 9.500000 hedge
+solid
+0 0.000000 8.500000 hedge
+solid
+0 0.000000 7.500000 hedge
+solid
+0 0.000000 6.500000 hedge
+solid
+0 0.000000 5.500000 hedge
+solid
+0 0.000000 4.500000 hedge
+solid
+0 0.000000 3.500000 hedge
+solid
+0 0.000000 2.500000 hedge
+solid
+0 0.000000 1.500000 hedge
+solid
+0 0.000000 0.500000 hedge
+solid
+0.000000 57.000000 0.500000 vedge

@@ -1,0 +1,3 @@
+<map id="AsyncRangePropertyRequest" name="AsyncRangePropertyRequest">
+<area shape="rect" id="node2" href="$classAsyncRangePropertyReply.html" title="The AsyncRangePropertyReply class is used by a source to reply to an AsyncRangePropertyRequest. The source should set success to &#39;true&#39; and populate the &#39;values&#39; member if the request was successful. If the request is not successful, &#39;success&#39; should be set to &#39;false&#39; and the &#39;error&#39; member should be set. " alt="" coords="13,80,193,107"/>
+</map>

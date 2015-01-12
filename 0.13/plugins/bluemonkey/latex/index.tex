@@ -1,0 +1,20 @@
+\begin{DoxyVersion}{Version}
+0.\+12.\+902 
+\end{DoxyVersion}
+\hypertarget{index_intro}{}\section{Introduction}\label{index_intro}
+\hyperlink{interfaceBluemonkey}{Bluemonkey} is a javascript rendering engine that allows the scripting of source plugin behavior in javascript. It allows developers a quick way to prototype plugin code as well as a way to create custom properties. \hypertarget{index_properties}{}\section{Properties}\label{index_properties}
+\hyperlink{interfaceBluemonkey}{Bluemonkey} uses internal property names (not D\+Bus A\+P\+I interface names). These properties are defined in lib/vehicleproperty.\+h. There are mappings from A\+M\+B internal property names to D\+Bus A\+P\+I properties in the \href{ambdbusmappings_8idl}{\tt mappings documentation}. The mappings comes in handy when you want to implement properties that are exported as an D\+Bus A\+P\+I interface (ie, org.\+automotive.\+Vehicle\+Speed). \hypertarget{index_example}{}\section{Example bluemonkey script}\label{index_example}
+
+\begin{DoxyCode}
+var speedProperty = bluemonkey.subscribeTo(\textcolor{stringliteral}{"VehicleSpeed"});
+
+var testTimer = bluemonkey.createTimer();
+testTimer.interval = 3000;
+testTimer.singleShot = \textcolor{keyword}{false};
+testTimer.timeout.connect(\textcolor{keyword}{function}() \{
+  \textcolor{comment}{//VehicleSpeed}
+  speedProperty.value = Math.floor((Math.random() * 100) + 1);
+\});
+\end{DoxyCode}
+ \hypertarget{index_Javascript}{}\section{A\+P\+I documentation}\label{index_Javascript}
+Javascript A\+P\+I documentation is found in \hyperlink{bluemonkey_8idl_source}{bluemonkey.\+idl} and is described using Web\+I\+D\+L. Plugin configuration documentation can be found in bluemonkey.\+R\+E\+A\+D\+M\+E. 

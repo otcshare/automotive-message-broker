@@ -1,0 +1,9 @@
+<map id="VehiclePropertyType" name="VehiclePropertyType">
+<area shape="rect" id="node2" href="$interfaceAntilockBrakingSystem.html" title="AntilockBrakingSystem" alt="" coords="5,5,164,32"/>
+<area shape="rect" id="node3" href="$interfaceTractionControlSystem.html" title="TractionControlSystem" alt="" coords="7,56,163,83"/>
+<area shape="rect" id="node4" href="$interfaceOccupantStatus.html" title="OccupantStatus" alt="" coords="27,107,143,133"/>
+<area shape="rect" id="node5" href="$interfaceTemperature.html" title="Temperature" alt="" coords="37,157,132,184"/>
+<area shape="rect" id="node6" href="$interfaceAirbagStatus.html" title="AirbagStatus" alt="" coords="36,208,133,235"/>
+<area shape="rect" id="node7" href="$interfaceVehicleButton.html" title="VehicleButton" alt="" coords="33,259,136,285"/>
+<area shape="rect" id="node8" href="$interfaceParkingBrake.html" title="ParkingBrake" alt="" coords="35,309,135,336"/>
+</map>

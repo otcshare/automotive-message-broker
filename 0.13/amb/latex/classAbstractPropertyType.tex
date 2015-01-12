@@ -1,0 +1,263 @@
+\hypertarget{classAbstractPropertyType}{\section{Abstract\+Property\+Type Class Reference}
+\label{classAbstractPropertyType}\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+}
+
+
+Inheritance diagram for Abstract\+Property\+Type\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classAbstractPropertyType__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63}{Priority} \{ \hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a3412bc77a6a781fb4a832059f1fe5d9a}{Normal} = 0, 
+\hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a611e6f3b55352cad8a1602ec8cb3c505}{Low}, 
+\hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63aabbaad7e0356d6929119fc0e17aa6ad0}{High}, 
+\hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a5ef5703d3d1af9d204d6d2f3cf41569a}{Instant}
+ \}
+\begin{DoxyCompactList}\small\item\em The Priority enum describes prority of the property type. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAbstractPropertyType_a2a525d57a943122e1cc709f738deb13e}{{\bfseries Abstract\+Property\+Type} (std\+::string property)}\label{classAbstractPropertyType_a2a525d57a943122e1cc709f738deb13e}
+
+\item 
+virtual std\+::string \hyperlink{classAbstractPropertyType_a4c359b2e7c3b0ede21c64ba2c90567aa}{to\+String} () const =0
+\begin{DoxyCompactList}\small\item\em to\+String \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_a9fae6e2ced72541b5e2bf321a1d193b0}{virtual void \hyperlink{classAbstractPropertyType_a9fae6e2ced72541b5e2bf321a1d193b0}{from\+String} (std\+::string)=0}\label{classAbstractPropertyType_a9fae6e2ced72541b5e2bf321a1d193b0}
+
+\begin{DoxyCompactList}\small\item\em from\+String converts from string value \end{DoxyCompactList}\item 
+virtual G\+Variant $\ast$ \hyperlink{classAbstractPropertyType_ae4c8025e310eb06916a28e0341f3356d}{to\+Variant} ()=0
+\begin{DoxyCompactList}\small\item\em to\+Variant \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_a3de5f842aa061f168438e67ca29c2685}{virtual void \hyperlink{classAbstractPropertyType_a3de5f842aa061f168438e67ca29c2685}{from\+Variant} (G\+Variant $\ast$)=0}\label{classAbstractPropertyType_a3de5f842aa061f168438e67ca29c2685}
+
+\begin{DoxyCompactList}\small\item\em from\+Variant converts G\+Variant value into compatible native value. Caller owns G\+Variant argument. \end{DoxyCompactList}\item 
+virtual \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $\ast$ \hyperlink{classAbstractPropertyType_a8fedd4300acc7ba7ada94e964f2fd166}{copy} ()=0
+\begin{DoxyCompactList}\small\item\em copy \end{DoxyCompactList}\item 
+virtual void \hyperlink{classAbstractPropertyType_a0996989d0082ad3f621fec938b60ed10}{quick\+Copy} (\hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $\ast$other)
+\begin{DoxyCompactList}\small\item\em quick\+Copy is intended as a way to quickly copy the often changing bits from one abstract property to another It assumes that the properties are almost identical in name, source, and zone. \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_af156588f45c7b2f2107a8ebb8977e71f}{bool {\bfseries operator==} (\hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} \&other)}\label{classAbstractPropertyType_af156588f45c7b2f2107a8ebb8977e71f}
+
+\item 
+\hypertarget{classAbstractPropertyType_a137d170e61776d59cff141d2df7cab9b}{bool {\bfseries operator!=} (\hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} \&other)}\label{classAbstractPropertyType_a137d170e61776d59cff141d2df7cab9b}
+
+\item 
+virtual void \hyperlink{classAbstractPropertyType_a1b2598b86718911533587a5bd41bfb9c}{set\+Value} (boost\+::any val)
+\begin{DoxyCompactList}\small\item\em set\+Value \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_ae723621925382263eba046fa1ca8e36d}{{\footnotesize template$<$typename T $>$ }\\T \hyperlink{classAbstractPropertyType_ae723621925382263eba046fa1ca8e36d}{value} () const }\label{classAbstractPropertyType_ae723621925382263eba046fa1ca8e36d}
+
+\begin{DoxyCompactList}\small\item\em \hyperlink{classAbstractPropertyType_ae723621925382263eba046fa1ca8e36d}{value()} native value. Does not use type coercion. Will throw if types do not match. \end{DoxyCompactList}\item 
+boost\+::any \hyperlink{classAbstractPropertyType_a7ba4118acb746d2b8fc220a12b0e2666}{any\+Value} ()
+\begin{DoxyCompactList}\small\item\em any\+Value \end{DoxyCompactList}\item 
+virtual const string \hyperlink{classAbstractPropertyType_ae87a5dc3ad7315c595a14959e4acedf1}{signature} ()
+\begin{DoxyCompactList}\small\item\em signature \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::string \hyperlink{classAbstractPropertyType_a0899de35293963a6c18a0f4913916871}{name}
+\begin{DoxyCompactList}\small\item\em name Property name. \end{DoxyCompactList}\item 
+double \hyperlink{classAbstractPropertyType_a6a391546600fde38a351d3d236be8a9b}{timestamp}
+\begin{DoxyCompactList}\small\item\em timestamp. Timestamp when the value was last updated by the system. This is updated automatically any time \hyperlink{classAbstractPropertyType_a1b2598b86718911533587a5bd41bfb9c}{set\+Value()} is called \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_ae74440c78c4a5f6af1c3b9c85f1a34c2}{int32\+\_\+t \hyperlink{classAbstractPropertyType_ae74440c78c4a5f6af1c3b9c85f1a34c2}{sequence}}\label{classAbstractPropertyType_ae74440c78c4a5f6af1c3b9c85f1a34c2}
+
+\begin{DoxyCompactList}\small\item\em sequence internal counter. Useful as a unique indentifier. values is -\/1 if not used (default). \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_abe2de53722d28e8e7c2a715b97e1ae48}{std\+::string \hyperlink{classAbstractPropertyType_abe2de53722d28e8e7c2a715b97e1ae48}{source\+Uuid}}\label{classAbstractPropertyType_abe2de53722d28e8e7c2a715b97e1ae48}
+
+\begin{DoxyCompactList}\small\item\em source\+Uuid uuid of the source that produced this property. This is set by the routingengine if left unmodified. \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_a420b96a1fcbcbe513ff3801185e788bc}{Zone\+::\+Type \hyperlink{classAbstractPropertyType_a420b96a1fcbcbe513ff3801185e788bc}{zone}}\label{classAbstractPropertyType_a420b96a1fcbcbe513ff3801185e788bc}
+
+\begin{DoxyCompactList}\small\item\em zone that the property is situated in. \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_a3f831860b5ddc30e5a53dd4937ae5ebe}{\hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63}{Priority} \hyperlink{classAbstractPropertyType_a3f831860b5ddc30e5a53dd4937ae5ebe}{priority}}\label{classAbstractPropertyType_a3f831860b5ddc30e5a53dd4937ae5ebe}
+
+\begin{DoxyCompactList}\small\item\em priority is used to tell the routing engine how to prioritize routing the value to plugins. setting this value to \hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a5ef5703d3d1af9d204d6d2f3cf41569a}{Abstract\+Property\+Type\+::\+Instant} will tell the routing engine to immedietly route the value without any reliance on the mainloop. Instant priority is N\+O\+T thread safe. Default priority is \hyperlink{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a3412bc77a6a781fb4a832059f1fe5d9a}{Abstract\+Property\+Type\+::\+Normal}. \end{DoxyCompactList}\item 
+\hypertarget{classAbstractPropertyType_ab557c141cce1769d0e4d8213894c9e2c}{std\+::vector$<$ std\+::function\\*
+$<$ void(\hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $\ast$)$>$ $>$ \hyperlink{classAbstractPropertyType_ab557c141cce1769d0e4d8213894c9e2c}{destroyed}}\label{classAbstractPropertyType_ab557c141cce1769d0e4d8213894c9e2c}
+
+\begin{DoxyCompactList}\small\item\em destroyed is called if this property is destroyed. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAbstractPropertyType_a69b5d8cd643415d4f63cd6a9e19721d9}{boost\+::any {\bfseries m\+Value}}\label{classAbstractPropertyType_a69b5d8cd643415d4f63cd6a9e19721d9}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!Priority@{Priority}}
+\index{Priority@{Priority}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{Priority}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Abstract\+Property\+Type\+::\+Priority}}}\label{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63}
+
+
+The Priority enum describes prority of the property type. 
+
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{Normal@{Normal}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!Normal@{Normal}}\item[{\em 
+\hypertarget{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a3412bc77a6a781fb4a832059f1fe5d9a}{Normal}\label{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a3412bc77a6a781fb4a832059f1fe5d9a}
+}]normal priority. This is default \index{Low@{Low}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!Low@{Low}}\item[{\em 
+\hypertarget{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a611e6f3b55352cad8a1602ec8cb3c505}{Low}\label{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a611e6f3b55352cad8a1602ec8cb3c505}
+}]Low priority. \index{High@{High}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!High@{High}}\item[{\em 
+\hypertarget{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63aabbaad7e0356d6929119fc0e17aa6ad0}{High}\label{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63aabbaad7e0356d6929119fc0e17aa6ad0}
+}]High priority \index{Instant@{Instant}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!Instant@{Instant}}\item[{\em 
+\hypertarget{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a5ef5703d3d1af9d204d6d2f3cf41569a}{Instant}\label{classAbstractPropertyType_a1e513f66eb2dd2bd2cddbec16422af63a5ef5703d3d1af9d204d6d2f3cf41569a}
+}]Instant. Using this priority is not thread safe. This is typically used for Properties that need to be deterministic. \end{description}
+\end{Desc}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classAbstractPropertyType_a7ba4118acb746d2b8fc220a12b0e2666}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!any\+Value@{any\+Value}}
+\index{any\+Value@{any\+Value}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{any\+Value}]{\setlength{\rightskip}{0pt plus 5cm}boost\+::any Abstract\+Property\+Type\+::any\+Value (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classAbstractPropertyType_a7ba4118acb746d2b8fc220a12b0e2666}
+
+
+any\+Value 
+
+\begin{DoxyReturn}{Returns}
+boost\+::any value 
+\end{DoxyReturn}
+\hypertarget{classAbstractPropertyType_a8fedd4300acc7ba7ada94e964f2fd166}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!copy@{copy}}
+\index{copy@{copy}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{copy}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf Abstract\+Property\+Type}$\ast$ Abstract\+Property\+Type\+::copy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractPropertyType_a8fedd4300acc7ba7ada94e964f2fd166}
+
+
+copy 
+
+\begin{DoxyReturn}{Returns}
+a copy of the \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classListPropertyType_a2b4d928c8fa6c7317a31d4aa376908d1}{List\+Property\+Type$<$ T $>$}, \hyperlink{classStringPropertyType_a15866eb8e3ee9e1be587740f64353d57}{String\+Property\+Type}, \hyperlink{classBasicPropertyType_a244d19253bfc42dfadd84570b8c8e404}{Basic\+Property\+Type$<$ T $>$}, \hyperlink{classMapPropertyType_abcc0f1c2cd4faff2859420f90dd67cad}{Map\+Property\+Type$<$ T, N $>$}, and \hyperlink{classMapPropertyType_abcc0f1c2cd4faff2859420f90dd67cad}{Map\+Property\+Type$<$ String\+Property\+Type, String\+Property\+Type $>$}.
+
+\hypertarget{classAbstractPropertyType_a0996989d0082ad3f621fec938b60ed10}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!quick\+Copy@{quick\+Copy}}
+\index{quick\+Copy@{quick\+Copy}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{quick\+Copy}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Abstract\+Property\+Type\+::quick\+Copy (
+\begin{DoxyParamCaption}
+\item[{{\bf Abstract\+Property\+Type} $\ast$}]{other}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classAbstractPropertyType_a0996989d0082ad3f621fec938b60ed10}
+
+
+quick\+Copy is intended as a way to quickly copy the often changing bits from one abstract property to another It assumes that the properties are almost identical in name, source, and zone. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & the property to copy from \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{classListPropertyType_a1e5afbe102ea305d8095ee6e56a08753}{List\+Property\+Type$<$ T $>$}.
+
+\hypertarget{classAbstractPropertyType_a1b2598b86718911533587a5bd41bfb9c}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!set\+Value@{set\+Value}}
+\index{set\+Value@{set\+Value}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{set\+Value}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Abstract\+Property\+Type\+::set\+Value (
+\begin{DoxyParamCaption}
+\item[{boost\+::any}]{val}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classAbstractPropertyType_a1b2598b86718911533587a5bd41bfb9c}
+
+
+set\+Value 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & boost\+::any value. N\+O\+T\+E\+: boost\+::any does not accept type coercion. Types must match exactly with native type. (ie, don't use \char`\"{}int\char`\"{} if the native type is \char`\"{}uint\char`\"{}) \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{classBasicPropertyType_aa1893ef55f29b01daeadbc93438afa0e}{Basic\+Property\+Type$<$ T $>$}.
+
+\hypertarget{classAbstractPropertyType_ae87a5dc3ad7315c595a14959e4acedf1}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!signature@{signature}}
+\index{signature@{signature}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{signature}]{\setlength{\rightskip}{0pt plus 5cm}virtual const string Abstract\+Property\+Type\+::signature (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}}\label{classAbstractPropertyType_ae87a5dc3ad7315c595a14959e4acedf1}
+
+
+signature 
+
+\begin{DoxyReturn}{Returns}
+gvariant signature 
+\end{DoxyReturn}
+\hypertarget{classAbstractPropertyType_a4c359b2e7c3b0ede21c64ba2c90567aa}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!to\+String@{to\+String}}
+\index{to\+String@{to\+String}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{to\+String}]{\setlength{\rightskip}{0pt plus 5cm}virtual std\+::string Abstract\+Property\+Type\+::to\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractPropertyType_a4c359b2e7c3b0ede21c64ba2c90567aa}
+
+
+to\+String 
+
+\begin{DoxyReturn}{Returns}
+strigified value 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classListPropertyType_a7c0f0a4ab1d1ceaf4d7abfbdade7f5ea}{List\+Property\+Type$<$ T $>$}, \hyperlink{classStringPropertyType_afb461a0a918e23e66880d0c8d2180b35}{String\+Property\+Type}, \hyperlink{classBasicPropertyType_a672e2824bcc38da6e60090022fd8d114}{Basic\+Property\+Type$<$ T $>$}, \hyperlink{classMapPropertyType_a662d25c3cd9e1732f0cd2dabd38c1bcd}{Map\+Property\+Type$<$ T, N $>$}, and \hyperlink{classMapPropertyType_a662d25c3cd9e1732f0cd2dabd38c1bcd}{Map\+Property\+Type$<$ String\+Property\+Type, String\+Property\+Type $>$}.
+
+\hypertarget{classAbstractPropertyType_ae4c8025e310eb06916a28e0341f3356d}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!to\+Variant@{to\+Variant}}
+\index{to\+Variant@{to\+Variant}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{to\+Variant}]{\setlength{\rightskip}{0pt plus 5cm}virtual G\+Variant$\ast$ Abstract\+Property\+Type\+::to\+Variant (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAbstractPropertyType_ae4c8025e310eb06916a28e0341f3356d}
+
+
+to\+Variant 
+
+\begin{DoxyReturn}{Returns}
+G\+Variant representation of value. Caller must unref the returned G\+Variant 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{classListPropertyType_ab0a0e192757158cd9901becacbafdb41}{List\+Property\+Type$<$ T $>$}, \hyperlink{classStringPropertyType_a1ec1ba3797194880a1e7576bd3695a28}{String\+Property\+Type}, \hyperlink{classBasicPropertyType_a893a2d1f8fec7141159d850caa78bc06}{Basic\+Property\+Type$<$ T $>$}, \hyperlink{classMapPropertyType_a0dfca18093e88f7ae8788bf1ce852109}{Map\+Property\+Type$<$ T, N $>$}, and \hyperlink{classMapPropertyType_a0dfca18093e88f7ae8788bf1ce852109}{Map\+Property\+Type$<$ String\+Property\+Type, String\+Property\+Type $>$}.
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classAbstractPropertyType_a0899de35293963a6c18a0f4913916871}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!name@{name}}
+\index{name@{name}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{name}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Abstract\+Property\+Type\+::name}}\label{classAbstractPropertyType_a0899de35293963a6c18a0f4913916871}
+
+
+name Property name. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classVehicleProperty}{Vehicle\+Property} for built-\/in supported property names 
+\end{DoxySeeAlso}
+\hypertarget{classAbstractPropertyType_a6a391546600fde38a351d3d236be8a9b}{\index{Abstract\+Property\+Type@{Abstract\+Property\+Type}!timestamp@{timestamp}}
+\index{timestamp@{timestamp}!Abstract\+Property\+Type@{Abstract\+Property\+Type}}
+\subsubsection[{timestamp}]{\setlength{\rightskip}{0pt plus 5cm}double Abstract\+Property\+Type\+::timestamp}}\label{classAbstractPropertyType_a6a391546600fde38a351d3d236be8a9b}
+
+
+timestamp. Timestamp when the value was last updated by the system. This is updated automatically any time \hyperlink{classAbstractPropertyType_a1b2598b86718911533587a5bd41bfb9c}{set\+Value()} is called 
+
+\begin{DoxySeeAlso}{See also}
+amb\+::current\+Time() 
+
+\hyperlink{classAbstractPropertyType_a1b2598b86718911533587a5bd41bfb9c}{set\+Value()} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/kev/src/automotive-\/message-\/broker/lib/abstractpropertytype.\+h\end{DoxyCompactItemize}

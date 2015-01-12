@@ -1,0 +1,347 @@
+\hypertarget{classAmbPluginImpl}{\section{Amb\+Plugin\+Impl Class Reference}
+\label{classAmbPluginImpl}\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+}
+
+
+\hyperlink{classAmbPlugin}{Amb\+Plugin} private class implementation -\/ base class for all plugin implementations.  
+
+
+
+
+{\ttfamily \#include $<$ambpluginimpl.\+h$>$}
+
+
+
+Collaboration diagram for Amb\+Plugin\+Impl\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classAmbPluginImpl__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classAmbPluginImpl_a3d8f1cc299086979feda83a738383da9}{Amb\+Plugin\+Impl} (\hyperlink{classAbstractRoutingEngine}{Abstract\+Routing\+Engine} $\ast$re, const map$<$ string, string $>$ \&config, \hyperlink{classAbstractSource}{Abstract\+Source} \&parent)
+\item 
+virtual void \hyperlink{classAmbPluginImpl_a5d8761396425365968082d33858766ff}{get\+Property\+Async} (\hyperlink{classAsyncPropertyReply}{Async\+Property\+Reply} $\ast$reply)
+\begin{DoxyCompactList}\small\item\em get\+Property\+Async is called when a sink requests the value for given property. This is only called if the source supports the Get operation. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classAmbPluginImpl_aed6dbea1334112647a1ea3929c63b974}{get\+Range\+Property\+Async} (\hyperlink{classAsyncRangePropertyReply}{Async\+Range\+Property\+Reply} $\ast$reply)
+\begin{DoxyCompactList}\small\item\em get\+Range\+Property\+Async is called when a sink requests a series of values for a given property within a specified time or sequencial range. This will only be called if the source support the Ranged Operation. \end{DoxyCompactList}\item 
+virtual \hyperlink{classAsyncPropertyReply}{Async\+Property\+Reply} $\ast$ \hyperlink{classAmbPluginImpl_a5f6fde74abdb780eeb2bd559622442db}{set\+Property} (const \hyperlink{classAsyncSetPropertyRequest}{Async\+Set\+Property\+Request} \&request)
+\begin{DoxyCompactList}\small\item\em set\+Property is called when a sink requests to set a value for a given property. This is only called if the source supports the Set Operation. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classAmbPluginImpl_ac30b646ad031abf4242385a9036036f5}{subscribe\+To\+Property\+Changes} (const Vehicle\+Property\+::\+Property \&property)
+\begin{DoxyCompactList}\small\item\em subscribe\+To\+Property\+Changes is called when a sink requests a subscription. Source plugins can keep track of subscriptions and may wish to sleep if there are no subscriptions. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classAmbPluginImpl_a79ba9ce98ad124a1900960fa48161841}{unsubscribe\+To\+Property\+Changes} (const Vehicle\+Property\+::\+Property \&property)
+\begin{DoxyCompactList}\small\item\em unsubscribe\+To\+Property\+Changes is called when a sink requests to unsubscribe from a given property's changes. \end{DoxyCompactList}\item 
+virtual Property\+List \hyperlink{classAmbPluginImpl_a7e68d394462c7937b71a832e17a61bf4}{supported} () const 
+\begin{DoxyCompactList}\small\item\em supported is called by the routing\+Engine to understand what properties this source supports. \end{DoxyCompactList}\item 
+virtual int \hyperlink{classAmbPluginImpl_aa2ed14eb33f85a4bbf9d272e1f4b31bd}{supported\+Operations} () const 
+\begin{DoxyCompactList}\small\item\em supported\+Operations \end{DoxyCompactList}\item 
+virtual \hyperlink{classPropertyInfo}{Property\+Info} \hyperlink{classAmbPluginImpl_a1055d9c3af49bee75de80386888b8398}{get\+Property\+Info} (const Vehicle\+Property\+::\+Property \&property)
+\begin{DoxyCompactList}\small\item\em get\+Property\+Info used to return specific information about a property. The source should override this otherwise a \hyperlink{classPropertyInfo_a5a3e9a1198ac54a40b1f3ae009bb1397}{Property\+Info\+::invalid()} will be returned for the property \end{DoxyCompactList}\item 
+virtual const std\+::string \hyperlink{classAmbPluginImpl_abba832fa02a70798df7323b909c7a2c2}{uuid} () const =0
+\item 
+virtual void \hyperlink{classAmbPluginImpl_a3ca73b22f4ca3a98ec1abe6313fb0129}{property\+Changed} (\hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $\ast$value)
+\item 
+virtual void \hyperlink{classAmbPluginImpl_a9ef528c7ee79bfd30132b926ce38b0ae}{supported\+Changed} (const Property\+List \&supported\+Properties)
+\item 
+virtual void \hyperlink{classAmbPluginImpl_a0e9fa59ffb80efe0e30fb5de78540a31}{init} ()
+\end{DoxyCompactItemize}
+\subsection*{Protected Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef std\+::map$<$ Zone\+::\+Type, \\*
+std\+::shared\+\_\+ptr\\*
+$<$ \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $>$ $>$ \hyperlink{classAmbPluginImpl_a6be3e5823bb358932c132760262fb4ee}{Zone\+Property\+Type}
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $\ast$ \hyperlink{classAmbPluginImpl_a885512c1be862693f6e6a10c70a23ab2}{find\+Property\+Type} (const Vehicle\+Property\+::\+Property \&property\+Name, const Zone\+::\+Type \&zone=Zone\+::\+None)
+\item 
+std\+::shared\+\_\+ptr\\*
+$<$ \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $>$ \hyperlink{classAmbPluginImpl_a96567c4d044e98821fec46ace002b8ed}{add\+Property\+Support} (Zone\+::\+Type zone, std\+::function$<$ \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $\ast$(void)$>$ type\+Factory, std\+::string source\+Uuid=\char`\"{}\char`\"{})
+\item 
+\hypertarget{classAmbPluginImpl_aad251db3a4cb7f188c2853a273bccef1}{{\footnotesize template$<$class T $>$ }\\std\+::shared\+\_\+ptr\\*
+$<$ \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} $>$ {\bfseries add\+Property\+Support} (Zone\+::\+Type zone)}\label{classAmbPluginImpl_aad251db3a4cb7f188c2853a273bccef1}
+
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAmbPluginImpl_a36fa7b3c793f1410b331d3221079d19b}{\hyperlink{classAbstractSource}{Abstract\+Source} \& {\bfseries source}}\label{classAmbPluginImpl_a36fa7b3c793f1410b331d3221079d19b}
+
+\item 
+\hyperlink{classAbstractRoutingEngine}{Abstract\+Routing\+Engine} $\ast$ \hyperlink{classAmbPluginImpl_a44be51306133b0d71ed79507032c3a8c}{routing\+Engine}
+\item 
+std\+::map\\*
+$<$ Vehicle\+Property\+::\+Property, \\*
+\hyperlink{classAmbPluginImpl_a6be3e5823bb358932c132760262fb4ee}{Zone\+Property\+Type} $>$ \hyperlink{classAmbPluginImpl_a8f58d50cf0a4dd48b90e8fad6a9f5baa}{properties}
+\item 
+std\+::map$<$ std\+::string, \\*
+std\+::string $>$ \hyperlink{classAmbPluginImpl_a1f711a42020b16453e6890d3634de987}{configuration}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{classAmbPlugin}{Amb\+Plugin} private class implementation -\/ base class for all plugin implementations. 
+
+Contains common code used in all Ivi\+Po\+C I\+I plugins for Automotive message broker(\+A\+M\+B). For the A\+M\+B library A\+P\+I please visit \href{https://github.com/otcshare/automotive-message-broker}{\tt Automotive message broker web page}. 
+
+\subsection{Member Typedef Documentation}
+\hypertarget{classAmbPluginImpl_a6be3e5823bb358932c132760262fb4ee}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!Zone\+Property\+Type@{Zone\+Property\+Type}}
+\index{Zone\+Property\+Type@{Zone\+Property\+Type}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{Zone\+Property\+Type}]{\setlength{\rightskip}{0pt plus 5cm}typedef std\+::map$<$ Zone\+::\+Type, std\+::shared\+\_\+ptr$<${\bf Abstract\+Property\+Type}$>$ $>$ {\bf Amb\+Plugin\+Impl\+::\+Zone\+Property\+Type}\hspace{0.3cm}{\ttfamily [protected]}}}\label{classAmbPluginImpl_a6be3e5823bb358932c132760262fb4ee}
+Helper typedef 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classAmbPluginImpl_a3d8f1cc299086979feda83a738383da9}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{Amb\+Plugin\+Impl}]{\setlength{\rightskip}{0pt plus 5cm}Amb\+Plugin\+Impl\+::\+Amb\+Plugin\+Impl (
+\begin{DoxyParamCaption}
+\item[{{\bf Abstract\+Routing\+Engine} $\ast$}]{re, }
+\item[{const map$<$ string, string $>$ \&}]{config, }
+\item[{{\bf Abstract\+Source} \&}]{parent}
+\end{DoxyParamCaption}
+)}}\label{classAmbPluginImpl_a3d8f1cc299086979feda83a738383da9}
+
+\begin{DoxyParams}{Parameters}
+{\em re} & \hyperlink{classAbstractRoutingEngine}{Abstract\+Routing\+Engine} \\
+\hline
+{\em config} & Map of the configuration string values loaded on startup from A\+M\+B configuration file \\
+\hline
+{\em parent} & \hyperlink{classAmbPlugin}{Amb\+Plugin} instance \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classAmbPluginImpl_a96567c4d044e98821fec46ace002b8ed}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!add\+Property\+Support@{add\+Property\+Support}}
+\index{add\+Property\+Support@{add\+Property\+Support}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{add\+Property\+Support}]{\setlength{\rightskip}{0pt plus 5cm}std\+::shared\+\_\+ptr$<$ {\bf Abstract\+Property\+Type} $>$ Amb\+Plugin\+Impl\+::add\+Property\+Support (
+\begin{DoxyParamCaption}
+\item[{Zone\+::\+Type}]{zone, }
+\item[{std\+::function$<$ {\bf Abstract\+Property\+Type} $\ast$(void)$>$}]{type\+Factory, }
+\item[{std\+::string}]{source\+Uuid = {\ttfamily \char`\"{}\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}}}\label{classAmbPluginImpl_a96567c4d044e98821fec46ace002b8ed}
+Registers property in A\+M\+B 
+\begin{DoxyParams}{Parameters}
+{\em zone} & \hyperlink{classZone}{Zone} of the property to be registered. \\
+\hline
+{\em type\+Factory} & Function to be used to create instance of the \hyperlink{classAbstractPropertyType}{Abstract\+Property\+Type} for registered property \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Abstract\+Property\+Type$\ast$ if signal exits otherwise nullptr(in this case we do not know its datatype) 
+\end{DoxyReturn}
+\hypertarget{classAmbPluginImpl_a885512c1be862693f6e6a10c70a23ab2}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!find\+Property\+Type@{find\+Property\+Type}}
+\index{find\+Property\+Type@{find\+Property\+Type}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{find\+Property\+Type}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Abstract\+Property\+Type} $\ast$ Amb\+Plugin\+Impl\+::find\+Property\+Type (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\+Property\+::\+Property \&}]{property\+Name, }
+\item[{const Zone\+::\+Type \&}]{zone = {\ttfamily Zone\+:\+:None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [virtual]}}}\label{classAmbPluginImpl_a885512c1be862693f6e6a10c70a23ab2}
+Finds property type in \hyperlink{classAmbPluginImpl_a8f58d50cf0a4dd48b90e8fad6a9f5baa}{properties} 
+\begin{DoxyParams}{Parameters}
+{\em property\+Name} & Name of the property to be found. \\
+\hline
+{\em zone} & \hyperlink{classZone}{Zone} of the property to be found. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Abstract\+Property\+Type$\ast$ if signal exits otherwise nullptr(in this case we do not know its datatype) 
+\end{DoxyReturn}
+\hypertarget{classAmbPluginImpl_a5d8761396425365968082d33858766ff}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!get\+Property\+Async@{get\+Property\+Async}}
+\index{get\+Property\+Async@{get\+Property\+Async}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{get\+Property\+Async}]{\setlength{\rightskip}{0pt plus 5cm}void Amb\+Plugin\+Impl\+::get\+Property\+Async (
+\begin{DoxyParamCaption}
+\item[{{\bf Async\+Property\+Reply} $\ast$}]{reply}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a5d8761396425365968082d33858766ff}
+
+
+get\+Property\+Async is called when a sink requests the value for given property. This is only called if the source supports the Get operation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em reply} & the reply variable. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAmbPluginImpl_a1055d9c3af49bee75de80386888b8398}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!get\+Property\+Info@{get\+Property\+Info}}
+\index{get\+Property\+Info@{get\+Property\+Info}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{get\+Property\+Info}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Property\+Info} Amb\+Plugin\+Impl\+::get\+Property\+Info (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\+Property\+::\+Property \&}]{property}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a1055d9c3af49bee75de80386888b8398}
+
+
+get\+Property\+Info used to return specific information about a property. The source should override this otherwise a \hyperlink{classPropertyInfo_a5a3e9a1198ac54a40b1f3ae009bb1397}{Property\+Info\+::invalid()} will be returned for the property 
+
+
+\begin{DoxyParams}{Parameters}
+{\em property} & the property to get info for. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+a \hyperlink{classPropertyInfo}{Property\+Info} object. 
+\end{DoxyReturn}
+\hypertarget{classAmbPluginImpl_aed6dbea1334112647a1ea3929c63b974}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!get\+Range\+Property\+Async@{get\+Range\+Property\+Async}}
+\index{get\+Range\+Property\+Async@{get\+Range\+Property\+Async}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{get\+Range\+Property\+Async}]{\setlength{\rightskip}{0pt plus 5cm}void Amb\+Plugin\+Impl\+::get\+Range\+Property\+Async (
+\begin{DoxyParamCaption}
+\item[{{\bf Async\+Range\+Property\+Reply} $\ast$}]{reply}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_aed6dbea1334112647a1ea3929c63b974}
+
+
+get\+Range\+Property\+Async is called when a sink requests a series of values for a given property within a specified time or sequencial range. This will only be called if the source support the Ranged Operation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em reply} & is the reply variable. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAmbPluginImpl_a0e9fa59ffb80efe0e30fb5de78540a31}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!init@{init}}
+\index{init@{init}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}Amb\+Plugin\+Impl\+::init (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a0e9fa59ffb80efe0e30fb5de78540a31}
+Second phase of the plugin initialization. \hypertarget{classAmbPluginImpl_a3ca73b22f4ca3a98ec1abe6313fb0129}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!property\+Changed@{property\+Changed}}
+\index{property\+Changed@{property\+Changed}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{property\+Changed}]{\setlength{\rightskip}{0pt plus 5cm}void Amb\+Plugin\+Impl\+::property\+Changed (
+\begin{DoxyParamCaption}
+\item[{{\bf Abstract\+Property\+Type} $\ast$}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a3ca73b22f4ca3a98ec1abe6313fb0129}
+property\+Changed is called when a subscribed to property changes. 
+\begin{DoxyParams}{Parameters}
+{\em value} & value of the property that changed. this is a temporary pointer that will be destroyed. Do not destroy it. If you need to store the value use value.\+any\+Value(), value.\+value$<$\+T$>$() or value-\/$>$copy() to copy. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAmbPluginImpl_a5f6fde74abdb780eeb2bd559622442db}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!set\+Property@{set\+Property}}
+\index{set\+Property@{set\+Property}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{set\+Property}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Async\+Property\+Reply} $\ast$ Amb\+Plugin\+Impl\+::set\+Property (
+\begin{DoxyParamCaption}
+\item[{const {\bf Async\+Set\+Property\+Request} \&}]{request}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a5f6fde74abdb780eeb2bd559622442db}
+
+
+set\+Property is called when a sink requests to set a value for a given property. This is only called if the source supports the Set Operation. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em request} & the requested property to set. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+returns a pointer to the new value for the property. 
+\end{DoxyReturn}
+\hypertarget{classAmbPluginImpl_ac30b646ad031abf4242385a9036036f5}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!subscribe\+To\+Property\+Changes@{subscribe\+To\+Property\+Changes}}
+\index{subscribe\+To\+Property\+Changes@{subscribe\+To\+Property\+Changes}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{subscribe\+To\+Property\+Changes}]{\setlength{\rightskip}{0pt plus 5cm}void Amb\+Plugin\+Impl\+::subscribe\+To\+Property\+Changes (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\+Property\+::\+Property \&}]{property}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_ac30b646ad031abf4242385a9036036f5}
+
+
+subscribe\+To\+Property\+Changes is called when a sink requests a subscription. Source plugins can keep track of subscriptions and may wish to sleep if there are no subscriptions. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em property} & the property that is being subscribed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAmbPluginImpl_a7e68d394462c7937b71a832e17a61bf4}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!supported@{supported}}
+\index{supported@{supported}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{supported}]{\setlength{\rightskip}{0pt plus 5cm}Property\+List Amb\+Plugin\+Impl\+::supported (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a7e68d394462c7937b71a832e17a61bf4}
+
+
+supported is called by the routing\+Engine to understand what properties this source supports. 
+
+\begin{DoxyReturn}{Returns}
+returns a list of supported properties. If the the supported properties changed, the source should call Abstract\+Routing\+Engine\+::set\+Supported. 
+\end{DoxyReturn}
+\hypertarget{classAmbPluginImpl_a9ef528c7ee79bfd30132b926ce38b0ae}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!supported\+Changed@{supported\+Changed}}
+\index{supported\+Changed@{supported\+Changed}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{supported\+Changed}]{\setlength{\rightskip}{0pt plus 5cm}Amb\+Plugin\+Impl\+::supported\+Changed (
+\begin{DoxyParamCaption}
+\item[{const Property\+List \&}]{supported\+Properties}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a9ef528c7ee79bfd30132b926ce38b0ae}
+\hyperlink{classAmbPluginImpl_a9ef528c7ee79bfd30132b926ce38b0ae}{supported\+Changed()} is called when the supported properties changes
+
+
+\begin{DoxyParams}{Parameters}
+{\em supported\+Properties} & the new list of supported properties. \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAmbPluginImpl_aa2ed14eb33f85a4bbf9d272e1f4b31bd}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!supported\+Operations@{supported\+Operations}}
+\index{supported\+Operations@{supported\+Operations}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{supported\+Operations}]{\setlength{\rightskip}{0pt plus 5cm}int Amb\+Plugin\+Impl\+::supported\+Operations (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_aa2ed14eb33f85a4bbf9d272e1f4b31bd}
+
+
+supported\+Operations 
+
+\begin{DoxyReturn}{Returns}
+returns the supported operations. 
+\end{DoxyReturn}
+\hypertarget{classAmbPluginImpl_a79ba9ce98ad124a1900960fa48161841}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!unsubscribe\+To\+Property\+Changes@{unsubscribe\+To\+Property\+Changes}}
+\index{unsubscribe\+To\+Property\+Changes@{unsubscribe\+To\+Property\+Changes}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{unsubscribe\+To\+Property\+Changes}]{\setlength{\rightskip}{0pt plus 5cm}void Amb\+Plugin\+Impl\+::unsubscribe\+To\+Property\+Changes (
+\begin{DoxyParamCaption}
+\item[{const Vehicle\+Property\+::\+Property \&}]{property}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}}\label{classAmbPluginImpl_a79ba9ce98ad124a1900960fa48161841}
+
+
+unsubscribe\+To\+Property\+Changes is called when a sink requests to unsubscribe from a given property's changes. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em property} & the property to unsubscribe to \\
+\hline
+\end{DoxyParams}
+\hypertarget{classAmbPluginImpl_abba832fa02a70798df7323b909c7a2c2}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!uuid@{uuid}}
+\index{uuid@{uuid}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{uuid}]{\setlength{\rightskip}{0pt plus 5cm}virtual const std\+::string Amb\+Plugin\+Impl\+::uuid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [pure virtual]}}}\label{classAmbPluginImpl_abba832fa02a70798df7323b909c7a2c2}
+\hyperlink{classAmbPluginImpl_abba832fa02a70798df7323b909c7a2c2}{uuid()} is a unique identifier \begin{DoxyReturn}{Returns}
+a guid-\/style unique identifier 
+\end{DoxyReturn}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classAmbPluginImpl_a1f711a42020b16453e6890d3634de987}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!configuration@{configuration}}
+\index{configuration@{configuration}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{configuration}]{\setlength{\rightskip}{0pt plus 5cm}std\+::map$<$ std\+::string, std\+::string$>$ Amb\+Plugin\+Impl\+::configuration\hspace{0.3cm}{\ttfamily [protected]}}}\label{classAmbPluginImpl_a1f711a42020b16453e6890d3634de987}
+configuration \hypertarget{classAmbPluginImpl_a8f58d50cf0a4dd48b90e8fad6a9f5baa}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!properties@{properties}}
+\index{properties@{properties}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{properties}]{\setlength{\rightskip}{0pt plus 5cm}Amb\+Plugin\+Impl\+::properties\hspace{0.3cm}{\ttfamily [protected]}}}\label{classAmbPluginImpl_a8f58d50cf0a4dd48b90e8fad6a9f5baa}
+Supported property values map \hypertarget{classAmbPluginImpl_a44be51306133b0d71ed79507032c3a8c}{\index{Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}!routing\+Engine@{routing\+Engine}}
+\index{routing\+Engine@{routing\+Engine}!Amb\+Plugin\+Impl@{Amb\+Plugin\+Impl}}
+\subsubsection[{routing\+Engine}]{\setlength{\rightskip}{0pt plus 5cm}Amb\+Plugin\+Impl\+::routing\+Engine\hspace{0.3cm}{\ttfamily [protected]}}}\label{classAmbPluginImpl_a44be51306133b0d71ed79507032c3a8c}
+\hyperlink{classAbstractRoutingEngine}{Abstract\+Routing\+Engine} instance 
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/kev/src/automotive-\/message-\/broker/lib/ambpluginimpl.\+h\item 
+/home/kev/src/automotive-\/message-\/broker/lib/ambpluginimpl.\+cpp\end{DoxyCompactItemize}

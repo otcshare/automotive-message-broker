@@ -1,0 +1,61 @@
+\hypertarget{classAmbPlugin}{\section{Amb\+Plugin$<$ T $>$ Class Template Reference}
+\label{classAmbPlugin}\index{Amb\+Plugin$<$ T $>$@{Amb\+Plugin$<$ T $>$}}
+}
+
+
+{\ttfamily \#include $<$ambplugin.\+h$>$}
+
+
+
+Inheritance diagram for Amb\+Plugin$<$ T $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=168pt]{classAmbPlugin__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for Amb\+Plugin$<$ T $>$\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{classAmbPlugin__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class T$>$class Amb\+Plugin$<$ T $>$}
+
+\hyperlink{classAmbPlugin}{Amb\+Plugin} class contains common code used in all Ivi\+Po\+C I\+I plugins for Automotive message broker(\+A\+M\+B). For the A\+M\+B library A\+P\+I please visit \href{https://github.com/otcshare/automotive-message-broker}{\tt Automotive message broker web page}.
+
+Example of the minimal code to write a new plugin using \hyperlink{classAmbPlugin}{Amb\+Plugin}\+:
+
+
+\begin{DoxyCode}
+\textcolor{preprocessor}{#include "ambpluginimpl.h"}
+
+\textcolor{keyword}{class }MyPlugin: \textcolor{keyword}{public} \hyperlink{classAmbPluginImpl}{AmbPluginImpl} \{
+
+\textcolor{keyword}{public}:
+    MyPlugin(\hyperlink{classAbstractRoutingEngine}{AbstractRoutingEngine}* re, \textcolor{keyword}{const} std::map<std::string, std::string>& 
+      config, \hyperlink{classAbstractSink}{AbstractSink}& parent);
+    ~MyPlugin();
+
+    \textcolor{keyword}{const} std::string \hyperlink{classAbstractSink_a965ae1d5218713c7823fbd95fa51b053}{uuid}()\textcolor{keyword}{ const }\{ \textcolor{keywordflow}{return} \textcolor{stringliteral}{"plugin\_uuid"}; \}
+\};
+
+\textcolor{comment}{// library exported function for plugin loader}
+\textcolor{keyword}{extern} \textcolor{stringliteral}{"C"} \hyperlink{classAbstractSource}{AbstractSource}* create(\hyperlink{classAbstractRoutingEngine}{AbstractRoutingEngine}* routingengine, 
+      std::map<std::string, std::string> config)
+\{
+    \textcolor{keywordflow}{return} \textcolor{keyword}{new} \hyperlink{classAmbPlugin}{AmbPlugin<MyPlugin>}(routingengine, config);
+\}
+\end{DoxyCode}
+ 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/home/kev/src/automotive-\/message-\/broker/lib/\hyperlink{ambplugin_8h}{ambplugin.\+h}\end{DoxyCompactItemize}

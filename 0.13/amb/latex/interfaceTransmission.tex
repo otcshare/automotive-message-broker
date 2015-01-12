@@ -1,0 +1,92 @@
+\hypertarget{interfaceTransmission}{\section{Transmission Interface Reference}
+\label{interfaceTransmission}\index{Transmission@{Transmission}}
+}
+
+
+Corresponds with D\+Bus Interface org.\+automotive.\+Transmission.  
+
+
+
+
+{\ttfamily import\char`\"{}ambdbusmappings.\+idl\char`\"{};}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{interfaceTransmission_adca9345a62115b7a722fc66fccff434c}{enum {\bfseries Transmission\+Positions} \{ \\*
+{\bfseries Neutral} = 0, 
+{\bfseries First}, 
+{\bfseries Second}, 
+{\bfseries Third}, 
+\\*
+{\bfseries Forth}, 
+{\bfseries Fifth}, 
+{\bfseries Sixth}, 
+{\bfseries Seventh}, 
+\\*
+{\bfseries Eighth}, 
+{\bfseries Ninth}, 
+{\bfseries Tenth}, 
+{\bfseries C\+V\+T} = 64, 
+\\*
+{\bfseries Drive} = 96, 
+{\bfseries Reverse} = 128, 
+{\bfseries Park} = 255
+ \}}\label{interfaceTransmission_adca9345a62115b7a722fc66fccff434c}
+
+\item 
+enum \hyperlink{interfaceTransmission_a15d0278c6e0dc75cd28f5aeaadb86680}{Mode} \{ \\*
+{\bfseries Normal} =0, 
+{\bfseries Sports} = 1, 
+{\bfseries Economy} = 2, 
+{\bfseries O\+E\+M\+Custom1} = 3, 
+\\*
+{\bfseries O\+E\+M\+Custom2} = 4
+ \}
+\item 
+\hypertarget{interfaceTransmission_ae88e058c356841ec4b74c89004aeba78}{enum {\bfseries Type} \{ {\bfseries Unknown} = -\/1, 
+{\bfseries Auto} = 0, 
+{\bfseries Manual} = 1, 
+{\bfseries C\+V} = 2
+ \}}\label{interfaceTransmission_ae88e058c356841ec4b74c89004aeba78}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{interfaceTransmission_a749c8273349cd7689858ed24217049b1}{const D\+O\+M\+String \hyperlink{interfaceTransmission_a749c8273349cd7689858ed24217049b1}{Transmission\+Shift\+Position} = \char`\"{}Shift\+Position\char`\"{}}\label{interfaceTransmission_a749c8273349cd7689858ed24217049b1}
+
+\begin{DoxyCompactList}\small\item\em corresponds with D\+Bus property Shift\+Position for interface org.\+automotive.\+Transmission A\+M\+B fulfills this member with \hyperlink{classVehicleProperty_ae486d9ea26918460822086b797018800}{Vehicle\+Property\+::\+Transmission\+Shift\+Position} \end{DoxyCompactList}\item 
+const D\+O\+M\+String \hyperlink{interfaceTransmission_a0271138d40b3619ffcbfe32f2081d516}{Transmission\+Gear\+Position} = \char`\"{}Gear\+Position\char`\"{}
+\begin{DoxyCompactList}\small\item\em corresponds with D\+Bus property Gear\+Position for interface org.\+automotive.\+Transmission A\+M\+B fulfills this member with Vehicle\+Property\+::\+Transmission\+Gear\+Position \end{DoxyCompactList}\item 
+\hypertarget{interfaceTransmission_a5f02d4b865d13144dbbff4ca10e731b7}{const D\+O\+M\+String \hyperlink{interfaceTransmission_a5f02d4b865d13144dbbff4ca10e731b7}{Transmission\+Mode\+W3\+C} = \char`\"{}Mode\char`\"{}}\label{interfaceTransmission_a5f02d4b865d13144dbbff4ca10e731b7}
+
+\begin{DoxyCompactList}\small\item\em corresponds with D\+Bus property Mode for interface org.\+automotive.\+Transmission A\+M\+B fulfills this member with Vehicle\+Property\+::\+Transmission\+Mode\+W3\+C \end{DoxyCompactList}\item 
+\hypertarget{interfaceTransmission_afdd88c1d4eefa241b0ae1e444c8a7ed6}{const D\+O\+M\+String \hyperlink{interfaceTransmission_afdd88c1d4eefa241b0ae1e444c8a7ed6}{Transmission\+Gear\+Type} = \char`\"{}Type\char`\"{}}\label{interfaceTransmission_afdd88c1d4eefa241b0ae1e444c8a7ed6}
+
+\begin{DoxyCompactList}\small\item\em corresponds with D\+Bus property Type for interface org.\+automotive.\+Transmission A\+M\+B fulfills this member with Vehicle\+Property\+::\+Transmission\+Gear\+Type \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Corresponds with D\+Bus Interface org.\+automotive.\+Transmission. 
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{interfaceTransmission_a15d0278c6e0dc75cd28f5aeaadb86680}{\index{Transmission@{Transmission}!Mode@{Mode}}
+\index{Mode@{Mode}!Transmission@{Transmission}}
+\subsubsection[{Mode}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Transmission\+::\+Mode}}}\label{interfaceTransmission_a15d0278c6e0dc75cd28f5aeaadb86680}
+T\+O\+D\+O\+: deprecate in 0.\+14. Replaced with Drive\+::\+Mode\+: 
+
+\subsection{Member Data Documentation}
+\hypertarget{interfaceTransmission_a0271138d40b3619ffcbfe32f2081d516}{\index{Transmission@{Transmission}!Transmission\+Gear\+Position@{Transmission\+Gear\+Position}}
+\index{Transmission\+Gear\+Position@{Transmission\+Gear\+Position}!Transmission@{Transmission}}
+\subsubsection[{Transmission\+Gear\+Position}]{\setlength{\rightskip}{0pt plus 5cm}const D\+O\+M\+String Transmission\+::\+Transmission\+Gear\+Position = \char`\"{}Gear\+Position\char`\"{}}}\label{interfaceTransmission_a0271138d40b3619ffcbfe32f2081d516}
+
+
+corresponds with D\+Bus property Gear\+Position for interface org.\+automotive.\+Transmission A\+M\+B fulfills this member with Vehicle\+Property\+::\+Transmission\+Gear\+Position 
+
+corresponds with D\+Bus property Gear for interface org.\+automotive.\+Transmission A\+M\+B fulfills this member with Vehicle\+Property\+::\+Transmission\+Gear\+Position 
+
+The documentation for this interface was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/kev/src/automotive-\/message-\/broker/build/docs/\hyperlink{ambdbusmappings_8idl}{ambdbusmappings.\+idl}\item 
+/home/kev/src/automotive-\/message-\/broker/lib/vehicleproperty.\+h\end{DoxyCompactItemize}

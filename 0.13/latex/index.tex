@@ -1,0 +1,29 @@
+\begin{DoxyVersion}{Version}
+0.\+13 
+\end{DoxyVersion}
+\hypertarget{index_links}{}\section{A\+M\+B Documentation Sections}\label{index_links}
+
+\begin{DoxyItemize}
+\item \href{../dbus/html/index.html}{\tt D\+Bus A\+P\+I documentation} -\/ Using A\+M\+B with your application
+\item \href{../amb/html/index.html}{\tt libamb internal A\+P\+I documentation} -\/ Developing A\+M\+B or A\+M\+B plugins
+\item \href{../plugins/bluemonkey/html/index.html}{\tt Bluemonkey Javascript A\+P\+I documentation}
+\item \href{../plugins/websocket/html/index.html}{\tt A\+M\+B Websocket protocol documentation} 
+\end{DoxyItemize}\hypertarget{index_intro}{}\section{Introduction}\label{index_intro}
+Automotive Message Broker (A\+M\+B) is a framework for providing applications with standardized access to vehicle data. It uses a plugin architecture to allow customization for different vehicles and devices. Here is a diagram of how A\+M\+B is architected\+:  A\+M\+B works by passing \char`\"{}\+Properties\char`\"{} from \char`\"{}source\char`\"{} plugins to interested \char`\"{}sink\char`\"{} plugins. These properties represent vehicle data, ie 'Vehicle\+Speed' represents the vehicle's ground velocity.
+
+In General, A\+M\+B \char`\"{}source\char`\"{} plugins produce data and A\+M\+B \char`\"{}sink\char`\"{} plugins consume them. However, it is possible that a source can also consumes data. A\+M\+B supports multiple simultaneous source and sink plugins. This allows for aggregation from multiple vehicle networks, the cloud, or even from other instances of A\+M\+B running elsewhere (via the websocket plugins).
+
+More information about A\+M\+B plugins can be found in the \href{../amb/html/index.html}{\tt library documentation}. \hypertarget{index_plugins}{}\section{A\+M\+B Plugins}\label{index_plugins}
+A\+M\+B plugins each have their own usage documentation including any special Properties they define. Below is a description of several A\+M\+B plugins and their documenation\+:
+\begin{DoxyItemize}
+\item \href{../plugins/bluemonkey.README}{\tt Bluemonkey} -\/ Extensible javascript engine plugin for defining plugin behavior in javascript
+\item \href{../plugins/database.README}{\tt Database} -\/ Plugin that logs data in a sqlite database and can play back logs
+\item \href{../plugins/dbus.README}{\tt D\+Bus} -\/ Exposes A\+M\+B Properties on D\+Bus
+\item \href{../plugins/gpsnmea.README}{\tt G\+P\+S\+Nmea} -\/ G\+P\+S Plugin that provides location position data from N\+M\+E\+A compatible devices
+\item \href{../plugins/obd2.README}{\tt O\+B\+D-\/\+I\+I} -\/ Plugin that provides data from O\+B\+D-\/\+I\+I compatible vehicles
+\item \href{../plugins/opencvlux.README}{\tt Open\+C\+V\+Lux} -\/ Plugin that uses Open\+C\+V to produce A\+D\+A\+S data and perform video logging
+\item \href{../plugins/websocket.README}{\tt Websocket} -\/ Both source and sink plugin that uses a websocket protocol to communicate
+\item \href{../plugins/wheel.README}{\tt Wheel} -\/ Plugin that generates data using the Logitech G27 racing wheel 
+\end{DoxyItemize}\hypertarget{index_crosswalk}{}\section{Crosswalk Vehicle Extension}\label{index_crosswalk}
+A\+M\+B also comes with a \href{http://crosswalk-project.org}{\tt crosswalk} extension that implements the W3\+C Automotive Business group \href{https://rawgit.com/w3c/automotive-bg/master/vehicle_spec.html}{\tt vehicle} and \href{https://rawgit.com/w3c/automotive-bg/master/data_spec.html}{\tt data} specifications. \hypertarget{index_licensing}{}\section{Licensing}\label{index_licensing}
+A\+M\+B is licensed L\+G\+P\+L v2. This allows the creation of proprietary plugins. 

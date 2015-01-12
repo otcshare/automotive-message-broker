@@ -1,0 +1,83 @@
+\hypertarget{classAsyncPropertyReply}{\section{Async\-Property\-Reply Class Reference}
+\label{classAsyncPropertyReply}\index{Async\-Property\-Reply@{Async\-Property\-Reply}}
+}
+
+
+The \hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} class is used by sources to reply to Get and Set operations. The source should set success to true if the call is successful or 'false' if the request was not successful and set 'error' to the appropriate error.  
+
+
+
+
+{\ttfamily \#include $<$abstractroutingengine.\-h$>$}
+
+Inheritance diagram for Async\-Property\-Reply\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classAsyncPropertyReply}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classAsyncPropertyReply_ad91affaa25fcc3b73947a6cf4591e5d1}{Error} \{ \\*
+{\bfseries No\-Error} = 0, 
+{\bfseries Timeout}, 
+{\bfseries Invalid\-Operation}, 
+{\bfseries Permission\-Denied}, 
+\\*
+{\bfseries Zone\-Not\-Supported}
+ \}
+\begin{DoxyCompactList}\small\item\em The Error enum. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncPropertyReply_a3e29405633f16c8d06c7fa25a1890427}{{\bfseries Async\-Property\-Reply} (const \hyperlink{classAsyncPropertyRequest}{Async\-Property\-Request} \&request)}\label{classAsyncPropertyReply_a3e29405633f16c8d06c7fa25a1890427}
+
+\item 
+\hypertarget{classAsyncPropertyReply_acc396dd9b00628358a293bce441ebd51}{{\bfseries Async\-Property\-Reply} (const \hyperlink{classAsyncSetPropertyRequest}{Async\-Set\-Property\-Request} \&request)}\label{classAsyncPropertyReply_acc396dd9b00628358a293bce441ebd51}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncPropertyReply_a133699682d0376614b08b162f81c2b02}{\hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$ \hyperlink{classAsyncPropertyReply_a133699682d0376614b08b162f81c2b02}{value}}\label{classAsyncPropertyReply_a133699682d0376614b08b162f81c2b02}
+
+\begin{DoxyCompactList}\small\item\em value of the reply. This may be null if success = false. This is owned by the source. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncPropertyReply_aed1f10990a65664ce0c630039cae01bb}{bool \hyperlink{classAsyncPropertyReply_aed1f10990a65664ce0c630039cae01bb}{success}}\label{classAsyncPropertyReply_aed1f10990a65664ce0c630039cae01bb}
+
+\begin{DoxyCompactList}\small\item\em success indicates if the request was successfull or not. True means success. False means fail and the 'error' member should be set. \end{DoxyCompactList}\item 
+\hyperlink{classAsyncPropertyReply_ad91affaa25fcc3b73947a6cf4591e5d1}{Error} \hyperlink{classAsyncPropertyReply_a8c5cb98a6e2a72d6d94b43449a5e842d}{error}
+\begin{DoxyCompactList}\small\item\em error contains the error if the request was not successful.\textbackslash{} \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} class is used by sources to reply to Get and Set operations. The source should set success to true if the call is successful or 'false' if the request was not successful and set 'error' to the appropriate error. 
+
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classAbstractRoutingEngine_ad1cbda415f674be4a3ce49be05aa8ee8}{Abstract\-Routing\-Engine\-::get\-Property\-Async} 
+
+\hyperlink{classAsyncPropertyReply}{Async\-Property\-Reply} 
+
+\hyperlink{classAbstractSource_aad1e5e4914f2aa174dfd8fa6e143c1b9}{Abstract\-Source\-::\-Operations} 
+
+\hyperlink{classAbstractSource_a05589e699ea16a14675db226d51bdf9f}{Abstract\-Source\-::get\-Property\-Async} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classAsyncPropertyReply_a8c5cb98a6e2a72d6d94b43449a5e842d}{\index{Async\-Property\-Reply@{Async\-Property\-Reply}!error@{error}}
+\index{error@{error}!AsyncPropertyReply@{Async\-Property\-Reply}}
+\subsubsection[{error}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Error} Async\-Property\-Reply\-::error}}\label{classAsyncPropertyReply_a8c5cb98a6e2a72d6d94b43449a5e842d}
+
+
+error contains the error if the request was not successful.\textbackslash{} 
+
+\begin{DoxySeeAlso}{See Also}
+\hyperlink{classAsyncPropertyReply_ad91affaa25fcc3b73947a6cf4591e5d1}{Error} 
+\end{DoxySeeAlso}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/kev/src/automotive-\/message-\/broker/lib/abstractroutingengine.\-h\item 
+/home/kev/src/automotive-\/message-\/broker/lib/abstractroutingengine.\-cpp\end{DoxyCompactItemize}

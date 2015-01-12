@@ -1,0 +1,44 @@
+\hypertarget{classAsyncRangePropertyReply}{\section{Async\-Range\-Property\-Reply Class Reference}
+\label{classAsyncRangePropertyReply}\index{Async\-Range\-Property\-Reply@{Async\-Range\-Property\-Reply}}
+}
+
+
+The \hyperlink{classAsyncRangePropertyReply}{Async\-Range\-Property\-Reply} class is used by a source to reply to an \hyperlink{classAsyncRangePropertyRequest}{Async\-Range\-Property\-Request}. the source should set success to 'true' and populate the 'values' member if the request was successful. If the request is not successful, 'success' should be set to 'false' and the 'error' member should be set.  
+
+
+
+
+{\ttfamily \#include $<$abstractroutingengine.\-h$>$}
+
+Inheritance diagram for Async\-Range\-Property\-Reply\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classAsyncRangePropertyReply}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncRangePropertyReply_ac253016c5ff4dc8e0ac11f8e98a16025}{{\bfseries Async\-Range\-Property\-Reply} (\hyperlink{classAsyncRangePropertyRequest}{Async\-Range\-Property\-Request} request)}\label{classAsyncRangePropertyReply_ac253016c5ff4dc8e0ac11f8e98a16025}
+
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classAsyncRangePropertyReply_a43762c9a2d88ec91e3218f7eca297e56}{\hyperlink{classAsyncPropertyReply_ad91affaa25fcc3b73947a6cf4591e5d1}{Async\-Property\-Reply\-::\-Error} \hyperlink{classAsyncRangePropertyReply_a43762c9a2d88ec91e3218f7eca297e56}{error}}\label{classAsyncRangePropertyReply_a43762c9a2d88ec91e3218f7eca297e56}
+
+\begin{DoxyCompactList}\small\item\em error this is set if there was an error in the request. \char`\"{}success\char`\"{} will also be set to false. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyReply_a4ce96fd40ce8ec3fddab46652026734b}{std\-::list$<$ \hyperlink{classAbstractPropertyType}{Abstract\-Property\-Type} $\ast$ $>$ \hyperlink{classAsyncRangePropertyReply_a4ce96fd40ce8ec3fddab46652026734b}{values}}\label{classAsyncRangePropertyReply_a4ce96fd40ce8ec3fddab46652026734b}
+
+\begin{DoxyCompactList}\small\item\em values if the request was successful, this will contain a list of values meeting the criteria of the request. \end{DoxyCompactList}\item 
+\hypertarget{classAsyncRangePropertyReply_a4eab37dada60970211e62b0fc3aeac92}{bool \hyperlink{classAsyncRangePropertyReply_a4eab37dada60970211e62b0fc3aeac92}{success}}\label{classAsyncRangePropertyReply_a4eab37dada60970211e62b0fc3aeac92}
+
+\begin{DoxyCompactList}\small\item\em success this will be true if the request was successful. If not, this is false and error is set. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{classAsyncRangePropertyReply}{Async\-Range\-Property\-Reply} class is used by a source to reply to an \hyperlink{classAsyncRangePropertyRequest}{Async\-Range\-Property\-Request}. the source should set success to 'true' and populate the 'values' member if the request was successful. If the request is not successful, 'success' should be set to 'false' and the 'error' member should be set. 
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/kev/src/automotive-\/message-\/broker/lib/abstractroutingengine.\-h\end{DoxyCompactItemize}

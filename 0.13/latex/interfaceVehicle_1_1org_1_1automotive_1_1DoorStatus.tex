@@ -1,0 +1,56 @@
+\hypertarget{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus}{\section{Vehicle\-:\-:org\-:\-:automotive\-:\-:Door\-Status Interface Reference}
+\label{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus}\index{Vehicle\-::org\-::automotive\-::\-Door\-Status@{Vehicle\-::org\-::automotive\-::\-Door\-Status}}
+}
+Inheritance diagram for Vehicle\-:\-:org\-:\-:automotive\-:\-:Door\-Status\-:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus}
+\end{center}
+\end{figure}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_aa180d72224864738e37782c3228691c4}{const U\-Int16 {\bfseries D\-O\-O\-R\-S\-T\-A\-T\-U\-S\-\_\-\-C\-L\-O\-S\-E\-D} = 0}\label{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_aa180d72224864738e37782c3228691c4}
+
+\item 
+\hypertarget{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_ad2bce616fb0872655b3503cbb1426e0d}{const U\-Int16 {\bfseries D\-O\-O\-R\-S\-T\-A\-T\-U\-S\-\_\-\-O\-P\-E\-N} = 1}\label{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_ad2bce616fb0872655b3503cbb1426e0d}
+
+\item 
+\hypertarget{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a5bea88b5fe03e4ddc19036faeee112e3}{const U\-Int16 {\bfseries D\-O\-O\-R\-S\-T\-A\-T\-U\-S\-\_\-\-A\-J\-A\-R} = 2}\label{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a5bea88b5fe03e4ddc19036faeee112e3}
+
+\item 
+readonly attribute U\-Int16 \hyperlink{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a9df11347f9dc6b16d7be1ba632fc466d}{Door\-Status}
+\begin{DoxyCompactList}\small\item\em M\-U\-S\-T returns Door status (byte). See D\-O\-O\-R\-S\-T\-A\-T\-U\-S\-\_\-$\ast$. \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a92f3230d4fc471eab8541be36324e902}{Door\-Lock\-Status}
+\begin{DoxyCompactList}\small\item\em M\-U\-S\-T returns Door status (bool locked = true, unlocked = false). \end{DoxyCompactList}\item 
+attribute Boolean \hyperlink{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a682f1828dfa219ae0ba18d54029ea6ff}{Child\-Lock\-Status}
+\begin{DoxyCompactList}\small\item\em M\-U\-S\-T returns Child lock status of rear doors. active = true, inactive = false. Setting this to 'true' will prevent the rear doors from being opened from the inside. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a682f1828dfa219ae0ba18d54029ea6ff}{\index{Vehicle\-::org\-::automotive\-::\-Door\-Status@{Vehicle\-::org\-::automotive\-::\-Door\-Status}!Child\-Lock\-Status@{Child\-Lock\-Status}}
+\index{Child\-Lock\-Status@{Child\-Lock\-Status}!Vehicle::org::automotive::DoorStatus@{Vehicle\-::org\-::automotive\-::\-Door\-Status}}
+\subsubsection[{Child\-Lock\-Status}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\-::org\-::automotive\-::\-Door\-Status\-::\-Child\-Lock\-Status}}\label{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a682f1828dfa219ae0ba18d54029ea6ff}
+
+
+M\-U\-S\-T returns Child lock status of rear doors. active = true, inactive = false. Setting this to 'true' will prevent the rear doors from being opened from the inside. 
+
+Child\-Lock\-Status \hypertarget{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a92f3230d4fc471eab8541be36324e902}{\index{Vehicle\-::org\-::automotive\-::\-Door\-Status@{Vehicle\-::org\-::automotive\-::\-Door\-Status}!Door\-Lock\-Status@{Door\-Lock\-Status}}
+\index{Door\-Lock\-Status@{Door\-Lock\-Status}!Vehicle::org::automotive::DoorStatus@{Vehicle\-::org\-::automotive\-::\-Door\-Status}}
+\subsubsection[{Door\-Lock\-Status}]{\setlength{\rightskip}{0pt plus 5cm}attribute Boolean Vehicle\-::org\-::automotive\-::\-Door\-Status\-::\-Door\-Lock\-Status}}\label{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a92f3230d4fc471eab8541be36324e902}
+
+
+M\-U\-S\-T returns Door status (bool locked = true, unlocked = false). 
+
+Door\-Lock\-Status \hypertarget{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a9df11347f9dc6b16d7be1ba632fc466d}{\index{Vehicle\-::org\-::automotive\-::\-Door\-Status@{Vehicle\-::org\-::automotive\-::\-Door\-Status}!Door\-Status@{Door\-Status}}
+\index{Door\-Status@{Door\-Status}!Vehicle::org::automotive::DoorStatus@{Vehicle\-::org\-::automotive\-::\-Door\-Status}}
+\subsubsection[{Door\-Status}]{\setlength{\rightskip}{0pt plus 5cm}readonly attribute U\-Int16 Vehicle\-::org\-::automotive\-::\-Door\-Status\-::\-Door\-Status}}\label{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus_a9df11347f9dc6b16d7be1ba632fc466d}
+
+
+M\-U\-S\-T returns Door status (byte). See D\-O\-O\-R\-S\-T\-A\-T\-U\-S\-\_\-$\ast$. 
+
+\hyperlink{interfaceVehicle_1_1org_1_1automotive_1_1DoorStatus}{Door\-Status} 
+
+The documentation for this interface was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+amb.\-idl\end{DoxyCompactItemize}

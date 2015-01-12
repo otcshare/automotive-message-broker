@@ -1,0 +1,45 @@
+\hypertarget{amb_8fidl}{\section{/home/kev/src/automotive-\/message-\/broker/docs/amb.fidl File Reference}
+\label{amb_8fidl}\index{/home/kev/src/automotive-\/message-\/broker/docs/amb.\+fidl@{/home/kev/src/automotive-\/message-\/broker/docs/amb.\+fidl}}
+}
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+union \hyperlink{unionVariant}{Variant}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{Indent}{\bf automotive-\/message-\/broker}\par
+{\em This document describes the D\+Bus interfaces and data types for the Automotive Message Broker A\+P\+I. The data types are intended to as-\/close-\/as-\/ possible be compatible with the W3\+C vehicle \href{https://rawgit.com/w3c/automotive-bg/master/data_spec.html}{\tt data spec}.
+
+\begin{DoxyVersion}{Version}
+0.\+13 
+\end{DoxyVersion}
+}\begin{DoxyCompactItemize}
+\item 
+union \hyperlink{unionVariant}{Variant} \hyperlink{amb_8fidl_aea9b81502a85e8451cb2de497511ce5c}{Get\+History} (Double begin\+Time, Double end\+Time)
+\begin{DoxyCompactList}\small\item\em Vehicle\+Property\+Type is the base class for all Data types. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\subsection{Function Documentation}
+\hypertarget{amb_8fidl_aea9b81502a85e8451cb2de497511ce5c}{\index{amb.\+fidl@{amb.\+fidl}!Get\+History@{Get\+History}}
+\index{Get\+History@{Get\+History}!amb.\+fidl@{amb.\+fidl}}
+\subsubsection[{Get\+History}]{\setlength{\rightskip}{0pt plus 5cm}union {\bf Variant} Get\+History (
+\begin{DoxyParamCaption}
+\item[{Double}]{begin\+Time, }
+\item[{Double}]{end\+Time}
+\end{DoxyParamCaption}
+)}}\label{amb_8fidl_aea9b81502a85e8451cb2de497511ce5c}
+
+
+Vehicle\+Property\+Type is the base class for all Data types. 
+
+Dictionary
+
+Vehicle\+Property\+Type
+
+time in seconds since system start when a property in the interface updated.
+
+Zone in which the interface is situated.
+
+return dictionary of object\+Name and values for data between 'begin\+Time' and 'end\+Time' \begin{DoxyItemize}
+\item begin\+Time time stamp in Seconds since Unix Epoc \item end\+Time time stamp in Seconds since Unix Epoc \end{DoxyItemize}
