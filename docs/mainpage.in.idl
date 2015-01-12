@@ -36,4 +36,7 @@
 * <a href="https://rawgit.com/w3c/automotive-bg/master/vehicle_spec.html">vehicle</a> and <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html">data</a> specifications.
 * \section licensing Licensing
 * AMB is licensed LGPL v2.  This allows the creation of proprietary plugins.
+* \section previous_versions Previous Versions
+* - <a href="../../0.12/docs/amb/html/index.html">0.12 library Documentation</a>
+* - <a href="../../0.12/docs/dbus/html/index.html">0.12 DBus API Documentation</a>
 */
