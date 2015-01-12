@@ -2,11 +2,13 @@
 * \mainpage Automotive Message Broker Documentation
 * \version @PROJECT_VERSION@
 * \section links AMB Documentation Sections
-* - ambd.md AMB Daemon Documentation
+* - \ref ambd.md - AMB Daemon Documentation
 * - <a href="../dbus/html/index.html">DBus API documentation</a> - Using AMB with your application
 * - <a href="../amb/html/index.html">libamb internal API documentation</a> - Developing AMB or AMB plugins
 * - <a href="../plugins/bluemonkey/html/index.html">Bluemonkey Javascript API documentation</a>
 * - <a href="../plugins/websocket/html/index.html">AMB Websocket protocol documentation</a>
+* - \ref RELEASE.md - Current release notes
+*
 * \section intro Introduction
 * Automotive Message Broker (AMB) is a framework for providing applications with standardized access to vehicle data.
 * It uses a plugin architecture to allow customization for different vehicles and devices.  Here is a diagram of how
