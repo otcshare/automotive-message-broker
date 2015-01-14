@@ -22,34 +22,121 @@ class bcolors:
 		WHITE = '\x1b[37m'
 		BLUE = '\x1b[34m'
 
+class Autocomplete:
+	class Cmd:
+		name = ""
+		description = ""
+		def __init__(self, n, d):
+			self.name = n
+			self.description = d
+
+	commands = []
+	properties = []
+
+	def __init__(self):
+		self.commands = []
+		self.commands.append(Autocomplete.Cmd('help', 'Prints help data (also see COMMAND help)'))
+		self.commands.append(Autocomplete.Cmd('list', 'List supported ObjectNames'))
+		self.commands.append(Autocomplete.Cmd('get', 'Get properties from an ObjectName'))
+		self.commands.append(Autocomplete.Cmd('listen', 'Listen for changes on an ObjectName'))
+		self.commands.append(Autocomplete.Cmd('set', 'Set a property for an ObjectName'))
+		self.commands.append(Autocomplete.Cmd('getHistory', 'Get logged data within a time range'))
+		self.commands.append(Autocomplete.Cmd('plugin', 'enable, disable and get info on a plugin'))
+		self.commands.append(Autocomplete.Cmd('quit', 'Exit ambctl'))
+
+		bus = dbus.SystemBus()
+		try:
+			managerObject = bus.get_object("org.automotive.message.broker", "/");
+			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
+			self.properties = managerInterface.List()
+		except dbus.exceptions.DBusException, error:
+			print error
+
+	def complete(self, partialString):
+		results = []
+
+		sameString = ""
+
+		for cmd in self.commands:
+			if not (len(partialString)) or cmd.name.startswith(partialString):
+				results.append(cmd.name)
+
+		for property in self.properties:
+			if not(len(partialString)) or property.startswith(partialString):
+				results.append(str(property))
+
+		if len(results) > 1 and len(results[0]) > 0:
+			for i in range(len(results[0])):
+				for j in range(len(results[0])-i+1):
+					if j > len(sameString) and all(results[0][i:i+j] in x for x in results):
+						sameString = results[0][i:i+j]
+		elif len(results) == 1:
+			sameString = results[0]
+
+		return results, sameString
+
+
 def help():
-		help = ("Available commands:\n"
-						+bcolors.HEADER+ "help" +bcolors.WHITE+ "           Prints help data\n"
-						+bcolors.HEADER+ "list" +bcolors.WHITE+ "           List supported ObjectNames\n"
-						+bcolors.HEADER+ "get" +bcolors.WHITE+ "            Get properties from an ObjectName\n"
-						+bcolors.HEADER+ "listen" +bcolors.WHITE+ "         Listen for changes on an ObjectName\n"
-						+bcolors.HEADER+ "set" +bcolors.WHITE+ "            Set a property for an ObjectName\n"
-						+bcolors.HEADER+ "getHistory" +bcolors.WHITE+ "     Get logged data within a time range\n"
-						+bcolors.HEADER+ "quit" +bcolors.WHITE+ "           Exit ambctl\n")
+		help = ("Available commands:\n")
+		autocomplete = Autocomplete()
+		for cmd in autocomplete.commands:
+			help += bcolors.HEADER + cmd.name + bcolors.WHITE
+			for i in range(1, 15 - len(cmd.name)):
+				help += " "
+			help += cmd.description + "\n"
+
 		return help
 
 def changed(interface, properties, invalidated):
 	print json.dumps(properties, indent=2)
 
+def listPlugins():
+	list = []
+	for root, dirs, files in os.walk('@PLUGIN_SEGMENT_INSTALL_PATH@'):
+		for file in files:
+			fullpath = root + "/" + file;
+			pluginFile = open(fullpath)
+			data = json.load(pluginFile)
+			data['segmentPath'] = fullpath
+			pluginFile.close()
+			list.append(data)
+	return list
+
+def enablePlugin(pluginName, enabled):
+	list = listPlugins()
+
+	for plugin in list:
+		if plugin["name"] == pluginName:
+			try :
+				plugin["enabled"] = enabled
+				file = open(plugin["segmentPath"], 'rw+')
+				plugin.pop('segmentPath', None)
+				fixedData = json.dumps(plugin, separators=(', ', ' : '), indent=4)
+				file.truncate()
+				file.write(fixedData)
+				file.close()
+				return True
+			except IOError, error:
+				print error
+				return False
+	return False
+
+
+
 def processCommand(command, commandArgs, noMain=True):
 
 	if command == 'help':
-			print help()
-			return 1
+		print help()
+		return 1
 
 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 	bus = dbus.SystemBus()
 	try:
-			managerObject = bus.get_object("org.automotive.message.broker", "/");
-			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
+		managerObject = bus.get_object("org.automotive.message.broker", "/");
+		managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
 	except:
-			print "Error connecting to AMB.  is AMB running?"
-			return 1
+		print "Error connecting to AMB.  is AMB running?"
+		return 1
 
 	if command == "list" :
 		supportedList = managerInterface.List()
@@ -112,7 +199,7 @@ def processCommand(command, commandArgs, noMain=True):
 		if property == realValue:
 			print propertyName + " = ", property
 		else:
-			print "Error setting property"
+			print "Error setting property.  Expected value: ", realValue, " Received: ", property
 		return 1
 	elif command == "getHistory":
 		if len(commandArgs) == 0:
@@ -136,13 +223,52 @@ def processCommand(command, commandArgs, noMain=True):
 		object = managerInterface.FindObjectForZone(objectName, zone);
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
+	elif command == "plugin":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
+		if commandArgs[0] == 'help':
+			print "[list] [pluginName] [on/off]"
+			return 1
+		elif commandArgs[0] == 'list':
+			for plugin in listPlugins():
+				print plugin['name']
+			return 1
+		elif len(commandArgs) == 1:
+			for plugin in listPlugins():
+				if plugin['name'] == commandArgs[0]:
+					print json.dumps(plugin, indent=4)
+					return 1
+				else:
+					print "name: " + plugin['name'] + "==?" + commandArgs[0]
+			print "plugin not found: ", commandArgs[0]
+			return 0
+		else:
+			if len(commandArgs) < 2:
+				return 1
+			enArg = commandArgs[1]
+			if not enArg == "on" and not enArg == "off":
+				print "please use 'on' or 'off' to enable/disable the plugin"
+				return 1
+			plugin = commandArgs[0]
+			enabled = enArg == "on"
+			enStr = "disabled"
+			if enablePlugin(plugin, enabled):
+				if enabled:
+					enStr = "enabled"
+			else:
+				print "Error could not enable", plugin
+
+			print plugin, enStr
+
+			return 1
+
 	else:
 		print "Invalid command"
 	return 1
 
 
 
-parser = argparse.ArgumentParser(prog="ambctl", description='Process DBus mappings.', add_help=False)
+parser = argparse.ArgumentParser(prog="ambctl", description='Automotive Message Broker DBus client tool', add_help=False)
 parser.add_argument('command', metavar='COMMAND [help]', nargs='?', default='stdin', help='amb dbus command')
 parser.add_argument('commandArgs', metavar='ARG', nargs='*',
 			help='amb dbus command arguments')
@@ -166,6 +292,7 @@ if args.command == "stdin":
 				fullprompt = promptAmbctl + promptEnd
 				curpos = 0
 				historypos = -1
+				autocomplete = Autocomplete()
 				def full_line_len(self):
 						return len(self.fullprompt) + len(self.line)
 				def insert(self, str):
@@ -262,65 +389,105 @@ if args.command == "stdin":
 						#print "char: ", ord(str)
 
 						if len(str) > 1:
-								if ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 68: #left arrow
-										if data.arrow_back():
-												cursor_left()
-												sys.stdout.flush()
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 67: #right arrow
-										if data.arrow_forward():
-												cursor_right()
-												sys.stdout.flush()
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 70: #end
-										while data.arrow_forward():
-												cursor_right()
-												sys.stdout.flush()
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 72: #home
-										while data.arrow_back():
-												cursor_left()
-										sys.stdout.flush()
-								elif len(str) == 4 and ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 51 and ord(str[3]) == 126: #del
-										data.delete()
-										redraw(data)
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 65:
-										#up arrow
-										data.save_temp()
-										data.history_up()
-										while data.arrow_forward():
-												cursor_right()
-										redraw(data)
-								elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 66:
-										#down arrow
-										data.history_down()
-										while data.arrow_forward():
-												cursor_right()
-										redraw(data)
-						elif ord(str) == 10: #enter
-								if data.line == "":
-										return True
-								print ""
-								words = data.line.split(' ')
-								if words[0] == "quit":
-									termios.tcsetattr(fd, termios.TCSAFLUSH, old)
-									fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
-									sys.exit()
-								try:
-										if len(words) > 1:
-												processCommand(words[0], words[1:])
-										else:
-												processCommand(words[0], [])
-								except dbus.exceptions.DBusException, error:
-										print error
-								except:
-										print "Error running command ", sys.exc_info()[0]
-								data.push();
-								data.clear()
+							if ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 68:
+								#left arrow
+								if data.arrow_back():
+									cursor_left()
+									sys.stdout.flush()
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 67:
+								#right arrow
+								if data.arrow_forward():
+									cursor_right()
+									sys.stdout.flush()
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 70:
+								#end
+								while data.arrow_forward():
+									cursor_right()
+								sys.stdout.flush()
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 72: #home
+								while data.arrow_back():
+									cursor_left()
+								sys.stdout.flush()
+							elif len(str) == 4 and ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 51 and ord(str[3]) == 126:
+								#del
+								data.delete()
 								redraw(data)
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 65:
+								#up arrow
+								data.save_temp()
+								data.history_up()
+								while data.arrow_forward():
+									cursor_right()
+								redraw(data)
+							elif ord(str[0]) == 27 and ord(str[1]) == 91 and ord(str[2]) == 66:
+								#down arrow
+								data.history_down()
+								while data.arrow_forward():
+									cursor_right()
+								redraw(data)
+						elif ord(str) == 10:
+							#enter
+							if data.line == "":
+								return True
+							print ""
+							words = data.line.split(' ')
+							if words[0] == "quit":
+								termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+								fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+								sys.exit()
+							try:
+								if len(words) > 1:
+									processCommand(words[0], words[1:])
+								else:
+									processCommand(words[0], [])
+							except dbus.exceptions.DBusException, error:
+								print error
+							except:
+								print "Error running command ", sys.exc_info()[0]
+							data.push();
+							data.clear()
+							redraw(data)
 						elif ord(str) == 127: #backspace
-								data.back_space()
-								redraw(data)
+							data.back_space()
+							redraw(data)
+						elif ord(str) == 9:
+							#tab
+							#get last string:
+							wordsList = data.line.split(' ')
+							toComplete = wordsList[-1]
+							results, samestring = data.autocomplete.complete(toComplete)
+							if len(samestring) and len(samestring) > len(toComplete) and not (samestring == toComplete):
+								if len(wordsList) > 1:
+									data.line = ' '.join(wordsList[0:-1]) + ' ' + samestring
+								else:
+									data.line = samestring
+								while data.arrow_forward():
+									cursor_right()
+
+							elif len(results) and not results[0] == toComplete:
+								print ""
+								if len(results) < 3:
+									print ' '.join(results)
+								else:
+									longestLen = 0
+									for r in results:
+										if len(r) > longestLen:
+											longestLen = len(r)
+									for i in range(0, len(results) / 3):
+										row = ""
+										endRow = -1
+										if len(results) >= i+3:
+											endRow = 2
+										for col in results[i : endRow]:
+											row += col
+											for i in range((longestLen + 5) - len(col)):
+												row += ' '
+										print row
+
+							redraw(data)
 						elif curses.ascii.isalnum(ord(str)) or ord(str) == curses.ascii.SP: #regular text
-								data.insert(str)
-								redraw(data)
+							data.insert(str)
+							redraw(data)
 
 						return True
 		print "@PROJECT_PRETTY_NAME@ @PROJECT_VERSION@"
@@ -349,6 +516,7 @@ if args.command == "stdin":
 		finally:
 				termios.tcsetattr(fd, termios.TCSAFLUSH, old)
 				fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+				print ""
 				sys.exit()
 
 else:

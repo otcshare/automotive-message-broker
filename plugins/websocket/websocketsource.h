@@ -52,9 +52,10 @@ public:
 	void supportedChanged(const PropertyList &) {}
 	void setConfiguration(std::map<std::string, std::string> config);
 
-	std::map<std::string,AsyncPropertyReply*> uuidReplyMap;
+	std::map<std::string, AsyncPropertyReply*> uuidReplyMap;
 	std::map<std::string,double> uuidTimeoutMap;
 	std::map<std::string, AsyncRangePropertyReply*> uuidRangedReplyMap;
+	std::map<std::string, AsyncPropertyReply*> setReplyMap;
 
 	int partialMessageIndex;
 	QByteArray incompleteMessage;

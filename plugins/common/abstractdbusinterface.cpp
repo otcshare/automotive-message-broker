@@ -64,9 +64,7 @@ const uint getPid(const char *owner)
 	return thePid;
 }
 
-
-
-static void handleMyMethodCall(GDBusConnection       *connection,
+void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection,
 							 const gchar           *sender,
 							 const gchar           *object_path,
 							 const gchar           *interface_name,
@@ -87,7 +85,80 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 
 	g_assert(iface);
 
-	if(method == "GetHistory")
+	if(std::string(interface_name) == "org.freedesktop.DBus.Properties")
+	{
+		if(method == "Get")
+		{
+			gchar* propertyName = nullptr;
+			gchar* ifaceName = nullptr;
+			g_variant_get(parameters, "(ss)", &ifaceName, &propertyName);
+
+			DebugOut(6) << "Parameter signature: " << g_variant_get_type_string(parameters) << endl;
+//			DebugOut(6) << "Get property " << propertyName << " for interface " << ifaceName << endl;
+
+			GError* error = nullptr;
+			auto value = amb::make_super(AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, propertyName, &error, iface));
+			amb::make_super(error);
+
+			if(!value)
+			{
+				g_dbus_method_invocation_return_dbus_error(invocation, std::string(std::string(ifaceName)+".PropertyNotFound").c_str(), "Property not found in interface");
+			}
+
+			g_dbus_method_invocation_return_value(invocation, g_variant_new("(v)", value.get()));
+			return;
+		}
+		else if(method == "GetAll")
+		{
+			gchar* ifaceName = nullptr;
+			g_variant_get(parameters, "(s)", &ifaceName);
+
+			GVariantBuilder builder;
+			g_variant_builder_init(&builder, G_VARIANT_TYPE("a{sv}"));
+
+			auto propertyMap = iface->getProperties();
+
+			for(auto itr : propertyMap)
+			{
+				auto prop = itr.second;
+				GError* error = nullptr;
+				auto value = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, prop->name().c_str(), &error, iface);
+				amb::make_super(error);
+				g_variant_builder_add(&builder, "{sv}", prop->name().c_str(), g_variant_new("v", value));
+				//sequence
+				auto sequence = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, std::string(prop->name()+"Sequence").c_str(), &error, iface);
+				g_variant_builder_add(&builder, "{sv}", std::string(prop->name()+"Sequence").c_str(), g_variant_new("v", sequence));
+			}
+
+			auto time = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, "Time", nullptr, iface);
+			auto zone = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, "Zone", nullptr, iface);
+			g_variant_builder_add(&builder, "{sv}", "Time", g_variant_new("v", time));
+			g_variant_builder_add(&builder, "{sv}", "Zone", g_variant_new("v", zone));
+
+			g_dbus_method_invocation_return_value(invocation, g_variant_new("(a{sv})", &builder));
+			return;
+		}
+		else if(method == "Set")
+		{
+			gchar* ifaceName = nullptr;
+			gchar* propName = nullptr;
+			GVariant* value;
+			g_variant_get(parameters, "(ssv)", &ifaceName, &propName, &value);
+
+			AbstractDBusInterface::setProperty(connection, sender, object_path, ifaceName, propName, value, nullptr, iface,
+											   [&invocation, &ifaceName](bool success, AsyncPropertyReply::Error error) {
+				if(success)
+				{
+					g_dbus_method_invocation_return_value(invocation, nullptr);
+				}
+				else
+				{
+					g_dbus_method_invocation_return_dbus_error(invocation, ifaceName, AsyncPropertyReply::errorToStr(error).c_str());
+				}
+			});
+		}
+	}
+	else if(method == "GetHistory")
 	{
 		double beginTime = 0;
 		double endTime = 0;
@@ -136,17 +207,17 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 			}
 
 			GVariantBuilder builder;
-			g_variant_builder_init(&builder, G_VARIANT_TYPE("a(svd)"));
+			g_variant_builder_init(&builder, G_VARIANT_TYPE("a{svd}"));
 
 
 			for(auto itr = reply->values.begin(); itr != reply->values.end(); itr++)
 			{
 				AbstractPropertyType* value = *itr;
 
-				g_variant_builder_add(&builder, "(svd)", value->name.c_str(), g_variant_ref(value->toVariant()),value->timestamp);
+				g_variant_builder_add(&builder, "{svd}", value->name.c_str(), g_variant_ref(value->toVariant()),value->timestamp);
 			}
 
-			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a(svd))",&builder));
+			g_dbus_method_invocation_return_value(invocation,g_variant_new("(a{svd})",&builder));
 		};
 
 		iface->re->getRangePropertyAsync(request);
@@ -154,6 +225,7 @@ static void handleMyMethodCall(GDBusConnection       *connection,
 		return;
 	}
 
+	///TODO: Deprecated in 0.15
 	else if(boost::algorithm::starts_with(method, "Get"))
 	{
 		std::string propertyName = method.substr(3);
@@ -219,7 +291,6 @@ AbstractDBusInterface::~AbstractDBusInterface()
 	}
 
 	objectMap.erase(mObjectPath);
-
 }
 
 void AbstractDBusInterface::addProperty(VariantType * property)
@@ -242,16 +313,14 @@ void AbstractDBusInterface::addProperty(VariantType * property)
 	///see which properties are supported:
 	introspectionXml +=
 			"<property type='"+ string(property->signature()) + "' name='"+ pn +"' access='"+access+"' />"
+			"<!-- 'GetFoo' is deprecated as of 0.14 -->"
+			/// TODO: remove GetFoo in 0.15
 			"<method name='Get" + pn + "'>"
 			"	<arg type='v' direction='out' name='value' />"
 			"	<arg type='d' direction='out' name='timestamp' />"
 			"	<arg type='i' direction='out' name='sequence' />"
 			"   <arg type='i' direction='out' name='updateFrequency' />"
 			"</method>"
-			"<signal name='" + pn + "Changed' >"
-			"	<arg type='v' name='" + nameToLower + "' direction='out' />"
-			"	<arg type='d' name='imestamp' direction='out' />"
-			"</signal>"
 			"<property type='i' name='" + pn + "Sequence' access='read' />";
 
 	properties[pn] = property;
@@ -302,7 +371,7 @@ void AbstractDBusInterface::registerObject()
 	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, mInterfaceName.c_str());
 
 
-	const GDBusInterfaceVTable vtable = { handleMyMethodCall, AbstractDBusInterface::getProperty, AbstractDBusInterface::setProperty };
+	const GDBusInterfaceVTable vtable = { handleMyMethodCall, nullptr, nullptr };
 
 	GError* error2=NULL;
 
@@ -399,6 +468,23 @@ void AbstractDBusInterface::startRegistration()
 	//unregisterObject();
 	introspectionXml ="<node>" ;
 	introspectionXml +=
+			"<interface name='org.freedesktop.DBus.Properties'>"
+			"<method name='Get'>"
+			"   <arg type='s' direction='in' name='interface' />"
+			"   <arg type='s' direction='in' name='property' />"
+			"   <arg type='v' direction='out' name='value' />"
+			"</method>"
+			"<method name='Set'>"
+			"   <arg type='s' direction='in' name='interface' />"
+			"   <arg type='s' direction='in' name='property' />"
+			"   <arg type='v' direction='in' name='value' />"
+			"</method>"
+			"<method name='GetAll'>"
+			"   <arg type='s' direction='in' name='interface' />"
+			"   <arg type='a{sv}' direction='out' name='interface' />"
+			"</method>"
+			"</interface>";
+	introspectionXml +=
 			"<interface name='"+ mInterfaceName + "' >"
 			"<property type='i' name='Zone' access='read' />"
 			"<property type='d' name='Time' access='read' />"
@@ -409,7 +495,8 @@ void AbstractDBusInterface::startRegistration()
 			"</method>";
 }
 
-GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GError** error, gpointer userData)
+GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName,
+											 const gchar* propertyName, GError** error, gpointer userData)
 {
 	if(DebugOut::getDebugThreshhold() >= 6)
 	{
@@ -478,7 +565,9 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 	return nullptr;
 }
 
-gboolean AbstractDBusInterface::setProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName, const gchar* propertyName, GVariant* value, GError** error, gpointer userData)
+gboolean AbstractDBusInterface::setProperty(GDBusConnection* connection, const gchar* sender, const gchar* objectPath, const gchar* interfaceName,
+											const gchar* propertyName, GVariant* value, GError** error, gpointer userData,
+											std::function<void (bool, AsyncPropertyReply::Error)> callback)
 {
 	if(DebugOut::getDebugThreshhold() >= 6)
 	{
@@ -488,22 +577,22 @@ gboolean AbstractDBusInterface::setProperty(GDBusConnection* connection, const g
 
 	if(objectMap.count(objectPath))
 	{
-		objectMap[objectPath]->setProperty(propertyName, value);
+		objectMap[objectPath]->setProperty(propertyName, value, callback);
 		return true;
 	}
 
 	return false;
 }
 
-void AbstractDBusInterface::setProperty(string propertyName, GVariant *value)
+void AbstractDBusInterface::setProperty(string propertyName, GVariant *value, std::function<void (bool, AsyncPropertyReply::Error)> callback)
 {
 	if(properties.count(propertyName))
 	{
-		properties[propertyName]->fromVariant(value);
+		properties[propertyName]->fromVariant(value, callback);
 	}
-	else
+	else if(callback)
 	{
-		throw -1;
+		callback(false, AsyncPropertyReply::InvalidOperation);
 	}
 }
 
@@ -511,8 +600,8 @@ GVariant *AbstractDBusInterface::getProperty(string propertyName)
 {
 	if(properties.count(propertyName))
 		return properties[propertyName]->toVariant();
-	else
-		throw -1;
+
+	return nullptr;
 }
 
 void AbstractDBusInterface::setTimeout(int timeout)

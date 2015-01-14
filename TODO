@@ -1,10 +1,4 @@
-
 - Refactor obd2 plugin with AsyncQueue.  Use thread safe-update property.
-- update json protocol to support rangerequests with PropertyList instead of a singel property (Verify)
 - source export from database plugin does not reflect the source in the database
-- no reason for pluginloader to track sources.  core already does it.
-- create docs for all plugins (README)
-- handle badly formed messages properly (ie not crash) in websocketsink
 - grep all the TODOs in the code and do them
-- investigate and enable use of provisioning in ssl websockets
-- enable ambd/plugins.d/
+

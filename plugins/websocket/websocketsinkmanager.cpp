@@ -191,19 +191,23 @@ void WebSocketSinkManager::addSingleShotRangedSink(libwebsocket* socket, Propert
 	rangedRequest.timeEnd = end;
 	rangedRequest.sequenceBegin = seqstart;
 	rangedRequest.sequenceEnd = seqend;
+	rangedRequest.properties = properties;
 
-	rangedRequest.completed = [socket,id](AsyncRangePropertyReply* reply)
+	rangedRequest.completed = [socket, id](AsyncRangePropertyReply* reply)
 	{
 		QVariantMap replyvar;
 		QVariantList list;
 
 		std::list<AbstractPropertyType*> values = reply->values;
-		for(auto itr = values.begin(); itr != values.end(); itr++)
+		for(auto value : values)
 		{
 			QVariantMap obj;
-			obj["value"]= (*itr)->toString().c_str();
-			obj["timestamp"] = (*itr)->timestamp;
-			obj["sequence"] = (*itr)->sequence;
+			obj["name"] = value->name.c_str();
+			obj["property"] = value->name.c_str();
+			obj["value"] = value->toString().c_str();
+			obj["timestamp"] = value->timestamp;
+			obj["zone"] = value->zone;
+			obj["sequence"] = value->sequence;
 
 			list.append(obj);
 		}
@@ -242,27 +246,33 @@ void WebSocketSinkManager::removeSink(libwebsocket* socket,VehicleProperty::Prop
 		lwsWriteVariant(socket, reply);
 	}
 }
-void WebSocketSinkManager::setValue(libwebsocket* socket,VehicleProperty::Property property,string value,Zone::Type zone,string uuid)
+void WebSocketSinkManager::setValue(libwebsocket* socket, VehicleProperty::Property property, string value,Zone::Type zone, string uuid)
 {
-	AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(property,value);
+	AbstractPropertyType* type = VehicleProperty::getPropertyTypeForPropertyNameValue(property, value);
 
 	AsyncSetPropertyRequest request;
 	request.property = property;
+
 	request.value = type;
 	request.zoneFilter = zone;
 	request.completed = [&](AsyncPropertyReply* reply)
 	{
 		QVariantMap data;
-		data["property"] = property.c_str();
-		data["zone"] = zone;
-		data["source"] = reply->value->sourceUuid.c_str();
-		data["success"] = reply->success;
+		if(reply->value)
+		{
+			data["property"] = property.c_str();
+			data["zone"] = zone;
+			data["source"] = reply->value->sourceUuid.c_str();
+			data["value"] = reply->value->toString().c_str();
+		}
 
 		QVariantMap replyvar;
 		replyvar["type"]="methodReply";
 		replyvar["name"]="set";
 		replyvar["data"]= data;
 		replyvar["transactionid"]=uuid.c_str();
+		replyvar["success"] = reply->success;
+		replyvar["error"] = AsyncPropertyReply::errorToStr(reply->error).c_str();
 
 		lwsWriteVariant(socket, replyvar);
 
@@ -452,16 +462,21 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 			{
 				if(name == "getRanged")
 				{
-					QVariantMap data = call["data"].toMap();
+					QVariant dataVariant = call["data"];
+
+					QVariantList data = dataVariant.toList();
 
 					PropertyList propertyList;
 
-					propertyList.push_back(data["property"].toString().toStdString());
+					Q_FOREACH(QVariant v, data)
+					{
+						propertyList.push_back(v.toString().toStdString());
+					}
 
-					double timeBegin = data["timeBegin"].toDouble();
-					double timeEnd = data["timeEnd"].toDouble();
-					double sequenceBegin = data["sequenceBegin"].toInt();
-					double sequenceEnd = data["sequenceEnd"].toInt();
+					double timeBegin = call["timeBegin"].toDouble();
+					double timeEnd = call["timeEnd"].toDouble();
+					int sequenceBegin = call["sequenceBegin"].toInt();
+					int sequenceEnd = call["sequenceEnd"].toInt();
 
 					if ((timeBegin < 0 && timeEnd > 0) || (timeBegin > 0 && timeEnd < 0))
 					{
@@ -473,7 +488,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					}
 					else
 					{
-						sinkManager->addSingleShotRangedSink(wsi,propertyList,timeBegin,timeEnd,sequenceBegin,sequenceEnd,id);
+						sinkManager->addSingleShotRangedSink(wsi, propertyList, timeBegin, timeEnd, sequenceBegin, sequenceEnd, id);
 					}
 				}
 				else if (name == "get")
@@ -495,7 +510,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					{
 						zone = data["zone"].toInt();
 					}
-					sinkManager->setValue(wsi,data["property"].toString().toStdString(), data["value"].toString().toStdString(), zone, id);
+					sinkManager->setValue(wsi, data["property"].toString().toStdString(), data["value"].toString().toStdString(), zone, id);
 				}
 				else if (name == "subscribe")
 				{
@@ -530,6 +545,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 								QVariantMap map;
 								map["zone"] = zone;
 								map["name"] = i.c_str();
+								map["property"] = i.c_str();
 								map["type"] = basicType.c_str();
 								map["source"] = source.c_str();
 

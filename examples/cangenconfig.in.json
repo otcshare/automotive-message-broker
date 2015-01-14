@@ -1,11 +1,11 @@
 {
-	"sources" : [ 
+	"sources" : [
 		{
 			"name" : "CANSimPlugin",
 			"path":"@PLUGIN_INSTALL_PATH@/cansimplugin.so",
 			"interfaces" : ["vcan0", "vcan1"]
-        	},
-		{ 
+		},
+		{
 			"name" : "CANGenPlugin",
 			"path":"@PLUGIN_INSTALL_PATH@/cangenplugin.so"
 		}

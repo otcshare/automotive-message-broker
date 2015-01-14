@@ -20,16 +20,12 @@ bluemonkey.createCustomProperty("AnswerToTheUniverse", 42);
 dbusConnected = bluemonkey.subscribeTo("DBusConnected");
 
 dbusConnected.changed.connect(function () {
-    bluemonkey.log("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEE!" + dbusConnected.value);
+	if(dbusConnected.value !== true)
+		return;
 
-    if(dbusConnected.value !== true)
-        return;
-
-    bluemonkey.exportInterface("Bluemonkey",[{'BluemonkeySuperProperty' : 'SuperProperty'},
-                               {'AnswerToTheUniverse' : 'AnswerToTheUniverse'}]);
+	bluemonkey.exportInterface("Bluemonkey",[{'BluemonkeySuperProperty' : 'SuperProperty'},
+							   {'AnswerToTheUniverse' : 'AnswerToTheUniverse'}]);
 });
-
-
 
 bluemonkey.createCustomProperty("VehicleSpeed", 10);
 bluemonkey.createCustomProperty("EngineSpeed", 5000);

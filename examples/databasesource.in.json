@@ -1,0 +1,16 @@
+{
+	"sources" : [
+		{
+			"name" : "Database Source",
+			"path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
+			"playbackOnLoad" : "true",
+			"databaseFile" : "/tmp/storage"
+		}
+	],
+	"sinks": [
+		{
+			"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
+		}
+	]
+}
+

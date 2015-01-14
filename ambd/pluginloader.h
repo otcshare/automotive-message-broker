@@ -30,9 +30,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "debugout.h"
 #include "imainloop.h"
 
-
-using namespace std;
-
 typedef void create_t(AbstractRoutingEngine*, map<string, string> );
 typedef void* create_mainloop_t(int argc, char** argv);
 typedef void* createRoutingEngine(void);
@@ -41,17 +38,21 @@ class PluginLoader
 {
 
 public:
-	PluginLoader(string configFile, int argc, char** argv);
+	PluginLoader(std::string configFile, int argc, char** argv);
 	~PluginLoader();
 
 	IMainLoop* mainloop();
 
 	std::string errorString();
 
+	void scanPluginDir(const std::string &);
+
+	bool readPluginConfig(const std::string & configData);
 
 private: ///methods:
 
-	bool loadPlugin(string pluginName, map<string, string> config)
+
+	bool loadPlugin(string pluginName, std::map<std::string, std::string> config)
 	{
 		DebugOut()<<"Loading plugin: "<<pluginName<<endl;
 

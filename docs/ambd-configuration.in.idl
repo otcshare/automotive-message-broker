@@ -1,0 +1,84 @@
+/*!
+ * \file ambd-configuration.idl
+ * \brief This document describes the ambd (AMB daemon) configuration.
+ * This file is typically located as "/etc/ambd/config".  Plugin segments are supported as of 0.14 and should be installed in "@PLUGIN_SEGMENT_INSTALL_PATH@".
+ * \section example Configuration Example
+ * \code
+ * {
+ *	 "plugins" : "@PLUGIN_SEGMENT_INSTALL_PATH@",
+ *	 "sources" : [	],
+ *	 "sinks": [	]
+ * }
+ * \endcode
+ */
+
+/*!
+ * \brief Config object is the root JSON object in the config.
+ */
+interface Config {
+
+  /*!
+   * \brief plugins - path to plugin segments.
+   * The AMB Daemon will scan this path for any plugin configuration segments and load them if enabled.
+   */
+  readonly attribute DOMString plugins;
+
+  /*!
+   * \brief mainloop - path to mainloop plugin.
+   * The mainloop plugin is by default glib.  AMB also provides a qt-based mainloop so plugins that use Qt mainloop features can be used.
+   */
+  readonly attribute DOMString mainloop;
+
+  /*!
+   * \brief source plugins.
+   * *depricated*.  Use plugin configuration segments placed in @PLUGIN_SEGMENT_INSTALL_PATH@.
+   * Plugins defined here will be loaded by AMB.
+   */
+  readonly attribute Plugin[] sources;
+
+  /*!
+   * \brief sink plugins.
+   * *depricated*.  Use plugin configuration segments placed in @PLUGIN_SEGMENT_INSTALL_PATH@.
+   * Plugins defined here will be loaded by AMB.
+   */
+  readonly attribute Plugin[] sinks;
+
+}
+
+/*!
+ * \brief the Plugin interface describes the configuration for a plugin.
+ * This interface may be extended with plugin specific options.  See the specific plugin's documentation for information on extended attributes.
+ */
+interface Plugin {
+
+  /*!
+   * \brief name of plugin (ie 'ExamplePlugin')
+   */
+  readonly attribute DOMString name;
+
+  /*!
+   * \brief path to the plugins .so file (ie @PLUGIN_INSTALL_PATH@/examplesourceplugin.so)
+   */
+  readonly attribute DOMString path;
+}
+
+/*!
+ * \brief PluginSegment root object for plugin segments.
+ * PluginSegment inherits the attributes from Plugin and adds the "enabled" attribute.
+ * Only plugins that have 'enabled' : true will be loaded by the AMB daemon.  PluginSements are usually installed
+ * in @PLUGIN_SEGMENT_INSTALL_PATH@.  The following is a basic example of a plugin segment configuration:
+ * \code
+ * {
+ *    "name" : "MyPlugin",
+ *    "path" : "@PLUGIN_INSTALL_PATH@/myplugin.so",
+ *    "enabled" : false
+ * }
+ * \endcode
+ */
+interface PluginSegment : Plugin {
+
+  /*!
+   * \brief enabled - returns true if the plugin is enabled or not.
+   */
+  readonly attribute boolean? enabled;
+}

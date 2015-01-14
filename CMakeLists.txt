@@ -8,8 +8,8 @@ include(CMakeDependentOption)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_PRETTY_NAME "Automotive Message Broker")
-set(PROJECT_VERSION "0.13.800")
-set(PROJECT_CODENAME "")
+set(PROJECT_VERSION "0.13.801")
+set(PROJECT_CODENAME "74A")
 set(PROJECT_QUALITY "alpha")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
@@ -21,7 +21,8 @@ set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" )
 set (PLUGIN_INSTALL_PATH "${LIB_INSTALL_DIR}/${PROJECT_NAME}")
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")
-set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}")
+set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}/${PROJECT_VERSION}")
+set (PLUGIN_SEGMENT_INSTALL_PATH "/etc/ambd/plugins.d")
 
 option(qtmainloop "Use QCoreApplication mainloop " OFF)
 option(websocket_plugin "websocket source and sink plugins" OFF)
@@ -46,11 +47,6 @@ set(XWALK_EXTENSION_PATH "/automotive-message-broker/xwalk" CACHE PATH "director
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++1y")
-
-if(opencvlux_plugin)
-	 message(STATUS "OpenCV Lux plugin enabled")
-
-endif(opencvlux_plugin)
 
 include (CMakeForceCompiler)
 
@@ -85,6 +81,8 @@ add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
 add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.in.md" "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.md" IMMEDIATE @ONLY)
 
 # packaging stuff:
 # Common things to every type of package

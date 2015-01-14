@@ -71,7 +71,10 @@ struct traits<GDBusConnection> {
 };
 
 template<typename T> using super_ptr =
-	  ::std::unique_ptr<T, typename traits<T>::delete_functor>;
+		 ::std::unique_ptr<T, typename traits<T>::delete_functor>;
+
+template<typename T> using gobject_ptr =
+		 ::std::unique_ptr<T , std::function<void(T*)> >;
 
 template<typename T> super_ptr<T> make_super(T* t)
 {
@@ -81,6 +84,11 @@ template<typename T> super_ptr<T> make_super(T* t)
 template<typename T> ::std::unique_ptr<T> make_unique(T* t)
 {
   return ::std::unique_ptr<T>(t);
+}
+
+template<typename T> gobject_ptr<T> make_gobject(T* t)
+{
+	return gobject_ptr<T>(t, [](auto ptr) { if(ptr) g_object_unref(ptr);});
 }
 
 }

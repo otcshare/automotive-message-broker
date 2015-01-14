@@ -28,6 +28,7 @@ BuildRequires:  pkgconfig(opencv)
 BuildRequires:  murphy
 BuildRequires:  pkgconfig(murphy-glib)
 BuildRequires:  pkgconfig(dbus-1)
+BuildRequires:  doxygen
 %if %{with qt5}
 BuildRequires:  qt5-qtcore-devel
 BuildRequires:  qt5-qtconcurrent-devel

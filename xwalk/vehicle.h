@@ -8,13 +8,13 @@
 #include <abstractpropertytype.h>
 #include <gio/gio.h>
 #include <glib.h>
+#include <picojson.h>
 #include <superptr.hpp>
 
 #include <string>
 #include <thread> // NOLINT
 #include <vector>
 
-#include "common/picojson.h"
 
 namespace common {
 

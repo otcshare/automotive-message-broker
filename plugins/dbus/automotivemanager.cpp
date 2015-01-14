@@ -340,11 +340,11 @@ static void handleMethodCall(GDBusConnection       *connection,
 			}
 		}
 		DebugOut(6) << "member " << propertyToFindStrPtr.get() << " of " << objectNamePtr.get() << " was not found." << endl;
-		g_dbus_method_invocation_return_value(invocation,g_variant_new("(b)", false));
+		g_dbus_method_invocation_return_value(invocation, g_variant_new("(b)", false));
 	}
 	else
 	{
-		g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
+		g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
 	}
 }
 
@@ -438,14 +438,16 @@ AutomotiveManager::AutomotiveManager(GDBusConnection *connection)
 	regId = g_dbus_connection_register_object(mConnection, "/", mInterfaceInfo, &interfaceVTable, this, NULL, &error);
 	g_dbus_node_info_unref(introspection);
 
-	if(error){
-		g_error_free(error);
+	auto errorPtr = amb::make_super(error);
+
+	if(errorPtr){
+		DebugOut(DebugOut::Error) << "registering dbus object: " << "'org.automotive.Manager' " << errorPtr->message << endl;
 		throw -1;
 	}
 
 	g_assert(regId > 0);
 
-	g_dbus_connection_signal_subscribe(g_bus_get_sync(G_BUS_TYPE_SYSTEM, NULL,NULL), "org.freedesktop.DBus", "org.freedesktop.DBus",
+	g_dbus_connection_signal_subscribe(mConnection, "org.freedesktop.DBus", "org.freedesktop.DBus",
 																					   "NameOwnerChanged", "/org/freedesktop/DBus", NULL, G_DBUS_SIGNAL_FLAGS_NONE,
 																					   signalCallback, this, NULL);
 }

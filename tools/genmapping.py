@@ -17,13 +17,22 @@ interfaces = []
 class Member:
 		ambName = ""
 		memberName = ""
-
+		interfaceName = ""
+		def __init__(self, ifaceName):
+			self.interfaceName = ifaceName
 		def __repr__(self):
 			return "Member"
 		def toString(self):
 			return "{" + self.ambName + " => " + self.memberName + "}"
 		def toIdl(self):
-			return '  const DOMString ' + self.ambName + ' = "' + self.memberName + '";\n'
+			idl = []
+			idl.append('')
+			idl.append('\t/*!')
+			idl.append('\t * \\brief corresponds with DBus property ' + self.memberName + ' for interface org.automotive.' + self.interfaceName)
+			idl.append('\t * AMB fulfills this member with VehicleProperty::' + self.ambName)
+			idl.append('\t */')
+			idl.append('\tconst DOMString ' + self.ambName + ' = "' + self.memberName + '";\n')
+			return '\n'.join(idl)
 
 class Interface:
 		def __init__(self):
@@ -37,7 +46,7 @@ class Interface:
 				output += member.toString() + ","
 			return output
 		def toIdl(self):
-			output = "interface " + self.name + " {\n"
+			output = "/*! \n * \\brief Corresponds with DBus Interface org.automotive." + self.name + "\n */\ninterface " + self.name + " {\n"
 			for member in self.members:
 				output += member.toIdl()
 			output += "\n};\n"
@@ -59,7 +68,7 @@ for input in args.mappingFiles:
 					wantPropertyVariant = 'wantPropertyVariant('
 					i = line.find(wantPropertyVariant)
 					if i!= -1:
-							member = Member()
+							member = Member(interfaces[-1].name)
 							ambNameEnd = line.find(', "')-2
 							member.ambName = line[i+len(wantPropertyVariant) : i + ambNameEnd].replace("VehicleProperty::", "")
 							memberNameBeg = line.find(', "')+3
@@ -78,7 +87,9 @@ with outputFile:
 		" * \\brief This describes the AMB internal property names to AMB DBus interface property names\n"
 		" * AMB internal property names are designed to be flat variable names (ie, 'ConvertableRoofStatus').  The DBus\n"
 		" * properties however follow the naming scheme defined in the W3C automotive business group vehicle <a href='http://w3c.github.io/automotive-bg/data_spec.html'>data specification</a>\n"
-		" * The pattern each interface is 'const DOMString AMBProperty = DBusProperty' where 'AMBProperty' is the internal name and 'DBusProperty' is the DBus property name")
+		" * The pattern each interface is 'const DOMString AMBProperty = DBusProperty' where 'AMBProperty' is the internal name and 'DBusProperty' is the DBus property name.\n"
+		" *\n"
+		" * For documentation on the interface and members, please see amb.fidl or the AMB DBus documentation.\n")
 	header += " */\n\n"
 	outputFile.write(header)
 	for iface in interfaces:

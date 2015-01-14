@@ -77,7 +77,7 @@ GVariant *VariantType::toVariant()
 	return v->toVariant();
 }
 
-void VariantType::fromVariant(GVariant *val)
+void VariantType::fromVariant(GVariant *val, std::function<void (bool, AsyncPropertyReply::Error)> callback)
 {
 	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(name());
 	v->fromVariant(val);
@@ -89,11 +89,9 @@ void VariantType::fromVariant(GVariant *val)
 	request.completed = [&](AsyncPropertyReply* r)
 	{
 		auto reply = amb::make_unique(r);
-		/// TODO: throw dbus exception
-		if(!reply->success)
-		{
-			DebugOut(DebugOut::Error)<<"SetProperty fail: "<<reply->error<<endl;
-		}
+
+		if(callback)
+			callback(reply->success, reply->error);
 	};
 
 	routingEngine->setProperty(request);

@@ -20,16 +20,24 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "pluginloader.h"
 #include "glibmainloop.h"
 #include "core.h"
+
 #include <json.h>
+#include <gio/gio.h>
+#include <picojson.h>
+
 #include <iostream>
 #include <stdexcept>
 #include <boost/concept_check.hpp>
 
 std::string get_file_contents(const char *filename)
 {
-	//FILE *in = fopen(filename,"r");
-
 	std::ifstream in(filename, std::ios::in);
+	if(!in.is_open())
+	{
+		DebugOut(DebugOut::Error) << "Failed to open file: " << filename << endl;
+		return "";
+	}
+
 	std::string output;
 	std::string line;
 	while(in.good())
@@ -43,36 +51,21 @@ std::string get_file_contents(const char *filename)
 PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(NULL), routingEngine(nullptr), mMainLoop(nullptr)
 {
 	DebugOut()<<"Loading config file: "<<configFile<<endl;
-	json_object *rootobject;
-	json_tokener *tokener = json_tokener_new();
 	std::string configBuffer = get_file_contents(configFile.c_str());
-	if(configBuffer == "")
+
+	std::string picojsonerr = "";
+	picojson::value v;
+	picojson::parse(v, configBuffer.begin(), configBuffer.end(), &picojsonerr);
+
+	if(!picojsonerr.empty())
 	{
-		throw std::runtime_error("No config or config empty");
-	}
-	enum json_tokener_error err;
-	do
-	{
-		rootobject = json_tokener_parse_ex(tokener, configBuffer.c_str(),configBuffer.length());
-	} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-	if (err != json_tokener_success)
-	{
-		fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-		// Handle errors, as appropriate for your application.
-		throw std::runtime_error("Invalid config");
-	}
-	if (tokener->char_offset < configFile.length()) // XXX shouldn't access internal fields
-	{
-		// Handle extra characters after parsed object as desired.
-		// e.g. issue an error, parse another object from that point, etc...
+		DebugOut(DebugOut::Error) << "Failed to parse main config! " << endl;
+		throw std::runtime_error("Error parsing config");
 	}
 
-	json_object *coreobject = json_object_object_get(rootobject,"routingEngine");
-	if (coreobject)
+	if(v.contains("routingEngine"))
 	{
-		/// there is a mainloop entry.  Load the plugin:
-
-		string restr = string(json_object_get_string(coreobject));
+		string restr = v.get("routingEngine").to_str();
 
 		routingEngine = loadRoutingEngine(restr);
 
@@ -90,46 +83,33 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 		/// core wants some specific configuration settings:
 		std::map<std::string,std::string> settings;
 
-		json_object *lpq = json_object_object_get(rootobject,"lowPriorityQueueSize");
-		if (lpq)
+
+		for (auto q : {"lowPriorityQueueSize", "normalPriorityQueueSize", "highPriorityQueueSize"})
 		{
-			/// there is a mainloop entry.  Load the plugin:
-
-			string restr = string(json_object_get_string(lpq));
-			settings["lowPriorityQueueSize"] = restr;
-		}
-
-		json_object *npq = json_object_object_get(rootobject,"normalPriorityQueueSize");
-		if (npq)
-		{
-			/// there is a mainloop entry.  Load the plugin:
-
-			string restr = string(json_object_get_string(npq));
-			settings["normalPriorityQueueSize"] = restr;
-		}
-
-		json_object *hpq = json_object_object_get(rootobject,"highPriorityQueueSize");
-		if (hpq)
-		{
-			/// there is a mainloop entry.  Load the plugin:
-
-			string restr = string(json_object_get_string(hpq));
-			settings["highPriorityQueueSize"] = restr;
+			if (v.contains(q))
+			{
+				string restr = v.get(q).to_str();
+				settings[q] = restr;
+			}
 		}
 
 		routingEngine = new Core(settings);
 	}
 
 
+	if(v.contains("plugins"))
+	{
+		std::string pluginsPath = v.get("plugins").to_str();
+		scanPluginDir(pluginsPath);
+	}
 
-	json_object *mainloopobject = json_object_object_get(rootobject,"mainloop");
-	if (mainloopobject)
+	if(v.contains("mainloop"))
 	{
 		/// there is a mainloop entry.  Load the plugin:
 
-		string mainloopstr = string(json_object_get_string(mainloopobject));
+		string mainloopstr = v.get("mainloop").to_str();
 
-		mMainLoop = loadMainLoop(mainloopstr,argc, argv);
+		mMainLoop = loadMainLoop(mainloopstr, argc, argv);
 
 		if(!mMainLoop)
 		{
@@ -140,89 +120,42 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 	{
 		/// there is no mainloop entry, use default glib
 		DebugOut()<<"No mainloop specified in config.  Using glib by default."<<endl;
-		mMainLoop = new GlibMainLoop(argc,argv);
+		mMainLoop = new GlibMainLoop(argc, argv);
 	}
 
-	json_object *sourcesobject = json_object_object_get(rootobject,"sources");
 
-	if(!sourcesobject)
+	for (auto q : {"sources", "sinks"})
 	{
-		DebugOut()<<"Error getting sources member: "<<endl;
-		throw std::runtime_error("Error getting sources member");
-	}
-
-	//g_assert(json_reader_is_array(reader));
-	g_assert(json_object_get_type(sourcesobject)==json_type_array);
-
-
-	array_list *sourceslist = json_object_get_array(sourcesobject);
-	if (!sourceslist)
-	{
-		DebugOut() << "Error getting source list" << endl;
-		throw std::runtime_error("Error getting sources list");
-	}
-
-	for(int i=0; i < array_list_length(sourceslist); i++)
-	{
-		json_object *obj = (json_object*)array_list_get_idx(sourceslist,i); //This is an object
-
-		std::map<std::string, std::string> configurationMap;
-		json_object_object_foreach(obj, key, val)
+		if(v.contains("sources"))
 		{
-			string valstr = json_object_get_string(val);
-			DebugOut() << "plugin config key: " << key << "value:" << valstr << endl;
-			configurationMap[key] = valstr;
+			picojson::array list = v.get(q).get<picojson::array>();
+			if (!list.size())
+			{
+				DebugOut() << "Error getting list for " << q << endl;
+				throw std::runtime_error("Error getting sources list");
+			}
+
+			for(auto src : list)
+			{
+				std::map<std::string, std::string> configurationMap;
+				for( auto obj : src.get<picojson::object>())
+				{
+					string valstr = obj.second.to_str();
+					string key = obj.first;
+
+					DebugOut() << "plugin config key: " << key << "value:" << valstr << endl;
+
+					configurationMap[key] = valstr;
+				}
+
+				string path = configurationMap["path"];
+
+				if(!loadPlugin(path, configurationMap))
+					DebugOut(DebugOut::Warning) << "Failed to load plugin: " << path <<endl;
+			}
+
 		}
-
-		string path = configurationMap["path"];
-
-		if(!loadPlugin(path,configurationMap))
-			DebugOut(DebugOut::Warning) << "Failed to load plugin: " << path <<endl;
 	}
-
-	//json_object_put(sourcesobject);
-	///read the sinks:
-
-	json_object *sinksobject = json_object_object_get(rootobject,"sinks");
-
-	if (!sinksobject)
-	{
-		DebugOut() << "Error getting sink object" << endl;
-		throw std::runtime_error("Error getting sink object");
-	}
-
-	array_list *sinkslist = json_object_get_array(sinksobject);
-
-
-	if (!sinkslist)
-	{
-		DebugOut() << "Error getting sink list" << endl;
-		throw std::runtime_error("Error getting sink list");
-	}
-
-
-	for(int i=0; i < array_list_length(sinkslist); i++)
-	{
-		json_object *obj = (json_object*)array_list_get_idx(sinkslist,i);
-
-		std::map<std::string, std::string> configurationMap;
-
-		json_object_object_foreach(obj, key, val)
-		{
-			string valstr = json_object_get_string(val);
-			DebugOut() << "plugin config key: " << key << "value:" << valstr << endl;
-			configurationMap[key] = valstr;
-		}
-
-
-		string path = configurationMap["path"];
-
-		loadPlugin(path, configurationMap);
-	}
-
-	//json_object_put(sinksobject);
-	json_object_put(rootobject);
-	json_tokener_free(tokener);
 
 	Core* core = static_cast<Core*>(routingEngine);
 	if( core != nullptr )
@@ -245,5 +178,111 @@ IMainLoop *PluginLoader::mainloop()
 std::string PluginLoader::errorString()
 {
 	return mErrorString;
+}
+
+void PluginLoader::scanPluginDir(const std::string & dir)
+{
+	DebugOut() << "Scanning plugin directory: " << dir << endl;
+
+	auto pluginsDirectory = amb::make_gobject(g_file_new_for_path(dir.c_str()));
+
+	GError* enumerateError = nullptr;
+
+	auto enumerator = amb::make_gobject(g_file_enumerate_children(pluginsDirectory.get(), G_FILE_ATTRIBUTE_ID_FILE,
+																  G_FILE_QUERY_INFO_NONE, nullptr,
+																  &enumerateError));
+	auto enumerateErrorPtr = amb::make_super(enumerateError);
+
+	if(enumerateErrorPtr)
+	{
+		DebugOut(DebugOut::Error) << "Scanning plugin directory: " << enumerateErrorPtr->message << endl;
+		return;
+	}
+
+	GError* errorGetFile = nullptr;
+	while(auto pluginConfig = amb::make_gobject(g_file_enumerator_next_file(enumerator.get(), nullptr, &errorGetFile)))
+	{
+		std::string name = g_file_info_get_name(pluginConfig.get());
+
+		DebugOut() << "Found file: " << name << endl;
+		std::string fullpath = dir + (boost::algorithm::ends_with(dir, "/") ? "":"/") + name;
+		std::string data = get_file_contents(fullpath.c_str());
+
+		DebugOut() << "data: " << data << endl;
+
+		if(!readPluginConfig(data))
+		{
+			DebugOut(DebugOut::Error) << "Reading contentds of file: " << name << endl;
+		}
+	}
+
+	auto errorGetFilePtr = amb::make_super(errorGetFile);
+
+	if(errorGetFilePtr)
+	{
+		DebugOut(DebugOut::Error) << "enumerating file: " << errorGetFilePtr->message << endl;
+		return;
+	}
+}
+
+bool PluginLoader::readPluginConfig(const string &configData)
+{
+	picojson::value v;
+	std::string err;
+
+	picojson::parse(v, configData.begin(), configData.end(), &err);
+
+	if (!err.empty())
+	{
+		DebugOut(DebugOut::Error) << err << endl;
+		return false;
+	}
+
+	std::string pluginName;
+	if(v.contains("name"))
+	{
+		pluginName = v.get("name").to_str();
+	}
+
+	std::string pluginPath;
+	if(v.contains("path"))
+	{
+		pluginPath = v.get("path").to_str();
+	}
+	else
+	{
+		DebugOut(DebugOut::Error) << "config missing 'path'." << endl;
+		return false;
+	}
+
+	bool enabled = false;
+	if(v.contains("enabled"))
+	{
+		enabled = v.get("enabled").get<bool>();
+	}
+	else
+	{
+		DebugOut(DebugOut::Error) << "config missing 'enabled'." << endl;
+		return false;
+	}
+
+	DebugOut() << "Plugin: " << pluginName << endl;
+	DebugOut() << "Path: " << pluginPath << endl;
+	DebugOut() << "Enabled: " << enabled << endl;
+
+	if(enabled)
+	{
+		std::map<std::string, std::string> otherConfig;
+
+		picojson::object obj = v.get<picojson::object>();
+		for(auto itr : obj)
+		{
+			otherConfig[itr.first] = itr.second.to_str();
+		}
+
+		loadPlugin(pluginPath, otherConfig);
+	}
+
+	return true;
 }
 

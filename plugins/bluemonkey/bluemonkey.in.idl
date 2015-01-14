@@ -1,6 +1,8 @@
 /*!
  * \mainpage Automotive Message Broker Library Documentation - Bluemonkey Plugin
  * \version @PROJECT_VERSION@
+ *
+ * <a href="../../../html/index.html">Back to AMB Documentation Main</a>
  * \section intro Introduction
  * Bluemonkey is a javascript rendering engine that allows the scripting of source plugin behavior in javascript.
  * It allows developers a quick way to prototype plugin code as well as a way to create custom properties.
@@ -112,12 +114,14 @@ interface Bluemonkey {
 	 void createCustomProperty(DOMString name, any value, optional unsigned short zone);
 
 	/*!
-	 * \brief exportInterface
+	 * \brief exportInterface export a custom DBus interface as org.automotive.[interfaceName] with properties
 	 */
 	 void exportInterface(DOMString interfaceName, ExportMap[] properties);
 
 };
-
+/*!
+ * \brief PropertyInterface represents an interface to an AMB Property
+ */
 interface PropertyInterface {
 	/*!
 	 * \brief AMB property name of this property
@@ -149,6 +153,10 @@ interface PropertyInterface {
 	 */
 	readonly attribute Signal changed;
 
+	/*!
+	 * \brief get logged data between \arg begin and \arg end.
+	 * callback is called with the results of this method.
+	 */
 	void getHistory(Date begin, Date end, HistoryCallback callback);
 };
 
@@ -163,6 +171,12 @@ interface Signal {
 	 void connect(ChangedCallback callback)
 };
 
+/*!
+ * \brief ExportMap is a dictionary from AmbPropertyName to DBusPropertyName
+ * AmbPropertyName should represent an internally defined or custom AMB property type.
+ * The DBusPropertyName should represent what you want the property to be represented in
+ * the DBus interface.
+ */
 interface ExportMap {
 	 /*!
 	  * \brief internal AMB property name

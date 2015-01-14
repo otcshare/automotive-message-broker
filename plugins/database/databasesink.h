@@ -52,7 +52,7 @@ public:
 
 	bool quit;
 
-	bool operator ==(const DBObject & other) const
+	bool operator == (const DBObject & other) const
 	{
 		return (key == other.key && source == other.source && zone == other.zone &&
 				value == other.value && sequence == other.sequence && time == other.time);
@@ -88,7 +88,7 @@ namespace std {
   {
 	size_t operator()(const DBObject & x) const
 	{
-	  return x.key.length();
+	  return x.key.length() * x.value.length() + x.time;
 	}
   };
 }

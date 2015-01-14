@@ -32,14 +32,11 @@ endif(cuda)
 find_package(Qt5Core REQUIRED)
 
 if(Qt5Core_FOUND)
-  message(STATUS "using Qt5")
-
   set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} )
   set(QT_LIBRARIES ${Qt5Core_LIBRARIES} )
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
   add_definitions(${Qt5Core_DEFINITIONS})
   add_definitions(-DQT_NO_KEYWORDS)
-
 endif(Qt5Core_FOUND)
 set(CMAKE_AUTOMOC ON)
 
