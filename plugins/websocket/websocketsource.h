@@ -62,6 +62,12 @@ public:
 	int expectedMessageFrames;
 
 	PropertyInfo getPropertyInfo(const VehicleProperty::Property & property);
+
+	/*!
+	 * \brief serverTimeOffset offset between server time and local time
+	 */
+	double serverTimeOffset;
+private:
 };
 
 #endif // WEBSOCKETSOURCE_H
