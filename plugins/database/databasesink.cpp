@@ -28,10 +28,10 @@ static void * cbFunc(Shared* shared)
 
 	vector<DictionaryList<string> > insertList;
 
+	double startTime = amb::currentTime();
+
 	while(1)
 	{
-		usleep(timeout*1000);
-
 		DBObject obj = shared->queue.pop();
 
 		if( obj.quit )
@@ -45,7 +45,7 @@ static void * cbFunc(Shared* shared)
 		NameValuePair<string> two("value", obj.value);
 		NameValuePair<string> three("source", obj.source);
 		NameValuePair<string> zone("zone", boost::lexical_cast<string>(obj.zone));
-		NameValuePair<string> four("time", boost::lexical_cast<string>(obj.time));
+		NameValuePair<string> four("time", boost::lexical_cast<string>(amb::Timestamp::instance()->epochTime(obj.time)));
 		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj.sequence));
 		NameValuePair<string> six("tripId", shared->tripId);
 
@@ -59,8 +59,10 @@ static void * cbFunc(Shared* shared)
 
 		insertList.push_back(dict);
 
-		if(insertList.size() >= bufferLength)
+		if(insertList.size() >= bufferLength && amb::currentTime() - startTime >= timeout / 1000)
 		{
+			startTime = amb::currentTime();
+
 			shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
 			for(int i=0; i< insertList.size(); i++)
 			{
