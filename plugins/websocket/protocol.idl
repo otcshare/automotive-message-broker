@@ -216,6 +216,11 @@ interface GetSupportedReply : BaseMessage {
   const DOMString name = "getSupported";
 
   /*!
+   * \brief systemTime of the other system.  Used to synchronize time
+   */
+   attribute double systemTime;
+
+  /*!
    * \brief data - array of properties supported by the system
    */
   attribute Property[] data;
