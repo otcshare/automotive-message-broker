@@ -344,7 +344,7 @@ void DatabaseSink::initDb()
 
 void DatabaseSink::setDatabaseFileName(string filename)
 {
-	bool isLogging = databaseLogging->value<bool>();
+	bool wasLogging = databaseLogging->value<bool>();
 
 	stopDb();
 	initDb();
@@ -368,7 +368,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 		}
 	}
 
-	if(isLogging)
+	if(wasLogging)
 	{
 		stopDb();
 		startDb();
@@ -413,8 +413,8 @@ void DatabaseSink::init()
 {
 	if(configuration.find("databaseFile") != configuration.end())
 	{
-		databaseName->setValue(configuration["databaseFile"]);
-		setDatabaseFileName(configuration["databaseFile"]);
+		setValue(databaseName, configuration["databaseFile"]);
+		setDatabaseFileName();
 	}
 
 	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;

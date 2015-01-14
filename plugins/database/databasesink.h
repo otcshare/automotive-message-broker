@@ -163,7 +163,7 @@ private: //methods:
 	void startDb();
 	void startPlayback();
 	void initDb();
-		void setDatabaseFileName(std::string filename);
+	void setDatabaseFileName();
 
 private:
 	PropertyList mSubscriptions;
