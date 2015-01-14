@@ -57,8 +57,11 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.js ${CMAKE_CURRENT_BINARY_DIR
 install(TARGETS bluemonkeyplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 install (FILES ${config_files} DESTINATION /etc/ambd/bluemonkey)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README.md @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey.in.idl ${CMAKE_CURRENT_BINARY_DIR}/docs/bluemonkey.idl @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey.in.json ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey @ONLY)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})
 
 set(bluemonkey_doc_files ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey.README ${CMAKE_CURRENT_BINARY_DIR}/docs/bluemonkey.idl)
 

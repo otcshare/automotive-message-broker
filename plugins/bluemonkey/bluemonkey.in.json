@@ -1,0 +1,6 @@
+{
+	"name" : "bluemonkey",
+	"path" : "@PLUGIN_INSTALL_PATH@/bluemonkeyplugin.so",
+	"enabled" : false,
+	"config" : "/etc/ambd/bluemonkey/config.js"
+}
