@@ -97,7 +97,7 @@ class Shared
 {
 public:
 	Shared()
-		:queue(true)
+		:queue(true, true)
 	{
 		db = new BaseDB;
 	}
