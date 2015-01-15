@@ -25,12 +25,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*!
  * \file ambplugin.h
- * \brief Contains common code used in all IviPoC II plugins for Automotive message broker(AMB).
+ * \brief Contains common code used in plugins for Automotive message broker(AMB).
  */
 
 /*!
- * AmbPlugin class contains common code used in all IviPoC II plugins for Automotive message broker(AMB).
- * For the AMB library API please visit <a href="https://github.com/otcshare/automotive-message-broker">Automotive message broker web page</a>.
+ * AmbPlugin class contains common code used in plugins for Automotive message broker(AMB).
+ * For the AMB library API please visit \ref libamb</a>.
  *
  * \class AmbPlugin
  *

@@ -23,7 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <sys/prctl.h>
 #include "logger.h"
 
-/** \addtogroup libivipoccommon
+/** \addtogroup libamb-plugins-common
  *  @{
  */
 
@@ -37,108 +37,108 @@ namespace CUtil {
  */
 class Thread
 {
-    /**
-    * Condition variable used to signal runnable status changes
-    * @property cond
-    * @private
-    */
-    pthread_cond_t cond;
-    /**
-    * Mutex used to lock runnable status changes
-    * @property mutex
-    * @private
-    */
-    pthread_mutex_t mutex;
-    /**
-    * Instance of the encapsulated posix thread
-    * @property thread
-    * @private
-    */
-    pthread_t thread;
-    /**
-    * Runnable status of the thread. True means that thread is running
-    * @property runnableFlag
-    * @private
-    */
-    bool runnableFlag;
+	/**
+	* Condition variable used to signal runnable status changes
+	* @property cond
+	* @private
+	*/
+	pthread_cond_t cond;
+	/**
+	* Mutex used to lock runnable status changes
+	* @property mutex
+	* @private
+	*/
+	pthread_mutex_t mutex;
+	/**
+	* Instance of the encapsulated posix thread
+	* @property thread
+	* @private
+	*/
+	pthread_t thread;
+	/**
+	* Runnable status of the thread. True means that thread is running
+	* @property runnableFlag
+	* @private
+	*/
+	bool runnableFlag;
 
 private:
 
-    /**
-    * Sets new runnable status of the thread. Holds mutex and signals condition variable
-    * @fn setRunnableFlag
-    * @private
-    * @param[in] flag New status of the thread to be set
-    * @return Actual runnable status after operation
-    */
-    bool setRunnableFlag(bool flag);
+	/**
+	* Sets new runnable status of the thread. Holds mutex and signals condition variable
+	* @fn setRunnableFlag
+	* @private
+	* @param[in] flag New status of the thread to be set
+	* @return Actual runnable status after operation
+	*/
+	bool setRunnableFlag(bool flag);
 
-    /**
-    * Sleeps current thread for specified time in miliseconds. Wait can be canceled if thread is in stopped/stopping state.
-    * @fn wait
-    * @private
-    * @param miliseconds Sleep time in miliseconds.
-    * @return True if wait wasn't canceled, false otherwise.
-    */
-    bool wait( long miliseconds );
+	/**
+	* Sleeps current thread for specified time in miliseconds. Wait can be canceled if thread is in stopped/stopping state.
+	* @fn wait
+	* @private
+	* @param miliseconds Sleep time in miliseconds.
+	* @return True if wait wasn't canceled, false otherwise.
+	*/
+	bool wait( long miliseconds );
 
 public:
 
-    /**
-    * Method to be executed in this thread. Has to be overwritten.
-    * @fn run
-    * @public
-    */
-    virtual void run() = 0;
+	/**
+	* Method to be executed in this thread. Has to be overwritten.
+	* @fn run
+	* @public
+	*/
+	virtual void run() = 0;
 
 protected:
 
-    /**
-    * Gets runnable status of current thread. Sleeps calling thread for a specified time.
-    * @protected
-    * @fn isRunnable
-    * @param miliseconds Time in miliseconds. 0 means no sleep.
-    * @return True if thread should still run.
-    *
-    * \b Example
-    * @code
-    *
-    *       void MyCustomThread::run()
-    *       {
-    *           while(isRunnable(1000)) { // execute some op once per second. Exits thread if stop() was called.
-    *           ...
-    *           }
-    *       }
-    * @endcode
-    */
-    bool isRunnable(long miliseconds = 0);
+	/**
+	* Gets runnable status of current thread. Sleeps calling thread for a specified time.
+	* @protected
+	* @fn isRunnable
+	* @param miliseconds Time in miliseconds. 0 means no sleep.
+	* @return True if thread should still run.
+	*
+	* \b Example
+	* @code
+	*
+	*       void MyCustomThread::run()
+	*       {
+	*           while(isRunnable(1000)) { // execute some op once per second. Exits thread if stop() was called.
+	*           ...
+	*           }
+	*       }
+	* @endcode
+	*/
+	bool isRunnable(long miliseconds = 0);
 
 public:
 
 	Thread();
 	virtual ~Thread();
 
-    /**
-    * Starts the thread
-    * @fn start
-    * @return True if thread was started
-    * @public
-    */
+	/**
+	* Starts the thread
+	* @fn start
+	* @return True if thread was started
+	* @public
+	*/
 	virtual bool start();
 
 	/**
-    * Stops the thread
-    * @fn stop
-    * @public
-    */
+	* Stops the thread
+	* @fn stop
+	* @public
+	*/
 	virtual void stop();
 
 	/**
-    * Restarts the thread.
-    * @fn restart
-    * @return True if thread was started again
-    * @public
-    */
+	* Restarts the thread.
+	* @fn restart
+	* @return True if thread was started again
+	* @public
+	*/
 	bool restart()
 	{
 		stop();

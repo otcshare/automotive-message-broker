@@ -1,4 +1,4 @@
-# AMB Release Notes
+# AMB Release Notes {#release_notes}
 Version: @PROJECT_VERSION@
 
 ## New features:

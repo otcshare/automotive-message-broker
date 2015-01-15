@@ -1,4 +1,5 @@
 /*!
+ * \file protocol.idl
  * \section websocket Websocket Plugin Protocol Documentation
  * \version @PROJECT_VERSION@
  *

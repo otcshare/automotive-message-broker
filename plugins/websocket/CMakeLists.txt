@@ -43,7 +43,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test/index.html ${CMAKE_CURRENT_SOURC
 install(TARGETS websocketsource LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/websocket.README.md @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/protocol.idl ${CMAKE_CURRENT_BINARY_DIR}/docs/protocol.idl @ONLY)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/protocol.idl ${CMAKE_CURRENT_BINARY_DIR}/protocol.idl @ONLY)
 
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/websocket.README.md DESTINATION ${DOC_INSTALL_DIR}/plugins)
 install (DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test DESTINATION ${DOC_INSTALL_DIR}/plugins/websocket COMPONENT Docs)

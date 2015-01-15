@@ -2,11 +2,11 @@
 * \mainpage Automotive Message Broker Documentation
 * \version @PROJECT_VERSION@
 * \section links AMB Documentation Sections
-* - \ref ambd.md - AMB Daemon Documentation
-* - <a href="../dbus/html/index.html">DBus API documentation</a> - Using AMB with your application
+* - \ref ambd
+* - \ref dbus_api - Using AMB with your application
 * - \ref libamb - Developing AMB or AMB plugins
 * - \ref plugins - Using Built in AMB plugins
-* - \ref RELEASE.md - Current release notes
+* - \ref release_notes - Current release notes
 *
 * \section intro Introduction
 * Automotive Message Broker (AMB) is a framework for providing applications with standardized access to vehicle data.

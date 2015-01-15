@@ -1,19 +1,17 @@
 /*!
- \file libamb.in
+ \file libamb.h
  \section libamb Automotive Message Broker Library Documentation
  \version @PROJECT_VERSION@
 
- <a href="../../html/index.html">Back to AMB Documentation Main</a>
-
- \section intro Introduction
+ \section libamb_intro Introduction
  Automotive Message Broker (AMB) Library documentation outlines the internal classes and structures for building
  plugins for AMB.
 
- \section architecture General Architecture
+ \section libamb_architecture General Architecture
  AMB has 3 main parts.  Source plugins which provide data, a routing engine that
  routes data and sink plugins that consume the data.
 
- \section properties Properties
+ \section libamb_properties Properties
  AMB defines a number of properties itself.  These properties are defined in vehicleproperty.h.  The DBus plugin
  will take many of these properties and combine them in DBus interfaces.  The mappings of AMB internal properties
  to DBus Interface properties can be found in the <a href="ambdbusmappings_8idl.html">mappings documentation</a>.  This file will come in handy when you want to
@@ -26,7 +24,7 @@
 
  "org.automotive.CustomProperty is the DBus interface and CustomProperty is a DBus property in that interface.
 
- \section plugins Plugins
+ \section libamb_plugins Plugins
  There are two types of plugins: plugins that provide data, called "sources"
  (AbstractSource) and plugins that consume data, called "sinks" (AbstractSink).
  A typical source would get data from the vehicle and then translate the raw data
@@ -40,7 +38,7 @@
 
  Various plugins have separate documentation found in @DOC_INSTALL_DIR@/plugins/.
 
- \section plugin_creation Creating your own plugin
+ \section libamb_plugin_creation Creating your own plugin
  AMB allows you to create your own plugins.  Plugins inherit from either AbstractSource, AbstractSink, or AmbPluginImpl.
 
  It is recommended that new plugins be written using AmbPlugin and AmbPluginImpl.

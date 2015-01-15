@@ -30,16 +30,7 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/examplesink DESTINATION ${PLUGIN_SEGM
 
 
 if(enable_docs)
-	find_package(Doxygen)
-	if(DOXYGEN_FOUND)
-		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plugins.in.idl ${CMAKE_CURRENT_BINARY_DIR}/plugins.idl @ONLY)
-		add_custom_target(plugin_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-											COMMENT "Generating plugin documentation with Doxygen" VERBATIM)
-
-		install (DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html DESTINATION ${DOC_INSTALL_DIR}/plugins COMPONENT Docs)
-	endif(DOXYGEN_FOUND)
-
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plugins.in.idl ${CMAKE_CURRENT_BINARY_DIR}/plugins.idl @ONLY)
 endif(enable_docs)
 
 add_subdirectory(common)

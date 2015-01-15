@@ -22,15 +22,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pthread.h>
 
 /**
- * @defgroup libivipoccommon ivipoc-common static library.
+ * @defgroup libamb-plugins-common amb-plugins-common static library.
  * \brief Project common C++ utilities.
  *
- * Contains Logger, Thread and Mutex utility classes.
+ * Contains Logger, Thread and Mutex, SerialPort and other utility classes.
  *
  * @{
  */
 
-/** 
+/**
  * \brief Project common C++ utilities namespace
  * @namespace CUtil
  */
@@ -45,30 +45,30 @@ namespace CUtil {
 
 class Mutex
 {
-    /**
-    * Encapsulated posix mutex object
-    * @property mutexID
-    * @private
-    */
-    pthread_mutex_t mutexID;
+	/**
+	* Encapsulated posix mutex object
+	* @property mutexID
+	* @private
+	*/
+	pthread_mutex_t mutexID;
 
 public:
 
-    Mutex();
-    ~Mutex();
+	Mutex();
+	~Mutex();
 
-    /**
-    * Locks mutex object
-    * @fn lock
-    * @public
-    */
-    void lock();
-    /**
-    * Unlocks mutex object
-    * @fn unlock
-    * @public
-    */
-    void unlock();
+	/**
+	* Locks mutex object
+	* @fn lock
+	* @public
+	*/
+	void lock();
+	/**
+	* Unlocks mutex object
+	* @fn unlock
+	* @public
+	*/
+	void unlock();
 };
 
 }
