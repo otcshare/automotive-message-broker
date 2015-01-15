@@ -1,4 +1,4 @@
-Database plugin
+# Database plugin {#database_plugin}
 Version: @PROJECT_VERSION@
 
 This plugin logs properties in a sqlite database file.  It can also be used as a source to
@@ -10,6 +10,7 @@ cmake -Ddatabase_plugin=On ..
 
 To use the Database plugin, add the following to the "sources" array in /etc/ambd/config:
 
+~~~~~~~~~~~~~{.json}
 {
   "name" : "Database",
   "path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
@@ -21,11 +22,12 @@ To use the Database plugin, add the following to the "sources" array in /etc/amb
   "playbackMultiplier" : "1",
   "frequency" : "1"
 }
+~~~~~~~~~~~~~
 
-Configuration Key Definitions:
+## Configuration Key Definitions:
 
 "name"
-name of plugin.  This key is not used by the plugin at this moment.
+name of plugin.
 
 "path"
 path to plugin on the filesystem.
@@ -69,7 +71,7 @@ database will not be written to until it is.
 
 Default: 1
 
-AMB Properties:
+## AMB Properties:
 
 DatabaseFile
 Type: string
@@ -96,3 +98,22 @@ Set to false to turn off playback. This property is mutually exclusive with the
 DatabaseLogging property.  Setting this to true will turn off logging.
 
 Default: false when configuration option "playbackOnLoad" is not set.
+
+
+## AMB DBus Interfaces:
+
+org.automotive.DataLogger
+
+Properties:
+LogFile - Corresponds to "DatabaseFile"
+Logging - Corresponds to "DatabaseLogging"
+Playback - Corresponds to "DatabasePlayback"
+
+~~~~~~~~~~~~~{.idl}
+interface Datalogger
+{
+ attribute DOMString LogFile;
+ attribute boolean Logging;
+ attribute boolean Playback;
+}
+~~~~~~~~~~~~~

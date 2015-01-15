@@ -1,15 +1,15 @@
 /*!
- * \mainpage Websocket Plugin Protocol Documentation
+ * \section websocket Websocket Plugin Protocol Documentation
  * \version @PROJECT_VERSION@
  *
  * <a href="../../../html/index.html">Back to AMB Documentation Main</a>
- * \section intro Introduction
+ * \section websocket_intro Introduction
  * This document describes the AMB Websocket protocol.  The messages are passed either as JSON or in binary format.  The binary format is
  * defined by the <a href="http://doc.qt.io/qt-5/qjsondocument.html#toBinaryData">Qt project</a>.  The JSON format is described in protocol.idl.
  *
  * For information about the using the plugin with AMB, see <a href="../../websocket.README">the plugin documentation</a>
  *
- * \section example Example javascript
+ * \section websocket_example Example javascript
  * The following is an example of using the websocket protocol in html5.  For a more complete example, see the <a href="../test/index.html">html test</a>.
  * \code
  * socket = new WebSocket('ws://localhost:23000/');

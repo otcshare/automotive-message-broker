@@ -1,18 +1,22 @@
 /*!
- * \mainpage Automotive Message Broker Library Documentation - Bluemonkey Plugin
+ * \file bluemonkey.idl
+ * \section bluemonkey Bluemonkey Javascript API Documentation
  * \version @PROJECT_VERSION@
  *
- * <a href="../../../html/index.html">Back to AMB Documentation Main</a>
- * \section intro Introduction
+ * \section bluemonkey_intro Introduction
  * Bluemonkey is a javascript rendering engine that allows the scripting of source plugin behavior in javascript.
  * It allows developers a quick way to prototype plugin code as well as a way to create custom properties.
  *
- * \section properties Properties
+ * the bluemonkey script engine is powered by Qt QML's javascript engine.  It supports QObject types as well
+ * as ECMA script (javascript).  All QObject properties, slots, and signals are available in javascript.
+ * \see Qt's QMetaObject system for additional details
+ *
+ * \section bluemonkey_properties Properties
  * Bluemonkey uses internal property names (not DBus API interface names).  These properties are defined in
  * lib/vehicleproperty.h.  There are mappings from AMB internal property names to DBus API properties in the
  * <a href="ambdbusmappings_8idl">mappings documentation</a>.  The mappings comes in handy when you want to implement properties that are
  * exported as an DBus API interface (ie, org.automotive.VehicleSpeed).
- * \section example Example bluemonkey script
+ * \section bluemonkey_example Example bluemonkey script
  * \code
  * var speedProperty = bluemonkey.subscribeTo("VehicleSpeed");
  *
@@ -25,17 +29,15 @@
  * });
  * testTimer.start();
  * \endcode
- * \section Javascript API documentation
+ * \section bluemonkey_js_api Javascript API documentation
  * Javascript API documentation is found in bluemonkey.idl and is described using WebIDL.  Plugin configuration documentation can be found in bluemonkey.README.
  */
 
  /*!
- * \file bluemonkey.idl
+ *
  * \name @PROJECT_NAME@ Bluemonkey interface documentation
  * \version @PROJECT_VERSION@
- * \brief the bluemonkey script engine is powered by Qt QML's javascript engine.  It supports QObject types as well
- * as ECMA script (javascript).  All QObject properties, slots, and signals are available in javascript.
- * \see Qt's QMetaObject system for additional details
+ * \brief
  */
 
 /*!

@@ -1,5 +1,8 @@
-OpenCV "lux" plugin
+# OpenCV "lux" plugin {#opencvlux_plugin}
+
 Version: @PROJECT_VERSION@
+
+## Introduction
 
 This plugin simulates the ExteriorBrigtness property using a traditional webcamera.  It works
 by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
@@ -13,6 +16,7 @@ Currently, this plugin has been tested with OpenCV 2.4.4.
 
 To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/config:
 
+~~~~~~~~~~~~~{.json}
 {
   "name" : "OpenCV LUX",
   "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
@@ -23,10 +27,11 @@ To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/
   "opencl" : "false",
   "device" : "0"
 }
+~~~~~~~~~~~~~
 
 NOTE: some features require the qtmainloop to be running.  see the main README for details.
 
-Configuration Key Definitions:
+## Configuration Key Definitions:
 
 "name"
 name of plugin.  This key is not used by the plugin at this moment.
@@ -90,7 +95,7 @@ open or closed.  If closed for a period of time, DriverDrowsiness will change to
 Default: "false"
 
 
-Properties:
+## AMB Properties:
 
 VideoLogging
 Turn on and off video logging

@@ -11,11 +11,7 @@ message(STATUS "doxygen doc generation enabled")
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.idl.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.idl @ONLY)
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.mainpage.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.mainpage @ONLY)
-	add_custom_target(libamb_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/amb COMMENT "Generating API documentation with Doxygen" VERBATIM)
-	add_custom_target(idl ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.idl WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/dbus COMMENT "Generating DBus API documentation with Doxygen" VERBATIM)
-	add_custom_target(mainpage_docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile.mainpage WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs COMMENT "Generating mainpage documentation with Doxygen" VERBATIM)
+	add_custom_target(docs ALL ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/docs/amb COMMENT "Generating API documentation with Doxygen" VERBATIM)
 
 	#generate mappings documentation
 	configure_file (${CMAKE_CURRENT_SOURCE_DIR}/libamb.in ${CMAKE_CURRENT_BINARY_DIR}/libamb.h @ONLY)
@@ -23,8 +19,7 @@ if(DOXYGEN_FOUND)
 	add_custom_target(genmappings_libamb
 										python ${CMAKE_SOURCE_DIR}/tools/genmapping --output ${CMAKE_CURRENT_BINARY_DIR}/ambdbusmappings.idl ${dbus_mapping_headers}
 										COMMENT "running genmapping")
-	add_dependencies(libamb_docs genmappings_libamb)
-	add_dependencies(idl genmappings_libamb)
+	add_dependencies(docs genmappings_libamb)
 
 endif(DOXYGEN_FOUND)
 

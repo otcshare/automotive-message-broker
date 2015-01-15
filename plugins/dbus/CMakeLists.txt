@@ -25,8 +25,8 @@ set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/par
 set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/drivingsafety.h CACHE INTERNAL "dbus mapping headers")
 set(dbus_mapping_headers ${dbus_mapping_headers} ${CMAKE_CURRENT_SOURCE_DIR}/personalization.h CACHE INTERNAL "dbus mapping headers")
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/dbus.README @ONLY)
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus.README DESTINATION ${DOC_INSTALL_DIR}/plugins)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/dbus.README.md @ONLY)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus.README.md DESTINATION ${DOC_INSTALL_DIR}/plugins)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/dbus.in.json ${CMAKE_CURRENT_BINARY_DIR}/dbus @ONLY)
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/dbus DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})

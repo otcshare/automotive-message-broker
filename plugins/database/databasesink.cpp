@@ -5,6 +5,8 @@
 #include "uuidhelper.h"
 #include "ambplugin.h"
 
+#include <dbusplugin.h>
+#include <dbusexport.h>
 #include <thread>
 
 int bufferLength = 100;
@@ -15,6 +17,19 @@ extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string>
 	auto plugin = new AmbPlugin<DatabaseSink>(routingengine, config);
 	plugin->init();
 }
+
+class DataLogger: public DBusSink
+{
+public:
+	DataLogger(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("DataLogger", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(DatabaseLogging, "LogFile", VariantType::ReadWrite);
+		wantPropertyVariant(DatabasePlayback, "Playback", VariantType::ReadWrite);
+		wantPropertyVariant(DatabaseLogging, "Logging", VariantType::ReadWrite);
+	}
+};
+
 
 static void * cbFunc(Shared* shared)
 {
@@ -416,6 +431,17 @@ void DatabaseSink::init()
 		setValue(databaseName, configuration["databaseFile"]);
 		updateForNewDbFilename();
 	}
+
+	routingEngine->subscribeToProperty(DBusConnected, [this](AbstractPropertyType* value)
+	{
+		if(value->name == DBusConnected)
+		{
+			if(value->value<bool>())
+			{
+				amb::Exporter::instance()->exportProperty<DataLogger>(routingEngine);
+			}
+		}
+	});
 
 	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;
 

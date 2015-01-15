@@ -1,5 +1,6 @@
 /*!
- \mainpage Automotive Message Broker Library Documentation
+ \file libamb.in
+ \section libamb Automotive Message Broker Library Documentation
  \version @PROJECT_VERSION@
 
  <a href="../../html/index.html">Back to AMB Documentation Main</a>
