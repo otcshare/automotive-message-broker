@@ -558,6 +558,7 @@ static int websocket_callback(struct libwebsocket_context *context,struct libweb
 					reply["name"] = "getSupported";
 					reply["transactionid"] = id.c_str();
 					reply["data"] = list;
+					reply["systemTime"] = amb::Timestamp::instance()->epochTime();
 
 					lwsWriteVariant(wsi, reply);
 				}

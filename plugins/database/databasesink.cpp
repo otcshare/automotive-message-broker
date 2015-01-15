@@ -28,10 +28,10 @@ static void * cbFunc(Shared* shared)
 
 	vector<DictionaryList<string> > insertList;
 
+	double startTime = amb::currentTime();
+
 	while(1)
 	{
-		usleep(timeout*1000);
-
 		DBObject obj = shared->queue.pop();
 
 		if( obj.quit )
@@ -45,7 +45,7 @@ static void * cbFunc(Shared* shared)
 		NameValuePair<string> two("value", obj.value);
 		NameValuePair<string> three("source", obj.source);
 		NameValuePair<string> zone("zone", boost::lexical_cast<string>(obj.zone));
-		NameValuePair<string> four("time", boost::lexical_cast<string>(obj.time));
+		NameValuePair<string> four("time", boost::lexical_cast<string>(amb::Timestamp::instance()->epochTime(obj.time)));
 		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj.sequence));
 		NameValuePair<string> six("tripId", shared->tripId);
 
@@ -59,8 +59,10 @@ static void * cbFunc(Shared* shared)
 
 		insertList.push_back(dict);
 
-		if(insertList.size() >= bufferLength)
+		if(insertList.size() >= bufferLength && amb::currentTime() - startTime >= timeout / 1000)
 		{
+			startTime = amb::currentTime();
+
 			shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
 			for(int i=0; i< insertList.size(); i++)
 			{
@@ -340,9 +342,9 @@ void DatabaseSink::initDb()
 	shared->db->init(databaseName->value<std::string>(), tablename, tablecreate);
 }
 
-void DatabaseSink::setDatabaseFileName(string filename)
+void DatabaseSink::updateForNewDbFilename()
 {
-	bool isLogging = databaseLogging->value<bool>();
+	bool wasLogging = databaseLogging->value<bool>();
 
 	stopDb();
 	initDb();
@@ -366,7 +368,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 		}
 	}
 
-	if(isLogging)
+	if(wasLogging)
 	{
 		stopDb();
 		startDb();
@@ -411,8 +413,8 @@ void DatabaseSink::init()
 {
 	if(configuration.find("databaseFile") != configuration.end())
 	{
-		databaseName->setValue(configuration["databaseFile"]);
-		setDatabaseFileName(configuration["databaseFile"]);
+		setValue(databaseName, configuration["databaseFile"]);
+		updateForNewDbFilename();
 	}
 
 	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;
@@ -517,7 +519,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(const AsyncSetPropertyRequest &req
 	}
 	else if(request.property == DatabaseFile)
 	{
-		setDatabaseFileName(databaseName->value<std::string>());
+		updateForNewDbFilename();
 	}
 	else if( request.property == DatabasePlayback)
 	{

@@ -116,6 +116,27 @@ map Dictionary {
 }
 
 /*!
+ * \brief HistoryObject is returned with GetHistory call
+ */
+interface HistoryObject {
+
+  /*!
+  * \brief Name of property
+  */
+  attribute String Name readonly
+
+  /*!
+  * \brief Value of property
+  */
+  attribute Variant Value readonly
+
+  /*!
+  * \brief Time in seconds since unix epoch.
+  */
+  attribute Double Time readonly
+}
+
+/*!
 * VehiclePropertyType
 * \brief VehiclePropertyType is the base class for all Data types.
 */
@@ -138,7 +159,7 @@ interface VehiclePropertyType {
   * \arg endTime time stamp in Seconds since Unix Epoc
   */
   method GetHistory(Double beginTime, Double endTime) {
-	out{ Dictionary result}
+	out{ array of HistoryObject result }
   }
 }
 
