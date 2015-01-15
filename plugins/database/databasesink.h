@@ -163,7 +163,7 @@ private: //methods:
 	void startDb();
 	void startPlayback();
 	void initDb();
-	void setDatabaseFileName();
+	void updateForNewDbFilename();
 
 private:
 	PropertyList mSubscriptions;

@@ -342,7 +342,7 @@ void DatabaseSink::initDb()
 	shared->db->init(databaseName->value<std::string>(), tablename, tablecreate);
 }
 
-void DatabaseSink::setDatabaseFileName(string filename)
+void DatabaseSink::updateForNewDbFilename()
 {
 	bool wasLogging = databaseLogging->value<bool>();
 
@@ -414,7 +414,7 @@ void DatabaseSink::init()
 	if(configuration.find("databaseFile") != configuration.end())
 	{
 		setValue(databaseName, configuration["databaseFile"]);
-		setDatabaseFileName();
+		updateForNewDbFilename();
 	}
 
 	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;
@@ -519,7 +519,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(const AsyncSetPropertyRequest &req
 	}
 	else if(request.property == DatabaseFile)
 	{
-		setDatabaseFileName(databaseName->value<std::string>());
+		updateForNewDbFilename();
 	}
 	else if( request.property == DatabasePlayback)
 	{

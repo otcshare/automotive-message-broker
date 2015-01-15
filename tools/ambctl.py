@@ -494,7 +494,7 @@ if args.command == "stdin":
 										print row
 
 							redraw(data)
-						elif curses.ascii.isalnum(ord(str)) or ord(str) == curses.ascii.SP: #regular text
+						elif curses.ascii.isprint(ord(str)) or ord(str) == curses.ascii.SP: #regular text
 							data.insert(str)
 							redraw(data)
 
