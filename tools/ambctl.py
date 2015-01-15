@@ -44,23 +44,29 @@ def processCommand(command, commandArgs, noMain=True):
 
 	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 	bus = dbus.SystemBus()
-	try:
+
+	def getManager(bus):
+		try:
 			managerObject = bus.get_object("org.automotive.message.broker", "/");
 			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
-	except:
+			return managerInterface
+		except:
 			print "Error connecting to AMB.  is AMB running?"
-			return 1
+			return None
 
 	if command == "list" :
+		managerInterface = getManager(bus)
 		supportedList = managerInterface.List()
 		for objectName in supportedList:
 			print objectName
 		return 1
 	elif command == "get":
+		if len(commandArgs) == 0:
+			commandArgs = ['help']
 		if commandArgs[0] == "help":
 			print "ObjectName [ObjectName...]"
 			return 1
-
+		managerInterface = getManager(bus)
 		for objectName in commandArgs:
 			objects = managerInterface.FindObject(objectName)
 			print objectName
@@ -74,6 +80,7 @@ def processCommand(command, commandArgs, noMain=True):
 		if commandArgs[0] == "help":
 			print "ObjectName [ObjectName...]"
 			return 1
+		managerInterface = getManager(bus)
 		for objectName in commandArgs:
 			objects = managerInterface.FindObject(objectName)
 			for o in objects:
@@ -101,6 +108,7 @@ def processCommand(command, commandArgs, noMain=True):
 		zone = 0
 		if len(commandArgs) == 4:
 			zone = int(commandArgs[3])
+		managerInterface = getManager(bus)
 		object = managerInterface.FindObjectForZone(objectName, zone)
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.freedesktop.DBus.Properties")
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)
@@ -133,6 +141,7 @@ def processCommand(command, commandArgs, noMain=True):
 		zone = 0
 		if len(commandArgs) >= 2:
 			zone = int(commandArgs[1])
+		managerInterface = getManager(bus)
 		object = managerInterface.FindObjectForZone(objectName, zone);
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
@@ -318,7 +327,7 @@ if args.command == "stdin":
 						elif ord(str) == 127: #backspace
 								data.back_space()
 								redraw(data)
-						elif curses.ascii.isalnum(ord(str)) or ord(str) == curses.ascii.SP: #regular text
+						elif curses.ascii.isprint(ord(str)): #regular text
 								data.insert(str)
 								redraw(data)
 
