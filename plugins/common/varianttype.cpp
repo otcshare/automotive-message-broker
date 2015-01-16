@@ -79,11 +79,18 @@ GVariant *VariantType::toVariant()
 
 void VariantType::fromVariant(GVariant *val, std::function<void (bool, AsyncPropertyReply::Error)> callback)
 {
-	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(name());
+	AbstractPropertyType *v = VehicleProperty::getPropertyTypeForPropertyNameValue(ambPropertyName());
+
+	if(!v)
+	{
+		DebugOut(DebugOut::Error) << "could not get AbstractPropertyType for: " << ambPropertyName() << endl;
+		return;
+	}
+
 	v->fromVariant(val);
 
 	AsyncSetPropertyRequest request;
-	request.property = name();
+	request.property = ambPropertyName();
 	request.value = v;
 	request.zoneFilter = zoneFilter();
 	request.completed = [&](AsyncPropertyReply* r)

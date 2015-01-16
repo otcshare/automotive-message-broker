@@ -1,6 +1,6 @@
 {
-    "name" : "ExampleSource",
-    "path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so",
-    "delay" : "6",
-    "enabled" : true
+	"name" : "ExampleSource",
+	"path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so",
+	"delay" : "5000",
+	"enabled" : true
 }

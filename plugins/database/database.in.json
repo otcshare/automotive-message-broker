@@ -1,0 +1,12 @@
+{
+	"name" : "Database",
+	"path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
+	"databaseFile" : "/tmp/storage",
+	"enabled" : false,
+	"bufferLength" : "100",
+	"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
+	"startOnLoad" : "false",
+	"playbackOnLoad" : "false",
+	"playbackMultiplier" : "1",
+	"frequency" : "1"
+}

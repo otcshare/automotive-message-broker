@@ -167,7 +167,8 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		{
 			int t = boost::lexical_cast<int>(config["frequency"]);
 			timeout = 1000 / t;
-		}catch(...)
+		}
+		catch(...)
 		{
 			DebugOut(DebugOut::Error)<<"Failed to parse frequency: Invalid value "<<config["frequency"]<<endl;
 		}
@@ -432,6 +433,10 @@ void DatabaseSink::init()
 		updateForNewDbFilename();
 	}
 
+	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;
+
+	routingEngine->updateSupported(supported(), PropertyList(), &source);
+
 	routingEngine->subscribeToProperty(DBusConnected, [this](AbstractPropertyType* value)
 	{
 		if(value->name == DBusConnected)
@@ -443,9 +448,6 @@ void DatabaseSink::init()
 		}
 	});
 
-	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;
-
-	routingEngine->updateSupported(supported(), PropertyList(), &source);
 }
 
 void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
