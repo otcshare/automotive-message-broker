@@ -1,5 +1,5 @@
 # AMB Release Notes {#release_notes}
-Version: 0.13.801
+Version: 0.13.802
 
 ## New features:
 - [DBus] some classes for exporting custom interfaces moved to plugins-common
