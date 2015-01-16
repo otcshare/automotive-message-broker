@@ -113,6 +113,7 @@ def enablePlugin(pluginName, enabled):
 				file = open(plugin["segmentPath"], 'rw+')
 				plugin.pop('segmentPath', None)
 				fixedData = json.dumps(plugin, separators=(', ', ' : '), indent=4)
+				fixedData = fixedData.replace('    ','\t');
 				file.truncate()
 				file.write(fixedData)
 				file.close()
