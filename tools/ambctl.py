@@ -9,6 +9,8 @@ import fileinput
 import termios, fcntl, os
 import glib
 import curses.ascii
+import traceback
+
 from dbus.mainloop.glib import DBusGMainLoop
 
 class bcolors:
@@ -122,16 +124,14 @@ def enablePlugin(pluginName, enabled):
 				print error
 				return False
 	return False
-
-
-
+class Subscribe:
+	subscriptions = {}
 def processCommand(command, commandArgs, noMain=True):
 
 	if command == 'help':
 		print help()
 		return 1
 
-	dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 	bus = dbus.SystemBus()
 
 	def getManager(bus):
@@ -164,24 +164,38 @@ def processCommand(command, commandArgs, noMain=True):
 				print json.dumps(propertiesInterface.GetAll("org.automotive."+objectName), indent=2)
 		return 1
 	elif command == "listen":
+		off = False
 		if len(commandArgs) == 0:
 			commandArgs = ['help']
 		if commandArgs[0] == "help":
-			print "ObjectName [ObjectName...]"
+			print "[help] [off] ObjectName [ObjectName...]"
 			return 1
+		elif commandArgs[0] == "off":
+			off=True
+			commandArgs=commandArgs[1:]
 		managerInterface = getManager(bus)
 		for objectName in commandArgs:
 			objects = managerInterface.FindObject(objectName)
 			for o in objects:
-				bus.add_signal_receiver(changed,
-					dbus_interface="org.freedesktop.DBus.Properties",
-					signal_name="PropertiesChanged", path=o)
-		if noMain != True:
-				try:
-						main_loop = gobject.MainLoop(None, False)
-						main_loop.run()
-				except KeyboardInterrupt:
-						return 1
+				if off == False:
+					signalMatch = bus.add_signal_receiver(changed, dbus_interface="org.freedesktop.DBus.Properties", signal_name="PropertiesChanged", path=o)
+					Subscribe.subscriptions[o] = signalMatch
+				else:
+					try:
+						signalMatch = Subscribe.subscriptions.get(o)
+						signalMatch.remove()
+						del Subscribe.subscriptions[o]
+					except KeyError:
+						print "not lisenting to object at: ", o
+						pass
+		if not noMain == True:
+			try:
+				main_loop = gobject.MainLoop(None, False)
+				main_loop.run()
+			except KeyboardInterrupt:
+				return 1
+			except:
+				traceback.print_stack()
 	elif command == "set":
 		if len(commandArgs) == 0:
 			commandArgs = ['help']
@@ -292,6 +306,8 @@ if args.help:
 		print
 		print help()
 		sys.exit()
+
+dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
 
 if args.command == "stdin":
 		class Data:
@@ -455,6 +471,7 @@ if args.command == "stdin":
 								print error
 							except:
 								print "Error running command ", sys.exc_info()[0]
+								traceback.print_stack()
 							data.push();
 							data.clear()
 							redraw(data)
@@ -521,18 +538,20 @@ if args.command == "stdin":
 		io_stdin.add_watch(glib.IO_IN, handle_keyboard, data)
 
 		try:
-				erase_line()
-				display_prompt()
-				sys.stdout.flush()
-				main_loop = gobject.MainLoop(None, False)
-				main_loop.run()
+			erase_line()
+			display_prompt()
+			sys.stdout.flush()
+			main_loop = gobject.MainLoop(None, False)
+			main_loop.run()
 		except KeyboardInterrupt:
-				sys.exit()
+			sys.exit()
+		except:
+			traceback.print_stack()
 		finally:
-				termios.tcsetattr(fd, termios.TCSAFLUSH, old)
-				fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
-				print ""
-				sys.exit()
+			termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+			fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+			print ""
+			sys.exit()
 
 else:
 	try:
