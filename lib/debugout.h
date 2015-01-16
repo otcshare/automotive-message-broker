@@ -30,7 +30,12 @@ using namespace std;
 
 void debugOut(const string &message);
 
+/*! \addtogroup libamb
+ *  @{
+ */
+
 /*!
+ * \file debugout.h
  * \brief The DebugOut class represents a class used for outputing debug information
  * The specified debug level will only be outputed if the debug level is => the debug threshhold
  * Here's a simple example:
@@ -178,8 +183,6 @@ private:
 	int mDebugLevel;
 };
 
-
-
-
-
 #endif
+
+/** @} */

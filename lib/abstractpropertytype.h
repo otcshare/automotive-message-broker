@@ -76,12 +76,16 @@ public:
 	 */
 	enum Priority
 	{
-		Normal = 0, /*!< normal priority.  This is default */
-		Low, /*!< Low priority. */
-		High, /*!< High priority*/
-		Instant /*!< Instant.  Using this priority is not thread safe.  This is typically used for
-				 *    Properties that need to be deterministic.
-				 */
+		/*!< normal priority.  This is default */
+		Normal = 0,
+		/*!< Low priority. */
+		Low,
+		/*!< High priority*/
+		High,
+		/*!< Instant.  Using this priority is not thread safe.  This is typically used for
+		 *    Properties that need to be deterministic.
+		 */
+		Instant
 	};
 
 	AbstractPropertyType(std::string property)
