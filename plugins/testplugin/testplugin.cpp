@@ -323,13 +323,20 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	testCoreSetSupported();
 
 	DebugOut() << "Testing MapPropertyType... " << endl;
-	MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmap("something");
-	MapPropertyType<BasicPropertyType<Zone::Type>,BasicPropertyType<Door::Status>> propmaptwo("something");
-	propmap.append(Zone::RearLeft,Door::Ajar);
+	MapPropertyType<BasicPropertyType<Door::Status>> propmap("Something");
+	MapPropertyType<BasicPropertyType<Door::Status>> propmaptwo("SomethingElse");
+	propmap.append("hi", Door::Ajar);
 	GVariant *var = propmap.toVariant();
 	gsize dictsize = g_variant_n_children(var);
 	//DebugOut() << var << endl;
 	propmaptwo.fromVariant(var);
+
+	g_assert(propmaptwo.toString() == propmap.toString());
+
+	///test fromString:
+	propmap.fromString(propmaptwo.toString());
+
+	DebugOut() << "Testing map string equivalency: " << propmaptwo.toString() << "==" << propmap.toString() << endl;
 
 	g_assert(propmaptwo.toString() == propmap.toString());
 

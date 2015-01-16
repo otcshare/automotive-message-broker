@@ -95,7 +95,7 @@ public:
 		{
 			ostream out(buf);
 			out.precision(15);
-			out<<message<<" ";
+			out<<message;
 		}
 		return *this;
 	}

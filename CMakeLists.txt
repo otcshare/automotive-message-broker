@@ -68,7 +68,6 @@ find_package(Boost REQUIRED)
 
 
 pkg_check_modules(glib REQUIRED glib-2.0 gobject-2.0)
-pkg_check_modules(json REQUIRED json)
 
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 

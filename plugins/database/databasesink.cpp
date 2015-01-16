@@ -7,6 +7,7 @@
 
 #include <dbusplugin.h>
 #include <dbusexport.h>
+#include <picojson.h>
 #include <thread>
 
 int bufferLength = 100;
@@ -226,39 +227,19 @@ void DatabaseSink::supportedChanged(const PropertyList &supportedProperties)
 
 void DatabaseSink::parseConfig()
 {
-	json_object *rootobject;
-	json_tokener *tokener = json_tokener_new();
-	enum json_tokener_error err;
-	do
-	{
-		rootobject = json_tokener_parse_ex(tokener, configuration["properties"].c_str(),configuration["properties"].size());
-	} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-	if (err != json_tokener_success)
-	{
-		fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-	}
-	if (tokener->char_offset < configuration["properties"].size()) // XXX shouldn't access internal fields
-	{
-		//Should handle the extra data here sometime...
-	}
+	std::string properties = configuration["properties"];
+	std::string jsonError;
+	picojson::value value;
+	picojson::parse (value, properties.begin(), properties.end(), &jsonError);
 
-	json_object *propobject = json_object_object_get(rootobject,"properties");
+	picojson::array array = value.get("properties").get<picojson::array>();
 
-	g_assert(json_object_get_type(propobject) == json_type_array);
-
-	array_list *proplist = json_object_get_array(propobject);
-
-	for(int i=0; i < array_list_length(proplist); i++)
+	for(auto i : array)
 	{
-		json_object *idxobj = (json_object*)array_list_get_idx(proplist,i);
-		std::string prop = json_object_get_string(idxobj);
+		std::string prop = i.to_str();
 		propertiesToSubscribeTo.push_back(prop);
-
 		DebugOut()<<"DatabaseSink logging: "<<prop<<endl;
 	}
-
-	//json_object_put(propobject);
-	json_object_put(rootobject);
 }
 
 void DatabaseSink::stopDb()

@@ -92,6 +92,8 @@ picojson::value GetBasic(GVariant* value) {
 		v = picojson::value(GVS<bool>::value(value));
 	} else if (type == "s") {
 		v = picojson::value(g_variant_get_string(value, nullptr));
+	} else {
+		DebugOut(DebugOut::Error) << "Unsupported type: " << type << endl;
 	}
 
 	return v;
@@ -118,6 +120,8 @@ GVariant* GetBasic(picojson::value value, const std::string& type) {
 		v = g_variant_new(type.c_str(), value.get<bool>());
 	} else if (type == "s") {
 		v = g_variant_new(type.c_str(), value.get<std::string>().c_str());
+	} else {
+		DebugOut(DebugOut::Error) << "Unsupported type: " << type << endl;
 	}
 
 	return v;
@@ -720,7 +724,7 @@ void Vehicle::Set(const std::string &object_name, picojson::object value,
 
 		GError* set_error = nullptr;
 
-		DebugOut() << "Trying to set " << attribute << " to " << itr.second.to_str() << endl;
+		DebugOut() << "Trying to set " << attribute << " to " << itr.second.serialize() << endl;
 
 		g_dbus_proxy_call_sync(properties_proxy.get(), "Set",
 							   g_variant_new("(ssv)",

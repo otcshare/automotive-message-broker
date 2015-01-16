@@ -6,22 +6,22 @@
 
 #include <map>
 #include <debugout.h>
-#include <json/json.h>
+#include "picojson.h"
 
-template <class T, class N>
+template <class N>
 class MapPropertyType: public AbstractPropertyType
 {
 public:
 	MapPropertyType(std::string propertyName):AbstractPropertyType(propertyName){}
 
-	void append(T  key, N  value)
+	void append(std::string  key, N  value)
 	{
-		appendPriv(key,value);
+		appendPriv(key, value);
 	}
 
 	AbstractPropertyType* copy()
 	{
-		MapPropertyType<T,N> *t = new MapPropertyType<T,N>(name);
+		MapPropertyType<N> *t = new MapPropertyType<N>(name);
 
 		t->setMap(mMap);
 		t->timestamp = timestamp;
@@ -39,14 +39,13 @@ public:
 
 		str<<"{";
 
-		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
+		for(auto itr: mMap)
 		{
 			if(str.str() != "{")
 				str << ", ";
 
-			auto t = *itr;
 
-			str <<"'"<< t.first.toString() <<"':'"<<t.second.toString()<<"'";
+			str <<"\""<< itr.first <<"\":\""<<itr.second.toString()<<"\"";
 		}
 
 		str << "}";
@@ -56,37 +55,33 @@ public:
 
 	void fromString(std::string str)
 	{
-		json_object *rootobject;
-		json_tokener *tokener = json_tokener_new();
-		enum json_tokener_error err;
-		do
-		{
-			rootobject = json_tokener_parse_ex(tokener, str.c_str(),str.length());
-		} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-		if (err != json_tokener_success)
-		{
-			fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-			// Handle errors, as appropriate for your application.
-		}
-		if (tokener->char_offset < str.length()) // XXX shouldn't access internal fields
-		{
-			// Handle extra characters after parsed object as desired.
-			// e.g. issue an error, parse another object from that point, etc...
-		}
-		//Good!
-
 		clear();
 
-		json_object_object_foreach(rootobject, key, val)
+		DebugOut() << str << endl;
+
+		picojson::value value;
+		picojson::parse(value, str);
+
+		std::string picojsonerr = picojson::get_last_error();
+
+		if(!value.is<picojson::object>() || !picojsonerr.empty())
 		{
-			T one("", key);
-			N two("", std::string(json_object_get_string(val)));
-			append(one, two);
-
+			DebugOut(DebugOut::Warning) << "JSon is invalid for MapPropertyType: " << str << endl;
+			DebugOut(DebugOut::Warning) << picojsonerr << endl;
+			return;
 		}
-		json_object_put(rootobject);
-		json_tokener_free(tokener);
 
+		const picojson::object& obj = value.get<picojson::object>();
+
+		DebugOut() << "obj size: " << obj.size() << endl;
+
+		for(auto i : obj)
+		{
+			std::string key = i.first;
+			N val("");
+			val.fromString(i.second.to_str());
+			append(key, val);
+		}
 	}
 
 	GVariant* toVariant()
@@ -96,7 +91,7 @@ public:
 		for(auto itr = mMap.begin(); itr != mMap.end(); itr++)
 		{
 			auto &foo = (*itr).first;
-			g_variant_builder_add(&params,"{?*}",const_cast<T&>(foo).toVariant(),(*itr).second.toVariant());
+			g_variant_builder_add(&params,"{sv}",foo.c_str(), (*itr).second.toVariant());
 		}
 
 		GVariant* var =  g_variant_builder_end(&params);
@@ -117,17 +112,24 @@ public:
 				//It is a dictionary entry
 				GVariant *keyvariant = g_variant_get_child_value(childvariant,0);
 				GVariant *valvariant = g_variant_get_child_value(childvariant,1);
-				T t = T();
-				t.fromVariant(keyvariant);
+				std::string key = g_variant_get_string(keyvariant, nullptr);
 				N n = N();
-				n.fromVariant(valvariant);
-				appendPriv(t,n);
+				GVariant *innerValue = nullptr;
+
+				DebugOut() << "variantType: " << g_variant_get_type_string(valvariant) << endl;
+
+				g_variant_get(valvariant, "v", &innerValue);
+
+				DebugOut() << "inner variange: " << g_variant_get_type_string(innerValue) << endl;
+
+				n.fromVariant(innerValue);
+				appendPriv(key,n);
 			}
 		}
 
 	}
 
-	void setMap(std::map<T, N> m)
+	void setMap(std::map<std::string, N> m)
 	{
 		mMap = m;
 	}
@@ -139,12 +141,12 @@ private:
 		mMap.clear();
 	}
 
-	void appendPriv(T  key, N  value)
+	void appendPriv(std::string  key, N  value)
 	{
 		mMap[key] = value;
 	}
 
-	std::map<T, N> mMap;
+	std::map<std::string, N> mMap;
 };
 
 
