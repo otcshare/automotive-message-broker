@@ -229,6 +229,7 @@ void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection
 	///TODO: Deprecated in 0.15
 	else if(boost::algorithm::starts_with(method, "Get"))
 	{
+		amb::deprecateMethod(method, "0.15");
 		std::string propertyName = method.substr(3);
 		auto propertyMap = iface->getProperties();
 		if(propertyMap.find(propertyName) == propertyMap.end())

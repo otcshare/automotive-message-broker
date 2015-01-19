@@ -21,20 +21,20 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "glibmainloop.h"
 #include "core.h"
 
-#include <json.h>
 #include <gio/gio.h>
 #include <picojson.h>
 
 #include <iostream>
+#include <fstream>
 #include <stdexcept>
 #include <boost/concept_check.hpp>
 
 std::string get_file_contents(const char *filename)
 {
 	std::ifstream in(filename, std::ios::in);
-	if(!in.is_open())
+	if(in.fail())
 	{
-		DebugOut(DebugOut::Error) << "Failed to open file: " << filename << endl;
+		DebugOut(DebugOut::Error) << "Failed to open file '" << filename << "':' " << strerror(errno) << endl;
 		return "";
 	}
 
@@ -59,7 +59,7 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 
 	if(!picojsonerr.empty())
 	{
-		DebugOut(DebugOut::Error) << "Failed to parse main config! " << endl;
+		DebugOut(DebugOut::Error) << "Failed to parse main config! " << picojsonerr << endl;
 		throw std::runtime_error("Error parsing config");
 	}
 

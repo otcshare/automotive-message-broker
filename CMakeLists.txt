@@ -87,6 +87,8 @@ add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/c
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.in.md" "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.md" @ONLY)
 
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/TODO" "${CMAKE_CURRENT_SOURCE_DIR}/TODO.md" @ONLY)
+
 # packaging stuff:
 # Common things to every type of package
 SET(CPACK_PACKAGE_DESCRIPTION "daemon that provides access vehicle data")
@@ -109,3 +111,5 @@ add_subdirectory(tools)
 add_subdirectory(examples)
 add_subdirectory(xwalk)
 add_subdirectory(packaging.in)
+
+

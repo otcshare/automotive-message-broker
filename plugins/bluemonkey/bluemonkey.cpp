@@ -317,6 +317,12 @@ void BluemonkeySink::reloadEngine()
 	QJSValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
 
+	QThread* thread = new QThread(this);
+
+	engine->moveToThread(thread);
+
+	thread->start();
+
 	loadConfig(configuration["config"].c_str());
 }
 

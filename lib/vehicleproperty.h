@@ -30,8 +30,6 @@
 #include "abstractpropertytype.h"
 #include "mappropertytype.hpp"
 
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-
 namespace ButtonEvents {
 enum ButtonEventType {
 	NoButton = 0,
@@ -542,7 +540,6 @@ public:
 
 	/**< Button Event @see ButtonEvents::ButtonEventType */
 	///TODO: deprecated.  Use ButtonEventW3C. Remove in 0.14
-	[[deprecated("Deprecated in 0.14.  Use ButtonEventW3C")]]
 	static const Property ButtonEvent;
 	PROPERTYTYPE(ButtonEvent, ButtonEventType, BasicPropertyType<ButtonEvents::ButtonEventType>, ButtonEvents::ButtonEventType)
 
