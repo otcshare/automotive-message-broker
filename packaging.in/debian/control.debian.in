@@ -2,7 +2,7 @@ Source: automotive-message-broker
 Section: Utilities
 Priority: extra
 Maintainer: Kevron Rees <tripzero.kev@gmail.com>
-Build-Depends: build-essential, debhelper (>= 8.0.0), cdbs, pkg-config, libltdl-dev, cmake, libboost-dev, uuid-dev, libjson-c-dev, libglib2.0-dev
+Build-Depends: build-essential, debhelper (>= 8.0.0), cdbs, pkg-config, libltdl-dev, cmake, libboost-dev, uuid-dev, libjson-c-dev, libglib2.0-dev, qtbase5-dev
 Standards-Version: 3.9.2
 Homepage: https://01.org/automotive-message-broker
 Vcs-Git: git@github.com:otcshare/automotive-message-broker.git
@@ -39,3 +39,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, libamb
 Description: Vehicle data abstraction and multiplexing daemon
  Vehicle data abstraction and multiplexing daemon implemented as
  plugin framework that communicates to OBDII and GPS devices
+
+Package: automotive-message-broker-plugins-bluemonkey
+Architecture: i386
+Version: @PROJECT_VERSION@
+Depends: ${shlibs:Depends}, ${misc:Depends}, libamb
+Description: Vehicle data abstraction and multiplexing daemon
+ Vehicle data abstraction and multiplexing daemon implemented as
+ plugin framework that communicates to OBDII and GPS devices
+
+
