@@ -20,8 +20,9 @@
 #ifndef BluemonkeySink_H
 #define BluemonkeySink_H
 
-#include "abstractsource.h"
-#include "ambpluginimpl.h"
+#include <abstractsource.h>
+#include <ambpluginimpl.h>
+#include <uuidhelper.h>
 
 #include <map>
 
@@ -30,19 +31,11 @@
 #include <QJsonDocument>
 #include <QDateTime>
 #include <QJSValue>
-#include "uuidhelper.h"
+#include <QThread>
 
 #include "authenticate.h"
 
 class QJSEngine;
-
-class ModuleInterface
-{
-public:
-	virtual std::map<std::string, QObject*> objects(std::map<string, string> config) = 0;
-};
-
-Q_DECLARE_INTERFACE(ModuleInterface, "org.automotive.bluemonkey.moduleinterface")
 
 class Property: public QObject, public AbstractSink
 {
@@ -54,7 +47,7 @@ class Property: public QObject, public AbstractSink
 	Q_PROPERTY(int zone READ zone)
 
 public:
-	Property(VehicleProperty::Property, QString srcFilter, AbstractRoutingEngine* re, Zone::Type zone = Zone::None, QObject *parent = 0);
+	Property(VehicleProperty::Property, QString srcFilter, AbstractRoutingEngine * re, Zone::Type zone = Zone::None, QObject * parent = 0);
 
 	QString name();
 	void setType(QString t);
