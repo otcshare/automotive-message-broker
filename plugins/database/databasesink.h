@@ -97,7 +97,7 @@ class Shared
 {
 public:
 	Shared()
-		:queue(true)
+		:queue(true, true)
 	{
 		db = new BaseDB;
 	}
@@ -163,7 +163,7 @@ private: //methods:
 	void startDb();
 	void startPlayback();
 	void initDb();
-		void setDatabaseFileName(std::string filename);
+	void updateForNewDbFilename();
 
 private:
 	PropertyList mSubscriptions;

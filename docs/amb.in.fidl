@@ -1,10 +1,18 @@
+/**
+ * \addtogroup dbus_api_module
+ *  @{
+ */
+
 /*!
-* \mainpage Automotive Message Broker DBus API Documentation
+* \file amb.fidl
+* \section dbus_api Automotive Message Broker DBus API Documentation
 * \version @PROJECT_VERSION@
 *
-* <a href="../../html/index.html">Back to AMB Documentation Main</a>
+* \section dbus_api_intro Introduction
+* This document describes the DBus interfaces and data types for the
+* Automotive Message Broker API.  The data types are intended to as-close-as-
+* possible be compatible with the W3C vehicle <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html">data spec</a>.
 *
-* \section intro Introduction
 * AMB organizes the API into two general interface categories.  First the Manager interface (see manager.txt)
 * which includes tools for using the other interfaces.  Second is a number of interfaces that
 * represent vehicle data.  The latter follows the schema of "org.automotive.DataType" and are
@@ -17,7 +25,7 @@
 * for your language of choice.  These interfaces types map to internal AMB properties.  To understand the mappings,
 * see the <a href="ambdbusmappings_8idl.html">mapping documentation</a>
 *
-* \section basic_usage Basic Recommended Usage
+* \section dbus_api_basic_usage Basic Recommended Usage
 *
 * It is recommended that the Manager interface be used to find the DBus Object that contains the
 * data type you need.  This is done through the FindObject() call.  It is expected that DBus
@@ -34,9 +42,9 @@
 *
 * console.log("Vehicle Speed: " + speedObject.Speed);
 * \endcode
-* \section automotive_manager Automotive Manager
+* \section dbus_api_automotive_manager Automotive Manager
 * Manager is a helper interface for discovering and finding available objects.  Manager also helps users look up objects by zone and get additional information about a data type (ieorg.automotive.Manager.ZonesForObjectName).
-* \section zones Zones
+* \section dbus_api_zones Zones
 *
 * 'Zone' describes the position in the vehicle where the object is located.  The Zone type is a bitfield of values that can be combined to describe a specific location.  For example
 *
@@ -58,7 +66,7 @@
 * }
 * \endcode
 *
-* \section vehicle_property_type Vehicle Property Type
+* \section dbus_api_vehicle_property_type Vehicle Property Type
 * Vehicle Property Type is the common interface which all Data types are derived.  This interface is as follows:
 *
 * \code
@@ -71,7 +79,7 @@
 * }
 * \endcode
 *
-* \section data_types Data types
+* \section dbus_api_data_types Data types
 *
 * The data types try to conform to the [http://w3c.github.io/automotive-bg/data_spec.html W3C Automotive Business Group Vehicle Data Specification] as much as possible.  There are differences in the Zone type, and this vehicle API contains some additional data types that the W3C Business Group has not yet defined.  'Time' also represents relative time in seconds rather than time in ms since epoch (DOMTimeStamp).  The names of the attributes are also different because of Web vs. DBus conventions.  In this Vehicle API, DBus properties use CamelCase (ie Speed vs speed) vs lowerCamelCase.  Units and types are the same where possible.
 *
@@ -79,14 +87,7 @@
 *
 */
 
-/*!
-* \file amb.fidl
-* \name @PROJECT_NAME@
-* \version @PROJECT_VERSION@
-* \brief This document describes the DBus interfaces and data types for the
-* Automotive Message Broker API.  The data types are intended to as-close-as-
-* possible be compatible with the W3C vehicle <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html">data spec</a>.
-*/
+/** @} */
 
 /*!
 * Variant

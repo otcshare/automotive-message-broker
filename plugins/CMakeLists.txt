@@ -28,6 +28,11 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/exampleplugins.README DESTINATION ${D
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/examplesource DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/examplesink DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})
 
+
+if(enable_docs)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/plugins.in.idl ${CMAKE_CURRENT_BINARY_DIR}/plugins.idl @ONLY)
+endif(enable_docs)
+
 add_subdirectory(common)
 
 add_subdirectory(wheel)

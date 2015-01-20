@@ -5,6 +5,9 @@
 #include "uuidhelper.h"
 #include "ambplugin.h"
 
+#include <dbusplugin.h>
+#include <dbusexport.h>
+#include <picojson.h>
 #include <thread>
 
 int bufferLength = 100;
@@ -15,6 +18,19 @@ extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string>
 	auto plugin = new AmbPlugin<DatabaseSink>(routingengine, config);
 	plugin->init();
 }
+
+class DataLogger: public DBusSink
+{
+public:
+	DataLogger(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
+		:DBusSink("DataLogger", re, connection, map<string, string>())
+	{
+		wantPropertyVariant(DatabaseLogging, "LogFile", VariantType::ReadWrite);
+		wantPropertyVariant(DatabasePlayback, "Playback", VariantType::ReadWrite);
+		wantPropertyVariant(DatabaseLogging, "Logging", VariantType::ReadWrite);
+	}
+};
+
 
 static void * cbFunc(Shared* shared)
 {
@@ -28,10 +44,10 @@ static void * cbFunc(Shared* shared)
 
 	vector<DictionaryList<string> > insertList;
 
+	double startTime = amb::currentTime();
+
 	while(1)
 	{
-		usleep(timeout*1000);
-
 		DBObject obj = shared->queue.pop();
 
 		if( obj.quit )
@@ -45,7 +61,7 @@ static void * cbFunc(Shared* shared)
 		NameValuePair<string> two("value", obj.value);
 		NameValuePair<string> three("source", obj.source);
 		NameValuePair<string> zone("zone", boost::lexical_cast<string>(obj.zone));
-		NameValuePair<string> four("time", boost::lexical_cast<string>(obj.time));
+		NameValuePair<string> four("time", boost::lexical_cast<string>(amb::Timestamp::instance()->epochTime(obj.time)));
 		NameValuePair<string> five("sequence", boost::lexical_cast<string>(obj.sequence));
 		NameValuePair<string> six("tripId", shared->tripId);
 
@@ -59,8 +75,10 @@ static void * cbFunc(Shared* shared)
 
 		insertList.push_back(dict);
 
-		if(insertList.size() >= bufferLength)
+		if(insertList.size() >= bufferLength && amb::currentTime() - startTime >= timeout / 1000)
 		{
+			startTime = amb::currentTime();
+
 			shared->db->exec("BEGIN IMMEDIATE TRANSACTION");
 			for(int i=0; i< insertList.size(); i++)
 			{
@@ -150,7 +168,8 @@ DatabaseSink::DatabaseSink(AbstractRoutingEngine *engine, map<std::string, std::
 		{
 			int t = boost::lexical_cast<int>(config["frequency"]);
 			timeout = 1000 / t;
-		}catch(...)
+		}
+		catch(...)
 		{
 			DebugOut(DebugOut::Error)<<"Failed to parse frequency: Invalid value "<<config["frequency"]<<endl;
 		}
@@ -208,39 +227,19 @@ void DatabaseSink::supportedChanged(const PropertyList &supportedProperties)
 
 void DatabaseSink::parseConfig()
 {
-	json_object *rootobject;
-	json_tokener *tokener = json_tokener_new();
-	enum json_tokener_error err;
-	do
-	{
-		rootobject = json_tokener_parse_ex(tokener, configuration["properties"].c_str(),configuration["properties"].size());
-	} while ((err = json_tokener_get_error(tokener)) == json_tokener_continue);
-	if (err != json_tokener_success)
-	{
-		fprintf(stderr, "Error: %s\n", json_tokener_error_desc(err));
-	}
-	if (tokener->char_offset < configuration["properties"].size()) // XXX shouldn't access internal fields
-	{
-		//Should handle the extra data here sometime...
-	}
+	std::string properties = configuration["properties"];
+	std::string jsonError;
+	picojson::value value;
+	picojson::parse (value, properties.begin(), properties.end(), &jsonError);
 
-	json_object *propobject = json_object_object_get(rootobject,"properties");
+	picojson::array array = value.get("properties").get<picojson::array>();
 
-	g_assert(json_object_get_type(propobject) == json_type_array);
-
-	array_list *proplist = json_object_get_array(propobject);
-
-	for(int i=0; i < array_list_length(proplist); i++)
+	for(auto i : array)
 	{
-		json_object *idxobj = (json_object*)array_list_get_idx(proplist,i);
-		std::string prop = json_object_get_string(idxobj);
+		std::string prop = i.to_str();
 		propertiesToSubscribeTo.push_back(prop);
-
 		DebugOut()<<"DatabaseSink logging: "<<prop<<endl;
 	}
-
-	//json_object_put(propobject);
-	json_object_put(rootobject);
 }
 
 void DatabaseSink::stopDb()
@@ -340,9 +339,9 @@ void DatabaseSink::initDb()
 	shared->db->init(databaseName->value<std::string>(), tablename, tablecreate);
 }
 
-void DatabaseSink::setDatabaseFileName(string filename)
+void DatabaseSink::updateForNewDbFilename()
 {
-	bool isLogging = databaseLogging->value<bool>();
+	bool wasLogging = databaseLogging->value<bool>();
 
 	stopDb();
 	initDb();
@@ -366,7 +365,7 @@ void DatabaseSink::setDatabaseFileName(string filename)
 		}
 	}
 
-	if(isLogging)
+	if(wasLogging)
 	{
 		stopDb();
 		startDb();
@@ -411,13 +410,25 @@ void DatabaseSink::init()
 {
 	if(configuration.find("databaseFile") != configuration.end())
 	{
-		databaseName->setValue(configuration["databaseFile"]);
-		setDatabaseFileName(configuration["databaseFile"]);
+		setValue(databaseName, configuration["databaseFile"]);
+		updateForNewDbFilename();
 	}
 
 	DebugOut() << "databaseLogging: " << databaseLogging->value<bool>() << endl;
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
+
+	routingEngine->subscribeToProperty(DBusConnected, [this](AbstractPropertyType* value)
+	{
+		if(value->name == DBusConnected)
+		{
+			if(value->value<bool>())
+			{
+				amb::Exporter::instance()->exportProperty<DataLogger>(routingEngine);
+			}
+		}
+	});
+
 }
 
 void DatabaseSink::getRangePropertyAsync(AsyncRangePropertyReply *reply)
@@ -517,7 +528,7 @@ AsyncPropertyReply *DatabaseSink::setProperty(const AsyncSetPropertyRequest &req
 	}
 	else if(request.property == DatabaseFile)
 	{
-		setDatabaseFileName(databaseName->value<std::string>());
+		updateForNewDbFilename();
 	}
 	else if( request.property == DatabasePlayback)
 	{

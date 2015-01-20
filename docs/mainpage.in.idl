@@ -2,12 +2,11 @@
 * \mainpage Automotive Message Broker Documentation
 * \version @PROJECT_VERSION@
 * \section links AMB Documentation Sections
-* - \ref ambd.md - AMB Daemon Documentation
-* - <a href="../dbus/html/index.html">DBus API documentation</a> - Using AMB with your application
-* - <a href="../amb/html/index.html">libamb internal API documentation</a> - Developing AMB or AMB plugins
-* - <a href="../plugins/bluemonkey/html/index.html">Bluemonkey Javascript API documentation</a>
-* - <a href="../plugins/websocket/html/index.html">AMB Websocket protocol documentation</a>
-* - \ref RELEASE.md - Current release notes
+* - \ref ambd
+* - \ref dbus_api - Using AMB with your application
+* - \ref libamb - Developing AMB or AMB plugins
+* - \ref plugins - Using Built in AMB plugins
+* - \ref release_notes - Current release notes
 *
 * \section intro Introduction
 * Automotive Message Broker (AMB) is a framework for providing applications with standardized access to vehicle data.
@@ -23,17 +22,6 @@
 * plugins).
 *
 * More information about AMB plugins can be found in the <a href="../amb/html/index.html">library documentation</a>.
-* \section plugins AMB Plugins
-* AMB plugins each have their own usage documentation including any special Properties they define.  Below is a description
-* of several AMB plugins and their documenation:
-* - <a href="../plugins/bluemonkey.README">Bluemonkey</a> - Extensible javascript engine plugin for defining plugin behavior in javascript
-* - <a href="../plugins/database.README">Database</a> - Plugin that logs data in a sqlite database and can play back logs
-* - <a href="../plugins/dbus.README">DBus</a> - Exposes AMB Properties on DBus
-* - <a href="../plugins/gpsnmea.README">GPSNmea</a> - GPS Plugin that provides location position data from NMEA compatible devices
-* - <a href="../plugins/obd2.README">OBD-II</a> - Plugin that provides data from OBD-II compatible vehicles
-* - <a href="../plugins/opencvlux.README">OpenCVLux</a> - Plugin that uses OpenCV to produce ADAS data and perform video logging
-* - <a href="../plugins/websocket.README">Websocket</a> - Both source and sink plugin that uses a websocket protocol to communicate
-* - <a href="../plugins/wheel.README">Wheel</a> - Plugin that generates data using the Logitech G27 racing wheel
 * \section crosswalk Crosswalk Vehicle Extension
 * AMB also comes with a <a href="http://crosswalk-project.org">crosswalk</a> extension that implements the W3C Automotive Business group
 * <a href="https://rawgit.com/w3c/automotive-bg/master/vehicle_spec.html">vehicle</a> and <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html">data</a> specifications.

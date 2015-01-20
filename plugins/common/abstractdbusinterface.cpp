@@ -97,7 +97,7 @@ void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection
 //			DebugOut(6) << "Get property " << propertyName << " for interface " << ifaceName << endl;
 
 			GError* error = nullptr;
-			auto value = amb::make_super(AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, propertyName, &error, iface));
+			auto value = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, propertyName, &error, iface);
 			amb::make_super(error);
 
 			if(!value)
@@ -105,7 +105,7 @@ void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection
 				g_dbus_method_invocation_return_dbus_error(invocation, std::string(std::string(ifaceName)+".PropertyNotFound").c_str(), "Property not found in interface");
 			}
 
-			g_dbus_method_invocation_return_value(invocation, g_variant_new("(v)", value.get()));
+			g_dbus_method_invocation_return_value(invocation, g_variant_new("(v)", value));
 			return;
 		}
 		else if(method == "GetAll")
@@ -156,6 +156,7 @@ void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection
 					g_dbus_method_invocation_return_dbus_error(invocation, ifaceName, AsyncPropertyReply::errorToStr(error).c_str());
 				}
 			});
+			return;
 		}
 	}
 	else if(method == "GetHistory")
@@ -557,6 +558,8 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 	if(objectMap.count(objectPath))
 	{
 		GVariant* value = objectMap[objectPath]->getProperty(propertyName);
+
+		DebugOut(6) << "Returning value for: " << propertyName << endl;
 		return value;
 	}
 

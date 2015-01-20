@@ -1,0 +1,21 @@
+/*!
+ * \file plugins.idl
+ * \section plugins AMB Plugin documentation
+ *
+ * \section intro Introduction
+ * AMB plugins each have their own usage documentation including any special AMB Properties or DBus interfaces they define.  Below is a description
+ * of several AMB plugins and their documenation:
+ * - \ref bluemonkey_plugin - Extensible javascript engine plugin for defining plugin behavior in javascript
+ * - \ref database_plugin - Plugin that logs data in a sqlite database and can play back logs
+ * - \ref dbus_plugin - Exposes AMB Properties on DBus
+ * - \ref gpsnmea_plugin - GPS Plugin that provides location position data from NMEA compatible devices
+ * - \ref obd2_plugin - Plugin that provides data from OBD-II compatible vehicles
+ * - \ref opencvlux_plugin - Plugin that uses OpenCV to produce ADAS data and perform video logging
+ * - \ref websocket_plugin - Both source and sink plugin that uses a websocket protocol to communicate
+ * - \ref wheel_plugin - Plugin that generates data using the Logitech G27 racing wheel
+ *
+ * \section plugins_docs Additional Plugin Documentation
+ * In addition to the plugin documentation listed above, some plugins have additional information.  Here are some links:
+ * - \ref bluemonkey
+ * - \ref websocket
+ */

@@ -1,17 +1,19 @@
-DBus plugin
+# DBus plugin                {#dbus_plugin}
 Version: @PROJECT_VERSION@
 
 This plugin provides a nice DBus API to application who want access to AMB data.
 
 To use the DBus plugin, add the following to the "sinks" array in /etc/ambd/config:
 
+~~~~~~~~~~~~~{.json}
 {
 	"name" : "dbussink",
 	"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so",
 	"frequency" : "60"
 }
+~~~~~~~~~~~~~
 
-Configuration Key Definitions:
+## Configuration Key Definitions:
 
 "name"
 name of plugin.  This key is not used by the plugin at this moment.

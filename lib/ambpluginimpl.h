@@ -21,15 +21,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "abstractsource.h"
 
-/*! \addtogroup ivipocbase
+/*! \addtogroup libamb
  *  @{
  */
 
 /*!
  * \brief AmbPlugin private class implementation - base class for all plugin implementations.
  *
- * Contains common code used in all IviPoC II plugins for Automotive message broker(AMB).
- * For the AMB library API please visit <a href="https://github.com/otcshare/automotive-message-broker">Automotive message broker web page</a>.
+ * Contains common code used in plugins for Automotive message broker(AMB).
+ * For the AMB library API please visit \ref libamb.
  *
  * \class AmbPluginImpl
  */

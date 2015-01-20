@@ -32,7 +32,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <pthread.h>
 #endif
 
-/** \addtogroup libivipoccommon
+/** \addtogroup libamb-plugins-common
  *  @{
  */
 
@@ -41,7 +41,7 @@ namespace CUtil {
 /**
  * \brief Simple logger to log messages on file and console.
  *
- * This is the implementation of a simple logger in C++. It is implemented 
+ * This is the implementation of a simple logger in C++. It is implemented
  * as a Singleton, so it can be easily called through two DEBUG macros.
  * It is Pthread-safe.
  * It allows to log on both file and screen, and to specify a verbosity
@@ -65,7 +65,7 @@ class Logger
 	 */
 	static pthread_mutex_t lock_;
 #endif
-	
+
 	bool configured_;
 
 	/**
@@ -79,11 +79,11 @@ class Logger
 	 */
 	std::string logFile_;
 
-    /**
-     * \brief Initial part of the name of the file used for Logging.
-     * Date and time are automatically appended.
-     */
-    std::string logFileName_;
+	/**
+	 * \brief Initial part of the name of the file used for Logging.
+	 * Date and time are automatically appended.
+	 */
+	std::string logFileName_;
 
 	/**
 	 * \brief Current configuration of the logger.
@@ -129,18 +129,18 @@ class Logger
 
 public:
 
-    /**
-    * Logging level
-    * \enum Level
-    * \public
-    */
+	/**
+	* Logging level
+	* \enum Level
+	* \public
+	*/
 	enum Level {
-	    EError = 0,
-	    EWarning,
-	    EMessage,
-	    EInfo,
-	    ETrace,
-	    EDebug
+		EError = 0,
+		EWarning,
+		EMessage,
+		EInfo,
+		ETrace,
+		EDebug
 	};
 
 	/**
@@ -153,14 +153,14 @@ public:
 	 * \endcode
 	 */
 	#define DEBUG_CONF(outputFile, \
-	        configuration, \
-	        fileVerbosityLevel, \
-	        screenVerbosityLevel) { \
-                CUtil::Logger::getInstance().configure(outputFile, \
-	                        configuration, \
-	                        fileVerbosityLevel, \
-	                        screenVerbosityLevel); \
-	        }
+			configuration, \
+			fileVerbosityLevel, \
+			screenVerbosityLevel) { \
+				CUtil::Logger::getInstance().configure(outputFile, \
+							configuration, \
+							fileVerbosityLevel, \
+							screenVerbosityLevel); \
+			}
 
 	/**
 	 * \brief Macro to print log messages.
@@ -172,75 +172,75 @@ public:
 	 * \endcode
 	 */
 	#define LOGGER(priority, msg) { \
-	    std::ostringstream __debug_stream__; \
-	    __debug_stream__ << msg; \
-	    CUtil::Logger::getInstance().print(priority, __FILE__, __LINE__, \
-	            __debug_stream__.str()); \
-	    }
+		std::ostringstream __debug_stream__; \
+		__debug_stream__ << msg; \
+		CUtil::Logger::getInstance().print(priority, __FILE__, __LINE__, \
+				__debug_stream__.str()); \
+		}
 
 	#ifndef _LOGGER_NO_LOG
 
-    /**
-     * Macro to log errors.
-     * \def LOG_ERROR
-     */
+	/**
+	 * Macro to log errors.
+	 * \def LOG_ERROR
+	 */
 	#define LOG_ERROR(M)        LOGGER(CUtil::Logger::EError, M)
 	/**
-     * Macro to log warnings.
-     * \def LOG_WARNING
-     */
+	 * Macro to log warnings.
+	 * \def LOG_WARNING
+	 */
 	#define LOG_WARNING(M)      LOGGER(CUtil::Logger::EWarning, M)
-    /**
-     * Macro to log messages.
-     * \def LOG_MESSAGE
-     */
+	/**
+	 * Macro to log messages.
+	 * \def LOG_MESSAGE
+	 */
 	#define LOG_MESSAGE(M)      LOGGER(CUtil::Logger::EMessage, M)
 	/**
-     * Macro to log info messages.
-     * \def LOG_INFO
-     */
-    #define LOG_INFO(M)         LOGGER(CUtil::Logger::EInfo, M)
-    /**
-     * Macro to log trace messages.
-     * \def LOG_TRACE
-     */
+	 * Macro to log info messages.
+	 * \def LOG_INFO
+	 */
+	#define LOG_INFO(M)         LOGGER(CUtil::Logger::EInfo, M)
+	/**
+	 * Macro to log trace messages.
+	 * \def LOG_TRACE
+	 */
 	#define LOG_TRACE(M)        LOGGER(CUtil::Logger::ETrace, M)
-    /**
-     * Macro to log debug messages.
-     * \def LOG_DEBUG
-     */
+	/**
+	 * Macro to log debug messages.
+	 * \def LOG_DEBUG
+	 */
 	#define LOG_DEBUG(M)        LOGGER(CUtil::Logger::EDebug, M)
 
 	#else
 
 	#define LOG_ERROR(M)        {}
 	#define LOG_WARNING(M)      {}
-    #define LOG_MESSAGE(M)      {}
+	#define LOG_MESSAGE(M)      {}
 	#define LOG_INFO(M)         {}
 	#define LOG_TRACE(M)        {}
-    #define LOG_DEBUG(M)        {}
+	#define LOG_DEBUG(M)        {}
 
 	#endif
 
-    /**
-     * Type used for the configuration
-     */
+	/**
+	 * Type used for the configuration
+	 */
 	typedef loggerConf_ loggerConf;
-    /**
-     * Disable logging to file
-     */
+	/**
+	 * Disable logging to file
+	 */
 	static const loggerConf file_on= 	L_nofile_;
-    /**
-     * Enable logging to file
-     */
-    static const loggerConf file_off= 	L_file_;
-    /**
-     * Enable logging to screen
-     */
-    static const loggerConf screen_on= 	L_noscreen_;
-    /**
-     * Disable logging to screen
-     */
+	/**
+	 * Enable logging to file
+	 */
+	static const loggerConf file_off= 	L_file_;
+	/**
+	 * Enable logging to screen
+	 */
+	static const loggerConf screen_on= 	L_noscreen_;
+	/**
+	 * Disable logging to screen
+	 */
 	static const loggerConf screen_off= L_screen_;
 
 	static Logger& getInstance();
@@ -255,12 +255,12 @@ public:
 			const int		fileVerbosityLevel,
 			const int		screenVerbosityLevel);
 
-    /**
-     * Flush output buffer
-     */
+	/**
+	 * Flush output buffer
+	 */
 	inline void flush()
 	{
-	    out_.flush();
+		out_.flush();
 	}
 };
 

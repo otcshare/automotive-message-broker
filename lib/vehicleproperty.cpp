@@ -484,7 +484,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(YawRate, 0);
 	registerPropertyPriv(ButtonEventW3C, [](){
 		ButtonEventW3CType* t = new ButtonEventW3CType();
-		StringPropertyType k, v;
+		std::string k;
+		StringPropertyType v;
 		t->append(k, v);
 		return t;
 	});

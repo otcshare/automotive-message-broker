@@ -1,4 +1,4 @@
-Websocket plugins
+# Websocket plugins {#websocket_plugin}
 Version: @PROJECT_VERSION@
 
 The websocket sink and source plugins are designed to relay data between devices and
@@ -8,9 +8,9 @@ To enable the websocket plugins, run cmake and enable the websocket_plugin optio
 
 cmake -Dwebsocket_plugin=On ..
 
-
 To use the websocket sink plugin, add the following to the "sinks" array in /etc/ambd/config:
 
+~~~~~~~~~~~~~{.json}
 {
 	"name" : "websocket sink",
 	"path" : "@PLUGIN_INSTALL_PATH@/websocketsink.so",
@@ -21,9 +21,11 @@ To use the websocket sink plugin, add the following to the "sinks" array in /etc
 	"cert" : "libwebsockets-test-server.pem",
 	"key" : "libwebsockets-test-server.key.pem"
 }
+~~~~~~~~~~~~~
 
 To use the websocket source plugin, add the following to the "sources" array in /etc/ambd/config:
 
+~~~~~~~~~~~~~{.json}
 {
 	"name" : "WebsocketSource",
 	"path" : "@PLUGIN_INSTALL_PATH@/websocketsource.so",
@@ -33,11 +35,12 @@ To use the websocket source plugin, add the following to the "sources" array in 
 	"binaryProtocol" : "true",
 	"useExtensions" : "true"
 }
+~~~~~~~~~~~~~
 
-Configuration Key Definitions:
+## Configuration Key Definitions:
 
 "name"
-name of plugin.  This key is not used by the plugin at this moment.
+name of plugin.
 
 "path"
 path to plugin on the filesystem.

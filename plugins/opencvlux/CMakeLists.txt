@@ -51,8 +51,8 @@ target_link_libraries(opencvluxplugin amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${li
 
 install(TARGETS opencvluxplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/opencvlux.README @ONLY)
-set(opencvlux_doc_files ${CMAKE_CURRENT_BINARY_DIR}/opencvlux.README)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/opencvlux.README.md @ONLY)
+set(opencvlux_doc_files ${CMAKE_CURRENT_BINARY_DIR}/opencvlux.README.md)
 install (FILES ${opencvlux_doc_files} DESTINATION ${DOC_INSTALL_DIR}/plugins)
 
 endif(opencvlux_plugin)

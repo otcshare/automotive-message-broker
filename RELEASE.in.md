@@ -1,7 +1,7 @@
-AMB Release Notes
+# AMB Release Notes {#release_notes}
 Version: @PROJECT_VERSION@
 
-New features:
+## New features:
 - [DBus] some classes for exporting custom interfaces moved to plugins-common
 - [Bluemonkey plugin] support for creating custom dbus interfaces: bluemonkey.exportInterface()
 - [ambctl] support for enabling disabling plugins
@@ -9,7 +9,7 @@ New features:
   are enabled.  See the example segments: /etc/ambd/plugins.d/dbus, examplesink, examplesource
 - [xwalk] vehicle extension now dynamically exports all AMB supported objects
 
-Changes:
+## Changes:
 - Plugin create() method signature changed.
 - Removed AbstractSinkManager class
 - Removed deprecated dbus interfaces
@@ -17,4 +17,4 @@ Changes:
 - Deprecated 'GetFoo' method.  This doesn't contain much more information that cannot already be
   obtained through the Properties interface.
 
-Fixes:
+## Fixes:

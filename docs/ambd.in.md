@@ -1,4 +1,4 @@
-# Automotive Message Broker
+# Automotive Message Broker Daemon {#ambd}
 
 Version @PROJECT_VERSION@
 

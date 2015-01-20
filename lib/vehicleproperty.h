@@ -547,7 +547,7 @@ public:
 	PROPERTYTYPE(ButtonEvent, ButtonEventType, BasicPropertyType<ButtonEvents::ButtonEventType>, ButtonEvents::ButtonEventType)
 
 	static const Property ButtonEventW3C;
-	class ButtonEventW3CType: public MapPropertyType<StringPropertyType, StringPropertyType>
+	class ButtonEventW3CType: public MapPropertyType<StringPropertyType>
 	{
 	public:
 		ButtonEventW3CType() : MapPropertyType(ButtonEventW3C) {}

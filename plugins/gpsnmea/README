@@ -1,4 +1,4 @@
-GPS NMEA plugin
+# GPS NMEA plugin {#gpsnmea_plugin}
 Version: @PROJECT_VERSION@
 
 This plugin uses NMEA-compatible devices to provide location information to AMB.
@@ -9,6 +9,7 @@ cmake -Dgpsnmea_plugin=On ..
 
 To use the Database plugin, add the following to the "sources" array in /etc/ambd/config:
 
+~~~~~~~~~~~~~{.json}
 {
 	"name" : "gpsnmea",
 	"path" : "@PLUGIN_INSTALL_PATH@/gpsnmea.so",
@@ -16,8 +17,9 @@ To use the Database plugin, add the following to the "sources" array in /etc/amb
 	"baudrate" : "4800",
 	"bluetoothAdapter" : "00:00:00:00:00:00"
 }
+~~~~~~~~~~~~~
 
-Configuration Key Definitions:
+## Configuration Key Definitions:
 
 "name"
 name of plugin.  This key is not used by the plugin at this moment.
@@ -41,10 +43,57 @@ If left blank, the system default adapter will be used.
 
 Default: none
 
-AMB Properties:
+## AMB Properties:
 
 GpsTime
-Timestamp in seconds from epoc UTC parsed from the NMEA output.
+Timestamp in seconds from unix epoc (UTC) parsed from the NMEA output.
 
 Type: double
 Access: readonly
+
+GpsSpeed
+Speed as reported by GPS
+
+Type: UInt16
+Access: readonly
+
+GpsFix
+Fix status.
+
+~~~~~~~~~~~~(.cpp}
+enum FixType {
+	NoFix = 1,
+	Fix2D = 2,
+	Fix3D = 3
+};
+~~~~~~~~~~~~
+
+Type: int
+Access: readonly
+
+GpsSatsUsed {#GpsSatsUsed}
+How many satellites are being used in the fix
+
+Type: UInt16
+Access: readonly
+
+GpsNmea
+Raw NMEA message.  Useful for debugging
+
+Type: String
+Access: readonly
+
+## DBus Interfaces:
+
+### org.automotive.GpsInfo
+**Properties**
+GpsTime - Corresponds with the GpsTime AMB Property
+Speed - Corresponds with the GpsSpeed AMB Property
+Fix - Corresponds with the GpsFix AMB Property
+SattelitesUsed - Corresponds with the GpsSatsUsed AMB Property
+RawNmea - Corresponds with the GpsNmea AMB Property
+
+interface GpsInfo
+{
+
+}

@@ -64,7 +64,9 @@ public:
 		}
 
 		if(!mQueue.size())
+		{
 			throw std::runtime_error("nothing in queue");
+		}
 
 		auto itr = mQueue.begin();
 

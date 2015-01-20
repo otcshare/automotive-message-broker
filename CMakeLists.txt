@@ -8,20 +8,24 @@ include(CMakeDependentOption)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_PRETTY_NAME "Automotive Message Broker")
-set(PROJECT_VERSION "0.13.801")
+set(PROJECT_SERIES "0.14")
+set(PROJECT_MAJOR_VERSION "0.13")
+set(PROJECT_MINOR_VERSION "802")
+set(PROJECT_VERSION "${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}")
 set(PROJECT_CODENAME "74A")
 set(PROJECT_QUALITY "alpha")
 
 add_definitions(-DPROJECT_VERSION="${PROJECT_VERSION}")
-add_definitions(-DPROJECT_NAME="${PROJECT_NAME}")
+add_definitions(-DPROJECT_NAME="${PROJECT_PRETTY_NAME}")
 add_definitions(-DPROJECT_CODENAME="${PROJECT_CODENAME}")
 add_definitions(-DPROJECT_QUALITY="${PROJECT_QUALITY}")
+add_definitions(-DPROJECT_SERIES="${PROJECT_SERIES}")
 
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" )
 set (PLUGIN_INSTALL_PATH "${LIB_INSTALL_DIR}/${PROJECT_NAME}")
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/include")
-set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}/${PROJECT_VERSION}")
+set (DOC_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/share/doc/packages/${PROJECT_NAME}/${PROJECT_SERIES}")
 set (PLUGIN_SEGMENT_INSTALL_PATH "/etc/ambd/plugins.d")
 
 option(qtmainloop "Use QCoreApplication mainloop " OFF)
@@ -64,7 +68,6 @@ find_package(Boost REQUIRED)
 
 
 pkg_check_modules(glib REQUIRED glib-2.0 gobject-2.0)
-pkg_check_modules(json REQUIRED json)
 
 add_definitions(-DDBusServiceName="org.automotive.message.broker")
 
@@ -82,7 +85,7 @@ add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake" "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake" IMMEDIATE @ONLY)
 add_custom_target(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.in.md" "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.md" IMMEDIATE @ONLY)
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.in.md" "${CMAKE_CURRENT_SOURCE_DIR}/RELEASE.md" @ONLY)
 
 # packaging stuff:
 # Common things to every type of package

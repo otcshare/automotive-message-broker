@@ -79,8 +79,8 @@ static const struct option longopts[] = {
 
 void printVersion()
 {
-	DebugOut(0)<<PROJECT_NAME<<endl;
-	DebugOut(0)<<"Version: "<<PROJECT_VERSION<<" ( "<<PROJECT_CODENAME<<" "<<PROJECT_QUALITY<<" )"<<endl;
+	DebugOut(0) << PROJECT_NAME << endl;
+	DebugOut(0)<<"Version: " << PROJECT_VERSION<<" Series: " << PROJECT_SERIES <<" (" << PROJECT_CODENAME<<" " << PROJECT_QUALITY << ")" << endl;
 }
 
 static void glibLogHandler(const gchar *log_domain, GLogLevelFlags log_level, const gchar *message, gpointer user_data)

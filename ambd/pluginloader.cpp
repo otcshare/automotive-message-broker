@@ -132,7 +132,6 @@ PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(N
 			if (!list.size())
 			{
 				DebugOut() << "Error getting list for " << q << endl;
-				throw std::runtime_error("Error getting sources list");
 			}
 
 			for(auto src : list)

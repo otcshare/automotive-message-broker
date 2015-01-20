@@ -89,7 +89,7 @@ with outputFile:
 		" * properties however follow the naming scheme defined in the W3C automotive business group vehicle <a href='http://w3c.github.io/automotive-bg/data_spec.html'>data specification</a>\n"
 		" * The pattern each interface is 'const DOMString AMBProperty = DBusProperty' where 'AMBProperty' is the internal name and 'DBusProperty' is the DBus property name.\n"
 		" *\n"
-		" * For documentation on the interface and members, please see amb.fidl or the AMB DBus documentation.\n")
+		" * For documentation on the interface and members, please see the \ref dbus_api.\n")
 	header += " */\n\n"
 	outputFile.write(header)
 	for iface in interfaces:
