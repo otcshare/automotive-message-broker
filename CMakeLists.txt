@@ -8,7 +8,7 @@ include(CMakeDependentOption)
 
 set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_PRETTY_NAME "Automotive Message Broker")
-set(PROJECT_VERSION "0.13")
+set(PROJECT_VERSION "0.13.1")
 set(PROJECT_CODENAME "agera")
 set(PROJECT_QUALITY "final")
 
