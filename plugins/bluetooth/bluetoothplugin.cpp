@@ -17,8 +17,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "bluetoothplugin.h"
-#include "timestamp.h"
-#include "listplusplus.h"
+
+#include <timestamp.h>
+#include <listplusplus.h>
+#include <bluetooth5.h>
 
 #include <iostream>
 #include <boost/assert.hpp>
@@ -51,7 +53,7 @@ bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
 		return false;
 	}
 
-	BluetoothSinkPlugin* p = static_cast<BluetoothSinkPlugin*>(data);
+	AbstractBluetoothSerialProfile* p = static_cast<AbstractBluetoothSerialProfile*>(data);
 
 	p->canHasData();
 
@@ -109,6 +111,41 @@ AbstractBluetoothSerialProfile::AbstractBluetoothSerialProfile(QString r)
 	{
 		DebugOut(DebugOut::Error)<<"RegisterProfile call failed: "<<reply.error().message().toStdString()<<endl;
 	}
+
+}
+
+void AbstractBluetoothSerialProfile::connect(string hwaddy)
+{
+	std::string device = findDevice(hwaddy);
+
+	if(device.empty())
+	{
+		DebugOut(DebugOut::Error) << "could not find device with address: " << hwaddy << endl;
+		return;
+	}
+
+	QDBusInterface deviceManager("org.bluez", device.c_str(), "org.bluez.Device1", QDBusConnection::systemBus());
+
+	if(!deviceManager.isValid())
+	{
+		DebugOut(DebugOut::Error) << "could not create DBus interface for device with address '"
+								  << hwaddy <<"' " << deviceManager.lastError().message().toStdString() << endl;
+		return;
+	}
+
+	QDBusPendingCall reply = deviceManager.asyncCall("Connect");
+
+	QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(reply, this);
+
+	QObject::connect(watcher, &QDBusPendingCallWatcher::finished, [](auto call)
+	{
+		QDBusPendingReply<void> reply = *call;
+		if(reply.isError())
+		{
+			DebugOut(DebugOut::Error) << "Connecting: " << reply.error().message().toStdString() << endl;
+		}
+	});
+
 }
 
 void AbstractBluetoothSerialProfile::release()
@@ -121,7 +158,6 @@ void AbstractBluetoothSerialProfile::newConnection(string path, QDBusUnixFileDes
 	DebugOut()<<"new Connection! Path: "<<path<<" fd: "<<fd.fileDescriptor()<<endl;
 
 	socket.setDescriptor(fd.fileDescriptor());
-	socket.write("ping");
 
 	GIOChannel *chan = g_io_channel_unix_new(socket.fileDescriptor());
 	g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
@@ -142,6 +178,11 @@ void AbstractBluetoothSerialProfile::canHasData()
 	DebugOut()<<"data read: "<<data.constData()<<endl;
 
 	dataReceived(data);
+}
+
+void AbstractBluetoothSerialProfile::write(const std::string & data)
+{
+	socket.write(data);
 }
 
 BtProfileAdaptor::BtProfileAdaptor(AbstractBluetoothSerialProfile *parent)

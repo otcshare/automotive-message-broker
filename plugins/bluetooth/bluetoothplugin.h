@@ -61,6 +61,8 @@ class AbstractBluetoothSerialProfile: public QObject
 public:
 	AbstractBluetoothSerialProfile(QString role = "server");
 
+	virtual void connect(std::string hwaddy);
+
 	virtual void release();
 
 	virtual void newConnection(std::string path, QDBusUnixFileDescriptor fd, QVariantMap props);
@@ -69,8 +71,12 @@ public:
 
 	virtual void canHasData();
 
+	void write(const string & data);
+
 protected:
-	virtual void dataReceived(QByteArray data) = 0;
+	virtual void connected() {}
+	virtual void disconnected() {}
+	virtual void dataReceived(QByteArray data) {}
 	SerialPort socket;
 
 private:

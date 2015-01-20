@@ -1,4 +1,4 @@
-#include <bluetooth.hpp>
+#include <bluetooth5.h>
 #include <debugout.h>
 #include <QCoreApplication>
 #include <QJsonDocument>
@@ -7,10 +7,21 @@
 
 #include "bluetoothplugin.h"
 
-class Bluetooth5: public AbstractBluetoothSerialProfile
+class BluetoothSerialClient: public AbstractBluetoothSerialProfile
 {
 public:
-	Bluetooth5(): AbstractBluetoothSerialProfile("client") {}
+	BluetoothSerialClient(): AbstractBluetoothSerialProfile("client") {}
+
+	void connected()
+	{
+
+	}
+
+	void disconnected()
+	{
+
+	}
+
 	void dataReceived(QByteArray d)
 	{
 		qDebug()<<"data: "<< d;
@@ -27,7 +38,9 @@ int main(int argc, char** argv)
 
 	qDebug()<<"connecting to: "<<addy;
 
-	Bluetooth5 client;
+	BluetoothSerialClient client;
+
+	client.connect(addy.toStdString());
 
 	app.exec();
 
