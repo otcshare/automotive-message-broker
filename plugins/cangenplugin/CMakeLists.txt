@@ -3,7 +3,7 @@ if(cangen_plugin)
 
 pkg_check_modules(websockets REQUIRED libwebsockets)
 
-include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common ${Boost_INCLUDE_DIRS} ${json_INCLUDE_DIRS})
+include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${gio_INCLUDE_DIRS} ${gio-unix_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common ${Boost_INCLUDE_DIRS} )
 
 set(cangenplugin_headers cangenplugin.h websockets.h)
 set(cangenplugin_sources cangenplugin.cpp websockets.cpp)
