@@ -1,3 +1,4 @@
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/amb.manifest.in.xml ${CMAKE_SOURCE_DIR}/packaging/amb.manifest @ONLY)
 
 find_program(rpmbuild rpmbuild /usr/bin)
 if(rpmbuild)
