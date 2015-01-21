@@ -261,7 +261,7 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 
 %files
 %defattr(-,root,root,-)
-%manifest amb.manifest
+%manifest packaging/amb.manifest
 %config %{_sysconfdir}/ambd/config
 %config %{_sysconfdir}/ambd/config.tizen
 %config %{_sysconfdir}/ambd/examples/*

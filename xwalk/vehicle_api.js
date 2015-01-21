@@ -26,7 +26,7 @@ function vehicleInterfaceCommonContructor(obj, attname) {
   obj._supported = false;
 
   var call = new AsyncCall(function(data) {
-    obj._zones = data;
+	obj._zones = data;
   });
 
   makeCall(call, msg);
@@ -36,7 +36,7 @@ function vehicleInterfaceCommonContructor(obj, attname) {
   supportedMessage['name'] = obj.attributeName;
 
   var supportedCall = new AsyncCall(function(data) {
-        obj._supported = data;
+		obj._supported = data;
   });
 
   makeCall(supportedCall, supportedMessage);
@@ -64,10 +64,10 @@ VehicleInterface.prototype.availableForRetrieval = function(attName) {
 
 VehicleInterface.prototype.availabilityChangedListener = function(callback) {
   if(this.changedListenerCount) {
-    this.changedListenerCount++;
+	this.changedListenerCount++;
   }
   else {
-    this.changedListenerCount = 0;
+	this.changedListenerCount = 0;
   }
   return this.changedListenerCount;
 }
@@ -106,21 +106,21 @@ VehicleSignalInterface.prototype.unsubscribe = function(handle) {
   var unsubscribe = true;
 
   for (var i = 0; i < subscriptions.length; i++) {
-    var testObj = subscriptions[i];
+	var testObj = subscriptions[i];
 
-    if (testObj.name === obj.name && testObj.zone.equals(obj.zone)) {
-      unsubscribe = false;
-      break;
-    }
+	if (testObj.name === obj.name && testObj.zone.equals(obj.zone)) {
+	  unsubscribe = false;
+	  break;
+	}
   }
 
   if (unsubscribe) {
-    var msg = {};
-    msg['method'] = 'unsubscribe';
-    msg['name'] = this.attributeName;
-    msg['zone'] = obj.zone;
+	var msg = {};
+	msg['method'] = 'unsubscribe';
+	msg['name'] = this.attributeName;
+	msg['zone'] = obj.zone;
 
-    extension.postMessage(JSON.stringify(msg));
+	extension.postMessage(JSON.stringify(msg));
   }
 };
 
@@ -152,9 +152,9 @@ function isAvailable(obj, attName)
   var reply = extension.internal.sendSyncMessage(JSON.stringify(msg));
 
   if (reply === "true") {
-    return "available";
+	return "available";
   } else {
-    return "not_supported";
+	return "not_supported";
   }
 }
 
@@ -165,7 +165,7 @@ function AsyncCall(resolve, reject) {
 
 function createPromise(msg) {
   var promise = new Promise(function(resolve, reject) {
-    async_calls[next_async_call_id] = new AsyncCall(resolve, reject);
+	async_calls[next_async_call_id] = new AsyncCall(resolve, reject);
   });
 
   msg.asyncCallId = next_async_call_id;
@@ -179,20 +179,20 @@ window.Zone = function(zone) {
   this.value = zone ? zone : [];
 
   Object.defineProperty(this, 'driver',
-                        { enumerable: false, get: function() {
-                          return new Zone(['Front', 'Left']);
-                        } });
+						{ enumerable: false, get: function() {
+						  return new Zone(['Front', 'Left']);
+						} });
 };
 
 window.Zone.prototype.equals = function(zone) {
   var is_equal = true;
 
   for (var i = 0; i < zone.value.length; i++) {
-    is_equal &= this.value.indexOf(zone.value[i]) !== -1;
+	is_equal = is_equal && this.value.indexOf(zone.value[i]) !== -1;
   }
 
   for (var i = 0; i < this.value.length; i++) {
-    is_equal &= zone.value.indexOf(this.value[i]) !== -1;
+	is_equal = is_equal && zone.value.indexOf(this.value[i]) !== -1;
   }
 
   return is_equal;
@@ -208,30 +208,30 @@ function _defineVehicleSignalProperty(obj, prop) {
 
 extension.setMessageListener(function(json) {
   try {
-    var msg = JSON.parse(json);
+	var msg = JSON.parse(json);
 
-    switch (msg.method) {
-      case 'get':
-        handlePromiseReply(msg);
-        break;
-      case 'zones':
-        handleZonesReply(msg);
-        break;
-      case 'subscribe':
-        handleSubscribeReply(msg);
-        break;
-      case 'set':
-        handlePromiseReply(msg);
-        break;
-      case 'supported':
-        handleSupportedReply(msg)
-        break;
-      default:
-        break;
-    }
+	switch (msg.method) {
+	  case 'get':
+		handlePromiseReply(msg);
+		break;
+	  case 'zones':
+		handleZonesReply(msg);
+		break;
+	  case 'subscribe':
+		handleSubscribeReply(msg);
+		break;
+	  case 'set':
+		handlePromiseReply(msg);
+		break;
+	  case 'supported':
+		handleSupportedReply(msg)
+		break;
+	  default:
+		break;
+	}
   } catch (error) {
-    console.log('Error in message listener: ' + error);
-    console.log("msg: " + JSON.stringify(msg))
+	console.log('Error in message listener: ' + error);
+	console.log("msg: " + JSON.stringify(msg))
   }
 });
 
@@ -239,35 +239,35 @@ function handlePromiseReply(msg) {
   var cbobj = async_calls[msg.asyncCallId];
 
   if (msg.error) {
-    var error = {};
-    error.error = msg.value;
-    switch (msg.value) {
-      case 'permission_denied':
-        error.message = 'Permission denied';
-        break;
-      case 'invalid_operation':
-        error.message = 'Invalid operation';
-        break;
-      case 'timeout':
-        error.message = 'Operation timed out';
-        break;
-      case 'invalid_zone':
-        error.message = 'Zone invalid or not found';
-        break;
-      case 'unknown':
-        error.message = 'An unknown error occured';
-        break;
-      default:
-        error.message = 'Unknown';
-        break;
-    }
+	var error = {};
+	error.error = msg.value;
+	switch (msg.value) {
+	  case 'permission_denied':
+		error.message = 'Permission denied';
+		break;
+	  case 'invalid_operation':
+		error.message = 'Invalid operation';
+		break;
+	  case 'timeout':
+		error.message = 'Operation timed out';
+		break;
+	  case 'invalid_zone':
+		error.message = 'Zone invalid or not found';
+		break;
+	  case 'unknown':
+		error.message = 'An unknown error occured';
+		break;
+	  default:
+		error.message = 'Unknown';
+		break;
+	}
 
-    cbobj.reject(error);
+	cbobj.reject(error);
   } else {
-    if (msg.value && msg.value.zone) {
-      msg.value.zone = new Zone(msg.value.zone);
-    }
-    cbobj.resolve(msg.value);
+	if (msg.value && msg.value.zone) {
+	  msg.value.zone = new Zone(msg.value.zone);
+	}
+	cbobj.resolve(msg.value);
   }
 
   delete async_calls[msg.asyncCallId];
@@ -277,14 +277,14 @@ function handleZonesReply(msg) {
   var cbobj = async_calls[msg.asyncCallId];
 
   if (cbobj)
-    cbobj.resolve(new Zone(msg.value));
+	cbobj.resolve(new Zone(msg.value));
 }
 
 function handleSupportedReply(msg) {
   var cbobj = async_calls[msg.asyncCallId];
 
   if (cbobj)
-    cbobj.resolve(msg.value);
+	cbobj.resolve(msg.value);
 }
 
 function handleSubscribeReply(msg) {
@@ -293,11 +293,11 @@ function handleSubscribeReply(msg) {
   value.zone = new Zone(value.zone);
 
   for (var i = 0; i < subscriptions.length; i++) {
-    var itr = subscriptions[i];
-    var ifaceIs = (value.interfaceName.toLowerCase() === itr.name.toLowerCase());
-    if (ifaceIs === true && value.zone.equals(itr.zone)) {
-      itr.callback(value);
-    }
+	var itr = subscriptions[i];
+	var ifaceIs = (value.interfaceName.toLowerCase() === itr.name.toLowerCase());
+	if (ifaceIs === true && value.zone.equals(itr.zone)) {
+	  itr.callback(value);
+	}
   }
 }
 /// Runningstatus attributes:
@@ -333,7 +333,7 @@ _defineVehicleSignalProperty(exports, 'washerFluid');
 _defineVehicleSignalProperty(exports, 'malfunctionIndicator');
 _defineVehicleSignalProperty(exports, 'batteryStatus');
 _defineVehicleSignalProperty(exports, 'tire');
-_defineVehicleSignalProperty(exports, 'diagnostics');
+_defineVehicleSignalProperty(exports, 'diagnostic');
 
 /// Personalization attributes:
 _defineVehicleSignalProperty(exports, 'mirror');
