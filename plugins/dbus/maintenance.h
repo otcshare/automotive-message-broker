@@ -133,7 +133,7 @@ class Diagnostics: public DBusSink
 {
 public:
 	Diagnostics(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink("Diagnostics", re, connection, map<string, string>())
+		:DBusSink("Diagnostic", re, connection, map<string, string>())
 	{
 		wantPropertyVariant(VehicleProperty::AccumulatedEngineRuntime, "AccumulatedEngineRuntime", VariantType::Read);
 		wantPropertyVariant(VehicleProperty::DistanceWithMILOn, "DistanceWithMILOn", VariantType::Read);
