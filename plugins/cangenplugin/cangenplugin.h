@@ -23,12 +23,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <memory>
 #include <tgmath.h>
 #include <libwebsockets.h>
+#include <json.h>
 
 #include <canbus.h>
 #include <canobserver.h>
 
 #include <ambpluginimpl.h>
-#include <picojson.h>
 #include "websockets.h"
 
 /*!
@@ -229,24 +229,21 @@ private:
 		MappingTable(MappingTable&& other) = default;
 		MappingTable& operator=(MappingTable&& other) = default;
 
-		void addProperty(const std::string& source, picojson::value signal)
+		void addProperty(const std::string& source, json_object* signal)
 		{
-
-			if(!signal.contains("can_id") || !signal.contains("name")) // mandatory
+			json_object* canIdObj = json_object_object_get(signal, "can_id");
+			json_object* nameObj = json_object_object_get(signal, "name");
+			if(!canIdObj || !nameObj) // mandatory
 				return;
-			picojson::value canIdObj = signal.get("can_id");
-			picojson::value nameObj = signal.get("name");
 			Zone::Type zone(Zone::None);
-
-			if(signal.contains("zone"))
-			{
-				zone = signal.get("zone").get<double>();
-			}
+			json_object* zoneObj = json_object_object_get(signal, "zone");
+			if(zoneObj)
+				zone = json_object_get_int(zoneObj);
 
 			auto& zp = mapping[source];
 			auto& prop = zp[Zone::Type(zone)];
-			std::string name(nameObj.to_str());
-			int can_id = canIdObj.get<double>();
+			std::string name(json_object_get_string(nameObj));
+			int can_id = json_object_get_int(canIdObj);
 			prop[name] = can_id; // update an existing value
 		}
 

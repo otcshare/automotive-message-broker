@@ -1,5 +1,5 @@
 # AMB Release Notes {#release_notes}
-Version: 0.13.802
+Version: 0.14
 
 ## New features:
 - [DBus] some classes for exporting custom interfaces moved to plugins-common
@@ -18,3 +18,5 @@ Version: 0.13.802
   obtained through the Properties interface.
 
 ## Fixes:
+- [XWalk] Fixed misspelled 'diagnostics' interface
+- [DBus] Fixed misspelled 'Diagnostics' interface

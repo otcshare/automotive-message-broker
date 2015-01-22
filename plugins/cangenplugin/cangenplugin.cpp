@@ -99,11 +99,8 @@ void CANGenPlugin::parseMappingTable(const std::string& table)
 
 	std::string json(table);
 	std::replace(json.begin(), json.end(), '\'', '"');// replace all ' to "
-	picojson::value rootobject;
-
-	picojson::parse(rootobject, json);
-
-	if(!rootobject.is<picojson::object>())
+	std::unique_ptr<json_object, decltype(&json_object_put)> rootobject(json_tokener_parse(json.c_str()), &json_object_put);
+	if(!rootobject)
 	{
 		LOG_ERROR("Failed to parse json: " << json);
 		return;
@@ -111,18 +108,31 @@ void CANGenPlugin::parseMappingTable(const std::string& table)
 
 	// Success, use json_obj here.
 	mappingTable.clear();
-	picojson::array sources = rootobject.get("sources").get<picojson::array>();
-	if(!sources.size())
+	json_object *sources = json_object_object_get(rootobject.get(),"sources");
+	if(!sources)
 		return;
-	for(auto rootsource : sources)
+	array_list* arraySources = json_object_get_array(sources);
+	if(!arraySources)
+		return;
+	for(int i=0; i < array_list_length(arraySources); ++i)
 	{
-		picojson::value source = rootsource.get("source");
-		const std::string guidstr = source.get("guid").to_str();
-		picojson::array signals = rootsource.get("signals").get<picojson::array>();
-		if(!signals.size())
+		json_object *rootsource = static_cast<json_object*>(array_list_get_idx(arraySources,i));
+		if(!rootsource)
 			continue;
-		for(auto signal : signals)
+		json_object* source = json_object_object_get(rootsource, "source");
+		if(!source)
+			continue;
+		json_object* guid = json_object_object_get(source, "guid");
+		const std::string guidstr(guid ? json_object_get_string(guid) : "");
+		json_object* signals = json_object_object_get(rootsource, "signals");
+		if(!signals)
+			continue;
+		array_list* arraySignals = json_object_get_array(signals);
+		for(int j = 0; j < array_list_length(arraySignals); ++j)
 		{
+			json_object *signal = static_cast<json_object*>(array_list_get_idx(arraySignals,j));
+			if(!signal)
+				continue;
 			mappingTable.addProperty(guidstr, signal);
 		}// signals array loop
 	}// sources array loop
@@ -280,36 +290,66 @@ void CANGenPlugin::dataReceived(libwebsocket* socket, const char* data, size_t l
 	if(!data || len == 0)
 		return;
 
-	picojson::value rootobject;
-
-	picojson::parse(rootobject, data);
-
-	if(!rootobject.is<picojson::object>())
+	//TODO: refactor ? copied from websocketsink
+	std::unique_ptr<json_object, decltype(&json_object_put)> rootobject(nullptr, &json_object_put);
+	std::unique_ptr<json_tokener, decltype(&json_tokener_free)> tokener(json_tokener_new(), &json_tokener_free);
+	enum json_tokener_error err;
+	do
+	{   std::unique_ptr<json_object, decltype(&json_object_put)> tmpobject(json_tokener_parse_ex(tokener.get(), data, len), &json_object_put);
+		rootobject.swap(tmpobject);
+	} while ((err = json_tokener_get_error(tokener.get())) == json_tokener_continue);
+	if (err != json_tokener_success)
+	{
+		LOG_ERROR("Error: " << json_tokener_error_desc(err) << std::endl);
+		return;
+	}
+	if(!rootobject)
 	{
 		LOG_ERROR("Failed to parse json: " << data << std::endl);
 		return;
 	}
 
-	std::string type = rootobject.get("type").to_str();
-	std::string name = rootobject.get("name").to_str();
-	std::string id = rootobject.get("transactionid").to_str();
+	if (tokener->char_offset < len) // XXX shouldn't access internal fields
+	{
+		// Handle extra characters after parsed object as desired.
+		// e.g. issue an error, parse another object from that point, etc...
+	}
+	// Success, use jobj here.
+	json_object *typeobject = json_object_object_get(rootobject.get(),"type");
+	json_object *nameobject = json_object_object_get(rootobject.get(),"name");
+	json_object *transidobject = json_object_object_get(rootobject.get(),"transactionid");
 
-	if(typeobject.empty() || nameobject.empty() || transidobject.empty())
+	if(!typeobject || !nameobject || !transidobject)
 	{
 		DebugOut(DebugOut::Warning)<<"Malformed json. aborting"<<endl;
 		return;
 	}
 
+	string type = string(json_object_get_string(typeobject));
+	string name = string(json_object_get_string(nameobject));
+	string id;
+	if (json_object_get_type(transidobject) == json_type_string)
+	{
+		id = string(json_object_get_string(transidobject));
+	}
+	else
+	{
+		stringstream strstr;
+		strstr << json_object_get_int(transidobject);
+		id = strstr.str();
+	}
 	if (type == "method") {
 
 		vector<string> propertyNames;
 		list< std::tuple<string, string, string, Zone::Type, string> > propertyData;
 
-		picojson::value dataobject = rootobject.get("data");
-		if(dataobject.is<picojson::array)
+		json_object *dataobject = json_object_object_get(rootobject.get(),"data");
+		if (json_object_get_type(dataobject) == json_type_array)
 		{
-			for (auto arrayobject : dataobject)
+			array_list *arraylist = json_object_get_array(dataobject);
+			for (int i=0;i<array_list_length(arraylist);i++)
 			{
+				json_object *arrayobject = (json_object*)array_list_get_idx(arraylist,i);
 				if (json_object_get_type(arrayobject) == json_type_object)
 				{
 					json_object *interfaceobject = json_object_object_get(arrayobject,"interface");
@@ -335,85 +375,92 @@ void CANGenPlugin::dataReceived(libwebsocket* socket, const char* data, size_t l
 					propertyNames.push_back(propertyName);
 				}
 			}
+			//array_list_free(arraylist);
 		}
 		else
 		{
-			propertyNames.push_back();
-		}
-
-		if (name == "get")
-		{
-			if (!propertyNames.empty())
+			string path = json_object_get_string(dataobject);
+			if (path != "")
 			{
-				//GetProperty is going to be a singleshot sink.
-				getValue(socket,propertyNames.front(), Zone::None,id);
+				propertyNames.push_back(path);
 			}
-			else if (!propertyData.empty())
+		}
+		if (type == "method")
+		{
+			if (name == "get")
 			{
-				//GetProperty is going to be a singleshot sink.
-				auto prop = propertyData.front();
-				getValue(socket,std::get<1>(prop),std::get<3>(prop),id);
+				if (!propertyNames.empty())
+				{
+					//GetProperty is going to be a singleshot sink.
+					getValue(socket,propertyNames.front(),Zone::None,id);
+				}
+				else if (!propertyData.empty())
+				{
+					//GetProperty is going to be a singleshot sink.
+					auto prop = propertyData.front();
+					getValue(socket,std::get<1>(prop),std::get<3>(prop),id);
+				}
+				else
+				{
+					LOG_WARNING(" \"get\" method called with no data! Transaction ID:" << id);
+				}
+			}
+			else if (name == "set")
+			{
+				LOG_MESSAGE("set called");
+				if (!propertyNames.empty())
+				{
+					//Should not happen
+				}
+				else if (!propertyData.empty())
+				{
+					for (auto prop = propertyData.begin(); prop != propertyData.end(); ++prop)
+					{
+						LOG_MESSAGE("websocketsinkmanager setting " << std::get<1>(*prop) << " to " << std::get<2>(*prop) << " in zone " << std::get<3>(*prop));
+						setValue(socket,std::get<1>(*prop),std::get<2>(*prop),std::get<3>(*prop),std::get<0>(*prop), id);
+					}
+				}
+			}
+			else if (name == "getSupportedEventTypes")
+			{
+				//If data.front() dosen't contain a property name, return a list of properties supported.
+				//if it does, then return the event types that particular property supports.
+				string typessupported = "";
+				if (propertyNames.empty())
+				{
+					//Send what properties we support
+					PropertyList foo(routingEngine->supported());
+					PropertyList::const_iterator i=foo.cbegin();
+					while (i != foo.cend())
+					{
+						if(i==foo.cbegin())
+							typessupported.append("\"").append((*i)).append("\"");
+						else
+							typessupported.append(",\"").append((*i)).append("\"");
+						++i;
+					}
+				}
+				else
+				{
+					//Send what events a particular property supports
+					PropertyList foo(routingEngine->supported());
+					if (contains(foo,propertyNames.front()))
+					{
+						//sinkManager->addSingleShotSink(wsi,data.front(),id);
+						typessupported = "\"get\",\"getSupportedEventTypes\"";
+					}
+				}
+				stringstream s;
+				string s2;
+				s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
+				string replystr = s.str();
+				LOG_INFO(" JSON Reply: " << replystr);
+				WebSockets::Write(socket, replystr);
 			}
 			else
 			{
-				LOG_WARNING(" \"get\" method called with no data! Transaction ID:" << id);
+				DebugOut(0)<<"Unknown method called."<<endl;
 			}
-		}
-		else if (name == "set")
-		{
-			LOG_MESSAGE("set called");
-			if (!propertyNames.empty())
-			{
-				//Should not happen
-			}
-			else if (!propertyData.empty())
-			{
-				for (auto prop = propertyData.begin(); prop != propertyData.end(); ++prop)
-				{
-					LOG_MESSAGE("websocketsinkmanager setting " << std::get<1>(*prop) << " to " << std::get<2>(*prop) << " in zone " << std::get<3>(*prop));
-					setValue(socket,std::get<1>(*prop),std::get<2>(*prop),std::get<3>(*prop),std::get<0>(*prop), id);
-				}
-			}
-		}
-		else if (name == "getSupportedEventTypes")
-		{
-			//If data.front() dosen't contain a property name, return a list of properties supported.
-			//if it does, then return the event types that particular property supports.
-			string typessupported = "";
-			if (propertyNames.empty())
-			{
-				//Send what properties we support
-				PropertyList foo(routingEngine->supported());
-				PropertyList::const_iterator i=foo.cbegin();
-				while (i != foo.cend())
-				{
-					if(i==foo.cbegin())
-						typessupported.append("\"").append((*i)).append("\"");
-					else
-						typessupported.append(",\"").append((*i)).append("\"");
-					++i;
-				}
-			}
-			else
-			{
-				//Send what events a particular property supports
-				PropertyList foo(routingEngine->supported());
-				if (contains(foo,propertyNames.front()))
-				{
-					//sinkManager->addSingleShotSink(wsi,data.front(),id);
-					typessupported = "\"get\",\"getSupportedEventTypes\"";
-				}
-			}
-			stringstream s;
-			string s2;
-			s << "{\"type\":\"methodReply\",\"name\":\"getSupportedEventTypes\",\"data\":[" << typessupported << "],\"transactionid\":\"" << id << "\"}";
-			string replystr = s.str();
-			LOG_INFO(" JSON Reply: " << replystr);
-			WebSockets::Write(socket, replystr);
-		}
-		else
-		{
-			DebugOut(0)<<"Unknown method called."<<endl;
 		}
 	}
 }
