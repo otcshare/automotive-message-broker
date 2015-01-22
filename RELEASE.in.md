@@ -1,5 +1,5 @@
 # AMB Release Notes {#release_notes}
-Version: @PROJECT_VERSION@
+Version: @PROJECT_SERIES@
 
 ## New features:
 - [DBus] some classes for exporting custom interfaces moved to plugins-common
@@ -18,3 +18,5 @@ Version: @PROJECT_VERSION@
   obtained through the Properties interface.
 
 ## Fixes:
+- [XWalk] Fixed misspelled 'diagnostics' interface
+- [DBus] Fixed misspelled 'Diagnostics' interface
