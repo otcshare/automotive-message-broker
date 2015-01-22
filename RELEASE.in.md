@@ -1,4 +1,4 @@
-Release notes for release @PROJECT_VERSION@
+Release notes for release @PROJECT_SERIES@
 
 New features:
 - [xwalk extension] implements full W3C automotive BG vehicle and data APIs
