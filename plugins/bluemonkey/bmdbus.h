@@ -39,6 +39,8 @@ public Q_SLOTS:
 
 	QObject* createInterface(const QString & service, const QString & path, const QString & interface, Connection bus);
 
+	bool exportObject(const QString & path, const QString & interface, Connection bus, QObject *obj);
+
 private: ///methods:
 
 

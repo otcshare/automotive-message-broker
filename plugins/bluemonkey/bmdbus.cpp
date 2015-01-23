@@ -18,6 +18,8 @@
 
 #include "bmdbus.h"
 
+#include <debugout.h>
+
 #include <QDBusInterface>
 #include <QDBusConnection>
 
@@ -37,4 +39,18 @@ BMDBus::BMDBus(QObject *parent)
 QObject *BMDBus::createInterface(const QString &service, const QString &path, const QString &interface, BMDBus::Connection bus)
 {
 	return new QDBusInterface(service, path, interface, bus == Session ? QDBusConnection::sessionBus() : QDBusConnection::systemBus(), this);
+}
+
+
+bool BMDBus::exportObject(const QString &path, const QString &interface, BMDBus::Connection bus, QObject * object)
+{
+	QDBusConnection con = bus == Session ? QDBusConnection::sessionBus( ): QDBusConnection::systemBus();
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
+	con.registerObject(path, interface, object, QDBusConnection::ExportAllContents);
+#else
+	DebugOut(DebugOut::Warning) << ___FUNCTION___ << " interface is ignored in qt 5.4 and lower" << endl;
+	con.registerObject(path, object, QDBusConnection::ExportAllContents);
+#endif
+
 }
