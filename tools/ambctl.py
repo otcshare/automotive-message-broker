@@ -99,19 +99,34 @@ def listPlugins():
 		for file in files:
 			fullpath = root + "/" + file;
 			pluginFile = open(fullpath)
-			data = json.load(pluginFile)
-			data['segmentPath'] = fullpath
-			pluginFile.close()
-			list.append(data)
+			try:
+				data = json.load(pluginFile)
+
+				data['segmentPath'] = fullpath
+				list.append(data)
+			except ValueError, e:
+				print "error parsing json file", file, ":", e
+				traceback.print_stack()
+			finally: pluginFile.close()
 	return list
 
 def enablePlugin(pluginName, enabled):
+	return setPluginProperty(pluginName, "enabled", enabled);
+
+def setPluginProperty(pluginName, key, value):
 	list = listPlugins()
 
 	for plugin in list:
 		if plugin["name"] == pluginName:
 			try :
-				plugin["enabled"] = enabled
+				if key not in plugin:
+					print "Key not found: ", key
+					return False
+				type = plugin[key].__class__
+				if type == bool:
+					value = value.lower() == "true"
+				value = type(value)
+				plugin[key] = value
 				file = open(plugin["segmentPath"], 'rw+')
 				plugin.pop('segmentPath', None)
 				fixedData = json.dumps(plugin, separators=(', ', ' : '), indent=4)
@@ -252,7 +267,7 @@ def processCommand(command, commandArgs, noMain=True):
 		if len(commandArgs) == 0:
 			commandArgs = ['help']
 		if commandArgs[0] == 'help':
-			print "[list] [pluginName] [on/off]"
+			print "[list] [pluginName] [key value]"
 			return 1
 		elif commandArgs[0] == 'list':
 			for plugin in listPlugins():
@@ -268,23 +283,15 @@ def processCommand(command, commandArgs, noMain=True):
 			print "plugin not found: ", commandArgs[0]
 			return 0
 		else:
-			if len(commandArgs) < 2:
-				return 1
-			enArg = commandArgs[1]
-			if not enArg == "on" and not enArg == "off":
-				print "please use 'on' or 'off' to enable/disable the plugin"
+			if len(commandArgs) < 3:
 				return 1
 			plugin = commandArgs[0]
-			enabled = enArg == "on"
-			enStr = "disabled"
-			if enablePlugin(plugin, enabled):
-				if enabled:
-					enStr = "enabled"
-			else:
-				print "Error could not enable", plugin
+			key = commandArgs[1]
+			value = commandArgs[2]
 
-			print plugin, enStr
-
+			if not setPluginProperty(plugin, key, value):
+				print "Could not set property"
+			print plugin, key, ":", value
 			return 1
 
 	else:

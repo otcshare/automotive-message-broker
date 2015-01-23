@@ -232,7 +232,7 @@ void DatabaseSink::parseConfig()
 	picojson::value value;
 	picojson::parse (value, properties.begin(), properties.end(), &jsonError);
 
-	picojson::array array = value.get("properties").get<picojson::array>();
+	picojson::array array = value.get<picojson::array>();
 
 	for(auto i : array)
 	{

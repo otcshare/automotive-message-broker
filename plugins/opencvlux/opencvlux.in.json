@@ -1,5 +1,5 @@
 {
-	"name" : "OpenCV LUX",
+	"name" : "OpenCV",
 	"path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
 	"enabled" : false,
 	"threaded" : "true",
@@ -14,4 +14,4 @@
 	"ddd" : "true",
 	"faceCascade" : "/usr/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml",
 	"eyeCascade" : "/usr/share/OpenCV/haarcascades/haarcascade_eye_tree_eyeglasses.xml"
-},
+}

@@ -55,7 +55,7 @@
 	  </node>-->
 	</dbus>
 	<filesystem path="/usr/bin/ambd" exec_label="AMB" />
-	<filesystem path="@LIB_INSTALL_DIR@/*" label="_" />
+	<filesystem path="@LIB_INSTALL_DIR@*" label="_" />
   </assign>
   <request>
 	<domain name="AMB" />
