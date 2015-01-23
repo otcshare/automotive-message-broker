@@ -46,8 +46,8 @@ class Autocomplete:
 		self.commands.append(Autocomplete.Cmd('plugin', 'enable, disable and get info on a plugin'))
 		self.commands.append(Autocomplete.Cmd('quit', 'Exit ambctl'))
 
-		bus = dbus.SystemBus()
 		try:
+			bus = dbus.SystemBus()
 			managerObject = bus.get_object("org.automotive.message.broker", "/");
 			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
 			self.properties = managerInterface.List()
@@ -147,10 +147,10 @@ def processCommand(command, commandArgs, noMain=True):
 		print help()
 		return 1
 
-	bus = dbus.SystemBus()
 
-	def getManager(bus):
+	def getManager():
 		try:
+			bus = dbus.SystemBus()
 			managerObject = bus.get_object("org.automotive.message.broker", "/");
 			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
 			return managerInterface
@@ -159,7 +159,9 @@ def processCommand(command, commandArgs, noMain=True):
 			return None
 
 	if command == "list" :
-		managerInterface = getManager(bus)
+		managerInterface = getManager()
+		if managerInterface == None:
+			return 0
 		supportedList = managerInterface.List()
 		for objectName in supportedList:
 			print objectName
@@ -170,7 +172,9 @@ def processCommand(command, commandArgs, noMain=True):
 		if commandArgs[0] == "help":
 			print "ObjectName [ObjectName...]"
 			return 1
-		managerInterface = getManager(bus)
+		managerInterface = getManager()
+		if managerInterface == None:
+			return 1
 		for objectName in commandArgs:
 			objects = managerInterface.FindObject(objectName)
 			print objectName
@@ -188,7 +192,9 @@ def processCommand(command, commandArgs, noMain=True):
 		elif commandArgs[0] == "off":
 			off=True
 			commandArgs=commandArgs[1:]
-		managerInterface = getManager(bus)
+		managerInterface = getManager()
+		if managerInterface == None:
+			return 1
 		for objectName in commandArgs:
 			objects = managerInterface.FindObject(objectName)
 			for o in objects:
@@ -226,7 +232,9 @@ def processCommand(command, commandArgs, noMain=True):
 		zone = 0
 		if len(commandArgs) == 4:
 			zone = int(commandArgs[3])
-		managerInterface = getManager(bus)
+		managerInterface = getManager()
+		if managerInterface == None:
+			return 1
 		object = managerInterface.FindObjectForZone(objectName, zone)
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.freedesktop.DBus.Properties")
 		property = propertiesInterface.Get("org.automotive."+objectName, propertyName)
@@ -259,7 +267,9 @@ def processCommand(command, commandArgs, noMain=True):
 		zone = 0
 		if len(commandArgs) >= 2:
 			zone = int(commandArgs[1])
-		managerInterface = getManager(bus)
+		managerInterface = getManager()
+		if managerInterface == None:
+			return 1
 		object = managerInterface.FindObjectForZone(objectName, zone);
 		propertiesInterface = dbus.Interface(bus.get_object("org.automotive.message.broker", object),"org.automotive."+objectName)
 		print json.dumps(propertiesInterface.GetHistory(start, end), indent=2)
@@ -501,7 +511,6 @@ if args.command == "stdin":
 
 							elif len(results) and not results[0] == toComplete:
 								print ''
-								print len(results), "results:"
 								if len(results) <= 3:
 									print ' '.join(results)
 								else:
@@ -510,7 +519,7 @@ if args.command == "stdin":
 										if len(r) > longestLen:
 											longestLen = len(r)
 									i=0
-									while i < len(results) / 3:
+									while i < len(results):
 										row = ""
 										numCols = 3
 										if len(results) < i+3:
@@ -519,8 +528,7 @@ if args.command == "stdin":
 											row += results[i]
 											for n in xrange((longestLen + 5) - len(results[i])):
 												row += ' '
-											i += 1
-
+											i = i + 1
 										print row
 
 							redraw(data)
