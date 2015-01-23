@@ -60,7 +60,7 @@ You will also need to edit your config to enable the Qt-based mainloop:
 
 ~~~~~~~~~~~~~{.json}
 {
-	"mainloop" : "/usr/lib/i386-linux-gnu/automotive-message-broker/qtmainloopplugin.so",
+	"mainloop" : "/usr/local/lib/i386-linux-gnu/automotive-message-broker/qtmainloopplugin.so",
 	"plugins" : "/etc/ambd/plugins.d"
 }
 ~~~~~~~~~~~~~

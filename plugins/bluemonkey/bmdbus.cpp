@@ -49,7 +49,7 @@ bool BMDBus::exportObject(const QString &path, const QString &interface, BMDBus:
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
 	con.registerObject(path, interface, object, QDBusConnection::ExportAllContents);
 #else
-	DebugOut(DebugOut::Warning) << ___FUNCTION___ << " interface is ignored in qt 5.4 and lower" << endl;
+	DebugOut(DebugOut::Warning) << "BMDBus::exportObject() interface is ignored in qt 5.4 and lower" << endl;
 	con.registerObject(path, object, QDBusConnection::ExportAllContents);
 #endif
 
