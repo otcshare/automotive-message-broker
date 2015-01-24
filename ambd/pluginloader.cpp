@@ -207,8 +207,6 @@ void PluginLoader::scanPluginDir(const std::string & dir)
         std::string fullpath = dir + (boost::algorithm::ends_with(dir, "/") ? "":"/") + name;
         std::string data = get_file_contents(fullpath.c_str());
 
-        DebugOut() << "data: " << data << endl;
-
         if(!readPluginConfig(data))
         {
             DebugOut(DebugOut::Error) << "Reading contentds of file: " << name << endl;
