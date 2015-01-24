@@ -153,7 +153,7 @@ def processCommand(command, commandArgs, noMain=True):
 			bus = dbus.SystemBus()
 			managerObject = bus.get_object("org.automotive.message.broker", "/");
 			managerInterface = dbus.Interface(managerObject, "org.automotive.Manager")
-			return managerInterface
+			return managerInterface, bus
 		except:
 			print "Error connecting to AMB.  is AMB running?"
 			return None
@@ -172,9 +172,9 @@ def processCommand(command, commandArgs, noMain=True):
 		if commandArgs[0] == "help":
 			print "ObjectName [ObjectName...]"
 			return 1
-		managerInterface = getManager()
+		managerInterface, bus = getManager()
 		if managerInterface == None:
-			return 1
+			return 0
 		for objectName in commandArgs:
 			objects = managerInterface.FindObject(objectName)
 			print objectName
@@ -192,7 +192,7 @@ def processCommand(command, commandArgs, noMain=True):
 		elif commandArgs[0] == "off":
 			off=True
 			commandArgs=commandArgs[1:]
-		managerInterface = getManager()
+		managerInterface, bus = getManager()
 		if managerInterface == None:
 			return 1
 		for objectName in commandArgs:
@@ -232,7 +232,7 @@ def processCommand(command, commandArgs, noMain=True):
 		zone = 0
 		if len(commandArgs) == 4:
 			zone = int(commandArgs[3])
-		managerInterface = getManager()
+		managerInterface, bus = getManager()
 		if managerInterface == None:
 			return 1
 		object = managerInterface.FindObjectForZone(objectName, zone)
@@ -267,7 +267,7 @@ def processCommand(command, commandArgs, noMain=True):
 		zone = 0
 		if len(commandArgs) >= 2:
 			zone = int(commandArgs[1])
-		managerInterface = getManager()
+		managerInterface, bus = getManager()
 		if managerInterface == None:
 			return 1
 		object = managerInterface.FindObjectForZone(objectName, zone);

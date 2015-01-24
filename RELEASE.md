@@ -4,6 +4,8 @@ Version: 0.14
 ## New features:
 - [DBus] some classes for exporting custom interfaces moved to plugins-common
 - [Bluemonkey plugin] support for creating custom dbus interfaces: bluemonkey.exportInterface()
+- [Bluemonkey plugin] dbus module supports creating dbus interfaces to system or session services and
+  creating/exporting dbus objects
 - [ambctl] support for enabling disabling plugins
 - [ambd] support plugins.d - now plugin segments can be stuck in there and amb will try to load all plugins that
   are enabled.  See the example segments: /etc/ambd/plugins.d/dbus, examplesink, examplesource
