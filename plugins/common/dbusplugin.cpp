@@ -16,14 +16,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#include <boost/lexical_cast.hpp>
-
 #include "dbusplugin.h"
+
+#include <boost/lexical_cast.hpp>
+#include <map>
+#include <string>
+
 #include "abstractroutingengine.h"
 #include "debugout.h"
 #include "listplusplus.h"
 
-DBusSink::DBusSink(string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, map<string, string> config)
+DBusSink::DBusSink(std::string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, std::map<std::string, std::string> config)
 	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
 	  AbstractSink(engine, config)
 {
