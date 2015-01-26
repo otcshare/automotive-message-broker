@@ -81,7 +81,7 @@ gboolean AmbTmplPlugin::timeoutCallback(gpointer data)
 // AmbTmplPlugin
 //----------------------------------------------------------------------------
 
-AmbTmplPlugin::AmbTmplPlugin(AbstractRoutingEngine* re, const map<string, string>& config, AbstractSink& parent) :
+AmbTmplPlugin::AmbTmplPlugin(AbstractRoutingEngine* re, const map<string, string>& config, AbstractSource& parent) :
       AmbPluginImpl(re, config, parent),
       interface(DEFAULT_CAN_IF_NAME),
       canBus(new CANBus(*static_cast<CANObserver*>(this))),

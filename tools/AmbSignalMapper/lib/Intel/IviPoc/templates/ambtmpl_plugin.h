@@ -30,6 +30,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <canbus.h>
 #include <canobserver.h>
 
+#include <ambplugin.h>
 #include <ambpluginimpl.h>
 #include "ambtmpl_cansignal.h"
 
@@ -42,7 +43,7 @@ class CANMessage;
 class AmbTmplPlugin : public AmbPluginImpl, public CANObserver {
 
 public:
-    AmbTmplPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSink& parent);
+    AmbTmplPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSource& parent);
     virtual ~AmbTmplPlugin(); // has to be virtual because of unit tests
 
     // from AbstractSink

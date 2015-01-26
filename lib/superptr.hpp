@@ -88,7 +88,7 @@ template<typename T> ::std::unique_ptr<T> make_unique(T* t)
 
 template<typename T> gobject_ptr<T> make_gobject(T* t)
 {
-	return gobject_ptr<T>(t, [](auto ptr) { if(ptr) g_object_unref(ptr);});
+    return gobject_ptr<T>(t, [](T *ptr) { if(ptr) g_object_unref(ptr);});
 }
 
 }
