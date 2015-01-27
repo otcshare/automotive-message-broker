@@ -22,3 +22,4 @@ Version: @PROJECT_SERIES@
 ## Fixes:
 - [XWalk] Fixed misspelled 'diagnostics' interface
 - [DBus] Fixed misspelled 'Diagnostics' interface
+- [XWalk] Fixed Zone.equals() return type
