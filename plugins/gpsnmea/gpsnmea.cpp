@@ -84,7 +84,8 @@ public:
 			 std::shared_ptr<AbstractPropertyType> spd,
 			 std::shared_ptr<AbstractPropertyType> time,
 			 std::shared_ptr<AbstractPropertyType> fix,
-			 std::shared_ptr<AbstractPropertyType> satsUsed);
+			 std::shared_ptr<AbstractPropertyType> satsUsed,
+			 std::shared_ptr<AbstractPropertyType> vspd);
 
 	void parse(std::string gprmc);
 
@@ -154,6 +155,7 @@ private:
 	std::shared_ptr<AbstractPropertyType> mAltitude;
 	std::shared_ptr<AbstractPropertyType> mDirection;
 	std::shared_ptr<AbstractPropertyType> mSpeed;
+	std::shared_ptr<AbstractPropertyType> mVehicleSpeed;
 	std::shared_ptr<AbstractPropertyType> mGpsTime;
 	std::shared_ptr<AbstractPropertyType> mFix;
 	std::shared_ptr<AbstractPropertyType> mSatelitesUsed;
@@ -172,7 +174,8 @@ Location::Location(AmbPluginImpl* source,
 				   std::shared_ptr<AbstractPropertyType> spd,
 				   std::shared_ptr<AbstractPropertyType> time,
 				   std::shared_ptr<AbstractPropertyType> fix,
-				   std::shared_ptr<AbstractPropertyType> satsUsed)
+				   std::shared_ptr<AbstractPropertyType> satsUsed,
+				   std::shared_ptr<AbstractPropertyType> vspd)
 	:parent(source), isActive(false)
 {
 	mLatitude = lat;
@@ -183,6 +186,7 @@ Location::Location(AmbPluginImpl* source,
 	mGpsTime = time;
 	mFix = fix;
 	mSatelitesUsed = satsUsed;
+	mVehicleSpeed = vspd;
 }
 
 void Location::parse(string nmea)
@@ -396,7 +400,7 @@ void Location::parseDirection(string dir)
 	}
 	catch(...)
 	{
-		DebugOut(5)<<"Failed to parse direction: "<<dir<<endl;
+		DebugOut(5) << "Failed to parse direction: " << dir << endl;
 	}
 }
 
@@ -465,13 +469,14 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 	auto lon = addPropertySupport<VehicleProperty::LongitudeType>(Zone::None);
 	auto alt = addPropertySupport<VehicleProperty::AltitudeType>(Zone::None);
 	auto spd = addPropertySupport(Zone::None, [](){ return new BasicPropertyType<uint16_t>(GPSSPEED, 0); });
+	auto vspd = addPropertySupport<VehicleProperty::VehicleSpeed>(Zone::None);
 	auto dir = addPropertySupport<VehicleProperty::DirectionType>(Zone::None);
 	auto time = addPropertySupport(Zone::None, [](){ return new BasicPropertyType<double>(GPSTIME, 0); });
 	auto fix = addPropertySupport(Zone::None, []() { return new BasicPropertyType<Location::FixType>(GpsFix, Location::NoFix); });
 	auto satsUsed = addPropertySupport(Zone::None, []() { return new BasicPropertyType<uint16_t>(GpsSatsUsed, 0); });
 	rawNmea = addPropertySupport(Zone::None, []() { return new StringPropertyType(GpsNmea); });
 
-	location = new Location(this, lat, lon, alt, dir, spd, time, fix, satsUsed);
+	location = new Location(this, lat, lon, alt, dir, spd, time, fix, satsUsed, vspd);
 
 	std::string btaddapter = config["bluetoothAdapter"];
 
