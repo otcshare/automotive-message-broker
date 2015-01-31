@@ -26,9 +26,9 @@
 #include "debugout.h"
 #include "listplusplus.h"
 
-DBusSink::DBusSink(std::string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, std::map<std::string, std::string> config)
 std::map<std::string, std::string> DBusSink::dbusConfig;
 
+DBusSink::DBusSink(std::string propertyName, AbstractRoutingEngine* engine, GDBusConnection* connection, std::map<std::string, std::string> config)
 	:AbstractDBusInterface("org.automotive."+propertyName, propertyName, connection),
 	  AbstractSink(engine, dbusConfig)
 {
