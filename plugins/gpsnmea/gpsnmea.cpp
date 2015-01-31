@@ -469,7 +469,7 @@ GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> conf
 	auto lon = addPropertySupport<VehicleProperty::LongitudeType>(Zone::None);
 	auto alt = addPropertySupport<VehicleProperty::AltitudeType>(Zone::None);
 	auto spd = addPropertySupport(Zone::None, [](){ return new BasicPropertyType<uint16_t>(GPSSPEED, 0); });
-	auto vspd = addPropertySupport<VehicleProperty::VehicleSpeed>(Zone::None);
+	auto vspd = addPropertySupport<VehicleProperty::VehicleSpeedType>(Zone::None);
 	auto dir = addPropertySupport<VehicleProperty::DirectionType>(Zone::None);
 	auto time = addPropertySupport(Zone::None, [](){ return new BasicPropertyType<double>(GPSTIME, 0); });
 	auto fix = addPropertySupport(Zone::None, []() { return new BasicPropertyType<Location::FixType>(GpsFix, Location::NoFix); });

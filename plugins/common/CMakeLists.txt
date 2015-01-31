@@ -21,4 +21,12 @@ install (FILES ${plugins_common_headers_install} DESTINATION ${INCLUDE_INSTALL_D
 
 install (TARGETS amb-plugins-common LIBRARY DESTINATION ${LIB_INSTALL_DIR} RUNTIME DESTINATION bin ARCHIVE DESTINATION ${LIB_INSTALL_DIR})
 
+set(amb_json_protocol_sources jsonprotocol.cpp)
+set(amb_json_protocol_headers jsonprotocol.cpp)
+
+add_library(amb-json-protocol SHARED ${amb_json_protocol_sources})
+
+target_link_libraries(amb-json-protocol amb -L${CMAKE_BINARY_DIR}/lib ${link_libraries} -L${CMAKE_CURRENT_BINARY_DIR} amb-plugins-common)
+
+install (TARGETS amb-json-protocol LIBRARY DESTINATION ${LIB_INSTALL_DIR})
 

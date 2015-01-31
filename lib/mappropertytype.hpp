@@ -8,7 +8,7 @@
 #include <debugout.h>
 #include "picojson.h"
 
-template <class N>
+template <class N = AbstractPropertyType*>
 class MapPropertyType: public AbstractPropertyType
 {
 public:
@@ -31,6 +31,28 @@ public:
 		t->zone = zone;
 
 		return t;
+	}
+
+	bool contains(std::string key)
+	{
+		return mMap.find(key) != mMap.end();
+	}
+
+	N operator[](std::string key)
+	{
+		return mMap[key];
+	}
+
+	std::vector<std::string> keys()
+	{
+		std::vector<std::string> list;
+
+		for(auto itr : mMap)
+		{
+			list.push_back(itr.first);
+		}
+
+		return list;
 	}
 
 	std::string toString() const
