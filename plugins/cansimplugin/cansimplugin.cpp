@@ -19,12 +19,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <boost/assert.hpp>
 #include <glib.h>
 #include <deque>
+#include <json.h>
 
 #include <vehicleproperty.h>
 #include <listplusplus.h>
+#include <ambplugin.h>
 
 #include <logger.h>
-#include <ambplugin.h>
 
 #include "cansimplugin.h"
 

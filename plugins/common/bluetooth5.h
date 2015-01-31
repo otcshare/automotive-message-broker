@@ -7,6 +7,8 @@
 
 typedef std::function<void(int)> ConnectedCallback;
 
+std::string findDevice(std::string address, std::string adapterPath="");
+
 class Bluetooth5
 {
 public:

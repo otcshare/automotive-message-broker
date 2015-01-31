@@ -1,0 +1,5 @@
+{
+	"name" : "Bluetooth",
+	"path" : "@PLUGIN_INSTALL_PATH@/bluetoothplugin.so",
+	"enabled" : false
+}

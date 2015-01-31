@@ -1,0 +1,7 @@
+{
+	"name" : "Obd2",
+	"path" : "@PLUGIN_INSTALL_PATH@/obd2sourceplugin.so",
+	"device" : "/dev/ttyUSB0",
+	"baud" : "115200",
+	"enabled" : false
+}

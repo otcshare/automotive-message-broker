@@ -116,7 +116,7 @@ static const GDBusInterfaceVTable interfaceVTable =
 	setProperty
 };
 
-std::string findDevice(std::string address, std::string adapterPath="")
+std::string findDevice(std::string address, std::string adapterPath)
 {
 	std::string objectPath;
 

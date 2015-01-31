@@ -27,6 +27,17 @@ dbusConnected.changed.connect(function () {
 							   {'AnswerToTheUniverse' : 'AnswerToTheUniverse'}]);
 });
 
+bluemonkey.loadModule("@PLUGIN_INSTALL_PATH@/bluemonkeyDBusModule.so");
+
+if(dbus)
+{
+	var dbusIface = dbus.createInterface("org.freedesktop.DBus", "/", "org.freedesktop.DBus", dbus.Session);
+
+	var reply = dbusIface.GetId();
+
+	bluemonkey.log("org.freedesktop.DBus.GetId() response: " + reply);
+}
+
 bluemonkey.createCustomProperty("VehicleSpeed", 10);
 bluemonkey.createCustomProperty("EngineSpeed", 5000);
 bluemonkey.createCustomProperty("PowertrainTorque", 324);

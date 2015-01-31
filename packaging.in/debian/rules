@@ -17,3 +17,5 @@ export DH_VERBOSE=1
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/cmake.mk
 
+DEB_CMAKE_NORMAL_ARGS += -Dbluemonkey_plugin=ON -Dbluetooth_plugin=ON -Dqtmainloop=ON
+DEB_BUILD_OPTIONS += parallel=8

@@ -23,6 +23,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <memory>
 #include <tgmath.h>
 #include <libwebsockets.h>
+#include <json.h>
 
 #include <canbus.h>
 #include <canobserver.h>
@@ -78,227 +79,227 @@ class CANGenPlugin: public AmbPluginImpl, public CANObserver, public WebSocketsO
 
 public:
 
-    /*!
-     * \param re AbstractRoutingEngine
-     * \param config Map of the configuration string values loaded on startup from AMB configuration file
-     * \param parent AmbPlugin instance
-     */
+	/*!
+	 * \param re AbstractRoutingEngine
+	 * \param config Map of the configuration string values loaded on startup from AMB configuration file
+	 * \param parent AmbPlugin instance
+	 */
 	CANGenPlugin(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSource &parent);
-    virtual ~CANGenPlugin(); // has to be virtual because of unit tests
+	virtual ~CANGenPlugin(); // has to be virtual because of unit tests
 
-    // from AbstractSink
+	// from AbstractSink
 public:
 
-    /*! uuid() is a unique identifier of the plugin
-     * @return a guid-style unique identifier
-     */
-    const std::string uuid() const { return "becbbef9-6cc8-4b9e-8cd7-2fbe37b9b52a"; }
+	/*! uuid() is a unique identifier of the plugin
+	 * @return a guid-style unique identifier
+	 */
+	const std::string uuid() const { return "becbbef9-6cc8-4b9e-8cd7-2fbe37b9b52a"; }
 
-    /*! propertyChanged is called when a subscribed to property changes.
-      * @see AbstractRoutingEngine::subscribeToPropertyChanges()
-      * \param value value of the property that changed. this is a temporary pointer that will be destroyed.
-      * Do not destroy it.  If you need to store the value use value.anyValue(), value.value<T>() or
-      * value->copy() to copy.
-      */
-    void propertyChanged(AbstractPropertyType* value);
+	/*! propertyChanged is called when a subscribed to property changes.
+	  * @see AbstractRoutingEngine::subscribeToPropertyChanges()
+	  * \param value value of the property that changed. this is a temporary pointer that will be destroyed.
+	  * Do not destroy it.  If you need to store the value use value.anyValue(), value.value<T>() or
+	  * value->copy() to copy.
+	  */
+	void propertyChanged(AbstractPropertyType* value);
 
 	AsyncPropertyReply* setProperty(const AsyncSetPropertyRequest &request);
 
-    // from CANObserver
+	// from CANObserver
 public:
-    /*!
-     * Called when error occurred on the bus.
-     * \fn errorOccured
-     * \param error \link CANObserver#CANError Bus error code \endlink
-     */
-    virtual void errorOccured(CANObserver::CANError error);/* socket error */
-    /*!
-     * Called when standard frame was is received from the bus.
-     * \fn standardFrameReceived
-     * \param frame Received frame
-     */
-    virtual void standardFrameReceived(const can_frame& frame);/* SFF was present */
-    /*!
-     * Called when extended frame was is received from the bus.
-     * \fn extendedFrameReceived
-     * \param frame Received frame
-     */
-    virtual void extendedFrameReceived(const can_frame& frame);/* EFF was present */
-    /*!
-     * Called when error frame was received from the bus.
-     * \fn errorFrameReceived
-     * \param frame Error frame
-     */
-    virtual void errorFrameReceived(const can_frame& frame);/* error frame */
-    /*!
-     * Called when remote transmission frame was received from the bus.
-     * \fn remoteTransmissionRequest
-     * \param frame RTR frame
-     */
-    virtual void remoteTransmissionRequest(const can_frame& frame);/* remote transmission request (SFF/EFF is still present)*/
+	/*!
+	 * Called when error occurred on the bus.
+	 * \fn errorOccured
+	 * \param error \link CANObserver#CANError Bus error code \endlink
+	 */
+	virtual void errorOccured(CANObserver::CANError error);/* socket error */
+	/*!
+	 * Called when standard frame was is received from the bus.
+	 * \fn standardFrameReceived
+	 * \param frame Received frame
+	 */
+	virtual void standardFrameReceived(const can_frame& frame);/* SFF was present */
+	/*!
+	 * Called when extended frame was is received from the bus.
+	 * \fn extendedFrameReceived
+	 * \param frame Received frame
+	 */
+	virtual void extendedFrameReceived(const can_frame& frame);/* EFF was present */
+	/*!
+	 * Called when error frame was received from the bus.
+	 * \fn errorFrameReceived
+	 * \param frame Error frame
+	 */
+	virtual void errorFrameReceived(const can_frame& frame);/* error frame */
+	/*!
+	 * Called when remote transmission frame was received from the bus.
+	 * \fn remoteTransmissionRequest
+	 * \param frame RTR frame
+	 */
+	virtual void remoteTransmissionRequest(const can_frame& frame);/* remote transmission request (SFF/EFF is still present)*/
 
-    /*!
-     * Second phase of the plugin initialization.
-     * \fn init
-     */
-    virtual void init();
+	/*!
+	 * Second phase of the plugin initialization.
+	 * \fn init
+	 */
+	virtual void init();
 
-    // from WebSocketsObserver
+	// from WebSocketsObserver
 
-    /*!
-     * Called when data received from libwebsockets
-     * \fn dataReceived
-     * \param socket libwebsocket* to be used to send any reply.
-     * \param data Received data pointer.
-     * \param len Length of the data.
-     * \return None
-     */
-    void dataReceived(libwebsocket* socket, const char* data, size_t len);
+	/*!
+	 * Called when data received from libwebsockets
+	 * \fn dataReceived
+	 * \param socket libwebsocket* to be used to send any reply.
+	 * \param data Received data pointer.
+	 * \param len Length of the data.
+	 * \return None
+	 */
+	void dataReceived(libwebsocket* socket, const char* data, size_t len);
 
 //
 // Internal methods:
 //
 private:
 
-    /*!
-     * \brief Prints received CAN frame
-     * \param frame Received CAN frame.
-     * \internal
-     * \private
-     */
-    void printFrame(const can_frame& frame) const;
+	/*!
+	 * \brief Prints received CAN frame
+	 * \param frame Received CAN frame.
+	 * \internal
+	 * \private
+	 */
+	void printFrame(const can_frame& frame) const;
 
-    /*!
-     * Parses 'MappingTable' property from CANSimPlugin.
-     * Result is stored in internal MappingTable class(AMB property and Zone to CAN Id map) which contains all properties that can be simulated.
-     * \param json Content of the 'MappingTable' property in JSON format.
-     */
-    void parseMappingTable(const std::string& json);
+	/*!
+	 * Parses 'MappingTable' property from CANSimPlugin.
+	 * Result is stored in internal MappingTable class(AMB property and Zone to CAN Id map) which contains all properties that can be simulated.
+	 * \param json Content of the 'MappingTable' property in JSON format.
+	 */
+	void parseMappingTable(const std::string& json);
 
-    /*!
-     * \brief Simulator.get request handler function.
-     * Builds and sends reply with the property value, timestamp and sequence number in JSON format.
-     * \param socket libwebsocket handle to be used to send reply.
-     * \param property Name of the property.
-     * \param zone Property's zone.
-     * \param uuid Request's transaction id.
-     * \private
-     */
-    void getValue(libwebsocket* socket, const std::string& property, int zone, const std::string& uuid);
+	/*!
+	 * \brief Simulator.get request handler function.
+	 * Builds and sends reply with the property value, timestamp and sequence number in JSON format.
+	 * \param socket libwebsocket handle to be used to send reply.
+	 * \param property Name of the property.
+	 * \param zone Property's zone.
+	 * \param uuid Request's transaction id.
+	 * \private
+	 */
+	void getValue(libwebsocket* socket, const std::string& property, int zone, const std::string& uuid);
 
-    /*!
-     * \brief Simulator.set request handler function.
-     * Formats property's value as a AMB's AbstractPropertyValue and passes it to sendValue. Reply to the Simulator with reply string in JSON format.
-     * \param socket libwebsocket handle to be used to send reply.
-     * \param property Name of the property.
-     * \param value Property's new value to be simulated.
-     * \param zone Property's zone.
-     * \param interface CAN interface to be used to send CAN frame.
-     * \param transactionId Request's transaction id.
-     * \private
-     */
-    void setValue(libwebsocket* socket, const std::string& property, const std::string& value, int zone, const std::string& interface, const std::string& transactionId);
+	/*!
+	 * \brief Simulator.set request handler function.
+	 * Formats property's value as a AMB's AbstractPropertyValue and passes it to sendValue. Reply to the Simulator with reply string in JSON format.
+	 * \param socket libwebsocket handle to be used to send reply.
+	 * \param property Name of the property.
+	 * \param value Property's new value to be simulated.
+	 * \param zone Property's zone.
+	 * \param interface CAN interface to be used to send CAN frame.
+	 * \param transactionId Request's transaction id.
+	 * \private
+	 */
+	void setValue(libwebsocket* socket, const std::string& property, const std::string& value, int zone, const std::string& interface, const std::string& transactionId);
 
-    /*!
-     * \brief Build and sends CAN frame to CANSimPlugin.
-     * Finds CAN Id using mappingTable for requested property name and zone, builds CAN frame with the property's new value and tries to send it via requested CAN interface.
-     * \param interface CAN interface to be used to send CAN frame.
-     * \param value AMB's AbstractPropertyValue which encapsulates property name, zone and value.
-     * \return true if CAN frame was successfully sent, otherwise false.
-     * \private
-     */
-    bool sendValue(const std::string& interface, AbstractPropertyType* value);
+	/*!
+	 * \brief Build and sends CAN frame to CANSimPlugin.
+	 * Finds CAN Id using mappingTable for requested property name and zone, builds CAN frame with the property's new value and tries to send it via requested CAN interface.
+	 * \param interface CAN interface to be used to send CAN frame.
+	 * \param value AMB's AbstractPropertyValue which encapsulates property name, zone and value.
+	 * \return true if CAN frame was successfully sent, otherwise false.
+	 * \private
+	 */
+	bool sendValue(const std::string& interface, AbstractPropertyType* value);
 
-    /*!
-     * Internal helper class
-     * AMB property and property's zone to CAN Id map
-     * \class MappingTable
-     * \private
-     * \internal
-     *
-     */
-    class MappingTable{
-    public:
-        MappingTable()
-        {
-        }
+	/*!
+	 * Internal helper class
+	 * AMB property and property's zone to CAN Id map
+	 * \class MappingTable
+	 * \private
+	 * \internal
+	 *
+	 */
+	class MappingTable{
+	public:
+		MappingTable()
+		{
+		}
 
-        MappingTable(const MappingTable& other) = delete;
-        MappingTable& operator=(const MappingTable& other) = delete;
-        MappingTable(MappingTable&& other) = default;
-        MappingTable& operator=(MappingTable&& other) = default;
+		MappingTable(const MappingTable& other) = delete;
+		MappingTable& operator=(const MappingTable& other) = delete;
+		MappingTable(MappingTable&& other) = default;
+		MappingTable& operator=(MappingTable&& other) = default;
 
-        void addProperty(const std::string& source, json_object* signal)
-        {
-            json_object* canIdObj = json_object_object_get(signal, "can_id");
-            json_object* nameObj = json_object_object_get(signal, "name");
-            if(!canIdObj || !nameObj) // mandatory
-                return;
-            Zone::Type zone(Zone::None);
-            json_object* zoneObj = json_object_object_get(signal, "zone");
-            if(zoneObj)
-                zone = json_object_get_int(zoneObj);
+		void addProperty(const std::string& source, json_object* signal)
+		{
+			json_object* canIdObj = json_object_object_get(signal, "can_id");
+			json_object* nameObj = json_object_object_get(signal, "name");
+			if(!canIdObj || !nameObj) // mandatory
+				return;
+			Zone::Type zone(Zone::None);
+			json_object* zoneObj = json_object_object_get(signal, "zone");
+			if(zoneObj)
+				zone = json_object_get_int(zoneObj);
 
-            auto& zp = mapping[source];
-            auto& prop = zp[Zone::Type(zone)];
-            std::string name(json_object_get_string(nameObj));
-            int can_id = json_object_get_int(canIdObj);
-            prop[name] = can_id; // update an existing value
-        }
+			auto& zp = mapping[source];
+			auto& prop = zp[Zone::Type(zone)];
+			std::string name(json_object_get_string(nameObj));
+			int can_id = json_object_get_int(canIdObj);
+			prop[name] = can_id; // update an existing value
+		}
 
-        int getCanId(const std::string& source, const Zone::Type& zone, const VehicleProperty::Property& name) const
-        {
-            //return mapping[source][zone][name]; // caution! this will insert if not found. I don't want it.
-            auto sourceIt = mapping.find(source);
-            if(sourceIt == mapping.end())
-                return 0;
-            auto zoneIt = sourceIt->second.find(zone);
-            if(zoneIt == sourceIt->second.end())
-                return 0;
-            auto propIt = zoneIt->second.find(name);
-            if(propIt == zoneIt->second.end())
-                return 0;
-            else
-                return propIt->second;
-        }
+		int getCanId(const std::string& source, const Zone::Type& zone, const VehicleProperty::Property& name) const
+		{
+			//return mapping[source][zone][name]; // caution! this will insert if not found. I don't want it.
+			auto sourceIt = mapping.find(source);
+			if(sourceIt == mapping.end())
+				return 0;
+			auto zoneIt = sourceIt->second.find(zone);
+			if(zoneIt == sourceIt->second.end())
+				return 0;
+			auto propIt = zoneIt->second.find(name);
+			if(propIt == zoneIt->second.end())
+				return 0;
+			else
+				return propIt->second;
+		}
 
-        void clear()
-        {
-            mapping.clear();
-        }
+		void clear()
+		{
+			mapping.clear();
+		}
 
-    private:
-        typedef std::map< Zone::Type, std::map<VehicleProperty::Property, canid_t> > ZonedProperty;
-        std::map<std::string, ZonedProperty> mapping;
-    };
+	private:
+		typedef std::map< Zone::Type, std::map<VehicleProperty::Property, canid_t> > ZonedProperty;
+		std::map<std::string, ZonedProperty> mapping;
+	};
 
 //
 // data:
 //
 
-    /*!
-     * AMB property and property's zone to CAN Id map
-     * \private
-     */
-    MappingTable mappingTable;
+	/*!
+	 * AMB property and property's zone to CAN Id map
+	 * \private
+	 */
+	MappingTable mappingTable;
 
-    /*!
-     * Opened CAN interfaces used to send CAN frames
-     * \private
-     */
-    std::map<std::string, std::shared_ptr<CANBus> > interfaces;
+	/*!
+	 * Opened CAN interfaces used to send CAN frames
+	 * \private
+	 */
+	std::map<std::string, std::shared_ptr<CANBus> > interfaces;
 
-    /*!
-     * Encapsulated libwebsocket library
-     * \private
-     */
-    std::unique_ptr<WebSockets> ws;
+	/*!
+	 * Encapsulated libwebsocket library
+	 * \private
+	 */
+	std::unique_ptr<WebSockets> ws;
 
-    /*!
-     * Mutex to protect mappingTable container during property 'MappingTable' parsing on change notification
-     * \private
-     */
-    interprocess_recursive_mutex mutex;
+	/*!
+	 * Mutex to protect mappingTable container during property 'MappingTable' parsing on change notification
+	 * \private
+	 */
+	interprocess_recursive_mutex mutex;
 };
 
 class SimCommand: public StringPropertyType

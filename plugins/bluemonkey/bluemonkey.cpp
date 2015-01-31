@@ -166,6 +166,8 @@ BluemonkeySink::~BluemonkeySink()
 	{
 		dlclose(module);
 	}
+
+	engine->deleteLater();
 }
 
 
@@ -253,7 +255,7 @@ void BluemonkeySink::loadConfig(QString str)
 
 	file.close();
 
-	DebugOut()<<"evaluating script: "<<script.toStdString()<<endl;
+	DebugOut(7)<<"evaluating script: "<<script.toStdString()<<endl;
 
 	QJSValue val = engine->evaluate(script);
 
@@ -312,10 +314,16 @@ void BluemonkeySink::reloadEngine()
 	if(engine)
 		engine->deleteLater();
 
-	engine = new QJSEngine(this);
+	engine = new QJSEngine();
 
 	QJSValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
+
+	QThread* thread = new QThread(this);
+
+	engine->moveToThread(thread);
+
+	thread->start();
 
 	loadConfig(configuration["config"].c_str());
 }

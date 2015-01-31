@@ -8,7 +8,7 @@
 			"path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
 			"databaseFile" : "../tests/generated.db",
 			"bufferLength" : "1",
-			"properties" : "{ 'properties' : ['VehicleSpeed','EngineSpeed'] }",
+			"properties" : "['VehicleSpeed','EngineSpeed']",
 			"startOnLoad" : "true",
 			"playbackOnLoad" : "false",
 			"playbackMultiplier" : "1",

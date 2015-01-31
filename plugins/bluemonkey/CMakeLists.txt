@@ -42,6 +42,17 @@ if(Qt5Sql_FOUND)
 	install(TARGETS bluemonkeyDbModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 endif()
 
+find_package(Qt5DBus)
+
+if(Qt5DBus_FOUND)
+	message(STATUS "enabling dbus bluemonkey module")
+	add_library(bluemonkeyDBusModule MODULE bmdbus.cpp)
+	set_target_properties(bluemonkeyDBusModule PROPERTIES PREFIX "")
+	target_link_libraries(bluemonkeyDBusModule ${link_libraries} amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${QT_LIBRARIES} ${Qt5DBus_LIBRARIES})
+	set(QT_INCLUDE_DIRS ${QT_INCLUDE_DIRS} ${Qt5DBus_INCLUDE_DIRS})
+	install(TARGETS bluemonkeyDBusModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+endif()
+
 include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${communi_INCLUDE_DIRS} ${QT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common)
 
 set(bluemonkeyplugin_headers bluemonkey.h authenticate.h)
@@ -51,7 +62,7 @@ add_library(bluemonkeyplugin MODULE ${bluemonkeyplugin_sources})
 set_target_properties(bluemonkeyplugin PROPERTIES PREFIX "")
 target_link_libraries(bluemonkeyplugin dl amb -L${CMAKE_CURRENT_BINARY_DIR}/lib ${link_libraries} ${QT_LIBRARIES} ${communi_LIBRARIES} amb-plugins-common -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common)
 
-set(config_files ${CMAKE_CURRENT_SOURCE_DIR}/config.js)
+set(config_files ${CMAKE_CURRENT_BINARY_DIR}/config.js)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/config.js ${CMAKE_CURRENT_BINARY_DIR}/config.js @ONLY)
 
 install(TARGETS bluemonkeyplugin LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})

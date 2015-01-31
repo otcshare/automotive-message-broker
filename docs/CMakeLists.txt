@@ -10,7 +10,7 @@ if(DOXYGEN_FOUND)
 
 	#generate mappings documentation
 	add_custom_target(genmappings_libamb
-						python ${CMAKE_SOURCE_DIR}/tools/genmapping --output ${CMAKE_CURRENT_BINARY_DIR}/ambdbusmappings.idl ${dbus_mapping_headers}
+						python ${CMAKE_BINARY_DIR}/tools/genmapping --output ${CMAKE_CURRENT_BINARY_DIR}/ambdbusmappings.idl ${dbus_mapping_headers}
 						COMMENT "running genmapping")
 	add_dependencies(docs genmappings_libamb)
 

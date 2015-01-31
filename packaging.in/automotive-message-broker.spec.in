@@ -202,7 +202,16 @@ Requires:  %{name} = %{version}-%{release}
 Requires: qt5-plugin-sqldriver-sqlite
 
 %description -n bluemonkey-modules-db
-Engine for creating scriptable plugins for AMB
+Engine for creating scriptable plugins for AMB - db module
+
+%package -n bluemonkey-modules-dbus
+Summary:   javascript plugin engine dbus module
+Group:     Automotive/Libraries
+Requires:  %{name} = %{version}-%{release}
+Requires:  qt5-qtdbus
+
+%description -n bluemonkey-modules-dbus
+Engine for creating scriptable plugins for AMB - dbus module
 
 %endif
 
@@ -261,7 +270,7 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 
 %files
 %defattr(-,root,root,-)
-%manifest packaging.in/amb.manifest
+%manifest packaging/amb.manifest
 %config %{_sysconfdir}/ambd/config
 %config %{_sysconfdir}/ambd/config.tizen
 %config %{_sysconfdir}/ambd/examples/*
@@ -299,12 +308,15 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/opencvluxplugin.so
+%{_sysconfdir}/ambd/plugins.d/opencvlux
 
 %files plugins-bluetooth
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/bluetoothplugin.so
 %config %{_sysconfdir}/dbus-1/system.d/ambbt.conf
+%{_sysconfdir}/ambd/plugins.d/bluetooth
+%{_bindir}/testAmbBt
 %endif
 
 %files plugins
@@ -315,6 +327,9 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %{_libdir}/%{name}/dbussinkplugin.so
 %{_libdir}/%{name}/demosinkplugin.so
 %config %{_sysconfdir}/dbus-1/system.d/amb.conf
+%{_sysconfdir}/ambd/plugins.d/dbus
+%{_sysconfdir}/ambd/plugins.d/examplesink
+%{_sysconfdir}/ambd/plugins.d/examplesource
 
 %files plugins-common
 %manifest packaging.in/amb.manifest.plugins
@@ -330,11 +345,13 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/obd2sourceplugin.so
+%{_sysconfdir}/ambd/plugins.d/obd2
 
 %files plugins-database
 %defattr(-,root,root,-)
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/databasesinkplugin.so
+%{_sysconfdir}/ambd/plugins.d/database
 
 %files plugins-murphy
 %defattr(-,root,root,-)
@@ -375,10 +392,15 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/bluemonkeyplugin.so
 %config %{_sysconfdir}/ambd/bluemonkey
+%{_sysconfdir}/ambd/plugins.d/bluemonkey
 
 %files -n bluemonkey-modules-db
 %manifest packaging.in/amb.manifest.plugins
 %{_libdir}/%{name}/bluemonkeyDbModule.so
+
+%files -n bluemonkey-modules-dbus
+%manifest packaging.in/amb.manifest.plugins
+%{_libdir}/%{name}/bluemonkeyDBusModule.so
 
 %endif
 

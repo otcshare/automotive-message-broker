@@ -32,3 +32,14 @@ void debugOut(const string &message)
 {
 	DebugOut()<<"DEBUG: "<<message.c_str()<<endl;
 }
+
+
+void amb::deprecateMethod(const string & methodName, const string &version)
+{
+	DebugOut(DebugOut::Warning) << methodName << " is deprecated in " << version << endl;
+
+	if(version == PROJECT_SERIES)
+	{
+		throw std::runtime_error("Using deprecated function.");
+	}
+}

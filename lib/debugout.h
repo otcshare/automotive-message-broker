@@ -59,6 +59,17 @@ void debugOut(const string &message);
  * DebugOut() << "This will log to stderr." << std::endl;
  * \endcode
  */
+
+namespace amb
+{
+/*!
+ * \brief deprecateMethod prints warning if method is used.  Throws if version >= PROJECT_SERIES
+ * \param methodName name of method being deprecated.
+ * \param version version in which this method will no longer function in.
+ */
+void deprecateMethod(const string &methodName, const std::string & version);
+}
+
 class DebugOut
 {
 public:

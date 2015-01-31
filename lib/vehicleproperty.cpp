@@ -137,6 +137,7 @@ const VehicleProperty::Property VehicleProperty::AccelerationX = "AccelerationX"
 const VehicleProperty::Property VehicleProperty::AccelerationY = "AccelerationY";
 const VehicleProperty::Property VehicleProperty::AccelerationZ = "AccelerationZ";
 const VehicleProperty::Property VehicleProperty::MassAirFlow = "MassAirFlow";
+[[deprecated("Deprecated in 0.14.  Use ButtonEventW3C")]]
 const VehicleProperty::Property VehicleProperty::ButtonEvent = "ButtonEvent";
 const VehicleProperty::Property VehicleProperty::AirIntakeTemperature = "AirIntakeTemperature";
 const VehicleProperty::Property VehicleProperty::BatteryVoltage = "BatteryVoltage";

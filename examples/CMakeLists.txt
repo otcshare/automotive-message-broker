@@ -10,7 +10,8 @@ set(amb_examples ${CMAKE_CURRENT_BINARY_DIR}/configwheel
 				 ${CMAKE_CURRENT_BINARY_DIR}/websocketsink2
 				 ${CMAKE_CURRENT_BINARY_DIR}/websocketsource2
 				 ${CMAKE_CURRENT_BINARY_DIR}/testsourceconfig
-				 ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey/bluemonkeyconfig)
+				 ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey/bluemonkeyconfig
+				 ${CMAKE_CURRENT_BINARY_DIR}/bluetooth)
 
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/configwheel.in.json ${CMAKE_CURRENT_BINARY_DIR}/configwheel @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/databasesource.in.json ${CMAKE_CURRENT_BINARY_DIR}/databasesource @ONLY)
@@ -28,6 +29,7 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/databasewebsocketsink.in.json ${CMAK
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/testsourceconfig.in.json ${CMAKE_CURRENT_BINARY_DIR}/testsourceconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/cangenconfig.in.json ${CMAKE_CURRENT_BINARY_DIR}/cangenconfig @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/bluemonkey/bluemonkeyconfig.in.json ${CMAKE_CURRENT_BINARY_DIR}/bluemonkey/bluemonkeyconfig @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/bluetooth.in.json ${CMAKE_CURRENT_BINARY_DIR}/bluetooth @ONLY)
 configure_file (${CMAKE_CURRENT_SOURCE_DIR}/testplugins.d.in.json ${CMAKE_CURRENT_SOURCE_DIR}/testplugins.d.json @ONLY)
 
 install (FILES ${amb_examples} DESTINATION /etc/ambd/examples)

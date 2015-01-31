@@ -55,4 +55,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/README ${CMAKE_CURRENT_BINARY_DIR}/op
 set(opencvlux_doc_files ${CMAKE_CURRENT_BINARY_DIR}/opencvlux.README.md)
 install (FILES ${opencvlux_doc_files} DESTINATION ${DOC_INSTALL_DIR}/plugins)
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/opencvlux.in.json ${CMAKE_CURRENT_BINARY_DIR}/opencvlux @ONLY)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/opencvlux DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})
+
 endif(opencvlux_plugin)
