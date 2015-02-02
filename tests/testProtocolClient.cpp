@@ -18,6 +18,13 @@ void runTest(amb::AmbRemoteClient *c)
 		DebugOut(0) << "list call reply" << endl;
 		g_assert(supported.size() == 2);
 	});
+
+	DebugOut(0) << "calling client->get()" << endl;
+	c->get("interface1", [](amb::Object &obj)
+	{
+		DebugOut(0) << "get call reply" << endl;
+		g_assert(obj.size() == 3);
+	});
 }
 
 int main(int argc, char** argv)

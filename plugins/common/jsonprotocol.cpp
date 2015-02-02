@@ -248,16 +248,22 @@ amb::BaseJsonMessageReader::BaseJsonMessageReader(AbstractIo *io)
 void amb::BaseJsonMessageReader::canHasData()
 {
 	std::string d = mIo->read();
+	incompleteMessage += d;
+
+	while(hasJson(incompleteMessage));
+}
+
+bool amb::BaseJsonMessageReader::hasJson(string & d)
+{
 
 	std::string::size_type start = d.find("{");
 
-	if(start == std::string::npos)
+	if(start == std::string::npos && incompleteMessage.empty())
 	{
-		incompleteMessage += d;
-		return;
+		return false;
 	}
 
-	if(incompleteMessage.empty() && start > 0)
+	if(start > 0)
 	{
 		DebugOut(7) << "We have an incomplete message at the beginning.  Toss it away." << endl;
 		d = d.substr(start-1);
@@ -268,11 +274,10 @@ void amb::BaseJsonMessageReader::canHasData()
 
 	if(end == std::string::npos)
 	{
-		incompleteMessage += d;
-		return;
+		return false;
 	}
 
-	std::string tryMessage = incompleteMessage + d.substr(0, end+1);
+	std::string tryMessage = d.substr(0, end+1);
 
 	DebugOut(6) << "Trying to parse message: " << tryMessage << endl;
 
@@ -286,13 +291,13 @@ void amb::BaseJsonMessageReader::canHasData()
 	{
 		DebugOut(7) << "Invalid or incomplete message" << endl;
 		DebugOut(7) << parseError << endl;
-		incompleteMessage += d;
-		return;
+		return false;
 	}
 
 	incompleteMessage = end == d.length()-1 ? "" : d.substr(end);
 
 	hasJsonMessage(doc);
+	return true;
 }
 
 
@@ -468,7 +473,9 @@ amb::Object amb::Object::fromJson(const picojson::object &obj)
 	for(auto i : obj)
 	{
 		if(i.second.is<picojson::object>())
+		{
 			ambObj[i.first] = std::shared_ptr<AbstractPropertyType>(amb::jsonToProperty(i.second));
+		}
 	}
 
 	return ambObj;
@@ -480,7 +487,7 @@ picojson::value amb::Object::toJson(const amb::Object &obj)
 	jsonObj["interfaceName"] = picojson::value(obj.interfaceName);
 	for(auto i : obj)
 	{
-		jsonObj[i.second->alias()] = i.second->toJson();
+		jsonObj[i.first] = i.second->toJson();
 	}
 
 	return picojson::value(jsonObj);

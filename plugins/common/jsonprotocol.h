@@ -250,6 +250,8 @@ protected:
 
 private:
 
+	bool hasJson(string &d);
+
 	std::string incompleteMessage;
 
 };
@@ -258,7 +260,7 @@ class AmbRemoteClient: public BaseJsonMessageReader
 {
 public:
 	typedef std::function<void (std::vector<Object>)> ListCallback;
-	typedef std::function<void (Object)> ObjectCallback;
+	typedef std::function<void (Object&)> ObjectCallback;
 	typedef std::function<void (bool)> SetCallback;
 
 	AmbRemoteClient(AbstractIo* io);

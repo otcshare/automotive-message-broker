@@ -26,6 +26,9 @@ protected:
 		amb::Object interface2("interface2");
 
 		interface1.emplace("vehicleSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::VehicleSpeedType(100)));
+		interface1.emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(1999)));
+
+		interface2.emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(3099)));
 
 		call.objectNames.push_back(interface1);
 		call.objectNames.push_back(interface2);
@@ -36,6 +39,23 @@ protected:
 	void get(amb::GetMethodCall &get)
 	{
 		DebugOut(0) << "get called" << endl;
+
+		if(get.value.interfaceName == "interface1")
+		{
+			amb::Object interface1("interface1");
+
+			interface1.emplace("vehicleSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::VehicleSpeedType(100)));
+			interface1.emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(1999)));
+			get.value = interface1;
+		}
+		else if(get.value.interfaceName == "interface2")
+		{
+			amb::Object interface2("interface2");
+			interface2.emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(3099)));
+			get.value = interface2;
+		}
+
+		send(get);
 	}
 };
 
