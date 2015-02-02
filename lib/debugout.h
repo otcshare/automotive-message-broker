@@ -113,8 +113,6 @@ public:
 
 	DebugOut const& operator << (ostream & (*manip)(std::ostream&)) const
 	{
-
-
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 		{
 			ostream out(buf);

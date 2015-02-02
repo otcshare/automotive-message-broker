@@ -196,13 +196,9 @@ void ExampleSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	{
 		VehicleProperty::DoorsPerRowType temp;
 
-		BasicPropertyType<uint16_t> row1(2);
-		BasicPropertyType<uint16_t> row2(2);
-		BasicPropertyType<uint16_t> row3(1);
-
-		temp.append(row1);
-		temp.append(row2);
-		temp.append(row3);
+		temp.append(2);
+		temp.append(2);
+		temp.append(1);
 
 		reply->value = &temp;
 		reply->success = true;

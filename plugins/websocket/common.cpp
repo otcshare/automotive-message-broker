@@ -7,14 +7,6 @@
 
 bool doBinary = false;
 
-const char * amb::BasicTypes::UInt16Str = "UInt16";
-const char * amb::BasicTypes::UInt32Str = "UInt32";
-const char * amb::BasicTypes::Int16Str = "Int16";
-const char * amb::BasicTypes::Int32Str = "Int32";
-const char * amb::BasicTypes::StringStr = "String";
-const char * amb::BasicTypes::DoubleStr = "Double";
-const char * amb::BasicTypes::BooleanStr = "Boolean";
-
 int lwsWrite(libwebsocket *lws, QByteArray d)
 {
 	if(!lws)
@@ -91,46 +83,3 @@ void cleanJson(QByteArray &json)
 	json.replace("\t", "");
 }
 
-const std::string amb::BasicTypes::fromSignature(const string &sig)
-{
-	if(sig.empty()) return "";
-
-	char c = sig[0];
-
-	if(c == G_VARIANT_CLASS_BOOLEAN)
-		return BooleanStr;
-
-	else if(c == G_VARIANT_CLASS_BYTE)
-		return "";
-
-	else if(c == G_VARIANT_CLASS_INT16)
-		return Int16Str;
-
-	else if(c == G_VARIANT_CLASS_UINT16)
-		return UInt16Str;
-
-	else if(c == G_VARIANT_CLASS_INT32)
-		return Int32Str;
-
-	else if(c ==  G_VARIANT_CLASS_UINT32)
-		return UInt32Str;
-
-	else if(c == G_VARIANT_CLASS_INT64)
-		return "";
-
-	else if(c == G_VARIANT_CLASS_UINT64)
-		return "";
-
-	else if(c == G_VARIANT_CLASS_DOUBLE)
-		return DoubleStr;
-
-	else if(c == G_VARIANT_CLASS_STRING)
-		return StringStr;
-
-	else if(c == G_VARIANT_CLASS_ARRAY)
-	{
-		///TODO support array and map
-		return "";
-	}
-	return "";
-}

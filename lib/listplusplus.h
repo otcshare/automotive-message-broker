@@ -53,4 +53,13 @@ void removeOne(T * iteratable, V value)
 	}
 }
 
+namespace amb
+{
+template <class T, class Key>
+bool containsKey(const T & map, const Key & key)
+{
+	return map.find(key) != map.end();
+}
+}
+
 #endif // LISTPLUSPLUS_H

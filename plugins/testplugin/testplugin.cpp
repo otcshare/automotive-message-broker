@@ -343,12 +343,9 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	DebugOut() << "Testing ListPropertyType... " << endl;
 	VehicleProperty::TripMetersType* tfirst = new VehicleProperty::TripMetersType();
 	VehicleProperty::TripMetersType* tsecond = new VehicleProperty::TripMetersType();
-	BasicPropertyType<uint16_t> v1(0);
-	BasicPropertyType<uint16_t> v2(5);
-	BasicPropertyType<uint16_t> v3(10);
-	tfirst->append(v1);
-	tfirst->append(v2);
-	tfirst->append(v3);
+	tfirst->append(0);
+	tfirst->append(5);
+	tfirst->append(10);
 	tsecond->fromVariant(tfirst->toVariant());
 
 	GVariant* testGVSVariant = g_variant_new("i", 9);

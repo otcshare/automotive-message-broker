@@ -18,10 +18,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 
-#ifndef OBD2SOURCE_H
-#define OBD2SOURCE_H
-
-
+#ifndef TESTSOURCE_H
+#define TESTSOURCE_H
 
 #include <abstractsource.h>
 #include <string>
@@ -31,9 +29,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <fcntl.h>
 #include <termios.h>
 #include <glib.h>
-
-
-
 
 class TestPlugin : public AbstractSource
 {

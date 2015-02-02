@@ -1,58 +1,9 @@
 #include "jsonprotocol.h"
 
+#include <jsonhelper.h>
+#include <listplusplus.h>
+
 #include <glib.h>
-
-const char * amb::BasicTypes::UInt16Str = "UInt16";
-const char * amb::BasicTypes::UInt32Str = "UInt32";
-const char * amb::BasicTypes::Int16Str = "Int16";
-const char * amb::BasicTypes::Int32Str = "Int32";
-const char * amb::BasicTypes::StringStr = "String";
-const char * amb::BasicTypes::DoubleStr = "Double";
-const char * amb::BasicTypes::BooleanStr = "Boolean";
-
-const std::string amb::BasicTypes::fromSignature(const string &sig)
-{
-	if(sig.empty()) return "";
-
-	char c = sig[0];
-
-	if(c == G_VARIANT_CLASS_BOOLEAN)
-		return BooleanStr;
-
-	else if(c == G_VARIANT_CLASS_BYTE)
-		return "";
-
-	else if(c == G_VARIANT_CLASS_INT16)
-		return Int16Str;
-
-	else if(c == G_VARIANT_CLASS_UINT16)
-		return UInt16Str;
-
-	else if(c == G_VARIANT_CLASS_INT32)
-		return Int32Str;
-
-	else if(c ==  G_VARIANT_CLASS_UINT32)
-		return UInt32Str;
-
-	else if(c == G_VARIANT_CLASS_INT64)
-		return "";
-
-	else if(c == G_VARIANT_CLASS_UINT64)
-		return "";
-
-	else if(c == G_VARIANT_CLASS_DOUBLE)
-		return DoubleStr;
-
-	else if(c == G_VARIANT_CLASS_STRING)
-		return StringStr;
-
-	else if(c == G_VARIANT_CLASS_ARRAY)
-	{
-		///TODO support array and map
-		return "";
-	}
-	return "";
-}
 
 bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
 {
@@ -92,32 +43,45 @@ void amb::AmbRemoteClient::list(amb::AmbRemoteClient::ListCallback cb)
 
 void amb::AmbRemoteClient::get(const string &objectName, amb::AmbRemoteClient::ObjectCallback cb)
 {
-
+	get(objectName, "", Zone::None, cb);
 }
 
 void amb::AmbRemoteClient::get(const string &objectName, const string &sourceUuid, amb::AmbRemoteClient::ObjectCallback cb)
 {
-
+	get(objectName, sourceUuid, Zone::None, cb);
 }
 
 void amb::AmbRemoteClient::get(const string &objectName, Zone::Type zone, amb::AmbRemoteClient::ObjectCallback cb)
 {
-
+	get(objectName, "", zone, cb);
 }
 
 void amb::AmbRemoteClient::get(const string &objectName, const string &sourceUuid, Zone::Type zone, amb::AmbRemoteClient::ObjectCallback cb)
 {
+	GetMethodCall getCall;
+	getCall.sourceUuid = sourceUuid;
+	getCall.zone = zone;
 
+	mGetMethodCalls[getCall.messageId] = cb;
+
+	send(getCall);
 }
 
-void amb::AmbRemoteClient::set(const string &objectName, MapPropertyType<> *value, amb::AmbRemoteClient::ObjectCallback cb)
+void amb::AmbRemoteClient::set(const string &objectName, const Object & value, SetCallback cb)
 {
-
+	set(objectName, value, "", Zone::None, cb);
 }
 
-void amb::AmbRemoteClient::set(const string &objectName, MapPropertyType<> *value, const string &sourceUuid, Zone::Type zone, amb::AmbRemoteClient::ObjectCallback cb)
+void amb::AmbRemoteClient::set(const string &objectName, const Object & value, const string &sourceUuid, Zone::Type zone, SetCallback cb)
 {
+	SetMethodCall setCall;
+	setCall.sourceUuid = sourceUuid;
+	setCall.zone = zone;
+	setCall.value = value;
 
+	mSetMethodCalls[setCall.messageId] = cb;
+
+	send(setCall);
 }
 
 void amb::AmbRemoteClient::listen(const string &objectName, const string &sourceUuid, Zone::Type zone, amb::AmbRemoteClient::ObjectCallback cb)
@@ -132,19 +96,13 @@ void amb::AmbRemoteClient::listen(const string &objectName, amb::AmbRemoteClient
 
 void amb::AmbRemoteClient::hasJsonMessage(const picojson::value &json)
 {
-	BaseMessage message;
+	DebugOut(7) << "json: " << json.serialize() << endl;
 
-	message.fromJson(json);
-
-	if(message.is<MethodCall>())
+	if(BaseMessage::is<MethodCall>(json))
 	{
-		MethodCall methodCall(message);
-		methodCall.fromJson(json);
-
-		if(message.is<ListMethodCall>())
+		if(BaseMessage::is<ListMethodCall>(json))
 		{
-			ListMethodCall listMethodCall(methodCall);
-
+			ListMethodCall listMethodCall;
 			listMethodCall.fromJson(json);
 
 			if(mListCalls.find(listMethodCall.messageId) != mListCalls.end())
@@ -162,6 +120,31 @@ void amb::AmbRemoteClient::hasJsonMessage(const picojson::value &json)
 
 				mListCalls.erase(listMethodCall.messageId);
 			}
+		}
+		else if(BaseMessage::is<GetMethodCall>(json))
+		{
+			GetMethodCall getCall;
+			getCall.fromJson(json);
+
+			if(amb::containsKey(mGetMethodCalls, getCall.messageId))
+			{
+				auto cb = mGetMethodCalls[getCall.messageId];
+
+				try
+				{
+					cb(getCall.value);
+				}
+				catch(...)
+				{
+					DebugOut(DebugOut::Warning) << "Invalid Get callback " << endl;
+				}
+
+				mGetMethodCalls.erase(getCall.messageId);
+			}
+		}
+		else if(BaseMessage::is<SetMethodCall>(json))
+		{
+
 		}
 	}
 }
@@ -198,7 +181,7 @@ bool amb::BaseMessage::fromJson(const picojson::value &json)
 	name = obj["name"].to_str();
 	messageId = obj["messageId"].to_str();
 
-	if(data.contains("data"))
+	if(json.contains("data"))
 	{
 		data = json.get("data");
 	}
@@ -215,7 +198,7 @@ picojson::value amb::ListMethodCall::toJson()
 
 	for(auto i : objectNames)
 	{
-		list.push_back(property2Json(i));
+		list.push_back(Object::toJson(i));
 	}
 
 	v["data"] = picojson::value(list);
@@ -225,17 +208,28 @@ picojson::value amb::ListMethodCall::toJson()
 
 bool amb::ListMethodCall::fromJson(const picojson::value &json)
 {
-	if(!MethodCall::fromJson(json) || json.get("type").to_str() != "list" || !data.is<picojson::array>())
+	if(!MethodCall::fromJson(json) || name != "list" || !data.is<picojson::array>())
 	{
-		DebugOut(DebugOut::Error) << "type not 'list' or data not type json array";
+		DebugOut(DebugOut::Error) << "type not 'list' or data not type json array" << endl;
 		return false;
 	}
 
 	objectNames.clear();
 
-	for(auto i : data.get<picojson::array>())
+	picojson::array dataList = json.get("data").get<picojson::array>();
+
+	for(auto i : dataList)
 	{
-		objectNames.push_back(json2Property(i));
+		if(!i.is<picojson::object>())
+		{
+			DebugOut(DebugOut::Warning) << "Malformed data.  Expected 'object'.  Got '" << i.to_str() << "'" << endl;
+			continue;
+		}
+		picojson::object obj = i.get<picojson::object>();
+
+		Object ambObj = Object::fromJson(obj);
+
+		objectNames.push_back(ambObj);
 	}
 
 	return true;
@@ -302,19 +296,38 @@ void amb::BaseJsonMessageReader::canHasData()
 }
 
 
+picojson::value amb::MethodCall::toJson()
+{
+	picojson::value value = BaseMessage::toJson();
+
+	picojson::object obj = value.get<picojson::object>();
+
+	obj["source"] = picojson::value(sourceUuid);
+	obj["zone"] = picojson::value((double)zone);
+	obj["methodSuccess"] = picojson::value(success);
+
+	return picojson::value(obj);
+}
+
 bool amb::MethodCall::fromJson(const picojson::value &json)
 {
+	if(!BaseMessage::fromJson(json))
+		return false;
+
+	sourceUuid = json.get("source").to_str();
+	zone = json.get("zone").get<double>();
+
+	if(json.contains("success"))
+		success = json.get("methodSuccess").get<bool>();
 
 	return true;
 }
 
 
-std::shared_ptr<AbstractPropertyType> amb::json2Property(const picojson::value &json)
+std::shared_ptr<AbstractPropertyType> amb::jsonToProperty(const picojson::value &json)
 {
-	Zone::Type zone = json.get("zone").get<double>();
-	std::string name = json.get("property").to_str();
+	std::string name = json.get("name").to_str();
 	std::string type = json.get("type").to_str();
-	std::string source = json.get("source").to_str();
 
 	auto t = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
 
@@ -362,30 +375,14 @@ std::shared_ptr<AbstractPropertyType> amb::json2Property(const picojson::value &
 		t = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
 	}
 
-	t->sourceUuid = source;
-	t->zone = zone;
+	t->fromJson(json);
 
 	return std::shared_ptr<AbstractPropertyType>(t);
 }
 
 
-picojson::value amb::property2Json(std::shared_ptr<AbstractPropertyType> property)
-{
-	std::string signature = property->signature();
-	const std::string basicType = amb::BasicTypes::fromSignature(signature);
-
-	picojson::object map;
-	map["zone"] = picojson::value((double)property->zone);
-	map["property"] = picojson::value(property->name);
-	map["type"] = picojson::value(basicType);
-	map["source"] = picojson::value(property->sourceUuid);
-
-	return picojson::value(map);
-}
-
-
-amb::AmbRemoteServer::AmbRemoteServer(AbstractIo *io)
-	:BaseJsonMessageReader(io)
+amb::AmbRemoteServer::AmbRemoteServer(AbstractIo *io, AbstractRoutingEngine *re)
+	:BaseJsonMessageReader(io), routingEngine(re)
 {
 
 }
@@ -395,7 +392,7 @@ void amb::AmbRemoteServer::list(ListMethodCall &call)
 
 }
 
-void amb::AmbRemoteServer::get()
+void amb::AmbRemoteServer::get(GetMethodCall & get)
 {
 
 }
@@ -412,9 +409,12 @@ void amb::AmbRemoteServer::listen()
 
 void amb::AmbRemoteServer::hasJsonMessage(const picojson::value &json)
 {
+	DebugOut(7) << "json: " << json.serialize() << endl;
+
 	if(!BaseMessage::validate(json))
 	{
-		DebugOut(DebugOut::Warning) << "not a valid message" << endl;
+		DebugOut(DebugOut::Warning) << "not a valid message: " << json.serialize() << endl;
+		return;
 	}
 
 	if(BaseMessage::is<MethodCall>(json))
@@ -426,13 +426,81 @@ void amb::AmbRemoteServer::hasJsonMessage(const picojson::value &json)
 			listCall.fromJson(json);
 
 			list(listCall);
+		}
+		else if(BaseMessage::is<GetMethodCall>(json))
+		{
+			GetMethodCall getCall;
+			getCall.fromJson(json);
 
-			send(&listCall);
+			get(getCall);
 		}
 	}
 }
 
-void amb::AmbRemoteServer::send(amb::BaseMessage *msg)
+picojson::value amb::GetMethodCall::toJson()
 {
-	mIo->write(msg->toJson().serialize());
+	picojson::value val = MethodCall::toJson();
+
+	picojson::object obj = val.get<picojson::object>();
+
+	obj["data"] = Object::toJson(value);
+
+	return picojson::value(obj);
+}
+
+bool amb::GetMethodCall::fromJson(const picojson::value &json)
+{
+	MethodCall::fromJson(json);
+
+	value = Object::fromJson(json.get<picojson::object>());
+}
+
+
+amb::Object amb::Object::fromJson(const picojson::object &obj)
+{
+	if(!amb::containsKey(obj, "interfaceName"))
+	{
+		DebugOut(DebugOut::Warning) << "object missing interfaceName" << endl;
+		return Object();
+	}
+	Object ambObj(obj.at("interfaceName").to_str());
+
+	for(auto i : obj)
+	{
+		if(i.second.is<picojson::object>())
+			ambObj[i.first] = std::shared_ptr<AbstractPropertyType>(amb::jsonToProperty(i.second));
+	}
+
+	return ambObj;
+}
+
+picojson::value amb::Object::toJson(const amb::Object &obj)
+{
+	picojson::object jsonObj;
+	jsonObj["interfaceName"] = picojson::value(obj.interfaceName);
+	for(auto i : obj)
+	{
+		jsonObj[i.second->alias()] = i.second->toJson();
+	}
+
+	return picojson::value(jsonObj);
+}
+
+
+picojson::value amb::SetMethodCall::toJson()
+{
+	picojson::value val = MethodCall::toJson();
+
+	picojson::object obj = val.get<picojson::object>();
+
+	obj["data"] = Object::toJson(value);
+
+	return picojson::value(obj);
+}
+
+bool amb::SetMethodCall::fromJson(const picojson::value &json)
+{
+	MethodCall::fromJson(json);
+
+	value = Object::fromJson(json.get<picojson::object>());
 }

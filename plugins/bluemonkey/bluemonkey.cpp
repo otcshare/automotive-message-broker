@@ -115,15 +115,15 @@ AbstractPropertyType* qVariantToAbstractPropertyType(QString name, QVariant var)
 	{
 		QVariant subVariant = var.toList().at(0);
 		if(subVariant.type() == QVariant::UInt)
-			return new ListPropertyType<BasicPropertyType<uint>>(name.toStdString(), subVariant.toUInt());
+			return new ListPropertyType<uint>(name.toStdString(), subVariant.toUInt());
 		else if(subVariant.type() == QVariant::Double)
-			return new ListPropertyType<BasicPropertyType<double>>(name.toStdString(), subVariant.toDouble());
+			return new ListPropertyType<double>(name.toStdString(), subVariant.toDouble());
 		else if(subVariant.type() == QVariant::Bool)
-			return new ListPropertyType<BasicPropertyType<bool>>(name.toStdString(), subVariant.toBool());
+			return new ListPropertyType<bool>(name.toStdString(), subVariant.toBool());
 		else if(subVariant.type() == QVariant::Int)
-			return new ListPropertyType<BasicPropertyType<int>>(name.toStdString(), subVariant.toInt());
+			return new ListPropertyType<int>(name.toStdString(), subVariant.toInt());
 		else if(subVariant.type() == QVariant::String)
-			return new ListPropertyType<StringPropertyType>(name.toStdString(), subVariant.toString().toStdString());
+			return new ListPropertyType<std::string>(name.toStdString(), subVariant.toString().toStdString());
 	}
 	return nullptr;
 }

@@ -616,19 +616,15 @@ public:
 	 */
 	static const Property VehiclePowerMode;
 	PROPERTYTYPE(VehiclePowerMode, VehiclePowerModeType, BasicPropertyType<Power::Modes>, Power::Modes)
-	//typedef BasicPropertyType<Power::PowerModes> VehiclePowerModeType;
 
 	static const Property TripMeters;
-	PROPERTYTYPE(TripMeters, TripMetersType, ListPropertyType<BasicPropertyType<uint16_t> >, uint16_t)
-	//typedef ListPropertyType<BasicPropertyType<uint16_t> > TripMetersType;
+	PROPERTYTYPE(TripMeters, TripMetersType, ListPropertyType<uint16_t>, uint16_t)
 
 	static const Property CruiseControlActive;
 	PROPERTYTYPE(CruiseControlActive, CruiseControlActiveType, BasicPropertyType<bool>, bool)
-	//typedef BasicPropertyType<bool> CruiseControlActiveType;
 
 	static const Property CruiseControlSpeed;
 	PROPERTYTYPE(CruiseControlSpeed, CruiseControlSpeedType, BasicPropertyType<uint16_t>, uint16_t)
-	//typedef BasicPropertyType<uint16_t> CruiseControlSpeedType;
 
 	static const Property LightHead;
 	PROPERTYTYPE(LightHead, LightHeadType, BasicPropertyType<bool>, bool)
@@ -726,7 +722,7 @@ public:
 	PROPERTYTYPE(VehicleType, VehicleTypeType, BasicPropertyType<Vehicle::Type>, Vehicle::Type)
 
 	static const Property DoorsPerRow;
-	PROPERTYTYPE(DoorsPerRow, DoorsPerRowType, ListPropertyType<BasicPropertyType<uint16_t> >, uint16_t)
+	PROPERTYTYPE(DoorsPerRow, DoorsPerRowType, ListPropertyType<uint16_t>, uint16_t)
 
 	static const Property TransmissionGearType;
 	PROPERTYTYPE(TransmissionGearType, TransmissionGearTypeType, BasicPropertyType<Transmission::Type>, Transmission::Type)
@@ -1059,7 +1055,7 @@ public:
 	PROPERTYTYPEBASIC(ActiveNoiseControlMode, bool)
 
 	static const Property AvailableSounds;
-	PROPERTYTYPE(AvailableSounds, AvailableSoundsType, ListPropertyType<StringPropertyType>, StringPropertyType)
+	PROPERTYTYPE(AvailableSounds, AvailableSoundsType, ListPropertyType<std::string>, std::string)
 
 	static const Property EngineSoundEnhancementMode;
 	PROPERTYTYPE(EngineSoundEnhancementMode, EngineSoundEnhancementModeType, StringPropertyType, std::string)

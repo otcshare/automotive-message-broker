@@ -345,8 +345,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY( VehiclePowerMode, Power::Off);
 	registerPropertyPriv(TripMeters, [](){
 		TripMetersType* t = new TripMetersType();
-		BasicPropertyType<uint16_t> v(0);
-		t->append(v);
+		t->append(0);
 		return t;
 	});
 
@@ -388,9 +387,8 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(Direction, 0);
 	REGISTERPROPERTY(VehicleType, Vehicle::Unknown);
 	registerPropertyPriv(DoorsPerRow, []() {
-		BasicPropertyType<uint16_t> d(0);
 		DoorsPerRowType* doors = new DoorsPerRowType();
-		doors->append(d);
+		doors->append(0);
 		return doors;
 	});
 	REGISTERPROPERTY(TransmissionGearType, Transmission::Unknown);
@@ -505,8 +503,7 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(ActiveNoiseControlMode, false);
 	registerPropertyPriv(AvailableSounds, [](){
 		AvailableSoundsType* t = new AvailableSoundsType();
-		StringPropertyType v;
-		t->append(v);
+		t->append("");
 		return t;
 	});
 	REGISTERPROPERTY(EngineSoundEnhancementMode, "");

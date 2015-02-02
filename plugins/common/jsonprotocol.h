@@ -37,34 +37,23 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 namespace amb
 {
 
-namespace BasicTypes
+class Object : public std::unordered_map<std::string, std::shared_ptr<AbstractPropertyType>>
 {
-enum BasicTypeEnum
-{
-	UInt16,
-	UInt32,
-	Int16,
-	Int32,
-	String,
-	Double,
-	Boolean
+public:
+	Object(): std::unordered_map<std::string, std::shared_ptr<AbstractPropertyType>>() { }
+	Object(const std::string & ifaceName): std::unordered_map<std::string, std::shared_ptr<AbstractPropertyType>>(),
+		interfaceName(ifaceName)
+	{
+
+	}
+
+	static Object fromJson(const picojson::object & obj);
+
+	static picojson::value toJson(const Object & obj);
+
+	std::string interfaceName;
+
 };
-
-extern const char * UInt16Str;
-extern const char * UInt32Str;
-extern const char * Int16Str;
-extern const char * Int32Str;
-extern const char * StringStr;
-extern const char * DoubleStr;
-extern const char * BooleanStr;
-
-const std::string fromSignature(std::string const & sig);
-
-} // BasicTypes
-
-std::shared_ptr<AbstractPropertyType> json2Property(const picojson::value& json);
-
-picojson::value property2Json(std::shared_ptr<AbstractPropertyType> property );
 
 class BaseMessage
 {
@@ -99,7 +88,7 @@ public:
 
 	static bool validate(const picojson::value & json)
 	{
-		return json.is<picojson::object>() && json.contains("type") && !json.contains("name") && json.contains("messageId");
+		return json.is<picojson::object>() && json.contains("type") && json.contains("name") && json.contains("messageId");
 	}
 
 	template <typename T>
@@ -119,13 +108,13 @@ class MethodCall : public BaseMessage
 {
 public:
 	MethodCall(std::string name)
-		:BaseMessage(name, "method"), zone(Zone::None)
+		:BaseMessage(name, "method"), zone(Zone::None), success(false)
 	{
 
 	}
 
 	MethodCall(const BaseMessage & other)
-		:BaseMessage(other), zone(Zone::None)
+		:BaseMessage(other), zone(Zone::None), success(false)
 	{
 		name = other.name;
 	}
@@ -134,6 +123,8 @@ public:
 		:MethodCall(other.name)
 	{
 		sourceUuid = other.sourceUuid;
+		zone = other.zone;
+		success = other.success;
 	}
 
 	static bool is(const BaseMessage * msg)
@@ -149,13 +140,16 @@ public:
 	 */
 	static bool is(const picojson::value & json)
 	{
-		return json.contains("sourceUuid") && json.contains("zone");
+		return json.contains("source") && json.get("source").is<std::string>()
+				&& json.contains("zone") && json.get("zone").is<double>();
 	}
 
+	virtual picojson::value toJson();
 	virtual bool fromJson(const picojson::value &json);
 
 	std::string sourceUuid;
 	Zone::Type zone;
+	bool success;
 };
 
 class ListMethodCall : public MethodCall
@@ -172,7 +166,7 @@ public:
 	picojson::value toJson();
 	bool fromJson(const picojson::value &json);
 
-	std::vector<std::shared_ptr<AbstractPropertyType>> objectNames;
+	std::vector<Object> objectNames;
 
 	static bool is(const BaseMessage * msg)
 	{
@@ -181,8 +175,58 @@ public:
 
 	static bool is(const picojson::value & json)
 	{
-		return json.get("type").to_str() != "list" && json.is<picojson::array>();
+		return json.get("name").to_str() == "list";
 	}
+};
+
+class GetMethodCall : public MethodCall
+{
+public:
+	GetMethodCall()
+		: MethodCall("get")
+	{
+
+	}
+
+	picojson::value toJson();
+	bool fromJson(const picojson::value &json);
+
+	static bool is(const BaseMessage * msg)
+	{
+		return msg->name == "get";
+	}
+
+	static bool is(const picojson::value & json)
+	{
+		return json.get("name").to_str() == "get";
+	}
+
+	Object value;
+};
+
+class SetMethodCall : public MethodCall
+{
+public:
+	SetMethodCall()
+		: MethodCall("set")
+	{
+
+	}
+
+	picojson::value toJson();
+	bool fromJson(const picojson::value &json);
+
+	static bool is(const BaseMessage * msg)
+	{
+		return msg->name == "set";
+	}
+
+	static bool is(const picojson::value & json)
+	{
+		return json.get("name").to_str() != "set";
+	}
+
+	Object value;
 };
 
 class BaseJsonMessageReader
@@ -196,6 +240,12 @@ protected:
 
 	virtual void hasJsonMessage(const picojson::value & message) = 0;
 
+	template <class T>
+	void send(T & msg)
+	{
+		mIo->write(msg.toJson().serialize());
+	}
+
 	std::shared_ptr<AbstractIo> mIo;
 
 private:
@@ -207,8 +257,8 @@ private:
 class AmbRemoteClient: public BaseJsonMessageReader
 {
 public:
-	typedef std::function<void (std::vector<std::shared_ptr<AbstractPropertyType>>)> ListCallback;
-	typedef std::function<void (MapPropertyType<> *)> ObjectCallback;
+	typedef std::function<void (std::vector<Object>)> ListCallback;
+	typedef std::function<void (Object)> ObjectCallback;
 	typedef std::function<void (bool)> SetCallback;
 
 	AmbRemoteClient(AbstractIo* io);
@@ -223,9 +273,9 @@ public:
 
 	void get(const std::string & objectName, const std::string & sourceUuid, Zone::Type zone, ObjectCallback cb);
 
-	void set(const std::string & objectName, MapPropertyType<>* value, ObjectCallback cb);
+	void set(const std::string & objectName, const Object & value, SetCallback cb);
 
-	void set(const std::string & objectName, MapPropertyType<>* value, const std::string & sourceUuid, Zone::Type zone, ObjectCallback cb);
+	void set(const std::string & objectName, const Object & value, const std::string & sourceUuid, Zone::Type zone, SetCallback cb);
 
 	void listen(const std::string & objectName, const std::string & sourceUuid, Zone::Type zone, ObjectCallback cb);
 
@@ -239,14 +289,15 @@ private:
 
 	std::string createSubscriptionId(const std::string & objectName,  const std::string & sourceUuid, Zone::Type zone);
 	std::unordered_map<std::string, ListCallback> mListCalls;
-	std::unordered_map<std::string, AsyncPropertyReply*> mMethodCalls;
+	std::unordered_map<std::string, ObjectCallback> mGetMethodCalls;
+	std::unordered_map<std::string, SetCallback> mSetMethodCalls;
 	std::unordered_map<std::string, std::vector<ObjectCallback>> mSubsriptions;
 };
 
 class AmbRemoteServer : public BaseJsonMessageReader
 {
 public:
-	AmbRemoteServer(AbstractIo* io);
+	AmbRemoteServer(AbstractIo* io, AbstractRoutingEngine* routingEngine);
 
 protected:
 
@@ -258,7 +309,7 @@ protected:
 	/*!
 	 * \brief get called when a GetMessageCall was received
 	 */
-	virtual void get();
+	virtual void get(GetMethodCall &get);
 
 	/*!
 	 * \brief set called when SetMessageCall was received
@@ -271,7 +322,10 @@ protected:
 
 	void hasJsonMessage(const picojson::value & json);
 
-	void send(BaseMessage* msg);
+protected:
+	AbstractRoutingEngine* routingEngine;
+
+
 };
 
 } //namespace amb
