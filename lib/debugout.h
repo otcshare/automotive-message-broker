@@ -100,6 +100,13 @@ public:
 				out<<"WARNING ";
 		}
 	}
+
+	DebugOut(const std::string & toLog, int debugLevel = 4)
+		:DebugOut(debugLevel)
+	{
+		(*this) << toLog << endl;
+	}
+
 	DebugOut const& operator << (const string &message) const
 	{
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)

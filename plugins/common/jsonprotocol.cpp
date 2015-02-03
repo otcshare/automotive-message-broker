@@ -38,7 +38,7 @@ void amb::AmbRemoteClient::list(amb::AmbRemoteClient::ListCallback cb)
 
 	mListCalls[methodCall.messageId] = cb;
 
-	mIo->write(methodCall.toJson().serialize());
+	send(methodCall);
 }
 
 void amb::AmbRemoteClient::get(const string &objectName, amb::AmbRemoteClient::ObjectCallback cb)
@@ -61,6 +61,7 @@ void amb::AmbRemoteClient::get(const string &objectName, const string &sourceUui
 	GetMethodCall getCall;
 	getCall.sourceUuid = sourceUuid;
 	getCall.zone = zone;
+	getCall.value = Object(objectName);
 
 	mGetMethodCalls[getCall.messageId] = cb;
 
@@ -250,13 +251,14 @@ void amb::BaseJsonMessageReader::canHasData()
 	std::string d = mIo->read();
 	incompleteMessage += d;
 
-	while(hasJson(incompleteMessage));
+	while(hasJson());
 }
 
-bool amb::BaseJsonMessageReader::hasJson(string & d)
-{
 
-	std::string::size_type start = d.find("{");
+
+bool amb::BaseJsonMessageReader::hasJson()
+{
+	std::string::size_type start = incompleteMessage.find("{");
 
 	if(start == std::string::npos && incompleteMessage.empty())
 	{
@@ -265,19 +267,19 @@ bool amb::BaseJsonMessageReader::hasJson(string & d)
 
 	if(start > 0)
 	{
-		DebugOut(7) << "We have an incomplete message at the beginning.  Toss it away." << endl;
-		d = d.substr(start-1);
+		DebugOut(7) << "We have an incomplete message at the beginning.  Toss it away:" << endl;
+		DebugOut(7) << incompleteMessage << endl;
+		incompleteMessage = incompleteMessage.substr(start-1);
 	}
 
-
-	std::string::size_type end = d.find_last_of("}");
+	int end = incompleteMessage.find("\n");
 
 	if(end == std::string::npos)
 	{
 		return false;
 	}
 
-	std::string tryMessage = d.substr(0, end+1);
+	std::string tryMessage = incompleteMessage.substr(0, end+1);
 
 	DebugOut(6) << "Trying to parse message: " << tryMessage << endl;
 
@@ -294,12 +296,11 @@ bool amb::BaseJsonMessageReader::hasJson(string & d)
 		return false;
 	}
 
-	incompleteMessage = end == d.length()-1 ? "" : d.substr(end);
+	incompleteMessage = end == incompleteMessage.length()-1 ? "" : incompleteMessage.substr(end+1);
 
 	hasJsonMessage(doc);
 	return true;
 }
-
 
 picojson::value amb::MethodCall::toJson()
 {
@@ -457,7 +458,7 @@ bool amb::GetMethodCall::fromJson(const picojson::value &json)
 {
 	MethodCall::fromJson(json);
 
-	value = Object::fromJson(json.get<picojson::object>());
+	value = Object::fromJson(json.get("data").get<picojson::object>());
 }
 
 

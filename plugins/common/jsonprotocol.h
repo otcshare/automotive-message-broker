@@ -243,14 +243,16 @@ protected:
 	template <class T>
 	void send(T & msg)
 	{
-		mIo->write(msg.toJson().serialize());
+		std::string buff = msg.toJson().serialize()+"\n";
+		DebugOut() << "writing: " << buff << endl;
+		mIo->write(buff);
 	}
 
 	std::shared_ptr<AbstractIo> mIo;
 
 private:
 
-	bool hasJson(string &d);
+	bool hasJson();
 
 	std::string incompleteMessage;
 

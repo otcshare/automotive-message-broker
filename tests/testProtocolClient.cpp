@@ -23,7 +23,7 @@ void runTest(amb::AmbRemoteClient *c)
 	c->get("interface1", [](amb::Object &obj)
 	{
 		DebugOut(0) << "get call reply" << endl;
-		g_assert(obj.size() == 3);
+		g_assert(obj.size() == 2);
 	});
 }
 

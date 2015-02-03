@@ -46,6 +46,8 @@ std::shared_ptr<AbstractPropertyType> jsonToProperty(const picojson::value& json
 
 picojson::value propertyToJson(std::shared_ptr<AbstractPropertyType> property);
 
+void findJson(const std::string & buffer, std::string::size_type beg, std::string::size_type & end);
+
 }
 
 #endif

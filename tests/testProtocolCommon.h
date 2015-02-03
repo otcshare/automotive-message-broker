@@ -39,7 +39,7 @@ public:
 		return socket->readAll().data();
 	}
 
-	void write(string data)
+	void write(const string & data)
 	{
 		socket->write(data.c_str(), data.length());
 	}

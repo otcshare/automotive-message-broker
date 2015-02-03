@@ -29,10 +29,12 @@
 #include "debugout.h"
 #include "timestamp.h"
 #include "testplugin.h"
+#include <jsonhelper.h>
+
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
 
-#define TEST(success)	g_assert((success));
+#define TEST(success)	DebugOut(0) << "Testing " << ""#success"" << endl; g_assert((success));
 const std::string TestProptertyName1 = "TestPropertyName1";
 const std::string TestProptertyName2 = "TestPropertyName2";
 
@@ -232,6 +234,56 @@ bool TestPlugin::testSubscription()
 	return true;
 }
 
+bool testListPlusPlus()
+{
+	std::map<std::string, int> theMap;
+	theMap["1"] = 1;
+	theMap["2"] = 2;
+
+	TEST(amb::containsKey(theMap, "1"));
+	TEST(!amb::containsKey(theMap, "bar"));
+
+	std::vector<int> list;
+	list.push_back(1);
+	list.push_back(2);
+	list.push_back(3);
+
+	TEST(contains(list, 2));
+	removeOne(&list, 2);
+	TEST(!contains(list, 2));
+
+	class Complex
+	{
+	public:
+		Complex(int a, int b): foo(a), bar(b) {}
+		int foo;
+		int bar;
+	};
+
+	Complex complex1(1, 2);
+
+	Complex complex2(2, 2);
+
+	std::vector<Complex> complexList;
+	complexList.push_back(complex1);
+	complexList.push_back(complex2);
+
+	TEST(contains(complexList, complex1, [](auto a, auto b) { return a.foo == b.foo && a.bar == b.bar; }));
+
+	return true;
+}
+
+void testJsonHelper()
+{
+	std::string json = "{{}{}}{}";
+
+	std::string::size_type end = 0;
+	amb::findJson(json, 0, end);
+
+	DebugOut(0) << "Found complete Json message at " << end << endl;
+	TEST(end == 7);
+}
+
 bool TestPlugin::testSetAndGet()
 {
 	bool replySuccess(false);
@@ -279,7 +331,7 @@ bool TestPlugin::testCoreUpdateSupported()
 	PropertyList toAdd;
 	toAdd.push_back(VehicleProperty::ClutchStatus);
 
-	routingEngine->updateSupported(toAdd,PropertyList(), this);
+	routingEngine->updateSupported(toAdd, PropertyList(), this);
 
 	PropertyList supported = routingEngine->supported();
 
@@ -360,6 +412,10 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	testSubscription();
 
 	testSetAndGet();
+
+	TEST(testListPlusPlus());
+
+	testJsonHelper();
 }
 
 TestPlugin::~TestPlugin()

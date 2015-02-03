@@ -270,9 +270,6 @@ public:
 		if(!var) return "";
 
 		const string s = g_variant_get_type_string(var.get());
-
-		DebugOut() << "returning signature: " << s << " for "<< name << endl;
-
 		return s;
 	}
 
@@ -963,7 +960,8 @@ public:
 
 		for(auto itr : mList)
 		{
-			GVariant *newvar = g_variant_new(GVS<T>::signature(), GVS<T>::gvalue(itr));
+			DebugOut(0) << "toVariant value: " << GVS<T>::gvalue(itr) << endl;
+			GVariant *newvar = g_variant_new("v", g_variant_new(GVS<T>::signature(), GVS<T>::gvalue(itr)));
 			g_variant_builder_add_value(&params, newvar);
 		}
 
