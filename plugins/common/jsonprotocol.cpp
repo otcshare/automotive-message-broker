@@ -27,7 +27,7 @@ bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
 }
 
 amb::AmbRemoteClient::AmbRemoteClient(AbstractIo *io)
-	:BaseJsonMessageReader(io)
+	:BaseJsonMessageReader(io), serverTimeOffset(0)
 {
 
 }
@@ -61,19 +61,19 @@ void amb::AmbRemoteClient::get(const string &objectName, const string &sourceUui
 	GetMethodCall getCall;
 	getCall.sourceUuid = sourceUuid;
 	getCall.zone = zone;
-	getCall.value = Object(objectName);
+	getCall.value = amb::make_shared(new Object(objectName));
 
 	mGetMethodCalls[getCall.messageId] = cb;
 
 	send(getCall);
 }
 
-void amb::AmbRemoteClient::set(const string &objectName, const Object & value, SetCallback cb)
+void amb::AmbRemoteClient::set(const string &objectName, Object::ObjectPtr value, SetCallback cb)
 {
 	set(objectName, value, "", Zone::None, cb);
 }
 
-void amb::AmbRemoteClient::set(const string &objectName, const Object & value, const string &sourceUuid, Zone::Type zone, SetCallback cb)
+void amb::AmbRemoteClient::set(const string &objectName, Object::ObjectPtr value, const string &sourceUuid, Zone::Type zone, SetCallback cb)
 {
 	SetMethodCall setCall;
 	setCall.sourceUuid = sourceUuid;
@@ -85,65 +85,120 @@ void amb::AmbRemoteClient::set(const string &objectName, const Object & value, c
 	send(setCall);
 }
 
-void amb::AmbRemoteClient::listen(const string &objectName, const string &sourceUuid, Zone::Type zone, amb::AmbRemoteClient::ObjectCallback cb)
+const string amb::AmbRemoteClient::subscribe(const string &objectName, const string &sourceUuid, Zone::Type zone, amb::AmbRemoteClient::ObjectCallback cb)
 {
+	std::string subscription = createSubscriptionId(objectName, sourceUuid, zone);
 
+	SubscribeMethodCall call(objectName);
+
+	Subscription sub(call, cb);
+
+	mSubscriptions[subscription].push_back(sub);
+
+	return call.messageId;
 }
 
-void amb::AmbRemoteClient::listen(const string &objectName, amb::AmbRemoteClient::ObjectCallback cb)
+void amb::AmbRemoteClient::subscribe(const string &objectName, amb::AmbRemoteClient::ObjectCallback cb)
 {
+	subscribe(objectName, "", Zone::None, cb);
+}
 
+void amb::AmbRemoteClient::unsubscribe(const string &subscribeId)
+{
+	for(auto i : mSubscriptions)
+	{
+		auto subscriptions = &i.second;
+		for(auto n : *subscriptions)
+		{
+			if(n.subscriptionId() == subscribeId)
+			{
+				removeOne(subscriptions, n);
+
+				if(!subscriptions->size())
+				{
+					UnsubscribeMethodCall call(n.call);
+
+					send(call);
+				}
+			}
+		}
+	}
 }
 
 void amb::AmbRemoteClient::hasJsonMessage(const picojson::value &json)
 {
 	DebugOut(7) << "json: " << json.serialize() << endl;
 
-	if(BaseMessage::is<MethodCall>(json))
+	if(BaseMessage::is<MethodReply<MethodCall>>(json))
 	{
-		if(BaseMessage::is<ListMethodCall>(json))
+		if(BaseMessage::is<MethodReply<ListMethodCall>>(json))
 		{
-			ListMethodCall listMethodCall;
-			listMethodCall.fromJson(json);
+			MethodReply<ListMethodCall> listMethodReply;
+			listMethodReply.fromJson(json);
 
-			if(mListCalls.find(listMethodCall.messageId) != mListCalls.end())
+			const ListMethodCallPtr listMethod = listMethodReply.method();
+
+			if(amb::containsKey(mListCalls, listMethod->messageId))
 			{
-				auto cb = mListCalls[listMethodCall.messageId];
+				auto cb = mListCalls[listMethod->messageId];
 
 				try
 				{
-					cb(listMethodCall.objectNames);
+					cb(listMethod->objectNames);
 				}
 				catch(...)
 				{
 					DebugOut(DebugOut::Warning) << "callback for 'list' is not valid" << endl;
 				}
 
-				mListCalls.erase(listMethodCall.messageId);
+				mListCalls.erase(listMethod->messageId);
 			}
 		}
-		else if(BaseMessage::is<GetMethodCall>(json))
+		else if(BaseMessage::is<MethodReply<GetMethodCall>>(json))
 		{
-			GetMethodCall getCall;
-			getCall.fromJson(json);
+			MethodReply<GetMethodCall> reply;
+			reply.fromJson(json);
+			GetMethodCallPtr getCall = reply.method();
 
-			if(amb::containsKey(mGetMethodCalls, getCall.messageId))
+			if(amb::containsKey(mGetMethodCalls, getCall->messageId))
 			{
-				auto cb = mGetMethodCalls[getCall.messageId];
+				auto cb = mGetMethodCalls[getCall->messageId];
 
 				try
 				{
-					cb(getCall.value);
+					cb(getCall->value);
 				}
 				catch(...)
 				{
 					DebugOut(DebugOut::Warning) << "Invalid Get callback " << endl;
 				}
 
-				mGetMethodCalls.erase(getCall.messageId);
+				mGetMethodCalls.erase(getCall->messageId);
 			}
 		}
-		else if(BaseMessage::is<SetMethodCall>(json))
+		else if(BaseMessage::is<MethodReply<SetMethodCall>>(json))
+		{
+			MethodReply<SetMethodCall> reply;
+			reply.fromJson(json);
+
+			auto call = reply.method();
+
+			if(amb::containsKey(mSetMethodCalls, call->messageId))
+			{
+				auto cb = mSetMethodCalls[call->messageId];
+
+				try
+				{
+					cb(reply.methodSuccess);
+				}
+				catch(...)
+				{
+					DebugOut(DebugOut::Warning) << "Invalid Set callback " << endl;
+				}
+				mSetMethodCalls.erase(call->messageId);
+			}
+		}
+		else if(BaseMessage::is<MethodReply<TimeSyncMessage>>(json))
 		{
 
 		}
@@ -228,7 +283,7 @@ bool amb::ListMethodCall::fromJson(const picojson::value &json)
 		}
 		picojson::object obj = i.get<picojson::object>();
 
-		Object ambObj = Object::fromJson(obj);
+		Object::ObjectPtr ambObj = Object::fromJson(obj);
 
 		objectNames.push_back(ambObj);
 	}
@@ -310,7 +365,6 @@ picojson::value amb::MethodCall::toJson()
 
 	obj["source"] = picojson::value(sourceUuid);
 	obj["zone"] = picojson::value((double)zone);
-	obj["methodSuccess"] = picojson::value(success);
 
 	return picojson::value(obj);
 }
@@ -322,9 +376,6 @@ bool amb::MethodCall::fromJson(const picojson::value &json)
 
 	sourceUuid = json.get("source").to_str();
 	zone = json.get("zone").get<double>();
-
-	if(json.contains("success"))
-		success = json.get("methodSuccess").get<bool>();
 
 	return true;
 }
@@ -393,22 +444,27 @@ amb::AmbRemoteServer::AmbRemoteServer(AbstractIo *io, AbstractRoutingEngine *re)
 
 }
 
-void amb::AmbRemoteServer::list(ListMethodCall &call)
+void amb::AmbRemoteServer::list(ListMethodCallPtr call)
 {
 
 }
 
-void amb::AmbRemoteServer::get(GetMethodCall & get)
+void amb::AmbRemoteServer::get(GetMethodCallPtr get)
 {
 
 }
 
-void amb::AmbRemoteServer::set()
+void amb::AmbRemoteServer::set(SetMethodCallPtr set)
 {
 
 }
 
-void amb::AmbRemoteServer::listen()
+void amb::AmbRemoteServer::subscribe(SubscribeMethodCallPtr call)
+{
+
+}
+
+void amb::AmbRemoteServer::unsubscribe(amb::UnsubscribeMethodCallPtr call)
 {
 
 }
@@ -427,19 +483,63 @@ void amb::AmbRemoteServer::hasJsonMessage(const picojson::value &json)
 	{
 		if(BaseMessage::is<ListMethodCall>(json))
 		{
-			ListMethodCall listCall;
-
-			listCall.fromJson(json);
+			ListMethodCallPtr listCall = BaseMessage::create<ListMethodCall>();
+			listCall->fromJson(json);
 
 			list(listCall);
 		}
 		else if(BaseMessage::is<GetMethodCall>(json))
 		{
-			GetMethodCall getCall;
-			getCall.fromJson(json);
+			GetMethodCallPtr getCall = BaseMessage::create<GetMethodCall>();
+			getCall->fromJson(json);
 
 			get(getCall);
 		}
+		else if(BaseMessage::is<SetMethodCall>(json))
+		{
+			SetMethodCallPtr setCall = BaseMessage::create<SetMethodCall>();
+			setCall->fromJson(json);
+
+			set(setCall);
+		}
+		else if(BaseMessage::is<SubscribeMethodCall>(json))
+		{
+			SubscribeMethodCallPtr call = BaseMessage::create<SubscribeMethodCall>();
+			call->fromJson(json);
+
+			subscribe(call);
+		}
+		else if(BaseMessage::is<UnsubscribeMethodCall>(json))
+		{
+			UnsubscribeMethodCallPtr call = BaseMessage::create<UnsubscribeMethodCall>();
+			call->fromJson(json);
+
+			unsubscribe(call);
+		}
+		else if(BaseMessage::is<TimeSyncMessage>(json))
+		{
+			TimeSyncMessagePtr call(new TimeSyncMessage);
+			call->fromJson(json);
+
+			call->serverTime = amb::Timestamp::instance()->epochTime();
+
+			MethodReply<TimeSyncMessage> reply(call, true);
+
+			send(reply);
+		}
+		else
+		{
+			BaseMessage call;
+			call.fromJson(json);
+			DebugOut(DebugOut::Warning) << "Unhandled method call: " << call.name << endl;
+		}
+	}
+	else
+	{
+		BaseMessage message;
+		message.fromJson(json);
+
+		DebugOut(DebugOut::Warning) << "Unhandled message: type: " << message.type << " name: " << message.name << endl;
 	}
 }
 
@@ -462,31 +562,31 @@ bool amb::GetMethodCall::fromJson(const picojson::value &json)
 }
 
 
-amb::Object amb::Object::fromJson(const picojson::object &obj)
+amb::Object::ObjectPtr amb::Object::fromJson(const picojson::object &obj)
 {
 	if(!amb::containsKey(obj, "interfaceName"))
 	{
 		DebugOut(DebugOut::Warning) << "object missing interfaceName" << endl;
-		return Object();
+		return ObjectPtr(new Object());
 	}
-	Object ambObj(obj.at("interfaceName").to_str());
+	Object * ambObj = new Object(obj.at("interfaceName").to_str());
 
 	for(auto i : obj)
 	{
 		if(i.second.is<picojson::object>())
 		{
-			ambObj[i.first] = std::shared_ptr<AbstractPropertyType>(amb::jsonToProperty(i.second));
+			(*ambObj)[i.first] = std::shared_ptr<AbstractPropertyType>(amb::jsonToProperty(i.second));
 		}
 	}
 
-	return ambObj;
+	return ObjectPtr(ambObj);
 }
 
-picojson::value amb::Object::toJson(const amb::Object &obj)
+picojson::value amb::Object::toJson(const ObjectPtr &obj)
 {
 	picojson::object jsonObj;
-	jsonObj["interfaceName"] = picojson::value(obj.interfaceName);
-	for(auto i : obj)
+	jsonObj["interfaceName"] = picojson::value(obj->interfaceName);
+	for(auto i : *obj.get())
 	{
 		jsonObj[i.first] = i.second->toJson();
 	}
@@ -511,4 +611,50 @@ bool amb::SetMethodCall::fromJson(const picojson::value &json)
 	MethodCall::fromJson(json);
 
 	value = Object::fromJson(json.get<picojson::object>());
+
+	return true;
+}
+
+
+picojson::value amb::SubscribeMethodCall::toJson()
+{
+	auto json = MethodCall::toJson();
+
+	auto obj = json.get<picojson::object>();
+
+	obj["interfaceName"] = picojson::value(interfaceName);
+
+	return picojson::value(obj);
+}
+
+bool amb::SubscribeMethodCall::fromJson(const picojson::value &json)
+{
+	if(!MethodCall::fromJson(json))
+		return false;
+
+	interfaceName = json.get("interfaceName").to_str();
+
+	return true;
+}
+
+
+picojson::value amb::TimeSyncMessage::toJson()
+{
+	auto val = BaseMessage::toJson();
+
+	auto obj = val.get<picojson::object>();
+
+	obj["serverTime"] = picojson::value(serverTime);
+
+	return picojson::value(obj);
+}
+
+bool amb::TimeSyncMessage::fromJson(const picojson::value &json)
+{
+	if(!BaseMessage::fromJson(json))
+		return false;
+
+	serverTime = json.get("serverTime").get<double>();
+
+	return true;
 }

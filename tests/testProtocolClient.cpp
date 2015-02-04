@@ -13,17 +13,25 @@
 void runTest(amb::AmbRemoteClient *c)
 {
 	DebugOut(0) << "calling client->list()" << endl;
-	c->list([](std::vector<amb::Object> supported)
+	c->list([](std::vector<amb::Object::ObjectPtr> supported)
 	{
 		DebugOut(0) << "list call reply" << endl;
 		g_assert(supported.size() == 2);
 	});
 
 	DebugOut(0) << "calling client->get()" << endl;
-	c->get("interface1", [](amb::Object &obj)
+	c->get("interface1", [&c](amb::Object::ObjectPtr obj)
 	{
 		DebugOut(0) << "get call reply" << endl;
-		g_assert(obj.size() == 2);
+		g_assert(obj->size() == 2);
+
+		obj->emplace("vehicleSpeed", amb::make_shared(new VehicleProperty::VehicleSpeedType(69)));
+
+		c->set("interface1", obj, [](bool s)
+		{
+			DebugOut(0) << "set call reply status: " << (s ? "success!" : "fail") << endl;
+			g_assert(s);
+		});
 	});
 }
 

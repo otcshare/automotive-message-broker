@@ -40,6 +40,8 @@ namespace amb
 class Object : public std::unordered_map<std::string, std::shared_ptr<AbstractPropertyType>>
 {
 public:
+	typedef std::shared_ptr<Object> ObjectPtr;
+
 	Object(): std::unordered_map<std::string, std::shared_ptr<AbstractPropertyType>>() { }
 	Object(const std::string & ifaceName): std::unordered_map<std::string, std::shared_ptr<AbstractPropertyType>>(),
 		interfaceName(ifaceName)
@@ -47,12 +49,11 @@ public:
 
 	}
 
-	static Object fromJson(const picojson::object & obj);
+	static ObjectPtr fromJson(const picojson::object & obj);
 
-	static picojson::value toJson(const Object & obj);
+	static picojson::value toJson(const ObjectPtr & obj);
 
 	std::string interfaceName;
-
 };
 
 class BaseMessage
@@ -97,6 +98,12 @@ public:
 		return T::is(json);
 	}
 
+	template <class T>
+	static std::shared_ptr<T> create()
+	{
+		return std::shared_ptr<T>(new T());
+	}
+
 protected:
 
 	picojson::value data;
@@ -108,13 +115,13 @@ class MethodCall : public BaseMessage
 {
 public:
 	MethodCall(std::string name)
-		:BaseMessage(name, "method"), zone(Zone::None), success(false)
+		:BaseMessage(name, "method"), zone(Zone::None)
 	{
 
 	}
 
 	MethodCall(const BaseMessage & other)
-		:BaseMessage(other), zone(Zone::None), success(false)
+		:BaseMessage(other), zone(Zone::None)
 	{
 		name = other.name;
 	}
@@ -124,7 +131,6 @@ public:
 	{
 		sourceUuid = other.sourceUuid;
 		zone = other.zone;
-		success = other.success;
 	}
 
 	static bool is(const BaseMessage * msg)
@@ -149,7 +155,45 @@ public:
 
 	std::string sourceUuid;
 	Zone::Type zone;
-	bool success;
+};
+
+template <class T>
+class MethodReply
+{
+public:
+
+	MethodReply(): MethodReply(nullptr, false) {}
+	MethodReply(std::shared_ptr<T> t, bool success): mMethod(t), methodSuccess(success) { }
+	bool methodSuccess;
+
+	picojson::value toJson()
+	{
+		picojson::value v = mMethod->toJson();
+
+		picojson::object obj = v.get<picojson::object>();
+		obj["methodSuccess"] = picojson::value(methodSuccess);
+
+		return picojson::value(obj);
+	}
+
+	bool fromJson(const picojson::value & json)
+	{
+		if(!mMethod) mMethod = std::shared_ptr<T>(new T());
+		mMethod->fromJson(json);
+		methodSuccess = json.get("methodSuccess").get<bool>();
+
+		return true;
+	}
+
+	static bool is(const picojson::value & v)
+	{
+		return v.contains("methodSuccess") && T::is(v);
+	}
+
+	const std::shared_ptr<T> method() { return mMethod; }
+
+protected:
+	std::shared_ptr<T> mMethod;
 };
 
 class ListMethodCall : public MethodCall
@@ -166,7 +210,7 @@ public:
 	picojson::value toJson();
 	bool fromJson(const picojson::value &json);
 
-	std::vector<Object> objectNames;
+	std::vector<Object::ObjectPtr> objectNames;
 
 	static bool is(const BaseMessage * msg)
 	{
@@ -201,7 +245,7 @@ public:
 		return json.get("name").to_str() == "get";
 	}
 
-	Object value;
+	Object::ObjectPtr value;
 };
 
 class SetMethodCall : public MethodCall
@@ -223,10 +267,100 @@ public:
 
 	static bool is(const picojson::value & json)
 	{
-		return json.get("name").to_str() != "set";
+		return json.get("name").to_str() == "set";
 	}
 
-	Object value;
+	Object::ObjectPtr value;
+};
+
+class SubscribeMethodCall : virtual public MethodCall
+{
+public:
+	SubscribeMethodCall()
+		:SubscribeMethodCall("")
+	{
+
+	}
+	SubscribeMethodCall(const std::string & ifaceName)
+		:MethodCall("subscribe"), interfaceName(ifaceName)
+	{
+
+	}
+
+	picojson::value toJson();
+	bool fromJson(const picojson::value &json);
+
+	static bool is(const BaseMessage *msg)
+	{
+		return msg->name == "subscribe";
+	}
+
+	static bool is(const picojson::value & json)
+	{
+		return json.get("name").to_str() == "subscribe";
+	}
+
+	std::string interfaceName;
+};
+
+class UnsubscribeMethodCall : virtual public MethodCall, public SubscribeMethodCall
+{
+public:
+	UnsubscribeMethodCall()
+		:UnsubscribeMethodCall("")
+	{
+
+	}
+
+	UnsubscribeMethodCall(const SubscribeMethodCall & call)
+		: UnsubscribeMethodCall(call.interfaceName)
+	{
+		sourceUuid = call.sourceUuid;
+		zone = call.zone;
+	}
+
+	UnsubscribeMethodCall(const std::string & ifaceName)
+		:MethodCall("unsubscribe"), interfaceName(ifaceName)
+	{
+
+	}
+
+	static bool is(const BaseMessage *msg)
+	{
+		return msg->name == "unsubscribe";
+	}
+
+	static bool is(const picojson::value & json)
+	{
+		return json.get("name").to_str() == "unsubscribe";
+	}
+
+	std::string interfaceName;
+};
+
+class TimeSyncMessage : public BaseMessage
+{
+public:
+	TimeSyncMessage()
+		:BaseMessage("timeSync", "message"), serverTime(0)
+	{
+
+	}
+
+	double serverTime;
+
+	picojson::value toJson();
+	bool fromJson(const picojson::value &json);
+
+	static bool is(const BaseMessage & msg)
+	{
+		return msg.type == "timeSync" && msg.name == "message";
+	}
+
+	static bool is(const picojson::value &json)
+	{
+		return json.contains("serverTime") && json.get("type").to_str() == "timeSync" && json.get("serverTime").is<double>();
+	}
 };
 
 class BaseJsonMessageReader
@@ -258,12 +392,35 @@ private:
 
 };
 
+
+typedef std::shared_ptr<ListMethodCall> ListMethodCallPtr;
+typedef std::shared_ptr<GetMethodCall> GetMethodCallPtr;
+typedef std::shared_ptr<SetMethodCall> SetMethodCallPtr;
+typedef std::shared_ptr<SubscribeMethodCall> SubscribeMethodCallPtr;
+typedef std::shared_ptr<UnsubscribeMethodCall> UnsubscribeMethodCallPtr;
+typedef std::shared_ptr<TimeSyncMessage> TimeSyncMessagePtr;
+
 class AmbRemoteClient: public BaseJsonMessageReader
 {
 public:
-	typedef std::function<void (std::vector<Object>)> ListCallback;
-	typedef std::function<void (Object&)> ObjectCallback;
+	typedef std::function<void (std::vector<Object::ObjectPtr>)> ListCallback;
+	typedef std::function<void (Object::ObjectPtr)> ObjectCallback;
 	typedef std::function<void (bool)> SetCallback;
+
+	class Subscription
+	{
+	public:
+		Subscription(SubscribeMethodCall subscribeCall, const ObjectCallback & cb)
+			:call(subscribeCall), callback(cb) {}
+		bool operator ==(const Subscription &rhs)
+		{
+			return rhs.subscriptionId() == subscriptionId();
+		}
+
+		const std::string subscriptionId() const { return call.messageId; }
+		SubscribeMethodCall call;
+		AmbRemoteClient::ObjectCallback callback;
+	};
 
 	AmbRemoteClient(AbstractIo* io);
 
@@ -277,15 +434,19 @@ public:
 
 	void get(const std::string & objectName, const std::string & sourceUuid, Zone::Type zone, ObjectCallback cb);
 
-	void set(const std::string & objectName, const Object & value, SetCallback cb);
+	void set(const std::string & objectName,  Object::ObjectPtr value, SetCallback cb);
 
-	void set(const std::string & objectName, const Object & value, const std::string & sourceUuid, Zone::Type zone, SetCallback cb);
+	void set(const std::string & objectName, Object::ObjectPtr value, const std::string & sourceUuid, Zone::Type zone, SetCallback cb);
 
-	void listen(const std::string & objectName, const std::string & sourceUuid, Zone::Type zone, ObjectCallback cb);
+	const std::string subscribe(const std::string & objectName, const std::string & sourceUuid, Zone::Type zone, ObjectCallback cb);
 
-	void listen(const std::string & objectName, ObjectCallback cb);
+	void subscribe(const std::string & objectName, ObjectCallback cb);
+
+	void unsubscribe(const std::string & subscribeId);
 
 protected:
+
+	double correctedTime();
 
 private:
 
@@ -295,7 +456,9 @@ private:
 	std::unordered_map<std::string, ListCallback> mListCalls;
 	std::unordered_map<std::string, ObjectCallback> mGetMethodCalls;
 	std::unordered_map<std::string, SetCallback> mSetMethodCalls;
-	std::unordered_map<std::string, std::vector<ObjectCallback>> mSubsriptions;
+	std::unordered_map<std::string, std::vector<Subscription>> mSubscriptions;
+
+	double serverTimeOffset;
 };
 
 class AmbRemoteServer : public BaseJsonMessageReader
@@ -308,21 +471,23 @@ protected:
 	/*!
 	 * \brief list called when a ListMessageCall was received
 	 */
-	virtual void list(ListMethodCall & call);
+	virtual void list(ListMethodCallPtr call);
 
 	/*!
 	 * \brief get called when a GetMessageCall was received
 	 */
-	virtual void get(GetMethodCall &get);
+	virtual void get(GetMethodCallPtr get);
 
 	/*!
 	 * \brief set called when SetMessageCall was received
 	 */
-	virtual void set();
+	virtual void set(SetMethodCallPtr set);
 	/*!
 	 * \brief listen called when ListenMessageCall was received
 	 */
-	virtual void listen();
+	virtual void subscribe(SubscribeMethodCallPtr call);
+
+	virtual void unsubscribe(UnsubscribeMethodCallPtr call);
 
 	void hasJsonMessage(const picojson::value & json);
 
