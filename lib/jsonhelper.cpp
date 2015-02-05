@@ -146,26 +146,3 @@ GVariant *amb::jsonToGVariant(const picojson::value & value, const std::string& 
 
 	return v;
 }
-
-
-void amb::findJson(const string &buffer, std::string::size_type beg, std::string::size_type &end)
-{
-	if(end == 0)
-	{
-		beg = buffer.find("{", beg);
-	}
-	else
-	{
-		beg = buffer.find("{", beg+1);
-	}
-
-	if(beg != std::string::npos)
-		findJson(buffer, beg+1, end);
-
-	std::string::size_type tempEnd;
-	if((tempEnd = buffer.find("}", end)) != string::npos)
-	{
-		end = tempEnd;
-		return;
-	}
-}

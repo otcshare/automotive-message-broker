@@ -275,13 +275,7 @@ bool testListPlusPlus()
 
 void testJsonHelper()
 {
-	std::string json = "{{}{}}{}";
 
-	std::string::size_type end = 0;
-	amb::findJson(json, 0, end);
-
-	DebugOut(0) << "Found complete Json message at " << end << endl;
-	TEST(end == 7);
 }
 
 bool TestPlugin::testSetAndGet()

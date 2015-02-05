@@ -163,7 +163,7 @@ class MethodReply
 public:
 
 	MethodReply(): MethodReply(nullptr, false) {}
-	MethodReply(std::shared_ptr<T> t, bool success): mMethod(t), methodSuccess(success) { }
+	MethodReply(std::shared_ptr<T> t, bool success): mMethod(t), methodSuccess(success), err(AsyncPropertyReply::NoError) { }
 	bool methodSuccess;
 
 	picojson::value toJson()
@@ -172,6 +172,7 @@ public:
 
 		picojson::object obj = v.get<picojson::object>();
 		obj["methodSuccess"] = picojson::value(methodSuccess);
+		obj["error"] = picojson::value((double)err);
 
 		return picojson::value(obj);
 	}
@@ -181,19 +182,29 @@ public:
 		if(!mMethod) mMethod = std::shared_ptr<T>(new T());
 		mMethod->fromJson(json);
 		methodSuccess = json.get("methodSuccess").get<bool>();
+		err = AsyncPropertyReply::Error(json.get("error").get<double>());
 
 		return true;
 	}
 
 	static bool is(const picojson::value & v)
 	{
-		return v.contains("methodSuccess") && T::is(v);
+		return v.contains("methodSuccess") && v.contains("error") && v.get("methodSuccess").is<bool>()
+				&& v.get("error").is<double>() && T::is(v);
 	}
+
+	AsyncPropertyReply::Error error()
+	{
+		return err;
+	}
+
+	const std::string errorString() { return AsyncPropertyReply::errorToStr(err); }
 
 	const std::shared_ptr<T> method() { return mMethod; }
 
 protected:
 	std::shared_ptr<T> mMethod;
+	AsyncPropertyReply::Error err;
 };
 
 class ListMethodCall : public MethodCall
@@ -446,7 +457,7 @@ public:
 
 protected:
 
-	double correctedTime();
+	double correctTimeFromServer(double serverTimestamp);
 
 private:
 

@@ -29,7 +29,9 @@ bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
 amb::AmbRemoteClient::AmbRemoteClient(AbstractIo *io)
 	:BaseJsonMessageReader(io), serverTimeOffset(0)
 {
+	TimeSyncMessage timeSyncRequest;
 
+	send(timeSyncRequest);
 }
 
 void amb::AmbRemoteClient::list(amb::AmbRemoteClient::ListCallback cb)
@@ -125,6 +127,11 @@ void amb::AmbRemoteClient::unsubscribe(const string &subscribeId)
 	}
 }
 
+double amb::AmbRemoteClient::correctTimeFromServer(double serverTimestamp)
+{
+	return serverTimestamp - serverTimeOffset;
+}
+
 void amb::AmbRemoteClient::hasJsonMessage(const picojson::value &json)
 {
 	DebugOut(7) << "json: " << json.serialize() << endl;
@@ -198,9 +205,20 @@ void amb::AmbRemoteClient::hasJsonMessage(const picojson::value &json)
 				mSetMethodCalls.erase(call->messageId);
 			}
 		}
-		else if(BaseMessage::is<MethodReply<TimeSyncMessage>>(json))
-		{
+	}
+	else if(BaseMessage::is<MethodReply<TimeSyncMessage>>(json))
+	{
+		DebugOut(7) << "Received time sync message" << endl;
+		MethodReply<TimeSyncMessage> reply;
+		reply.fromJson(json);
 
+		if(reply.methodSuccess)
+		{
+			serverTimeOffset = amb::Timestamp::instance()->epochTime() - reply.method()->serverTime;
+		}
+		else
+		{
+			DebugOut(DebugOut::Warning) << "Time Sync request failed" << endl;
 		}
 	}
 }
@@ -516,23 +534,23 @@ void amb::AmbRemoteServer::hasJsonMessage(const picojson::value &json)
 
 			unsubscribe(call);
 		}
-		else if(BaseMessage::is<TimeSyncMessage>(json))
-		{
-			TimeSyncMessagePtr call(new TimeSyncMessage);
-			call->fromJson(json);
-
-			call->serverTime = amb::Timestamp::instance()->epochTime();
-
-			MethodReply<TimeSyncMessage> reply(call, true);
-
-			send(reply);
-		}
 		else
 		{
 			BaseMessage call;
 			call.fromJson(json);
 			DebugOut(DebugOut::Warning) << "Unhandled method call: " << call.name << endl;
 		}
+	}
+	else if(BaseMessage::is<TimeSyncMessage>(json))
+	{
+		TimeSyncMessagePtr call(new TimeSyncMessage);
+		call->fromJson(json);
+
+		call->serverTime = amb::Timestamp::instance()->epochTime();
+
+		MethodReply<TimeSyncMessage> reply(call, true);
+
+		send(reply);
 	}
 	else
 	{
