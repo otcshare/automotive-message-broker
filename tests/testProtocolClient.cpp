@@ -13,14 +13,14 @@
 void runTest(amb::AmbRemoteClient *c)
 {
 	DebugOut(0) << "calling client->list()" << endl;
-	c->list([](std::vector<amb::Object::ObjectPtr> supported)
+	c->list([](std::vector<amb::Object::Ptr> supported)
 	{
 		DebugOut(0) << "list call reply" << endl;
 		g_assert(supported.size() == 2);
 	});
 
 	DebugOut(0) << "calling client->get()" << endl;
-	c->get("interface1", [&c](amb::Object::ObjectPtr obj)
+	c->get("interface1", [&c](amb::Object::Ptr obj)
 	{
 		DebugOut(0) << "get call reply" << endl;
 		g_assert(obj->size() == 2);

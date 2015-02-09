@@ -21,12 +21,12 @@ public:
 
 	// AmbRemoteServer interface
 protected:
-	void list(amb::ListMethodCallPtr call)
+	void list(amb::ListMethodCall::Ptr call)
 	{
 		DebugOut(0) << "list called" << endl;
 
-		amb::Object::ObjectPtr interface1(new amb::Object("interface1"));
-		amb::Object::ObjectPtr interface2( new amb::Object("interface2"));
+		amb::Object::Object::Ptr interface1(new amb::Object("interface1"));
+		amb::Object::Object::Ptr interface2( new amb::Object("interface2"));
 
 		interface1->emplace("vehicleSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::VehicleSpeedType(speed)));
 		interface1->emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(engineSpeed)));
@@ -39,13 +39,13 @@ protected:
 
 		send(reply);
 	}
-	void get(amb::GetMethodCallPtr get)
+	void get(amb::GetMethodCall::Ptr get)
 	{
 		DebugOut(0) << "get called" << endl;
 
 		if(get->value->interfaceName == "interface1")
 		{
-			amb::Object::ObjectPtr interface1(new amb::Object("interface1"));
+			amb::Object::Object::Ptr interface1(new amb::Object("interface1"));
 
 			interface1->emplace("vehicleSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::VehicleSpeedType(100)));
 			interface1->emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(1999)));
@@ -55,14 +55,14 @@ protected:
 		}
 		else if(get->value->interfaceName == "interface2")
 		{
-			amb::Object::ObjectPtr interface2(new amb::Object("interface2"));
+			amb::Object::Object::Ptr interface2(new amb::Object("interface2"));
 			interface2->emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(3099)));
 			get->value = interface2;
 			amb::MethodReply<amb::GetMethodCall> reply(get, true);
 			send(reply);
 		}
 	}
-	void set(amb::SetMethodCallPtr set)
+	void set(amb::SetMethodCall::Ptr set)
 	{
 		if(set->value->interfaceName == "interface1")
 		{
@@ -76,6 +76,23 @@ protected:
 		{
 			amb::MethodReply<amb::SetMethodCall> reply (set, false);
 			send(reply);
+		}
+	}
+	void subscribe(amb::SubscribeMethodCall::Ptr call)
+	{
+		DebugOut(0) << "subcribe to interface " << call->interfaceName << " zone: " << call->zone << " source" << call->sourceUuid << endl;
+
+		if(call->interfaceName == "interface1")
+		{
+			amb::Object::Object::Ptr interface1(new amb::Object("interface1"));
+
+			interface1->emplace("vehicleSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::VehicleSpeedType(++speed)));
+			interface1->emplace("engineSpeed", std::shared_ptr<AbstractPropertyType>(new VehicleProperty::EngineSpeedType(++engineSpeed)));
+
+			amb::PropertyChangeEvent event;
+			event.value = interface1;
+
+			send(event);
 		}
 	}
 
