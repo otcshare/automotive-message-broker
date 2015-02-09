@@ -939,8 +939,17 @@ public:
 
 	void fromString(std::string str)
 	{
+		if(!boost::algorithm::starts_with(str, "["))
+			str = "[" + str;
+
+		if(!boost::algorithm::ends_with(str, "]"))
+			str+= "]";
+
 		picojson::value value;
 		picojson::parse(value, str);
+
+		DebugOut()<< "str " << str << endl;
+
 
 		picojson::array array = value.get<picojson::array>();
 
@@ -960,7 +969,6 @@ public:
 
 		for(auto itr : mList)
 		{
-			DebugOut(0) << "toVariant value: " << GVS<T>::gvalue(itr) << endl;
 			GVariant *newvar = g_variant_new("v", g_variant_new(GVS<T>::signature(), GVS<T>::gvalue(itr)));
 			g_variant_builder_add_value(&params, newvar);
 		}

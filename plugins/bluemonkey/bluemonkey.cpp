@@ -153,21 +153,19 @@ public:
 };
 
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent)
-	: QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
+	: QObject(0), AmbPluginImpl(e, config, parent), mSilentMode(false)
 {
-	QTimer::singleShot(1,this,SLOT(reloadEngine()));
-
+	bluemonkey = new Bluemonkey(config, this);
 	auth = new Authenticate(config, this);
 }
 
 BluemonkeySink::~BluemonkeySink()
 {
-	Q_FOREACH(void* module, modules)
-	{
-		dlclose(module);
-	}
+}
 
-	engine->deleteLater();
+void BluemonkeySink::init()
+{
+	connect(bluemonkey, &Bluemonkey::ready,[this](){bluemonkey->loadModule("amb", this);});
 }
 
 
@@ -242,7 +240,7 @@ bool BluemonkeySink::authenticate(QString pass)
 
 }
 
-void BluemonkeySink::loadConfig(QString str)
+void Bluemonkey::loadConfig(QString str)
 {
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
@@ -269,7 +267,7 @@ void BluemonkeySink::loadConfig(QString str)
 	}
 }
 
-bool BluemonkeySink::loadModule(QString path)
+bool Bluemonkey::loadModule(QString path)
 {
 	void* handle = dlopen(path.toUtf8().data(), RTLD_LAZY);
 
@@ -298,18 +296,13 @@ bool BluemonkeySink::loadModule(QString path)
 
 	for(auto i : exports)
 	{
-		std::string obj = i.first;
-		if(!engine->globalObject().hasProperty(obj.c_str()))
-		{
-			QJSValue val = engine->newQObject(i.second);
-			engine->globalObject().setProperty(obj.c_str(), val);
-		}
+		loadModule(i.first, i.second);
 	}
 
 	return true;
 }
 
-void BluemonkeySink::reloadEngine()
+void Bluemonkey::reloadEngine()
 {
 	if(engine)
 		engine->deleteLater();
@@ -325,10 +318,13 @@ void BluemonkeySink::reloadEngine()
 
 	thread->start();
 
+	ready();
+
 	loadConfig(configuration["config"].c_str());
+
 }
 
-void BluemonkeySink::writeProgram(QString program)
+void Bluemonkey::writeProgram(QString program)
 {
 
 	QJSEngine temp;
@@ -353,17 +349,17 @@ void BluemonkeySink::writeProgram(QString program)
 	file.close();
 }
 
-void BluemonkeySink::log(QString str)
+void Bluemonkey::log(QString str)
 {
 	DebugOut()<<str.toStdString()<<endl;
 }
 
-QObject *BluemonkeySink::createTimer()
+QObject *Bluemonkey::createTimer()
 {
 	return new QTimer(this);
 }
 
-QObject *BluemonkeySink::createQObject()
+QObject *Bluemonkey::createQObject()
 {
 	return new QObject(this);
 }
@@ -429,7 +425,7 @@ void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, i
 	AsyncSetPropertyRequest request;
 	request.property = name.toStdString();
 	request.zoneFilter = zone;
-	request.value = VehicleProperty::getPropertyTypeForPropertyNameValue(name.toStdString(), defaultValue.toString().toStdString());
+	request.value = VehicleProperty::getPropertyTypeForPropertyNameValue(name.toStdString(), QJsonDocument::fromVariant(var).toJson().data());
 
 	routingEngine->updateSupported(supported(), PropertyList(), &source);
 	routingEngine->setProperty(request);
@@ -597,4 +593,31 @@ QVariant BluemonkeySink::zonesForProperty(QString prop, QString src)
 	}
 
 	return list;
+}
+
+
+Bluemonkey::Bluemonkey(std::map<string, string> config, QObject *parent)
+	:QObject(parent), engine(nullptr), configuration(config)
+{
+	QTimer::singleShot(1,this,SLOT(reloadEngine()));
+}
+
+Bluemonkey::~Bluemonkey()
+{
+	Q_FOREACH(void* module, modules)
+	{
+		dlclose(module);
+	}
+
+	engine->deleteLater();
+}
+
+bool Bluemonkey::loadModule(const std::string & name, QObject *module)
+{
+	std::string obj = name;
+	if(!engine->globalObject().hasProperty(obj.c_str()))
+	{
+		QJSValue val = engine->newQObject(module);
+		engine->globalObject().setProperty(obj.c_str(), val);
+	}
 }

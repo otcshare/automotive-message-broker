@@ -90,6 +90,41 @@ private:
 
 };
 
+class Bluemonkey : public QObject
+{
+	Q_OBJECT
+public:
+	Bluemonkey(std::map<std::string, std::string> config, QObject* parent = nullptr);
+	~Bluemonkey();
+
+	bool loadModule(const string &name, QObject* module);
+
+public Q_SLOTS:
+	void loadConfig(QString str);
+
+	bool loadModule(QString path);
+
+	void reloadEngine();
+
+	void writeProgram(QString program);
+
+	void log(QString str);
+
+	QObject* createTimer();
+	QObject* createQObject();
+
+Q_SIGNALS:
+
+	void ready();
+
+private:
+
+	QList<void*> modules;
+	QJSEngine* engine;
+	QStringList configsToLoad;
+	std::map<std::string, std::string> configuration;
+};
+
 class BluemonkeySink : public QObject, public AmbPluginImpl
 {
 Q_OBJECT
@@ -100,6 +135,7 @@ public:
 
 	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config,  AbstractSource& parent);
 	~BluemonkeySink();
+	void init();
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged(AbstractPropertyType* value);
@@ -126,19 +162,6 @@ public Q_SLOTS:
 
 	bool authenticate(QString pass);
 
-	void loadConfig(QString str);
-
-	bool loadModule(QString path);
-
-	void reloadEngine();
-
-	void writeProgram(QString program);
-
-	void log(QString str);
-
-	QObject* createTimer();
-	QObject* createQObject();
-
 	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction);
 
 	void setSilentMode(bool m)
@@ -156,10 +179,7 @@ public Q_SLOTS:
 	void exportInterface(QString name, QJSValue properties);
 
 private:
-	QList<void*> modules;
-	QJSEngine* engine;
-	QStringList configsToLoad;
-
+	Bluemonkey* bluemonkey;
 	Authenticate* auth;
 	bool mSilentMode;
 };

@@ -159,7 +159,7 @@ def processCommand(command, commandArgs, noMain=True):
 			return None
 
 	if command == "list" :
-		managerInterface = getManager()
+		managerInterface, bus = getManager()
 		if managerInterface == None:
 			return 0
 		supportedList = managerInterface.List()
@@ -486,9 +486,6 @@ if args.command == "stdin":
 									processCommand(words[0], [])
 							except dbus.exceptions.DBusException, error:
 								print error
-							except:
-								print "Error running command ", sys.exc_info()[0]
-								traceback.print_stack()
 							data.push();
 							data.clear()
 							redraw(data)
@@ -560,8 +557,6 @@ if args.command == "stdin":
 			main_loop.run()
 		except KeyboardInterrupt:
 			sys.exit()
-		except:
-			traceback.print_stack()
 		finally:
 			termios.tcsetattr(fd, termios.TCSAFLUSH, old)
 			fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
