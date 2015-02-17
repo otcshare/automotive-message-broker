@@ -1,5 +1,5 @@
 project(automotive-message-broker)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8.11)
 
 set(CMAKE_BUILD_TYPE, Debug)
 
@@ -47,6 +47,7 @@ option(enable_docs "enable Doxygen doc generation" OFF)
 option(usebluez5 "use bluez 5 API" OFF)
 option(xwalk_vehicle_extension "Crosswalk vehicle extension" OFF)
 set(XWALK_EXTENSION_PATH "/automotive-message-broker/xwalk" CACHE PATH "directory the xwalk extension will be installed to")
+set(QMAKE_INSTALL_PATH "/usr/bin/qmake" CACHE PATH "qmake executable path")
 
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

@@ -100,6 +100,8 @@ public:
 	bool loadModule(const string &name, QObject* module);
 
 public Q_SLOTS:
+	void assertIsTrue(bool isTrue, const QString &msg="");
+
 	void loadConfig(QString str);
 
 	bool loadModule(QString path);
@@ -118,7 +120,7 @@ Q_SIGNALS:
 	void ready();
 
 private:
-
+	QThread* thread;
 	QList<void*> modules;
 	QJSEngine* engine;
 	QStringList configsToLoad;

@@ -37,7 +37,7 @@
 
 #define foreach Q_FOREACH
 
-typedef std::map<std::string, QObject*> create_bluemonkey_module_t(std::map<std::string, std::string> config, QObject* parent);
+typedef void create_bluemonkey_module_t(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &javascript, QObject* parent);
 
 extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
 {
@@ -292,12 +292,17 @@ bool Bluemonkey::loadModule(QString path)
 
 	create_bluemonkey_module_t* create = (create_bluemonkey_module_t*)(c);
 
-	std::map<std::string, QObject*> exports = create(configuration, this);
+	std::map<std::string, QObject*> exports;
+	QString js;
+	create(configuration, exports, js, this);
 
 	for(auto i : exports)
 	{
-		loadModule(i.first, i.second);
+		QObject* obj = i.second;
+		loadModule(i.first, obj);
 	}
+
+	engine->evaluate(js);
 
 	return true;
 }
@@ -312,9 +317,7 @@ void Bluemonkey::reloadEngine()
 	QJSValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
 
-	QThread* thread = new QThread(this);
-
-	engine->moveToThread(thread);
+	//engine->moveToThread(thread);
 
 	thread->start();
 
@@ -339,7 +342,7 @@ void Bluemonkey::writeProgram(QString program)
 
 	if(!file.open(QIODevice::ReadWrite | QIODevice::Append))
 	{
-		DebugOut(DebugOut::Error)<<"failed to open file: "<<file.fileName().toStdString()<<endl;
+		DebugOut(DebugOut::Error) << "failed to open file: " << file.fileName().toStdString() << endl;
 		return;
 	}
 
@@ -599,6 +602,7 @@ QVariant BluemonkeySink::zonesForProperty(QString prop, QString src)
 Bluemonkey::Bluemonkey(std::map<string, string> config, QObject *parent)
 	:QObject(parent), engine(nullptr), configuration(config)
 {
+	thread = new QThread(this);
 	QTimer::singleShot(1,this,SLOT(reloadEngine()));
 }
 
@@ -620,4 +624,13 @@ bool Bluemonkey::loadModule(const std::string & name, QObject *module)
 		QJSValue val = engine->newQObject(module);
 		engine->globalObject().setProperty(obj.c_str(), val);
 	}
+}
+
+
+void Bluemonkey::assertIsTrue(bool isTrue, const QString & msg)
+{
+	if(!isTrue)
+		log(msg);
+
+	Q_ASSERT(isTrue);
 }

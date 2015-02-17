@@ -20,31 +20,76 @@
 #define BM_DBUS_H_
 
 #include <QObject>
+#include <QJSValue>
+#include <QDBusConnection>
 
 class BMDBus : public QObject
 {
 	Q_OBJECT
-	Q_ENUMS(Connection)
+	Q_PROPERTY(int Session READ sessionBus)
+	Q_PROPERTY(int System READ systemBus)
 
 public:
 
 	enum Connection{
-		System,
+		System=0,
 		Session
 	};
 
+	Q_ENUMS(Connection)
+
 	BMDBus(QObject * parent = nullptr);
+
+	Connection sessionBus() { return BMDBus::Session; }
+	Connection systemBus() { return BMDBus::System; }
 
 public Q_SLOTS:
 
 	QObject* createInterface(const QString & service, const QString & path, const QString & interface, Connection bus);
 
-	bool exportObject(const QString & path, const QString & interface, Connection bus, QObject *obj);
+	bool registerService(const QString & service, Connection bus);
+
+	bool unregisterService(const QString & service, Connection bus);
+
+	bool exportObject(const QString & path, const QString & interface, Connection bus, const QJSValue &obj);
+
+	QJSValue defineMethodSignature(const QJSValue & obj, const QString & methodName, const QString & returnType, const QStringList & arguments);
+
+	QString errorMessage(const Connection bus = Session);
 
 private: ///methods:
 
-
+	QDBusConnection getConnection(const Connection bus);
 };
 
+class BluemonkeyQObjectPrivate;
+class BluemonkeyQObject : public QObject
+{
+	Q_OBJECT
+public:
+	BluemonkeyQObject(QObject* parent = nullptr);
+
+private:
+	Q_DECLARE_PRIVATE(BluemonkeyQObject)
+	Q_DISABLE_COPY(BluemonkeyQObject)
+};
+
+Q_DECLARE_METATYPE(BluemonkeyQObject*)
+
+class BareQObject : public QObject
+{
+	Q_OBJECT
+public Q_SLOTS:
+	void becauseImHappy() { }
+};
+
+class TestQObject : public QObject
+{
+	Q_OBJECT
+public:
+	TestQObject(QObject * parent = nullptr) : QObject(parent) {}
+public Q_SLOTS:
+	QString awesomeMethod() { return "awesome"; }
+};
 
 #endif
