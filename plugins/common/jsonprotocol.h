@@ -403,19 +403,19 @@ public:
 
 	static bool is(const BaseMessage & msg)
 	{
-		return msg.type == "timeSync" && msg.name == "message";
+		return msg.type == "message" && msg.name == "timeSync";
 	}
 
 	static bool is(const picojson::value &json)
 	{
-		return json.contains("serverTime") && json.get("type").to_str() == "timeSync" && json.get("serverTime").is<double>();
+		return json.contains("serverTime") && json.get("name").to_str() == "timeSync" && json.get("serverTime").is<double>();
 	}
 };
 
 class PropertyChangeEvent: public EventMessage, public PtrMaker<PropertyChangeEvent>
 {
 public:
-	PropertyChangeEvent() : EventMessage("propertyChanged") {}
+	PropertyChangeEvent() : EventMessage("propertyChanged"), zone(Zone::None) {}
 
 
 	picojson::value toJson();
@@ -442,6 +442,9 @@ public:
 	BaseJsonMessageReader(AbstractIo* io);
 
 	void canHasData();
+	void closed();
+
+	std::function<void (void)> disconnected;
 
 protected:
 
@@ -531,7 +534,7 @@ private:
 	double serverTimeOffset;
 };
 
-class AmbRemoteServer : public BaseJsonMessageReader
+class AmbRemoteServer : public BaseJsonMessageReader, public PtrMaker<AmbRemoteServer>
 {
 public:
 	AmbRemoteServer(AbstractIo* io, AbstractRoutingEngine* routingEngine);
@@ -563,8 +566,6 @@ protected:
 
 protected:
 	AbstractRoutingEngine* routingEngine;
-
-
 };
 
 } //namespace amb

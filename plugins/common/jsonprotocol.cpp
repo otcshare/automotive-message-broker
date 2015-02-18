@@ -242,6 +242,38 @@ void amb::AmbRemoteClient::hasJsonMessage(const picojson::value &json)
 			DebugOut(DebugOut::Warning) << "Time Sync request failed" << endl;
 		}
 	}
+	else if(BaseMessage::is<EventMessage>(json))
+	{
+		if(PropertyChangeEvent::is(json))
+		{
+			DebugOut(7) << "property changed event" << endl;
+
+			PropertyChangeEvent::Ptr obj = PropertyChangeEvent::create();
+			if(!obj->fromJson(json))
+				return;
+
+			std::string subscribeId = createSubscriptionId(obj->value->interfaceName, obj->sourceUuid, obj->zone);
+
+			if(!amb::containsKey(mSubscriptions, subscribeId))
+			{
+				DebugOut(DebugOut::Warning) << "We haven't subscribed to this interface at this zone from this source..." << endl;
+				return;
+			}
+
+			auto list = mSubscriptions[subscribeId];
+
+			for(auto i : list)
+			{
+				i.callback(obj->value);
+			}
+		}
+	}
+	else
+	{
+		BaseMessage msg;
+		msg.fromJson(json);
+		DebugOut(DebugOut::Warning) << "Unhandled message: " << msg.name << " type: " << msg.type << endl;
+	}
 }
 
 string amb::AmbRemoteClient::createSubscriptionId(const string & objectName, const string & sourceUuid, Zone::Type zone)
@@ -348,7 +380,13 @@ void amb::BaseJsonMessageReader::canHasData()
 	while(hasJson());
 }
 
+void amb::BaseJsonMessageReader::closed()
+{
+	mIo->close();
 
+	if(disconnected)
+		disconnected();
+}
 
 bool amb::BaseJsonMessageReader::hasJson()
 {
@@ -649,7 +687,7 @@ bool amb::SetMethodCall::fromJson(const picojson::value &json)
 {
 	MethodCall::fromJson(json);
 
-	value = Object::fromJson(json.get<picojson::object>());
+	value = Object::fromJson(json.get("data").get<picojson::object>());
 
 	return true;
 }

@@ -19,19 +19,30 @@ void runTest(amb::AmbRemoteClient *c)
 		g_assert(supported.size() == 2);
 	});
 
+	c->subscribe("interface1", [](amb::Object::Ptr obj)
+	{
+		DebugOut(0) << obj->interfaceName << " changed!" << endl;
+	});
+
 	DebugOut(0) << "calling client->get()" << endl;
-	c->get("interface1", [&c](amb::Object::Ptr obj)
+	c->get("interface1", [](amb::Object::Ptr obj)
 	{
 		DebugOut(0) << "get call reply" << endl;
 		g_assert(obj->size() == 2);
 
 		obj->emplace("vehicleSpeed", amb::make_shared(new VehicleProperty::VehicleSpeedType(69)));
 
-		c->set("interface1", obj, [](bool s)
-		{
-			DebugOut(0) << "set call reply status: " << (s ? "success!" : "fail") << endl;
-			g_assert(s);
-		});
+	});
+
+	amb::Object::Ptr obj = amb::Object::create();
+
+	obj->interfaceName = "interface1";
+	obj->emplace("vehicleSpeed", amb::make_shared(new VehicleProperty::VehicleSpeedType(22)));
+
+	c->set("interface1", obj, [](bool s)
+	{
+		DebugOut(0) << "set call reply status: " << (s ? "success!" : "fail") << endl;
+		g_assert(s);
 	});
 }
 
@@ -49,7 +60,11 @@ int main(int argc, char** argv)
 
 	socket.open();
 
-	socket.getSocket()->waitForConnected();
+	if(!socket.getSocket()->waitForConnected())
+	{
+		DebugOut("Could not connect");
+		return -1;
+	}
 
 	DebugOut(0) << "We are connected!" << endl;
 

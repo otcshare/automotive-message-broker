@@ -36,29 +36,6 @@ using namespace std;
 
 #include "debugout.h"
 
-bool readCallback(GIOChannel *source, GIOCondition condition, gpointer data)
-{
-//	DebugOut(5) << "Polling..." << condition << endl;
-
-	if(condition & G_IO_ERR)
-	{
-		DebugOut(DebugOut::Error)<<"GpsNmeaSource polling error."<<endl;
-	}
-
-	if (condition & G_IO_HUP)
-	{
-		//Hang up. Returning false closes out the GIOChannel.
-		//printf("Callback on G_IO_HUP\n");
-		DebugOut(DebugOut::Warning)<<"socket hangup event..."<<endl;
-		return false;
-	}
-
-	AbstractBluetoothSerialProfile* p = static_cast<AbstractBluetoothSerialProfile*>(data);
-
-	p->canHasData();
-
-	return true;
-}
 
 BluetoothSinkPlugin::BluetoothSinkPlugin(AbstractRoutingEngine* re, map<string, string> config)
 :AbstractSink(re, config)
@@ -81,7 +58,19 @@ void BluetoothSinkPlugin::propertyChanged(AbstractPropertyType *value)
 
 }
 
-void BluetoothSinkPlugin::dataReceived(QByteArray data)
+void BluetoothSinkPlugin::newConnection(string, QDBusUnixFileDescriptor fd, QVariantMap)
+{
+	SerialPort *bluetoothDev = new SerialPort();
+	bluetoothDev->setDescriptor(fd.fileDescriptor());
+	auto client = amb::make_shared(new amb::AmbRemoteServer(bluetoothDev, routingEngine));
+	client->disconnected = [this, client]() {
+		removeOne(&clients, client);
+	};
+
+	clients.push_back(client);
+}
+
+void BluetoothSinkPlugin::requestDisconnection(string path)
 {
 
 }
@@ -156,33 +145,11 @@ void AbstractBluetoothSerialProfile::release()
 void AbstractBluetoothSerialProfile::newConnection(string path, QDBusUnixFileDescriptor fd, QVariantMap props)
 {
 	DebugOut()<<"new Connection! Path: "<<path<<" fd: "<<fd.fileDescriptor()<<endl;
-
-	socket.setDescriptor(fd.fileDescriptor());
-
-	GIOChannel *chan = g_io_channel_unix_new(socket.fileDescriptor());
-	g_io_add_watch(chan, GIOCondition(G_IO_IN | G_IO_HUP | G_IO_ERR),(GIOFunc)readCallback, this);
-	g_io_channel_set_close_on_unref(chan, true);
-	g_io_channel_unref(chan);
 }
 
 void AbstractBluetoothSerialProfile::requestDisconnection(string path)
 {
 	DebugOut()<<"requestDisconnection called.  Path: "<<path<<endl;
-	socket.close();
-}
-
-void AbstractBluetoothSerialProfile::canHasData()
-{
-	QByteArray data = socket.read().c_str();
-
-	DebugOut()<<"data read: "<<data.constData()<<endl;
-
-	dataReceived(data);
-}
-
-void AbstractBluetoothSerialProfile::write(const std::string & data)
-{
-	socket.write(data);
 }
 
 BtProfileAdaptor::BtProfileAdaptor(AbstractBluetoothSerialProfile *parent)

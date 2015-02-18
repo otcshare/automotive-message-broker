@@ -91,6 +91,8 @@ protected:
 
 			amb::PropertyChangeEvent event;
 			event.value = interface1;
+			event.sourceUuid = call->sourceUuid;
+			event.zone = call->zone;
 
 			send(event);
 		}
@@ -104,7 +106,7 @@ int main(int argc, char** argv)
 {
 	DebugOut::setDebugThreshhold(7);
 	DebugOut::setThrowErr(true);
-	DebugOut::setThrowWarn(true);
+	DebugOut::setThrowWarn(false);
 
 	DebugOut(0) << "Testing AMB json server/client" << endl;
 
