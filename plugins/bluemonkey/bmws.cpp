@@ -9,86 +9,22 @@
 
 #include <QCoreApplication>
 
-extern "C" void create(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &js, QObject* parent)
+QString BinaryType::Blob = "blob";
+QString BinaryType::ArrayBuffer = "arraybuffer";
+
+bool BinaryType::validType(const QString &t)
 {
-	exports["websockets"] = new Websockets(nullptr);
-
-	js.append("function WebSocket(url, protocols)"
-			  "{"
-			  "  this.client = websockets.createClient(url, protocols);"
-			  "  this._binaryType = 'blob';"
-			  "  Object.defineProperty(this, 'binaryType', { enumerable : false, get : function() { return this._binaryType; }, set : function (val)"
-			  "  {"
-			  "    if(val !=='blob' || val !== 'arraybuffer')"
-			  "      throw \"Invalid binaryType.  Must be 'blob' or 'arraybuffer'\";"
-			  "    this._binaryType = val;"
-			  "  } });"
-			  "  Object.defineProperty(this, 'bufferedAmount', { value : 0 });"
-			  "  Object.defineProperty(this, 'extensions', { value : ''});"
-			  "  Object.defineProperty(this, 'protocol', { value : ''});"
-			  "  Object.defineProperty(this, 'readyState', { enumberable : false, get : function ()"
-			  "  { "
-			  "    ready = this.client.readyState; "
-			  "    if(ready == -1)"
-			  "      return undefined;"
-			  "    return ready;"
-			  "  } });"
-			  "  Object.defineProperty(this, 'url', { get : function() { return this.client.url; }});"
-			  "  temporaryMe = this;"
-			  "  this.client.connected.connect(function()"
-			  "  {"
-			  "    if(temporaryMe.onopen !== undefined)"
-			  "      temporaryMe.onopen();"
-			  "    else"
-			  "      console.log('onopen is like, totally undefined');"
-			  "  });"
-			  ""
-			  "  this.client.disconnected.connect(function()"
-			  "  {"
-			  "    if(temporaryMe.onclose !== undefined)"
-			  "      temporaryMe.onclose()"
-			  "  });"
-			  ""
-			  "  this.client.error.connect(function(err)"
-			  "  {"
-			  "    if(temporaryMe.onerror !== undefined)"
-			  "      temporaryMe.onerror(temporaryMe.client.getErrorString());"
-			  "  });"
-			  ""
-			  "  this.client.textMessageReceived.connect(function(msg)"
-			  "  {"
-			  "    if(temporaryMe.onmessage !== undefined)"
-			  "    {"
-			  "      temporaryMe._binaryType = 'blob';"
-			  "      temporaryMe.onmessage(msg);"
-			  "    }"
-			  "  });"
-			  ""
-			  "  this.client.binaryMessageReceived.connect(function(msg)"
-			  "  {"
-			  "    if(temporaryMe.onmessage !== undefined)"
-			  "    {"
-			  "      temporaryMe._binaryType = 'arraybuffer';"
-			  "      temporaryMe.onmessage(msg);"
-			  "    }"
-			  "  });"
-			  "}"
-			  ""
-			  "WebSocket.prototype.send = function(msg)"
-			  "{"
-			  "  if(this._binaryType === 'blob')"
-			  "    this.client._sendTextMessage(msg);"
-			  "  else if(this._binaryType === 'arraybuffer')"
-			  "    this.client._sendBinaryMessage(msg);"
-			  "};"
-			  ""
-			  "WebSocket.prototype.close = function() { this.client.close(); };"
-			  "");
-
+	return t == Blob || t == ArrayBuffer;
 }
 
+extern const char bmws_api[];
 
+extern "C" void create(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &js, QObject* parent)
+{
+	exports["websockets"] = new Websockets(parent);
 
+	js.append(bmws_api);
+}
 
 Websockets::Websockets(QObject *parent)
 	:QObject(parent)
@@ -101,54 +37,82 @@ QObject *Websockets::createClient(const QString &url, const QStringList &protoco
 	return new WebsocketClient(url, nullptr);
 }
 
-QObject *Websockets::createServer()
+QObject *Websockets::createServer(bool useSsl)
+{
+	return new WebsocketServer(useSsl, this);
+}
+
+
+WebsocketClient::WebsocketClient(const QString &url, QObject *parent, QWebSocket * ws)
+	:QObject(parent), mUrl(url), mBinaryType("blob"), mSocket(ws)
+{
+	if(!mSocket)
+		mSocket = new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this);
+	else //reparent to this
+		mSocket->setParent(this);
+
+	connect(mSocket, &QWebSocket::connected, this, &WebsocketClient::connected);
+	connect(mSocket, &QWebSocket::disconnected, this, &WebsocketClient::disconnected);
+	connect(mSocket, &QWebSocket::stateChanged, this, &WebsocketClient::stateChanged);
+	connect(mSocket, &QWebSocket::textMessageReceived, [this](const QString & msg)
+	{
+		mBinaryType = BinaryType::Blob;
+		textMessageReceived(msg);
+	});
+	connect(mSocket, &QWebSocket::binaryMessageReceived, [this](const QByteArray & msg)
+	{
+		mBinaryType = BinaryType::ArrayBuffer;
+		binaryMessageReceived(msg);
+	});
+}
+
+WebsocketClient::WebsocketClient(QWebSocket *other, QObject* parent)
+	:WebsocketClient("", parent, other)
 {
 
 }
 
-
-WebsocketClient::WebsocketClient(const QString &url, QObject *parent)
-	:QWebSocket(QString(), QWebSocketProtocol::VersionLatest, parent), mUrl(url)
+WebsocketClient::~WebsocketClient()
 {
-	qDebug() << "Constructed websocket client";
-
-	connect(this, &WebsocketClient::connected, []()
-	{
-		qDebug() << "connected";
-	});
-
-	connect(this, &WebsocketClient::disconnected, []()
-	{
-		qDebug() << "disconnected";
-	});
-
-	connect(this, &WebsocketClient::stateChanged, [](QAbstractSocket::SocketState state)
-	{
-		qDebug() << "state changed: " << state;
-	});
-
-	open(QUrl(url));
+	mSocket->close();
 }
 
 int WebsocketClient::readyState()
 {
-	if(state() == QAbstractSocket::UnconnectedState)
+	if(mSocket->state() == QAbstractSocket::UnconnectedState)
 	{
 		return 3;
 	}
-	else if(state() == QAbstractSocket::ConnectingState)
+	else if(mSocket->state() == QAbstractSocket::ConnectingState)
 	{
 		return 0;
 	}
-	else if(state() == QAbstractSocket::ClosingState)
+	else if(mSocket->state() == QAbstractSocket::ClosingState)
 	{
 		return 2;
 	}
-	else if(state() == QAbstractSocket::ConnectedState)
+	else if(mSocket->state() == QAbstractSocket::ConnectedState)
 	{
 		return 1;
 	}
 	return -1;
+}
+
+void WebsocketClient::open()
+{
+	mSocket->open(mUrl);
+}
+
+void WebsocketClient::send(const QByteArray &msg)
+{
+	if(mBinaryType == BinaryType::Blob)
+	{
+		mSocket->sendTextMessage(msg);
+	}
+	else
+	{
+		mSocket->sendBinaryMessage(msg);
+	}
 }
 
 int main(int argc, char** argv)
@@ -159,8 +123,7 @@ int main(int argc, char** argv)
 	QObject::connect(&client, &WebsocketClient::connected, [&client]()
 	{
 		qDebug() << "Can has connection!";
-
-		client.sendTextMessage("Hello world!");
+		client.send("Hello world!");
 	});
 
 	QObject::connect(&client, &WebsocketClient::textMessageReceived, [](const QString & msg)
@@ -186,6 +149,20 @@ WebsocketServer::WebsocketServer(bool ssl, QObject *parent)
 	:QObject(parent), mServer(nullptr)
 {
 	mServer = new QWebSocketServer("", ssl ? QWebSocketServer::SecureMode : QWebSocketServer::NonSecureMode, this);
+
+	connect(mServer, &QWebSocketServer::newConnection, [this]()
+	{
+		QWebSocket * socket = mServer->nextPendingConnection();
+
+		auto client = new WebsocketClient(socket, this);
+
+		newConnection(client);
+	});
+}
+
+WebsocketServer::~WebsocketServer()
+{
+	close();
 }
 
 int WebsocketServer::secureMode()
@@ -195,5 +172,14 @@ int WebsocketServer::secureMode()
 
 void WebsocketServer::listen(quint16 port)
 {
-
+	mServer->listen(QHostAddress::Any, port);
 }
+
+void WebsocketServer::close()
+{
+	mServer->close();
+}
+
+
+
+

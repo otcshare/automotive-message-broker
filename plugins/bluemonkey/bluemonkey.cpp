@@ -39,13 +39,64 @@ QString bmJS = (""
 				"{"
 				"  bluemonkey.log(msg);"
 				"}"
-				"");
+				""
+				"function Application(args)"
+				"{"
+				"  this.app = bluemonkey.createCoreApplication();"
+				"  bluemonkey.assertIsTrue(this.app !== undefined, 'Need to instantiate QCoreApplication in the bluemonkey app before calling createCoreApplication()');"
+				"  this._connectEverything(this);"
+				""
+				"  this.startTimer = bluemonkey.createTimer();"
+				"  this.startTimer.singleShot = true;"
+				"  this.startTimer.timeout.connect(bluemonkey.ready);"
+				"  this.startTimer.start(1);"
+				"}"
+				"Application.prototype._connectEverything = function(obj)"
+				"{"
+				"  bluemonkey.ready.connect(function()"
+				"  {"
+				"    if(obj.main !== undefined)"
+				"      obj.main();"
+				"  });"
+				"};"
+				"Application.prototype.run = function()"
+				"{"
+				"  return bluemonkey.run(this.app);"
+				"};");
 
 
-Bluemonkey::Bluemonkey(std::map<std::string, std::string> config, QObject *parent)
-	:QObject(parent), engine(nullptr), configuration(config)
+Bluemonkey::Bluemonkey(QObject *parent)
+	:QObject(parent), engine(nullptr), configuration(std::map<std::string, std::string>())
 {
-	QTimer::singleShot(1,this,SLOT(reloadEngine()));
+	engine = new QJSEngine(this);
+
+	QJSValue value = engine->newQObject(this);
+	engine->globalObject().setProperty("bluemonkey", value);
+
+	QJSValue val = engine->evaluate(bmJS);
+
+	if(val.isError())
+	{
+		qCritical() << "Failed to load bluemonkey javascript extensions";
+		qCritical() << "Error: ";
+		qCritical() <<  val.property("name").toString();
+		qCritical() <<  val.property("message").toString();
+		qCritical() << "line: " << val.property("lineNumber").toString();
+
+		int line = val.property("lineNumber").toInt();
+		QStringList lines = bmJS.split("\n");
+
+		if(line - 1 >= 0)
+			qWarning() << lines.at(line-1);
+
+		qWarning() << lines.at(line) << "<--";
+
+		if(lines.size() > line + 1)
+			qWarning() << lines.at(line+1);
+
+		qCritical() << "Aborting";
+		throw std::runtime_error("Die die die");
+	}
 }
 
 Bluemonkey::~Bluemonkey()
@@ -58,7 +109,7 @@ Bluemonkey::~Bluemonkey()
 	engine->deleteLater();
 }
 
-void Bluemonkey::loadConfig(QString str)
+void Bluemonkey::loadScript(QString str)
 {
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
@@ -67,21 +118,36 @@ void Bluemonkey::loadConfig(QString str)
 		return;
 	}
 
-	QString script = file.readAll();
+	QString firstLine = file.readLine();
+
+	if(firstLine.startsWith("#!"))
+		firstLine = "";
+
+	QString script = firstLine + "\n" + file.readAll();
 
 	file.close();
 
-	qDebug() << "evaluating script: "<< script;
-
 	QJSValue val = engine->evaluate(script);
-
-	qDebug()<< val.toString();
 
 	if(val.isError())
 	{
-		qDebug() <<  val.property("name").toString() <<  endl;
-		qDebug() <<  val.property("message").toString() <<  endl;
-		qDebug() <<  str <<  ":" << val.property("lineNumber").toString() <<  endl;
+		qDebug() << "Error: ";
+		qDebug() <<  val.property("name").toString();
+		qDebug() <<  val.property("message").toString();
+		qDebug() <<  str <<  ":" << val.property("lineNumber").toString();
+
+		int line = val.property("lineNumber").toInt();
+		QStringList lines = script.split("\n");
+
+		if(line - 1 >= 0)
+			qWarning() << lines.at(line-1);
+
+		qWarning() << lines.at(line) << "<--";
+
+		if(lines.size() > line + 1)
+			qWarning() << lines.at(line+1);
+
+		throw std::runtime_error("JavaScript Error");
 	}
 }
 
@@ -117,7 +183,7 @@ bool Bluemonkey::loadModule(QString path)
 
 	std::map<std::string, QObject*> exports;
 	QString js;
-	create(configuration, exports, js, nullptr);
+	create(configuration, exports, js, this);
 
 	for(auto i : exports)
 	{
@@ -127,37 +193,29 @@ bool Bluemonkey::loadModule(QString path)
 
 	QJSValue val = engine->evaluate(js);
 
-	qDebug() << "evalutating module js result: " << val.toString();
-
 	if(val.isError())
 	{
-		qDebug() << "Script: " << js;
-		qCritical() << "Error in module javascript: " << val.toString();
+		qWarning() << "Error running script in module: " << path;
+		qWarning() <<  val.property("name").toString();
+		qWarning() <<  val.property("message").toString();
+		qWarning() << "line: " << val.property("lineNumber").toString();
+
+		int line = val.property("lineNumber").toInt();
+		QStringList lines = js.split("\n");
+
+		if(line - 1 >= 0)
+			qWarning() << lines.at(line-1);
+
+		qWarning() << lines.at(line) << "<--";
+
+		if(lines.size() > line + 1)
+			qWarning() << lines.at(line+1);
+
+		qCritical() << "Aborting";
+		throw std::runtime_error("Failed to load module");
 	}
 
 	return true;
-}
-
-void Bluemonkey::reloadEngine()
-{
-	if(engine)
-		engine->deleteLater();
-
-	engine = new QJSEngine();
-
-	QJSValue value = engine->newQObject(this);
-	engine->globalObject().setProperty("bluemonkey", value);
-
-	if(engine->evaluate(bmJS).isError())
-	{
-		qCritical() << "Failed to load bluemonkey javascript extensions";
-		return;
-	}
-
-	ready();
-
-	loadConfig(configuration["config"].c_str());
-
 }
 
 void Bluemonkey::writeProgram(QString program)
@@ -200,6 +258,11 @@ QObject *Bluemonkey::createQObject()
 	return new QObject(this);
 }
 
+QObject *Bluemonkey::createCoreApplication()
+{
+	return QCoreApplication::instance();
+}
+
 
 bool Bluemonkey::loadModule(const QString &name, QObject *module)
 {
@@ -210,6 +273,16 @@ bool Bluemonkey::loadModule(const QString &name, QObject *module)
 	}
 }
 
+void Bluemonkey::setArguments(int len, char **args)
+{
+	QStringList a;
+	for(int i = 0; i < len; i++)
+	{
+		a.append(args[i]);
+	}
+
+	setArguments(a);
+}
 
 void Bluemonkey::assertIsTrue(bool isTrue, const QString & msg)
 {
@@ -217,4 +290,10 @@ void Bluemonkey::assertIsTrue(bool isTrue, const QString & msg)
 		log(msg);
 
 	Q_ASSERT(isTrue);
+}
+
+
+int Bluemonkey::run(QCoreApplication *app)
+{
+	return app->exec();
 }

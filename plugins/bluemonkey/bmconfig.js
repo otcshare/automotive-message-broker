@@ -1,3 +1,5 @@
+#!/usr/bin/env bluemonkey
+
 console.log("hello world!");
 
 bluemonkey.loadModule("@PLUGIN_INSTALL_PATH@/bluemonkeyDbModule.so");
@@ -9,88 +11,97 @@ exportObj = {};
 exportObj.foo = function() { return "bar"; }
 exportObj.bar = true;
 
-if(dbus !== undefined)
+app = new Application();
+
+app.main = function()
 {
-    try
-    {
-        var dbusIface = dbus.createInterface("org.freedesktop.DBus", "/", "org.freedesktop.DBus", dbus.Session);
+	console.log("running main()");
 
-        var reply = dbusIface.GetId();
+	if(dbus !== undefined)
+	{
+		try
+		{
+			var dbusIface = dbus.createInterface("org.freedesktop.DBus", "/", "org.freedesktop.DBus", dbus.Session);
 
-        console.log("org.freedesktop.DBus.GetId() response: " + reply);
+			var reply = dbusIface.GetId();
 
-        var registered = dbus.registerService("org.bluemonkey", dbus.Session)
+			console.log("org.freedesktop.DBus.GetId() response: " + reply);
 
-        bluemonkey.assertIsTrue(registered, "could not register service: " + dbus.errorMessage(dbus.Session));
+			var registered = dbus.registerService("org.bluemonkey", dbus.Session)
 
-        /* TODO: Uncomment this when dbus export works
-        var exported = dbus.exportObject("/one", "org.awesome.interface", dbus.Session, exportObj);
-        console.log("exported: " + exported)
+			bluemonkey.assertIsTrue(registered, "could not register service: " + dbus.errorMessage(dbus.Session));
+		}
+		catch(error)
+		{
+			console.log("nasty dbus errors");
+		}
+	}
 
-        bluemonkey.assertIsTrue(exported, "Failed to export custom dbus object: " + dbus.errorMessage(dbus.Session));
+	if(ble !== undefined)
+	{
+		serviceUuid = "5faaf494-d4c6-483e-b592-d1a6ffd436c9";
+		device = ble.addService(serviceUuid, "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
+		ble.scanningChanged.connect(function ()
+		{
+			if(!ble.scan)
+			{
+				console.log("scan finished");
+			}
+		});
 
-        var exported2 = dbus.exportObject("/two", "org.awesome.interface2", dbus.Session, testExport)
-        console.log("exported2: " + exported2)
+		ble.scan = true;
+		ble.devicesChanged.connect(function ()
+		{
+			console.log("devices that match the service uuid: " + ble.devices(serviceUuid))
+		});
+	}
 
-        bluemonkey.assertIsTrue(exported2, "failed to export testExport: " + dbus.errorMessage());*/
-    }
-    catch(error)
-    {
-        console.log("nasty dbus errors");
-    }
+	if(websockets !== undefined)
+	{
+		console.log("can has websockets!");
+
+		server = new WebSocketServer();
+		server.onconnection = function(s)
+		{
+			console.log("server can has new connection!");
+			s.onmessage = function(msg)
+			{
+				console.log("server received msg: " + msg);
+				s.send("pong");
+			};
+		};
+
+		server.listen(8070);
+
+		socket = new WebSocket("ws://localhost:8070");
+
+		socket.onmessage = function(msg)
+		{
+			console.log("msg: "+ msg);
+		};
+
+		socket.onopen = function()
+		{
+			console.log("client connection opened!");
+			socket.send("ping");
+		};
+
+		socket.onclose = function()
+		{
+			console.log("closed");
+		};
+
+		socket.onerror = function(err)
+		{
+			console.log("error: " + err);
+		}
+
+		socket.open();
+	}
+	else
+	{
+		console.log("no websocket support :(");
+	}
 }
 
-if(ble !== undefined)
-{
-    serviceUuid = "5faaf494-d4c6-483e-b592-d1a6ffd436c9";
-    device = ble.addService(serviceUuid, "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
-    ble.scanningChanged.connect(function ()
-    {
-        if(!ble.scan)
-        {
-            console.log("scan finished");
-        }
-    });
-
-    ble.scan = true;
-    ble.devicesChanged.connect(function ()
-    {
-        console.log("devices that match the service uuid: " + ble.devices(serviceUuid))
-    });
-}
-
-var shndl
-
-if(websockets !== undefined)
-{
-    console.log("can has websockets!");
-
-    socket = new WebSocket("ws://echo.websocket.org");
-
-    socket.onmessage = function(msg)
-    {
-        console.log("msg: "+ msg);
-    };
-
-    socket.onopen = function()
-    {
-        console.log("opened!");
-        socket.send("ping");
-    };
-
-    socket.onclose = function()
-    {
-        console.log("closed");
-    };
-
-    socket.onerror = function(err)
-    {
-        console.log("error: " + err);
-    }
-
-    shndl = socket;
-}
-else
-{
-    console.log("no websocket support :(");
-}
+app.run();

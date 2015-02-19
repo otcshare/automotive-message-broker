@@ -9,10 +9,10 @@ set(vehicle_api_sources vehicle.cc vehicle_extension.cc vehicle_instance.cc comm
 include_directories(${include_dirs} ${CMAKE_CURRENT_SOURCE_DIR}/)
 
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/vehicle_api.cc
-				   COMMAND python ${CMAKE_CURRENT_SOURCE_DIR}/generate_api.py ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_api.js kSource_vehicle_api ${CMAKE_CURRENT_BINARY_DIR}/vehicle_api.cc )
+				   COMMAND python ${CMAKE_SOURCE_DIR}/tools/generate_api.py ${CMAKE_CURRENT_SOURCE_DIR}/vehicle_api.js kSource_vehicle_api ${CMAKE_CURRENT_BINARY_DIR}/vehicle_api.cc )
 
 add_library(vehicle_extension MODULE ${vehicle_api_sources} ${CMAKE_CURRENT_BINARY_DIR}/vehicle_api.cc)
-target_link_libraries(vehicle_extension ${link_libraries} amb ${gio_LIBRARIES} -L${CMAKE_CURRENT_BINARY_DIR}/lib)
+target_link_libraries(vehicle_extension ${link_libraries} amb ${gio_LIBRARIES} -L${CMAKE_BINARY_DIR}/lib)
 
 add_custom_target(js3cc DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/vehicle_api.cc)
 add_dependencies(vehicle_extension js3cc)

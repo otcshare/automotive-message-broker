@@ -126,7 +126,7 @@ public:
 BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent)
 	: QObject(0), AmbPluginImpl(e, config, parent), mSilentMode(false)
 {
-	bluemonkey = new Bluemonkey(config, this);
+	bluemonkey = new Bluemonkey(this);
 	auth = new Authenticate(config, this);
 }
 
@@ -136,7 +136,11 @@ BluemonkeySink::~BluemonkeySink()
 
 void BluemonkeySink::init()
 {
-	connect(bluemonkey, &Bluemonkey::ready,[this](){bluemonkey->loadModule("amb", this);});
+	connect(bluemonkey, &Bluemonkey::ready,[this]()
+	{
+		bluemonkey->loadModule("amb", this);
+		bluemonkey->loadScript(configuration["config"].c_str());
+	});
 }
 
 

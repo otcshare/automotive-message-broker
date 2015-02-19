@@ -27,6 +27,7 @@
 #include <QJsonDocument>
 #include <QDateTime>
 #include <QJSValue>
+#include <QCoreApplication>
 
 #include "authenticate.h"
 
@@ -35,20 +36,26 @@ class QJSEngine;
 class Bluemonkey : public QObject
 {
 	Q_OBJECT
+	Q_PROPERTY(QStringList arguments READ arguments)
+
 public:
-	Bluemonkey(std::map<std::string, std::string> config = std::map<std::string, std::string>(), QObject* parent = nullptr);
+	Bluemonkey(QObject * parent = nullptr);
+
 	~Bluemonkey();
 
 	bool loadModule(const QString &name, QObject* module);
 
+	QStringList arguments() { return mArguments;}
+	void setArguments(const QStringList & args) { mArguments = args; }
+	void setArguments(int len, char **args);
+
 public Q_SLOTS:
+
 	void assertIsTrue(bool isTrue, const QString &msg="");
 
-	void loadConfig(QString str);
+	void loadScript(QString str);
 
 	bool loadModule(QString path);
-
-	void reloadEngine();
 
 	void writeProgram(QString program);
 
@@ -56,6 +63,10 @@ public Q_SLOTS:
 
 	QObject* createTimer();
 	QObject* createQObject();
+
+	QObject* createCoreApplication();
+
+	int run(QCoreApplication *app);
 
 Q_SIGNALS:
 
@@ -65,6 +76,7 @@ private:
 	QList<void*> modules;
 	QJSEngine* engine;
 	QStringList configsToLoad;
+	QStringList mArguments;
 	std::map<std::string, std::string> configuration;
 };
 

@@ -25,8 +25,8 @@
 #include <QtDebug>
 extern "C" void create(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &js, QObject* parent)
 {
-	exports["dbus"] = new BMDBus(nullptr);
-	exports["testExport"] = new TestQObject(nullptr);
+	exports["dbus"] = new BMDBus(parent);
+	exports["testExport"] = new TestQObject(parent);
 
 	js.append("dbus.defineMethodSignature = function(obj, methodName, retType, args)"
 		  "{"

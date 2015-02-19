@@ -70,7 +70,6 @@ void Ble::addService(const QString &serviceUuid, const QString &rxUuid, const QS
 
 void Ble::startScan(bool scan)
 {
-	qDebug() << "Scanning: " << (scan ? "true":"false");
 	scan ? mDeviceDiscoveryAgent->start() : mDeviceDiscoveryAgent->stop();
 }
 
@@ -83,14 +82,14 @@ void Ble::deviceDiscovered(const QBluetoothDeviceInfo &device)
 {
 	if(device.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration)
 	{
-		qDebug() << "BLE device found: " << device.address().toString();
+		//qDebug() << "BLE device found: " << device.address().toString();
 
 		///We have a device.  Let's scan to see if it supports the service Uuid's we want
 		auto control = new QLowEnergyController(device.address(), this);
 
 		connect(control, &QLowEnergyController::stateChanged, [control, this](QLowEnergyController::ControllerState state)
 		{
-			qDebug() << "Controller state changed for device: " << control->remoteAddress().toString() << state;
+			//qDebug() << "Controller state changed for device: " << control->remoteAddress().toString() << state;
 			if(state == QLowEnergyController::DiscoveredState)
 			{
 				devicesChanged();
@@ -99,14 +98,14 @@ void Ble::deviceDiscovered(const QBluetoothDeviceInfo &device)
 		connect(control, &QLowEnergyController::disconnected, control, &QLowEnergyController::deleteLater); // if we disconnect, clean up.
 		connect(control, &QLowEnergyController::connected, [&control]()
 		{
-			qDebug() << "Device connected. Discovering services...";
+			//qDebug() << "Device connected. Discovering services...";
 			control->discoverServices();
 		});
 		connect(control, &QLowEnergyController::serviceDiscovered, [&control, this, device](const QBluetoothUuid & uuid)
 		{
 			Q_FOREACH(ServiceIdentifier * service, services)
 			{
-				qDebug() << "checking if service uuid (" << uuid.toString() << ") matches the one we want (" << service->serviceUuid << ")";
+				//qDebug() << "checking if service uuid (" << uuid.toString() << ") matches the one we want (" << service->serviceUuid << ")";
 				if(service->serviceUuid == uuid.toString())
 				{
 					service->service = control->createServiceObject(uuid, service);
@@ -115,7 +114,7 @@ void Ble::deviceDiscovered(const QBluetoothDeviceInfo &device)
 
 					if(!service->service)
 					{
-						qDebug() << "Could not get service object on device with address: " << control->remoteAddress().toString();
+						qWarning() << "Could not get service object on device with address: " << control->remoteAddress().toString();
 						return;
 					}
 
@@ -127,9 +126,9 @@ void Ble::deviceDiscovered(const QBluetoothDeviceInfo &device)
 
 							if(!rx.isValid())
 							{
-								qDebug() << "rx characteristic not found in service.";
-								qDebug() << "Characteristic: " << service->rxUuid;
-								qDebug() << "Service: " << service->serviceUuid;
+								qWarning() << "rx characteristic not found in service.";
+								qWarning() << "Characteristic: " << service->rxUuid;
+								qWarning() << "Service: " << service->serviceUuid;
 								service->isValid = false;
 								return;
 							}
@@ -138,9 +137,9 @@ void Ble::deviceDiscovered(const QBluetoothDeviceInfo &device)
 
 							if(!tx.isValid())
 							{
-								qDebug() << "rx characteristic not found in service.";
-								qDebug() << "Characteristic: " << service->rxUuid;
-								qDebug() << "Service: " << service->serviceUuid;
+								qWarning() << "rx characteristic not found in service.";
+								qWarning() << "Characteristic: " << service->rxUuid;
+								qWarning() << "Service: " << service->serviceUuid;
 								service->isValid = false;
 								return;
 							}
@@ -151,7 +150,6 @@ void Ble::deviceDiscovered(const QBluetoothDeviceInfo &device)
 				}
 			}
 		});
-		qDebug() << "attempting to connect to device: " << device.address().toString();
 		control->connectToDevice();
 	}
 }
