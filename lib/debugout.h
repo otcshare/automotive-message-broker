@@ -144,7 +144,7 @@ public:
 		{
 			ostream out(buf);
 			out.precision(15);
-			out<<val<<" ";
+			out<<val;
 		}
 		return *this;
 	}

@@ -18,18 +18,14 @@
 
 #include "db.h"
 
-#include <debugout.h>
-
 #include <QObject>
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QtQml>
 
-extern "C" std::map<std::string, QObject*> create(std::map<std::string, std::string> config, QObject* parent)
+extern "C" void create(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &js, QObject* parent)
 {
-	std::map<std::string, QObject*> moduleInstances;
-	moduleInstances["database"] = new BluemonkeyDatabaseModule(parent);
-	return moduleInstances;
+	exports["database"] = new BluemonkeyDatabaseModule(parent);
 }
 
 bool Database::open(QString connectionName, QString filename)

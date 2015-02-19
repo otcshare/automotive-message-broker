@@ -53,28 +53,12 @@ public Q_SLOTS:
 
 	bool exportObject(const QString & path, const QString & interface, Connection bus, const QJSValue &obj);
 
-	QJSValue defineMethodSignature(const QJSValue & obj, const QString & methodName, const QString & returnType, const QStringList & arguments);
-
 	QString errorMessage(const Connection bus = Session);
 
 private: ///methods:
 
 	QDBusConnection getConnection(const Connection bus);
 };
-
-class BluemonkeyQObjectPrivate;
-class BluemonkeyQObject : public QObject
-{
-	Q_OBJECT
-public:
-	BluemonkeyQObject(QObject* parent = nullptr);
-
-private:
-	Q_DECLARE_PRIVATE(BluemonkeyQObject)
-	Q_DISABLE_COPY(BluemonkeyQObject)
-};
-
-Q_DECLARE_METATYPE(BluemonkeyQObject*)
 
 class BareQObject : public QObject
 {

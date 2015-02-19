@@ -27,61 +27,6 @@ dbusConnected.changed.connect(function () {
 							   {'AnswerToTheUniverse' : 'AnswerToTheUniverse'}]);
 });
 
-bluemonkey.loadModule("@PLUGIN_INSTALL_PATH@/bluemonkeyDBusModule.so");
-
-exportObj = bluemonkey.createQObject();
-exportObj.foo = function() { return "bar"; }
-exportObj.bar = true;
-
-testExport.jsFunc = function() { return "js rules!"; }
-
-if(dbus)
-{
-	try
-	{
-		var dbusIface = dbus.createInterface("org.freedesktop.DBus", "/", "org.freedesktop.DBus", dbus.Session);
-
-		var reply = dbusIface.GetId();
-
-		bluemonkey.log("org.freedesktop.DBus.GetId() response: " + reply);
-
-		var registered = dbus.registerService("org.bluemonkey", dbus.Session)
-
-		bluemonkey.assertIsTrue(registered, "could not register service: " + dbus.errorMessage(dbus.Session));
-
-		for(prop in exportObj)
-		{
-			bluemonkey.log(prop +"="+ exportObj[prop]);
-		}
-		for(prop in testExport)
-		{
-			bluemonkey.log(prop +"="+ testExport[prop]);
-		}
-
-		var exported = dbus.exportObject("/one", "org.awesome.interface", dbus.Session, exportObj);
-		bluemonkey.log("exported: " + exported)
-
-		bluemonkey.assertIsTrue(exported, "Failed to export custom dbus object: " + dbus.errorMessage(dbus.Session));
-
-		var exported2 = dbus.exportObject("/two", "org.awesome.interface2", dbus.Session, testExport)
-		bluemonkey.log("exported2: " + exported2)
-
-		bluemonkey.assertIsTrue(exported2, "failed to export testExport: " + dbus.errorMessage());
-
-		//var exportedIface = dbus.createInterface("org.bluemonkey", "/", "org.awesome.interface", dbus.Session);
-
-		//bluemonkey.assertIsTrue(exportedIface.foo, "member 'foo' is missing " + dbus.errorMessage());
-
-		//var reply = exportedIface.foo();
-
-		//bluemonkey.assertIsTrue(reply === "bar" && exportedIface.bar === true);
-	}
-	catch(error)
-	{
-		bluemonkey.log("nasty dbus errors");
-	}
-}
-
 amb.createCustomProperty("VehicleSpeed", 10);
 amb.createCustomProperty("EngineSpeed", 5000);
 amb.createCustomProperty("PowertrainTorque", 324);
