@@ -180,3 +180,20 @@ int main(int argc, char** argv)
 
 	return app.exec();
 }
+
+
+WebsocketServer::WebsocketServer(bool ssl, QObject *parent)
+	:QObject(parent), mServer(nullptr)
+{
+	mServer = new QWebSocketServer("", ssl ? QWebSocketServer::SecureMode : QWebSocketServer::NonSecureMode, this);
+}
+
+int WebsocketServer::secureMode()
+{
+	return mServer->secureMode();
+}
+
+void WebsocketServer::listen(quint16 port)
+{
+
+}

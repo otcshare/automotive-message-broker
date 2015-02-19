@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QtWebSockets/QWebSocket>
-
+#include <QtWebSockets/QWebSocketServer>
 class Websockets : public QObject
 {
 	Q_OBJECT
@@ -34,6 +34,30 @@ public Q_SLOTS:
 
 private:
 	QString mUrl;
+};
+
+class WebsocketServer : public QObject
+{
+	Q_OBJECT
+	Q_PROPERTY(QString serverName READ serverName WRITE setServerName)
+	Q_PROPERTY(int secureMode READ secureMode)
+
+public:
+	WebsocketServer(bool ssl = false, QObject * parent = nullptr);
+
+	int secureMode();
+
+	void setSecureMode(int mode);
+
+public Q_SLOTS:
+	void listen(quint16 port);
+
+Q_SIGNALS:
+
+	void newConnection(QObject * socket);
+
+private:
+	QWebSocketServer * mServer;
 };
 
 #endif
