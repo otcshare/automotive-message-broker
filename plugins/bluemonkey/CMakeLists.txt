@@ -22,6 +22,17 @@ endif(Qt5Core_FOUND)
 
 set(CMAKE_AUTOMOC ON)
 
+find_package(Qt5WebSockets QUIET)
+if(Qt5WebSockets_FOUND)
+	message(STATUS "enabling bluemonkey websocket module")
+	add_executable(bluemonkeyWsModule bmws.cpp)
+	set_target_properties(bluemonkeyWsModule PROPERTIES PREFIX "")
+	set_target_properties(bluemonkeyWsModule PROPERTIES SUFFIX ".so")
+	target_link_libraries(bluemonkeyWsModule ${link_libraries} ${QT_LIBRARIES} ${Qt5WebSockets_LIBRARIES})
+	set(QT_INCLUDE_DIRS ${QT_INCLUDE_DIRS} ${Qt5WebSockets_LIBRARIES})
+	install(TARGETS bluemonkeyWsModule RUNTIME DESTINATION ${PLUGIN_INSTALL_PATH})
+endif()
+
 find_library(communi NAMES Communi)
 
 if(communi)
@@ -36,7 +47,7 @@ if(communi)
 	install(TARGETS bluemonkeyIrcModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 endif(communi)
 
-find_package(Qt5Sql)
+find_package(Qt5Sql QUIET)
 
 if(Qt5Sql_FOUND)
 	message(STATUS "enabling database bluemonkey module")
@@ -46,7 +57,7 @@ if(Qt5Sql_FOUND)
 	install(TARGETS bluemonkeyDbModule LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
 endif()
 
-find_package(Qt5DBus)
+find_package(Qt5DBus QUIET)
 
 if(Qt5DBus_FOUND)
 	message(STATUS "enabling dbus bluemonkey module")
@@ -58,7 +69,7 @@ if(Qt5DBus_FOUND)
 	install(TARGETS bluemonkeyDBusModule RUNTIME DESTINATION ${PLUGIN_INSTALL_PATH})
 endif()
 
-find_package(Qt5Bluetooth)
+find_package(Qt5Bluetooth QUIET)
 
 if(Qt5Bluetooth_FOUND)
 	message(STATUS "enabling bluetooth LE bluemonkey module")

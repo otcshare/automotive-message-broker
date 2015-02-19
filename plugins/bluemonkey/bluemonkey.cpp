@@ -33,6 +33,15 @@
 
 typedef void create_bluemonkey_module_t(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &javascript, QObject* parent);
 
+QString bmJS = (""
+				"console = { };"
+				"console.log = function(msg)"
+				"{"
+				"  bluemonkey.log(msg);"
+				"}"
+				"");
+
+
 Bluemonkey::Bluemonkey(std::map<std::string, std::string> config, QObject *parent)
 	:QObject(parent), engine(nullptr), configuration(config)
 {
@@ -116,7 +125,15 @@ bool Bluemonkey::loadModule(QString path)
 		loadModule(i.first.c_str(), obj);
 	}
 
-	engine->evaluate(js);
+	QJSValue val = engine->evaluate(js);
+
+	qDebug() << "evalutating module js result: " << val.toString();
+
+	if(val.isError())
+	{
+		qDebug() << "Script: " << js;
+		qCritical() << "Error in module javascript: " << val.toString();
+	}
 
 	return true;
 }
@@ -130,6 +147,12 @@ void Bluemonkey::reloadEngine()
 
 	QJSValue value = engine->newQObject(this);
 	engine->globalObject().setProperty("bluemonkey", value);
+
+	if(engine->evaluate(bmJS).isError())
+	{
+		qCritical() << "Failed to load bluemonkey javascript extensions";
+		return;
+	}
 
 	ready();
 
@@ -162,9 +185,9 @@ void Bluemonkey::writeProgram(QString program)
 	file.close();
 }
 
-void Bluemonkey::log(QString str)
+void Bluemonkey::log(QJSValue str)
 {
-	qDebug()<< str;
+	qDebug()<< str.toString();
 }
 
 QObject *Bluemonkey::createTimer()

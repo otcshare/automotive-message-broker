@@ -52,7 +52,7 @@ public Q_SLOTS:
 
 	void writeProgram(QString program);
 
-	void log(QString str);
+	void log(QJSValue str);
 
 	QObject* createTimer();
 	QObject* createQObject();
