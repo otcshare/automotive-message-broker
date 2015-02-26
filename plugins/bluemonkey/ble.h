@@ -52,6 +52,7 @@ class Ble : public QObject
 	Q_OBJECT
 	Q_PROPERTY(bool scan READ scanning WRITE startScan NOTIFY scanningChanged)
 	Q_PROPERTY(QList<QObject*> devices READ devices NOTIFY devicesChanged)
+	Q_PROPERTY(bool debug READ debug WRITE setDebug)
 public:
 
 	Ble(QObject* parent = nullptr);
@@ -59,12 +60,15 @@ public:
 	QList<QObject*> devices();
 	QList<QObject*> devices(const QString & serviceUuid);
 	QObject* device(const QString & address);
+	bool debug() { return mDebug; }
+	void setDebug(bool d) { mDebug = d; }
 
 public Q_SLOTS:
 
 	void addService(const QString & serviceUuid, const QString & rxUuid, const QString & txUuid);
 
 	void startScan(bool scan);
+	void setRemoteAddressType(int t);
 
 	bool scanning();
 
@@ -79,9 +83,12 @@ private Q_SLOTS:
 	void deviceDiscovered(const QBluetoothDeviceInfo & device);
 
 private:
+	bool mDebug;
+	QLowEnergyController::RemoteAddressType mAddyType;
 	QList<ServiceIdentifier*> services;
 	QBluetoothDeviceDiscoveryAgent* mDeviceDiscoveryAgent;
 };
 
 
 #endif
+

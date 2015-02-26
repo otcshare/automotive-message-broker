@@ -8,13 +8,15 @@
 #include <QtDebug>
 #include <QCoreApplication>
 
+#define DEBUG(msg) if(mDebug) qDebug() << msg;
+
 extern "C" void create(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &js, QObject* parent)
 {
 	exports["ble"] = new Ble(parent);
 }
 
 Ble::Ble(QObject *parent)
-	:QObject(parent)
+	:QObject(parent), mAddyType(QLowEnergyController::RandomAddress), mDebug(false)
 {
 	mDeviceDiscoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
 
@@ -70,7 +72,18 @@ void Ble::addService(const QString &serviceUuid, const QString &rxUuid, const QS
 
 void Ble::startScan(bool scan)
 {
+	DEBUG("Starting scan");
+	if(scan && !mDeviceDiscoveryAgent->isActive())
+		scanningChanged();
+	else if(!scan && mDeviceDiscoveryAgent->isActive())
+		scanningChanged();
+
 	scan ? mDeviceDiscoveryAgent->start() : mDeviceDiscoveryAgent->stop();
+}
+
+void Ble::setRemoteAddressType(int t)
+{
+	mAddyType = QLowEnergyController::RemoteAddressType(t);
 }
 
 bool Ble::scanning()
@@ -88,23 +101,25 @@ void Ble::deviceDiscovered(const QBluetoothDeviceInfo &device)
 	if(device.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration)
 	{
 		leDeviceFound(device.name(), device.address().toString());
-		//qDebug() << "BLE device found: " << device.address().toString();
+		DEBUG("BLE device found: " << device.address().toString());
 
 		///We have a device.  Let's scan to see if it supports the service Uuid's we want
 		auto control = new QLowEnergyController(device.address(), this);
+		control->setRemoteAddressType(mAddyType);
 
 		connect(control, &QLowEnergyController::stateChanged, [control, this](QLowEnergyController::ControllerState state)
 		{
-			qDebug() << "Controller state changed for device: " << control->remoteAddress().toString() << state;
+			DEBUG("Controller state changed for device: " << control->remoteAddress().toString() << state);
+
 			if(state == QLowEnergyController::DiscoveredState)
 			{
 				devicesChanged();
 			}
 		});
 		connect(control, &QLowEnergyController::disconnected, control, &QLowEnergyController::deleteLater); // if we disconnect, clean up.
-		connect(control, &QLowEnergyController::connected, [&control]()
+		connect(control, &QLowEnergyController::connected, [this, &control]()
 		{
-			qDebug() << "Device connected. Discovering services...";
+			DEBUG("Device connected. Discovering services...");
 			control->discoverServices();
 		});
 		connect(control, SIGNAL(error(QLowEnergyController::Error)), this, SLOT(errorHandle(QLowEnergyController::Error)));
@@ -183,7 +198,9 @@ void ServiceIdentifier::characteristicChanged(const QLowEnergyCharacteristic &ch
 
 int main(int argc, char** argv)
 {
-	qDebug() << "Bluemonkey BLE Module"  << "Version: " << PROJECT_VERSION;
+	bool mDebug = true;
+
+	DEBUG("Bluemonkey BLE Module"  << "Version: " << PROJECT_VERSION);
 
 	QCoreApplication app(argc, argv);
 
