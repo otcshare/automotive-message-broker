@@ -8,6 +8,7 @@
 #include <QJSValue>
 
 #include <QBluetoothDeviceInfo>
+#include <QLowEnergyController>
 
 class QBluetoothDeviceDiscoveryAgent;
 class QLowEnergyService;
@@ -16,9 +17,16 @@ class QLowEnergyCharacteristic;
 class ServiceIdentifier : public QObject
 {
 	Q_OBJECT
+	Q_PROPERTY(QString deviceName READ getDeviceName)
+	Q_PROPERTY(QString deviceName READ getDeviceAddress)
+
 public:
 	ServiceIdentifier(const QString & s, const QString & r, const QString & t, QObject *parent = nullptr)
 		:QObject(parent), serviceUuid(s), rxUuid(r), txUuid(t), service(nullptr), isValid(false) {}
+
+	QString getDeviceName() { return deviceName; }
+	QString getDeviceAddress() { return deviceAddress; }
+
 	QString serviceUuid;
 	QString rxUuid;
 	QString txUuid;
@@ -63,9 +71,11 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void scanningChanged();
 	void devicesChanged();
+	void leDeviceFound(QString name, QString address);
+	void error(int);
 
 private Q_SLOTS:
-
+	void errorHandle(QLowEnergyController::Error err);
 	void deviceDiscovered(const QBluetoothDeviceInfo & device);
 
 private:

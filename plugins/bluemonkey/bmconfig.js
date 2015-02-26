@@ -40,7 +40,7 @@ app.main = function()
 	if(ble !== undefined)
 	{
 		serviceUuid = "5faaf494-d4c6-483e-b592-d1a6ffd436c9";
-		device = ble.addService(serviceUuid, "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
+		ble.addService(serviceUuid, "5faaf495-d4c6-483e-b592-d1a6ffd436c9", "5faaf496-d4c6-483e-b592-d1a6ffd436c9");
 		ble.scanningChanged.connect(function ()
 		{
 			if(!ble.scan)
