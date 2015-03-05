@@ -1,4 +1,5 @@
 #Copyright (C) 2014  Intel Corporation
+#Copyright (c) 2015  Cogent Embedded Inc.
 #
 #This library is free software; you can redistribute it and/or
 #modify it under the terms of the GNU Lesser General Public
@@ -19,6 +20,12 @@
     my @ecuList = ();
     my %ecuMessages = ();
     my %ecuValues = ();
+    my %enumValues = ();
+    my %messageSenders = ();
+    my $fileComment = '';
+    my %ecuComments = ();
+    my %messageComments = ();
+    my %signalComments = ();
 }
 
 DbcOutput: Line(s?) eofile
@@ -75,32 +82,90 @@ Line: CommentPrefix /.*\n/
         # Not needed to output anything yet
     | 'VERSION' DoubleQuotedId
         # Not needed to output anything yet
+        # Version can be empty like this ""
     | 'NS_' ':' NSList(s?) ...'BS_'
+        # this tag holds a list of "new symbols" for the file
+        # Not needed to output anything
+    | 'BS_' ':'
+        # This tag holds definition of bit timings, obsolete
+        # Not need to output anything
+    | 'BU_' ':' <skip:'[ \t]*'> Identifier(s?)
         {
-            # We just read the list of NSs
-            @networks = @{$item[3]};
+	    # This tag holds the list of ECUs in one line
+            @ecuList = @{$item[4]};
         }
-    | 'BS_' /.*\n/
-        # Not needed to output anything yet
-    | 'BU_' ':' EcuList(s?) ...'BO_'
-        {
-            @ecuList = @{$item[3]};
-        }
-    | 'BO_' Number Identifier ':' Identifier Identifier Signal(s?)
+    | 'BO_' Integer Identifier ':' Identifier Identifier Signal(s?)
         {
             my %msg = ();
             $msg{'canId'} = $item[2];
             $msg{'canName'} = $item[3];
             $msg{'canDlc'} = $item[5];
-            $msg{'canMessageId'} = $item[6];
+            $msg{'canEcuId'} = $item[6];
             $msg{'signals'} = $item[7];
 
             push ( @{$ecuMessages{$item[6]}}, \%msg );
         }
     | 'VAL_' Number Identifier ValuePair(s?) ';'
         {
+	    # This tag holds enums defined for specific messages
             ${$ecuValues{$item[2]}->{$item[3]}} = $item[4];
         }
+    | 'VAL_TABLE_' Identifier ValuePair(s?) ';'
+        {
+	    # This tag holds predefined enumerations
+            ${$enumValues{$item[2]}} = $item[3];
+        }
+    | 'BO_TX_BU_' Number ':' Receiver(s /,/) ';'
+	{
+	    # This tag defines message senders
+	    @{$messageSenders{$item[2]}} = $item[4];
+	}
+    | 'CM_' DoubleQuotedId ';'
+	{
+	    # This tag is a comment for the whole file
+	    $fileComment = $item[2];
+	}
+    | 'CM_' 'BU_' Identifier DoubleQuotedId ';'
+	{
+	    # This tag is a comment for an ECU
+	    ${$ecuComments{$item[3]}} = $item[4];
+	}
+    | 'CM_' 'BO_' Identifier DoubleQuotedId ';'
+	{
+	    # This tag is a comment for a message
+	    ${$messageComments{$item[3]}} = $item[4];
+	}
+    | 'CM_' 'SG_' Number Identifier DoubleQuotedId ';'
+	{
+	    # This tag is a comment for a signal
+	    ${$signalComments{$item[3]}->{$item[4]}} = $item[5];
+	}
+    | 'BA_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'BA_DEF_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'BA_DEF_DEF_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'BA_REL_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'BA_DEF_REL_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'BA_DEF_DEF_REL_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'BA_SGTYPE_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'BA_DEF_SGTYPE_' /.*;/
+	    # This tag is an attribute definition
+	    # Not needed to output anything yet
+    | 'SIG_GROUP_' Number Identifier Number ':' Identifier(s) ';'
+	    # This tag is a signal group definition
     | <error: Invalid dbc format at $thisline!>
 
 Signal: 'SG_' Identifier ':' DataPlacement FactorOffset Range DoubleQuotedId Receiver(s /,/)
@@ -109,7 +174,7 @@ Signal: 'SG_' Identifier ':' DataPlacement FactorOffset Range DoubleQuotedId Rec
             $signal{'canId'} = $item[2];
 
             my %placement = %{$item[4]};
-            $signal{'startbit'} = $placement{'startbit'};
+            $signal{'startBit'} = $placement{'startbit'};
             $signal{'length'} = $placement{'length'};
             $signal{'byteOrdering'} = $placement{'byteOrdering'};
             $signal{'signedness'} = $placement{'signedness'};
@@ -131,11 +196,6 @@ Signal: 'SG_' Identifier ':' DataPlacement FactorOffset Range DoubleQuotedId Rec
             $signal{'AMBPropertyName'} = $ambPropertyName;
 
             $return=\%signal;
-        }
-
-EcuList: ...!'BO_' Identifier
-        {
-            $return = $item[2];
         }
 
 NSList: ...!'BS_' Identifier
@@ -209,10 +269,13 @@ Identifier: /[A-Za-z0-9_\-]+/
             $return = $item[1];
         }
 
-Number: /[-+]?[0-9]*/
+Number: Integer | RealNumber | Sign
+
+Integer: /[-+]?[0-9]*/
 RealNumber: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/
 Sign: /^[-+]?/
 
 CommentPrefix: /^\/\//
 
 DoubleQuotation: "\""
+

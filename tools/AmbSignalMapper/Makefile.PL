@@ -33,7 +33,7 @@ WriteMakefile(
 		'Digest::SHA1'=>0,
 		#'Config::General'=>0,
 	},
-	EXE_FILES => [ 'bin/dbc2json','bin/json2amb'],
+	EXE_FILES => [ 'bin/dbc2json','bin/json2amb', 'bin/dbc2amb' ],
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES => 'AmbSignalMapper-*' },
 );
@@ -54,10 +54,11 @@ sub MY::postamble {
 # Compile the RecDescent grammar during make; 
 sub compile_DbcGrammar {
 	push(@EXCLUSIONS,'blib/lib/Intel/IviPoc/DbcGrammar');
+	push(@EXCLUSIONS,'blib/lib/Intel/IviPoc/MsgGrammar');
 	$MORE_MAKERULES .= <<'MakeGrammar';
 
 # Precompile the (Recursive Descent) DbcGrammar
-pure_all :: $(INST_LIBDIR)/Intel/IviPoc/DbcGrammar.pm
+pure_all :: $(INST_LIBDIR)/Intel/IviPoc/DbcGrammar.pm $(INST_LIBDIR)/Intel/IviPoc/MsgGrammar.pm
 
 $(INST_LIBDIR)/Intel/IviPoc/DbcGrammar.pm: lib/Intel/IviPoc/DbcGrammar
 	$(PERLRUN) -MParse::RecDescent - lib/Intel/IviPoc/DbcGrammar Intel::IviPoc::DbcGrammar
@@ -65,6 +66,12 @@ $(INST_LIBDIR)/Intel/IviPoc/DbcGrammar.pm: lib/Intel/IviPoc/DbcGrammar
 	$(MV) -f DbcGrammar.pm blib/lib/Intel/IviPoc/DbcGrammar.pm
 	$(CHMOD) $(PERM_RWX) bin/dbc2json
 	$(CHMOD) $(PERM_RWX) bin/json2amb
+
+$(INST_LIBDIR)/Intel/IviPoc/MsgGrammar.pm: lib/Intel/IviPoc/MsgGrammar
+	$(PERLRUN) -MParse::RecDescent - lib/Intel/IviPoc/MsgGrammar Intel::IviPoc::MsgGrammar
+	$(NOECHO) $(MKPATH) $(INST_LIBDIR)/Intel/IviPoc
+	$(MV) -f MsgGrammar.pm blib/lib/Intel/IviPoc/MsgGrammar.pm
+	$(CHMOD) $(PERM_RWX) bin/dbc2amb
 
 MakeGrammar
 }

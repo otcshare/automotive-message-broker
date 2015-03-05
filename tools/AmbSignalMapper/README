@@ -1,8 +1,14 @@
 AmbSignalMapper
+===============
 
 ABSTRACT:
 
 The AmbSignalMapper tool serves basic utilities for AMB signal mapping process.
+Two workflows exist: a classic workflow with an intermediate file and a "direct"
+workflow with an *.msg file.
+
+Classic Workflow
+----------------
 It should take place in three steps:
 
 1. Vector CANdb++ conversion into intermediate file (First phase)
@@ -12,6 +18,27 @@ It should take place in three steps:
 The First phase is achieved by software utolity called dbc2json.
 The second phase needs to be done by humans manually.
 The third phase is again covered by software utolity called json2amb. 
+
+Direct Workflow
+---------------
+This workflow is designed for generation of production code. It consists of three steps:
+1. Obtain a *.dbc file
+2. Prepare a special *.msg message definition file
+3. Generate AMB plugin by running
+	dbc2amb I<dbc file> I<msg file> I<outdir> I<plugin name>
+
+*.msg file contains message definitions marked by the keyword B<RECEIVE>. Messages can be
+selected by name "Message1" or by id with b<@> prefix "@141". An asterisk can be specified
+instead of the list of signals to select all signals. 
+
+	RECEIVE Message1 {
+		Signal1
+	}
+
+	RECEIVE Message2.Signal2;
+
+	RECEIVE @141.*;
+
 
 PREREQUISITES:
 
@@ -55,6 +82,8 @@ perldoc command.
     perldoc dbc2json
     
     perldoc json2amb   
+
+    perldoc dbc2amb
 
 LICENSE AND COPYRIGHT
 

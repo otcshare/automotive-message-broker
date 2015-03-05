@@ -107,8 +107,17 @@ if ($total == 2) {
     $targetDir = Cwd::abs_path($ARGV[2]);
 }
 
+# Load the json
+my $json_text = &readFileContent( $ARGV[1] );
+
+my $json = JSON->new;
+$json = $json->utf8;
+
+my $dbcjson = $json->decode( $json_text );
+
+
 # Generate the plaugin
-processPlugin ( $hashingAllowed, $ARGV[1], $targetDir );
+processPlugin ( $hashingAllowed, $dbcjson, $targetDir );
 
 # Finnish
 exit;

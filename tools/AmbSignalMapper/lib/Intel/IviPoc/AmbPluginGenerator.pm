@@ -84,16 +84,9 @@ my $hashingAllowed = 'E';       # Enabled by default
 
 sub processPlugin {
 	$hashingAllowed = $_[0];
-	my $jsonfile = $_[1];
+	my $dbcjson = $_[1];
 	my $targetDir = $_[2];
-
-	# Load the json
-	my $json_text = &readFileContent( $jsonfile );
-
-	my $json = JSON->new;
-	$json = $json->utf8;
-
-	my $dbcjson = $json->decode( $json_text );
+	
 	if ($hashingAllowed eq 'E' ) {
 		&encryptAmbPropertyNames( $dbcjson );
 	}
@@ -113,6 +106,7 @@ sub processPlugin {
 						 , "ambtmpl_plugin.cpp"
 						 , "ambtmpl_cansignals.h"
 						 , "ambtmpl_plugin.idl"
+						 , "ambtmpl.in.json"
 						 );
 
 	my @pluginFiles = ( "CMakeLists.txt"
@@ -122,6 +116,7 @@ sub processPlugin {
 					  , lc ($pluginName) . "_plugin.cpp"
 					  , lc ($pluginName) . "_cansignals.h"
 					  , lc ($pluginName) . "_plugin.idl"
+					  , lc ($pluginName) . ".in.json"
 					  );
 
 	my @generationSubs = ( undef
@@ -131,6 +126,7 @@ sub processPlugin {
 						 , \&generateCppImplTypes
 						 , \&generateSignalsTypes
 						 , \&generateIdlTypes
+						 , undef
 						 );
 
 	my $templateFile = '';
@@ -483,7 +479,7 @@ sub generatePropertyClasses {
 		$cppType = "$type";
 	}
 
-	 $typeBasedText .= "CANSIGNAL($ambPropertyName, $cppType, $signal->{'startBit'}, $signal->{'length'}, $byteOrdering, $signedness, $signal->{'factor'}, $signal->{'offset'}, static_cast<$cppType>($signal->{'minValue'}), static_cast<$cppType>($signal->{'maxValue'}), $convertFromFunction, $convertToFunction)\n";
+	$typeBasedText .= "CANSIGNAL($ambPropertyName, $cppType, $signal->{'startBit'}, $signal->{'length'}, $byteOrdering, $signedness, $signal->{'factor'}, $signal->{'offset'}, static_cast<$cppType>($signal->{'minValue'}), static_cast<$cppType>($signal->{'maxValue'}), $convertFromFunction, $convertToFunction)\n";
 
 	$generatedText .= " */\n";
 	my $shownPropertyName = $ambPropertyName;

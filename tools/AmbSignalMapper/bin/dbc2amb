@@ -1,0 +1,288 @@
+#!/usr/bin/perl -w
+
+#	Copyright (C) 2014  Intel Corporation
+#   Copyright (c) 2015  Cogent Embedded Inc.
+#   
+#	This library is free software; you can redistribute it and/or
+#	modify it under the terms of the GNU Lesser General Public
+#	License as published by the Free Software Foundation; either
+#	version 2.1 of the License, or (at your option) any later version.
+#
+#	This library is distributed in the hope that it will be useful,
+#	but WITHOUT ANY WARRANTY; without even the implied warranty of
+#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#	Lesser General Public License for more details.
+#
+#	You should have received a copy of the GNU Lesser General Public
+#	License along with this library; if not, write to the Free Software
+#	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+use strict;
+use warnings;
+
+use warnings FATAL => 'all';
+
+use Intel::IviPoc::DbcGrammar;
+use Intel::IviPoc::MsgGrammar;
+use Intel::IviPoc::AmbCommon;
+use Intel::IviPoc::AmbPluginGenerator qw(processPlugin);
+use File::Basename;
+use File::Spec;
+use Cwd;
+use Data::Dumper;
+
+=head1 NAME
+
+dbc2amb - Vector CANdb++ to Automotive Message Broker plugin generator.
+
+=head1 SYNOPSIS
+
+B<dbc2amb> I<dbc file> I<msg file> [ I<outdir> [I<plugin name>] ] 
+
+=head1 DESCRIPTION
+
+Part of Automotive Message Broker Signal Mapper tool.
+
+B<dbc2amb> converts file in Vector CANdb++ format to Automotive Message Broker plugin.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<dbc file>
+
+Input I<dbc file> file in Vector CANdb++ (*.dbc) format.
+
+"-" (without quotes) can be specified instead of I<dbc file> to omit *.dbc file.
+
+=item I<msg file>
+
+Input I<msg file> file with message definitions.
+
+=item [ I<outdir> ]
+
+This parameter is optional. Target directory where the plugin is generated to.
+Otherwise current directory.
+
+=item [ I<plugin name> ]
+
+Machine- and user- readable name of the plugin. Plugin code will be exported to 
+B<I<outdir>>/BI<plugin name>_plugin> directory
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=back
+
+=head1 REQUIRES
+
+Perl 5.006, Intel::IviPoc::DbcGrammar, Intel::IviPoc::MsgGrammar, Intel::IviPoc::AmbPluginGenerator, Intel::IviPoc::AmbCommon, File::Basename, File::Spec, Cwd
+
+=head1 SEE ALSO
+
+perl(1), amb2json(1), json2amb(1)
+
+=cut
+
+local $/;
+
+# get total arg passed to this script
+my $total = $#ARGV + 1;
+
+if ( $total < 2 or $total > 4) {
+    # get script name and print usage
+    my $scriptname = $0;
+    &printUsage($scriptname);
+    exit;
+    }
+
+# First parameter is input dbc filename
+my $dbc_inputfilename = $ARGV[0];
+my $dbc_text;
+if ($dbc_inputfilename eq '-') {
+	# use dummy *.dbc file if '-' is specified on command line
+	$dbc_text = "VERSION \"\" \n\n\nNS_ :  \n\n\nEMPTY  \nBS_:  \nBU_: \n ";
+}
+else {
+	$dbc_text = &readFileContent($dbc_inputfilename);
+}
+
+# Second parameter is input msg filename
+my $msg_inputfilename = $ARGV[1];
+my $msg_text = &readFileContent($msg_inputfilename);
+
+# Third optional parameter is output file
+my $targetDir = ();
+if ( $total <= 2 ) {
+	$targetDir = getcwd;
+} else {
+    $targetDir = Cwd::abs_path($ARGV[2]);
+}
+
+# Fourth optional parameter is plugin name
+my $pluginname;
+if ( $total <= 2 ) {
+	my ($infilename, $indirectories, $insuffix) = fileparse($dbc_inputfilename, qr/\.[^.]*/);
+	$pluginname = $infilename;
+} else {
+    $pluginname = $ARGV[3];
+}
+
+# We add one space to dbc file if there is something like  ""ReceiverId to get "" ReceiverId
+$dbc_text =~ s/"(.*)"(\w*)/"$1" $2/g;
+
+#Create parsers
+my $dbc_parser = new Intel::IviPoc::DbcGrammar;
+my $msg_parser = new Intel::IviPoc::MsgGrammar;
+
+# Print wait info for user
+&printWait($dbc_inputfilename, $msg_inputfilename, $targetDir);
+
+# Parse input files
+my $dbc_result;
+$dbc_result = $dbc_parser->DbcOutput($dbc_text);
+my $msg_result;
+$msg_result = $msg_parser->MsgOutput($msg_text);
+# print Dumper $msg_result;  #TODO: Remove debug print
+
+# Generate the plugin
+my $selected_signals = selectSignals($dbc_result, $msg_result, "CAN");
+$selected_signals->{'pluginName'} = $pluginname;
+#print Dumper $selected_signals; #TODO: remove this after debugging is complete
+my $hashingAllowed = 'D';
+
+processPlugin ( $hashingAllowed, $selected_signals, $targetDir );
+
+print "Plugin is generated in '$targetDir'.\n";
+
+# Finnish
+exit;
+
+
+=head2 selectSignals
+
+Select signals for implementing in an AMB plugin.
+
+=cut
+
+sub selectSignals {
+    my %dbc_root = %{$_[0]};
+    my %msg_root = %{$_[1]};
+	my $plugin_name = $_[2];
+
+	my @electronicControlUnits = ();
+	keys $msg_root{'receive'};
+	while( my($msg_id, $signals) = each $msg_root{'receive'}) {
+	 
+
+		for my $ecu (@{$dbc_root{'electronicControlUnits'}}) {
+			my %add_ecu = ();			
+
+			for my $message (@{$ecu->{'messages'}}) {
+				if ((lc $msg_id eq lc $message->{'canName'}) or ($msg_id eq $message->{'canId'})) {
+					# selected valid message, add its common properties
+					my %msg_copy = %{$message};
+
+					if (!(exists $signals->{'*'})) {
+						delete $msg_copy{'signals'};
+
+						for my $signal (@{$message->{'signals'}}) {
+							if (exists $signals->{$signal->{'canId'}}) {
+								push(@{$msg_copy{'signals'}}, $signal);
+							}
+						}
+					}
+
+					# add message only if not empty
+					if (exists $msg_copy{'signals'}) {
+						push(@{$add_ecu{'messages'}}, \%msg_copy);
+					}
+				}
+			}
+
+			# add signals to the reference
+			if (%add_ecu){
+				push(@electronicControlUnits, \%add_ecu);
+			}
+		}
+	}
+
+	my %jsonroot = ();
+    $jsonroot{'pluginName'} = "pluginName";
+    $jsonroot{'electronicControlUnits'} = \@electronicControlUnits;
+
+	return \%jsonroot;
+}
+
+=head2 printWait
+
+Prints out wait information
+
+=cut
+
+sub printWait {
+    print STDERR ("\n");
+    print STDERR ("Processing input dbc file:\n");
+    print STDERR ("    $_[0]\n");
+    print STDERR ("Processing input msg file:\n");
+    print STDERR ("    $_[1]\n");
+    print STDERR ("Generating output files is in:\n");
+    print STDERR ("    $_[2]\n");
+    print STDERR ("\n");
+    print STDERR ("This operation may take some while. Please wait...\n");
+}
+
+=head2 printUsage
+
+Prints out basic usage help
+
+=cut
+
+sub printUsage {
+    my $scriptname=$_[0];
+    print STDERR ("$scriptname\n");
+    print STDERR ("Usage: dbc2amb in_dbc_file in_msg_file [outdir [plugin_name]]\n");
+    print STDERR ("  in_dbc_file              Input dbc file. Specify '-' to skip.\n");
+    print STDERR ("  in_msg_file              Input msg file\n");
+    print STDERR ("  outdir                   Target plugin directory (optional) generated to,\n");
+    print STDERR ("                            otherwise current directory.\n");
+    print STDERR ("  plugin_name              Machine-readable name of the plugin\n");
+    print STDERR ("\n");
+}
+
+=head1 AUTHOR
+
+IntelIVIPoc, C<< <ivipoc at intel.com> >>
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc dbc2amb
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2014  Intel Corporation
+
+Copyright (C) 2015  Cogent Embedded, Inc.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+=cut
