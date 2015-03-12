@@ -1,6 +1,7 @@
 #ifndef _TIMESTAMP_H___
 #define _TIMESTAMP_H___
 
+#include <time.h>
 
 namespace amb {
 
@@ -13,10 +14,14 @@ protected:
 public:
 
 	double currentTime();
+	double currentTime(double time);
 
 	double epochTime(double time);
 
 	double epochTime();
+
+    static double fromTimeval(const struct ::timeval& tv);
+    static struct ::timeval toTimeval(const double time);
 
 public:
 	static Timestamp *instance();

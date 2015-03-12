@@ -66,6 +66,13 @@ private:
     */
     virtual void run();
 
+    /**
+     * Proceseses CAN message received from SocketCAN and notifies mObserver.
+     * @fn dispatchMessage
+     * @param message CAN message to be processed. Unchanged.
+     */
+    virtual void dispatchMessage(const CANFrameInfo &message);
+
 private:
     /**
     * #CANObserver instance reference

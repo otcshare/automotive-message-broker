@@ -117,6 +117,12 @@ public:
     * \return True if frame was sent
     */
     bool sendExtendedFrame(const can_frame& frame);
+    /**
+     * Called when timeout was detected for a cyclic message.
+     * @fn timeoutDetected
+     * @param frame
+     */
+    virtual void timeoutDetected(const can_frame& frame);
 
     /*!
      * Second phase of the plugin initialization.
@@ -135,15 +141,15 @@ public:
 
 protected:
 
-    void registerMessage(const canid_t& canId, const __u8& canDlc)
+    void registerMessage(const canid_t& canId, const __u8& canDlc, const double CycleTime)
     {
         LOG_MESSAGE("registered message: " << canId);
     }
 
     template<typename Signal, typename... Rest>
-    void registerMessage(const canid_t& canId, const __u8& canDlc, Signal* canSignal, Rest... rest)
+    void registerMessage(const canid_t& canId, const __u8& canDlc, const double CycleTime, Signal* canSignal, Rest... rest)
     {
-        static_assert(std::is_base_of<CANSignal, Signal>::value, "CANSignal has to be a base of Signal");
+        static_assert(std::is_base_of<CANSignal, Signal>::value, "CANSignal has to be a base class of Signal");
 
         if(!canSignal)
             return;
@@ -153,20 +159,21 @@ protected:
             canSignal->setAmbProperty(prop);
             auto messageIt = messages.find(canId);
             if(messageIt == messages.end()){
-                messageIt = messages.insert(make_pair(canId, CANMessage(canId, canDlc))).first;
+                messageIt = messages.insert(make_pair(canId, CANMessage(canId, canDlc, CycleTime))).first;
             }
             auto& message = messageIt->second;
             message.addSignal(prop->name, std::shared_ptr<CANSignal>(canSignal));
             propertyToMessage[prop->name] = &message;
         }
 
-        registerMessage(canId, canDlc, rest...);
+        registerMessage(canId, canDlc, CycleTime, rest...);
     }
 
 private:
 
     void printFrame(const can_frame& frame) const;
     void onMessage(const can_frame& frame);
+    void onTimeout(const can_frame& frame);
     bool sendValue(AbstractPropertyType* value);
     void registerMessages();
 

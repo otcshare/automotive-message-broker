@@ -126,6 +126,12 @@ public:
      * \param frame RTR frame
      */
     virtual void remoteTransmissionRequest(const can_frame& frame);/* remote transmission request (SFF/EFF is still present)*/
+    /**
+     * Called when timeout was detected for a cyclic message.
+     * @fn timeoutDetected
+     * @param frame
+     */
+    virtual void timeoutDetected(const can_frame& frame);
 
     /*!
      * Second phase of the plugin initialization.

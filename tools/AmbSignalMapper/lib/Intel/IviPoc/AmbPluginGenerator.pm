@@ -263,7 +263,7 @@ sub generateCppImplTypes {
             my @messages = @{$engineControlUnits[$ecui]{'messages'}};
             for my $msgi (0..scalar(@messages)-1) {
                 $hexValue = '0x' . uc ( sprintf( "%x", $messages[$msgi]{'canId'} ) );
-                $registerMessageText .= "    registerMessage($hexValue, $messages[$msgi]{'canDlc'}";
+                $registerMessageText .= "    registerMessage($hexValue, $messages[$msgi]{'canDlc'}, $messages[$msgi]{'cycle'}";
 
                 my @signals = @{$messages[$msgi]{'signals'}};
                 foreach my $signal ( @signals ) {

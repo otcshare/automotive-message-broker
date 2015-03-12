@@ -1,5 +1,7 @@
 /*
 Copyright (C) 2012 Intel Corporation
+Copyright (C) 2015 Cogent Embedded Inc.
+Copyright (C) 2015 Renesas Electronics Corporation
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -21,25 +23,21 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "canadapter.h"
 #include "logger.h"
 
-//----------------------------------------------------------------------------
-// CANBusImpl
-//----------------------------------------------------------------------------
-
-CANBus::Impl::Impl(CANObserver& observer) :
+CANBusImpl::CANBusImpl(CANObserver& observer) :
     mObserver(observer),
     mAdapter(NULL)
 {
     LOG_TRACE("");
 }
 
-CANBus::Impl::~Impl()
+CANBusImpl::~CANBusImpl()
 {
     LOG_TRACE("");
 
     stop();
 }
 
-bool CANBus::Impl::start(const char* name)
+bool CANBusImpl::start(const char* name)
 {
     LOG_TRACE("");
 
@@ -49,7 +47,7 @@ bool CANBus::Impl::start(const char* name)
     return mAdapter ? mAdapter->start(name) : false;
 }
 
-void CANBus::Impl::stop()
+void CANBusImpl::stop()
 {
     LOG_TRACE("");
 
@@ -60,7 +58,7 @@ void CANBus::Impl::stop()
     }
 }
 
-bool CANBus::Impl::sendStandardFrame(const can_frame& frame)
+bool CANBusImpl::sendStandardFrame(const can_frame& frame)
 {
     LOG_TRACE("");
 
@@ -72,7 +70,7 @@ bool CANBus::Impl::sendStandardFrame(const can_frame& frame)
     return false;
 }
 
-bool CANBus::Impl::sendExtendedFrame(const can_frame& frame)
+bool CANBusImpl::sendExtendedFrame(const can_frame& frame)
 {
     LOG_TRACE("");
 
@@ -85,56 +83,24 @@ bool CANBus::Impl::sendExtendedFrame(const can_frame& frame)
     return false;
 }
 
-void CANBus::Impl::init()
+void CANBusImpl::init()
 {
     mAdapter = CANAdapter::createCANAdapter(mObserver);
 }
 
-//----------------------------------------------------------------------------
-// CANBus
-//----------------------------------------------------------------------------
-
-CANBus::CANBus(CANObserver& observer) :
-    d(new CANBus::Impl(observer))
+bool CANBusImpl::registerCyclicMessageForReceive(int canId, double minCycleTime, double maxCycleTime)
 {
-    LOG_TRACE("");
-}
-
-CANBus::~CANBus()
-{
-    LOG_TRACE("");
-
-    if(d) {
-    	delete d;
-        d = 0;
+    if(mAdapter) {
+        return mAdapter->registerCyclicMessageForReceive(canId, minCycleTime, maxCycleTime);
     }
+    return false;
 }
 
-bool CANBus::start(const char* name)
+bool CANBusImpl::unregisterMessageForReceive(int canId)
 {
-    LOG_TRACE("");
-
-    return d ? d->start(name) : false;
+    if(mAdapter) {
+     return mAdapter->unregisterMessageForReceive(canId);
+    }
+    return false;
 }
 
-void CANBus::stop()
-{
-    LOG_TRACE("");
-
-    if(d)
-    	d->stop();
-}
-
-bool CANBus::sendStandardFrame(const can_frame& frame)
-{
-    LOG_TRACE("");
-
-    return d ? d->sendStandardFrame(frame) : false;
-}
-
-bool CANBus::sendExtendedFrame(const can_frame& frame)
-{
-    LOG_TRACE("");
-
-    return d ? d->sendExtendedFrame(frame) : false;
-}

@@ -2,6 +2,7 @@
 
 #	Copyright (C) 2014  Intel Corporation
 #	Copyright (c) 2015  Cogent Embedded Inc.
+#	Copyright (C) 2015  Renesas Electronics Corporation
 #
 #	This library is free software; you can redistribute it and/or
 #	modify it under the terms of the GNU Lesser General Public
@@ -192,6 +193,14 @@ sub selectSignals {
 								push(@{$msg_copy{'signals'}}, $signal);
 							}
 						}
+					}
+
+					# select 'cycle' property
+					if (exists $msg_root{'cycle'}->{$msg_id}) {
+						$msg_copy{'cycle'} = $msg_root{'cycle'}->{$msg_id};
+					}
+					else {
+						$msg_copy{'cycle'} = 0;
 					}
 
 					# add message only if not empty

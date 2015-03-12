@@ -1,4 +1,5 @@
 #Copyright (c) 2015  Cogent Embedded Inc.
+#Copyright (C) 2015 Renesas Electronics Corporation
 #
 #This library is free software; you can redistribute it and/or
 #modify it under the terms of the GNU Lesser General Public
@@ -22,6 +23,7 @@
 MsgOutput: Line(s?) eofile
     {
 	my %rcv_msg = ();
+	my %cycle_msg = ();
 	my %send_msg = ();
 
 	for my $msg (@receive) {
@@ -30,10 +32,16 @@ MsgOutput: Line(s?) eofile
 	    for my $signal (@{$m{'signals'}}) {
 		    $rcv_msg{$m{'id'}}->{$signal} += 1;
             }
+
+	    if (exists $m{'cycle'}) {
+		$cycle_msg{$m{'id'}} = $m{'cycle'} / 1000.0;
+	    }
+
 	}
 
 	my %picked = ();
 	$picked{'receive'} = \%rcv_msg;
+	$picked{'cycle'} = \%cycle_msg;
 	$picked{'send'} = \%send_msg;
 
 	return \%picked;
@@ -53,20 +61,26 @@ Line: CommentPrefix /.*\n/
 	   # select the message for sending
 	   push(@send, $item[2]);
 	}
-    | <error: Invalid msg format at $thisline!>	
+    | <error: Invalid msg format at $thisline!>
 
-MessageSpec: MessageId '.' SignalId ';'
+MessageSpec: MessageId '.' SignalId MessageProperties ';'
 	{
 	   my %msg;
 	   $msg{'id'} = $item[1];
            @{$msg{'signals'}} = $item[3];
+	   for my $p (@{$item[4]}) {
+		$msg{lc($p->{'name'})} = $p->{'value'};
+	   }
 	   $return = \%msg;
 	}
-      | MessageId '{' SignalId(s? /,/) '}'
+      | MessageId MessageProperties '{' SignalId(s? /,/) '}'
 	{
 	   my %msg;
 	   $msg{'id'} = $item[1];
-           $msg{'signals'} = $item[3];
+           $msg{'signals'} = $item[4];
+	   for my $p (@{$item[2]}) {
+		$msg{lc($p->{'name'})} = $p->{'value'};
+	   }
 	   $return = \%msg;
 	}
 
@@ -81,12 +95,25 @@ MessageId: Identifier
 	  $return = $item[2];
 	}
 
+MessageProperties: MessageProperty(s?)
+
+MessageProperty: Identifier '=' Value
+	{
+		# property of the message
+		my %prop;
+		$prop{'name'} = $item[1];
+		$prop{'value'} = $item[3];
+		$return = \%prop;
+	}
+
 SignalId: Identifier|'*'
 
 Identifier: /[A-Za-z0-9_\-]+/
         {
             $return = $item[1];
         }
+
+Value: Number | String
 
 Number: Integer | RealNumber | Sign
 
@@ -97,4 +124,6 @@ Sign: /^[-+]?/
 CommentPrefix: '#'
 
 DoubleQuotation: "\""
+
+String: /\"[^\"]*\"/ 
 

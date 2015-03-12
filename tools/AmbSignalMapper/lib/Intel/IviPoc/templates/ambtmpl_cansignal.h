@@ -97,6 +97,7 @@ public:
     virtual GVariant *processSignal( const can_frame& frame ) = 0;
 
     virtual void onMessage( const can_frame& frame, std::function<void (AbstractPropertyType*)> changeCallback );
+    virtual void onTimeout( const can_frame& frame, std::function<void (AbstractPropertyType*)> changeCallback );
 
     virtual bool updateFrame( can_frame* frame );
 
@@ -145,9 +146,10 @@ class CANMessage
 public:
     CANMessage() = delete;
 
-    CANMessage(canid_t canId, __u8 canDlc) :
+    CANMessage(canid_t canId, __u8 canDlc, double CycleTime) :
         canId(canId),
-        canDlc(canDlc)
+        canDlc(canDlc),
+        CycleTime(CycleTime)
     {
     }
 
@@ -159,6 +161,7 @@ public:
 
     void onMessage(const can_frame& frame, std::function<void (AbstractPropertyType*)> changeCallback)
     {
+        // sanity check
         if(frame.can_dlc != canDlc || frame.can_id != canId)
             return;
 
@@ -167,6 +170,21 @@ public:
 
             if ( signal ) {
                 signal->onMessage(frame, changeCallback);
+            }
+        }
+    }
+
+    void onTimeout(const can_frame& frame, std::function<void (AbstractPropertyType*)> changeCallback)
+    {
+        // sanity check
+        if(frame.can_id != canId)
+            return;
+
+        for ( auto it = canSignals.begin(); it != canSignals.end(); ++it ) {
+            std::shared_ptr<CANSignal> signal(it->second);
+
+            if ( signal ) {
+                signal->onTimeout(frame, changeCallback);
             }
         }
     }
@@ -185,9 +203,15 @@ public:
         }
     }
 
+    bool registerOnCANBus(CANBus& canBus)
+    {
+        return canBus.registerCyclicMessageForReceive(canId, 0, CycleTime);
+    }
+
 private:
     canid_t canId;
     __u8 canDlc;
+    double CycleTime;
     std::map< VehicleProperty::Property , std::shared_ptr<CANSignal> > canSignals;
 };
 

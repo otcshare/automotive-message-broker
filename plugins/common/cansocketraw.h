@@ -16,40 +16,29 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-#ifndef CANSOCKET_H
-#define CANSOCKET_H
+#ifndef CANSOCKETRAW_H
+#define CANSOCKETRAW_H
 
 /**
  *  \addtogroup libcanbus
  *  @{
  */
 
-#include <linux/can.h>
+#include <net/if.h>
+#include <sys/poll.h>
+#include <string>
+#include <linux/can/raw.h>
 
-#include "canbus.h"
+#include "cansocket.h"
 
 /**
-* \brief Wrapper around different implementations of SocketCAN.
+* \brief CAN Socket wrapper.
 * @class CANSocket
 */
-class CANSocket
+class CANSocketRaw : public CANSocket
 {
 public:
-
-    /**
-    * CAN bus socket error.
-    * @enum CANSocketReadSuccess
-    * @public
-    */
-    enum CANSocketReadSuccess {
-        READING_FAILED = -1,
-        READING_TIMED_OUT,
-        READING_SUCCEEDED,
-    };
-
-public:
-    CANSocket();
-    virtual ~CANSocket();
+    CANSocketRaw();
 
     /**
     * Opens and initializes CAN socket
@@ -57,9 +46,9 @@ public:
     * @param ifName Name of the CAN bus network interface.
     * @return True if no error occurs.
     */
-    virtual bool start(const char* ifName) = 0;
+    virtual bool start(const char* ifName);
     /**
-    * Closes the socket
+    * Closes socket
     * @fn stop
     */
     virtual void stop();
@@ -67,7 +56,6 @@ public:
     * Writes CAN frame using the socket
     * @fn write
     * @param message CAN frame with additional information
-    * @param bytesWritten Number of written bytes.
     * @return True if no error occurs.
     */
     virtual bool write(const struct CANFrameInfo &message);
@@ -79,24 +67,36 @@ public:
     * @return Reading operation status code.
     */
     virtual CANSocket::CANSocketReadSuccess read(struct CANFrameInfo& message, unsigned int timeout = 1000);
+
+private:
     /**
-     * Registers CAN ID of a cyclic message for receiving
-     * @fn registerCyclicMessageForReceive
-     * @param canId CAN ID of the message.
-     * @param minCycleTime Minimal interval between messages in seconds. Set to 0 if not used.
-     * @param maxCycleTime Maximum interval between messages for timeout detection in seconds. Set to 0 if no timeout detection is necessary.
-     * @return True if registration succeeds.
-     */
-    virtual bool registerCyclicMessageForReceive(int canId, double minCycleTime, double maxCycleTime);
+    * @internal
+    */
+    bool createSocket();
+    bool enableCANErrors(can_err_mask_t errorMask);
+    bool enableTimestamps();
+    bool locateInterfaceIndex(struct ifreq& ifr);
+    bool bindSocket(struct sockaddr_can &addr);
+    bool closeSocket();
+    int waitData(unsigned int timeout);
+    bool writeFrame(const struct can_frame &frame);
+    ssize_t readFrame(can_frame& frame, double &timestamp);
+
+private:
     /**
-     * Unregisters CAN ID for receiving
-     * @fn unregisterMessageForReceive
-     * @param canId CAN ID of the message.
-     * @return True if de-registration succeeds.
-     */
-    virtual bool unregisterMessageForReceive(int canId);
+    * Socket file descriptor.
+    * @property mSocket
+    * @private
+    */
+    int mSocket;
+    /**
+    * Data structure describing a polling request.
+    * @property mPoll
+    * @private
+    */
+    struct pollfd mPoll;
 };
 
-#endif // CANSOCKET_H
+#endif // CANSOCKETRAW_H
 
 /** @} */

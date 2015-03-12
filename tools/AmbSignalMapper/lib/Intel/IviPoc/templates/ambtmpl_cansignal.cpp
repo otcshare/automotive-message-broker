@@ -84,6 +84,18 @@ void CANSignal::onMessage(const can_frame& frame, std::function<void (AbstractPr
     }
 }
 
+void CANSignal::onTimeout(const can_frame& frame, std::function<void (AbstractPropertyType*)> changeCallback)
+{
+    //TODO: implement <no-value> handling
+/*    if (ambProperty->toString() != "none") {
+        ambProperty->setValue("none");
+        if(changeCallback)
+            changeCallback(ambProperty.get());
+    }
+*/
+}
+
+
 void CANSignal::setAmbProperty(std::shared_ptr<AbstractPropertyType> ambProperty)
 {
     this->ambProperty = ambProperty;

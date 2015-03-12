@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <logger.h>
 #include <ambplugin.h>
+#include <canbusimpl.h>
 
 #include "cangenplugin.h"
 
@@ -203,7 +204,7 @@ bool CANGenPlugin::sendValue(const std::string& interface, AbstractPropertyType*
 
 	auto& canBus = interfaces[interface];
 	if(!canBus){
-		canBus = std::shared_ptr<CANBus>(new CANBus(*static_cast<CANObserver*>(this)));
+		canBus = std::shared_ptr<CANBus>(new CANBusImpl(*static_cast<CANObserver*>(this)));
 		bool started(canBus->start(interface.c_str()));
 		if(!started)
 			return false;
@@ -463,4 +464,9 @@ void CANGenPlugin::dataReceived(libwebsocket* socket, const char* data, size_t l
 			}
 		}
 	}
+}
+
+void CANGenPlugin::timeoutDetected(const can_frame& frame)
+{
+	// do nothing
 }

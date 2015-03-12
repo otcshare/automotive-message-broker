@@ -1,5 +1,7 @@
 /*
 Copyright (C) 2012 Intel Corporation
+Copyright (C) 2015 Cogent Embedded Inc.
+Copyright (C) 2015 Renesas Electronics Corporation
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -35,14 +37,14 @@ class CANAdapter;
 * @class CANBus::Impl
 */
 
-class CANBus::Impl
+class CANBusImpl : public CANBus
 {
 public:
     /**
-    * @param observer \link #CANObserver Observer \endlink that will receives CAN bus frames
+    * @param observer \link #CANObserver Observer \endlink that will receive CAN bus frames
     */
-    Impl(CANObserver& observer);
-    virtual ~Impl();
+    CANBusImpl(CANObserver& observer);
+    virtual ~CANBusImpl();
 
     /**
     * Starts the CAN bus instance on the specified interface
@@ -70,6 +72,22 @@ public:
     * @return True if frame was sent
     */
     bool sendExtendedFrame(const can_frame& frame);
+    /**
+     * Registers CAN ID of a cyclic message for receiving
+     * @fn registerCyclicMessageForReceive
+     * @param canId CAN ID of the message.
+     * @param minCycleTime Minimal interval between messages in seconds. Set to 0 if not used.
+     * @param maxCycleTime Maximum interval between messages for timeout detection in seconds. Set to 0 if no timeout detection is necessary.
+     * @return True if registration succeeds.
+     */
+    virtual bool registerCyclicMessageForReceive(int canId, double minCycleTime, double maxCycleTime);
+    /**
+     * Unregisters CAN ID for receiving
+     * @fn unregisterMessageForReceive
+     * @param canId CAN ID of the message.
+     * @return True if de-registration succeeds.
+     */
+    virtual bool unregisterMessageForReceive(int canId);
 
 protected:
     /**

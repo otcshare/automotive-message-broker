@@ -26,6 +26,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <ambplugin.h>
 
 #include <logger.h>
+#include <canbusimpl.h>
 
 #include "cansimplugin.h"
 
@@ -86,7 +87,7 @@ CANSimPlugin::CANSimPlugin(AbstractRoutingEngine* re, const map<string, string>&
 					json_object* obj = (json_object*)array_list_get_idx(ifacelist,i);
 					const char* str = obj ? json_object_get_string(obj) : nullptr;
 					if(str){
-						interfaces[str] = std::shared_ptr<CANBus>(new CANBus(*static_cast<CANObserver*>(this)));
+						interfaces[str] = std::shared_ptr<CANBus>(new CANBusImpl(*static_cast<CANObserver*>(this)));
 					}
 				}
 			}
@@ -94,7 +95,7 @@ CANSimPlugin::CANSimPlugin(AbstractRoutingEngine* re, const map<string, string>&
 	}
 	// Default interface if none has been configured.
 	if(interfaces.empty()){
-		interfaces[DEFAULT_CAN_IF_NAME] = std::shared_ptr<CANBus>(new CANBus(*static_cast<CANObserver*>(this)));
+		interfaces[DEFAULT_CAN_IF_NAME] = std::shared_ptr<CANBus>(new CANBusImpl(*static_cast<CANObserver*>(this)));
 	}
 
 	addPropertySupport(
@@ -386,4 +387,7 @@ void CANSimPlugin::printFrame(const can_frame& frame) const
 	LOG_INFO( "CANSimPlugin::printFrame can data" << ss.str() << endl );
 }
 
-
+void CANSimPlugin::timeoutDetected(const can_frame& frame)
+{
+	// do nothing
+}
