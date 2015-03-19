@@ -9,6 +9,7 @@
 
 #include <QBluetoothDeviceInfo>
 #include <QLowEnergyController>
+#include <QBluetoothUuid>
 
 class QBluetoothDeviceDiscoveryAgent;
 class QLowEnergyService;
@@ -17,15 +18,17 @@ class QLowEnergyCharacteristic;
 class ServiceIdentifier : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QString deviceName READ getDeviceName)
-	Q_PROPERTY(QString deviceName READ getDeviceAddress)
+	Q_PROPERTY(QString name READ getDeviceName)
+	Q_PROPERTY(QString address READ getDeviceAddress)
 
 public:
 	ServiceIdentifier(const QString & s, const QString & r, const QString & t, QObject *parent = nullptr)
-		:QObject(parent), serviceUuid(s), rxUuid(r), txUuid(t), service(nullptr), isValid(false) {}
+		:QObject(parent), serviceUuid(s), rxUuid(r), txUuid(t), service(nullptr), mController(nullptr),
+	mAddyType(QLowEnergyController::RandomAddress){}
 
 	QString getDeviceName() { return deviceName; }
 	QString getDeviceAddress() { return deviceAddress; }
+	void setRemoteAddressType(int t);
 
 	QString serviceUuid;
 	QString rxUuid;
@@ -35,47 +38,54 @@ public:
 
 	QLowEnergyService * service;
 
-	bool isValid;
-
 public Q_SLOTS:
-	void write(const QByteArray & data);
+	QByteArray read();
+	bool write(const QByteArray &data);
+	void connectToDevice();
+	void disconnectFromDevice();
 
 Q_SIGNALS:
 	void onMessage(const QByteArray & data);
+	void connected();
+	void disconnected();
+	void stateChanged(int state);
 
 private Q_SLOTS:
 	void characteristicChanged(const QLowEnergyCharacteristic & characteristic, const QByteArray & newValue);
+	void controllerConnected();
+	void controllerServiceDiscovered(const QBluetoothUuid & uuid);
+	void controllerStateChanged(QLowEnergyController::ControllerState state);
+	void serviceStateChanged(QLowEnergyService::ServiceState s);
+
+private:
+	QLowEnergyController * mController;
+	QLowEnergyController::RemoteAddressType mAddyType;
 };
 
 class Ble : public QObject
 {
 	Q_OBJECT
 	Q_PROPERTY(bool scan READ scanning WRITE startScan NOTIFY scanningChanged)
-	Q_PROPERTY(QList<QObject*> devices READ devices NOTIFY devicesChanged)
 	Q_PROPERTY(bool debug READ debug WRITE setDebug)
 public:
 
 	Ble(QObject* parent = nullptr);
-
-	QList<QObject*> devices();
-	QList<QObject*> devices(const QString & serviceUuid);
+	~Ble();
 	QObject* device(const QString & address);
-	bool debug() { return mDebug; }
-	void setDebug(bool d) { mDebug = d; }
+	bool debug();
+	void setDebug(bool d);
 
 public Q_SLOTS:
 
 	void addService(const QString & serviceUuid, const QString & rxUuid, const QString & txUuid);
 
 	void startScan(bool scan);
-	void setRemoteAddressType(int t);
 
 	bool scanning();
 
 Q_SIGNALS:
 	void scanningChanged();
-	void devicesChanged();
-	void leDeviceFound(QString name, QString address);
+	void leDeviceFound(QObject*);
 	void error(int);
 
 private Q_SLOTS:
@@ -83,8 +93,6 @@ private Q_SLOTS:
 	void deviceDiscovered(const QBluetoothDeviceInfo & device);
 
 private:
-	bool mDebug;
-	QLowEnergyController::RemoteAddressType mAddyType;
 	QList<ServiceIdentifier*> services;
 	QBluetoothDeviceDiscoveryAgent* mDeviceDiscoveryAgent;
 };

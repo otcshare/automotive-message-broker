@@ -32,7 +32,7 @@ class BMDBus : public QObject
 public:
 
 	enum Connection{
-		System=0,
+		System = 0,
 		Session
 	};
 
