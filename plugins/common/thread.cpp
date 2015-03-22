@@ -44,18 +44,18 @@ static int gActiveThreadCount(0);
 
 static void *PosixThreadProc(void *param)
 {
-	gMutex.lock();
-	++gActiveThreadCount;
-	gMutex.unlock();
+    gMutex.lock();
+    ++gActiveThreadCount;
+    gMutex.unlock();
 
-	CUtil::Thread *thread = (CUtil::Thread *)param;
-	thread->run();
+    CUtil::Thread *thread = (CUtil::Thread *)param;
+    thread->run();
 
-	gMutex.lock();
-        --gActiveThreadCount;
-        LOG_INFO("PosixThreadProc() - active threads: " << gActiveThreadCount);
-        gMutex.unlock();
-	return 0;
+    gMutex.lock();
+    --gActiveThreadCount;
+    LOG_INFO("PosixThreadProc() - active threads: " << gActiveThreadCount);
+    gMutex.unlock();
+    return 0;
 }
 
 namespace CUtil{
@@ -80,19 +80,44 @@ bool Thread::start()
     }
     // try to run
     if (pthread_create(&thread, NULL/*&thread_attr*/, PosixThreadProc, this) != 0) {
-		//pthread_attr_destroy(&thread_attr);
+        //pthread_attr_destroy(&thread_attr);
         pthread_mutex_unlock(&mutex);
-		return false;
-	}
-	//pthread_attr_destroy(&thread_attr);
+        return false;
+    }
+    //pthread_attr_destroy(&thread_attr);
     runnableFlag = true;
     pthread_mutex_unlock(&mutex);
-	return true;
+    return true;
+}
+
+
+bool Thread::setPriority(int priority)
+{
+    pthread_mutex_lock(&mutex);
+    if (!runnableFlag) {// not running yet or terminated already
+        pthread_mutex_unlock(&mutex);
+        return false;
+    }
+
+    priority = priority < 1  ? 1  : priority;
+    priority = priority < 99 ? priority : 99;
+
+    // set priority
+    struct sched_param pr;
+    pr.__sched_priority = priority;
+    if (pthread_setschedparam(thread, SCHED_FIFO, &pr) < 0)
+    {
+        pthread_mutex_unlock(&mutex);
+        return false;
+    }
+
+    pthread_mutex_unlock(&mutex);
+    return true;
 }
 
 Thread::~Thread()
 {
-	stop();
+    stop();
     pthread_cond_destroy( &cond );
     pthread_mutex_destroy( &mutex );
     thread = 0;
@@ -100,8 +125,8 @@ Thread::~Thread()
 
 void Thread::stop()
 {
-	if (setRunnableFlag(false) == true) {
-	    if( thread != 0 ){
+    if (setRunnableFlag(false) == true) {
+        if( thread != 0 ){
             if (thread == pthread_self()){
                 int s = pthread_detach(thread);
                 ((void)s);// prevent compiler warning in RELEASE build
@@ -117,9 +142,9 @@ void Thread::stop()
                 }
             }
             thread = 0;
-		}
-	}
-	return;
+        }
+    }
+    return;
 }
 
 bool Thread::setRunnableFlag(bool flag)
@@ -145,7 +170,7 @@ bool Thread::isRunnable(long miliseconds)
     runnable = runnableFlag;
 
     pthread_mutex_unlock(&mutex);
-	return runnable;
+    return runnable;
 }
 
 bool Thread::wait( long miliseconds )

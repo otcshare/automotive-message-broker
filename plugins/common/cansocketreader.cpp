@@ -38,7 +38,11 @@ bool CANSocketReader::start()
 {
     LOG_TRACE("");
 
-    return CUtil::Thread::start();
+    bool res = CUtil::Thread::start();
+
+    // try to set higher priority
+    if (res) res = setPriority(4);
+    return res;
 }
 
 void CANSocketReader::stop()
