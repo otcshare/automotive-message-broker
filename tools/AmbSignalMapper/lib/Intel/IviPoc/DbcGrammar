@@ -91,7 +91,7 @@ Line: CommentPrefix /.*\n/
         # Not need to output anything
     | 'BU_' ':' <skip:'[ \t]*'> Identifier(s?)
         {
-	    # This tag holds the list of ECUs in one line
+        # This tag holds the list of ECUs in one line
             @ecuList = @{$item[4]};
         }
     | 'BO_' Integer Identifier ':' Identifier Identifier Signal(s?)

@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 
 #	Copyright (C) 2014  Intel Corporation
-#   Copyright (c) 2015  Cogent Embedded Inc.
-#   
+#	Copyright (c) 2015  Cogent Embedded Inc.
+#
 #	This library is free software; you can redistribute it and/or
 #	modify it under the terms of the GNU Lesser General Public
 #	License as published by the Free Software Foundation; either
@@ -93,11 +93,11 @@ local $/;
 my $total = $#ARGV + 1;
 
 if ( $total < 2 or $total > 4) {
-    # get script name and print usage
-    my $scriptname = $0;
-    &printUsage($scriptname);
-    exit;
-    }
+	# get script name and print usage
+	my $scriptname = $0;
+	&printUsage($scriptname);
+	exit;
+}
 
 # First parameter is input dbc filename
 my $dbc_inputfilename = $ARGV[0];
@@ -119,7 +119,7 @@ my $targetDir = ();
 if ( $total <= 2 ) {
 	$targetDir = getcwd;
 } else {
-    $targetDir = Cwd::abs_path($ARGV[2]);
+	$targetDir = Cwd::abs_path($ARGV[2]);
 }
 
 # Fourth optional parameter is plugin name
@@ -128,7 +128,7 @@ if ( $total <= 2 ) {
 	my ($infilename, $indirectories, $insuffix) = fileparse($dbc_inputfilename, qr/\.[^.]*/);
 	$pluginname = $infilename;
 } else {
-    $pluginname = $ARGV[3];
+	$pluginname = $ARGV[3];
 }
 
 # We add one space to dbc file if there is something like  ""ReceiverId to get "" ReceiverId
@@ -169,17 +169,15 @@ Select signals for implementing in an AMB plugin.
 =cut
 
 sub selectSignals {
-    my %dbc_root = %{$_[0]};
-    my %msg_root = %{$_[1]};
+	my %dbc_root = %{$_[0]};
+	my %msg_root = %{$_[1]};
 	my $plugin_name = $_[2];
 
 	my @electronicControlUnits = ();
 	keys $msg_root{'receive'};
 	while( my($msg_id, $signals) = each $msg_root{'receive'}) {
-	 
-
 		for my $ecu (@{$dbc_root{'electronicControlUnits'}}) {
-			my %add_ecu = ();			
+			my %add_ecu = ();
 
 			for my $message (@{$ecu->{'messages'}}) {
 				if ((lc $msg_id eq lc $message->{'canName'}) or ($msg_id eq $message->{'canId'})) {
@@ -211,7 +209,7 @@ sub selectSignals {
 	}
 
 	my %jsonroot = ();
-    $jsonroot{'pluginName'} = "pluginName";
+	$jsonroot{'pluginName'} = "pluginName";
     $jsonroot{'electronicControlUnits'} = \@electronicControlUnits;
 
 	return \%jsonroot;
@@ -224,15 +222,15 @@ Prints out wait information
 =cut
 
 sub printWait {
-    print STDERR ("\n");
-    print STDERR ("Processing input dbc file:\n");
-    print STDERR ("    $_[0]\n");
-    print STDERR ("Processing input msg file:\n");
-    print STDERR ("    $_[1]\n");
-    print STDERR ("Generating output files is in:\n");
-    print STDERR ("    $_[2]\n");
-    print STDERR ("\n");
-    print STDERR ("This operation may take some while. Please wait...\n");
+	print STDERR ("\n");
+	print STDERR ("Processing input dbc file:\n");
+	print STDERR ("    $_[0]\n");
+	print STDERR ("Processing input msg file:\n");
+	print STDERR ("    $_[1]\n");
+	print STDERR ("Generating output files is in:\n");
+	print STDERR ("    $_[2]\n");
+	print STDERR ("\n");
+	print STDERR ("This operation may take some while. Please wait...\n");
 }
 
 =head2 printUsage
@@ -242,15 +240,15 @@ Prints out basic usage help
 =cut
 
 sub printUsage {
-    my $scriptname=$_[0];
-    print STDERR ("$scriptname\n");
-    print STDERR ("Usage: dbc2amb in_dbc_file in_msg_file [outdir [plugin_name]]\n");
-    print STDERR ("  in_dbc_file              Input dbc file. Specify '-' to skip.\n");
-    print STDERR ("  in_msg_file              Input msg file\n");
-    print STDERR ("  outdir                   Target plugin directory (optional) generated to,\n");
-    print STDERR ("                            otherwise current directory.\n");
-    print STDERR ("  plugin_name              Machine-readable name of the plugin\n");
-    print STDERR ("\n");
+	my $scriptname=$_[0];
+	print STDERR ("$scriptname\n");
+	print STDERR ("Usage: dbc2amb in_dbc_file in_msg_file [outdir [plugin_name]]\n");
+	print STDERR ("  in_dbc_file              Input dbc file. Specify '-' to skip.\n");
+	print STDERR ("  in_msg_file              Input msg file\n");
+	print STDERR ("  outdir                   Target plugin directory (optional) generated to,\n");
+	print STDERR ("                            otherwise current directory.\n");
+	print STDERR ("  plugin_name              Machine-readable name of the plugin\n");
+	print STDERR ("\n");
 }
 
 =head1 AUTHOR
