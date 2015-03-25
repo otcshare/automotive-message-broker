@@ -9,14 +9,14 @@ Vcs-Git: git@github.com:otcshare/automotive-message-broker.git
 Vcs-Browser: http://github.com/otcshare/automotive-message-broker.git
 
 Package: libamb
-Architecture: i386
+Architecture: any
 Version: @PROJECT_VERSION@
 Depends: ${shlibs:Depends}, ${misc:Despends}
 Description: Supporting amb library
 
 Package: libamb-dev
 Section: devel
-Architecture: i386
+Architecture: any
 Version: @PROJECT_VERSION@
 Depends: libamb, uuid-dev, libjson-c-dev
 Description: Vehicle data abstraction and multiplexing daemon
@@ -25,7 +25,7 @@ Description: Vehicle data abstraction and multiplexing daemon
  TCP, bluetooth or USB
 
 Package: automotive-message-broker
-Architecture: i386
+Architecture: any
 Version: @PROJECT_VERSION@
 Depends: ${shlibs:Depends}, ${misc:Depends}, libamb
 Description: Vehicle data abstraction and multiplexing daemon
@@ -33,7 +33,7 @@ Description: Vehicle data abstraction and multiplexing daemon
  plugin framework that communicates to OBDII and GPS devices
 
 Package: automotive-message-broker-plugins
-Architecture: i386
+Architecture: any
 Version: @PROJECT_VERSION@
 Depends: ${shlibs:Depends}, ${misc:Depends}, libamb
 Description: Vehicle data abstraction and multiplexing daemon
@@ -41,7 +41,7 @@ Description: Vehicle data abstraction and multiplexing daemon
  plugin framework that communicates to OBDII and GPS devices
 
 Package: automotive-message-broker-plugins-qtmainloop
-Architecture: i386
+Architecture: any
 Version: @PROJECT_VERSION@
 Depends: ${shlibs:Depends}, ${misc:Depends}, libamb
 Description: Vehicle data abstraction and multiplexing daemon
@@ -49,7 +49,7 @@ Description: Vehicle data abstraction and multiplexing daemon
  plugin framework that communicates to OBDII and GPS devices
 
 Package: automotive-message-broker-plugins-bluemonkey
-Architecture: i386
+Architecture: any
 Version: @PROJECT_VERSION@
 Depends: ${shlibs:Depends}, ${misc:Depends}, libamb, automotive-message-broker-plugins-qtmainloop
 Description: Vehicle data abstraction and multiplexing daemon
@@ -57,7 +57,7 @@ Description: Vehicle data abstraction and multiplexing daemon
  plugin framework that communicates to OBDII and GPS devices
 
 Package: automotive-message-broker-plugins-bluetooth
-Architecture: i386
+Architecture: any
 Version: @PROJECT_VERSION@
 Depends: ${shlibs:Depends}, ${misc:Depends}, libamb, automotive-message-broker-plugins-qtmainloop
 Description: Vehicle data abstraction and multiplexing daemon
