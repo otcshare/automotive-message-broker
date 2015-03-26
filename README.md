@@ -72,7 +72,7 @@ rpmbuild [options] packaging/automotive-message-broker.spec
 ## Running with the Qt mainloop:
 
 Some source and sink plugins may want to use the Qt-based mainloop to take advantage of Qt features. To enable
-the Qt mainloop, run cmake with -Duse_qtcore=On:
+the Qt mainloop, run cmake with -Dqtmainloop=On:
 
 ~~~~~~~~~~~~~{.bash}
 cmake .. -Dqtmainloop=On
