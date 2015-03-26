@@ -47,6 +47,28 @@ ambd
 
 For information on ambd's configuration, please see ambd-configuration.idl.
 
+## Packaging
+
+To generate packaging, you must first run cmake to generate the necessary packaging files:
+
+~~~~~~~~~~~~~{.bash}
+mkdir build
+cd build && cmake ..
+cd ..
+~~~~~~~~~~~~~
+
+After running cmake, to create a debian package run:
+
+~~~~~~~~~~~~~{.bash}
+debuild
+~~~~~~~~~~~~~
+
+To create an RPM package, run:
+
+~~~~~~~~~~~~~{.bash}
+rpmbuild [options] packaging/automotive-message-broker.spec
+~~~~~~~~~~~~~
+
 ## Running with the Qt mainloop:
 
 Some source and sink plugins may want to use the Qt-based mainloop to take advantage of Qt features. To enable
