@@ -191,7 +191,7 @@ Location::Location(AmbPluginImpl* source,
 
 void Location::parse(string nmea)
 {
-	if(boost::algorithm::starts_with(nmea,"GPRMC"))
+	if(boost::algorithm::starts_with(nmea,"GPRMC") || boost::algorithm::starts_with(nmea,"GNRMC"))
 	{
 		parseGprmc(nmea);
 	}
