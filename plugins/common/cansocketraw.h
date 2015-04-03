@@ -39,6 +39,7 @@ class CANSocketRaw : public CANSocket
 {
 public:
     CANSocketRaw();
+    virtual ~CANSocketRaw(){} /*LCOV_EXCL_LINE*/
 
     /**
     * Opens and initializes CAN socket

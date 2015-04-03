@@ -43,6 +43,7 @@ class CANSocketBCM : public CANSocket
 {
 public:
     CANSocketBCM();
+    virtual ~CANSocketBCM(){} /*LCOV_EXCL_LINE*/
 
     /**
     * Opens and initialize CAN socket
