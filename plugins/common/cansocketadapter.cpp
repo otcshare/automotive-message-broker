@@ -27,83 +27,83 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 // TODO: handle socket errors
 
 CANSocketAdapter::CANSocketAdapter(CANObserver& observer) :
-    CANAdapter(observer),
-    mSocket(NULL),
-    mReader(NULL)
+	CANAdapter(observer),
+	mSocket(NULL),
+	mReader(NULL)
 {
-    LOG_TRACE("");
+	LOG_TRACE("");
 }
 
 CANSocketAdapter::~CANSocketAdapter()
 {
-    LOG_TRACE("");
+	LOG_TRACE("");
 
-    stop();
+	stop();
 }
 
 bool CANSocketAdapter::start(const char* ifName)
 {
-    LOG_TRACE("");
+	LOG_TRACE("");
 
-    if(!mSocket || !mReader) {
-        init();
-    }
+	if(!mSocket || !mReader) {
+		init();
+	}
 
-    if(mSocket && mReader && mSocket->start(ifName) && mReader->start()) {
+	if(mSocket && mReader && mSocket->start(ifName) && mReader->start()) {
 		return true;
 	}
 
 	stop();
-    return false;
+	return false;
 }
 
 void CANSocketAdapter::stop()
 {
-    LOG_TRACE("");
+	LOG_TRACE("");
 
-    if(mReader) {
-        mReader->stop();
-        delete mReader;
-        mReader = 0;
-    }
-    if(mSocket) {
-        mSocket->stop();
-        delete mSocket;
-        mSocket = 0;
-    }
+	if(mReader) {
+		mReader->stop();
+		delete mReader;
+		mReader = 0;
+	}
+	if(mSocket) {
+		mSocket->stop();
+		delete mSocket;
+		mSocket = 0;
+	}
 }
 
 bool CANSocketAdapter::sendFrame(const can_frame& frame)
 {
-    LOG_TRACE("");
+	LOG_TRACE("");
 
-    if(mSocket) {
+	if(mSocket) {
 		CANFrameInfo message(frame);
 		return mSocket->write(message);
-    }
-    return false;
+	}
+	return false;
 }
 
 void CANSocketAdapter::init()
 {
-    if(!mSocket)
-    	mSocket = new CANSocketBCM();
-    if(!mReader)
-    	mReader = new CANSocketReader(mObserver, *mSocket);
+	if(!mSocket)
+		mSocket = new CANSocketBCM();
+	if(!mReader)
+		mReader = new CANSocketReader(mObserver, *mSocket);
 }
 
 bool CANSocketAdapter::registerCyclicMessageForReceive(int canId, double minCycleTime, double maxCycleTime)
 {
-    if(mSocket) {
+	if(mSocket)
 		return mSocket->registerCyclicMessageForReceive(canId, minCycleTime, maxCycleTime);
-    }
-    return false;
+	else
+		return false;
 }
 
 bool CANSocketAdapter::unregisterMessageForReceive(int canId)
 {
-    if(mSocket) {
-    	return mSocket->unregisterMessageForReceive(canId);
-    }
-    return false;
+	if(mSocket) 
+		return mSocket->unregisterMessageForReceive(canId);
+	else
+		return false;
 }
