@@ -46,6 +46,7 @@
  */
 partial interface Navigator {
 	readonly attribute Bluemonkey bluemonkey;
+	readonly attribute Amb amb;
 };
 
 /*!
@@ -58,26 +59,6 @@ partial interface Navigator {
  * \endcode
  */
 interface Bluemonkey {
-	/*!
-	 * \brief subscribe to a property
-	 * \returns PropertyInterface representing the property
-	 */
-	PropertyInterface subscribeTo(DOMString propertyName, optional unsigned short zone, optional DOMString source);
-
-	/*!
-	 * \brief return the AMB sources that provide propertyName
-	 */
-	DOMString[] sourcesForProperty(DOMString propertyName);
-
-	/*!
-	 * \brief returns the available zones that contians propertyName
-	 */
-	unsigned short[] zonesForProperty(DOMString propertyName);
-
-	/*!
-	 * \brief return supported properties
-	 */
-	DOMString[] supportedProperties();
 
 	/*!
 	 * \brief load another script
@@ -106,22 +87,51 @@ interface Bluemonkey {
 	 */
 	QObject createQObject();
 
-	/*!
-	 * \brief return logged data between "begin" and "end"
-	 */
-	 void getHistory(DOMString[] properties, Date begin, Date end, HistoryCallback callback);
-
-	/*!
-	 * \brief creates a custom property
-	 */
-	 void createCustomProperty(DOMString name, any value, optional unsigned short zone);
-
-	/*!
-	 * \brief exportInterface export a custom DBus interface as org.automotive.[interfaceName] with properties
-	 */
-	 void exportInterface(DOMString interfaceName, ExportMap[] properties);
 
 };
+
+/*!
+ * \brief amb - interface to AMB plugin functions
+ */
+interface Amb {
+
+	/*!
+	 * \brief subscribe to a property
+	 * \returns PropertyInterface representing the property
+	 */
+	PropertyInterface subscribeTo(DOMString propertyName, optional unsigned short zone, optional DOMString source);
+
+	/*!
+	 * \brief return the AMB sources that provide propertyName
+	 */
+	DOMString[] sourcesForProperty(DOMString propertyName);
+
+	/*!
+	 * \brief returns the available zones that contians propertyName
+	 */
+	unsigned short[] zonesForProperty(DOMString propertyName);
+
+	/*!
+	 * \brief return supported properties
+	 */
+	DOMString[] supportedProperties();
+
+	/*!
+	* \brief return logged data between "begin" and "end"
+	*/
+	void getHistory(DOMString[] properties, Date begin, Date end, HistoryCallback callback);
+
+	/*!
+	* \brief creates a custom property
+	*/
+	void createCustomProperty(DOMString name, any value, optional unsigned short zone);
+
+	/*!
+	* \brief exportInterface export a custom DBus interface as org.automotive.[interfaceName] with properties
+	*/
+	void exportInterface(DOMString interfaceName, ExportMap[] properties);
+};
+
 /*!
  * \brief PropertyInterface represents an interface to an AMB Property
  */

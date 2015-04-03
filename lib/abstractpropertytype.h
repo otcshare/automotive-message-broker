@@ -19,22 +19,26 @@
 #ifndef _ABSTRACTPROPERTYTYPE_H_
 #define _ABSTRACTPROPERTYTYPE_H_
 
-#include <string>
-#include <sstream>
-#include <stdexcept>
-#include <vector>
-#include <iostream>
-#include <memory>
+#include "debugout.h"
+#include "jsonhelper.h"
+#include "picojson.h"
+#include "superptr.hpp"
+#include "timestamp.h"
+
+#include <boost/algorithm/string.hpp>
 #include <boost/any.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/utility.hpp>
-#include <type_traits>
-#include <glib.h>
+#include <iostream>
 #include <list>
-#include "timestamp.h"
-#include <debugout.h>
-#include <boost/algorithm/string.hpp>
-#include <superptr.hpp>
+#include <memory>
+#include <string>
+#include <sstream>
+#include <stdexcept>
+#include <type_traits>
+#include <vector>
+
+#include <glib.h>
 
 class Zone {
 
@@ -102,39 +106,61 @@ public:
 		}
 	}
 
-	/**
-	 * @brief toString
-	 * @return strigified value
+	/*!
+	 * \brief toJson convert this type to json representation.
+	 * The json typically looks something like this:
+	 * \code
+	 * {
+	 *  "name" : "VehicleSpeed",
+	 *  "type" : "UInt16",
+	 *  "source" : "daf23v32342ddsdffafaeefe",
+	 *  "zone" : 0,
+	 *  "value" : 25
+	 * }
+	 * \endcode
+	 * \return json value representing the type
+	 */
+	virtual const picojson::value toJson();
+
+	/*!
+	 * \brief fromJson instantiate this type from json
+	 * \param json
+	 */
+	virtual void fromJson(const picojson::value & json);
+
+	/*!
+	 * \brief toString
+	 * \return strigified value
 	 */
 	virtual std::string toString() const = 0;
 
-	/**
-	 * @brief fromString converts from string value
+	/*!
+	 * \brief fromString converts from string value
 	 */
-	virtual void fromString(std::string)= 0;
+	virtual void fromString(std::string) = 0;
 
-	/**
-	 * @brief toVariant
-	 * @return GVariant representation of value. Caller must unref the returned GVariant
+	/*!
+	 * \brief toVariant
+	 * \return GVariant representation of value. Caller must unref the returned GVariant
 	 */
 	virtual GVariant* toVariant() = 0;
 
-	/**
-	 * @brief fromVariant converts GVariant value into compatible native value.  Caller owns
+	/*!
+	 * \brief fromVariant converts GVariant value into compatible native value.  Caller owns
 	 * GVariant argument.
 	 */
 	virtual void fromVariant(GVariant*) = 0;
 
-	/**
-	 * @brief copy
-	 * @return a copy of the AbstractPropertyType
+	/*!
+	 * \brief copy
+	 * \return a copy of the AbstractPropertyType
 	 */
 	virtual AbstractPropertyType* copy() = 0;
 
-	/**
-	 * @brief quickCopy is intended as a way to quickly copy the often changing bits from one abstract property to another
+	/*!
+	 * \brief quickCopy is intended as a way to quickly copy the often changing bits from one abstract property to another
 	 * It assumes that the properties are almost identical in name, source, and zone.
-	 * @param other the property to copy from
+	 * \param other the property to copy from
 	 */
 	virtual void quickCopy(AbstractPropertyType* other)
 	{
@@ -160,32 +186,40 @@ public:
 		return one != two;
 	}
 
-	/**
-	 * @brief name Property name. @see VehicleProperty for built-in supported property names
+	/*!
+	 * \brief name Property name. \see VehicleProperty for built-in supported property names
 	 */
 	std::string name;
 
-	/**
-	 * @brief timestamp.  Timestamp when the value was last updated by the system. This is updated automatically
+	/*!
+	 * \brief alias alias for the property name
+	 * \return alias if any of name if alias has not been set
+	 */
+	const std::string alias() { return mAlias.empty() ? name : mAlias; }
+
+	void setAlias(const std::string & a) { mAlias = a; }
+
+	/*!
+	 * \brief timestamp.  Timestamp when the value was last updated by the system. This is updated automatically
 	 * any time setValue() is called
-	 * @see amb::currentTime()
-	 * @see setValue()
+	 * \see amb::currentTime()
+	 * \see setValue()
 	 */
 	double timestamp;
 
-	/**
-	 * @brief sequence internal counter.  Useful as a unique indentifier.  values is -1 if not used (default).
+	/*!
+	 * \brief sequence internal counter.  Useful as a unique indentifier.  values is -1 if not used (default).
 	 */
 	int32_t sequence;
 
-	/**
-	 * @brief sourceUuid  uuid of the source that produced this property.  This is set by the routingengine
+	/*!
+	 * \brief sourceUuid  uuid of the source that produced this property.  This is set by the routingengine
 	 * if left unmodified.
 	 */
 	std::string sourceUuid;
 
-	/**
-	 * @brief zone that the property is situated in.
+	/*!
+	 * \brief zone that the property is situated in.
 	 */
 	Zone::Type zone;
 
@@ -197,9 +231,9 @@ public:
 	 */
 	Priority priority;
 
-	/**
-	 * @brief setValue
-	 * @param val boost::any value.  NOTE: boost::any does not accept type coercion.  Types must match exactly
+	/*!
+	 * \brief setValue
+	 * \param val boost::any value.  NOTE: boost::any does not accept type coercion.  Types must match exactly
 	 * with native type. (ie, don't use "int" if the native type is "uint")
 	 */
 	virtual void setValue(boost::any val)
@@ -208,7 +242,7 @@ public:
 		timestamp = amb::currentTime();
 	}
 
-	/**
+	/*!
 	 * \brief value() native value.  Does not use type coercion.  Will throw if types do not match.
 	 */
 	template <typename T>
@@ -217,9 +251,9 @@ public:
 		return boost::any_cast<T>(mValue);
 	}
 
-	/**
-	 * @brief anyValue
-	 * @return boost::any value
+	/*!
+	 * \brief anyValue
+	 * \return boost::any value
 	 */
 	boost::any anyValue()
 	{
@@ -236,14 +270,11 @@ public:
 		if(!var) return "";
 
 		const string s = g_variant_get_type_string(var.get());
-
-		DebugOut() << "returning signature: " << s << " for "<< name << endl;
-
 		return s;
 	}
 
-	/**
-	 * @brief destroyed is called if this property is destroyed.
+	/*!
+	 * \brief destroyed is called if this property is destroyed.
 	 */
 	std::vector<std::function<void(AbstractPropertyType*)>> destroyed;
 
@@ -251,6 +282,7 @@ protected:
 
 	boost::any mValue;
 
+	std::string mAlias;
 };
 
 namespace amb
@@ -275,11 +307,64 @@ struct PropertyCompare
 }
 
 
+class JsonNumber
+{
+public:
+	static double fromJson(picojson::value v)
+	{
+		return v.get<double>();
+	}
+
+	static picojson::value toJson(double v)
+	{
+		return picojson::value(v);
+	}
+};
+
+class JsonBoolean
+{
+public:
+	static bool fromJson(picojson::value v)
+	{
+		return v.get<bool>();
+	}
+
+	static picojson::value toJson(bool v)
+	{
+		return picojson::value(v);
+	}
+};
+
+class JsonString
+{
+public:
+	static std::string fromJson(picojson::value v)
+	{
+		return v.get<std::string>();
+	}
+
+	static picojson::value toJson(std::string v)
+	{
+		return picojson::value(v);
+	}
+};
+
+
+template <typename T>
+class BaseGVS
+{
+public:
+	static T gvalue(T t)
+	{
+		return t;
+	}
+};
+
 template <typename T>
 class GVS;
 
 template <>
-class GVS<int>
+class GVS<int> : public BaseGVS<int>, public JsonNumber
 {
 public:
 	static const char* signature() { return "i"; }
@@ -298,7 +383,7 @@ public:
 };
 
 template <>
-class GVS<double>
+class GVS<double> : public BaseGVS<double>, public JsonNumber
 {
 public:
 	static const char* signature() { return "d"; }
@@ -314,7 +399,7 @@ public:
 };
 
 template <>
-class GVS<uint16_t>
+class GVS<uint16_t> : public BaseGVS<uint16_t>, public JsonNumber
 {
 public:
 	static const char* signature() { return "q"; }
@@ -330,7 +415,7 @@ public:
 };
 
 template <>
-class GVS<int16_t>
+class GVS<int16_t> : public BaseGVS<int16_t>, public JsonNumber
 {
 public:
 	static const char* signature() { return "n"; }
@@ -346,7 +431,7 @@ public:
 };
 
 template <>
-class GVS<char>
+class GVS<char> : public BaseGVS<char>, public JsonNumber
 {
 public:
 	static const char* signature() { return "y"; }
@@ -362,7 +447,7 @@ public:
 };
 
 template <>
-class GVS<uint32_t>
+class GVS<uint32_t> : public BaseGVS<uint32_t>, public JsonNumber
 {
 public:
 	static const char* signature() { return "u"; }
@@ -378,7 +463,7 @@ public:
 };
 
 template <>
-class GVS<int64_t>
+class GVS<int64_t> : public BaseGVS<int64_t>, public JsonNumber
 {
 public:
 	static const char* signature() { return "x"; }
@@ -394,7 +479,7 @@ public:
 };
 
 template <>
-class GVS<uint64_t>
+class GVS<uint64_t> : public BaseGVS<uint64_t>, public JsonNumber
 {
 public:
 	static const char* signature() { return "t"; }
@@ -410,7 +495,7 @@ public:
 };
 
 template <>
-class GVS<bool>
+class GVS<bool> : public BaseGVS<bool>, public JsonBoolean
 {
 public:
 	static const char* signature() { return "b"; }
@@ -429,7 +514,27 @@ public:
 	}
 };
 
-/**
+template <>
+class GVS<std::string> : public JsonString
+{
+public:
+	static const char* signature() { return "s"; }
+
+	static const char* value(GVariant *v)
+	{
+		return g_variant_get_string(v, nullptr);
+	}
+	static std::string stringize(std::string v)
+	{
+		return v;
+	}
+	static const char* gvalue(std::string v)
+	{
+		return v.c_str();
+	}
+};
+
+/*!
  * \brief BasicPropertyType is a typed property type.  Most internal types are derived from this class
  * \example
  * std::unique_ptr<BasicPropertyType<int>> boostPSI = new BasicPropertyType<int>("BoostPSI",5);
@@ -528,6 +633,24 @@ public:
 		return new BasicPropertyType<T>(*this);
 	}
 
+	const picojson::value toJson()
+	{
+		picojson::value v = AbstractPropertyType::toJson();
+
+		picojson::object object = v.get<picojson::object>();
+
+		object["value"] = amb::gvariantToJson(toVariant());
+
+		return picojson::value(object);
+	}
+
+	virtual void fromJson(const picojson::value &json)
+	{
+		AbstractPropertyType::fromJson(json);
+
+		fromVariant(amb::jsonToGVariant(json.get("value"), signature()));
+	}
+
 	void fromString(std::string val)
 	{
 		if(!val.empty() && val != "")
@@ -555,9 +678,9 @@ public:
 		setValue(deserializeVariant<T>(v));
 	}
 
-	/**
-	 * @brief basicValue
-	 * @return Typed version of value.  Slightly more useful than @see AbstractPropertyType::value()
+	/*!
+	 * \brief basicValue
+	 * \return Typed version of value.  Slightly more useful than \see AbstractPropertyType::value()
 	 */
 
 	T basicValue()
@@ -577,10 +700,8 @@ public:
 
 private:
 
-	//GVariant* mVariant;
-
 	template <class N>
-	void serialize(std::string val,  typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	void serialize(const std::string & val,  typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
 	{
 		int someTemp;
 
@@ -591,7 +712,7 @@ private:
 	}
 
 	template <class N>
-	void serialize(std::string  val,  typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	void serialize(const std::string & val,  typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
 	{
 		std::stringstream stream(GVS<T>::stringize(val));
 		N someTemp;
@@ -600,33 +721,26 @@ private:
 	}
 
 	template <class N>
-	GVariant* serializeVariant(T val, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
+	GVariant* serializeVariant(const T val, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
 	{
-		//mVariant = Glib::VariantBase(Glib::Variant<gint16>::create((int)val).gobj());
-
 		return (g_variant_new("i",(int)val));
 	}
 
 	template <class N>
-	GVariant* serializeVariant(T val, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
+	GVariant* serializeVariant(const T val, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
 	{
-		//mVariant = Glib::Variant<T>::create(val);
-		//mVariant = g_variant_ref(g_variant_new(GVS<T>::signature(),val));
 		return g_variant_new(GVS<T>::signature(),val);
 	}
 
 	template <class N>
 	T deserializeVariant(GVariant* v, typename std::enable_if<std::is_enum<N>::value, N>::type* = 0)
 	{
-//		return (T)((Glib::Variant<int>::cast_dynamic<Glib::Variant<int> >(*v)).get());
-
 		return (T)GVS<int>::value(v);
 	}
 
 	template <class N>
 	T deserializeVariant(GVariant* v, typename std::enable_if<!std::is_enum<N>::value, N>::type* = 0)
 	{
-		//	return Glib::VariantBase::cast_dynamic<Glib::Variant<T> >(*v).get();
 		return GVS<T>::value(v);
 	}
 };
@@ -688,6 +802,21 @@ public:
 		return value<std::string>() < other.value<std::string>();
 	}
 
+	virtual const picojson::value toJson()
+	{
+		auto val = AbstractPropertyType::toJson();
+
+		picojson::object obj = val.get<picojson::object>();
+
+		obj["value"] = amb::gvariantToJson(toVariant());
+	}
+
+	virtual void fromJson(const picojson::value &json)
+	{
+		AbstractPropertyType::fromJson(json);
+
+		fromString(json.get("value").to_str());
+	}
 
 	void fromString(std::string val)
 	{
@@ -721,7 +850,7 @@ public:
 /*!
  * \brief ListPropertyType is a AbstractPropertyType for arrays of AbstractPropertyTypes
  */
-template <class T = AbstractPropertyType>
+template <class T>
 class ListPropertyType: public AbstractPropertyType
 {
 public:
@@ -759,8 +888,8 @@ public:
 		clear();
 	}
 
-	/** \brief append - appends a property to the list
-	 * @arg property - property to be appended.
+	/*! \brief append - appends a property to the list
+	 * \arg property - property to be appended.
 	 **/
 	void append(T property)
 	{
@@ -797,61 +926,50 @@ public:
 
 	std::string toString() const
 	{
-		std::string str = "[";
+		picojson::array array;
 
-		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		for(auto i : mList)
 		{
-			if(str != "[")
-				str += ",";
-
-			T t = *itr;
-
-			str += t.toString();
+			array.push_back(GVS<T>::toJson(i));
 		}
 
-		str += "]";
-
-		return str;
+		return picojson::value(array).serialize();
 	}
 
 
-	void fromString(std::string str )
+	void fromString(std::string str)
 	{
-		clear();
+		if(!boost::algorithm::starts_with(str, "["))
+			str = "[" + str;
 
-		if(!str.length())
-			return;
+		if(!boost::algorithm::ends_with(str, "]"))
+			str+= "]";
 
-		if(str[0] == '[' && str[str.length()-1] == ']')
+		picojson::value value;
+		picojson::parse(value, str);
+
+		DebugOut()<< "str " << str << endl;
+
+
+		picojson::array array = value.get<picojson::array>();
+
+		for(auto i : array)
 		{
-			str = str.substr(1,str.length() - 2);
+			mList.push_back(GVS<T>::fromJson(i));
 		}
 
-		std::vector<std::string> elements;
-
-		std::istringstream f(str);
-
-		std::string element;
-		while(std::getline(f,element,','))
-		{
-			T foo("", element);
-			append (foo);
-		}
 		timestamp = amb::currentTime();
 	}
 
 
 	GVariant* toVariant()
 	{
-
 		GVariantBuilder params;
 		g_variant_builder_init(&params, ((const GVariantType *) "av"));
 
-		for(auto itr = mList.begin(); itr != mList.end(); itr++)
+		for(auto itr : mList)
 		{
-			T t = *itr;
-			auto var = t.toVariant();
-			GVariant *newvar = g_variant_new("v", var);
+			GVariant *newvar = g_variant_new("v", g_variant_new(GVS<T>::signature(), GVS<T>::gvalue(itr)));
 			g_variant_builder_add_value(&params, newvar);
 		}
 
@@ -871,9 +989,7 @@ public:
 		{
 			GVariant *childvariant = g_variant_get_child_value(v,i);
 			GVariant *innervariant = g_variant_get_variant(childvariant);
-			T t;
-			t.fromVariant(innervariant);
-			appendPriv(t);
+			appendPriv(GVS<T>::value(innervariant));
 		}
 	}
 

@@ -11,3 +11,20 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/gendb.sh ${CMAKE_CURRENT_SOURCE_DIR}
 
 install (PROGRAMS ${amb_tests} DESTINATION bin)
 
+find_package(Qt5Network)
+find_package(Qt5Core)
+
+if(Qt5Network_FOUND)
+  set(QT_INCLUDE_DIRS ${Qt5Core_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS})
+  set(QT_LIBRARIES ${Qt5Core_LIBRARIES} ${Qt5Network_LIBRARIES})
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Core_EXECUTABLE_COMPILE_FLAGS}")
+  add_definitions(${Qt5Core_DEFINITIONS})
+
+  include_directories(${CMAKE_SOURCE_DIR}/lib ${include_dirs} ${QT_INCLUDE_DIRS} ${CMAKE_SOURCE_DIR}/plugins/common)
+
+  add_executable(testProtocol testProtocol.cpp testProtocolCommon.h)
+  target_link_libraries(testProtocol ${link_libraries} amb -L${CMAKE_CURRENT_BINARY_DIR}/lib amb-plugins-common amb-json-protocol -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${QT_LIBRARIES})
+
+  add_executable(testProtocolClient testProtocolClient.cpp testProtocolCommon.h)
+  target_link_libraries(testProtocolClient ${link_libraries} amb -L${CMAKE_CURRENT_BINARY_DIR}/lib amb-plugins-common amb-json-protocol -L${CMAKE_CURRENT_BINARY_DIR}/plugins/common ${QT_LIBRARIES})
+endif()

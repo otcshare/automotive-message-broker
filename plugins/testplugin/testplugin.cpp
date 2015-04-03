@@ -29,10 +29,12 @@
 #include "debugout.h"
 #include "timestamp.h"
 #include "testplugin.h"
+#include <jsonhelper.h>
+
 #define __SMALLFILE__ std::string(__FILE__).substr(std::string(__FILE__).rfind("/")+1)
 AbstractRoutingEngine *m_re;
 
-#define TEST(success)	g_assert((success));
+#define TEST(success)	DebugOut(0) << "Testing " << ""#success"" << endl; g_assert((success));
 const std::string TestProptertyName1 = "TestPropertyName1";
 const std::string TestProptertyName2 = "TestPropertyName2";
 
@@ -232,6 +234,50 @@ bool TestPlugin::testSubscription()
 	return true;
 }
 
+bool testListPlusPlus()
+{
+	std::map<std::string, int> theMap;
+	theMap["1"] = 1;
+	theMap["2"] = 2;
+
+	TEST(amb::containsKey(theMap, "1"));
+	TEST(!amb::containsKey(theMap, "bar"));
+
+	std::vector<int> list;
+	list.push_back(1);
+	list.push_back(2);
+	list.push_back(3);
+
+	TEST(contains(list, 2));
+	removeOne(&list, 2);
+	TEST(!contains(list, 2));
+
+	class Complex
+	{
+	public:
+		Complex(int a, int b): foo(a), bar(b) {}
+		int foo;
+		int bar;
+	};
+
+	Complex complex1(1, 2);
+
+	Complex complex2(2, 2);
+
+	std::vector<Complex> complexList;
+	complexList.push_back(complex1);
+	complexList.push_back(complex2);
+
+	TEST(contains(complexList, complex1, [](auto a, auto b) { return a.foo == b.foo && a.bar == b.bar; }));
+
+	return true;
+}
+
+void testJsonHelper()
+{
+
+}
+
 bool TestPlugin::testSetAndGet()
 {
 	bool replySuccess(false);
@@ -279,7 +325,7 @@ bool TestPlugin::testCoreUpdateSupported()
 	PropertyList toAdd;
 	toAdd.push_back(VehicleProperty::ClutchStatus);
 
-	routingEngine->updateSupported(toAdd,PropertyList(), this);
+	routingEngine->updateSupported(toAdd, PropertyList(), this);
 
 	PropertyList supported = routingEngine->supported();
 
@@ -343,12 +389,9 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	DebugOut() << "Testing ListPropertyType... " << endl;
 	VehicleProperty::TripMetersType* tfirst = new VehicleProperty::TripMetersType();
 	VehicleProperty::TripMetersType* tsecond = new VehicleProperty::TripMetersType();
-	BasicPropertyType<uint16_t> v1(0);
-	BasicPropertyType<uint16_t> v2(5);
-	BasicPropertyType<uint16_t> v3(10);
-	tfirst->append(v1);
-	tfirst->append(v2);
-	tfirst->append(v3);
+	tfirst->append(0);
+	tfirst->append(5);
+	tfirst->append(10);
 	tsecond->fromVariant(tfirst->toVariant());
 
 	GVariant* testGVSVariant = g_variant_new("i", 9);
@@ -363,6 +406,10 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	testSubscription();
 
 	testSetAndGet();
+
+	TEST(testListPlusPlus());
+
+	testJsonHelper();
 }
 
 TestPlugin::~TestPlugin()

@@ -106,9 +106,9 @@ public:
 		return result;
 	}
 
-	void write(std::string data)
+	void write(const std::string & data)
 	{
-		int written = ::write(fd,data.c_str(),data.length());
+		int written = ::write(fd, data.c_str(), data.length());
 		if(written == -1)
 		{
 			DebugOut(DebugOut::Warning)<<"Unable to write ("<<fd<<")"<<endl;

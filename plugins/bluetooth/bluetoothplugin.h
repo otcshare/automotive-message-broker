@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <abstractsink.h>
 #include <serialport.hpp>
+#include <jsonprotocol.h>
+
 #include <string>
 
 #include <QDBusAbstractAdaptor>
@@ -69,19 +71,14 @@ public:
 
 	virtual void requestDisconnection(std::string path);
 
-	virtual void canHasData();
-
-	void write(const string & data);
-
 protected:
 	virtual void connected() {}
 	virtual void disconnected() {}
-	virtual void dataReceived(QByteArray data) {}
-	SerialPort socket;
 
 private:
 	QString role;
 };
+
 
 class BluetoothSinkPlugin: public AbstractBluetoothSerialProfile, public AbstractSink
 {
@@ -96,9 +93,13 @@ public:
 
 	void propertyChanged(AbstractPropertyType* value);
 
-protected:
-	virtual void dataReceived(QByteArray data);
+private:
+	std::vector<amb::AmbRemoteServer::Ptr> clients;
 
+	// AbstractBluetoothSerialProfile interface
+public:
+	void newConnection(string path, QDBusUnixFileDescriptor fd, QVariantMap props);
+	void requestDisconnection(string path);
 };
 
 

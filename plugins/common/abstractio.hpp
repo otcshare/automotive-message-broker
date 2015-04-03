@@ -11,7 +11,7 @@ public:
 	virtual bool close() = 0;
 	virtual bool isOpen() =0;
 	virtual std::string read() = 0;
-	virtual void write(std::string data) = 0;
+	virtual void write(const std::string & data) = 0;
 
 	virtual int fileDescriptor() = 0;
 };

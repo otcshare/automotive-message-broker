@@ -18,12 +18,6 @@
 
 
 #include "bluemonkey.h"
-#include "abstractroutingengine.h"
-#include "ambplugin.h"
-#include "debugout.h"
-
-#include "dbusplugin.h"
-#include "dbusexport.h"
 
 #include <QJsonDocument>
 #include <QJSEngine>
@@ -37,130 +31,75 @@
 
 #define foreach Q_FOREACH
 
-typedef std::map<std::string, QObject*> create_bluemonkey_module_t(std::map<std::string, std::string> config, QObject* parent);
+typedef void create_bluemonkey_module_t(std::map<std::string, std::string> config, std::map<std::string, QObject*> &exports, QString &javascript, QObject* parent);
 
-extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string> config)
+QString bmJS = (""
+				"console = { };"
+				"console.log = function(msg)"
+				"{"
+				"  bluemonkey.log(msg);"
+				"}"
+				""
+				"function Application(args)"
+				"{"
+				"  this.app = bluemonkey.createCoreApplication();"
+				"  bluemonkey.assertIsTrue(this.app !== undefined, 'Need to instantiate QCoreApplication in the bluemonkey app before calling createCoreApplication()');"
+				"  this._connectEverything(this);"
+				""
+				"  this.startTimer = bluemonkey.createTimer();"
+				"  this.startTimer.singleShot = true;"
+				"  this.startTimer.timeout.connect(bluemonkey.ready);"
+				"  this.startTimer.start(1);"
+				"}"
+				"Application.prototype._connectEverything = function(obj)"
+				"{"
+				"  bluemonkey.ready.connect(function()"
+				"  {"
+				"    if(obj.main !== undefined)"
+				"      obj.main();"
+				"  });"
+				"};"
+				"Application.prototype.run = function()"
+				"{"
+				"  return bluemonkey.run(this.app);"
+				"};");
+
+
+Bluemonkey::Bluemonkey(QObject *parent)
+	:QObject(parent), engine(nullptr), configuration(std::map<std::string, std::string>())
 {
-	auto plugin = new AmbPlugin<BluemonkeySink>(routingengine, config);
-	plugin->init();
-}
+	engine = new QJSEngine(this);
 
-QVariant gvariantToQVariant(GVariant *value)
-{
-	GVariantClass c = g_variant_classify(value);
-	if(c == G_VARIANT_CLASS_BOOLEAN)
-		return QVariant((bool) g_variant_get_boolean(value));
+	QJSValue value = engine->newQObject(this);
+	engine->globalObject().setProperty("bluemonkey", value);
 
-	else if(c == G_VARIANT_CLASS_BYTE)
-		return QVariant((char) g_variant_get_byte(value));
+	QJSValue val = engine->evaluate(bmJS);
 
-	else if(c == G_VARIANT_CLASS_INT16)
-		return QVariant((int) g_variant_get_int16(value));
-
-	else if(c == G_VARIANT_CLASS_UINT16)
-		return QVariant((unsigned int) g_variant_get_uint16(value));
-
-	else if(c == G_VARIANT_CLASS_INT32)
-		return QVariant((int) g_variant_get_int32(value));
-
-	else if(c ==  G_VARIANT_CLASS_UINT32)
-		return QVariant((unsigned int) g_variant_get_uint32(value));
-
-	else if(c == G_VARIANT_CLASS_INT64)
-		return QVariant((long long) g_variant_get_int64(value));
-
-	else if(c == G_VARIANT_CLASS_UINT64)
-		return QVariant((unsigned long long) g_variant_get_uint64(value));
-
-	else if(c == G_VARIANT_CLASS_DOUBLE)
-		return QVariant(g_variant_get_double(value));
-
-	else if(c == G_VARIANT_CLASS_STRING)
-		return QVariant(g_variant_get_string(value, NULL));
-
-	else if(c == G_VARIANT_CLASS_ARRAY)
+	if(val.isError())
 	{
-		gsize dictsize = g_variant_n_children(value);
-		QVariantList list;
-		for (int i=0; i<dictsize; i++)
-		{
-			GVariant *childvariant = g_variant_get_child_value(value, i);
-			GVariant *innervariant = g_variant_get_variant(childvariant);
-			list.append(gvariantToQVariant(innervariant));
-		}
-		return list;
+		qCritical() << "Failed to load bluemonkey javascript extensions";
+		qCritical() << "Error: ";
+		qCritical() <<  val.property("name").toString();
+		qCritical() <<  val.property("message").toString();
+		qCritical() << "line: " << val.property("lineNumber").toString();
+
+		int line = val.property("lineNumber").toInt();
+		QStringList lines = bmJS.split("\n");
+
+		if(line - 1 >= 0)
+			qWarning() << lines.at(line-1);
+
+		qWarning() << lines.at(line) << "<--";
+
+		if(lines.size() > line + 1)
+			qWarning() << lines.at(line+1);
+
+		qCritical() << "Aborting";
+		throw std::runtime_error("Die die die");
 	}
-
-	else
-		return QVariant::Invalid;
-
 }
 
-AbstractPropertyType* qVariantToAbstractPropertyType(QString name, QVariant var)
-{
-	if(!var.isValid())
-		return nullptr;
-
-	if(var.type() == QVariant::UInt)
-		return new BasicPropertyType<uint>(name.toStdString(), var.toUInt());
-	else if(var.type() == QVariant::Double)
-		return new BasicPropertyType<double>(name.toStdString(), var.toDouble());
-	else if(var.type() == QVariant::Bool)
-		return new BasicPropertyType<bool>(name.toStdString(), var.toBool());
-	else if(var.type() == QVariant::Int)
-		return new BasicPropertyType<int>(name.toStdString(), var.toInt());
-	else if(var.type() == QVariant::String)
-		return new StringPropertyType(name.toStdString(), var.toString().toStdString());
-	else if(var.type() == QVariant::List && var.toList().count())
-	{
-		QVariant subVariant = var.toList().at(0);
-		if(subVariant.type() == QVariant::UInt)
-			return new ListPropertyType<BasicPropertyType<uint>>(name.toStdString(), subVariant.toUInt());
-		else if(subVariant.type() == QVariant::Double)
-			return new ListPropertyType<BasicPropertyType<double>>(name.toStdString(), subVariant.toDouble());
-		else if(subVariant.type() == QVariant::Bool)
-			return new ListPropertyType<BasicPropertyType<bool>>(name.toStdString(), subVariant.toBool());
-		else if(subVariant.type() == QVariant::Int)
-			return new ListPropertyType<BasicPropertyType<int>>(name.toStdString(), subVariant.toInt());
-		else if(subVariant.type() == QVariant::String)
-			return new ListPropertyType<StringPropertyType>(name.toStdString(), subVariant.toString().toStdString());
-	}
-	return nullptr;
-}
-
-QVariant toQVariant(AbstractPropertyType* val)
-{
-	QVariantMap value;
-
-	value["name"] = val->name.c_str();
-	value["zone"] = val->zone;
-	value["source"] = val->sourceUuid.c_str();
-	value["timestamp"] = val->timestamp;
-	value["sequence"] = val->sequence;
-	value["value"] = gvariantToQVariant(val->toVariant());
-
-	return value;
-}
-
-class BluemonkeyDBusInterface: public DBusSink
-{
-public:
-	BluemonkeyDBusInterface(std::string ifaceName, AbstractRoutingEngine* re, GDBusConnection* connection)
-		:DBusSink(ifaceName, re, connection)
-	{
-
-	}
-};
-
-BluemonkeySink::BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config, AbstractSource &parent)
-	: QObject(0), AmbPluginImpl(e, config, parent), engine(nullptr), mSilentMode(false)
-{
-	QTimer::singleShot(1,this,SLOT(reloadEngine()));
-
-	auth = new Authenticate(config, this);
-}
-
-BluemonkeySink::~BluemonkeySink()
+Bluemonkey::~Bluemonkey()
 {
 	Q_FOREACH(void* module, modules)
 	{
@@ -170,112 +109,55 @@ BluemonkeySink::~BluemonkeySink()
 	engine->deleteLater();
 }
 
-
-PropertyList BluemonkeySink::subscriptions()
-{
-
-}
-
-void BluemonkeySink::supportedChanged(const PropertyList & supportedProperties)
-{
-	DebugOut()<<"supported changed"<<endl;
-}
-
-void BluemonkeySink::propertyChanged(AbstractPropertyType * value)
-{
-
-}
-
-const string BluemonkeySink::uuid() const
-{
-	return "bluemonkey";
-}
-
-int BluemonkeySink::supportedOperations()
-{
-	return AbstractSource::Get | AbstractSource::Set;
-}
-
-QObject *BluemonkeySink::subscribeTo(QString str)
-{
-	return new Property(str.toStdString(), "", routingEngine, Zone::None, this);
-}
-
-QObject *BluemonkeySink::subscribeTo(QString str, int zone, QString srcFilter)
-{
-	return new Property(str.toStdString(), srcFilter, routingEngine, zone, this);
-}
-
-QObject* BluemonkeySink::subscribeTo(QString str, int zone)
-{
-	return new Property(str.toStdString(), "", routingEngine, zone, this);
-}
-
-
-QStringList BluemonkeySink::sourcesForProperty(QString property)
-{
-	std::vector<std::string> list = routingEngine->sourcesForProperty(property.toStdString());
-	QStringList strList;
-	for(auto itr : list)
-	{
-		strList<<itr.c_str();
-	}
-
-	return strList;
-}
-
-QStringList BluemonkeySink::supportedProperties()
-{
-	PropertyList props = routingEngine->supported();
-	QStringList strList;
-	for(auto p : props)
-	{
-		strList<<p.c_str();
-	}
-
-	return strList;
-}
-
-
-bool BluemonkeySink::authenticate(QString pass)
-{
-
-}
-
-void BluemonkeySink::loadConfig(QString str)
+void Bluemonkey::loadScript(QString str)
 {
 	QFile file(str);
 	if(!file.open(QIODevice::ReadOnly))
 	{
-		DebugOut(DebugOut::Error)<<"failed to open config file: "<<str.toStdString()<<endl;
+		qDebug()<< "failed to open config file: "<< str;
 		return;
 	}
 
-	QString script = file.readAll();
+	QString firstLine = file.readLine();
+
+	if(firstLine.startsWith("#!"))
+		firstLine = "";
+
+	QString script = firstLine + "\n" + file.readAll();
 
 	file.close();
 
-	DebugOut(7)<<"evaluating script: "<<script.toStdString()<<endl;
-
 	QJSValue val = engine->evaluate(script);
-
-	DebugOut()<<val.toString().toStdString()<<endl;
 
 	if(val.isError())
 	{
-		DebugOut(DebugOut::Error) << val.property("name").toString().toStdString() << endl;
-		DebugOut(DebugOut::Error) << val.property("message").toString().toStdString() << endl;
-		DebugOut(DebugOut::Error) << str.toStdString() << ":" <<val.property("lineNumber").toString().toStdString() << endl;
+		qDebug() << "Error: ";
+		qDebug() <<  val.property("name").toString();
+		qDebug() <<  val.property("message").toString();
+		qDebug() <<  str <<  ":" << val.property("lineNumber").toString();
+
+		int line = val.property("lineNumber").toInt();
+		QStringList lines = script.split("\n");
+
+		if(line - 1 >= 0)
+			qWarning() << lines.at(line-1);
+
+		qWarning() << lines.at(line) << "<--";
+
+		if(lines.size() > line + 1)
+			qWarning() << lines.at(line+1);
+
+		throw std::runtime_error("JavaScript Error");
 	}
 }
 
-bool BluemonkeySink::loadModule(QString path)
+bool Bluemonkey::loadModule(QString path)
 {
 	void* handle = dlopen(path.toUtf8().data(), RTLD_LAZY);
 
 	if(!handle)
 	{
-		DebugOut(DebugOut::Warning) << "bluemonkey load module failed: " << dlerror() << endl;
+		qDebug() <<  "bluemonkey load module failed: " <<  dlerror() <<  endl;
 		return false;
 	}
 
@@ -288,54 +170,62 @@ bool BluemonkeySink::loadModule(QString path)
 
 	if(!c)
 	{
-		DebugOut(DebugOut::Warning) << "bluemonkey load module failed: " << path.toStdString() << " " << dlerror() << endl;
+		qDebug() <<  "bluemonkey load module failed: " <<  path <<  " " <<  dlerror() <<  endl;
 		return false;
 	}
 
-	create_bluemonkey_module_t* create = (create_bluemonkey_module_t*)(c);
+	create_bluemonkey_module_t* create = reinterpret_cast<create_bluemonkey_module_t*>(c);
 
-	std::map<std::string, QObject*> exports = create(configuration, this);
+	if(!create)
+	{
+		qCritical() << "Failed to call create() on module "<< path << ". Check signature.";
+	}
+
+	std::map<std::string, QObject*> exports;
+	QString js;
+	create(configuration, exports, js, this);
 
 	for(auto i : exports)
 	{
-		std::string obj = i.first;
-		if(!engine->globalObject().hasProperty(obj.c_str()))
-		{
-			QJSValue val = engine->newQObject(i.second);
-			engine->globalObject().setProperty(obj.c_str(), val);
-		}
+		QObject* obj = i.second;
+		loadModule(i.first.c_str(), obj);
+	}
+
+	QJSValue val = engine->evaluate(js);
+
+	if(val.isError())
+	{
+		qWarning() << "Error running script in module: " << path;
+		qWarning() <<  val.property("name").toString();
+		qWarning() <<  val.property("message").toString();
+		qWarning() << "line: " << val.property("lineNumber").toString();
+
+		int line = val.property("lineNumber").toInt();
+		QStringList lines = js.split("\n");
+
+		if(line - 1 >= 0)
+			qWarning() << lines.at(line-1);
+
+		qWarning() << lines.at(line) << "<--";
+
+		if(lines.size() > line + 1)
+			qWarning() << lines.at(line+1);
+
+		qCritical() << "Aborting";
+		throw std::runtime_error("Failed to load module");
 	}
 
 	return true;
 }
 
-void BluemonkeySink::reloadEngine()
-{
-	if(engine)
-		engine->deleteLater();
-
-	engine = new QJSEngine();
-
-	QJSValue value = engine->newQObject(this);
-	engine->globalObject().setProperty("bluemonkey", value);
-
-	QThread* thread = new QThread(this);
-
-	engine->moveToThread(thread);
-
-	thread->start();
-
-	loadConfig(configuration["config"].c_str());
-}
-
-void BluemonkeySink::writeProgram(QString program)
+void Bluemonkey::writeProgram(QString program)
 {
 
 	QJSEngine temp;
 	QJSValue result = temp.evaluate(program);
 	if(result.isError())
 	{
-		DebugOut(DebugOut::Error)<<"Syntax error in program: "<<result.toString().toStdString()<<endl;
+		qDebug()<< "Syntax error in program: "<< result.toString();
 		return;
 	}
 
@@ -343,7 +233,7 @@ void BluemonkeySink::writeProgram(QString program)
 
 	if(!file.open(QIODevice::ReadWrite | QIODevice::Append))
 	{
-		DebugOut(DebugOut::Error)<<"failed to open file: "<<file.fileName().toStdString()<<endl;
+		qDebug() <<  "failed to open file: " <<  file.fileName() <<  endl;
 		return;
 	}
 
@@ -353,248 +243,57 @@ void BluemonkeySink::writeProgram(QString program)
 	file.close();
 }
 
-void BluemonkeySink::log(QString str)
+void Bluemonkey::log(QJSValue str)
 {
-	DebugOut()<<str.toStdString()<<endl;
+	qDebug()<< str.toString();
 }
 
-QObject *BluemonkeySink::createTimer()
+QObject *Bluemonkey::createTimer()
 {
 	return new QTimer(this);
 }
 
-QObject *BluemonkeySink::createQObject()
+QObject *Bluemonkey::createQObject()
 {
 	return new QObject(this);
 }
 
-void BluemonkeySink::getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction)
+QObject *Bluemonkey::createCoreApplication()
 {
-	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
-	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
-	AsyncRangePropertyRequest request;
-	request.timeBegin = b;
-	request.timeEnd = e;
+	return QCoreApplication::instance();
+}
 
-	PropertyList reqlist;
 
-	foreach(QString prop, properties)
+bool Bluemonkey::loadModule(const QString &name, QObject *module)
+{
+	if(!engine->globalObject().hasProperty(name))
 	{
-		reqlist.push_back(prop.toStdString());
+		QJSValue val = engine->newQObject(module);
+		engine->globalObject().setProperty(name, val);
+	}
+}
+
+void Bluemonkey::setArguments(int len, char **args)
+{
+	QStringList a;
+	for(int i = 0; i < len; i++)
+	{
+		a.append(args[i]);
 	}
 
-	request.properties = reqlist;
-	request.completed = [&cbFunction](AsyncRangePropertyReply* reply)
-	{
-		if(!reply->success)
-		{
-			DebugOut(DebugOut::Error)<<"bluemoney get history call failed"<<endl;
-			return;
-		}
-
-		if(cbFunction.isCallable())
-		{
-			QVariantList list;
-
-			for(auto val : reply->values)
-			{
-				list.append(toQVariant(val));
-			}
-
-			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
-
-			cbFunction.call(QJSValueList()<<val);
-
-		}
-
-		delete reply;
-	};
-
-	routingEngine->getRangePropertyAsync(request);
+	setArguments(a);
 }
 
-void BluemonkeySink::createCustomProperty(QString name, QJSValue defaultValue, int zone)
+void Bluemonkey::assertIsTrue(bool isTrue, const QString & msg)
 {
-	QVariant var = defaultValue.toVariant();
+	if(!isTrue)
+		log(msg);
 
-	DebugOut() << "Variant value for: " << name.toStdString() << " is " << defaultValue.toString().toStdString() << endl;
-
-	auto create = [name, var]() -> AbstractPropertyType*
-	{
-		return qVariantToAbstractPropertyType(name, var);
-	};
-
-	addPropertySupport(zone, create);
-
-	AsyncSetPropertyRequest request;
-	request.property = name.toStdString();
-	request.zoneFilter = zone;
-	request.value = VehicleProperty::getPropertyTypeForPropertyNameValue(name.toStdString(), defaultValue.toString().toStdString());
-
-	routingEngine->updateSupported(supported(), PropertyList(), &source);
-	routingEngine->setProperty(request);
-}
-
-void BluemonkeySink::exportInterface(QString name, QJSValue properties)
-{
-	std::unordered_map<std::string, std::string> propertiesMap;
-
-	QVariantList tempProps = properties.toVariant().toList();
-
-	DebugOut() << "num keys: " << tempProps.size() << endl;
-
-	Q_FOREACH(QVariant i, tempProps)
-	{
-		QVariantMap obj = i.toMap();
-		propertiesMap[obj.firstKey().toStdString()] = obj.first().toString().toStdString();
-	}
-
-	DebugOut() << "exporting new dbus interface: " << name.toStdString() << endl;
-	auto exporter = amb::Exporter::instance();
-	exporter->exportProperty<DBusSink>(name.toStdString(), propertiesMap, routingEngine);
-}
-
-QVariant Property::value()
-{
-	return mValue ? gvariantToQVariant(mValue->toVariant()) : QVariant::Invalid;
-}
-
-void Property::setValue(QVariant v)
-{
-	if(v.type() == QVariant::List || v.type() == QVariant::Map)
-	{
-
-		QJsonDocument doc = QJsonDocument::fromVariant(v);
-
-		QString json = doc.toJson();
-
-		mValue->fromString(json.toStdString());
-	}
-	else
-	{
-		QString tempVal = v.toString();
-		mValue->fromString(tempVal.toStdString());
-	}
-
-	AsyncSetPropertyRequest request;
-	request.property = mValue->name;
-	request.value = mValue->copy();
-	request.completed = [&](AsyncPropertyReply* reply)
-	{
-		if(reply->success)
-		{
-			propertyChanged(reply->value);
-		}
-		else
-		{
-			DebugOut(DebugOut::Warning) << "Error, trying to set value: " << reply->error << endl;
-		}
-		delete reply;
-	};
-	routingEngine->setProperty(request);
-}
-
-void Property::getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction)
-{
-	double b = (double)begin.toMSecsSinceEpoch() / 1000.0;
-	double e = (double)end.toMSecsSinceEpoch() / 1000.0;
-	AsyncRangePropertyRequest request;
-	request.timeBegin = b;
-	request.timeEnd = e;
-
-	PropertyList reqlist;
-	reqlist.push_back(mValue->name);
-
-	request.properties = reqlist;
-	request.completed = [&cbFunction](AsyncRangePropertyReply* reply)
-	{
-		if(!reply->success)
-		{
-			DebugOut(DebugOut::Error)<<"bluemoney get history call failed"<<endl;
-			return;
-		}
-
-		if(cbFunction.isCallable())
-		{
-			QVariantList list;
-
-			for(auto val : reply->values)
-			{
-				list.append(toQVariant(val));
-			}
-
-			QJSValue val = cbFunction.engine()->toScriptValue<QVariantList>(list);
-			cbFunction.call(QJSValueList()<<val);
-
-		}
-
-		delete reply;
-	};
-
-	routingEngine->getRangePropertyAsync(request);
-}
-
-Property::Property(VehicleProperty::Property prop, QString srcFilter, AbstractRoutingEngine* re, Zone::Type zone, QObject *parent)
-	:QObject(parent), AbstractSink(re, std::map<std::string,std::string>()),mValue(nullptr), mUuid(amb::createUuid()), mZone(zone)
-{
-	setType(prop.c_str());
-}
-
-QString Property::name()
-{
-	return mValue->name.c_str();
-}
-
-void Property::setType(QString t)
-{
-	if(mValue && name() != "")
-		routingEngine->unsubscribeToProperty(name().toStdString(), this);
-
-	routingEngine->subscribeToProperty(t.toStdString(), this);
-
-	mValue = VehicleProperty::getPropertyTypeForPropertyNameValue(t.toStdString());
-
-	if(!mValue)
-		return;
-
-	AsyncPropertyRequest request;
-	request.property = mValue->name;
-	request.completed = [this](AsyncPropertyReply* reply)
-	{
-		if(reply->success)
-			propertyChanged(reply->value);
-
-		delete reply;
-	};
-
-	routingEngine->getPropertyAsync(request);
-}
-
-void Property::propertyChanged(AbstractPropertyType *value)
-{
-	if(value->zone != mZone)
-		return;
-
-	if(mValue)
-	{
-		delete mValue;
-	}
-	mValue = value->copy();
-
-	changed(gvariantToQVariant(mValue->toVariant()));
+	Q_ASSERT(isTrue);
 }
 
 
-QVariant BluemonkeySink::zonesForProperty(QString prop, QString src)
+int Bluemonkey::run(QCoreApplication *app)
 {
-	PropertyInfo info = routingEngine->getPropertyInfo(prop.toStdString(), src.toStdString());
-
-	QVariantList list;
-
-	for(auto i : info.zones())
-	{
-		list << i;
-	}
-
-	return list;
+	return app->exec();
 }

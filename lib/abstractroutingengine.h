@@ -375,11 +375,10 @@ public:
 	virtual void updateSupported(PropertyList added, PropertyList removed, AbstractSource* source) = 0;
 
 
-	/// Deprecated:
+	///TODO: Deprecated, remove in 0.15:
 	void updateProperty(VehicleProperty::Property property, AbstractPropertyType* value, std::string uuid)
 	{
-		DebugOut(DebugOut::Warning)<<"updateProperty(VehicleProperty::Property,AbstractPropertyType*,std::string) is deprecated.  use new updateProperty(AbstractPropertyType*, const std::string &)"<<endl;
-		updateProperty(value,uuid);
+		throw std::runtime_error("updateProperty(VehicleProperty::Property,AbstractPropertyType*,std::string) is deprecated.  use new updateProperty(AbstractPropertyType*, const std::string &)");
 	}
 
 	virtual void updateProperty(AbstractPropertyType* value, const std::string &uuid) = 0;
@@ -390,9 +389,9 @@ public:
 	virtual void  unregisterSink(AbstractSink* self) = 0;
 
 	/**
-	 * /brief sourcesForProperty
-	 * /param property
-	 * /return vector of source uuid's that support the "property"
+	 * \brief sourcesForProperty
+	 * \param property
+	 * \return vector of source uuid's that support the "property"
 	 */
 	virtual std::vector<std::string> sourcesForProperty(const VehicleProperty::Property & property) = 0;
 
@@ -457,6 +456,11 @@ public:
 
 	/*!
 	 * \brief subscribeToProperty subscribes to propertyName.  Value changes will be passed to callback.
+	 * \code
+	 * subscribeToProperty(Vehicle::EngineSpeed, [](AbstractPropertyType* property) {
+	 *   ...
+	 * }, this);
+	 * \endcode
 	 * \arg propertyName
 	 * \arg callback
 	 * \arg pid process id of the requesting application
@@ -472,6 +476,8 @@ public:
 
 	/*!
 	 * \brief subscribeToProperty subscribe to changes made to a property value.
+	 * By default, all providers of this property will receive the subscription.  If you need to filter by source, use
+	 * \ref subscribeToProperty(const VehicleProperty::Property & propertyName, const std::string & sourceUuidFilter, AbstractSink *self)
 	 * \arg propertyName name of the property to request a subscription for.
 	 * \arg self pointer to the sink who is subscribing.
 	 * \code

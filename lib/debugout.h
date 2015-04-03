@@ -100,6 +100,13 @@ public:
 				out<<"WARNING ";
 		}
 	}
+
+	DebugOut(const std::string & toLog, int debugLevel = 4)
+		:DebugOut(debugLevel)
+	{
+		(*this) << toLog << endl;
+	}
+
 	DebugOut const& operator << (const string &message) const
 	{
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
@@ -113,8 +120,6 @@ public:
 
 	DebugOut const& operator << (ostream & (*manip)(std::ostream&)) const
 	{
-
-
 		if(mDebugLevel <= debugThreshhold || mDebugLevel == Error || mDebugLevel == Warning)
 		{
 			ostream out(buf);
@@ -139,7 +144,7 @@ public:
 		{
 			ostream out(buf);
 			out.precision(15);
-			out<<val<<" ";
+			out<<val;
 		}
 		return *this;
 	}

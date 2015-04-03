@@ -17,12 +17,8 @@
 */
 
 
-#ifndef BluemonkeySink_H
-#define BluemonkeySink_H
-
-#include <abstractsource.h>
-#include <ambpluginimpl.h>
-#include <uuidhelper.h>
+#ifndef Bluemonkey_H
+#define Bluemonkey_H
 
 #include <map>
 
@@ -31,138 +27,57 @@
 #include <QJsonDocument>
 #include <QDateTime>
 #include <QJSValue>
-#include <QThread>
+#include <QCoreApplication>
 
 #include "authenticate.h"
 
 class QJSEngine;
 
-class Property: public QObject, public AbstractSink
+class Bluemonkey : public QObject
 {
 	Q_OBJECT
-	Q_PROPERTY(QString name READ name)
-	Q_PROPERTY(QString source READ source)
-	Q_PROPERTY(double timestamp READ timestamp)
-	Q_PROPERTY(QVariant value READ value WRITE setValue)
-	Q_PROPERTY(int zone READ zone)
+	Q_PROPERTY(QStringList arguments READ arguments)
 
 public:
-	Property(VehicleProperty::Property, QString srcFilter, AbstractRoutingEngine * re, Zone::Type zone = Zone::None, QObject * parent = 0);
+	Bluemonkey(QObject * parent = nullptr);
 
-	QString name();
-	void setType(QString t);
+	~Bluemonkey();
 
-	QString source()
-	{
-		return mValue->sourceUuid.c_str();
-	}
+	bool loadModule(const QString &name, QObject* module);
 
-	double timestamp()
-	{
-		return mValue->timestamp;
-	}
-
-	virtual PropertyList subscriptions() { return PropertyList(); }
-	virtual void supportedChanged(const PropertyList &)
-	{
-		DebugOut()<<"Bluemonkey Property Supported Changed"<<endl;
-	}
-
-	virtual void propertyChanged(AbstractPropertyType* value);
-
-	virtual const std::string uuid() { return mUuid; }
-
-	QVariant value();
-	void setValue(QVariant v);
-
-	void getHistory(QDateTime begin, QDateTime end, QJSValue cbFunction);
-
-	Zone::Type zone() { return mZone; }
-
-Q_SIGNALS:
-
-	void changed(QVariant val);
-
-private:
-	AbstractPropertyType* mValue;
-	const std::string mUuid;
-	Zone::Type mZone;
-
-};
-
-class BluemonkeySink : public QObject, public AmbPluginImpl
-{
-Q_OBJECT
-
-public:
-	using AmbPluginImpl::setProperty;
-	using QObject::setProperty;
-
-	BluemonkeySink(AbstractRoutingEngine* e, map<string, string> config,  AbstractSource& parent);
-	~BluemonkeySink();
-	virtual PropertyList subscriptions();
-	virtual void supportedChanged(const PropertyList & supportedProperties);
-	virtual void propertyChanged(AbstractPropertyType* value);
-	virtual const std::string uuid() const;
-
-	virtual int supportedOperations();
-
-private: //source privates
-
-	PropertyList mSupported;
-	std::list<AbstractPropertyType*> propertyValueCache;
-
+	QStringList arguments() { return mArguments;}
+	void setArguments(const QStringList & args) { mArguments = args; }
+	void setArguments(int len, char **args);
 
 public Q_SLOTS:
 
-	QObject* subscribeTo(QString str);
-	QObject* subscribeTo(QString str, int zone);
-	QObject* subscribeTo(QString str, int zone, QString srcFilter);
+	void assertIsTrue(bool isTrue, const QString &msg="");
 
-	QStringList sourcesForProperty(QString property);
-	QVariant zonesForProperty(QString property, QString src);
-
-	QStringList supportedProperties();
-
-	bool authenticate(QString pass);
-
-	void loadConfig(QString str);
+	void loadScript(QString str);
 
 	bool loadModule(QString path);
 
-	void reloadEngine();
-
 	void writeProgram(QString program);
 
-	void log(QString str);
+	void log(QJSValue str);
 
 	QObject* createTimer();
 	QObject* createQObject();
 
-	void getHistory(QStringList properties, QDateTime begin, QDateTime end, QJSValue cbFunction);
+	QObject* createCoreApplication();
 
-	void setSilentMode(bool m)
-	{
-		mSilentMode = m;
-	}
+	int run(QCoreApplication *app);
 
-	void createCustomProperty(QString name, QJSValue defaultValue)
-	{
-		createCustomProperty(name, defaultValue, Zone::None);
-	}
+Q_SIGNALS:
 
-	void createCustomProperty(QString name, QJSValue defaultValue, int zone);
-
-	void exportInterface(QString name, QJSValue properties);
+	void ready();
 
 private:
 	QList<void*> modules;
 	QJSEngine* engine;
 	QStringList configsToLoad;
-
-	Authenticate* auth;
-	bool mSilentMode;
+	QStringList mArguments;
+	std::map<std::string, std::string> configuration;
 };
 
-
-#endif // BluemonkeySink_H
+#endif // Bluemonkey_H
