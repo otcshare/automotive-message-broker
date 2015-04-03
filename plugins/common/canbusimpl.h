@@ -82,7 +82,7 @@ public:
      */
     virtual bool registerCyclicMessageForReceive(int canId, double minCycleTime, double maxCycleTime);
     /**
-     * Unregisters CAN ID for receiving
+     * Un-registers CAN ID of a message used of receiving. Valid for cyclic and sporadic messages.
      * @fn unregisterMessageForReceive
      * @param canId CAN ID of the message.
      * @return True if de-registration succeeds.

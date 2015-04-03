@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 class CANBus
 {
 public:
-	virtual ~CANBus(){} /*LCOV_EXCL_LINE*/
+    virtual ~CANBus(){} /*LCOV_EXCL_LINE*/
 
     /**
     * Starts the CAN bus instance on the specified interface
@@ -47,26 +47,26 @@ public:
     * @param name Name of the CAN bus network interface
     * @return True if no error occurs.
     */
-	virtual bool start(const char* name) = 0;
+    virtual bool start(const char* name) = 0;
     /**
     * Stops the CAN bus instance
     * @fn stop
     */
-	virtual void stop() = 0; 
+    virtual void stop() = 0; 
     /**
     * Sends standard(11bit) CAN frame over the bus
     * @fn sendStandardFrame
     * @param frame CAN frame to be sent
     * @return True if frame was sent
     */
-	virtual bool sendStandardFrame(const can_frame& frame) = 0;
+    virtual bool sendStandardFrame(const can_frame& frame) = 0;
     /**
     * Sends extended(29bit) CAN frame over the bus
     * @fn sendExtendedFrame
     * @param frame CAN frame to be sent
     * @return True if frame was sent
     */
-	virtual bool sendExtendedFrame(const can_frame& frame) = 0;
+    virtual bool sendExtendedFrame(const can_frame& frame) = 0;
     /**
     * Registers CAN ID of a cyclic message for receiving
     * @fn registerCyclicMessageForReceive
@@ -84,10 +84,10 @@ public:
     */
     virtual bool registerMessageForReceive(int canId)
     {
-        return registerCyclicMessageForReceive(canId, 0, 0);
+	return registerCyclicMessageForReceive(canId, 0, 0);
     }
     /**
-    * Unregisters CAN ID for receiving
+    * Un-registers CAN ID of a message used of receiving. Valid for cyclic and sporadic messages.
     * @fn unregisterMessageForReceive
     * @param canId CAN ID of the message.
     * @return True if de-registration succeeds.
