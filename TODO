@@ -4,4 +4,6 @@
 - Refactor obd2 plugin with AsyncQueue.  Use thread-safe updateProperty.
 - source export from database plugin does not reflect the source in the database
 - grep all the TODOs in the code and do them
+- implement no-value for AbstractPropertyType
+- add timestamp processing for CAN data
 

@@ -1,5 +1,6 @@
 #include "timestamp.h"
 
+#include <math.h>
 #include <time.h>
 #include <iostream>
 #include <chrono>
@@ -36,6 +37,11 @@ double amb::Timestamp::epochTime(double time)
 	return startTimeEpoch + time;
 }
 
+double amb::Timestamp::currentTime(double time)
+{
+    return time - startTimeEpoch;
+}
+
 double amb::Timestamp::epochTime()
 {
 	auto tm = std::chrono::system_clock::now();
@@ -51,4 +57,14 @@ amb::Timestamp* amb::Timestamp::instance()
 		mInstance = new Timestamp();
 
 	return mInstance;
+}
+
+double amb::Timestamp::fromTimeval(const struct ::timeval &tv)
+{
+    return tv.tv_sec*1.0 + tv.tv_usec*1e-6;
+}
+
+struct ::timeval amb::Timestamp::toTimeval(const double time)
+{
+    return { (__time_t) time, (__suseconds_t)fmod(time*1e6, 1e6) };
 }

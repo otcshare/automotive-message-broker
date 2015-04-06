@@ -82,10 +82,15 @@ public:
 		{
 			std::lock_guard<std::mutex> lock(mutex);
 
-			if(contains(mQueue, item))
+			auto i = mQueue.begin();
+			while(true)
 			{
-				mQueue.erase(std::find(mQueue.begin(), mQueue.end(), item));
+				i = find(i, mQueue.end(), item);
+				if (i == mQueue.end())
+					break;
+				i = mQueue.erase(i);
 			}
+
 			mQueue.push_back(item);
 		}
 

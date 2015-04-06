@@ -1,0 +1,50 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          ambd
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Automotive Message Broker daemon
+### END INIT INFO
+
+# Source function library.
+. /etc/init.d/functions
+
+PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+[ -f /etc/default/rcS ] && . /etc/default/rcS
+[ -f /etc/default/ambd ] && . /etc/default/ambd
+
+case "$1" in
+    start)
+	echo -n "Starting Automotive Message Broker daemon: "
+	start-stop-daemon -S -x @CMAKE_INSTALL_PREFIX@/bin/ambd -- -D
+	if [ $? = 0 ]; then
+	    echo "ambd."
+	else
+	    echo "(failed.)"
+	fi
+	;;
+    stop)
+	echo -n "Stopping Automotive Message Broker daemon: "
+	start-stop-daemon -K -x @CMAKE_INSTALL_PREFIX@/bin/ambd
+	echo "apmd."
+	;;
+    status)
+	status @CMAKE_INSTALL_PREFIX@/bin/ambd;
+	exit $?
+	;;
+    restart|force-reload) 
+	$0 stop
+	$0 start
+	exit
+	;;
+    *)
+	echo "Usage: /etc/init.d/ambd {start|stop|status|restart|force-reload}"
+	exit 1
+	;;
+esac
+
+exit 0
+

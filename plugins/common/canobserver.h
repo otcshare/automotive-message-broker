@@ -24,7 +24,10 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  *  @{
  */
 
+#include <stdlib.h>
 #include <linux/can.h>
+
+#include "canframeinfo.h"
 
 /**
 * \brief Interface. Receives notifications about the CAN bus traffic and errors.
@@ -76,7 +79,12 @@ public:
 	* @param frame RTR frame
 	*/
 	virtual void remoteTransmissionRequest(const can_frame& frame) = 0;   /* remote transmission request (SFF/EFF is still present)*/
-
+	/**
+	* Called when timeout was detected for a cyclic message.
+	* @fn timeoutDetected
+	* @param frame
+	*/
+	virtual void timeoutDetected(const can_frame& frame) = 0;             /* timeout */
 };
 
 #endif // CANOBSERVER_H

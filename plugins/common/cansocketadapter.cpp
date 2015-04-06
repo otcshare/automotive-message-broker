@@ -21,6 +21,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include "canobserver.h"
 #include "cansocketreader.h"
 #include "logger.h"
+#include "cansocketbcm.h"
+#include "cansocketraw.h"
 
 // TODO: handle socket errors
 
@@ -76,8 +78,8 @@ bool CANSocketAdapter::sendFrame(const can_frame& frame)
 	LOG_TRACE("");
 
 	if(mSocket) {
-		int bytesWritten(0);
-		return mSocket->write(frame, bytesWritten);
+		CANFrameInfo message(frame);
+		return mSocket->write(message);
 	}
 	return false;
 }
@@ -85,8 +87,23 @@ bool CANSocketAdapter::sendFrame(const can_frame& frame)
 void CANSocketAdapter::init()
 {
 	if(!mSocket)
-		mSocket = new CANSocket();
+		mSocket = new CANSocketBCM();
 	if(!mReader)
 		mReader = new CANSocketReader(mObserver, *mSocket);
 }
 
+bool CANSocketAdapter::registerCyclicMessageForReceive(int canId, double minCycleTime, double maxCycleTime)
+{
+	if(mSocket)
+		return mSocket->registerCyclicMessageForReceive(canId, minCycleTime, maxCycleTime);
+	else
+		return false;
+}
+
+bool CANSocketAdapter::unregisterMessageForReceive(int canId)
+{
+	if(mSocket) 
+		return mSocket->unregisterMessageForReceive(canId);
+	else
+		return false;
+}

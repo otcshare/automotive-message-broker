@@ -1,0 +1,129 @@
+#Copyright (c) 2015  Cogent Embedded Inc.
+#Copyright (C) 2015 Renesas Electronics Corporation
+#
+#This library is free software; you can redistribute it and/or
+#modify it under the terms of the GNU Lesser General Public
+#License as published by the Free Software Foundation; either
+#version 2.1 of the License, or (at your option) any later version.
+#
+#This library is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#Lesser General Public License for more details.
+#
+#You should have received a copy of the GNU Lesser General Public
+#License along with this library; if not, write to the Free Software
+#Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+
+{
+    my @receive = ();
+    my @send = ();
+}
+
+MsgOutput: Line(s?) eofile
+    {
+	my %rcv_msg = ();
+	my %cycle_msg = ();
+	my %send_msg = ();
+
+	for my $msg (@receive) {
+	    my %m = %{$msg};
+
+	    for my $signal (@{$m{'signals'}}) {
+		    $rcv_msg{$m{'id'}}->{$signal} += 1;
+            }
+
+	    if (exists $m{'cycle'}) {
+		$cycle_msg{$m{'id'}} = $m{'cycle'} / 1000.0;
+	    }
+
+	}
+
+	my %picked = ();
+	$picked{'receive'} = \%rcv_msg;
+	$picked{'cycle'} = \%cycle_msg;
+	$picked{'send'} = \%send_msg;
+
+	return \%picked;
+    }
+
+eofile: /^\Z/
+
+Line: CommentPrefix /.*\n/
+        # Not needed to output anything yet
+    | 'RECEIVE' MessageSpec
+	{
+	   # select the message for receiving
+	   push(@receive, $item[2]);
+	}
+    | 'SEND' MessageSpec
+	{
+	   # select the message for sending
+	   push(@send, $item[2]);
+	}
+    | <error: Invalid msg format at $thisline!>
+
+MessageSpec: MessageId '.' SignalId MessageProperties ';'
+	{
+	   my %msg;
+	   $msg{'id'} = $item[1];
+           @{$msg{'signals'}} = $item[3];
+	   for my $p (@{$item[4]}) {
+		$msg{lc($p->{'name'})} = $p->{'value'};
+	   }
+	   $return = \%msg;
+	}
+      | MessageId MessageProperties '{' SignalId(s? /,/) '}'
+	{
+	   my %msg;
+	   $msg{'id'} = $item[1];
+           $msg{'signals'} = $item[4];
+	   for my $p (@{$item[2]}) {
+		$msg{lc($p->{'name'})} = $p->{'value'};
+	   }
+	   $return = \%msg;
+	}
+
+MessageId: Identifier
+	{
+	  # Message is selected by name
+	  $return = $item[1];
+	}
+	| '@' Integer
+	{
+	  # Message is selected by id
+	  $return = $item[2];
+	}
+
+MessageProperties: MessageProperty(s?)
+
+MessageProperty: Identifier '=' Value
+	{
+		# property of the message
+		my %prop;
+		$prop{'name'} = $item[1];
+		$prop{'value'} = $item[3];
+		$return = \%prop;
+	}
+
+SignalId: Identifier|'*'
+
+Identifier: /[A-Za-z0-9_\-]+/
+        {
+            $return = $item[1];
+        }
+
+Value: Number | String
+
+Number: Integer | RealNumber | Sign
+
+Integer: /[-+]?[0-9]*/
+RealNumber: /[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?/
+Sign: /^[-+]?/
+
+CommentPrefix: '#'
+
+DoubleQuotation: "\""
+
+String: /\"[^\"]*\"/ 
+

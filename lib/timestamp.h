@@ -1,6 +1,7 @@
 #ifndef _TIMESTAMP_H___
 #define _TIMESTAMP_H___
 
+#include <time.h>
 
 namespace amb {
 
@@ -25,6 +26,7 @@ public:
 	 * \return current monotonic (steady) time in seconds.
 	 */
 	double currentTime();
+	double currentTime(double time);
 
 	/*!
 	 * \brief epochTime
@@ -38,6 +40,9 @@ public:
 	 * \return current system time in seconds since unix epoch
 	 */
 	double epochTime();
+
+    static double fromTimeval(const struct ::timeval& tv);
+    static struct ::timeval toTimeval(const double time);
 
 public:
 	/*!

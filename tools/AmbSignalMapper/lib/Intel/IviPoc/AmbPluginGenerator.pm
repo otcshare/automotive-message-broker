@@ -80,20 +80,13 @@ based on information comming from input JSON file.
 
 =cut
 
-my $hashingAllowed = 'E';       # Enabled by default
+my $hashingAllowed = 'E';	   # Enabled by default
 
 sub processPlugin {
 	$hashingAllowed = $_[0];
-	my $jsonfile = $_[1];
+	my $dbcjson = $_[1];
 	my $targetDir = $_[2];
-
-	# Load the json
-	my $json_text = &readFileContent( $jsonfile );
-
-	my $json = JSON->new;
-	$json = $json->utf8;
-
-	my $dbcjson = $json->decode( $json_text );
+	
 	if ($hashingAllowed eq 'E' ) {
 		&encryptAmbPropertyNames( $dbcjson );
 	}
@@ -113,6 +106,7 @@ sub processPlugin {
 						 , "ambtmpl_plugin.cpp"
 						 , "ambtmpl_cansignals.h"
 						 , "ambtmpl_plugin.idl"
+						 , "ambtmpl.in.json"
 						 );
 
 	my @pluginFiles = ( "CMakeLists.txt"
@@ -122,6 +116,7 @@ sub processPlugin {
 					  , lc ($pluginName) . "_plugin.cpp"
 					  , lc ($pluginName) . "_cansignals.h"
 					  , lc ($pluginName) . "_plugin.idl"
+					  , lc ($pluginName) . ".in.json"
 					  );
 
 	my @generationSubs = ( undef
@@ -131,11 +126,12 @@ sub processPlugin {
 						 , \&generateCppImplTypes
 						 , \&generateSignalsTypes
 						 , \&generateIdlTypes
+						 , undef
 						 );
 
 	my $templateFile = '';
 	my $pluginFile = '';
-	my ($volume, $directory) = File::Spec->splitpath( $INC{'Intel/IviPoc/AmbPluginGenerator.pm'} );
+	my ($volume, $directory) = File::Spec->splitpath(__FILE__);
 	for my $i (0..scalar(@pluginFiles)-1) {
 		# First join templates folder and filename
 		$templateFile = File::Spec->catfile( ($templatesDir), $templatesFiles[$i] );
@@ -267,7 +263,7 @@ sub generateCppImplTypes {
 			my @messages = @{$engineControlUnits[$ecui]{'messages'}};
 			for my $msgi (0..scalar(@messages)-1) {
 				$hexValue = '0x' . uc ( sprintf( "%x", $messages[$msgi]{'canId'} ) );
-				$registerMessageText .= "    registerMessage($hexValue, $messages[$msgi]{'canDlc'}";
+				$registerMessageText .= "	registerMessage($hexValue, $messages[$msgi]{'canDlc'}, $messages[$msgi]{'cycle'}";
 
 				my @signals = @{$messages[$msgi]{'signals'}};
 				foreach my $signal ( @signals ) {
@@ -275,7 +271,7 @@ sub generateCppImplTypes {
 					$registerMessageText .= &generateCppProperty( $signal, $type);
 				}
 
-				$registerMessageText .= "\n                   );\n";
+				$registerMessageText .= "\n				   );\n";
 			}
 		}
 	}
@@ -303,9 +299,9 @@ sub generateCppProperty {
 		# TODO CANSignal needs to take zone as argument
 		#my $zone = 'Zone::None';
 		#if ($zonesInUse) {
-		#    $zone = &calculateZone( $ambPropertyName );
+		#	$zone = &calculateZone( $ambPropertyName );
 		#}
-		$generatedText .= "\n                   , new ${ambPropertyName}Type()";
+		$generatedText .= "\n				   , new ${ambPropertyName}Type()";
 	}
 	return $generatedText;
 }
@@ -382,7 +378,7 @@ sub generateEnumOrValues {
 			# Generate enum values
 			for my $vali (0..scalar(@values) -1 ) {
 				$hexValue = '0x' . uc ( sprintf( "%x", $values[$vali]->{'value'} ) );
-				$generatedText .= "    $values[$vali]->{'name'} = $hexValue";
+				$generatedText .= "	$values[$vali]->{'name'} = $hexValue";
 				if ($vali != scalar(@values)-1 ) {
 					$generatedText .= ",";
 				}
@@ -427,16 +423,16 @@ sub generatePropertyClasses {
 	$ambPropertyName = $signal->{'AMBPropertyName'};
 	}
 
-	my $byteOrdering = "Endian::Intel";                 # LittleEndian by default
+	my $byteOrdering = "Endian::Intel";				 # LittleEndian by default
 	if ( exists( $signal->{'byteOrdering'} ) and $signal->{'byteOrdering'} eq '0') {
-	$byteOrdering = "Endian::Motorola";                 # BigEndian
+	$byteOrdering = "Endian::Motorola";				 # BigEndian
 	}
 
 	my $signedness;
 	if ($signal->{'signedness'} eq '+') {
-	$signedness = "Signedness::Unsigned";               # Unsigned
+	$signedness = "Signedness::Unsigned";			   # Unsigned
 	} else {
-	$signedness = "Signedness::Signed";                 # Signed
+	$signedness = "Signedness::Signed";				 # Signed
 	}
 
 	my $convertFromFunction = "nullptr";
@@ -479,7 +475,7 @@ sub generatePropertyClasses {
 		} else {
 			$cppType = "int";
 		}
-	} else {    # (u)int16, (u)int64
+	} else {	# (u)int16, (u)int64
 		$cppType = "$type";
 	}
 
@@ -552,15 +548,15 @@ sub generateIdlProperty {
 			for my $vali (0..scalar(@values) -1 ) {
 				# TODO const unsigned short migth be not enough, guess type based on values
 				$hexValue = '0x' . uc (sprintf( "%x", $values[$vali]->{'value'} ) );
-				$generatedText .= "    const unsigned short " . uc($values[$vali]->{'name'}) . " = $hexValue;\n";
+				$generatedText .= "	const unsigned short " . uc($values[$vali]->{'name'}) . " = $hexValue;\n";
 			}
 		}
 	}
 
 	$generatedText .= "\n";
-	$generatedText .= "    /**  ${ambPropertyName}\n";
-	$generatedText .= "     *   \\brief  Returns ${ambPropertyName}\n";
-	$generatedText .= "     **/\n";
+	$generatedText .= "	/**  ${ambPropertyName}\n";
+	$generatedText .= "	 *   \\brief  Returns ${ambPropertyName}\n";
+	$generatedText .= "	 **/\n";
 
 	my $unsigned = '';
 	if ( $type =~ m/uint/ ) {
@@ -569,17 +565,17 @@ sub generateIdlProperty {
 
 	if ( $type =~ m/enum/ ) {
 		# TODO const unsigned short migth be not enough, guess type based on values
-		$generatedText .= "    readonly attribute octet ${ambPropertyName};\n";
+		$generatedText .= "	readonly attribute octet ${ambPropertyName};\n";
 	} elsif ( $type =~ m/bool/ ) {
-		$generatedText .= "    readonly attribute boolean ${ambPropertyName};\n";
+		$generatedText .= "	readonly attribute boolean ${ambPropertyName};\n";
 	} elsif ( $type =~ m/int8/ ) {
-		$generatedText .= "    readonly attribute ${unsigned}octet ${ambPropertyName};\n";
+		$generatedText .= "	readonly attribute ${unsigned}octet ${ambPropertyName};\n";
 	} elsif ( $type =~ m/int16/ ) {
-		$generatedText .= "    readonly attribute ${unsigned}short ${ambPropertyName};\n";
+		$generatedText .= "	readonly attribute ${unsigned}short ${ambPropertyName};\n";
 	} elsif ( $type =~ m/int32/ ) {
-		$generatedText .= "    readonly attribute ${unsigned}long ${ambPropertyName};\n";
+		$generatedText .= "	readonly attribute ${unsigned}long ${ambPropertyName};\n";
 	} else {
-		$generatedText .= "    readonly attribute double ${ambPropertyName};\n";
+		$generatedText .= "	readonly attribute double ${ambPropertyName};\n";
 	}
 	$generatedText .= "};\n\n";
 

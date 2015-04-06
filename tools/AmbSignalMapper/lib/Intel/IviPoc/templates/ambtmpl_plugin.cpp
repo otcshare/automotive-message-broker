@@ -25,6 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include <logger.h>
 
+#include <canbusimpl.h>
 #include "ambtmpl_plugin.h"
 #include "ambtmpl_cansignals.h"
 
@@ -81,10 +82,10 @@ gboolean AmbTmplPlugin::timeoutCallback(gpointer data)
 // AmbTmplPlugin
 //----------------------------------------------------------------------------
 
-AmbTmplPlugin::AmbTmplPlugin(AbstractRoutingEngine* re, const map<string, string>& config, AbstractSink& parent) :
+AmbTmplPlugin::AmbTmplPlugin(AbstractRoutingEngine* re, const map<string, string>& config, AbstractSource& parent) :
       AmbPluginImpl(re, config, parent),
       interface(DEFAULT_CAN_IF_NAME),
-      canBus(new CANBus(*static_cast<CANObserver*>(this))),
+      canBus(new CANBusImpl(*static_cast<CANObserver*>(this))),
       announcementIntervalTimer(1000),
       announcementCount(20)
 {
@@ -125,6 +126,11 @@ AmbTmplPlugin::~AmbTmplPlugin()
 void AmbTmplPlugin::init()
 {
     canBus->start(interface.c_str());
+
+    for(auto iter = messages.begin(); iter != messages.end(); iter++) {
+        if (!iter->second.registerOnCANBus(*canBus))
+            LOG_ERROR("Cannot register a message with can_id=0x" << std::hex << iter->first);
+    }
 }
 
 AsyncPropertyReply *AmbTmplPlugin::setProperty(const AsyncSetPropertyRequest& request )
@@ -176,6 +182,18 @@ void AmbTmplPlugin::onMessage(const can_frame& frame)
     message.onMessage( frame, [&re, &guid](AbstractPropertyType* value){re->updateProperty(value, guid);} );
 }
 
+void AmbTmplPlugin::onTimeout(const can_frame& frame)
+{
+    auto messageIt = messages.find(frame.can_id);
+    if(messageIt == messages.end())
+        return;
+
+    CANMessage& message(messageIt->second);
+    const std::string guid = uuid();
+    AbstractRoutingEngine* re = routingEngine;
+    message.onTimeout( frame, [&re, &guid](AbstractPropertyType* value){re->updateProperty(value, guid);} );
+}
+
 bool AmbTmplPlugin::sendValue(AbstractPropertyType* value)
 {
     if(!value)
@@ -212,6 +230,14 @@ void AmbTmplPlugin::extendedFrameReceived(const can_frame& frame)
     printFrame(frame);
 
     onMessage(frame);
+}
+
+void AmbTmplPlugin::timeoutDetected(const can_frame& frame)
+{
+    LOG_INFO("testPlugin::timeoutDetected()");
+    printFrame( frame );
+
+    onTimeout(frame);
 }
 
 void AmbTmplPlugin::errorFrameReceived(const can_frame& frame)

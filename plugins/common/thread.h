@@ -127,6 +127,15 @@ public:
 	virtual bool start();
 
 	/**
+	* Sets the priority of the thread for FIFO scheduling.
+	* @fn set_priority
+	* @param priority Integer ranging from 1 (lowest) to 99 (highest).
+	* @return True if the operation was successful.
+	* @public
+	*/
+	bool setPriority(int priority);
+
+	/**
 	* Stops the thread
 	* @fn stop
 	* @public

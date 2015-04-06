@@ -93,7 +93,7 @@ template<typename T> ::std::shared_ptr<T> make_shared(T* t)
 
 template<typename T> gobject_ptr<T> make_gobject(T* t)
 {
-	return gobject_ptr<T>(t, [](auto ptr) { if(ptr) g_object_unref(ptr);});
+	return gobject_ptr<T>(t, [](T *ptr) { if(ptr) g_object_unref(ptr);});
 }
 
 }

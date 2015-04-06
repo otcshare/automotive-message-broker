@@ -63,6 +63,22 @@ public:
 	* @return True if frame was sent
 	*/
 	virtual bool sendFrame(const can_frame& frame);
+	/**
+	* Registers CAN ID of a cyclic message for receiving
+	* @fn registerCyclicMessageForReceive
+	* @param canId CAN ID of the message.
+	* @param minCycleTime Minimal interval between messages in seconds. Set to 0 if not used.
+	* @param maxCycleTime Maximum interval between messages for timeout detection in seconds. Set to 0 if no timeout detection is necessary.
+	* @return True if registration succeeds.
+	*/
+	virtual bool registerCyclicMessageForReceive(int canId, double minCycleTime, double maxCycleTime);
+	/**
+	* Un-registers CAN ID of a message used of receiving. Valid for cyclic and sporadic messages.
+	* @fn unregisterMessageForReceive
+	* @param canId CAN ID of the message.
+	* @return True if de-registration succeeds.
+	*/
+	virtual bool unregisterMessageForReceive(int canId);
 
 protected:
 	/**

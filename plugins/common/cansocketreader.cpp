@@ -1,5 +1,7 @@
 /*
 Copyright (C) 2012 Intel Corporation
+Copyright (C) 2015 Cogent Embedded Inc.
+Copyright (C) 2015 Renesas Electronics Corporation
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
@@ -38,7 +40,11 @@ bool CANSocketReader::start()
 {
     LOG_TRACE("");
 
-    return CUtil::Thread::start();
+    bool res = CUtil::Thread::start();
+
+    // try to set higher priority
+    if (res) res = setPriority(4);
+    return res;
 }
 
 void CANSocketReader::stop()
@@ -55,41 +61,71 @@ void CANSocketReader::run()
 
     while(isRunnable()) {
 
-        struct can_frame frame;
-        int bytesRead;
+        CANFrameInfo message;
+        CANSocket::CANSocketReadSuccess success = mSocket.read(message);
 
-        CANSocket::CANSocketReadSuccess success = mSocket.read(frame, bytesRead);
+        switch(success)
+        {
+        case CANSocket::READING_SUCCEEDED:
+            dispatchMessage(message);
+            break;
 
-        switch(success) {
-        case CANSocket::READING_FAILED:
-            LOG_ERROR("reading failed");
-            mObserver.errorOccured(CANObserver::GENERAL_ERROR);
-            return;
         case CANSocket::READING_TIMED_OUT:
             // read again
             break;
-        default: //CANSocketWrapper::READING_SUCCEEDED
-            if(frame.can_id & CAN_ERR_FLAG) {
-                frame.can_id &= (CAN_ERR_FLAG|CAN_ERR_MASK);
-                mObserver.errorFrameReceived(frame);
-            }
-            else if(frame.can_id & CAN_RTR_FLAG){
-                if(!(frame.can_id & CAN_EFF_FLAG)){
-                    frame.can_id &= CAN_SFF_MASK;
-                }
-                else{
-                    frame.can_id &= (~CAN_RTR_FLAG);
-                }
-                mObserver.remoteTransmissionRequest(frame);
-            }
-            else if(frame.can_id & CAN_EFF_FLAG){
-                frame.can_id &= CAN_EFF_MASK;
-                mObserver.extendedFrameReceived(frame);
-            }
-            else{
-                frame.can_id &= CAN_SFF_MASK;
-                mObserver.standardFrameReceived(frame);
-            }
+
+        case CANSocket::READING_FAILED:
+        default:
+            LOG_ERROR("reading failed");
+            mObserver.errorOccured(CANObserver::GENERAL_ERROR);
+            break;
         }
     }
 }
+
+void CANSocketReader::dispatchMessage(const CANFrameInfo &message)
+{
+    struct can_frame frame = message.frame;
+
+    switch (message.status)
+    {
+    case CANFrameInfo::CANMessageStatus::GOOD:
+        if(frame.can_id & CAN_ERR_FLAG) {
+            frame.can_id &= (CAN_ERR_FLAG|CAN_ERR_MASK);
+            mObserver.errorFrameReceived(frame);
+        }
+        else if( frame.can_id & CAN_RTR_FLAG){
+            if(!( frame.can_id & CAN_EFF_FLAG)){
+                frame.can_id &= CAN_SFF_MASK;
+            }
+            else{
+                frame.can_id &= (~CAN_RTR_FLAG);
+            }
+            mObserver.remoteTransmissionRequest(frame);
+        }
+        else if(frame.can_id & CAN_EFF_FLAG){
+            frame.can_id &= CAN_EFF_MASK;
+            mObserver.extendedFrameReceived(frame);
+        }
+        else{
+            frame.can_id &= CAN_SFF_MASK;
+            mObserver.standardFrameReceived(frame);
+        }
+        break;
+
+    case CANFrameInfo::CANMessageStatus::TIMEOUT:
+        if(frame.can_id & CAN_EFF_FLAG)
+            frame.can_id &= CAN_EFF_MASK;
+        else
+            frame.can_id &= CAN_SFF_MASK;
+
+        mObserver.timeoutDetected(frame);
+        break;
+
+    default:
+        LOG_ERROR("Unexpected CAN message status " << message.status);
+        mObserver.errorOccured(CANObserver::GENERAL_ERROR);
+        break;
+    }
+}
+
