@@ -92,16 +92,13 @@ public:
 
 	std::string read()
 	{
-		char buff;
+		char buff = '?';
 		std::string result;
 		int bytesread = 0;
-		while( bytesread = ::read(fd, &buff, 1) > 0 )
-		{
-			result += buff;
-		}
-
-		if(bytesread == -1)
-			perror("Error while reading: ");
+		do {
+			bytesread = ::read(fd, &buff, 1);
+			if(bytesread>0) result += buff;
+		} while(buff!='\n');
 
 		return result;
 	}
@@ -133,6 +130,7 @@ private: ///methods
 		}
 
 		struct termios oldtio;
+        memset (&oldtio, 0, sizeof(oldtio));
 		tcgetattr(fd,&oldtio);
 
 		oldtio.c_cflag |= CS8 | CLOCAL | CREAD;
@@ -147,6 +145,8 @@ private: ///methods
 		oldtio.c_lflag &= ~(ECHO | ICANON | ISIG);
 
 		//oldtio.c_cc[VEOL]     = '\r';
+        oldtio.c_cc[VMIN]  = 1; // 1 for Blocking
+	    oldtio.c_cc[VTIME] = 5; // 0.5 seconds read timeout
 
 		cfsetispeed(&oldtio, speed);
 		cfsetospeed(&oldtio, speed);
