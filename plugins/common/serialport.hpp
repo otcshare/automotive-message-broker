@@ -97,7 +97,7 @@ public:
 		int bytesread = 0;
 		do {
 			bytesread = ::read(fd, &buff, 1);
-			if(bytesread>0) result += buff;
+			if((bytesread>0) && (buff!='\n') && (buff!='\r')) result += buff;
 		} while(buff!='\n');
 
 		return result;
@@ -145,16 +145,14 @@ private: ///methods
 		oldtio.c_lflag &= ~(ECHO | ICANON | ISIG);
 
 		//oldtio.c_cc[VEOL]     = '\r';
-        oldtio.c_cc[VMIN]  = 1; // 1 for Blocking
-	    oldtio.c_cc[VTIME] = 5; // 0.5 seconds read timeout
+		oldtio.c_cc[VMIN]  = 1; // 1 for Blocking
+		oldtio.c_cc[VTIME] = 5; // 0.5 seconds read timeout
 
 		cfsetispeed(&oldtio, speed);
 		cfsetospeed(&oldtio, speed);
 
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &oldtio);
-
-		fcntl(fd,F_SETFL,O_NONBLOCK);
 
 		return true;
 	}

@@ -632,54 +632,29 @@ void GpsNmeaSource::test()
 
 bool GpsNmeaSource::tryParse(string data)
 {
-	std::vector<std::string> lines;
-
-	boost::split(lines, data, boost::is_any_of("$"));
-
 	bool weFoundAMessage = false;
 
-	for(auto line : lines)
+	DebugOut(7)<<"Data : [" << data << "]" << endl;
+
+	std::string::size_type pos = data.find('$');
+	if(pos != 0)
 	{
-		if(checksum(line))
-		{
-			DebugOut(7) << "checksome checks out for: " << line << endl;
-			buffer = line;
-		}
-		else
-		{
-			buffer += line;
-		}
+		DebugOut(7) << "Throwing the incomplete stuff away.  if it doesn't begin with '$'' it'll never be complete: " << endl;
+		return false;
+	}		
 
-		std::string::size_type pos = buffer.find('G');
-
-		if(pos != std::string::npos && pos != 0)
-		{
-			DebugOut(7) << "Throwing the incomplete stuff away.  if it doesn't begin with 'G'' it'll never be complete: " << buffer << endl;
-			buffer = buffer.substr(pos);
-		}
-
-		if(checksum(buffer))
-		{
-			/// we have a complete message.  parse it!
-			DebugOut(7)<<"Complete message: "<<buffer<<endl;
-			location->parse(buffer);
-			weFoundAMessage = true;
-			buffer = "";
-		}
-		else
-		{
-			if(pos == 0 )
-			{
-				std::string::size_type cs = buffer.find('*');
-				if (cs != std::string::npos && cs != buffer.length()-1)
-				{
-					DebugOut(7) << "false flag somewhere: "<< cs << " " << buffer << endl;
-					buffer = buffer.substr(cs+(buffer.length() - cs));
-				}
-			}
-		}
-
-		DebugOut(7)<<"buffer: "<<buffer<<endl;
+	data = data.substr(1);
+	if(checksum(data))
+	{
+		//DebugOut(7) << "checksome checks out for: " << line << endl;
+		DebugOut(7) << "Parsing [" << data << "]" << endl;
+		location->parse(data);
+		weFoundAMessage = true;
+	}
+	else
+	{
+		//buffer += line;
+		DebugOut(7) << "Wrong checksum - skipping line [" << data << "]" << endl;
 	}
 
 	return weFoundAMessage;
