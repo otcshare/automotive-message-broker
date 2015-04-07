@@ -222,7 +222,7 @@ void Location::parseTime(string h, string m, string s, string dd, string mm, str
 		t.tm_mon = boost::lexical_cast<int>(mm) - 1;
 		t.tm_year = boost::lexical_cast<int>(yy) + 100;
 
-		time_t time = mktime(&t);
+		time_t time = timegm(&t);
 
 		if(mGpsTime->basicValue() != (double(time)))
 		{
