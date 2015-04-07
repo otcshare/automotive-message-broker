@@ -4,11 +4,11 @@ import argparse
 import dbus
 import sys
 import json
-import gobject
 import fileinput
 import termios, fcntl, os
-import glib
 import curses.ascii
+from gi.repository import GObject, GLib
+
 from dbus.mainloop.glib import DBusGMainLoop
 
 class bcolors:
@@ -344,21 +344,21 @@ if args.command == "stdin":
 		oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
 		fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
 
-		io_stdin = glib.IOChannel(fd)
-		io_stdin.add_watch(glib.IO_IN, handle_keyboard, data)
+		io_stdin = GLib.IOChannel(fd)
+		io_stdin.add_watch(GLib.IO_IN, handle_keyboard, data)
 
 		try:
-				erase_line()
-				display_prompt()
-				sys.stdout.flush()
-				main_loop = gobject.MainLoop(None, False)
-				main_loop.run()
+			erase_line()
+			display_prompt()
+			sys.stdout.flush()
+			main_loop = GObject.MainLoop()
+			main_loop.run()
 		except KeyboardInterrupt:
-				sys.exit()
+			sys.exit()
 		finally:
-				termios.tcsetattr(fd, termios.TCSAFLUSH, old)
-				fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
-				sys.exit()
+			termios.tcsetattr(fd, termios.TCSAFLUSH, old)
+			fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+			sys.exit()
 
 else:
 	try:
