@@ -26,6 +26,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/un.h>
+#include <sys/time.h>
 #include <math.h>
 
 #define GPSTIME "GpsTime"
@@ -70,9 +71,8 @@ void ChronySink::propertyChanged(AbstractPropertyType *value)
 	        return;
 	}
 
-	chronydata.tv.tv_sec  = (int)floor(value->value<double>());
-	chronydata.tv.tv_usec = 0;
-	chronydata.offset = 0.0;
+	gettimeofday(&(chronydata.tv), NULL);
+	chronydata.offset = (value->value<double>() - chronydata.tv.tv_sec) - (chronydata.tv.tv_usec / 1000000.0);
 	chronydata.pulse = 0;
 	chronydata.leap = 0;
 	chronydata.magic = 0x534f434b;
