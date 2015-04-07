@@ -23,3 +23,4 @@ Fixes:
 - [xwalk extension] fixed set() for some types did not work because of invalid GVariant creation.
 - [websocket plugin] Updated html test page.  Fixed protocol usage.
 - [websocket plugin] Source zones properly supported
+- [ambctl] Fix to use gi.repository instead of old glib/gobject python bindings
