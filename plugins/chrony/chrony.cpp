@@ -57,9 +57,6 @@ void ChronySink::propertyChanged(AbstractPropertyType *value)
 	struct sockaddr_un s;
 	struct chrony_sock_sample chronydata;
 
-	VehicleProperty::Property property = value->name;
-	DebugOut()<<property<<" value: "<<value->toString()<<endl;
-
 	sockfd = socket(AF_UNIX, SOCK_DGRAM, 0);
 	if (sockfd < 0) return;
 
@@ -72,7 +69,8 @@ void ChronySink::propertyChanged(AbstractPropertyType *value)
 	}
 
 	gettimeofday(&(chronydata.tv), NULL);
-	chronydata.offset = (value->value<double>() - chronydata.tv.tv_sec) - (chronydata.tv.tv_usec / 1000000.0);
+	chronydata.offset  = (value->value<double>() - chronydata.tv.tv_sec) - (chronydata.tv.tv_usec / 1000000.0);
+	chronydata.offset -= (amb::currentTime()-value->timestamp);
 	chronydata.pulse = 0;
 	chronydata.leap = 0;
 	chronydata.magic = 0x534f434b;
