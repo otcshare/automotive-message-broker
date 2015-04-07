@@ -22,6 +22,16 @@
 
 #include "abstractsink.h"
 
+#define CHRONYD_SOCKET "/tmp/chrony.gps.sock"
+
+struct chrony_sock_sample {
+  struct timeval tv;
+  double offset;
+  int pulse;
+  int leap;
+  int _pad;
+  int magic;
+};
 
 class ChronySink : public AbstractSink
 {

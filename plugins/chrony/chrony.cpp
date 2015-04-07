@@ -23,6 +23,10 @@
 #include "listplusplus.h"
 
 #include <glib.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <math.h>
 
 #define GPSTIME "GpsTime"
 
@@ -48,9 +52,33 @@ void ChronySink::supportedChanged(const PropertyList & supportedProperties)
 
 void ChronySink::propertyChanged(AbstractPropertyType *value)
 {
+	int sockfd;
+	struct sockaddr_un s;
+	struct chrony_sock_sample chronydata;
+
 	VehicleProperty::Property property = value->name;
 	DebugOut()<<property<<" value: "<<value->toString()<<endl;
-	/* TODO: send the GpsTime to chrony */
+
+	sockfd = socket(AF_UNIX, SOCK_DGRAM, 0);
+	if (sockfd < 0) return;
+
+	s.sun_family = AF_UNIX;
+	strcpy(s.sun_path, CHRONYD_SOCKET );
+
+	if(connect(sockfd, (struct sockaddr *)&s, sizeof(s)) == -1) 
+	{
+	        return;
+	}
+
+	chronydata.tv.tv_sec  = (int)floor(value->value<double>());
+	chronydata.tv.tv_usec = 0;
+	chronydata.offset = 0.0;
+	chronydata.pulse = 0;
+	chronydata.leap = 0;
+	chronydata.magic = 0x534f434b;
+	send(sockfd,&chronydata,sizeof(chronydata),0);
+
+	close(sockfd);
 }
 
 const string ChronySink::uuid()
