@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012  Intel Corporation
+    Copyright (C) 2015  AWTC Europe
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -18,6 +19,7 @@
 
 
 #include "chrony.h"
+#include "ambplugin.h"
 #include "abstractroutingengine.h"
 #include "debugout.h"
 #include "listplusplus.h"
@@ -29,17 +31,21 @@
 #include <sys/time.h>
 #include <math.h>
 
-#define GPSTIME "GpsTime"
-
 extern "C" void create(AbstractRoutingEngine* routingEngine, map<string, string> config)
 {
-	new ChronySink(routingEngine, config);
+        auto plugin = new AmbPlugin<ChronySink>(routingEngine, config);
+        plugin->init();
 }
 
-ChronySink::ChronySink(AbstractRoutingEngine* engine, map<string, string> config): AbstractSink(engine, config)
+ChronySink::ChronySink(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSource& parent)
+	:AmbPluginImpl(re, config, parent)
 {
-	routingEngine->subscribeToProperty(GPSTIME, this);
-	supportedChanged(engine->supported());
+	supportedChanged(re->supported());
+}
+
+void ChronySink::init()
+{
+	routingEngine->subscribeToProperty("GpsTime", &source);
 }
 
 PropertyList ChronySink::subscriptions()
@@ -79,7 +85,3 @@ void ChronySink::propertyChanged(AbstractPropertyType *value)
 	close(sockfd);
 }
 
-const string ChronySink::uuid()
-{
-	return "35324592-db72-11e4-b432-0022684a4a24";
-}
