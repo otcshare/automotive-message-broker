@@ -1,5 +1,6 @@
 /*
     Copyright (C) 2012  Intel Corporation
+    Copyright (C) 2015  AWTC Europe
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
@@ -20,7 +21,7 @@
 #ifndef CHRONYSINK_H
 #define CHRONYSINK_H
 
-#include "abstractsink.h"
+#include "ambpluginimpl.h"
 
 #define CHRONYD_SOCKET "/tmp/chrony.gps.sock"
 
@@ -33,15 +34,18 @@ struct chrony_sock_sample {
   int magic;
 };
 
-class ChronySink : public AbstractSink
+class ChronySink : public AmbPluginImpl
 {
 
 public:
-	ChronySink(AbstractRoutingEngine* engine, map<string, string> config);
+	ChronySink(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSource& parent);
+	~ChronySink() { };
+	const std::string uuid() const { return "35324592-db72-11e4-b432-0022684a4a24"; }
+	virtual void init();
 	virtual PropertyList subscriptions();
 	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged( AbstractPropertyType* value);
-	virtual const std::string uuid();
+
 };
 
 #endif // CHRONYSINK_H
