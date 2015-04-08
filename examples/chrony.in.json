@@ -1,0 +1,16 @@
+{
+	"sources" : [
+		{
+			"name" : "gps nmea plugin",
+			"path" : "@PLUGIN_INSTALL_PATH@/gpsnmea.so",
+			"device" : "/dev/ttyUSB0",
+			"baudrate" : "4800"
+		}
+	],
+	"sinks": [
+		{
+			"path" : "@PLUGIN_INSTALL_PATH@/chrony.so"
+		}
+	]
+}
+
