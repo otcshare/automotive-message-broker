@@ -40,7 +40,6 @@ extern "C" void create(AbstractRoutingEngine* routingEngine, map<string, string>
 ChronySink::ChronySink(AbstractRoutingEngine* re, const std::map<std::string, std::string>& config, AbstractSource& parent)
 	:AmbPluginImpl(re, config, parent)
 {
-	supportedChanged(re->supported());
 }
 
 void ChronySink::init()
@@ -50,11 +49,6 @@ void ChronySink::init()
 
 PropertyList ChronySink::subscriptions()
 {
-}
-
-void ChronySink::supportedChanged(const PropertyList & supportedProperties)
-{
-	DebugOut()<<"Support changed!"<<endl;
 }
 
 void ChronySink::propertyChanged(AbstractPropertyType *value)

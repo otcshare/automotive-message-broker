@@ -43,7 +43,6 @@ public:
 	const std::string uuid() const { return "35324592-db72-11e4-b432-0022684a4a24"; }
 	virtual void init();
 	virtual PropertyList subscriptions();
-	virtual void supportedChanged(const PropertyList & supportedProperties);
 	virtual void propertyChanged( AbstractPropertyType* value);
 
 };
