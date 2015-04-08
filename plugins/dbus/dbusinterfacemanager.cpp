@@ -51,7 +51,7 @@ on_bus_acquired (GDBusConnection *connection, const gchar *name, gpointer user_d
 {
 	DBusInterfaceManager* iface = static_cast<DBusInterfaceManager*>(user_data);
 
-	iface->connection = std::shared_ptr<GDBusConnection>(connection, [=](auto conn){
+	iface->connection = std::shared_ptr<GDBusConnection>(connection, [=](GDBusConnection* conn){
 		amb::traits<GDBusConnection>::delete_functor functor;
 		functor(conn);
 	});
