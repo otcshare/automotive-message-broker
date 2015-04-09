@@ -3,6 +3,7 @@
 
 #include "abstractio.hpp"
 #include "debugout.h"
+#include "thread.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -13,31 +14,32 @@
 #include <termios.h>
 #include <errno.h>
 #include <stdio.h>
+#include <pthread.h>
+#include <queue>
 
-class SerialPort: public AbstractIo
+class SerialPort: public AbstractIo, public CUtil::Thread
 {
 private:
 	speed_t speed;
+	char    terminator;
+	pthread_mutex_t datamutex;
+	std::queue<std::string> lines;
 
 public:
 	SerialPort()
-		:fd(0), speed(B9600)
+		:fd(0), speed(B9600), terminator('\n')
 	{
-
 	}
 
 	SerialPort(int fileDesc)
-		:fd(fileDesc)
+		:fd(fileDesc), speed(B9600), terminator('\n')
 	{
-		speed = B9600;
-
 		setDescriptor(fd);
 	}
 
 	SerialPort(std::string _tty)
-		:tty(_tty), fd(0)
+		:tty(_tty), fd(0), speed(B9600), terminator('\n')
 	{
-		speed = B9600;
 	}
 
 	~SerialPort()
@@ -71,11 +73,21 @@ public:
 		return ret;
 	}
 
+	void setTerminator( char newterm )
+	{
+		terminator = newterm;
+	}
+
 	bool open()
 	{
+		bool isOpen;
 		fd = ::open(tty.c_str(), O_RDWR, O_NOCTTY);
-
-		return setupDevice();
+		isOpen = setupDevice();
+		if(isOpen)
+		{
+			start();
+		}
+		return isOpen;
 	}
 
 	bool isOpen()
@@ -87,22 +99,42 @@ public:
 
 	bool close()
 	{
+		stop();
 		::close(fd);
+	}
+
+	virtual void run() 
+	{
+		char buff;
+		int bytesread;
+		std::string line;
+		while(isRunnable(0))
+		{ 
+			bytesread = ::read(fd, &buff, 1);
+			if(bytesread>0)
+			{
+				line += buff;
+				if(buff==terminator)
+				{
+					pthread_mutex_lock(&datamutex);
+					lines.push(line);
+					pthread_mutex_unlock(&datamutex);
+					line = "";
+				}
+			}
+		}
 	}
 
 	std::string read()
 	{
-		char buff;
 		std::string result;
-		int bytesread = 0;
-		while( bytesread = ::read(fd, &buff, 1) > 0 )
+		pthread_mutex_lock(&datamutex);        
+		if(!lines.empty())
 		{
-			result += buff;
+			result = lines.front();
+			lines.pop();
 		}
-
-		if(bytesread == -1)
-			perror("Error while reading: ");
-
+		pthread_mutex_unlock(&datamutex);
 		return result;
 	}
 
@@ -133,6 +165,7 @@ private: ///methods
 		}
 
 		struct termios oldtio;
+        memset (&oldtio, 0, sizeof(oldtio));
 		tcgetattr(fd,&oldtio);
 
 		oldtio.c_cflag |= CS8 | CLOCAL | CREAD;
@@ -147,14 +180,14 @@ private: ///methods
 		oldtio.c_lflag &= ~(ECHO | ICANON | ISIG);
 
 		//oldtio.c_cc[VEOL]     = '\r';
+		oldtio.c_cc[VMIN] = 1; // 1 for Blocking
+		oldtio.c_cc[VTIME] = 5; // 0.5 seconds read timeout
 
 		cfsetispeed(&oldtio, speed);
 		cfsetospeed(&oldtio, speed);
 
 		tcflush(fd, TCIFLUSH);
 		tcsetattr(fd, TCSANOW, &oldtio);
-
-		fcntl(fd,F_SETFL,O_NONBLOCK);
 
 		return true;
 	}
