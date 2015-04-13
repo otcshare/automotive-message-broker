@@ -299,10 +299,10 @@ void Location::parseTime(string h, string m, string s, string dd, string mm, str
 		t.tm_min = boost::lexical_cast<int>(m);
 		t.tm_sec = boost::lexical_cast<int>(s);
 		t.tm_mday = boost::lexical_cast<int>(dd);
-		t.tm_mon = boost::lexical_cast<int>(mm);
+		t.tm_mon = boost::lexical_cast<int>(mm) - 1;
 		t.tm_year = boost::lexical_cast<int>(yy) + 100;
 
-		time_t time = mktime(&t);
+		time_t time = timegm(&t);
 
 		if(mGpsTime->value<double>() != (double(time)))
 		{
