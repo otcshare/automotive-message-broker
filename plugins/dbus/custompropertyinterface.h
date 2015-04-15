@@ -7,6 +7,7 @@ class CustomPropertyInterface: public DBusSink
 {
 public:
 	CustomPropertyInterface(VehicleProperty::Property, AbstractRoutingEngine* re, GDBusConnection* connection);
+	virtual ~CustomPropertyInterface();
 };
 
 

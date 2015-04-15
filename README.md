@@ -1,6 +1,6 @@
 # Automotive Message Broker Daemon {#ambd}
 
-Version 0.14.802
+Version 0.15
 
 ## Introduction
 
@@ -11,7 +11,7 @@ Automotive Message Broker is built using CMake and requires libltdl (libtool), l
 
 ## Git
 About the Git Tree:
-master is expected to be unstable and may not even compile.  If you want something more stable, checkout one of the
+'master' is expected to be unstable and may not even compile.  If you want something more stable, checkout one of the
 release branches (ie, 0.9.0, 0.10, etc)
 
 ## Building
@@ -60,7 +60,7 @@ You will also need to edit your config to enable the Qt-based mainloop:
 
 ~~~~~~~~~~~~~{.json}
 {
-	"mainloop" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/qtmainloopplugin.so",
+	"mainloop" : "/PLUGIN_INSTALL_PATH/qtmainloopplugin.so",
 	"plugins" : "/etc/ambd/plugins.d"
 }
 ~~~~~~~~~~~~~
