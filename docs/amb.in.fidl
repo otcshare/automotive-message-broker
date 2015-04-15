@@ -67,17 +67,7 @@
 * \endcode
 *
 * \section dbus_api_vehicle_property_type Vehicle Property Type
-* Vehicle Property Type is the common interface which all Data types are derived.  This interface is as follows:
-*
-* \code
-* interface VehiclePropertyType {
-*   attribute Double Time readonly
-*   attribute Zone Zone readonly
-*   method GetHistory(Double beginTime, Double endTime) {
-*     out{ Dictionary result}
-*   }
-* }
-* \endcode
+* Vehicle Property Type (\ref VehiclePropertyType) is the common interface which all Data types are derived.
 *
 * \section dbus_api_data_types Data types
 *

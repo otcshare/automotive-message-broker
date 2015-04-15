@@ -1,5 +1,7 @@
-set(amb_sources abstractpropertytype.cpp abstractroutingengine.cpp listplusplus.cpp abstractsink.cpp vehicleproperty.cpp abstractsource.cpp debugout.cpp timestamp.cpp uuidhelper.cpp mappropertytype.hpp propertyinfo.hpp superptr.hpp asyncqueue.hpp ambpluginimpl.cpp ambplugin.h picojson.h jsonhelper.cpp)
-set(amb_headers_install abstractpropertytype.h nullptr.h abstractroutingengine.h listplusplus.h abstractsink.h vehicleproperty.h debugout.h abstractsource.h timestamp.h uuidhelper.h mappropertytype.hpp propertyinfo.hpp superptr.hpp asyncqueue.hpp ambplugin.h ambpluginimpl.h picojson.h jsonhelper.h)
+set(amb_sources abstractpropertytype.cpp abstractroutingengine.cpp listplusplus.cpp abstractsink.cpp vehicleproperty.cpp abstractsource.cpp debugout.cpp timestamp.cpp uuidhelper.cpp mappropertytype.hpp
+	propertyinfo.hpp superptr.hpp asyncqueue.hpp ambpluginimpl.cpp ambplugin.h picojson.h jsonhelper.cpp)
+set(amb_headers_install abstractpropertytype.h nullptr.h abstractroutingengine.h listplusplus.h abstractsink.h vehicleproperty.h debugout.h abstractsource.h timestamp.h uuidhelper.h mappropertytype.hpp
+	propertyinfo.hpp superptr.hpp asyncqueue.hpp ambplugin.h ambpluginimpl.h picojson.h jsonhelper.h valuequality.h)
 
 add_library(amb SHARED ${amb_sources})
 

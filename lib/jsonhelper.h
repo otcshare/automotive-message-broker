@@ -32,8 +32,18 @@ extern const char * StringStr;
 extern const char * DoubleStr;
 extern const char * BooleanStr;
 
+/*!
+ * \brief fromSignature get the basic type from gvariant signature
+ * \param sig gvariant signature
+ * \return string representing the basic type
+ */
 const std::string fromSignature(std::string const & sig);
 
+/*!
+ * \brief fromAbstractProperty get the basic type from AbstractPropertType
+ * \param property
+ * \return
+ */
 const std::string fromAbstractProperty(AbstractPropertyType *property);
 
 } // BasicTypes
@@ -43,9 +53,6 @@ picojson::value gvariantToJson(GVariant* value);
 GVariant * jsonToGVariant(const picojson::value & json, const std::string & signature);
 
 std::shared_ptr<AbstractPropertyType> jsonToProperty(const picojson::value& json);
-
-picojson::value propertyToJson(std::shared_ptr<AbstractPropertyType> property);
-
 }
 
 #endif
