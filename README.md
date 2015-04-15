@@ -1,6 +1,6 @@
 # Automotive Message Broker Daemon {#ambd}
 
-Version 0.14.801
+Version 0.14.802
 
 ## Introduction
 
@@ -60,7 +60,7 @@ You will also need to edit your config to enable the Qt-based mainloop:
 
 ~~~~~~~~~~~~~{.json}
 {
-	"mainloop" : "/usr/lib/i386-linux-gnu/automotive-message-broker/qtmainloopplugin.so",
+	"mainloop" : "/usr/lib/x86_64-linux-gnu/automotive-message-broker/qtmainloopplugin.so",
 	"plugins" : "/etc/ambd/plugins.d"
 }
 ~~~~~~~~~~~~~
