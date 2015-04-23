@@ -187,7 +187,8 @@ void PluginLoader::scanPluginDir(const std::string & dir)
 
     GError* enumerateError = nullptr;
 
-    auto enumerator = amb::make_gobject(g_file_enumerate_children(pluginsDirectory.get(), G_FILE_ATTRIBUTE_ID_FILE,
+    auto enumerator = amb::make_gobject(g_file_enumerate_children(pluginsDirectory.get(),
+                                                                  G_FILE_ATTRIBUTE_ID_FILE "," G_FILE_ATTRIBUTE_STANDARD_NAME,
                                                                   G_FILE_QUERY_INFO_NONE, nullptr,
                                                                   &enumerateError));
     auto enumerateErrorPtr = amb::make_super(enumerateError);
