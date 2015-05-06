@@ -158,7 +158,7 @@ def processCommand(command, commandArgs, noMain=True):
 			return None
 
 	if command == "list" :
-		managerInterface = getManager()
+		managerInterface, bus = getManager()
 		if managerInterface == None:
 			return 0
 		supportedList = managerInterface.List()
