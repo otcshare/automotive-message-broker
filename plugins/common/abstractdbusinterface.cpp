@@ -128,6 +128,12 @@ void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection
 				//sequence
 				auto sequence = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, std::string(prop->name()+"Sequence").c_str(), &error, iface);
 				g_variant_builder_add(&builder, "{sv}", std::string(prop->name()+"Sequence").c_str(), g_variant_new("v", sequence));
+
+				auto quality = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, std::string(prop->name()+"ValueQuality").c_str(), &error, iface);
+				g_variant_builder_add(&builder, "{sv}", std::string(prop->name()+"ValueQuality").c_str(), g_variant_new("v", quality));
+
+				auto freq = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, std::string(prop->name()+"UpdateFrequency").c_str(), &error, iface);
+				g_variant_builder_add(&builder, "{sv}", std::string(prop->name()+"UpdateFrequency").c_str(), g_variant_new("v", freq));
 			}
 
 			auto time = AbstractDBusInterface::getProperty(connection, sender, object_path, ifaceName, "Time", nullptr, iface);
@@ -226,44 +232,6 @@ void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection
 		return;
 	}
 
-	///TODO: Deprecated in 0.15
-	else if(boost::algorithm::starts_with(method, "Get"))
-	{
-		amb::deprecateMethod(method, "0.15");
-		std::string propertyName = method.substr(3);
-		auto propertyMap = iface->getProperties();
-		if(propertyMap.find(propertyName) == propertyMap.end())
-		{
-			g_dbus_method_invocation_return_error(invocation, G_DBUS_ERROR, G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
-			return;
-		}
-
-		VariantType * property = propertyMap[propertyName];
-
-		GError *error = NULL;
-
-		GVariant **params = g_new(GVariant*,4);
-		GVariant *val = g_variant_ref(property->value()->toVariant());
-		params[0] = g_variant_new("v", val);
-		params[1] = g_variant_new("d",property->timestamp());
-		params[2] = g_variant_new("i",property->value()->sequence);
-		params[3] = g_variant_new("i",property->updateFrequency());
-
-		GVariant *tuple_variant = g_variant_new_tuple(params,4);
-
-		g_dbus_method_invocation_return_value(invocation, tuple_variant);
-
-		g_free(params);
-		g_variant_unref(val);
-
-		if(error)
-		{
-			DebugOut(DebugOut::Error)<<error->message<<endl;
-			g_error_free(error);
-		}
-		return;
-	}
-
 	g_dbus_method_invocation_return_error(invocation,G_DBUS_ERROR,G_DBUS_ERROR_UNKNOWN_METHOD, "Unknown method.");
 }
 
@@ -315,15 +283,9 @@ void AbstractDBusInterface::addProperty(VariantType * property)
 	///see which properties are supported:
 	introspectionXml +=
 			"<property type='"+ string(property->signature()) + "' name='"+ pn +"' access='"+access+"' />"
-			"<!-- 'GetFoo' is deprecated as of 0.14 -->"
-			/// TODO: remove GetFoo in 0.15
-			"<method name='Get" + pn + "'>"
-			"	<arg type='v' direction='out' name='value' />"
-			"	<arg type='d' direction='out' name='timestamp' />"
-			"	<arg type='i' direction='out' name='sequence' />"
-			"   <arg type='i' direction='out' name='updateFrequency' />"
-			"</method>"
-			"<property type='i' name='" + pn + "Sequence' access='read' />";
+			"<property type='i' name='" + pn + "Sequence' access='read' />"
+			"<property type='i' name='" + pn + "ValueQuality' access='read' />"
+			"<property type='i' name='" + pn + "UpdateFrequency' access='read' />";
 
 	properties[pn] = property;
 
@@ -520,7 +482,7 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 		return value;
 	}
 
-	if(boost::ends_with(pn, "Sequence"))
+	else if(boost::ends_with(pn, "Sequence"))
 	{
 		AbstractDBusInterface* t = static_cast<AbstractDBusInterface*>(userData);
 
@@ -542,7 +504,51 @@ GVariant* AbstractDBusInterface::getProperty(GDBusConnection* connection, const 
 		return value;
 	}
 
-	if(pn == "Zone")
+	else if(boost::ends_with(pn, "ValueQuality"))
+	{
+		AbstractDBusInterface* t = static_cast<AbstractDBusInterface*>(userData);
+
+		int pos = pn.find("ValueQuality");
+
+		std::string p = pn.substr(0, pos);
+
+		VariantType * theProperty = t->property(p);
+
+		if(!theProperty)
+		{
+			DebugOut(DebugOut::Error)<<"Invalid ValueQuality property: "<<p<<endl;
+			return nullptr;
+		}
+
+		int quality = theProperty->value()->valueQuality;
+
+		GVariant* value = g_variant_new("i", quality);
+		return value;
+	}
+
+	else if(boost::ends_with(pn, "UpdateFrequency"))
+	{
+		AbstractDBusInterface* t = static_cast<AbstractDBusInterface*>(userData);
+
+		int pos = pn.find("UpdateFrequency");
+
+		std::string p = pn.substr(0, pos);
+
+		VariantType * theProperty = t->property(p);
+
+		if(!theProperty)
+		{
+			DebugOut(DebugOut::Error)<<"Invalid UpdateFrequency property: "<<p<<endl;
+			return nullptr;
+		}
+
+		int freq = theProperty->updateFrequency();
+
+		GVariant* value = g_variant_new("i", freq);
+		return value;
+	}
+
+	else if(pn == "Zone")
 	{
 		if(objectMap.find(objectPath) == objectMap.end())
 		{

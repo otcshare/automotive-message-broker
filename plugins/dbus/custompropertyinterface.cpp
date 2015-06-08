@@ -17,14 +17,15 @@ CustomPropertyInterface::CustomPropertyInterface(VehicleProperty::Property prop,
 			throw std::runtime_error("Cannot create custom property: " + prop);
 		}
 
-		GVariant* var = temp->toVariant();
-		std::string signature = g_variant_get_type_string(var);
-		g_variant_unref(var);
-
-		propertyDBusMap.push_back( new VariantType(re, prop, prop, VariantType::ReadWrite));
+		///TODO: Deprecated.  Remove in 0.17.  Use "Value" instead.
+		propertyDBusMap.push_back(new VariantType(re, prop, prop, VariantType::ReadWrite));
+		propertyDBusMap.push_back(new VariantType(re, prop, "Value", VariantType::ReadWrite));
 
 		delete temp;
 	}
+}
 
+CustomPropertyInterface::~CustomPropertyInterface()
+{
 
 }

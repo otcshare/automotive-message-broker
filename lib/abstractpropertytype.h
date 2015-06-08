@@ -24,6 +24,7 @@
 #include "picojson.h"
 #include "superptr.hpp"
 #include "timestamp.h"
+#include "valuequality.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/any.hpp>
@@ -93,7 +94,8 @@ public:
 	};
 
 	AbstractPropertyType(std::string property)
-		: name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None), priority(Normal)
+		: name(property), timestamp(amb::currentTime()), sequence(-1), zone(Zone::None), priority(Normal),
+		  valueQuality(amb::Quality::UncertainInitialValue)
 	{
 
 	}
@@ -192,11 +194,16 @@ public:
 	std::string name;
 
 	/*!
-	 * \brief alias alias for the property name
-	 * \return alias if any of name if alias has not been set
+	 * \brief alias for the property name
+	 * \return alias or \ref name if alias has not been set
 	 */
 	const std::string alias() { return mAlias.empty() ? name : mAlias; }
 
+	/*!
+	 * \brief setAlias sets the alias name for a property
+	 * This may be useful for implementing standards where the standard name differs from the internal AMB \ref name
+	 * \param a name of alias
+	 */
 	void setAlias(const std::string & a) { mAlias = a; }
 
 	/*!
@@ -232,6 +239,19 @@ public:
 	Priority priority;
 
 	/*!
+	 * \brief valueQuality is used to indicate the quality of the value
+	 * Each AMB property is given a default value.  valueQuality is a way to describe whether the value
+	 * is the default one and the system has not yet provided a valid value, bad if an error occured, or
+	 * good.
+	 *
+	 * The default value for this is \ref amb::Quality::UncertainInitialValue indicating that the amb property value is the
+	 * default value.  When \ref AbastractPropertyType::setValue is called, valueQuality is set to "Good" automatically.
+	 *
+	 * TODO: this may be able to provide a replacement for set and get error codes: \ref AsyncPropertyReply::Error
+	 */
+	amb::Quality::ValueQuality valueQuality;
+
+	/*!
 	 * \brief setValue
 	 * \param val boost::any value.  NOTE: boost::any does not accept type coercion.  Types must match exactly
 	 * with native type. (ie, don't use "int" if the native type is "uint")
@@ -240,6 +260,7 @@ public:
 	{
 		mValue = val;
 		timestamp = amb::currentTime();
+		valueQuality = amb::Quality::Good;
 	}
 
 	/*!

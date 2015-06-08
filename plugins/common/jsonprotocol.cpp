@@ -457,64 +457,6 @@ bool amb::MethodCall::fromJson(const picojson::value &json)
 	return true;
 }
 
-
-std::shared_ptr<AbstractPropertyType> amb::jsonToProperty(const picojson::value &json)
-{
-	std::string name = json.get("name").to_str();
-	std::string type = json.get("type").to_str();
-
-	auto t = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
-
-	if(!t)
-	{
-		bool ret = VehicleProperty::registerProperty(name, [name, type]() -> AbstractPropertyType* {
-			if(type == amb::BasicTypes::UInt16Str)
-			{
-				return new BasicPropertyType<uint16_t>(name, 0);
-			}
-			else if(type == amb::BasicTypes::Int16Str)
-			{
-				return new BasicPropertyType<int16_t>(name, 0);
-			}
-			else if(type == amb::BasicTypes::UInt32Str)
-			{
-				return new BasicPropertyType<uint32_t>(name, 0);
-			}
-			else if(type == amb::BasicTypes::Int32Str)
-			{
-				return new BasicPropertyType<int32_t>(name, 0);
-			}
-			else if(type == amb::BasicTypes::StringStr)
-			{
-				return new StringPropertyType(name);
-			}
-			else if(type == amb::BasicTypes::DoubleStr)
-			{
-				return new BasicPropertyType<double>(name, 0);
-			}
-			else if(type == amb::BasicTypes::BooleanStr)
-			{
-				return new BasicPropertyType<bool>(name, false);
-			}
-			DebugOut(DebugOut::Warning) << "Unknown or unsupported type: " << type << endl;
-			return nullptr;
-		});
-
-		if(!ret)
-		{
-			DebugOut(DebugOut::Error) << "failed to register property: " << name << endl;
-			return nullptr;
-		}
-
-		t = VehicleProperty::getPropertyTypeForPropertyNameValue(name);
-	}
-
-	t->fromJson(json);
-
-	return std::shared_ptr<AbstractPropertyType>(t);
-}
-
-
 amb::AmbRemoteServer::AmbRemoteServer(AbstractIo *io, AbstractRoutingEngine *re)
 	:BaseJsonMessageReader(io), routingEngine(re)
 {
