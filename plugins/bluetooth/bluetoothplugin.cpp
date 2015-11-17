@@ -137,7 +137,7 @@ void AbstractBluetoothSerialProfile::connect(string hwaddy)
 
 	QDBusPendingCallWatcher *watcher = new QDBusPendingCallWatcher(reply, this);
 
-	QObject::connect(watcher, &QDBusPendingCallWatcher::finished, [](auto call)
+	QObject::connect(watcher, &QDBusPendingCallWatcher::finished, [](QDBusPendingCallWatcher* call)
 	{
 		QDBusPendingReply<void> reply = *call;
 		if(reply.isError())
