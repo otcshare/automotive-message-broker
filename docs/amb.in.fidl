@@ -635,7 +635,7 @@ interface org.automotive.ClimateControl extends VehiclePropertyType  {
   attribute AirflowDirectionType AirflowDirection
 
   /*!  FanSpeedLevel
-  *   \brief MUST return seat heater status: on (true) / off (false).
+  *   \brief MUST return the speed of the fan ( 0: off, 1: lowest speed, 7: highest speed )
   */
   attribute UInt8 FanSpeedLevel
 
@@ -665,12 +665,12 @@ interface org.automotive.ClimateControl extends VehiclePropertyType  {
   attribute UInt8 SeatCooler
 
   /*!  AirRecirculation
-  *   \brief MUST return current setting of air recirculation: on (true) or pulling in outside air (false).
+  *   \brief MUST return current setting of air recirculation: on (true) or pulling in outside air (false)
   */
   attribute Boolean AirRecirculation
 
   /*!  SteeringWheelHeater
-  *   \brief MUST return current status of steering wheel heater ( 0: off, 1: least warm, 10: warmest ).
+  *   \brief MUST return current status of steering wheel heater ( 0: off, 1: least warm, 10: warmest )
   */
   attribute UInt8 SteeringWheelHeater
 }
