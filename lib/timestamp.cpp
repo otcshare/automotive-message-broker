@@ -68,3 +68,8 @@ struct ::timeval amb::Timestamp::toTimeval(const double time)
 {
     return { (__time_t) time, (__suseconds_t)fmod(time*1e6, 1e6) };
 }
+
+struct ::bcm_timeval amb::Timestamp::toBcmTimeval(const double time)
+{
+    return { (long) time, (long)fmod(time*1e6, 1e6) };
+}

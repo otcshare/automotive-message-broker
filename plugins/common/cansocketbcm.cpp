@@ -255,8 +255,8 @@ bool CANSocketBCM::registerCyclicMessageForReceive(int canId, double minCycleTim
     hdr.flags = RX_FILTER_ID | RX_CHECK_DLC | SETTIMER | STARTTIMER | RX_ANNOUNCE_RESUME;
     hdr.nframes = 0;
     hdr.can_id = canId;
-    hdr.ival1 = amb::Timestamp::toTimeval(maxCycleTime);
-    hdr.ival2 = amb::Timestamp::toTimeval(minCycleTime);
+    hdr.ival1 = amb::Timestamp::toBcmTimeval(maxCycleTime);
+    hdr.ival2 = amb::Timestamp::toBcmTimeval(minCycleTime);
 
     // and write
     ssize_t nbytes = ::write(mSocket, &hdr, sizeof(hdr));
