@@ -2,6 +2,7 @@
 #define _TIMESTAMP_H___
 
 #include <time.h>
+#include <linux/can/bcm.h>
 
 namespace amb {
 
@@ -43,6 +44,8 @@ public:
 
     static double fromTimeval(const struct ::timeval& tv);
     static struct ::timeval toTimeval(const double time);
+
+    static struct ::bcm_timeval toBcmTimeval(const double time);
 
 public:
 	/*!
