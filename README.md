@@ -1,6 +1,6 @@
 # Automotive Message Broker Daemon {#ambd}
 
-Version 0.13.900
+Version 0.14.0
 
 ## Introduction
 
