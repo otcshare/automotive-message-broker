@@ -4,6 +4,12 @@
 #include <time.h>
 #include <linux/can/bcm.h>
 
+#ifndef HAVE_BCM_TIMEVAL
+
+#define bcm_timeval timeval
+
+#endif
+
 namespace amb {
 
 double currentTime();

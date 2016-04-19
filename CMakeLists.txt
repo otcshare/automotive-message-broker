@@ -81,6 +81,15 @@ if(usebluez5)
 
 endif(usebluez5)
 
+include(CheckCSourceCompiles)
+check_c_source_compiles("
+        #include <linux/can/bcm.h>
+        int main() { struct bcm_timeval t; return 0;}" have_bcm_timeval)
+
+if(have_bcm_timeval)
+        add_definitions(-DHAVE_BCM_TIMEVAL)
+endif(have_bcm_timeval)
+
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
 add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
