@@ -1,0 +1,9 @@
+The Documentation for AMB is generated using Doxygen from amb.fidl.
+To enable doxygen generation of documents, pass -Denable_docs=ON to cmake:
+
+cmake -Denable_docs=ON ..
+
+The internal AMB class and interface documentation is generated in the docs/amb folder.
+DBus API documentation is generated in the docs/dbus folder.
+
+Specific plugin documentation can be found in the plugins/${plugin}/README (ie plugins/dbus/README).

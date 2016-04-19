@@ -1,0 +1,3 @@
+debian/tmp/usr/bin/ambd
+debian/tmp/usr/bin/ambctl
+debian/tmp/etc/ambd/config

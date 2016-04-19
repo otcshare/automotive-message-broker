@@ -1,0 +1,63 @@
+<manifest>
+  <define>
+	 <domain name="AMB" />
+	 <provide>
+	   <label name="AMB::readall" />
+	   <label name="AMB::writeall" />
+	   <label name="AMB::machinegun" />
+	 </provide>
+	 <request>
+	   <smack request="_" type="rwxatl" />
+	   <smack request="User" type="w" />
+	   <smack request="System" type="wx" />
+	   <smack request="System::Run" type="rwxat" />
+	   <smack request="System::Shared" type="rx" />
+	   <smack request="AMB::readall" type="rw" />
+	   <smack request="AMB::writeall" type="rw" />
+	   <smack request="AMB::machinegun" type="rw" />
+	 </request>
+	 <permit>
+	   <smack permit="_" type="w" />
+	   <smack permit="System" type="rwx" />
+	   <smack permit="User" type="w" />
+	 </permit>
+  </define>
+  <assign>
+	<dbus name="org.automotive.message.broker" own="AMB" bus="system">
+	  <!--<node name="*/0/MachineGunTurretStatus" >
+		<interface name="org.freedesktop.DBus.Properties">
+		  <method name="Set" >
+			<annotation name="com.tizen.smack" value="AMB::machinegun" />
+		  </method>
+		</interface>
+	  </node>
+	  <node name="*" >
+		<interface name="org.freedesktop.DBus.Properties">
+		  <method name="Set" >
+			<annotation name="com.tizen.smack" value="AMB::writeall" />
+		  </method>
+		</interface>
+	  </node>
+	  -->
+	  <!--<node name="*" >
+		<interface name="org.freedesktop.DBus.Properties">
+		  <method name="Get" >
+			<annotation name="com.tizen.smack" value="AMB::readall" />
+		  </method>
+		</interface>
+	  </node>
+	  <node name="*" >
+		<interface name="org.freedesktop.DBus.Properties">
+		  <method name="GetAll" >
+			<annotation name="com.tizen.smack" value="AMB::readall" />
+		  </method>
+		</interface>
+	  </node>-->
+	</dbus>
+	<filesystem path="/usr/bin/ambd" exec_label="AMB" />
+	<filesystem path="@LIB_INSTALL_DIR@*" label="_" />
+  </assign>
+  <request>
+	<domain name="AMB" />
+  </request>
+</manifest>

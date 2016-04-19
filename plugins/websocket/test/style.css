@@ -1,0 +1,182 @@
+.PassClass {
+    font: bold 16px Arial;
+    color: green;
+}
+
+.FailClass {
+    font: bold 16px Arial;
+    color: red;
+}
+
+.LogClass {
+    font: 16px Arial;
+    color: black;
+}
+
+#tester {
+    position: absolute;
+    -webkit-user-select: none;
+    top: 0px;
+    left: 0%;
+    height: 100%;
+    width: 620px;
+    overflow-y: auto;
+}
+
+#result {
+    position: absolute;
+    top: 0px;
+    left: 620px;
+    height: 98%;
+    width: 1380px;
+    padding-top: 1%;
+    background-color: #eeeeee;
+    padding-left: 1%;
+    word-wrap:break-word;
+    overflow-y: auto;
+}
+
+.proptest {
+    position: relative;
+    left: 0px;
+    height: 67px;
+    width: 700px;
+    overflow: hidden;
+}
+
+.proptest .buttons {
+    position: absolute;
+    top: 32px;
+    left: 0px;
+    height: 35px;
+    width: 630px;
+}
+
+.smallText {
+    text-align: left;
+    color: #FFFFFF;
+    font: 18px Arial;
+    display: inline;
+}
+.propinfo {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 67px;
+    width: 600px;
+    text-align: left;
+    color: #FFFFFF;
+    font: 18px Arial;
+    line-height: 30px;
+    padding-left: 5px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#444), to(#000));
+    cursor: pointer;
+}
+
+.propinfo.select {
+    background: -webkit-gradient(linear, left top, left bottom, from(#444), to(#aaa));
+}
+
+.propinfo.unselectable {
+    cursor: auto;
+    background: #000000;
+    border-bottom: solid 1px #444;
+}
+
+input[type='text'] {
+    margin-top: 5px;
+    color: black;
+    font: bold 18px Arial;
+    height: 19px;
+    width: 100px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#fff));
+    -webkit-transition: all 2s linear;
+}
+
+input[type='text'].change {
+    -webkit-transition: all 0.1s linear;
+    color: red;
+}
+
+.testbutton {
+    position: relative;
+    float: left;
+    color: #d7d7d7;
+    border: solid 1px #333;
+    text-align: center;
+    text-decoration: none;
+    font: 16px/100% Arial, Helvetica, sans-serif;
+    text-shadow: 0 1px 1px rgba(0,0,0,.3);
+    -webkit-border-radius: 12px;
+    border-radius: 12px;
+    background: -webkit-gradient(linear, left top, left bottom, from(#666), to(#000));
+    height: 25px;
+    line-height: 24px;
+    cursor: pointer;
+    box-shadow: 2px 2px 14px #000;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 2px;
+}
+
+.testbutton.types {
+    width: 50px;
+    background: -webkit-gradient(linear, left top, left bottom, from(blue), to(#000));
+}
+
+.testbutton.types:after {
+    content: 'types';
+}
+
+.testbutton.get {
+    width: 35px;
+    background: -webkit-gradient(linear, left top, left bottom, from(green), to(#000));
+}
+
+.testbutton.get:after {
+    content: 'get';
+}
+
+.testbutton.set {
+    width: 35px;
+    background: -webkit-gradient(linear, left top, left bottom, from(green), to(#000));
+}
+
+.testbutton.set:after {
+    content: 'set';
+}
+
+.testbutton.subscribe {
+    width: 80px;
+    background: -webkit-gradient(linear, left top, left bottom, from(purple), to(#000));
+}
+
+.testbutton.subscribe.disable {
+    pointer-events: none;
+    color: #999999;
+    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#111));
+}
+
+.testbutton.subscribe:after {
+    content: 'subscribe';
+}
+
+.testbutton.unsubscribe {
+    width: 100px;
+    background: -webkit-gradient(linear, left top, left bottom, from(purple), to(#000));
+}
+
+.testbutton.unsubscribe.disable {
+    pointer-events: none;
+    color: #999999;
+    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#111));
+}
+
+.testbutton.unsubscribe:after {
+    content: 'unsubscribe';
+}
+
+.testbutton:active {
+    color: #666;
+    background: -webkit-gradient(linear, left top, left bottom, from(#000), to(#444));
+}

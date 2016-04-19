@@ -1,0 +1,18 @@
+{
+"sources" :
+	[
+		{
+			"name" : "Murphy Source",
+			"path" : "@PLUGIN_INSTALL_PATH@/murphysourceplugin.so",
+			"address" : "unxs:/tmp/murphy/amb"
+		}
+	],
+"sinks":
+	[
+		{
+			"name" : "DBusSink",
+			"path" : "@PLUGIN_INSTALL_PATH@/dbussinkplugin.so"
+		}
+	]
+}
+

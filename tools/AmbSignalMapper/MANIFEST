@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+bin/dbc2json
+bin/json2amb
+lib/Intel/IviPoc/DbcGrammar
+lib/Intel/IviPoc/DbcGrammar.pod
+lib/Intel/IviPoc/AmbPluginGenerator.pm
+lib/Intel/IviPoc/AmbCommon.pm
+lib/Intel/IviPoc/templates/ambtmpl_plugin.h
+lib/Intel/IviPoc/templates/ambtmpl_plugin.cpp
+lib/Intel/IviPoc/templates/ambtmpl_plugin.idl
+lib/Intel/IviPoc/templates/ambtmpl_cansignal.h
+lib/Intel/IviPoc/templates/ambtmpl_cansignal.cpp
+lib/Intel/IviPoc/templates/ambtmpl_cansignals.h
+lib/Intel/IviPoc/templates/CMakeLists.txt
+t/00-load.t
+t/ambsignalmapper.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t

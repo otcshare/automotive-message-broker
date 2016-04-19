@@ -1,0 +1,17 @@
+{
+	"name" : "OpenCV",
+	"path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
+	"enabled" : false,
+	"threaded" : "true",
+	"opencl" : "true",
+	"fps" : "30",
+	"pixelLowerBound" : "18",
+	"pixelUpperBound" : "255",
+	"device" : "0",
+	"codec" : "h264",
+	"logging" : "false",
+	"logfile" : "/tmp/video.avi",
+	"ddd" : "true",
+	"faceCascade" : "/usr/share/OpenCV/lbpcascades/lbpcascade_frontalface.xml",
+	"eyeCascade" : "/usr/share/OpenCV/haarcascades/haarcascade_eye_tree_eyeglasses.xml"
+}

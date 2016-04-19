@@ -1,0 +1,18 @@
+Test Source Plugin
+
+The test source plugin tests the internal routing engine of AMB.  If there is an error, the test plugin will cause ambd to abort.
+This plugin is useful when testing changes in AMB's core routing engine.
+
+To use the Test Source plugin, add the following config to your /etc/ambd/config:
+
+
+"sources" : [
+		{
+			"name" : "test",
+			"path" : "/usr/lib/automotive-message-broker/testsourceplugin.so"
+		}
+	]
+
+
+
+

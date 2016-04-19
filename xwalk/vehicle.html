@@ -1,0 +1,102 @@
+<!DOCTYPE text/html>
+<html>
+<h1>Hello,Vehicle API!</h1>
+
+<body>
+<pre id="console"></pre>
+<script src="js/js-test-pre.js"></script>
+<script>
+
+vehicle = navigator.vehicle;
+
+function get(objName) {
+
+	if(!vehicle[objName].get) {
+		debug("Error no get() method for " + objName);
+		return;
+	}
+
+	getSuccess = function(data) {
+		try {
+			debug("get " + objName + ": " + JSON.stringify(data));
+		} catch(error) {
+			debug("error " + error.message);
+		}
+	}
+
+	getError = function(error) {
+		debug("error getting " + objName + ": " + error.message);
+	}
+
+	var zones = vehicle[objName].zones;
+
+	if(zones.length !== 0)
+	{
+		for(var zone in zones)
+		{
+			vehicle[objName].get(zone).then(getSuccess, getError);
+		}
+	}
+	else
+	{
+		vehicle[objName].get().then(getSuccess, getError);
+	}
+}
+
+debug("testing zones...");
+var zone = new Zone;
+
+debug('Driver zone: ' + zone.driver.value);
+
+var zone1 = new Zone(["Front", "Left"]);
+var zone2 = new Zone(["Left", "Front"]);
+var zone3 = new Zone(["Front", "Right"]);
+var zone4 = new Zone([]);
+
+debug("zone1 == zone2 ? " + zone1.equals(zone2));
+debug("zone1 == zone3 ? " + zone1.equals(zone3));
+debug("zone1 == zone1 ? " + zone1.equals(zone1));
+debug("zone1 == empty zone ? " + zone1.equals(zone4));
+
+
+debug("testing supported");
+debug("vehicle speed supported? " + vehicle.vehicleSpeed.supported);
+
+debug("testing subscribe()");
+
+var subReplies = 0;
+var handle = vehicle.vehicleSpeed.subscribe(function(data) {
+	console.log("got subscribe callback");
+	debug("Vehicle speed changed: " + data.speed);
+	subReplies++;
+
+	if (subReplies === 5) {
+		debug("unsubscribing");
+		vehicle.vehicleSpeed.unsubscribe(handle);
+	}
+});
+
+debug("test invalid zone error");
+vehicle.vehicleSpeed.get("invalidzone").then(function() { },
+	function(error) { debug("Invalid zone: " + error.message); });
+
+///test set()
+debug("testing set()");
+
+vehicle.lightStatus.set({"fog" : false}).then(function() {
+	 debug("set success!");
+}, function(error) {
+	 debug("set fail! " + error.message);
+});
+
+for(var propName in vehicle) {
+	if(typeof(vehicle[propName]) != "undefined") {
+		debug("vehicle." + propName);
+		get(propName);
+	}
+}
+
+</script>
+<script src="js/js-test-post.js"></script>
+</body>
+</html>

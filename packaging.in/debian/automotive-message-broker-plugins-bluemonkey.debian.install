@@ -1,0 +1,5 @@
+debian/tmp/@PLUGIN_INSTALL_PATH@/bluemonkeyplugin.so
+debian/tmp/@PLUGIN_INSTALL_PATH@/bluemonkeyDbModule.so
+debian/tmp/@PLUGIN_INSTALL_PATH@/bluemonkeyDBusModule.so
+debian/tmp/etc/ambd/bluemonkey/config.js
+debian/tmp/etc/ambd/plugins.d/bluemonkey

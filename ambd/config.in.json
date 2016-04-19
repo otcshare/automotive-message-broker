@@ -1,0 +1,6 @@
+{
+	"plugins" : "@PLUGIN_SEGMENT_INSTALL_PATH@",
+	"sources" : [	],
+	"sinks": [	]
+}
+

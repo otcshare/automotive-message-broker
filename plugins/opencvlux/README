@@ -1,0 +1,61 @@
+# OpenCV plugin {#opencvlux_plugin}
+
+[TOC]
+# OpenCV "lux" plugin
+Version: @PROJECT_VERSION@
+
+
+# Introduction {#opencv_intro}
+
+This plugin simulates the ExteriorBrigtness property using a traditional webcamera.  It works
+by taking the mean pixel intensity of the web camera image and estimating lux.  The particular
+can be calibrated using the "pixelUpperBound" and "pixelLowerBound" variables.
+
+
+# Setup {#opencv_setup}
+
+To enable the OpenCV "lux" plugin, run cmake and enable the opencvlux_plugin option:
+
+cmake -Dopencvlux_plugin=On ..
+
+Currently, this plugin has been tested with OpenCV 2.4.4.
+
+To use the OpenCV plugin, add the following to the "sources" array in /etc/ambd/config:
+~~~~~~~~~~~~~{.js}
+{
+  "name" : "OpenCV LUX",
+  "path" : "@PLUGIN_INSTALL_PATH@/opencvluxplugin.so",
+  "threaded" : "true",
+  "pixelLowerBound" : "0",
+  "pixelUpperBound" : "255",
+  "fps" : "30",
+  "opencl" : "false",
+  "device" : "0"
+}
+~~~~~~~~~~~~~
+
+**NOTE:** some features require the qtmainloop to be running.  see the main README for details.
+
+# Configuration Key Definitions: {#opencv_config_keys}
+
+| Key               | Definition                                                              |  Default Value     |
+| :---------------- | :---------------------------------------------------------------------- | :----------------- |
+| "name"            | Name of plugin.  This key is not used by the plugin at this moment      |                    |
+| "path"            | Path to plugin on the filesystem                                        |                    |
+| "device"          | Camera to use.  The string "0" corrisponds to /dev/video0               | "0"                |
+| "threaded"        | Compute pixel intensity in another thread.  Set to "true" or "false"    | "false"            |
+| "fps"             | How many times per second to poll image data from the camera.           | "30"               |
+| "opencl"          | (experimental) Use a specialized CPU/GPU device to help with processing | "false"            |
+| "logging"         | Turn on video logging.                                                  | "false"            |
+| "logfile"         | File to encode video to.                                                | "/tmp/video.avi"   |
+| "codec"           | Fourcc name of codec.  See <http://www.fourcc.org/codecs.php>           | "mjpg"             |
+| "ddd"             | (experimental) Driver Drowsiness Detection with a driver facing camera detect whether or not eyes are open or closed. If closed for a period  </br> of time, DriverDrowsiness will change to "true". | "false"            |
+
+
+# AMB Properties: {#opencv_amb_properties}
+
+| Property Name     | Description                                                             | Type     | Access    |
+| :---------------- | :---------------------------------------------------------------------- | :------: | :-------- |
+| VideoLogging      | Turn on and off video logging                                           | bool     | readwrite |
+| DriverDrowsiness  | True if the driver has been detected drowsy.                            | bool     | readonly  |
+| OpenCL            | True if OpenCL acceleration is enabled.                                 | bool     | readwrite |

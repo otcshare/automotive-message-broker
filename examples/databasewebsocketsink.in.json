@@ -1,0 +1,29 @@
+{
+	"sources" : [
+		{
+			"path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so"
+		},
+		{
+			"name" : "Database",
+			"path" : "@PLUGIN_INSTALL_PATH@/databasesinkplugin.so",
+			"databaseFile" : "../tests/generated.db",
+			"bufferLength" : "1",
+			"properties" : "['VehicleSpeed','EngineSpeed']",
+			"startOnLoad" : "true",
+			"playbackOnLoad" : "false",
+			"playbackMultiplier" : "1",
+			"frequency" : "1"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "WebSocketSink",
+			"path" : "@PLUGIN_INSTALL_PATH@/websocketsink.so",
+			"interface" : "lo",
+			"ssl" : "false",
+			"port" : "23000",
+			"binaryProtocol" : "false",
+			"useExtensions" : "true"
+		}
+	]
+}

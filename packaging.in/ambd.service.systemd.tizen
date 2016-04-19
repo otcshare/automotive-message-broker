@@ -1,0 +1,18 @@
+#
+# ambd systemd service unit file
+#
+
+[Unit]
+Description=Automotive Message Broker
+Wants=bluetooth.service
+
+[Service]
+Type=dbus
+BusName=org.automotive.message.broker
+Environment=LD_PRELOAD=/usr/lib/libv4l/v4l1compat.so
+ExecStart=/usr/bin/ambd -c /etc/ambd/config.tizen
+
+[Install]
+WantedBy=multi-user.target
+
+

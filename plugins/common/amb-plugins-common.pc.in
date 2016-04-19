@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=@LIB_INSTALL_DIR@
+includedir=@INCLUDE_INSTALL_DIR@/amb
+
+Name: amb-plugins-common
+Description: 
+Version: @PROJECT_VERSION@
+Requires: gio-2.0 glib-2.0 automotive-message-broker
+Libs: -L${libdir} -lamb -luuid -lamb-plugins-common
+Cflags: -I${includedir}

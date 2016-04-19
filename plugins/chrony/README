@@ -1,0 +1,24 @@
+CHRONY plugin
+Version: @PROJECT_VERSION@
+
+This plugin will forward the GpsTime property to the CHRONYD daemon.
+
+To enable the CHRONY plugin, run cmake and enable the chrony_plugin option:
+
+cmake -Dchrony_plugin=On ..
+
+To use this plugin, add the following to the "sinks" array in /etc/ambd/config:
+
+{
+	"name" : "chrony",
+	"path" : "@PLUGIN_INSTALL_PATH@/chrony.so",
+}
+
+Configuration Key Definitions:
+
+"name"
+name of plugin.  This key is not used by the plugin at this moment.
+
+"path"
+path to plugin on the filesystem.
+

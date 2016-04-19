@@ -1,0 +1,18 @@
+{
+	"mainloop" : "@PLUGIN_INSTALL_PATH@/qtmainloopplugin.so",
+	"sources" : [
+		{
+			"name" : "ExampleSouce",
+			"path" : "@PLUGIN_INSTALL_PATH@/examplesourceplugin.so"
+		}
+	],
+	"sinks": [
+		{
+			"name" : "Example sink",
+			"path" : "@PLUGIN_INSTALL_PATH@/examplesinkplugin.so",
+			"interface" : "lo",
+			"port" : "23000"
+		}
+	]
+}
+

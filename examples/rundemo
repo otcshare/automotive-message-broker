@@ -1,0 +1,40 @@
+#!/bin/bash
+
+BUTTONVALUE=$1
+
+echo "Button pressed: ${BUTTONVALUE}"
+
+if [[ ${BUTTONVALUE} = Right ]]
+then
+	gst-launch v4l2src device=/dev/video1 ! 'video/x-raw-yuv,width=1920,height=1080,framerate=30/1' ! xvimagesink
+else
+	if [[ ${BUTTONVALUE} = Left ]]
+	then
+		gst-launch v4l2src device=/dev/video2 ! 'video/x-raw-yuv,width=1920,height=1080,framerate=30/1' ! xvimagesink
+	fi
+fi
+
+if [[ ${BUTTONVALUE} = Off ]]
+then
+	killall gst-launch-0.10
+fi
+
+if [[ ${BUTTONVALUE} = "Button1" ]]; then
+	#Run script 1 here
+	echo "Button 1 script!"
+fi
+
+if [[ ${BUTTONVALUE} = "Button2" ]]; then
+	#Run script 2 here
+	echo "Button 2 script!"
+fi
+
+if [[ ${BUTTONVALUE} = "Button3" ]]; then
+	#Run script 3 here
+	echo "Button 3 script!"
+fi
+
+if [[ ${BUTTONVALUE} = "Button4" ]]; then
+	#Run script 4 here
+	echo "Button 4 script!"
+fi

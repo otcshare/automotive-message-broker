@@ -1,0 +1,7 @@
+- Make updateFrequency a normal property
+- Core auto-calculate updateFrequency
+- Create API export class that creates the standardized API regardless of IPC mechanism.  That way, the same API can be used over websockets too.
+- Refactor obd2 plugin with AsyncQueue.  Use thread-safe updateProperty.
+- source export from database plugin does not reflect the source in the database
+- grep all the TODOs in the code and do them
+

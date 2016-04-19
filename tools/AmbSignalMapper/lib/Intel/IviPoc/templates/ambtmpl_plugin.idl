@@ -1,0 +1,18 @@
+/**
+
+
+Details. 
+
+\def-api-feature http://tizen.org/api/vehicle 
+\brief Allows access to the AmbTmplPlugin API
+
+
+
+*/
+
+module AmbTmplPlugin {
+
+/*GENERATED_CODE*/
+
+};
+
