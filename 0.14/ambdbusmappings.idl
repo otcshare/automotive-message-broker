@@ -1,0 +1,1537 @@
+/*!
+ * \name AMB to AMB-DBus Mapping Tables
+ * \file ambdbusmappings.idl
+ * \brief This describes the AMB internal property names to AMB DBus interface property names
+ * AMB internal property names are designed to be flat variable names (ie, 'ConvertableRoofStatus').  The DBus
+ * properties however follow the naming scheme defined in the W3C automotive business group vehicle <a href='http://w3c.github.io/automotive-bg/data_spec.html'>data specification</a>
+ * The pattern each interface is 'const DOMString AMBProperty = DBusProperty' where 'AMBProperty' is the internal name and 'DBusProperty' is the DBus property name.
+ *
+ * For documentation on the interface and members, please see the ef dbus_api.
+ */
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.VehicleSpeed
+ */
+interface VehicleSpeed {
+
+	/*!
+	 * \brief corresponds with DBus property Speed for interface org.automotive.VehicleSpeed
+	 * AMB fulfills this member with VehicleProperty::VehicleSpeed
+	 */
+	const DOMString VehicleSpeed = "Speed";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.EngineSpeed
+ */
+interface EngineSpeed {
+
+	/*!
+	 * \brief corresponds with DBus property Speed for interface org.automotive.EngineSpeed
+	 * AMB fulfills this member with VehicleProperty::EngineSpeed
+	 */
+	const DOMString EngineSpeed = "Speed";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.VehiclePowerMode
+ */
+interface VehiclePowerMode {
+
+	/*!
+	 * \brief corresponds with DBus property VehiclePowerMode for interface org.automotive.VehiclePowerMode
+	 * AMB fulfills this member with VehicleProperty::VehiclePowerMode
+	 */
+	const DOMString VehiclePowerMode = "VehiclePowerMode";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.TripMeter
+ */
+interface TripMeter {
+
+	/*!
+	 * \brief corresponds with DBus property TripMeters for interface org.automotive.TripMeter
+	 * AMB fulfills this member with VehicleProperty::TripMeters
+	 */
+	const DOMString TripMeters = "TripMeters";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Acceleration
+ */
+interface Acceleration {
+
+	/*!
+	 * \brief corresponds with DBus property X for interface org.automotive.Acceleration
+	 * AMB fulfills this member with VehicleProperty::AccelerationX
+	 */
+	const DOMString AccelerationX = "X";
+
+	/*!
+	 * \brief corresponds with DBus property Y for interface org.automotive.Acceleration
+	 * AMB fulfills this member with VehicleProperty::AccelerationY
+	 */
+	const DOMString AccelerationY = "Y";
+
+	/*!
+	 * \brief corresponds with DBus property Z for interface org.automotive.Acceleration
+	 * AMB fulfills this member with VehicleProperty::AccelerationZ
+	 */
+	const DOMString AccelerationZ = "Z";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Transmission
+ */
+interface Transmission {
+
+	/*!
+	 * \brief corresponds with DBus property ShiftPosition for interface org.automotive.Transmission
+	 * AMB fulfills this member with VehicleProperty::TransmissionShiftPosition
+	 */
+	const DOMString TransmissionShiftPosition = "ShiftPosition";
+
+	/*!
+	 * \brief corresponds with DBus property GearPosition for interface org.automotive.Transmission
+	 * AMB fulfills this member with VehicleProperty::TransmissionGearPosition
+	 */
+	const DOMString TransmissionGearPosition = "GearPosition";
+
+	/*!
+	 * \brief corresponds with DBus property Gear for interface org.automotive.Transmission
+	 * AMB fulfills this member with VehicleProperty::TransmissionGearPosition
+	 */
+	const DOMString TransmissionGearPosition = "Gear";
+
+	/*!
+	 * \brief corresponds with DBus property Mode for interface org.automotive.Transmission
+	 * AMB fulfills this member with VehicleProperty::TransmissionModeW3C
+	 */
+	const DOMString TransmissionModeW3C = "Mode";
+
+	/*!
+	 * \brief corresponds with DBus property Type for interface org.automotive.Transmission
+	 * AMB fulfills this member with VehicleProperty::TransmissionGearType
+	 */
+	const DOMString TransmissionGearType = "Type";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.CruiseControlStatus
+ */
+interface CruiseControlStatus {
+
+	/*!
+	 * \brief corresponds with DBus property Speed for interface org.automotive.CruiseControlStatus
+	 * AMB fulfills this member with VehicleProperty::CruiseControlSpeed
+	 */
+	const DOMString CruiseControlSpeed = "Speed";
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.CruiseControlStatus
+	 * AMB fulfills this member with VehicleProperty::CruiseControlActive
+	 */
+	const DOMString CruiseControlActive = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.BrakeOperation
+ */
+interface BrakeOperation {
+
+	/*!
+	 * \brief corresponds with DBus property BrakePedalDepressed for interface org.automotive.BrakeOperation
+	 * AMB fulfills this member with VehicleProperty::WheelBrake
+	 */
+	const DOMString WheelBrake = "BrakePedalDepressed";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.LightStatus
+ */
+interface LightStatus {
+
+	/*!
+	 * \brief corresponds with DBus property Head for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightHead
+	 */
+	const DOMString LightHead = "Head";
+
+	/*!
+	 * \brief corresponds with DBus property RightTurn for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightRightTurn
+	 */
+	const DOMString LightRightTurn = "RightTurn";
+
+	/*!
+	 * \brief corresponds with DBus property LeftTurn for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightLeftTurn
+	 */
+	const DOMString LightLeftTurn = "LeftTurn";
+
+	/*!
+	 * \brief corresponds with DBus property Brake for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightBrake
+	 */
+	const DOMString LightBrake = "Brake";
+
+	/*!
+	 * \brief corresponds with DBus property Fog for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightFog
+	 */
+	const DOMString LightFog = "Fog";
+
+	/*!
+	 * \brief corresponds with DBus property Hazard for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightHazard
+	 */
+	const DOMString LightHazard = "Hazard";
+
+	/*!
+	 * \brief corresponds with DBus property Parking for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightParking
+	 */
+	const DOMString LightParking = "Parking";
+
+	/*!
+	 * \brief corresponds with DBus property HighBeam for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightHighBeam
+	 */
+	const DOMString LightHighBeam = "HighBeam";
+
+	/*!
+	 * \brief corresponds with DBus property AutomaticHeadlights for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightAutomatic
+	 */
+	const DOMString LightAutomatic = "AutomaticHeadlights";
+
+	/*!
+	 * \brief corresponds with DBus property DynamicHighBeam for interface org.automotive.LightStatus
+	 * AMB fulfills this member with VehicleProperty::LightDynamicHighBeam
+	 */
+	const DOMString LightDynamicHighBeam = "DynamicHighBeam";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.InteriorLightStatus
+ */
+interface InteriorLightStatus {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.InteriorLightStatus
+	 * AMB fulfills this member with VehicleProperty::InteriorLightStatus
+	 */
+	const DOMString InteriorLightStatus = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Horn
+ */
+interface Horn {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.Horn
+	 * AMB fulfills this member with VehicleProperty::Horn
+	 */
+	const DOMString Horn = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Fuel
+ */
+interface Fuel {
+
+	/*!
+	 * \brief corresponds with DBus property Level for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelLevel
+	 */
+	const DOMString FuelLevel = "Level";
+
+	/*!
+	 * \brief corresponds with DBus property Range for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelRange
+	 */
+	const DOMString FuelRange = "Range";
+
+	/*!
+	 * \brief corresponds with DBus property InstantConsumption for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelConsumption
+	 */
+	const DOMString FuelConsumption = "InstantConsumption";
+
+	/*!
+	 * \brief corresponds with DBus property InstantEconomy for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelEconomy
+	 */
+	const DOMString FuelEconomy = "InstantEconomy";
+
+	/*!
+	 * \brief corresponds with DBus property AverageEconomy for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelAverageEconomy
+	 */
+	const DOMString FuelAverageEconomy = "AverageEconomy";
+
+	/*!
+	 * \brief corresponds with DBus property AverageConsumption for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelAverageConsumption
+	 */
+	const DOMString FuelAverageConsumption = "AverageConsumption";
+
+	/*!
+	 * \brief corresponds with DBus property FuelConsumedSinceRestart for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelConsumptionSinceRestart
+	 */
+	const DOMString FuelConsumptionSinceRestart = "FuelConsumedSinceRestart";
+
+	/*!
+	 * \brief corresponds with DBus property TimeSinceRestart for interface org.automotive.Fuel
+	 * AMB fulfills this member with VehicleProperty::FuelTimeSinceRestart
+	 */
+	const DOMString FuelTimeSinceRestart = "TimeSinceRestart";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.EngineOil
+ */
+interface EngineOil {
+
+	/*!
+	 * \brief corresponds with DBus property Level for interface org.automotive.EngineOil
+	 * AMB fulfills this member with VehicleProperty::EngineOilRemaining
+	 */
+	const DOMString EngineOilRemaining = "Level";
+
+	/*!
+	 * \brief corresponds with DBus property Temperature for interface org.automotive.EngineOil
+	 * AMB fulfills this member with VehicleProperty::EngineOilTemperature
+	 */
+	const DOMString EngineOilTemperature = "Temperature";
+
+	/*!
+	 * \brief corresponds with DBus property Pressure for interface org.automotive.EngineOil
+	 * AMB fulfills this member with VehicleProperty::EngineOilPressure
+	 */
+	const DOMString EngineOilPressure = "Pressure";
+
+	/*!
+	 * \brief corresponds with DBus property Change for interface org.automotive.EngineOil
+	 * AMB fulfills this member with VehicleProperty::EngineOilChangeIndicator
+	 */
+	const DOMString EngineOilChangeIndicator = "Change";
+
+	/*!
+	 * \brief corresponds with DBus property LifeRemaining for interface org.automotive.EngineOil
+	 * AMB fulfills this member with VehicleProperty::EngineOilLifeRemaining
+	 */
+	const DOMString EngineOilLifeRemaining = "LifeRemaining";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Location
+ */
+interface Location {
+
+	/*!
+	 * \brief corresponds with DBus property Latitude for interface org.automotive.Location
+	 * AMB fulfills this member with VehicleProperty::Latitude
+	 */
+	const DOMString Latitude = "Latitude";
+
+	/*!
+	 * \brief corresponds with DBus property Longitude for interface org.automotive.Location
+	 * AMB fulfills this member with VehicleProperty::Longitude
+	 */
+	const DOMString Longitude = "Longitude";
+
+	/*!
+	 * \brief corresponds with DBus property Altitude for interface org.automotive.Location
+	 * AMB fulfills this member with VehicleProperty::Altitude
+	 */
+	const DOMString Altitude = "Altitude";
+
+	/*!
+	 * \brief corresponds with DBus property Direction for interface org.automotive.Location
+	 * AMB fulfills this member with VehicleProperty::Direction
+	 */
+	const DOMString Direction = "Direction";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.SteeringWheel
+ */
+interface SteeringWheel {
+
+	/*!
+	 * \brief corresponds with DBus property Angle for interface org.automotive.SteeringWheel
+	 * AMB fulfills this member with VehicleProperty::SteeringWheelAngleW3C
+	 */
+	const DOMString SteeringWheelAngleW3C = "Angle";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ThrottlePosition
+ */
+interface ThrottlePosition {
+
+	/*!
+	 * \brief corresponds with DBus property Value for interface org.automotive.ThrottlePosition
+	 * AMB fulfills this member with VehicleProperty::ThrottlePosition
+	 */
+	const DOMString ThrottlePosition = "Value";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.NightMode
+ */
+interface NightMode {
+
+	/*!
+	 * \brief corresponds with DBus property NightMode for interface org.automotive.NightMode
+	 * AMB fulfills this member with VehicleProperty::NightMode
+	 */
+	const DOMString NightMode = "NightMode";
+
+	/*!
+	 * \brief corresponds with DBus property Mode for interface org.automotive.NightMode
+	 * AMB fulfills this member with VehicleProperty::NightMode
+	 */
+	const DOMString NightMode = "Mode";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.DrivingMode
+ */
+interface DrivingMode {
+
+	/*!
+	 * \brief corresponds with DBus property DrivingMode for interface org.automotive.DrivingMode
+	 * AMB fulfills this member with VehicleProperty::DrivingMode
+	 */
+	const DOMString DrivingMode = "DrivingMode";
+
+	/*!
+	 * \brief corresponds with DBus property Mode for interface org.automotive.DrivingMode
+	 * AMB fulfills this member with VehicleProperty::DrivingModeW3C
+	 */
+	const DOMString DrivingModeW3C = "Mode";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.PowertrainTorque
+ */
+interface PowertrainTorque {
+
+	/*!
+	 * \brief corresponds with DBus property Value for interface org.automotive.PowertrainTorque
+	 * AMB fulfills this member with VehicleProperty::PowertrainTorque
+	 */
+	const DOMString PowertrainTorque = "Value";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.AcceleratorPedalPosition
+ */
+interface AcceleratorPedalPosition {
+
+	/*!
+	 * \brief corresponds with DBus property Value for interface org.automotive.AcceleratorPedalPosition
+	 * AMB fulfills this member with VehicleProperty::AcceleratorPedalPosition
+	 */
+	const DOMString AcceleratorPedalPosition = "Value";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Chime
+ */
+interface Chime {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.Chime
+	 * AMB fulfills this member with VehicleProperty::Chime
+	 */
+	const DOMString Chime = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.WheelTick
+ */
+interface WheelTick {
+
+	/*!
+	 * \brief corresponds with DBus property Value for interface org.automotive.WheelTick
+	 * AMB fulfills this member with VehicleProperty::WheelTick
+	 */
+	const DOMString WheelTick = "Value";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.IgnitionTime
+ */
+interface IgnitionTime {
+
+	/*!
+	 * \brief corresponds with DBus property IgnitionTimeOn for interface org.automotive.IgnitionTime
+	 * AMB fulfills this member with VehicleProperty::IgnitionTimeOn
+	 */
+	const DOMString IgnitionTimeOn = "IgnitionTimeOn";
+
+	/*!
+	 * \brief corresponds with DBus property IgnitionTimeOff for interface org.automotive.IgnitionTime
+	 * AMB fulfills this member with VehicleProperty::IgnitionTimeOff
+	 */
+	const DOMString IgnitionTimeOff = "IgnitionTimeOff";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.YawRate
+ */
+interface YawRate {
+
+	/*!
+	 * \brief corresponds with DBus property Value for interface org.automotive.YawRate
+	 * AMB fulfills this member with VehicleProperty::YawRate
+	 */
+	const DOMString YawRate = "Value";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ButtonEvent
+ */
+interface ButtonEvent {
+
+	/*!
+	 * \brief corresponds with DBus property Value for interface org.automotive.ButtonEvent
+	 * AMB fulfills this member with VehicleProperty::YawRate
+	 */
+	const DOMString YawRate = "Value";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ExteriorBrightness
+ */
+interface ExteriorBrightness {
+
+	/*!
+	 * \brief corresponds with DBus property ExteriorBrightness for interface org.automotive.ExteriorBrightness
+	 * AMB fulfills this member with VehicleProperty::ExteriorBrightness
+	 */
+	const DOMString ExteriorBrightness = "ExteriorBrightness";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Temperature
+ */
+interface Temperature {
+
+	/*!
+	 * \brief corresponds with DBus property InteriorTemperature for interface org.automotive.Temperature
+	 * AMB fulfills this member with VehicleProperty::InteriorTemperature
+	 */
+	const DOMString InteriorTemperature = "InteriorTemperature";
+
+	/*!
+	 * \brief corresponds with DBus property ExteriorTemperature for interface org.automotive.Temperature
+	 * AMB fulfills this member with VehicleProperty::ExteriorTemperature
+	 */
+	const DOMString ExteriorTemperature = "ExteriorTemperature";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.RainSensor
+ */
+interface RainSensor {
+
+	/*!
+	 * \brief corresponds with DBus property RainIntensity for interface org.automotive.RainSensor
+	 * AMB fulfills this member with VehicleProperty::RainSensor
+	 */
+	const DOMString RainSensor = "RainIntensity";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.WiperStatus
+ */
+interface WiperStatus {
+
+	/*!
+	 * \brief corresponds with DBus property WiperSpeed for interface org.automotive.WiperStatus
+	 * AMB fulfills this member with VehicleProperty::WindshieldWiperSpeed
+	 */
+	const DOMString WindshieldWiperSpeed = "WiperSpeed";
+
+	/*!
+	 * \brief corresponds with DBus property WiperSetting for interface org.automotive.WiperStatus
+	 * AMB fulfills this member with VehicleProperty::WindshieldWiperSetting
+	 */
+	const DOMString WindshieldWiperSetting = "WiperSetting";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ClimateControl
+ */
+interface ClimateControl {
+
+	/*!
+	 * \brief corresponds with DBus property AirflowDirection for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::AirflowDirectionW3C
+	 */
+	const DOMString AirflowDirectionW3C = "AirflowDirection";
+
+	/*!
+	 * \brief corresponds with DBus property FanSpeedLevel for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::FanSpeed
+	 */
+	const DOMString FanSpeed = "FanSpeedLevel";
+
+	/*!
+	 * \brief corresponds with DBus property TargetTemperature for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::TargetTemperature
+	 */
+	const DOMString TargetTemperature = "TargetTemperature";
+
+	/*!
+	 * \brief corresponds with DBus property AirConditioning for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::AirConditioning
+	 */
+	const DOMString AirConditioning = "AirConditioning";
+
+	/*!
+	 * \brief corresponds with DBus property AirRecirculation for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::AirRecirculation
+	 */
+	const DOMString AirRecirculation = "AirRecirculation";
+
+	/*!
+	 * \brief corresponds with DBus property Heater for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::Heater
+	 */
+	const DOMString Heater = "Heater";
+
+	/*!
+	 * \brief corresponds with DBus property SteeringWheelHeater for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::SteeringWheelHeater
+	 */
+	const DOMString SteeringWheelHeater = "SteeringWheelHeater";
+
+	/*!
+	 * \brief corresponds with DBus property SeatHeater for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::SeatHeater
+	 */
+	const DOMString SeatHeater = "SeatHeater";
+
+	/*!
+	 * \brief corresponds with DBus property SeatCooler for interface org.automotive.ClimateControl
+	 * AMB fulfills this member with VehicleProperty::SeatCooler
+	 */
+	const DOMString SeatCooler = "SeatCooler";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.WindowStatus
+ */
+interface WindowStatus {
+
+	/*!
+	 * \brief corresponds with DBus property Openness for interface org.automotive.WindowStatus
+	 * AMB fulfills this member with VehicleProperty::WindowStatus
+	 */
+	const DOMString WindowStatus = "Openness";
+
+	/*!
+	 * \brief corresponds with DBus property Defrost for interface org.automotive.WindowStatus
+	 * AMB fulfills this member with VehicleProperty::Defrost
+	 */
+	const DOMString Defrost = "Defrost";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.SideWindow
+ */
+interface SideWindow {
+
+	/*!
+	 * \brief corresponds with DBus property Openness for interface org.automotive.SideWindow
+	 * AMB fulfills this member with VehicleProperty::WindowStatus
+	 */
+	const DOMString WindowStatus = "Openness";
+
+	/*!
+	 * \brief corresponds with DBus property Lock for interface org.automotive.SideWindow
+	 * AMB fulfills this member with VehicleProperty::WindowLockStatus
+	 */
+	const DOMString WindowLockStatus = "Lock";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Defrost
+ */
+interface Defrost {
+
+	/*!
+	 * \brief corresponds with DBus property DefrostWindow for interface org.automotive.Defrost
+	 * AMB fulfills this member with VehicleProperty::DefrostWindow
+	 */
+	const DOMString DefrostWindow = "DefrostWindow";
+
+	/*!
+	 * \brief corresponds with DBus property DefrostMirror for interface org.automotive.Defrost
+	 * AMB fulfills this member with VehicleProperty::DefrostMirror
+	 */
+	const DOMString DefrostMirror = "DefrostMirror";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Sunroof
+ */
+interface Sunroof {
+
+	/*!
+	 * \brief corresponds with DBus property Openness for interface org.automotive.Sunroof
+	 * AMB fulfills this member with VehicleProperty::Sunroof
+	 */
+	const DOMString Sunroof = "Openness";
+
+	/*!
+	 * \brief corresponds with DBus property Tilt for interface org.automotive.Sunroof
+	 * AMB fulfills this member with VehicleProperty::SunroofTilt
+	 */
+	const DOMString SunroofTilt = "Tilt";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ConvertibleRoof
+ */
+interface ConvertibleRoof {
+
+	/*!
+	 * \brief corresponds with DBus property Setting for interface org.automotive.ConvertibleRoof
+	 * AMB fulfills this member with VehicleProperty::ConvertibleRoof
+	 */
+	const DOMString ConvertibleRoof = "Setting";
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.ConvertibleRoof
+	 * AMB fulfills this member with VehicleProperty::ConvertibleRoofStatus
+	 */
+	const DOMString ConvertibleRoofStatus = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.AtmosphericPressure
+ */
+interface AtmosphericPressure {
+
+	/*!
+	 * \brief corresponds with DBus property Pressure for interface org.automotive.AtmosphericPressure
+	 * AMB fulfills this member with VehicleProperty::AtmosphericPressure
+	 */
+	const DOMString AtmosphericPressure = "Pressure";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.VehicleId
+ */
+interface VehicleId {
+
+	/*!
+	 * \brief corresponds with DBus property WMI for interface org.automotive.VehicleId
+	 * AMB fulfills this member with VehicleProperty::WMI
+	 */
+	const DOMString WMI = "WMI";
+
+	/*!
+	 * \brief corresponds with DBus property VIN for interface org.automotive.VehicleId
+	 * AMB fulfills this member with VehicleProperty::VIN
+	 */
+	const DOMString VIN = "VIN";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Size
+ */
+interface Size {
+
+	/*!
+	 * \brief corresponds with DBus property Width for interface org.automotive.Size
+	 * AMB fulfills this member with VehicleProperty::VehicleWidth
+	 */
+	const DOMString VehicleWidth = "Width";
+
+	/*!
+	 * \brief corresponds with DBus property Height for interface org.automotive.Size
+	 * AMB fulfills this member with VehicleProperty::VehicleHeight
+	 */
+	const DOMString VehicleHeight = "Height";
+
+	/*!
+	 * \brief corresponds with DBus property Length for interface org.automotive.Size
+	 * AMB fulfills this member with VehicleProperty::VehicleLength
+	 */
+	const DOMString VehicleLength = "Length";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.FuelInfo
+ */
+interface FuelInfo {
+
+	/*!
+	 * \brief corresponds with DBus property Type for interface org.automotive.FuelInfo
+	 * AMB fulfills this member with VehicleProperty::FuelType
+	 */
+	const DOMString FuelType = "Type";
+
+	/*!
+	 * \brief corresponds with DBus property RefuelPosition for interface org.automotive.FuelInfo
+	 * AMB fulfills this member with VehicleProperty::FuelPositionSide
+	 */
+	const DOMString FuelPositionSide = "RefuelPosition";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.VehicleType
+ */
+interface VehicleType {
+
+	/*!
+	 * \brief corresponds with DBus property Type for interface org.automotive.VehicleType
+	 * AMB fulfills this member with VehicleProperty::VehicleType
+	 */
+	const DOMString VehicleType = "Type";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Doors
+ */
+interface Doors {
+
+	/*!
+	 * \brief corresponds with DBus property DoorsPerRow for interface org.automotive.Doors
+	 * AMB fulfills this member with VehicleProperty::DoorsPerRow
+	 */
+	const DOMString DoorsPerRow = "DoorsPerRow";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.WheelInformation
+ */
+interface WheelInformation {
+
+	/*!
+	 * \brief corresponds with DBus property FrontWheelRadius for interface org.automotive.WheelInformation
+	 * AMB fulfills this member with VehicleProperty::FrontWheelRadius
+	 */
+	const DOMString FrontWheelRadius = "FrontWheelRadius";
+
+	/*!
+	 * \brief corresponds with DBus property RearWheelRadius for interface org.automotive.WheelInformation
+	 * AMB fulfills this member with VehicleProperty::RearWheelRadius
+	 */
+	const DOMString RearWheelRadius = "RearWheelRadius";
+
+	/*!
+	 * \brief corresponds with DBus property WheelTrack for interface org.automotive.WheelInformation
+	 * AMB fulfills this member with VehicleProperty::WheelTrack
+	 */
+	const DOMString WheelTrack = "WheelTrack";
+
+	/*!
+	 * \brief corresponds with DBus property AntilockBrakingSystem for interface org.automotive.WheelInformation
+	 * AMB fulfills this member with VehicleProperty::AntilockBrakingSystem
+	 */
+	const DOMString AntilockBrakingSystem = "AntilockBrakingSystem";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Odometer
+ */
+interface Odometer {
+
+	/*!
+	 * \brief corresponds with DBus property Odometer for interface org.automotive.Odometer
+	 * AMB fulfills this member with VehicleProperty::Odometer
+	 */
+	const DOMString Odometer = "Odometer";
+
+	/*!
+	 * \brief corresponds with DBus property DistanceTotal for interface org.automotive.Odometer
+	 * AMB fulfills this member with VehicleProperty::DistanceTotal
+	 */
+	const DOMString DistanceTotal = "DistanceTotal";
+
+	/*!
+	 * \brief corresponds with DBus property DistanceSinceStart for interface org.automotive.Odometer
+	 * AMB fulfills this member with VehicleProperty::DistanceSinceStart
+	 */
+	const DOMString DistanceSinceStart = "DistanceSinceStart";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Fluid
+ */
+interface Fluid {
+
+	/*!
+	 * \brief corresponds with DBus property Transmission for interface org.automotive.Fluid
+	 * AMB fulfills this member with VehicleProperty::TransmissionFluidLevel
+	 */
+	const DOMString TransmissionFluidLevel = "Transmission";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.BatteryStatus
+ */
+interface BatteryStatus {
+
+	/*!
+	 * \brief corresponds with DBus property Voltage for interface org.automotive.BatteryStatus
+	 * AMB fulfills this member with VehicleProperty::BatteryVoltage
+	 */
+	const DOMString BatteryVoltage = "Voltage";
+
+	/*!
+	 * \brief corresponds with DBus property Current for interface org.automotive.BatteryStatus
+	 * AMB fulfills this member with VehicleProperty::BatteryCurrent
+	 */
+	const DOMString BatteryCurrent = "Current";
+
+	/*!
+	 * \brief corresponds with DBus property ChargeLevel for interface org.automotive.BatteryStatus
+	 * AMB fulfills this member with VehicleProperty::BatteryChargeLevel
+	 */
+	const DOMString BatteryChargeLevel = "ChargeLevel";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Tire
+ */
+interface Tire {
+
+	/*!
+	 * \brief corresponds with DBus property Pressure for interface org.automotive.Tire
+	 * AMB fulfills this member with VehicleProperty::TirePressure
+	 */
+	const DOMString TirePressure = "Pressure";
+
+	/*!
+	 * \brief corresponds with DBus property PressureLow for interface org.automotive.Tire
+	 * AMB fulfills this member with VehicleProperty::TirePressureLow
+	 */
+	const DOMString TirePressureLow = "PressureLow";
+
+	/*!
+	 * \brief corresponds with DBus property Temperature for interface org.automotive.Tire
+	 * AMB fulfills this member with VehicleProperty::TireTemperature
+	 */
+	const DOMString TireTemperature = "Temperature";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.EngineCoolant
+ */
+interface EngineCoolant {
+
+	/*!
+	 * \brief corresponds with DBus property Level for interface org.automotive.EngineCoolant
+	 * AMB fulfills this member with VehicleProperty::EngineCoolantLevel
+	 */
+	const DOMString EngineCoolantLevel = "Level";
+
+	/*!
+	 * \brief corresponds with DBus property Temperature for interface org.automotive.EngineCoolant
+	 * AMB fulfills this member with VehicleProperty::EngineCoolantTemperature
+	 */
+	const DOMString EngineCoolantTemperature = "Temperature";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.TransmissionOil
+ */
+interface TransmissionOil {
+
+	/*!
+	 * \brief corresponds with DBus property Wear for interface org.automotive.TransmissionOil
+	 * AMB fulfills this member with VehicleProperty::TransmissionOilWear
+	 */
+	const DOMString TransmissionOilWear = "Wear";
+
+	/*!
+	 * \brief corresponds with DBus property Temperature for interface org.automotive.TransmissionOil
+	 * AMB fulfills this member with VehicleProperty::TransmissionOilTemperature
+	 */
+	const DOMString TransmissionOilTemperature = "Temperature";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.TransmissionClutch
+ */
+interface TransmissionClutch {
+
+	/*!
+	 * \brief corresponds with DBus property Wear for interface org.automotive.TransmissionClutch
+	 * AMB fulfills this member with VehicleProperty::TransmissionClutchWear
+	 */
+	const DOMString TransmissionClutchWear = "Wear";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.BrakeMaintenance
+ */
+interface BrakeMaintenance {
+
+	/*!
+	 * \brief corresponds with DBus property PadWear for interface org.automotive.BrakeMaintenance
+	 * AMB fulfills this member with VehicleProperty::BrakePadWear
+	 */
+	const DOMString BrakePadWear = "PadWear";
+
+	/*!
+	 * \brief corresponds with DBus property FluidLevel for interface org.automotive.BrakeMaintenance
+	 * AMB fulfills this member with VehicleProperty::BrakeFluidLevel
+	 */
+	const DOMString BrakeFluidLevel = "FluidLevel";
+
+	/*!
+	 * \brief corresponds with DBus property FluidLevelLow for interface org.automotive.BrakeMaintenance
+	 * AMB fulfills this member with VehicleProperty::BrakeFluidLevelLow
+	 */
+	const DOMString BrakeFluidLevelLow = "FluidLevelLow";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.WasherFluid
+ */
+interface WasherFluid {
+
+	/*!
+	 * \brief corresponds with DBus property Level for interface org.automotive.WasherFluid
+	 * AMB fulfills this member with VehicleProperty::WasherFluidLevel
+	 */
+	const DOMString WasherFluidLevel = "Level";
+
+	/*!
+	 * \brief corresponds with DBus property LevelLow for interface org.automotive.WasherFluid
+	 * AMB fulfills this member with VehicleProperty::WasherFluidLevelLow
+	 */
+	const DOMString WasherFluidLevelLow = "LevelLow";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.MalfunctionIndicator
+ */
+interface MalfunctionIndicator {
+
+	/*!
+	 * \brief corresponds with DBus property On for interface org.automotive.MalfunctionIndicator
+	 * AMB fulfills this member with VehicleProperty::MalfunctionIndicatorOn
+	 */
+	const DOMString MalfunctionIndicatorOn = "On";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Diagnostic
+ */
+interface Diagnostic {
+
+	/*!
+	 * \brief corresponds with DBus property AccumulatedEngineRuntime for interface org.automotive.Diagnostic
+	 * AMB fulfills this member with VehicleProperty::AccumulatedEngineRuntime
+	 */
+	const DOMString AccumulatedEngineRuntime = "AccumulatedEngineRuntime";
+
+	/*!
+	 * \brief corresponds with DBus property DistanceWithMILOn for interface org.automotive.Diagnostic
+	 * AMB fulfills this member with VehicleProperty::DistanceWithMILOn
+	 */
+	const DOMString DistanceWithMILOn = "DistanceWithMILOn";
+
+	/*!
+	 * \brief corresponds with DBus property DistanceSinceCodeCleared for interface org.automotive.Diagnostic
+	 * AMB fulfills this member with VehicleProperty::DistanceSinceCodeCleared
+	 */
+	const DOMString DistanceSinceCodeCleared = "DistanceSinceCodeCleared";
+
+	/*!
+	 * \brief corresponds with DBus property TimeRunMILOn for interface org.automotive.Diagnostic
+	 * AMB fulfills this member with VehicleProperty::TimeRunMILOn
+	 */
+	const DOMString TimeRunMILOn = "TimeRunMILOn";
+
+	/*!
+	 * \brief corresponds with DBus property TimeTroubleCodeClear for interface org.automotive.Diagnostic
+	 * AMB fulfills this member with VehicleProperty::TimeTroubleCodeClear
+	 */
+	const DOMString TimeTroubleCodeClear = "TimeTroubleCodeClear";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ParkingBrake
+ */
+interface ParkingBrake {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.ParkingBrake
+	 * AMB fulfills this member with VehicleProperty::ParkingBrakeStatusW3C
+	 */
+	const DOMString ParkingBrakeStatusW3C = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.HazardLight
+ */
+interface HazardLight {
+
+	/*!
+	 * \brief corresponds with DBus property HazardLight for interface org.automotive.HazardLight
+	 * AMB fulfills this member with VehicleProperty::HazardLightStatus
+	 */
+	const DOMString HazardLightStatus = "HazardLight";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.LaneDepartureDetection
+ */
+interface LaneDepartureDetection {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.LaneDepartureDetection
+	 * AMB fulfills this member with VehicleProperty::LaneDepartureStatus
+	 */
+	const DOMString LaneDepartureStatus = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Alarm
+ */
+interface Alarm {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.Alarm
+	 * AMB fulfills this member with VehicleProperty::AlarmStatus
+	 */
+	const DOMString AlarmStatus = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.AntilockBrakingSystem
+ */
+interface AntilockBrakingSystem {
+
+	/*!
+	 * \brief corresponds with DBus property AntilockBrakingSystem for interface org.automotive.AntilockBrakingSystem
+	 * AMB fulfills this member with VehicleProperty::AntilockBrakingSystem
+	 */
+	const DOMString AntilockBrakingSystem = "AntilockBrakingSystem";
+
+	/*!
+	 * \brief corresponds with DBus property Engaged for interface org.automotive.AntilockBrakingSystem
+	 * AMB fulfills this member with VehicleProperty::AntilockBrakingSystem
+	 */
+	const DOMString AntilockBrakingSystem = "Engaged";
+
+	/*!
+	 * \brief corresponds with DBus property Enabled for interface org.automotive.AntilockBrakingSystem
+	 * AMB fulfills this member with VehicleProperty::AntilockBrakingSystemEnabled
+	 */
+	const DOMString AntilockBrakingSystemEnabled = "Enabled";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.TractionControlSystem
+ */
+interface TractionControlSystem {
+
+	/*!
+	 * \brief corresponds with DBus property TractionControlSystem for interface org.automotive.TractionControlSystem
+	 * AMB fulfills this member with VehicleProperty::TractionControlSystem
+	 */
+	const DOMString TractionControlSystem = "TractionControlSystem";
+
+	/*!
+	 * \brief corresponds with DBus property Enabled for interface org.automotive.TractionControlSystem
+	 * AMB fulfills this member with VehicleProperty::TractionControlSystemEnabled
+	 */
+	const DOMString TractionControlSystemEnabled = "Enabled";
+
+	/*!
+	 * \brief corresponds with DBus property Engaged for interface org.automotive.TractionControlSystem
+	 * AMB fulfills this member with VehicleProperty::TractionControlSystem
+	 */
+	const DOMString TractionControlSystem = "Engaged";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.VehicleTopSpeedLimit
+ */
+interface VehicleTopSpeedLimit {
+
+	/*!
+	 * \brief corresponds with DBus property VehicleTopSpeedLimit for interface org.automotive.VehicleTopSpeedLimit
+	 * AMB fulfills this member with VehicleProperty::VehicleTopSpeedLimit
+	 */
+	const DOMString VehicleTopSpeedLimit = "VehicleTopSpeedLimit";
+
+	/*!
+	 * \brief corresponds with DBus property Speed for interface org.automotive.VehicleTopSpeedLimit
+	 * AMB fulfills this member with VehicleProperty::VehicleTopSpeedLimit
+	 */
+	const DOMString VehicleTopSpeedLimit = "Speed";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.AirbagStatus
+ */
+interface AirbagStatus {
+
+	/*!
+	 * \brief corresponds with DBus property AirbagStatus for interface org.automotive.AirbagStatus
+	 * AMB fulfills this member with VehicleProperty::AirbagStatus
+	 */
+	const DOMString AirbagStatus = "AirbagStatus";
+
+	/*!
+	 * \brief corresponds with DBus property AirbagActivated for interface org.automotive.AirbagStatus
+	 * AMB fulfills this member with VehicleProperty::AirbagActivated
+	 */
+	const DOMString AirbagActivated = "AirbagActivated";
+
+	/*!
+	 * \brief corresponds with DBus property AirbagDeployed for interface org.automotive.AirbagStatus
+	 * AMB fulfills this member with VehicleProperty::AirbagDeployed
+	 */
+	const DOMString AirbagDeployed = "AirbagDeployed";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.DoorStatus
+ */
+interface DoorStatus {
+
+	/*!
+	 * \brief corresponds with DBus property DoorStatus for interface org.automotive.DoorStatus
+	 * AMB fulfills this member with VehicleProperty::DoorStatus
+	 */
+	const DOMString DoorStatus = "DoorStatus";
+
+	/*!
+	 * \brief corresponds with DBus property DoorLockStatus for interface org.automotive.DoorStatus
+	 * AMB fulfills this member with VehicleProperty::DoorLockStatus
+	 */
+	const DOMString DoorLockStatus = "DoorLockStatus";
+
+	/*!
+	 * \brief corresponds with DBus property ChildLockStatus for interface org.automotive.DoorStatus
+	 * AMB fulfills this member with VehicleProperty::ChildLockStatus
+	 */
+	const DOMString ChildLockStatus = "ChildLockStatus";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Door
+ */
+interface Door {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.Door
+	 * AMB fulfills this member with VehicleProperty::DoorStatusW3C
+	 */
+	const DOMString DoorStatusW3C = "Status";
+
+	/*!
+	 * \brief corresponds with DBus property Lock for interface org.automotive.Door
+	 * AMB fulfills this member with VehicleProperty::DoorLockStatus
+	 */
+	const DOMString DoorLockStatus = "Lock";
+
+	/*!
+	 * \brief corresponds with DBus property ChildLock for interface org.automotive.Door
+	 * AMB fulfills this member with VehicleProperty::ChildLockStatus
+	 */
+	const DOMString ChildLockStatus = "ChildLock";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.SeatBelt
+ */
+interface SeatBelt {
+
+	/*!
+	 * \brief corresponds with DBus property Status for interface org.automotive.SeatBelt
+	 * AMB fulfills this member with VehicleProperty::SeatBeltStatus
+	 */
+	const DOMString SeatBeltStatus = "Status";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.OccupantStatus
+ */
+interface OccupantStatus {
+
+	/*!
+	 * \brief corresponds with DBus property OccupantStatus for interface org.automotive.OccupantStatus
+	 * AMB fulfills this member with VehicleProperty::OccupantStatus
+	 */
+	const DOMString OccupantStatus = "OccupantStatus";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ObstacleDistance
+ */
+interface ObstacleDistance {
+
+	/*!
+	 * \brief corresponds with DBus property ObstacleDistance for interface org.automotive.ObstacleDistance
+	 * AMB fulfills this member with VehicleProperty::ObstacleDistance
+	 */
+	const DOMString ObstacleDistance = "ObstacleDistance";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ElectronicStabilityControl
+ */
+interface ElectronicStabilityControl {
+
+	/*!
+	 * \brief corresponds with DBus property Enabled for interface org.automotive.ElectronicStabilityControl
+	 * AMB fulfills this member with VehicleProperty::ElectronicStabilityControlEnabled
+	 */
+	const DOMString ElectronicStabilityControlEnabled = "Enabled";
+
+	/*!
+	 * \brief corresponds with DBus property Engaged for interface org.automotive.ElectronicStabilityControl
+	 * AMB fulfills this member with VehicleProperty::ElectronicStabilityControlEngaged
+	 */
+	const DOMString ElectronicStabilityControlEngaged = "Engaged";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.ChildSafetyLock
+ */
+interface ChildSafetyLock {
+
+	/*!
+	 * \brief corresponds with DBus property Lock for interface org.automotive.ChildSafetyLock
+	 * AMB fulfills this member with VehicleProperty::ChildLockStatus
+	 */
+	const DOMString ChildLockStatus = "Lock";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Seat
+ */
+interface Seat {
+
+	/*!
+	 * \brief corresponds with DBus property Occupant for interface org.automotive.Seat
+	 * AMB fulfills this member with VehicleProperty::OccupantStatusW3C
+	 */
+	const DOMString OccupantStatusW3C = "Occupant";
+
+	/*!
+	 * \brief corresponds with DBus property SeatBelt for interface org.automotive.Seat
+	 * AMB fulfills this member with VehicleProperty::SeatBeltStatus
+	 */
+	const DOMString SeatBeltStatus = "SeatBelt";
+
+	/*!
+	 * \brief corresponds with DBus property OccupantName for interface org.automotive.Seat
+	 * AMB fulfills this member with VehicleProperty::OccupantName
+	 */
+	const DOMString OccupantName = "OccupantName";
+
+	/*!
+	 * \brief corresponds with DBus property IdentificationType for interface org.automotive.Seat
+	 * AMB fulfills this member with VehicleProperty::OccupantIdentificationType
+	 */
+	const DOMString OccupantIdentificationType = "IdentificationType";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.SteeringWheelPosition
+ */
+interface SteeringWheelPosition {
+
+	/*!
+	 * \brief corresponds with DBus property Slide for interface org.automotive.SteeringWheelPosition
+	 * AMB fulfills this member with VehicleProperty::SteeringWheelPositionSlide
+	 */
+	const DOMString SteeringWheelPositionSlide = "Slide";
+
+	/*!
+	 * \brief corresponds with DBus property Tilt for interface org.automotive.SteeringWheelPosition
+	 * AMB fulfills this member with VehicleProperty::SteeringWheelPositionTilt
+	 */
+	const DOMString SteeringWheelPositionTilt = "Tilt";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.Mirror
+ */
+interface Mirror {
+
+	/*!
+	 * \brief corresponds with DBus property MirrorPan for interface org.automotive.Mirror
+	 * AMB fulfills this member with VehicleProperty::MirrorSettingPan
+	 */
+	const DOMString MirrorSettingPan = "MirrorPan";
+
+	/*!
+	 * \brief corresponds with DBus property MirrorTilt for interface org.automotive.Mirror
+	 * AMB fulfills this member with VehicleProperty::MirrorSettingTilt
+	 */
+	const DOMString MirrorSettingTilt = "MirrorTilt";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.SeatAdjustment
+ */
+interface SeatAdjustment {
+
+	/*!
+	 * \brief corresponds with DBus property SeatBackCushion for interface org.automotive.SeatAdjustment
+	 * AMB fulfills this member with VehicleProperty::SeatPositionBackCushion
+	 */
+	const DOMString SeatPositionBackCushion = "SeatBackCushion";
+
+	/*!
+	 * \brief corresponds with DBus property SeatReclineBack for interface org.automotive.SeatAdjustment
+	 * AMB fulfills this member with VehicleProperty::SeatPositionRecline
+	 */
+	const DOMString SeatPositionRecline = "SeatReclineBack";
+
+	/*!
+	 * \brief corresponds with DBus property SeatSlide for interface org.automotive.SeatAdjustment
+	 * AMB fulfills this member with VehicleProperty::SeatPositionSlide
+	 */
+	const DOMString SeatPositionSlide = "SeatSlide";
+
+	/*!
+	 * \brief corresponds with DBus property SeatCushionHeight for interface org.automotive.SeatAdjustment
+	 * AMB fulfills this member with VehicleProperty::SeatPositionCushionHeight
+	 */
+	const DOMString SeatPositionCushionHeight = "SeatCushionHeight";
+
+	/*!
+	 * \brief corresponds with DBus property SeatHeadrest for interface org.automotive.SeatAdjustment
+	 * AMB fulfills this member with VehicleProperty::SeatPositionHeadrest
+	 */
+	const DOMString SeatPositionHeadrest = "SeatHeadrest";
+
+	/*!
+	 * \brief corresponds with DBus property SeatSideCushion for interface org.automotive.SeatAdjustment
+	 * AMB fulfills this member with VehicleProperty::SeatPositionSideCushion
+	 */
+	const DOMString SeatPositionSideCushion = "SeatSideCushion";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.DriveMode
+ */
+interface DriveMode {
+
+	/*!
+	 * \brief corresponds with DBus property DriveMode for interface org.automotive.DriveMode
+	 * AMB fulfills this member with VehicleProperty::VehicleDriveMode
+	 */
+	const DOMString VehicleDriveMode = "DriveMode";
+
+};
+
+/*! 
+ * \brief Corresponds with DBus Interface org.automotive.VehicleSound
+ */
+interface VehicleSound {
+
+	/*!
+	 * \brief corresponds with DBus property ActiveNoiseControlMode for interface org.automotive.VehicleSound
+	 * AMB fulfills this member with VehicleProperty::ActiveNoiseControlMode
+	 */
+	const DOMString ActiveNoiseControlMode = "ActiveNoiseControlMode";
+
+	/*!
+	 * \brief corresponds with DBus property EngineSoundEnhancementMode for interface org.automotive.VehicleSound
+	 * AMB fulfills this member with VehicleProperty::EngineSoundEnhancementMode
+	 */
+	const DOMString EngineSoundEnhancementMode = "EngineSoundEnhancementMode";
+
+	/*!
+	 * \brief corresponds with DBus property AvailableSounds for interface org.automotive.VehicleSound
+	 * AMB fulfills this member with VehicleProperty::AvailableSounds
+	 */
+	const DOMString AvailableSounds = "AvailableSounds";
+
+};
+

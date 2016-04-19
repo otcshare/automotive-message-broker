@@ -1,0 +1,11 @@
+PROJECT_NAME = automotive-message-broker
+PROJECT_NUMBER = 0.14.0
+PROJECT_NAME = automotive-message-broker
+PROJECT_NUMBER = 0.14.0
+GENERATE_LATEX = NO
+EXTENSION_MAPPING = fidl=IDL
+FILE_PATTERNS = *.md *.idl *.fidl *.h
+RECURSIVE = YES
+IMAGE_PATH = /home/kev/src/automotive-message-broker/docs/images
+INPUT = /home/kev/src/automotive-message-broker/RELEASE.md /home/kev/src/automotive-message-broker/lib/ /home/kev/src/automotive-message-broker/build/plugins /home/kev/src/automotive-message-broker/build/docs
+HTML_OUTPUT=/home/kev/src/automotive-message-broker/build/docs

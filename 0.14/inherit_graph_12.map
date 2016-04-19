@@ -1,0 +1,4 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classAsyncRangePropertyRequest.html" title="The AsyncRangePropertyRequest class is used by sinks to request values within a time or sequence rang..." alt="" coords="5,5,200,32"/>
+<area shape="rect" id="node2" href="$classAsyncRangePropertyReply.html" title="The AsyncRangePropertyReply class is used by a source to reply to an AsyncRangePropertyRequest. The source should set success to &#39;true&#39; and populate the &#39;values&#39; member if the request was successful. If the request is not successful, &#39;success&#39; should be set to &#39;false&#39; and the &#39;error&#39; member should be set. " alt="" coords="248,5,428,32"/>
+</map>

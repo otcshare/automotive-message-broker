@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classAbstractPropertyType.html" title="AbstractPropertyType" alt="" coords="5,56,155,83"/>
+<area shape="rect" id="node2" href="$classBasicPropertyType.html" title="BasicPropertyType\&lt; T \&gt;" alt="" coords="203,5,368,32"/>
+<area shape="rect" id="node3" href="$classListPropertyType.html" title="ListPropertyType is a AbstractPropertyType for arrays of AbstractPropertyTypes. " alt="" coords="209,56,362,83"/>
+<area shape="rect" id="node4" href="$classStringPropertyType.html" title="StringPropertyType" alt="" coords="218,107,353,133"/>
+</map>

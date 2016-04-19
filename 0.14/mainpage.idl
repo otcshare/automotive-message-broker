@@ -1,0 +1,34 @@
+/*!
+* \mainpage Automotive Message Broker Documentation
+* \version 0.14.0
+* \section links AMB Documentation Sections
+* - \ref ambd
+* - \ref dbus_api - Using AMB with your application
+* - \ref libamb - Developing AMB or AMB plugins
+* - \ref plugins - Using Built in AMB plugins
+* - \ref release_notes - Current release notes
+*
+* \section intro Introduction
+* Automotive Message Broker (AMB) is a framework for providing applications with standardized access to vehicle data.
+* It uses a plugin architecture to allow customization for different vehicles and devices.  Here is a diagram of how
+* AMB is architected:
+* \image html AMBArchitecture.png
+* AMB works by passing "Properties" from "source" plugins to interested "sink" plugins.  These properties represent
+* vehicle data, ie 'VehicleSpeed' represents the vehicle's ground velocity.
+*
+* In General, AMB "source" plugins produce data and AMB "sink" plugins consume them.  However, it is possible that a
+* source can also consumes data.  AMB supports multiple simultaneous source and sink plugins.  This allows for aggregation
+* from multiple vehicle networks, the cloud, or even from other instances of AMB running elsewhere (via the websocket
+* plugins).
+*
+* More information about AMB plugins can be found in the <a href="../amb/html/index.html">library documentation</a>.
+* \section crosswalk Crosswalk Vehicle Extension
+* AMB also comes with a <a href="http://crosswalk-project.org">crosswalk</a> extension that implements the W3C Automotive Business group
+* <a href="https://rawgit.com/w3c/automotive-bg/master/vehicle_spec.html">vehicle</a> and <a href="https://rawgit.com/w3c/automotive-bg/master/data_spec.html">data</a> specifications.
+* \section licensing Licensing
+* AMB is licensed LGPL v2.  This allows the creation of proprietary plugins.
+* \section previous_versions Previous Versions
+* - <a href="../../0.13/index.html">0.13</a>
+* - <a href="../../0.12/docs/amb/html/index.html">0.12 library Documentation</a>
+* - <a href="../../0.12/docs/dbus/html/index.html">0.12 DBus API Documentation</a>
+*/
