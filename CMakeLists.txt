@@ -11,7 +11,7 @@ set(PROJECT_NAME "automotive-message-broker")
 set(PROJECT_PRETTY_NAME "Automotive Message Broker")
 set(PROJECT_SERIES "0.15")
 set(PROJECT_MAJOR_VERSION "0.14")
-set(PROJECT_MINOR_VERSION "802")
+set(PROJECT_MINOR_VERSION "803")
 set(PROJECT_VERSION "${PROJECT_MAJOR_VERSION}.${PROJECT_MINOR_VERSION}")
 set(PROJECT_CODENAME "")
 set(PROJECT_QUALITY "alpha")
@@ -80,6 +80,15 @@ if(usebluez5)
 	add_definitions(-DUSE_BLUEZ5)
 
 endif(usebluez5)
+
+include(CheckCSourceCompiles)
+check_c_source_compiles("
+        #include <linux/can/bcm.h>
+        int main() { struct bcm_timeval t; return 0;}" have_bcm_timeval)
+
+if(have_bcm_timeval)
+        add_definitions(-DHAVE_BCM_TIMEVAL)
+endif(have_bcm_timeval)
 
 set(ARCHIVE_NAME ${CMAKE_PROJECT_NAME}-${PROJECT_VERSION})
 add_custom_target(dist COMMAND git archive --prefix=${ARCHIVE_NAME}/ HEAD | bzip2 > ${CMAKE_BINARY_DIR}/${ARCHIVE_NAME}.tar.bz2 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
