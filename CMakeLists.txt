@@ -24,10 +24,10 @@ add_definitions(-DPROJECT_SERIES="${PROJECT_SERIES}")
 
 set (LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set (LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}" )
-set (PLUGIN_INSTALL_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}")
+set (PLUGIN_INSTALL_PATH "${CMAKE_INSTALL_LIBDIR}/${PROJECT_NAME}")
 set (INCLUDE_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
 set (DOC_INSTALL_DIR "${CMAKE_INSTALL_DOCDIR}/${PROJECT_SERIES}")
-set (PLUGIN_SEGMENT_INSTALL_PATH "/${CMAKE_INSTALL_SYSCONFDIR}/ambd/plugins.d")
+set (PLUGIN_SEGMENT_INSTALL_PATH "${CMAKE_INSTALL_SYSCONFDIR}/ambd/plugins.d")
 
 option(qtmainloop "Use QCoreApplication mainloop " OFF)
 option(websocket_plugin "websocket source and sink plugins" OFF)
