@@ -1,0 +1,8 @@
+{
+	"name" : "gpsnmea",
+	"enabled" : false,
+	"path" : "@PLUGIN_INSTALL_PATH@/gpsnmea.so",
+        "device" : "/dev/ttyUSB0",
+        "baudrate" : "4800",
+        "bluetoothAdapter" : "00:00:00:00:00:00"
+}
