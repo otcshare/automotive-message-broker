@@ -284,6 +284,7 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %{_bindir}/amb-set
 %{_bindir}/amb-listen
 %{_bindir}/ambctl
+%{_sysconfdir}/init.d/ambd
 
 %files devel
 %defattr(-,root,root,-)
@@ -335,6 +336,7 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %manifest packaging.in/amb.manifest.plugins
 %defattr(-,root,root,-)
 %{_libdir}/libamb-plugins-common.so
+%{_libdir}/libamb-json-protocol.so
 
 %files plugins-wheel
 %defattr(-,root,root,-)
@@ -393,6 +395,7 @@ cp packaging/config.tizen %{buildroot}%{_sysconfdir}/ambd/
 %{_libdir}/%{name}/bluemonkeyplugin.so
 %config %{_sysconfdir}/ambd/bluemonkey
 %{_sysconfdir}/ambd/plugins.d/bluemonkey
+%{_bindir}/bluemonkey
 
 %files -n bluemonkey-modules-db
 %manifest packaging.in/amb.manifest.plugins
