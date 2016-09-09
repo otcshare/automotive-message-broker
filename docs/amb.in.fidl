@@ -1139,16 +1139,16 @@ interface org.automotive.WheelTick extends VehiclePropertyType {
    attribute UInt8 Value readonly
 }
 
-interface IgnitionTime : VehicleCommonDataType {
+interface org.automotive.IgnitionTime extends VehiclePropertyType {
    /*!
-	* \brief MUST return time at ignition on
-	*/
-	attribute UInt64 ignitionOnTime readonly
+    * \brief MUST return time at ignition on
+    */
+    attribute UInt64 ignitionOnTime readonly
 
-	/*!
-	 * \brief MUST return time at ignition off
-	 */
-	 attribute UInt64 ignitionOffTime readonly
+   /*!
+    * \brief MUST return time at ignition off
+    */
+    attribute UInt64 ignitionOffTime readonly
 }
 
 interface org.automotive.YawRate extends VehiclePropertyType {
@@ -1168,39 +1168,39 @@ interface org.automotive.BrakeOperation extends VehiclePropertyType {
 }
 
 enumeration Button {
-	home = "home",
-	back = "back",
-	search = "search",
-	call = "call",
-	end_call = "end_call",
-	media_play = "media_play",
-	media_next = "media_next",
-	media_previous = "media_previous",
-	media_pause = "media_pause",
-	voice_recognize = "voice_recognize",
-	enter = "enter",
-	left = "left",
-	right = "right",
-	up = "up",
-	down = "down"
+    home = "home",
+    back = "back",
+    search = "search",
+    call = "call",
+    end_call = "end_call",
+    media_play = "media_play",
+    media_next = "media_next",
+    media_previous = "media_previous",
+    media_pause = "media_pause",
+    voice_recognize = "voice_recognize",
+    enter = "enter",
+    left = "left",
+    right = "right",
+    up = "up",
+    down = "down"
 }
 
 enumeration ButtonEventType {
-	press = "press",
-	long_press = "long_press",
-	release = "release"
+    press = "press",
+    long_press = "long_press",
+    release = "release"
 }
 
 interface VehicleButton {
-	/*!
-	* \brief MUST return the button corresponding to the event.
-	*/
-	attribute Button button readonly
+   /*!
+    * \brief MUST return the button corresponding to the event.
+    */
+    attribute Button button readonly
 
-	/*!
-	* \brief MUST return the type of event
-	*/
-	attribute ButtonEventType state readonly
+   /*!
+    * \brief MUST return the type of event
+    */
+    attribute ButtonEventType state readonly
 }
 
 interface org.automotive.ButtonEvent extends VehiclePropertyType {
@@ -1284,24 +1284,24 @@ interface org.automotive.Diagnostic extends VehiclePropertyType {
    attribute UInt32 AccumulatedEngineRuntime readonly
 
    /*!
-	* \brief MUST return distance travelled since the codes were last cleared (Unit: meters)
-	*/
-   attribute UInt32 DistanceSinceCodeCleared readonly
+    * \brief MUST return distance travelled since the codes were last cleared (Unit: meters)
+    */
+    attribute UInt32 DistanceSinceCodeCleared readonly
 
    /*!
-	* \brief MUST return distance travelled with the malfunction indicator light on (Unit: meters)
-	*/
-   attribute UInt32 DistanceWithMILOn readonly
+    * \brief MUST return distance travelled with the malfunction indicator light on (Unit: meters)
+    */
+    attribute UInt32 DistanceWithMILOn readonly
 
    /*!
-	* \brief MUST return time elapsed with the malfunction indicator light on (Unit: seconds)
-	*/
-   attribute UInt32 TimeRunMILOn readonly
+    * \brief MUST return time elapsed with the malfunction indicator light on (Unit: seconds)
+    */
+    attribute UInt32 TimeRunMILOn readonly
 
    /*!
-	* \brief MUST return time elapsed since the trouble codes were last cleared (Unit: seconds)
-	*/
-   attribute UInt32 TimeTroubleCodeClear readonly
+    * \brief MUST return time elapsed since the trouble codes were last cleared (Unit: seconds)
+    */
+    attribute UInt32 TimeTroubleCodeClear readonly
 }
 
 interface org.automotive.Mirror extends VehiclePropertyType {
@@ -1367,136 +1367,136 @@ interface org.automotive.DriveMode extends VehiclePropertyType {
 }
 
 interface org.automotive.DashboardIllumination extends VehiclePropertyType {
-  /*!
-  * \brief MUST return illumination of dashboard as a percentage (Unit: percentage, 0%: none, 100%: maximum illumination)
-  */
-  attribute UInt8 DashboardIllumination
+   /*!
+    * \brief MUST return illumination of dashboard as a percentage (Unit: percentage, 0%: none, 100%: maximum illumination)
+    */
+    attribute UInt8 DashboardIllumination
 }
 
 interface org.automotive.VehicleSound extends VehiclePropertyType {
-  /*!
-  * \brief MUST return active noise control status: not-activated (false), activated (true)
-  */
-  attribute Boolean ActiveNoiseControlMode
+   /*!
+    * \brief MUST return active noise control status: not-activated (false), activated (true)
+    */
+    attribute Boolean ActiveNoiseControlMode
 
-  /*!
-  * \brief MUST return active noise control status: not-activated (false), activated (true)
-  */
-  attribute Boolean EngineSoundEnhancementMode
+   /*!
+    * \brief MUST return active noise control status: not-activated (false), activated (true)
+    */
+    attribute Boolean EngineSoundEnhancementMode
 
-  /*!
-  * \brief MUST return array of available sounds. See EngineSoundEnhancementMode
-  */
-  attribute array EngineSoundEnhancementMode of String readonly
+   /*!
+    * \brief MUST return array of available sounds. See EngineSoundEnhancementMode
+    */
+    attribute array EngineSoundEnhancementMode of String readonly
 }
 
 interface org.automotive.ElectronicStabilityControl extends VehiclePropertyType {
-  /*!
-  * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
-  */
-  attribute Boolean Enabled readonly
+   /*!
+    * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
+    */
+    attribute Boolean Enabled readonly
 
-  /*!
-  * \brief MUST return whether or not the ESC is engaged: engaged (true) or idle (false)
-  */
-  attribute Boolean Engaged readonly
+   /*!
+    * \brief MUST return whether or not the ESC is engaged: engaged (true) or idle (false)
+    */
+    attribute Boolean Engaged readonly
 }
 
 interface org.automotive.TopSpeedLimit extends VehiclePropertyType {
-  /*!
-  * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
-  */
-  attribute UInt16 Speed readonly
+   /*!
+    * \brief MUST return whether or not the ESC Setting is enabled: enabled (true) or disabled (false)
+    */
+    attribute UInt16 Speed readonly
 }
 
 interface org.automotive.ChildSafetyLock extends VehiclePropertyType {
-  /*!
-  * \brief MUST return whether or not the Child Safety Lock is locked: locked (true) or unlocked (false)
-  */
-  attribute Boolean Lock
+   /*!
+    * \brief MUST return whether or not the Child Safety Lock is locked: locked (true) or unlocked (false)
+    */
+    attribute Boolean Lock
 }
 
 enumeration OccupantStatus {
-  adult = "adult",
-  child = "child",
-  vacant = "vacant"
+    adult = "adult",
+    child = "child",
+    vacant = "vacant"
 }
 
 enumeration IdentificationTypeEnum {
-  pin = "pin",
-  keyfob = "keyfob",
-  Bluetooth = "Bluetooth",
-  NFC = "NFC",
-  fingerprint = "fingerprint",
-  camera = "camera",
-  voice = "voice"
+    pin = "pin",
+    keyfob = "keyfob",
+    Bluetooth = "Bluetooth",
+    NFC = "NFC",
+    fingerprint = "fingerprint",
+    camera = "camera",
+    voice = "voice"
 }
 
 interface org.automotive.Seat extends VehiclePropertyType {
-  /*!
-  * \brief MUST return the status of seat occupant
-  */
-  attribute OccupantStatus Occupant
+   /*!
+    * \brief MUST return the status of seat occupant
+    */
+    attribute OccupantStatus Occupant
 
-  /*!
-  * \brief MUST return whether or not the seat belt is fastened: fastened (true) or unfastened (false)
-  */
-  attribute Boolean SeatBelt
+   /*!
+    * \brief MUST return whether or not the seat belt is fastened: fastened (true) or unfastened (false)
+    */
+    attribute Boolean SeatBelt
 
-  /*!
-  * \brief MUST return occupant identifier
-  */
-  attribute String OccupantName
+   /*!
+    * \brief MUST return occupant identifier
+    */
+    attribute String OccupantName
 
-  /*!
-  * \brief MUST return identification type
-  */
-  attribute IdentificationTypeEnum IdentificationType
+   /*!
+    * \brief MUST return identification type
+    */
+    attribute IdentificationTypeEnum IdentificationType
 }
 
 interface org.automotive.AtmosphericPressure extends VehiclePropertyType {
-  /*!
-  * \brief MUST return the current atmospheric pressure outside of the vehicle (Unit: hectopascal)
-  */
-  attribute UInt16 Pressure
+   /*!
+    * \brief MUST return the current atmospheric pressure outside of the vehicle (Unit: hectopascal)
+    */
+    attribute UInt16 Pressure
 }
 
 enumeration LaneDepartureStatus {
-	off = "off",
-	pause = "pause",
-	running = "running"
+    off = "off",
+    pause = "pause",
+    running = "running"
 }
 
 interface org.automotive.LaneDepartureDetection extends VehiclePropertyType {
-  /*!
-  * \brief MUST return current status of Lane departure warning function.
-  */
-  attribute LaneDepartureStatus Status readonly
+   /*!
+    * \brief MUST return current status of Lane departure warning function.
+    */
+    attribute LaneDepartureStatus Status readonly
 }
 
 enumeration AlarmStatus {
-	disarmed = "disarmed",
-	prearmed = "prearmed",
-	armed = "armed",
-	alarmed = "alarmed"
+    disarmed = "disarmed",
+    prearmed = "prearmed",
+    armed = "armed",
+    alarmed = "alarmed"
 }
 
 interface org.automotive.Alarm extends VehiclePropertyType {
-  /*!
-  * \brief MUST return the current status of vehicle Alarm System.
-  */
-  attribute AlarmStatus Status
+   /*!
+    * \brief MUST return the current status of vehicle Alarm System.
+    */
+    attribute AlarmStatus Status
 }
 
 enumeration ParkingBrakeStatus {
-	inactive = "inactive",
-	active = "active",
-	error = "error"
+    inactive = "inactive",
+    active = "active",
+    error = "error"
 }
 
 interface org.automotive.ParkingBrake extends VehiclePropertyType {
-  /*!
-  * \brief MUST return the current status of vehicle Alarm System.
-  */
-  attribute ParkingBrakeStatus Status readonly
+   /*!
+    * \brief MUST return the current status of vehicle Alarm System.
+    */
+    attribute ParkingBrakeStatus Status readonly
 }
