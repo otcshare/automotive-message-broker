@@ -21,6 +21,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use Intel::IviPoc::AmbPluginGenerator qw(processPlugin);
+use Intel::IviPoc::AmbCommon;
 use Cwd;
 
 =head1 NAME
