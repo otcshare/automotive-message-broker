@@ -5,6 +5,7 @@ set(PLUGIN_SEGMENT_INSTALL_PATH "/etc/ambd/plugins.d")
 set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
 set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" )
 set(PLUGIN_INSTALL_PATH "${LIB_INSTALL_DIR}/automotive-message-broker")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 # to install plugin into /usr instead of /usr/local
 set (CMAKE_INSTALL_PREFIX /usr)
@@ -28,9 +29,6 @@ find_package(Boost REQUIRED)
 
 pkg_check_modules(glib REQUIRED glib-2.0)
 pkg_check_modules(json REQUIRED json)
-
-add_definitions(-std=gnu++0x)
-
 pkg_check_modules( amb REQUIRED automotive-message-broker )
 pkg_check_modules( amb-plugins-common REQUIRED amb-plugins-common )
 
