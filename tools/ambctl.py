@@ -210,7 +210,7 @@ def processCommand(command, commandArgs, noMain=True):
 						pass
 		if not noMain == True:
 			try:
-				main_loop = gobject.MainLoop(None, False)
+				main_loop = GObject.MainLoop()
 				main_loop.run()
 			except KeyboardInterrupt:
 				return 1
