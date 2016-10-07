@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 2.8)
 
+include(GNUInstallDirs)
+
 set(CMAKE_VERBOSE_MAKEFILE on )
 set(PLUGIN_SEGMENT_INSTALL_PATH "/etc/ambd/plugins.d")
-set(LIB_SUFFIX "" CACHE STRING "Define suffix of directory name (32/64)" )
-set(LIB_INSTALL_DIR "${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/${CMAKE_LIBRARY_ARCHITECTURE}" )
+set(LIB_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
 set(PLUGIN_INSTALL_PATH "${LIB_INSTALL_DIR}/automotive-message-broker")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
@@ -71,7 +72,5 @@ add_library(ambtmpl_plugin MODULE ${ambtmpl_plugin_sources} ${ambtmpl_plugin_hea
 set_target_properties(ambtmpl_plugin PROPERTIES PREFIX "")
 target_link_libraries(ambtmpl_plugin ${link_libraries} ${libamb_LIBRARY} ${amb_LIBRARIES} ${amb-plugins-common_LIBRARIES})
 
-install(TARGETS ambtmpl_plugin LIBRARY DESTINATION "lib/automotive-message-broker")
+install(TARGETS ambtmpl_plugin LIBRARY DESTINATION ${LIB_INSTALL_DIR}/automotive-message-broker)
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ambtmpl DESTINATION ${PLUGIN_SEGMENT_INSTALL_PATH})
-
-
