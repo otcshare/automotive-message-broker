@@ -103,7 +103,7 @@ AmbTmplPlugin::AmbTmplPlugin(AbstractRoutingEngine* re, const map<string, string
     if (it != config.end() && it->second.length())
         announcementCount = atoi(std::string(it->second).c_str());
     if(announcementCount < 1)
-            announcementIntervalTimer = 1;
+            announcementCount = 1;
 
     registerMessages();
 }
