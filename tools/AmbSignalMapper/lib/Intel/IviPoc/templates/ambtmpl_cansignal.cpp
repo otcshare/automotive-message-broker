@@ -125,6 +125,8 @@ bool CANSignal::updateFrame(can_frame* frame)
     int64_t bits = conversionFunctionTo(val, static_cast<int64_t>(temp));
 
     *(reinterpret_cast<uint64_t*>(&frame->data[0])) |= toSignalBits(bits);
+
+    return true;
 }
 
 int64_t CANSignal::getSignalBits( const can_frame& frame )
