@@ -48,7 +48,7 @@ std::string get_file_contents(const char *filename)
     return output;
 }
 
-PluginLoader::PluginLoader(string configFile, int argc, char** argv): f_create(NULL), routingEngine(nullptr), mMainLoop(nullptr)
+PluginLoader::PluginLoader(string configFile, int argc, char** argv): routingEngine(nullptr), f_create(NULL), mMainLoop(nullptr)
 {
     DebugOut()<<"Loading config file: "<<configFile<<endl;
     std::string configBuffer = get_file_contents(configFile.c_str());

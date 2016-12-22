@@ -237,7 +237,7 @@ void AbstractDBusInterface::handleMyMethodCall(GDBusConnection       *connection
 
 AbstractDBusInterface::AbstractDBusInterface(string interfaceName, string objectName,
 											 GDBusConnection* connection)
-	: mInterfaceName(interfaceName), mConnection(connection), mPropertyName(objectName), supported(false), zoneFilter(Zone::None), mTime(0), regId(0)
+	: zoneFilter(Zone::None), supported(false), mTime(0), mInterfaceName(interfaceName), mPropertyName(objectName), mConnection(connection), regId(0)
 {
 	startRegistration();
 

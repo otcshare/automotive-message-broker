@@ -316,6 +316,8 @@ bool TestPlugin::testSetAndGet()
 
 	TEST(replySuccess == true);
 	TEST(replyError == AsyncPropertyReply::NoError);
+
+	return replySuccess;
 }
 
 bool TestPlugin::testCoreUpdateSupported()
@@ -373,8 +375,6 @@ TestPlugin::TestPlugin(AbstractRoutingEngine *re, map<string, string> config)
 	MapPropertyType<BasicPropertyType<Door::Status>> propmaptwo("SomethingElse");
 	propmap.append("hi", Door::Ajar);
 	GVariant *var = propmap.toVariant();
-	gsize dictsize = g_variant_n_children(var);
-	//DebugOut() << var << endl;
 	propmaptwo.fromVariant(var);
 
 	g_assert(propmaptwo.toString() == propmap.toString());

@@ -23,7 +23,7 @@
 std::string::size_type amb::count(const std::string & t, const std::string & toFind, const std::string &before)
 {
 	int count = 0;
-	int pos = -1;
+	size_t pos = -1;
 
 	std::string::size_type beforePos = t.find(before);
 
@@ -37,9 +37,9 @@ std::string::size_type amb::count(const std::string & t, const std::string & toF
 
 int amb::findNth(const std::string & t, const std::string & toFind, std::string::size_type n)
 {
-	int count = 0;
+	size_t count = 0;
 	auto itr = t.begin();
-	for(itr; count < n; itr++, count++)
+	for(; count < n; itr++, count++)
 	{
 		if(itr == t.end())
 			break;

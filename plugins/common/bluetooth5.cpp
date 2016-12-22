@@ -200,9 +200,6 @@ std::string findDevice(std::string address, std::string adapterPath)
 Bluetooth5::Bluetooth5()
 {
 	GError* errorIntrospection = NULL;
-
-	GDBusNodeInfo* introspection = g_dbus_node_info_new_for_xml(introspection_xml, &errorIntrospection);
-
 	auto errorIntrospectionPtr = amb::make_super(errorIntrospection);
 
 	if(errorIntrospectionPtr)
@@ -212,9 +209,6 @@ Bluetooth5::Bluetooth5()
 	}
 
 	GError* errorBus = nullptr;
-
-	GDBusInterfaceInfo* mInterfaceInfo = g_dbus_node_info_lookup_interface(introspection, "org.bluez.Profile1");
-
 	mConnection = amb::make_super(g_bus_get_sync(G_BUS_TYPE_SYSTEM, nullptr, &errorBus));
 
 	auto errorBusPtr = amb::make_super(errorBus);
@@ -226,11 +220,7 @@ Bluetooth5::Bluetooth5()
 	}
 
 	GError* errorRegister = nullptr;
-
-	int regId = g_dbus_connection_register_object(mConnection.get(), "/org/bluez/spp", mInterfaceInfo, &interfaceVTable, this, NULL, &errorRegister);
-
 	auto errorRegisterPtr = amb::make_super(errorRegister);
-
 	if(errorRegisterPtr)
 	{
 

@@ -143,11 +143,6 @@ void WheelSourcePlugin::getPropertyAsync(AsyncPropertyReply *reply)
 	reply->completed(reply);
 }
 
-AsyncPropertyReply *WheelSourcePlugin::setProperty(AsyncSetPropertyRequest request )
-{
-
-}
-
 void WheelSourcePlugin::subscribeToPropertyChanges(VehicleProperty::Property property)
 {
 	mRequests.insert(property);
@@ -207,21 +202,21 @@ void readCallback(GObject *srcObj, GAsyncResult *res, gpointer userData)
 
 WheelPrivate::WheelPrivate(WheelSourcePlugin *parent, AbstractRoutingEngine *route)
 	:re(route), gis(nullptr), axis(nullptr), button(nullptr),
+	  machineGuns(new VehicleProperty::MachineGunTurretStatusType(false)),
+	  vehicleSpeed(new VehicleProperty::VehicleSpeedType(0)),
+	  engineSpeed(new VehicleProperty::EngineSpeedType(0)),
+	  turnSignal(new VehicleProperty::TurnSignalType(TurnSignals::Off)),
+	  shiftPosition(new VehicleProperty::TransmissionShiftPositionType(Transmission::Neutral)),
+	  gearPosition(new VehicleProperty::TransmissionGearPositionType(Transmission::Neutral)),
 	  oilPSI(new VehicleProperty::EngineOilPressureType(10)),
 	  coolantTemp(new VehicleProperty::EngineCoolantTemperatureType(100)),
-	  turnSignal(new VehicleProperty::TurnSignalType(TurnSignals::Off)),
-	  throttle(new VehicleProperty::ThrottlePositionType(0)),
-	  machineGuns(new VehicleProperty::MachineGunTurretStatusType(false)),
-	  gearPosition(new VehicleProperty::TransmissionGearPositionType(Transmission::Neutral)),
-	  shiftPosition(new VehicleProperty::TransmissionShiftPositionType(Transmission::Neutral)),
-	  engineSpeed(new VehicleProperty::EngineSpeedType(0)),
-	  vehicleSpeed(new VehicleProperty::VehicleSpeedType(0)),
 	  steeringAngle(new VehicleProperty::SteeringWheelAngleType(0)),
 	  steeringAngleW3C(new VehicleProperty::SteeringWheelAngleW3CType(0)),
+	  throttle(new VehicleProperty::ThrottlePositionType(0)),
 	  clutch(new VehicleProperty::ClutchStatusType(false)),
 	  brake(new VehicleProperty::WheelBrakeType(false)),
-	  tempButton(new VehicleProperty::ButtonEventType(ButtonEvents::NoButton)),
-	  mParent(parent)
+	  mParent(parent),
+	  tempButton(new VehicleProperty::ButtonEventType(ButtonEvents::NoButton))
 {
 
 	unsigned char numAxes = 0;
