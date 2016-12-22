@@ -26,19 +26,19 @@ AbstractRoutingEngine::~AbstractRoutingEngine()
 }
 
 AsyncPropertyReply::AsyncPropertyReply()
-	:AsyncPropertyRequest(), value(nullptr), success(false), timeoutSource(nullptr), timedout(nullptr)
+	:AsyncPropertyRequest(), value(nullptr), success(false), timedout(nullptr), timeoutSource(nullptr)
 {
 	setTimeout();
 }
 
 AsyncPropertyReply::AsyncPropertyReply(const AsyncPropertyRequest &request)
-	:AsyncPropertyRequest(request), value(NULL), success(false), timeoutSource(nullptr), timedout(nullptr)
+	:AsyncPropertyRequest(request), value(NULL), success(false), timedout(nullptr), timeoutSource(nullptr)
 {
 	setTimeout();
 }
 
 AsyncPropertyReply::AsyncPropertyReply(const AsyncSetPropertyRequest &request)
-	:AsyncPropertyRequest(request), value(request.value), success(false), timeoutSource(nullptr), timedout(nullptr)
+	:AsyncPropertyRequest(request), value(request.value), success(false), timedout(nullptr), timeoutSource(nullptr)
 {
 	setTimeout();
 	if(value)

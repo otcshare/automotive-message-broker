@@ -404,7 +404,7 @@ bool amb::BaseJsonMessageReader::hasJson()
 		incompleteMessage = incompleteMessage.substr(start-1);
 	}
 
-	int end = incompleteMessage.find("\n");
+	unsigned int end = incompleteMessage.find("\n");
 
 	if(end == std::string::npos)
 	{
@@ -578,6 +578,7 @@ bool amb::GetMethodCall::fromJson(const picojson::value &json)
 	MethodCall::fromJson(json);
 
 	value = Object::fromJson(json.get("data").get<picojson::object>());
+	return true;
 }
 
 

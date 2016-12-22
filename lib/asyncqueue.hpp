@@ -34,7 +34,7 @@ class Queue
 {
 public:
 	Queue(bool unique = false, bool blocking = false)
-		:mUnique(unique), mBlocking(blocking)
+		:mBlocking(blocking), mUnique(unique)
 	{
 
 	}

@@ -21,7 +21,7 @@ private:
 
 public:
 	SerialPort()
-		:fd(0), speed(B9600)
+		:speed(B9600), fd(0)
 	{
 
 	}
@@ -35,7 +35,7 @@ public:
 	}
 
 	SerialPort(std::string _tty)
-		:tty(_tty), fd(0)
+		:fd(0), tty(_tty)
 	{
 		speed = B9600;
 	}
@@ -95,7 +95,7 @@ public:
 		char buff;
 		std::string result;
 		int bytesread = 0;
-		while( bytesread = ::read(fd, &buff, 1) > 0 )
+		while((bytesread = ::read(fd, &buff, 1)) > 0 )
 		{
 			result += buff;
 		}

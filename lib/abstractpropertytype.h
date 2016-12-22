@@ -604,11 +604,13 @@ public:
 	BasicPropertyType & operator ++ ()
 	{
 		setValue(basicValue() + 1);
+		return *this;
 	}
 
 	BasicPropertyType & operator -- ()
 	{
 		setValue(basicValue() - 1);
+		return *this;
 	}
 
 	bool operator < (const BasicPropertyType<T>& other) const
@@ -830,6 +832,8 @@ public:
 		picojson::object obj = val.get<picojson::object>();
 
 		obj["value"] = amb::gvariantToJson(toVariant());
+
+		return picojson::value(obj);
 	}
 
 	virtual void fromJson(const picojson::value &json)
@@ -1006,7 +1010,7 @@ public:
 
 		/// TODO: fill this in
 		gsize dictsize = g_variant_n_children(v);
-		for (int i=0;i<dictsize;i++)
+		for (gsize i=0;i<dictsize;i++)
 		{
 			GVariant *childvariant = g_variant_get_child_value(v,i);
 			GVariant *innervariant = g_variant_get_variant(childvariant);

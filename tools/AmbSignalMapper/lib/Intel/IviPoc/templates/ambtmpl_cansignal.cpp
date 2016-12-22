@@ -124,15 +124,19 @@ bool CANSignal::updateFrame(can_frame* frame)
 
     int64_t bits = conversionFunctionTo(val, static_cast<int64_t>(temp));
 
-    *(reinterpret_cast<uint64_t*>(&frame->data[0])) |= toSignalBits(bits);
+	int64_t uvalue;
+	memcpy(&uvalue, frame->data, sizeof(int64_t));
+	uvalue = uvalue | toSignalBits(bits);
+	memcpy(frame->data, &uvalue, sizeof(int64_t));
 
     return true;
 }
 
 int64_t CANSignal::getSignalBits( const can_frame& frame )
 {
-    int64_t bits = *reinterpret_cast<const int64_t* >(frame.data);
     int startbit = signalInfo.m_startbit;
+	int64_t bits;
+	memcpy(&bits, frame.data, sizeof(int64_t));
 
     if (signalInfo.m_byteOrdering == Motorola ) {
         // Motorola

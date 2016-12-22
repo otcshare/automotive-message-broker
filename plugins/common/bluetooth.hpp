@@ -176,7 +176,6 @@ public:
 			return ;
 		}
 
-		gchar* serialDeviceName;
 		if(!org_bluez_serial_call_disconnect_sync(serialDevice,"spp",NULL,&error))
 		{
 			DebugOut(DebugOut::Warning)<<"Error disconnecting bluetooth serial device: "<<address<<" - "<<error->message<<endl;

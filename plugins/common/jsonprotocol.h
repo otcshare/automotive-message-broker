@@ -170,7 +170,7 @@ class MethodReply
 public:
 
 	MethodReply(): MethodReply(nullptr, false) {}
-	MethodReply(std::shared_ptr<T> t, bool success): mMethod(t), methodSuccess(success), err(AsyncPropertyReply::NoError) { }
+	MethodReply(std::shared_ptr<T> t, bool success): methodSuccess(success), mMethod(t), err(AsyncPropertyReply::NoError) { }
 	bool methodSuccess;
 
 	picojson::value toJson()

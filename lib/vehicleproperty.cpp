@@ -137,8 +137,6 @@ const VehicleProperty::Property VehicleProperty::AccelerationX = "AccelerationX"
 const VehicleProperty::Property VehicleProperty::AccelerationY = "AccelerationY";
 const VehicleProperty::Property VehicleProperty::AccelerationZ = "AccelerationZ";
 const VehicleProperty::Property VehicleProperty::MassAirFlow = "MassAirFlow";
-[[deprecated("Deprecated in 0.14.  Use ButtonEventW3C")]]
-const VehicleProperty::Property VehicleProperty::ButtonEvent = "ButtonEvent";
 const VehicleProperty::Property VehicleProperty::AirIntakeTemperature = "AirIntakeTemperature";
 const VehicleProperty::Property VehicleProperty::BatteryVoltage = "BatteryVoltage";
 const VehicleProperty::Property VehicleProperty::BatteryCurrent = "BatteryCurrent";
@@ -330,7 +328,6 @@ VehicleProperty::VehicleProperty()
 	REGISTERPROPERTY(AccelerationY, 0);
 	REGISTERPROPERTY(AccelerationZ, 0);
 	REGISTERPROPERTY(MassAirFlow, 0);
-	REGISTERPROPERTY(ButtonEvent, ButtonEvents::NoButton);
 	REGISTERPROPERTY(AirIntakeTemperature, 0)
 	REGISTERPROPERTY(BatteryVoltage, 0);
 	REGISTERPROPERTY(BatteryCurrent, 0);

@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 #include <listplusplus.h>
 
 VariantType::VariantType(AbstractRoutingEngine* re, VehicleProperty::Property ambPropertyName, std::string propertyName,  Access access)
-	:mPropertyName(propertyName), mAccess(access), mValue(nullptr), mZoneFilter(Zone::None), mUpdateFrequency(0), mInitialized(false)
+	:mZoneFilter(Zone::None), mUpdateFrequency(0), mPropertyName(propertyName), mAccess(access), mValue(nullptr), mInitialized(false)
 {
 	mAmbPropertyName = ambPropertyName;
 	routingEngine = re;
