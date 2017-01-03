@@ -53,7 +53,7 @@ set(QMAKE_INSTALL_PATH "/usr/bin/qmake" CACHE PATH "qmake executable path")
 
 #turn on -fpic/-fpie:
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++14")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpie -pie -std=c++14 -Wall")
 
 if (enable_icecc)
 	include (CMakeForceCompiler)

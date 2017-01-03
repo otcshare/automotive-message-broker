@@ -95,7 +95,7 @@ private:
 			for(auto itr : queue)
 			{
 				std::string objectPath;
-				GDBusConnection* connection;
+				GDBusConnection* connection = NULL;
 				std::string interfaceName;
 				std::string signalName;
 

@@ -103,7 +103,7 @@ public:
 	{
 		clear();
 		gsize dictsize = g_variant_n_children(variant);
-		for (int i=0;i<dictsize;i++)
+		for (gsize i=0;i<dictsize;i++)
 		{
 			GVariant *childvariant = g_variant_get_child_value(variant,i);
 			gsize dictvalsize = g_variant_n_children(childvariant);

@@ -41,12 +41,6 @@ ExampleSink::ExampleSink(AbstractRoutingEngine* engine, map<string, string> conf
 	supportedChanged(engine->supported());
 }
 
-
-PropertyList ExampleSink::subscriptions()
-{
-
-}
-
 void ExampleSink::supportedChanged(const PropertyList & supportedProperties)
 {
 	DebugOut()<<"Support changed!"<<endl;

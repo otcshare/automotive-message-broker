@@ -176,7 +176,7 @@ Location::Location(AmbPluginImpl* source,
 				   std::shared_ptr<AbstractPropertyType> fix,
 				   std::shared_ptr<AbstractPropertyType> satsUsed,
 				   std::shared_ptr<AbstractPropertyType> vspd)
-	:parent(source), isActive(false)
+	:isActive(false), parent(false)
 {
 	mLatitude = lat;
 	mLongitude = lon;
@@ -461,7 +461,7 @@ extern "C" void create(AbstractRoutingEngine* routingengine, map<string, string>
 }
 
 GpsNmeaSource::GpsNmeaSource(AbstractRoutingEngine *re, map<string, string> config, AbstractSource &parent)
-	:AmbPluginImpl(re, config, parent), mUuid("33d86462-1708-4f78-a001-99ea8d55422b"), device(nullptr), bt(nullptr)
+	:AmbPluginImpl(re, config, parent), device(nullptr), mUuid("33d86462-1708-4f78-a001-99ea8d55422b"), bt(nullptr)
 {
 	int baudrate = 0;
 

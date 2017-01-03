@@ -201,6 +201,13 @@ void daemonize()
 	{
 		close(i);	// close all descriptors
 	}
+
+
+	// handle standard I/O
+	i = open("/dev/null", O_RDWR);
+	dup2(i, STDIN_FILENO);
+	dup2(i, STDOUT_FILENO);
+	dup2(i, STDERR_FILENO);
 	{	// handle standard I/O
 		i = open("/dev/null", O_RDWR);
 		dup(i);

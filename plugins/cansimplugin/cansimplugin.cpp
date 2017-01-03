@@ -233,7 +233,7 @@ void CANSimPlugin::createMappingTable(const PropertyList& /*supported*/)
 
 		bool IAmTheSource = contains(sources, uuid());
 
-		if(size == 0 || size == 1 && IAmTheSource) {
+		if(size == 0 || (size == 1 && IAmTheSource)) {
 			if( size == 0 ){
 				// I'm the source from now
 				ZonePropertyType& zonePropType = properties[propertyName];
